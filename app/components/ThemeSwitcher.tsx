@@ -25,8 +25,8 @@ const ThemeSwitcher = () => {
   }
 
   return (
-    <div className="">
-      <button onClick={toggleTheme} className="text-2xl">
+    <div className="mr-2">
+      <button onClick={toggleTheme} className="text-3xl">
         {theme === 'light' ? (
           <FaMoon className="text-gray-700" />
         ) : (

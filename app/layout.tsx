@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className="bg-slate-100 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
         <Providers>
           <main>{children}</main>
-<Footer/>
+          <Footer />
         </Providers>
       </body>
     </html>

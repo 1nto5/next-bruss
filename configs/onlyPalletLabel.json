@@ -1,0 +1,42 @@
+[
+  {
+    "workplace": "136/153",
+    "articles": [
+      {
+        "number": 30354,
+        "name": "Test",
+        "palletSize": 10
+      },
+      {
+        "number": 30355,
+        "name": "Test2",
+        "palletSize": 12
+      },
+      {
+        "number": 30356,
+        "name": "Test3",
+        "palletSize": 14
+      }
+    ]
+  },
+  {
+    "workplace": "144/145",
+    "articles": [
+      {
+        "number": 30354,
+        "name": "Test",
+        "palletSize": 10
+      },
+      {
+        "number": 30355,
+        "name": "Test2",
+        "palletSize": 12
+      },
+      {
+        "number": 30356,
+        "name": "Test3",
+        "palletSize": 14
+      }
+    ]
+  }
+]
