@@ -12,7 +12,7 @@ type Workplace = {
   articles: Article[]
 }
 
-const filePath = path.join(process.cwd(), 'configs', 'onlyPalletLabel.json')
+const filePath = path.join(process.cwd(), 'configs', 'only-pallet-label.json')
 
 export function getWorkplaces(): string[] {
   const fileContents = fs.readFileSync(filePath, 'utf8')

@@ -1,8 +1,18 @@
-import { getWorkplaces } from './lib/workplaces'
-import WorkplaceCard from '../components/WorkplaceCard'
+'use client'
 
-const workplaces: string[] = getWorkplaces()
+import { useAppSelector } from '../redux/store'
 
-export default function Home() {
-  return <WorkplaceCard workplaceName="test" />
+import NumLogIn from '../components/NumLogIn'
+
+export default function OnlyPalletLabel() {
+  const isAuth = useAppSelector(
+    (state) => state.operatorAuthReducer.value.isAuth
+  )
+  return (
+    <>
+      {!isAuth && <NumLogIn />}
+
+      {/* <WorkplaceCard workplaceName="test" /> */}
+    </>
+  )
 }
