@@ -1,4 +1,4 @@
-import Navbar from './components/Navbar'
+import Status from './components/Status'
 
 export const metadata = {
   title: 'Next BRUSS: Only Pallet Label',
@@ -10,10 +10,5 @@ export default function OnlyPalletLabelLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  )
+  return <>{children}</>
 }

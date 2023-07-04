@@ -7,16 +7,12 @@ type InitialState = {
 type AuthState = {
   isAuth: boolean
   persNum: string
-  uid: string
-  isModerator: boolean
 }
 
 const initialState = {
   value: {
     isAuth: false,
-    persNum: 'test',
-    uid: '',
-    isModerator: false,
+    persNum: '1394',
   } as AuthState,
 } as InitialState
 
@@ -32,8 +28,6 @@ export const auth = createSlice({
         value: {
           isAuth: true,
           persNum: action.payload,
-          uid: 'wdasdasda',
-          isModerator: false,
         },
       }
     },

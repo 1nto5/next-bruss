@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <head />
-      <body className="">
+      <body className="bg-slate-50 dark:bg-slate-950">
         <DarkLightProvider>
           <main>{children}</main>
           <Footer />
