@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react'
-import { logIn } from '../redux/features/auth-slice'
+import checkUser from '../utils/checkUser'
+import { logIn } from '../redux/operatorSlice'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../redux/store'
 
@@ -27,9 +28,15 @@ const NumLogIn = () => {
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    dispatch(logIn(persNum))
-    toast.success(`Zalogowano!`)
-    // TODO validate persNum with db and show notifications
+    const operator = checkUser(Number(persNum))
+
+    if (operator) {
+      dispatch(logIn({ persNum: Number(persNum), name: operator.name }))
+      toast.success(`Zalogowano!`)
+      // TODO validate persNum with db and show notifications
+    } else {
+      toast.error(`Operator number ${persNum} does not exist!`)
+    }
   }
 
   const handleClickNumber = (calcNum: number) => {
