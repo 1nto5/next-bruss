@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import operatorReducer from './operatorSlice'
-import checkUser from '../utils/checkUser'
+import articleReducer from './articleSlice' // Import the article reducer
 
 type OperatorState = {
   persNum: number | null
@@ -8,30 +8,41 @@ type OperatorState = {
   loggedIn: boolean
 }
 
-const initialState: OperatorState = {
+type ArticleState = {
+  artNum: number | null
+  artName: string | null
+  palletSize: number | null
+}
+
+const initialOperatorState: OperatorState = {
   persNum: null,
   name: null,
   loggedIn: false,
 }
 
-const preloadedState = (): { user: OperatorState } => {
+const initialArticleState: ArticleState = {
+  artNum: null,
+  artName: null,
+  palletSize: null,
+}
+
+const preloadedState = () => {
   if (typeof window !== 'undefined') {
     const savedState = localStorage.getItem('redux')
     if (savedState) {
-      const { user } = JSON.parse(savedState)
-      const operator = checkUser(user.persNum)
-      if (operator) {
-        user.name = operator.name
-      }
-      return { user }
+      // Parse the state from local storage and return it
+      return JSON.parse(savedState)
     }
   }
-  return { user: initialState }
+
+  // If there's no saved state, return the initial state
+  return { operator: initialOperatorState, article: initialArticleState }
 }
 
 const store = configureStore({
   reducer: {
-    user: operatorReducer,
+    operator: operatorReducer,
+    article: articleReducer, // Add the article reducer
   },
   preloadedState: preloadedState(),
 })

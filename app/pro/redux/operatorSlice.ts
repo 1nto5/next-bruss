@@ -1,20 +1,19 @@
-// store/userSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-interface UserState {
+interface OperatorState {
   persNum: number | null
   name: string | null
   loggedIn: boolean
 }
 
-const initialState: UserState = {
+const initialState: OperatorState = {
   persNum: null,
   name: null,
   loggedIn: false,
 }
 
-const userSlice = createSlice({
-  name: 'user',
+const operatorSlice = createSlice({
+  name: 'operator',
   initialState,
   reducers: {
     logIn: (
@@ -33,5 +32,5 @@ const userSlice = createSlice({
   },
 })
 
-export const { logIn, logOut } = userSlice.actions
-export default userSlice.reducer
+export const { logIn, logOut } = operatorSlice.actions
+export default operatorSlice.reducer

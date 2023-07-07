@@ -13,7 +13,6 @@ const Toast = () => {
       toastOptions={{
         className: '',
         duration: 2500,
-        // limit: 3,
         style: {
           textAlign: 'center',
           fontSize: '1.5rem',

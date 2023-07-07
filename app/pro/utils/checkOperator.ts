@@ -5,9 +5,9 @@ type Operator = {
   name: string
 }
 
-const checkUser = (persNum: number): Operator | null => {
+const checkOperator = (persNum: number): Operator | null => {
   const operator = operators.find((operator) => operator.persNum === persNum)
   return operator || null
 }
 
-export default checkUser
+export default checkOperator

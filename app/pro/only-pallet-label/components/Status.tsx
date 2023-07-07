@@ -1,32 +1,61 @@
-import React from 'react'
+import { useSelector } from 'react-redux'
+import { useAppSelector } from '../../redux/hooks'
 import {
   StatusBox,
   StatusBoxBlinking,
   BoxSeparator,
 } from '@/app/pro/components/StatusElements'
 
-type StatusProps = {
-  operator: string
-  article: string
-  workStage: number
-  box: string
-  palletBox: boolean
-  pallet: string
-}
+const Status: React.FC = () => {
+  const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
+  const articleLogged = useAppSelector((state) => state.article.artNum)
 
-const Status: React.FC<StatusProps> = (props) => {
+  const operatorName = useSelector(
+    (state: { operator: { name: string; persNum: number } }) =>
+      state.operator.name
+  )
+  const operatorNum = useSelector(
+    (state: { operator: { name: string; persNum: number } }) =>
+      state.operator.persNum
+  )
+
+  const formatOperator = (name: string, persNum: number) => {
+    const parts = name.split(' ')
+    if (parts.length === 2) {
+      return `${parts[0]} ${parts[1].charAt(0)}. (${persNum})`
+    }
+    return name
+  }
+
+  const artNum = useSelector(
+    (state: { article: { artNum: number; artName: string } }) =>
+      state.article.artNum
+  )
+  const artName = useSelector(
+    (state: { article: { artNum: number; artName: string } }) =>
+      state.article.artName
+  )
+
   return (
-    <div className=" mb-10 flex h-40 flex-row items-center justify-between bg-slate-100 shadow-md dark:bg-slate-800">
-      <StatusBox boxName="operator:" value={props.operator} />
+    <div className="flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800">
+      <StatusBox
+        boxName="operator:"
+        value={
+          operatorLogged
+            ? formatOperator(operatorName, operatorNum)
+            : 'nie zalogowany'
+        }
+      />
       <BoxSeparator />
-      <StatusBox boxName="artykuł:" value={props.article} />
+      <StatusBox
+        boxName="artykuł:"
+        value={articleLogged ? `${artName} (${artNum})` : 'nie wybrany'}
+      />
       <BoxSeparator />
-
-      {props.workStage === 1 ? (
-        <StatusBoxBlinking boxName="na palecie:" value={121} />
-      ) : (
-        <StatusBox boxName="na palecie:" value={123} />
-      )}
+      <StatusBox
+        boxName="na palecie:"
+        value={articleLogged ? `${artName} (${artNum})` : 'brak'}
+      />
     </div>
   )
 }

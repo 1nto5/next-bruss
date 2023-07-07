@@ -9,7 +9,7 @@ export const StatusBox: React.FC<StatusBoxProps> = ({ boxName, value }) => {
       <p className="text-xl font-thin tracking-widest text-slate-900 dark:text-slate-100">
         {boxName}
       </p>
-      <p className="text-6xl text-slate-900 dark:text-slate-50">{value}</p>
+      <p className="text-3xl text-slate-900 dark:text-slate-50">{value}</p>
     </div>
   )
 }
@@ -19,11 +19,11 @@ export const StatusBoxBlinking: React.FC<StatusBoxProps> = ({
   value,
 }) => {
   return (
-    <div className="ml-auto mr-auto box-border p-20 text-center">
-      <p className="text-xl font-thin tracking-widest text-slate-900 dark:text-slate-100">
+    <div className="ml-auto mr-auto box-border text-center">
+      <p className="text-3xl font-thin tracking-widest text-slate-900 dark:text-slate-100">
         {boxName}
       </p>
-      <p className="animate-pulse text-6xl text-bruss">{value}</p>
+      <p className="animate-pulse text-xl text-bruss">{value}</p>
     </div>
   )
 }
