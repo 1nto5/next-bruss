@@ -4,7 +4,7 @@ export async function connectToMongo(
   collectionName: string
 ): Promise<Collection> {
   const client = new MongoClient(process.env.MONGO_URI as string)
-  const dbName = 'yourDbName' // Replace with your DB name
+  const dbName = 'next_bruss' // Replace with your DB name
 
   try {
     await client.connect()

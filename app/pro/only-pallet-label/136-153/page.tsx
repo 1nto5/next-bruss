@@ -5,7 +5,7 @@ import { useAppSelector } from '../../redux/hooks'
 import Status from '../components/Status'
 import NumLogIn from '../../components/NumLogIn'
 import ArticleSelector from '../components/ArticleSelector'
-import ScanHydraBatch from '../../components/ScanHydraBatch'
+import ScanHydraBatch from '../components/ScanHydraBatch'
 
 export default function OnlyPalletLabel() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
@@ -16,7 +16,7 @@ export default function OnlyPalletLabel() {
       {operatorLogged && <Status />}
       {!operatorLogged && <NumLogIn />}
       {!articleLogged && operatorLogged && <ArticleSelector />}
-      <ScanHydraBatch />
+      {articleLogged && operatorLogged && <ScanHydraBatch />}
     </div>
   )
 }

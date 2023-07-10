@@ -5,7 +5,8 @@
       {
         "number": 30354,
         "name": "M-488-K-2-G",
-        "palletSize": 10
+        "palletSize": 10,
+        "hydraProcess": "50"
       },
       {
         "number": 30355,
