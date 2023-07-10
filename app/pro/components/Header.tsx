@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {operatorLogged && (
           <Button text="wyloguj operatora" onClick={handleLogoutOperator} />
         )}
-        {articleLogged && (
+        {articleLogged && operatorLogged && (
           <Button text="zmień artykuł" onClick={handleLogoutArticle} />
         )}
       </div>

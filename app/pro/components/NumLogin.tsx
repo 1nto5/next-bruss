@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, FormEvent } from 'react'
 import checkOperator from '../utils/checkOperator'
 import { logIn } from '../redux/operatorSlice'
@@ -40,7 +42,7 @@ const NumLogIn = () => {
       dispatch(logIn({ persNum: Number(persNum), name: operator.name }))
       toast.success(`${persNum} zalogowany!`)
     } else {
-      toast.error(`${persNum} nie istnieje!`)
+      toast(`${persNum} nie istnieje!`)
     }
   }
 

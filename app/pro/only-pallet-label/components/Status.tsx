@@ -52,10 +52,7 @@ const Status: React.FC = () => {
         value={articleLogged ? `${artName} (${artNum})` : 'nie wybrany'}
       />
       <BoxSeparator />
-      <StatusBox
-        boxName="na palecie:"
-        value={articleLogged ? `${artName} (${artNum})` : 'brak'}
-      />
+      <StatusBox boxName="na palecie:" value={'x/y'} />
     </div>
   )
 }
