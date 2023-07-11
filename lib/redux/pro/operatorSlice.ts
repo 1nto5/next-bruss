@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface OperatorState {
-  persNum: number | null
+  personalNumber: number | null
   name: string | null
   loggedIn: boolean
 }
 
 const initialState: OperatorState = {
-  persNum: null,
+  personalNumber: null,
   name: null,
   loggedIn: false,
 }
@@ -18,14 +18,14 @@ const operatorSlice = createSlice({
   reducers: {
     logIn: (
       state,
-      action: PayloadAction<{ persNum: number; name: string }>
+      action: PayloadAction<{ personalNumber: number; name: string }>
     ) => {
-      state.persNum = action.payload.persNum
+      state.personalNumber = action.payload.personalNumber
       state.name = action.payload.name
       state.loggedIn = true
     },
     logOut: (state) => {
-      state.persNum = null
+      state.personalNumber = null
       state.name = null
       state.loggedIn = false
     },

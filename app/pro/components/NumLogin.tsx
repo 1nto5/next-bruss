@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import checkOperator from '../utils/checkOperator'
-import { logIn } from '../redux/operatorSlice'
+import checkOperator from '@/lib/utils/pro/checkOperator'
+import { logIn } from '@/lib/redux/pro/operatorSlice'
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../redux/store'
+import { AppDispatch } from '../../../lib/redux/pro/store'
 
 import toast from 'react-hot-toast'
 
@@ -24,34 +24,36 @@ const NumberButton: React.FC<NumberButtonProps> = ({ onClick, value }) => (
 )
 
 const NumLogIn = () => {
-  const [persNum, setPersNum] = useState('')
+  const [personalNumber, setPersonalNumber] = useState('')
 
   const dispatch = useDispatch<AppDispatch>()
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!persNum) {
-      toast.error('Podaj numer personalny!')
+    if (!personalNumber) {
+      toast.error('Nie wpisano numeru!', { id: 'error' })
       return
     }
 
-    const operator = checkOperator(Number(persNum))
+    const operator = checkOperator(Number(personalNumber))
 
     if (operator) {
-      dispatch(logIn({ persNum: Number(persNum), name: operator.name }))
-      toast.success(`${persNum} zalogowany!`)
+      dispatch(
+        logIn({ personalNumber: Number(personalNumber), name: operator.name })
+      )
+      toast.success(`${personalNumber} zalogowany!`, { id: 'success' })
     } else {
-      toast(`${persNum} nie istnieje!`)
+      toast.error(`${personalNumber} nie istnieje!`, { id: 'error' })
     }
   }
 
   const handleClickNumber = (calcNum: number) => {
-    setPersNum(persNum + calcNum.toString())
+    setPersonalNumber(personalNumber + calcNum.toString())
   }
 
   const handleClickClear = () => {
-    setPersNum('')
+    setPersonalNumber('')
   }
 
   return (
@@ -62,8 +64,8 @@ const NumLogIn = () => {
       <input
         className="font mt-4 h-20 w-3/12 rounded-lg bg-slate-100 text-center text-4xl text-slate-900 shadow-sm outline-none dark:bg-slate-700 dark:text-slate-100"
         type="text"
-        value={persNum}
-        onChange={(e) => setPersNum(e.target.value)}
+        value={personalNumber}
+        onChange={(e) => setPersonalNumber(e.target.value)}
         placeholder="nr personalny"
         autoFocus
       />

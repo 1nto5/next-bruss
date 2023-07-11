@@ -1,48 +1,75 @@
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { saveHydraBatch } from '../actions'
-import { startTransition, useTransition } from 'react'
+import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 
+// Component to scan Hydra Batch
 export default function ScanHydraBatch() {
+  // Use the article number from the Redux state
+  const articleNumber = useSelector(
+    (state: { article: { articleNumber: number; articleName: number } }) =>
+      state.article.articleNumber
+  )
+
+  // Use the operator number from the Redux state
+  const operatorPersonalNumber = useSelector(
+    (state: {
+      operator: { personalNumber: number; name: string; loggedIn: boolean }
+    }) => state.operator.personalNumber
+  )
+
+  // React transition state
+  const [isPending, startTransition] = useTransition()
+
+  // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('')
 
-  const handleEnter = async (event) => {
+  // Handle key press on input (only interested in 'Enter')
+  const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
       return
     }
 
+    // Start transition (for loading state)
     startTransition(async () => {
-      toast.loading('Zapisywanie...')
+      toast.loading('Przetwarzanie...', { id: 'loading' })
 
       try {
-        const result = await saveHydraBatch(hydraBatch)
-        toast.dismiss() // Dismiss the loading toast here
+        const result = await saveHydraBatch(
+          hydraBatch,
+          articleNumber,
+          operatorPersonalNumber
+        )
 
-        if (result.status === 'saved') {
-          toast.success('Hydra batch saved successfully!', {
-            id: 'success',
-          })
-        }
-      } catch (err) {
+        const status = result?.status
         toast.dismiss()
 
-        if (err.message === 'exists') {
-          toast.error('Batch istnieje!', {
-            id: 'error',
-          })
-        } else if (err.message === 'invalid') {
-          toast.error('Batch niepoprawny!', {
-            id: 'error',
-          })
-        } else if (err.message === 'invalid') {
-          toast.error('Batch niepoprawny!', {
-            id: 'error',
-          })
-        } else {
-          toast.error('Failed to save Hydra batch!', {
-            id: 'error',
-          })
+        // Display toast message based on the result status
+        switch (status) {
+          case 'saved':
+            toast.success('Batch OK!', { id: 'success' })
+            break
+          case 'exists':
+            toast.error('Batch istnieje!', { id: 'error' })
+            break
+          case 'invalid':
+            toast.error('Batch niepoprawny!', { id: 'error' })
+            break
+          case 'wrong article':
+            toast.error('Błędny artykuł!', { id: 'error' })
+            break
+          case 'wrong quantity':
+            toast.error('Błędna ilość!', { id: 'error' })
+            break
+          case 'wrong process':
+            toast.error('Błędny proces!', { id: 'error' })
+            break
+          default:
+            toast.error('Zgłość się do IT!', { id: 'error' })
         }
+      } catch (err) {
+        toast.error('Zgłoś się do IT!', { id: 'error' })
       }
     })
   }
@@ -55,7 +82,7 @@ export default function ScanHydraBatch() {
         onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}
         placeholder="HYDRA batch"
-        autoFocus={true}
+        autoFocus
       />
     </div>
   )

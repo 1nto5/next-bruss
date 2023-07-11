@@ -1,9 +1,9 @@
 'use client'
 
 import { useDispatch } from 'react-redux'
-import { logOut } from '../redux/operatorSlice'
-import { clearArticle } from '../redux/articleSlice'
-import { useAppSelector } from '../redux/hooks'
+import { logOut } from '@/lib/redux/pro/operatorSlice'
+import { clearArticle } from '@/lib/redux/pro/articleSlice'
+import { useAppSelector } from '@/lib/redux/pro/hooks'
 import Button from './Button'
 
 import toast from 'react-hot-toast'
@@ -16,17 +16,17 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const dispatch = useDispatch()
 
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
-  const articleLogged = useAppSelector((state) => state.article.artNum)
+  const articleLogged = useAppSelector((state) => state.article.articleNumber)
 
   const handleLogoutOperator = () => {
-    if (window.confirm('Operator zostanie wylogowany! Kontynuować?')) {
+    if (window.confirm('Wylogować operatora?')) {
       dispatch(logOut()) // Logout operator
       toast.error('Wylogowano!')
     }
   }
 
   const handleLogoutArticle = () => {
-    if (window.confirm('Artykuł zostanie wylogowany! Kontynuować?')) {
+    if (window.confirm('Wylogować artykuł?')) {
       dispatch(clearArticle()) // Clear article
       toast.error('Wylogowano artykuł!')
     }

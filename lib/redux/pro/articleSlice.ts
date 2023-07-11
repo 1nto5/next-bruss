@@ -1,15 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type ArticleState = {
-  artNum: number | null
-  artName: string | null
-  palletSize: number | null
+  articleNumber: number | null
+  articleName: string | null
 }
 
 const initialArticleState: ArticleState = {
-  artNum: null,
-  artName: null,
-  palletSize: null,
+  articleNumber: null,
+  articleName: null,
 }
 
 const articleSlice = createSlice({
@@ -19,19 +17,16 @@ const articleSlice = createSlice({
     setArticle: (
       state,
       action: PayloadAction<{
-        artNum: number
-        artName: string
-        palletSize: number
+        articleNumber: number
+        articleName: string
       }>
     ) => {
-      state.artNum = action.payload.artNum
-      state.artName = action.payload.artName
-      state.palletSize = action.payload.palletSize
+      state.articleNumber = action.payload.articleNumber
+      state.articleName = action.payload.articleName
     },
     clearArticle: (state) => {
-      state.artNum = null
-      state.artName = null
-      state.palletSize = null
+      state.articleNumber = null
+      state.articleName = null
     },
   },
 })

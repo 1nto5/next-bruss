@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { setArticle } from '@/app/pro/redux/articleSlice'
+import { setArticle } from '@/lib/redux/pro/articleSlice'
 import { usePathname } from 'next/navigation'
 import config from '@/configs/only-pallet-label.json'
 import toast from 'react-hot-toast'
@@ -10,19 +10,14 @@ const ArticleSelector: React.FC = () => {
 
   const articles = config.find((data) => data.workplace === workplace)?.articles
 
-  const handleClick = (article: {
-    number: number
-    name: string
-    palletSize: number
-  }) => {
+  const handleClick = (article: { number: number; name: string }) => {
     dispatch(
       setArticle({
-        artNum: article.number,
-        artName: article.name,
-        palletSize: article.palletSize,
+        articleNumber: article.number,
+        articleName: article.name,
       })
     )
-    toast.success('Artykuł zalogowany!')
+    toast.success('Artykuł zalogowany!', { id: 'success' })
   }
 
   return (

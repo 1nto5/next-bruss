@@ -1,39 +1,40 @@
 import { useSelector } from 'react-redux'
-import { useAppSelector } from '../../redux/hooks'
+import { useAppSelector } from '@/lib/redux/pro/hooks'
 import {
   StatusBox,
   StatusBoxBlinking,
   BoxSeparator,
 } from '@/app/pro/components/StatusElements'
+import { getQuantityOnPallet } from '../actions'
 
-const Status: React.FC = () => {
+export default function Status() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
-  const articleLogged = useAppSelector((state) => state.article.artNum)
+  const articleLogged = useAppSelector((state) => state.article.articleNumber)
 
   const operatorName = useSelector(
-    (state: { operator: { name: string; persNum: number } }) =>
+    (state: { operator: { name: string; personalNumber: number } }) =>
       state.operator.name
   )
-  const operatorNum = useSelector(
-    (state: { operator: { name: string; persNum: number } }) =>
-      state.operator.persNum
+  const operatorNumber = useSelector(
+    (state: { operator: { name: string; personalNumber: number } }) =>
+      state.operator.personalNumber
   )
 
-  const formatOperator = (name: string, persNum: number) => {
+  const formatOperator = (name: string, personalNumber: number) => {
     const parts = name.split(' ')
     if (parts.length === 2) {
-      return `${parts[0]} ${parts[1].charAt(0)}. (${persNum})`
+      return `${parts[0]} ${parts[1].charAt(0)}. (${personalNumber})`
     }
     return name
   }
 
-  const artNum = useSelector(
-    (state: { article: { artNum: number; artName: string } }) =>
-      state.article.artNum
+  const articleNumber = useSelector(
+    (state: { article: { articleNumber: number; articleName: string } }) =>
+      state.article.articleNumber
   )
-  const artName = useSelector(
-    (state: { article: { artNum: number; artName: string } }) =>
-      state.article.artName
+  const articleName = useSelector(
+    (state: { article: { articleNumber: number; articleName: string } }) =>
+      state.article.articleName
   )
 
   return (
@@ -42,19 +43,19 @@ const Status: React.FC = () => {
         boxName="operator:"
         value={
           operatorLogged
-            ? formatOperator(operatorName, operatorNum)
+            ? formatOperator(operatorName, operatorNumber)
             : 'nie zalogowany'
         }
       />
       <BoxSeparator />
       <StatusBox
         boxName="artykuł:"
-        value={articleLogged ? `${artName} (${artNum})` : 'nie wybrany'}
+        value={
+          articleLogged ? `${articleName} (${articleNumber})` : 'nie wybrany'
+        }
       />
       <BoxSeparator />
-      <StatusBox boxName="na palecie:" value={'x/y'} />
+      <StatusBox boxName="na palecie:" value={'test'} />
     </div>
   )
 }
-
-export default Status

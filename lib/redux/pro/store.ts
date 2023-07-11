@@ -3,27 +3,25 @@ import operatorReducer from './operatorSlice'
 import articleReducer from './articleSlice' // Import the article reducer
 
 type OperatorState = {
-  persNum: number | null
+  personalNumber: number | null
   name: string | null
   loggedIn: boolean
 }
 
 type ArticleState = {
-  artNum: number | null
-  artName: string | null
-  palletSize: number | null
+  articleNumber: number | null
+  articleName: string | null
 }
 
 const initialOperatorState: OperatorState = {
-  persNum: null,
+  personalNumber: null,
   name: null,
   loggedIn: false,
 }
 
 const initialArticleState: ArticleState = {
-  artNum: null,
-  artName: null,
-  palletSize: null,
+  articleNumber: null,
+  articleName: null,
 }
 
 const preloadedState = () => {
@@ -42,7 +40,7 @@ const preloadedState = () => {
 const store = configureStore({
   reducer: {
     operator: operatorReducer,
-    article: articleReducer, // Add the article reducer
+    article: articleReducer,
   },
   preloadedState: preloadedState(),
 })

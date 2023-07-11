@@ -1,4 +1,4 @@
-import { ReduxProvider } from './redux//provider'
+import { ReduxProvider } from '@/lib/redux/pro/provider'
 
 import Toast from './components/Toast'
 

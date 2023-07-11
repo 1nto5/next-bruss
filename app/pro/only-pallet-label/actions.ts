@@ -1,80 +1,151 @@
 'use server'
-import { connectToMongo } from '../utils/mongoConnector'
+import { connectToMongo } from '@/lib/mongo/connector'
+import { headers } from 'next/headers'
+import { configDataOnlyPalletLabel as configData } from '@/lib/utils/pro/configData'
+import { on } from 'events'
 
-export async function saveHydraBatch(hydraQr: string) {
-  //   if (hydra.length < 34 || !hydra.includes("|")) {
-  //     toast.error("NOK QR!");
-  //     playNotification("nok");
-  //     return;
-  //   }
-  //   const splittedHydra = hydra.split("|");
-  //   const hydraArticle =
-  //     splittedHydra[0].length === 7 ? splittedHydra[0].substr(2) : "";
-  //   const hydraBatch = splittedHydra[3]
-  //     ? splittedHydra[3].substr(2).toUpperCase()
-  //     : "";
-  //   const hydraQuantity = splittedHydra[2]
-  //     ? parseInt(splittedHydra[2].substr(2))
-  //     : "";
-  //   const hydraProcess = splittedHydra[1] ? splittedHydra[1].substr(2) : "";
-  //   if (hydraArticle !== currentArticleRef.current) {
-  //     toast.error("NOK artykuł!");
-  //     playNotification("nok");
-  //     return;
-  //   }
-  //   if (hydraQuantity !== inBox) {
-  //     toast.error("NOK ilość!");
-  //     playNotification("nok");
-  //     return;
-  //   }
-  //   if (hydraProcess !== "050" && hydraProcess !== "090") {
-  //     // TODO proces from config
-  //     toast.error("NOK proces!");
-  //     playNotification("nok");
-  //     return;
-  //   }
-  //   saveHydra(hydraBatch);
-  // }
-  // }, [hydraInputted]);
+// Define Types
+type ArticleConfig = {
+  number: number
+  name: string
+  palletSize: number
+  boxSize: number
+  hydraProcess: string[]
+}
 
+type WorkplaceConfig = {
+  workplace: string
+  articles: ArticleConfig[]
+}
+
+// Save Hydra Batch function
+export async function saveHydraBatch(
+  hydraQr: string,
+  articleNumber: number,
+  operatorPersonalNumber: number
+) {
   try {
+    const referer = headers().get('referer')
+    const workplace = referer?.split('/').pop()
+
+    // Find workplace and article configuration
+    const workplaceConfig = configData.find(
+      (w: WorkplaceConfig) => w.workplace === workplace
+    )
+    const articleConfig = workplaceConfig?.articles.find(
+      (a: ArticleConfig) => a.number === articleNumber
+    )
+
+    // // Validate hydra QR code
     if (hydraQr.length < 34 || !hydraQr.includes('|')) {
-      throw new Error('invalid')
+      return { status: 'invalid' }
     }
 
-    const splittedHydra = hydraQr.split('|')
+    // // Split QR code
+    const splitHydraQr = hydraQr.split('|')
+    const qrArticleNumber =
+      splitHydraQr[0].length === 7 && Number(splitHydraQr[0].substr(2))
 
-    const hydraArticle =
-      splittedHydra[0].length === 7 ? splittedHydra[0].substr(2) : ''
+    // // Check article number
+    if (qrArticleNumber !== articleNumber) {
+      return { status: 'wrong article' }
+    }
 
-    const hydraBatch = splittedHydra[3]
-      ? splittedHydra[3].substr(2).toUpperCase()
-      : ''
+    // Check quantity
+    const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2))
+    if (qrQuantity !== articleConfig.boxSize) {
+      return { status: 'wrong quantity' }
+    }
 
-    const hydraQuantity = splittedHydra[2]
-      ? parseInt(splittedHydra[2].substr(2))
-      : ''
+    // Check process
+    const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2)
+    if (!articleConfig.hydraProc.includes(qrProcess)) {
+      return { status: 'wrong process' }
+    }
 
-    const hydraProcess = splittedHydra[1] ? splittedHydra[1].substr(2) : ''
+    // Extract batch from QR code
+    const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase()
 
-    const collection = await connectToMongo('only_pallet_label') // Pass the collection name to connectToMongo / connect Mongo :)
+    // Connect to MongoDB
+    const collection = await connectToMongo('only_pallet_label')
 
     // Check for existing data
-    const existingData = await collection.findOne({
-      hydra_batch: hydraBatch,
+    const existingData = await collection.findOne({ hydra_batch: qrBatch })
+    if (existingData) {
+      return { status: 'exists' }
+    }
+
+    // Insert data
+    const insertResult = await collection.insertOne({
+      status: 'pallet',
+      hydra_batch: qrBatch,
+      workplace: workplace,
+      article: articleNumber,
+      operator: operatorPersonalNumber,
+      time: new Date(),
     })
 
-    if (existingData) {
-      throw new Error('exists')
-    }
-
-    // Insert or update data
-    const result = await collection.insertOne({ hydra_batch: hydraBatch }) // inserting the hydraBatch to the collection
-
-    if (result) {
-      return { status: 'saved' } // return status
+    if (insertResult) {
+      return { status: 'saved' }
     }
   } catch (error) {
-    throw error // Rethrow the error
+    console.error(error)
+    throw new Error('An error occurred while saving the hydra batch.')
+  }
+}
+
+// Function to get the number of documents with a specific status, article number, and workplace
+async function countOnPallet(workplace: string, articleNumber: number) {
+  try {
+    // Connect to MongoDB
+    const collection = await connectToMongo('only_pallet_label')
+
+    // Query the collection
+    const count = await collection.countDocuments({
+      status: 'pallet',
+      workplace: workplace,
+      article: articleNumber,
+    })
+
+    // Return the count
+    return count
+  } catch (error) {
+    console.error(error)
+    throw new Error('An error occurred while counting the documents.')
+  }
+}
+
+// Function to get the pallet size for a specific workplace and article
+async function getPalletSize(workplace: string, articleNumber: number) {
+  // Find the workplace and article configuration
+  const workplaceConfig = configData.find(
+    (w: WorkplaceConfig) => w.workplace === workplace
+  )
+  const articleConfig = workplaceConfig?.articles.find(
+    (a: ArticleConfig) => a.number === articleNumber
+  )
+
+  // Return the pallet size
+  return articleConfig?.palletSize
+}
+
+// Function to calculate and return the quantity on pallet / pallet size
+export async function getQuantityOnPallet(articleNumber: number) {
+  try {
+    // Call the countOnPallet and getPalletSize functions
+    const count = await countOnPallet('136-153', articleNumber)
+    const size = await getPalletSize('136-153', articleNumber)
+
+    // Calculate the quantity
+    const onPallet = `${count} / ${size}`
+
+    // Return the quantity as a string
+    console.log(onPallet)
+    return onPallet
+  } catch (error) {
+    console.error(error)
+    throw new Error(
+      'An error occurred while calculating the quantity on the pallet.'
+    )
   }
 }
