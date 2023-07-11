@@ -20,10 +20,10 @@ export const StatusBoxBlinking: React.FC<StatusBoxProps> = ({
 }) => {
   return (
     <div className="ml-auto mr-auto box-border text-center">
-      <p className="text-3xl font-thin tracking-widest text-slate-900 dark:text-slate-100">
+      <p className="text-xl font-thin tracking-widest text-slate-900 dark:text-slate-100">
         {boxName}
       </p>
-      <p className="animate-pulse text-xl text-bruss">{value}</p>
+      <p className="animate-pulse text-3xl text-bruss">{value}</p>
     </div>
   )
 }

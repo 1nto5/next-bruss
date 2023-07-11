@@ -130,18 +130,14 @@ async function getPalletSize(workplace: string, articleNumber: number) {
 }
 
 // Function to calculate and return the quantity on pallet / pallet size
-export async function getQuantityOnPallet(articleNumber: number) {
+export async function getOnPalletAndPalletSize(articleNumber: number) {
   try {
     // Call the countOnPallet and getPalletSize functions
     const count = await countOnPallet('136-153', articleNumber)
     const size = await getPalletSize('136-153', articleNumber)
 
-    // Calculate the quantity
-    const onPallet = `${count} / ${size}`
-
-    // Return the quantity as a string
-    console.log(onPallet)
-    return onPallet
+    // Return the quantity and pallet size as an object
+    return { onPallet: count, palletSize: size }
   } catch (error) {
     console.error(error)
     throw new Error(

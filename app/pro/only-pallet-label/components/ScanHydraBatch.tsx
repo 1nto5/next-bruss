@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { updateLastScan, updateWorkStage } from '@/lib/redux/pro/workStageSlice'
 import { saveHydraBatch } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
@@ -25,6 +26,8 @@ export default function ScanHydraBatch() {
   // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('')
 
+  const dispatch = useDispatch()
+
   // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
@@ -48,6 +51,8 @@ export default function ScanHydraBatch() {
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
+            const currentTime = new Date().toISOString()
+            dispatch(updateLastScan(currentTime))
             toast.success('Batch OK!', { id: 'success' })
             break
           case 'exists':

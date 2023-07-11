@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import operatorReducer from './operatorSlice'
-import articleReducer from './articleSlice' // Import the article reducer
+import articleReducer from './articleSlice'
+import workStageReducer from './workStageSlice'
 
 type OperatorState = {
   personalNumber: number | null
@@ -11,6 +12,11 @@ type OperatorState = {
 type ArticleState = {
   articleNumber: number | null
   articleName: string | null
+}
+
+type WorkStageState = {
+  lastScan: string | null
+  workStage: number | null
 }
 
 const initialOperatorState: OperatorState = {
@@ -24,6 +30,11 @@ const initialArticleState: ArticleState = {
   articleName: null,
 }
 
+const initialWorkStageState: WorkStageState = {
+  lastScan: null,
+  workStage: null,
+}
+
 const preloadedState = () => {
   if (typeof window !== 'undefined') {
     const savedState = localStorage.getItem('redux')
@@ -34,20 +45,31 @@ const preloadedState = () => {
   }
 
   // If there's no saved state, return the initial state
-  return { operator: initialOperatorState, article: initialArticleState }
+  return {
+    operator: initialOperatorState,
+    article: initialArticleState,
+    workStage: initialWorkStageState,
+  }
 }
 
 const store = configureStore({
   reducer: {
     operator: operatorReducer,
     article: articleReducer,
+    workStage: workStageReducer,
   },
   preloadedState: preloadedState(),
 })
 
 // Middlewares
 store.subscribe(() => {
-  localStorage.setItem('redux', JSON.stringify(store.getState()))
+  const state = store.getState()
+  const savableState = {
+    operator: state.operator,
+    article: state.article,
+  }
+
+  localStorage.setItem('redux', JSON.stringify(savableState))
 })
 
 export type AppDispatch = typeof store.dispatch
