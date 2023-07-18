@@ -31,6 +31,10 @@ export default function OnlyPalletLabel() {
   const [isPending, startTransition] = useTransition()
 
   useEffect(() => {
+    dispatch(togglePending(isPending))
+  }, [dispatch, isPending])
+
+  useEffect(() => {
     startTransition(async () => {
       try {
         if (articleLogged) {
@@ -59,7 +63,7 @@ export default function OnlyPalletLabel() {
 
   return (
     <div>
-      {operatorLogged && <Status isPending={isPending} />}
+      {operatorLogged && <Status />}
       {!operatorLogged && <NumLogIn />}
       {!articleLogged && operatorLogged && (
         <ArticleSelector workplace={pathWorkplace} />

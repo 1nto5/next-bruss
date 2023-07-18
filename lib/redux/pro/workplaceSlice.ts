@@ -20,8 +20,8 @@ const workplaceSlice = createSlice({
   name: 'workplaceStatus',
   initialState: initialWorkplaceStatusState,
   reducers: {
-    togglePending: (state) => {
-      state.isPending = !state.isPending
+    togglePending: (state, action: PayloadAction<boolean>) => {
+      state.isPending = action.payload
     },
     updateOnPallet: (state, action: PayloadAction<number>) => {
       state.onPallet = action.payload

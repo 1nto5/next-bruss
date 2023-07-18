@@ -7,11 +7,7 @@ import {
   StatusBoxSkeleton,
 } from '@/app/pro/components/StatusElements'
 
-type StatusProps = {
-  isPending: boolean
-}
-
-export default function Status({ isPending }: StatusProps) {
+export default function Status() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
 
@@ -25,6 +21,7 @@ export default function Status({ isPending }: StatusProps) {
   const isFull = useAppSelector((state) => state.workplace.isFull)
   const onPallet = useAppSelector((state) => state.workplace.onPallet)
   const palletSize = useAppSelector((state) => state.workplace.palletSize)
+  const isPending = useAppSelector((state) => state.workplace.isPending)
 
   const formatOperator = (name: string, personalNumber: number) => {
     const parts = name.split(' ')
