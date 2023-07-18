@@ -1,11 +1,13 @@
 import { useDispatch } from 'react-redux'
 import { setArticle } from '@/lib/redux/pro/articleSlice'
-import { usePathname } from 'next/navigation'
 import config from '@/configs/only-pallet-label.json'
 import toast from 'react-hot-toast'
 
-const ArticleSelector: React.FC = () => {
-  const workplace = usePathname().split('/').pop() || ''
+type StatusProps = {
+  workplace: string
+}
+
+export default function ArticleSelector({ workplace }: StatusProps) {
   const dispatch = useDispatch()
 
   const articles = config.find((data) => data.workplace === workplace)?.articles
@@ -37,5 +39,3 @@ const ArticleSelector: React.FC = () => {
     </div>
   )
 }
-
-export default ArticleSelector

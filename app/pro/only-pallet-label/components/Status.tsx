@@ -6,12 +6,23 @@ import {
   BoxSeparator,
   StatusBoxSkeleton,
 } from '@/app/pro/components/StatusElements'
-import { getOnPalletAndPalletSize } from '../actions'
 
-export default function Status() {
+type StatusProps = {
+  isPending: boolean
+  onPallet: number
+  palletSize: number
+  isFull: boolean
+}
+
+export default function Status({
+  isPending,
+  onPallet,
+  palletSize,
+  isFull,
+}: StatusProps) {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
-  const lastScan = useAppSelector((state) => state.workStage.lastScan)
+
   const operatorName = useAppSelector((state) => state.operator.name)
   const operatorNumber = useAppSelector(
     (state) => state.operator.personalNumber
@@ -27,31 +38,6 @@ export default function Status() {
     }
     return name
   }
-
-  // State for the quantity on a pallet
-  const [palletStatus, setPalletStatus] = useState<{
-    onPallet: number
-    palletSize: number
-  } | null>(null)
-
-  // Use transition to display a loading state while fetching the quantity on a pallet
-  const [isPending, startTransition] = useTransition()
-
-  // Effect to fetch the quantity on a pallet whenever lastScan changes
-  useEffect(() => {
-    startTransition(async () => {
-      try {
-        if (articleNumber && articleNumber !== 0) {
-          const pallet = await getOnPalletAndPalletSize(articleNumber)
-          setPalletStatus(pallet)
-        } else {
-          setPalletStatus(null)
-        }
-      } catch (error) {
-        console.error('Failed to fetch quantity on a pallet:', error)
-      }
-    })
-  }, [articleNumber, lastScan])
 
   return (
     <div className="flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800">
@@ -73,19 +59,15 @@ export default function Status() {
       <BoxSeparator />
       {isPending ? (
         <StatusBoxSkeleton boxName="na palecie:" value="x/y" />
-      ) : palletStatus && palletStatus.onPallet === palletStatus.palletSize ? (
+      ) : isFull ? (
         <StatusBoxBlinking
           boxName="na palecie:"
-          value={`${palletStatus.onPallet} / ${palletStatus.palletSize}`}
+          value={`${onPallet} / ${palletSize}`}
         />
       ) : (
         <StatusBox
           boxName="na palecie:"
-          value={
-            palletStatus
-              ? `${palletStatus.onPallet} / ${palletStatus.palletSize}`
-              : 'brak'
-          }
+          value={`${onPallet} / ${palletSize}`}
         />
       )}
     </div>

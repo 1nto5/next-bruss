@@ -5,8 +5,12 @@ import { saveHydraBatch } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 
+type StatusProps = {
+  workplace: string
+}
+
 // Component to scan Hydra Batch
-export default function ScanHydraBatch() {
+export default function ScanHydraBatch({ workplace }: StatusProps) {
   // Use the article number from the Redux state
   const articleNumber = useSelector(
     (state: { article: { articleNumber: number; articleName: number } }) =>
@@ -41,6 +45,7 @@ export default function ScanHydraBatch() {
       try {
         const result = await saveHydraBatch(
           hydraBatch,
+          workplace,
           articleNumber,
           operatorPersonalNumber
         )
@@ -51,8 +56,7 @@ export default function ScanHydraBatch() {
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
-            const currentTime = new Date().toISOString()
-            dispatch(updateLastScan(currentTime))
+            dispatch(updateLastScan(hydraBatch))
             toast.success('Batch OK!', { id: 'success' })
             break
           case 'exists':
@@ -69,6 +73,9 @@ export default function ScanHydraBatch() {
             break
           case 'wrong process':
             toast.error('Błędny proces!', { id: 'error' })
+            break
+          case 'full pallet':
+            toast.error('Pełna paleta!', { id: 'error' })
             break
           default:
             toast.error('Zgłość się do IT!', { id: 'error' })
