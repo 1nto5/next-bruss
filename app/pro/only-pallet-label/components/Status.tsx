@@ -9,17 +9,9 @@ import {
 
 type StatusProps = {
   isPending: boolean
-  onPallet: number
-  palletSize: number
-  isFull: boolean
 }
 
-export default function Status({
-  isPending,
-  onPallet,
-  palletSize,
-  isFull,
-}: StatusProps) {
+export default function Status({ isPending }: StatusProps) {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
 
@@ -30,6 +22,9 @@ export default function Status({
 
   const articleNumber = useAppSelector((state) => state.article.articleNumber)
   const articleName = useAppSelector((state) => state.article.articleName)
+  const isFull = useAppSelector((state) => state.workplace.isFull)
+  const onPallet = useAppSelector((state) => state.workplace.onPallet)
+  const palletSize = useAppSelector((state) => state.workplace.palletSize)
 
   const formatOperator = (name: string, personalNumber: number) => {
     const parts = name.split(' ')

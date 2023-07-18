@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { updateLastScan, updateWorkStage } from '@/lib/redux/pro/workStageSlice'
+import { updateLastScan } from '@/lib/redux/pro/workplaceSlice'
 import { saveHydraBatch } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
@@ -78,7 +78,7 @@ export default function ScanHydraBatch({ workplace }: StatusProps) {
             toast.error('Pełna paleta!', { id: 'error' })
             break
           default:
-            toast.error('Zgłość się do IT!', { id: 'error' })
+            toast.error('Zgłoś się do IT!', { id: 'error' })
         }
       } catch (err) {
         toast.error('Zgłoś się do IT!', { id: 'error' })

@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import operatorReducer from './operatorSlice'
 import articleReducer from './articleSlice'
-import workStageReducer from './workStageSlice'
+import workplaceReducer from './workplaceSlice'
 
 type OperatorState = {
   personalNumber: number | null
@@ -14,7 +14,7 @@ type ArticleState = {
   articleName: string | null
 }
 
-type WorkStageState = {
+type WorkplaceState = {
   lastScan: string | null
   workStage: number | null
 }
@@ -30,7 +30,7 @@ const initialArticleState: ArticleState = {
   articleName: null,
 }
 
-const initialWorkStageState: WorkStageState = {
+const initialWorkplaceState: WorkplaceState = {
   lastScan: null,
   workStage: null,
 }
@@ -48,7 +48,7 @@ const preloadedState = () => {
   return {
     operator: initialOperatorState,
     article: initialArticleState,
-    workStage: initialWorkStageState,
+    workplace: initialWorkplaceState,
   }
 }
 
@@ -56,7 +56,7 @@ const store = configureStore({
   reducer: {
     operator: operatorReducer,
     article: articleReducer,
-    workStage: workStageReducer,
+    workplace: workplaceReducer,
   },
   preloadedState: preloadedState(),
 })
