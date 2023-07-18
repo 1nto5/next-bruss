@@ -4,6 +4,7 @@ import {
   StatusBox,
   StatusBoxBlinking,
   BoxSeparator,
+  StatusBoxSkeleton,
 } from '@/app/pro/components/StatusElements'
 import { getOnPalletAndPalletSize } from '../actions'
 
@@ -70,7 +71,9 @@ export default function Status() {
         }
       />
       <BoxSeparator />
-      {palletStatus && palletStatus.onPallet === palletStatus.palletSize ? (
+      {isPending ? (
+        <StatusBoxSkeleton boxName="na palecie:" value="x/y" />
+      ) : palletStatus && palletStatus.onPallet === palletStatus.palletSize ? (
         <StatusBoxBlinking
           boxName="na palecie:"
           value={`${palletStatus.onPallet} / ${palletStatus.palletSize}`}
@@ -79,11 +82,9 @@ export default function Status() {
         <StatusBox
           boxName="na palecie:"
           value={
-            isPending
-              ? 'Loading...'
-              : palletStatus
+            palletStatus
               ? `${palletStatus.onPallet} / ${palletStatus.palletSize}`
-              : 'Brak danych'
+              : 'brak'
           }
         />
       )}
