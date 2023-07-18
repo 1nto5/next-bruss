@@ -1,8 +1,6 @@
 'use server'
 import { connectToMongo } from '@/lib/mongo/connector'
-import { headers } from 'next/headers'
 import { configDataOnlyPalletLabel as configData } from '@/lib/utils/pro/configData'
-import { on } from 'events'
 
 // Define Types
 type ArticleConfig = {
@@ -18,16 +16,49 @@ type WorkplaceConfig = {
   articles: ArticleConfig[]
 }
 
+// Function to get the number of documents with a specific status, article number, and workplace
+export async function countOnPallet(workplace: string, articleNumber: number) {
+  try {
+    // Connect to MongoDB
+    const collection = await connectToMongo('only_pallet_label')
+
+    // Query the collection
+    const count = await collection.countDocuments({
+      status: 'pallet',
+      workplace: workplace,
+      article: articleNumber,
+    })
+
+    // Return the count
+    return count
+  } catch (error) {
+    console.error(error)
+    throw new Error('An error occurred while counting the documents.')
+  }
+}
+
+// Function to get the pallet size for a specific workplace and article
+export async function getPalletSize(workplace: string, articleNumber: number) {
+  // Find the workplace and article configuration
+  const workplaceConfig = configData.find(
+    (w: WorkplaceConfig) => w.workplace === workplace
+  )
+  const articleConfig = workplaceConfig?.articles.find(
+    (a: ArticleConfig) => a.number === articleNumber
+  )
+
+  // Return the pallet size
+  return articleConfig?.palletSize
+}
+
 // Save Hydra Batch function
 export async function saveHydraBatch(
   hydraQr: string,
+  workplace: string,
   articleNumber: number,
   operatorPersonalNumber: number
 ) {
   try {
-    const referer = headers().get('referer')
-    const workplace = referer?.split('/').pop()
-
     // Find workplace and article configuration
     const workplaceConfig = configData.find(
       (w: WorkplaceConfig) => w.workplace === workplace
@@ -75,6 +106,13 @@ export async function saveHydraBatch(
       return { status: 'exists' }
     }
 
+    // Check if pallet is full
+    const onPallet = await countOnPallet(workplace, articleNumber)
+    const palletSize = await getPalletSize(workplace, articleNumber)
+    if (onPallet >= palletSize) {
+      return { status: 'full pallet' }
+    }
+
     // Insert data
     const insertResult = await collection.insertOne({
       status: 'pallet',
@@ -91,57 +129,5 @@ export async function saveHydraBatch(
   } catch (error) {
     console.error(error)
     throw new Error('An error occurred while saving the hydra batch.')
-  }
-}
-
-// Function to get the number of documents with a specific status, article number, and workplace
-async function countOnPallet(workplace: string, articleNumber: number) {
-  try {
-    // Connect to MongoDB
-    const collection = await connectToMongo('only_pallet_label')
-
-    // Query the collection
-    const count = await collection.countDocuments({
-      status: 'pallet',
-      workplace: workplace,
-      article: articleNumber,
-    })
-
-    // Return the count
-    return count
-  } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while counting the documents.')
-  }
-}
-
-// Function to get the pallet size for a specific workplace and article
-async function getPalletSize(workplace: string, articleNumber: number) {
-  // Find the workplace and article configuration
-  const workplaceConfig = configData.find(
-    (w: WorkplaceConfig) => w.workplace === workplace
-  )
-  const articleConfig = workplaceConfig?.articles.find(
-    (a: ArticleConfig) => a.number === articleNumber
-  )
-
-  // Return the pallet size
-  return articleConfig?.palletSize
-}
-
-// Function to calculate and return the quantity on pallet / pallet size
-export async function getOnPalletAndPalletSize(articleNumber: number) {
-  try {
-    // Call the countOnPallet and getPalletSize functions
-    const count = await countOnPallet('136-153', articleNumber)
-    const size = await getPalletSize('136-153', articleNumber)
-
-    // Return the quantity and pallet size as an object
-    return { onPallet: count, palletSize: size }
-  } catch (error) {
-    console.error(error)
-    throw new Error(
-      'An error occurred while calculating the quantity on the pallet.'
-    )
   }
 }
