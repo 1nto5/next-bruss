@@ -10,13 +10,16 @@ import {
   toggleIsFull,
   updateOnPallet,
   updatePalletSize,
+  updateBoxSize,
 } from '@/lib/redux/pro/workplaceSlice'
 import Status from '../components/Status'
 import NumLogIn from '../../components/NumLogIn'
 import ArticleSelector from '../components/ArticleSelector'
-import ScanHydraBatch from '../components/ScanHydraBatch'
+import ScanHydraQr from '../components/ScanHydraQr'
+import ScanPalletQr from '../components/ScanPalletQr'
+import PrintPalletLabel from '../../components/PrintPalletLabel'
 
-import { countOnPallet, getPalletSize } from '../actions'
+import { countOnPallet, getPalletSize, getBoxSize } from '../actions'
 
 export default function OnlyPalletLabel() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
@@ -38,23 +41,19 @@ export default function OnlyPalletLabel() {
     startTransition(async () => {
       try {
         if (articleLogged) {
-          const onPalletCount = await countOnPallet(
-            pathWorkplace,
-            articleLogged
-          )
-          dispatch(updateOnPallet(onPalletCount))
-          const palletSizeCount = await getPalletSize(
-            pathWorkplace,
-            articleLogged
-          )
-          dispatch(updatePalletSize(palletSizeCount))
-          if (onPalletCount >= palletSizeCount) {
+          const onPallet = await countOnPallet(pathWorkplace, articleLogged)
+          dispatch(updateOnPallet(onPallet))
+          const palletSize = await getPalletSize(pathWorkplace, articleLogged)
+          dispatch(updatePalletSize(palletSize))
+          if (onPallet >= palletSize) {
             dispatch(toggleIsFull())
           }
+          const boxSize = await getBoxSize(pathWorkplace, articleLogged)
+          dispatch(updateBoxSize(boxSize))
         }
       } catch (error) {
         console.error(
-          'Failed to fetch quantity on a pallet and pallet size:',
+          'Failed to fetch quantity on a pallet, pallet size or box size:',
           error
         )
       }
@@ -68,10 +67,14 @@ export default function OnlyPalletLabel() {
       {!articleLogged && operatorLogged && (
         <ArticleSelector workplace={pathWorkplace} />
       )}
-      {articleLogged &&
-        operatorLogged &&
-        !isFull &&
-        (isPending ? 'laading' : <ScanHydraBatch workplace={pathWorkplace} />)}
+      {!isPending && articleLogged && operatorLogged && isFull ? (
+        <>
+          <ScanPalletQr workplace={pathWorkplace} />
+          <PrintPalletLabel />
+        </>
+      ) : (
+        <ScanHydraQr workplace={pathWorkplace} />
+      )}
     </div>
   )
 }

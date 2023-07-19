@@ -1,4 +1,3 @@
-import { useEffect, useTransition, useState } from 'react'
 import { useAppSelector } from '@/lib/redux/pro/hooks'
 import {
   StatusBox,
@@ -21,6 +20,8 @@ export default function Status() {
   const isFull = useAppSelector((state) => state.workplace.isFull)
   const onPallet = useAppSelector((state) => state.workplace.onPallet)
   const palletSize = useAppSelector((state) => state.workplace.palletSize)
+  const boxSize = useAppSelector((state) => state.workplace.boxSize)
+  const quantityOnPallet = onPallet! * boxSize!
   const isPending = useAppSelector((state) => state.workplace.isPending)
 
   const formatOperator = (name: string, personalNumber: number) => {
@@ -54,12 +55,12 @@ export default function Status() {
       ) : isFull ? (
         <StatusBoxBlinking
           boxName="na palecie:"
-          value={`${onPallet} / ${palletSize}`}
+          value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
         />
       ) : (
         <StatusBox
           boxName="na palecie:"
-          value={`${onPallet} / ${palletSize}`}
+          value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
         />
       )}
     </div>

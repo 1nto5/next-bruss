@@ -15,8 +15,12 @@ type ArticleState = {
 }
 
 type WorkplaceState = {
+  isPending: boolean
+  onPallet: number | null
+  palletSize: number | null
+  boxSize: number | null
+  isFull: boolean
   lastScan: string | null
-  workStage: number | null
 }
 
 const initialOperatorState: OperatorState = {
@@ -31,8 +35,12 @@ const initialArticleState: ArticleState = {
 }
 
 const initialWorkplaceState: WorkplaceState = {
+  isPending: false,
+  onPallet: null,
+  palletSize: null,
+  boxSize: null,
+  isFull: false,
   lastScan: null,
-  workStage: null,
 }
 
 const preloadedState = () => {
