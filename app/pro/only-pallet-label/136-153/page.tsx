@@ -1,6 +1,6 @@
 'use client'
 
-// auto full screen
+// full screen deosnt work properly
 
 import { useAppSelector } from '@/lib/redux/pro/hooks'
 import { useDispatch } from 'react-redux'
