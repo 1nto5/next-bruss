@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { FaExpand, FaCompress } from 'react-icons/fa'
 
 const FullScreenToggle: React.FC = () => {
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(true)
 
   const openFullscreen = (elem: HTMLElement) => {
     if (elem.requestFullscreen) {
