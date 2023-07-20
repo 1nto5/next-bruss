@@ -8,7 +8,7 @@ export async function connectToMongo(
 
   try {
     await client.connect()
-    console.log('Connected successfully to MongoDB server')
+    // console.log('Connected successfully to MongoDB server')
 
     const db = client.db(dbName)
     const collection = db.collection(collectionName)
