@@ -101,14 +101,12 @@ const PrintPalletLabel = () => {
       })
   }
 
-  return isPending ? (
-    <></>
-  ) : (
+  return (
     <div className="mt-8 flex flex-col items-center justify-center">
-      <div className="absolute left-full mb-4" ref={qrCodeRef}>
+      <Button text="wydruk QR" onClick={handlePrint} />
+      <div style={{ opacity: 0 }} ref={qrCodeRef}>
         <QRCode value={palletQr!} />
       </div>
-      <Button text="wydruk QR" onClick={handlePrint} />
     </div>
   )
 }

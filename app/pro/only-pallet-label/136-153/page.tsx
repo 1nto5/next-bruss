@@ -1,5 +1,6 @@
-// "client" module should be imported correctly based on your directory structure
 'use client'
+
+// auto full screen
 
 import { useAppSelector } from '@/lib/redux/pro/hooks'
 import { useDispatch } from 'react-redux'
@@ -54,7 +55,7 @@ export default function OnlyPalletLabel() {
           const boxSize = await getBoxSize(pathWorkplace, articleLogged)
           dispatch(updateBoxSize(boxSize))
         }
-        // toast.dismiss('loading')
+        toast.dismiss('loading')
       } catch (error) {
         console.error(
           'Failed to fetch quantity on a pallet, pallet size or box size:',
