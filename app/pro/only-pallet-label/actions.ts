@@ -82,7 +82,7 @@ export async function getPalletQr(
   quantityOnPallet: number
 ) {
   try {
-    return generatePalletQr(articleNumber, quantityOnPallet, 'PL')
+    return generatePalletQr(articleNumber, quantityOnPallet, '876')
   } catch (error) {
     console.error(error)
     throw new Error('An error occurred while generating pallet qr.')
