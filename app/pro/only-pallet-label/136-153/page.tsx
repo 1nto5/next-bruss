@@ -54,7 +54,7 @@ export default function OnlyPalletLabel() {
           const boxSize = await getBoxSize(pathWorkplace, articleLogged)
           dispatch(updateBoxSize(boxSize))
         }
-        toast.dismiss('loading')
+        // toast.dismiss('loading')
       } catch (error) {
         console.error(
           'Failed to fetch quantity on a pallet, pallet size or box size:',
