@@ -21,6 +21,8 @@ import PrintPalletLabel from '../../components/PrintPalletLabel'
 
 import { countOnPallet, getPalletSize, getBoxSize } from '../actions'
 
+import toast from 'react-hot-toast'
+
 export default function OnlyPalletLabel() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
@@ -41,6 +43,7 @@ export default function OnlyPalletLabel() {
     startTransition(async () => {
       try {
         if (articleLogged) {
+          toast.loading('Ładowanie...', { id: 'loading' })
           const onPallet = await countOnPallet(pathWorkplace, articleLogged)
           dispatch(updateOnPallet(onPallet))
           const palletSize = await getPalletSize(pathWorkplace, articleLogged)
@@ -51,6 +54,7 @@ export default function OnlyPalletLabel() {
           const boxSize = await getBoxSize(pathWorkplace, articleLogged)
           dispatch(updateBoxSize(boxSize))
         }
+        toast.dismiss('loading')
       } catch (error) {
         console.error(
           'Failed to fetch quantity on a pallet, pallet size or box size:',
@@ -67,17 +71,22 @@ export default function OnlyPalletLabel() {
       {!articleLogged && operatorLogged && (
         <ArticleSelector workplace={pathWorkplace} />
       )}
-      {articleLogged && operatorLogged && !isPending && (
-        <>
-          {isFull ? (
-            <>
-              <ScanPalletQr workplace={pathWorkplace} />
-              <PrintPalletLabel />
-            </>
-          ) : (
-            <ScanHydraQr workplace={pathWorkplace} />
-          )}
-        </>
+      {isPending ? (
+        <div></div>
+      ) : (
+        articleLogged &&
+        operatorLogged && (
+          <>
+            {isFull ? (
+              <>
+                <ScanPalletQr workplace={pathWorkplace} />
+                <PrintPalletLabel />
+              </>
+            ) : (
+              <ScanHydraQr workplace={pathWorkplace} />
+            )}
+          </>
+        )
       )}
     </div>
   )

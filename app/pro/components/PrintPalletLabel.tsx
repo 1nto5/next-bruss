@@ -20,10 +20,10 @@ const PrintPalletLabel = () => {
   useEffect(() => {
     if (articleNumber && quantity) {
       startTransition(async () => {
-        toast.loading('Generowanie QR...', { id: 'loading' })
+        toast.loading('Generowanie QR...', { id: 'loadingQr' })
         const qr = await getPalletQr(articleNumber, quantityOnPallet)
         setPalletQr(qr)
-        toast.dismiss()
+        toast.dismiss('loadingQr')
       })
     }
   }, [articleNumber, quantity, quantityOnPallet])
