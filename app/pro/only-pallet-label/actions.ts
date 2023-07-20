@@ -210,7 +210,7 @@ export async function savePalletBatch(
 
     // Check process
     const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2)
-    if (qrProcess !== 'OPL') {
+    if (qrProcess !== '876') {
       return { status: 'wrong process' }
     }
 
