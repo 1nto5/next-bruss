@@ -5,7 +5,7 @@ const generatePalletQr = (
   quantityOnPallet: number,
   workplaceType: string
 ) => {
-  return `A:${article}|O:${workplaceType}|Q:${quantityOnPallet}|B:AA${uuidv4()
+  return `A:${article}|O:000|Q:${quantityOnPallet}|B:${workplaceType}${uuidv4()
     .slice(0, 8)
     .toUpperCase()}|C:G`
 }

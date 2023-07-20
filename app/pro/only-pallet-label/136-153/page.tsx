@@ -67,13 +67,17 @@ export default function OnlyPalletLabel() {
       {!articleLogged && operatorLogged && (
         <ArticleSelector workplace={pathWorkplace} />
       )}
-      {!isPending && articleLogged && operatorLogged && isFull ? (
+      {articleLogged && operatorLogged && !isPending && (
         <>
-          <ScanPalletQr workplace={pathWorkplace} />
-          <PrintPalletLabel />
+          {isFull ? (
+            <>
+              <ScanPalletQr workplace={pathWorkplace} />
+              <PrintPalletLabel />
+            </>
+          ) : (
+            <ScanHydraQr workplace={pathWorkplace} />
+          )}
         </>
-      ) : (
-        <ScanHydraQr workplace={pathWorkplace} />
       )}
     </div>
   )

@@ -19,17 +19,13 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
 
   const handleLogoutOperator = () => {
-    if (window.confirm('Wylogować operatora?')) {
-      dispatch(logOut()) // Logout operator
-      toast.error('Wylogowano!')
-    }
+    dispatch(logOut()) // Logout operator
+    toast.error('Wylogowano!')
   }
 
   const handleLogoutArticle = () => {
-    if (window.confirm('Wylogować artykuł?')) {
-      dispatch(clearArticle()) // Clear article
-      toast.error('Wylogowano artykuł!')
-    }
+    dispatch(clearArticle()) // Clear article
+    toast.error('Wylogowano artykuł!')
   }
 
   return (

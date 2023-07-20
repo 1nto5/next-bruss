@@ -60,7 +60,11 @@ export default function Status() {
       ) : (
         <StatusBox
           boxName="na palecie:"
-          value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
+          value={
+            onPallet === null || palletSize === null
+              ? 'brak'
+              : `${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`
+          }
         />
       )}
     </div>
