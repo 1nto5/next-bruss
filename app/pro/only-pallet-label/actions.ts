@@ -122,6 +122,7 @@ export async function saveHydraBatch(
 
     // Check quantity
     const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2))
+    console.log(qrQuantity)
     if (qrQuantity !== articleConfig.boxSize) {
       return { status: 'wrong quantity' }
     }
