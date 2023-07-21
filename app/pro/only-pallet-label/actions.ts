@@ -157,6 +157,7 @@ export async function saveHydraBatch(
       hydra_batch: qrBatch,
       workplace: workplace,
       article: articleNumber,
+      quantity: qrQuantity,
       operator: operatorPersonalNumber,
       time: new Date(),
     })
