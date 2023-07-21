@@ -214,8 +214,11 @@ export async function savePalletBatch(
       return { status: 'wrong process' }
     }
 
-    // Extract batch from QR code
+    // Extract batch from QR code and test length
     const qrBatch = splitPalletQr[3] && splitPalletQr[3].substr(2).toUpperCase()
+    if (!qrBatch || qrBatch.length !== 10) {
+      return { status: 'invalid' }
+    }
 
     // Connect to MongoDB
     const collection = await connectToMongo('only_pallet_label')

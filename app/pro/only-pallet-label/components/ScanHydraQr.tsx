@@ -52,7 +52,7 @@ export default function ScanHydraQr({ workplace }: StatusProps) {
 
         const status = result?.status
         toast.dismiss()
-
+        setHydraBatch('')
         // Display toast message based on the result status
         switch (status) {
           case 'saved':

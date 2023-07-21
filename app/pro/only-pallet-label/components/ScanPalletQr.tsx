@@ -53,6 +53,7 @@ export default function ScanPalletQr({ workplace }: StatusProps) {
 
         const status = result?.status
         toast.dismiss()
+        setPalletQr('')
 
         // Display toast message based on the result status
         switch (status) {
