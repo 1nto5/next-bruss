@@ -30,6 +30,10 @@ export default function ScanPalletQr({ workplace }: StatusProps) {
   // Local state for the pallet batch
   const [palletQr, setPalletQr] = useState('')
 
+  // Function to clear the hydraBatch input field
+  const clearPalletQr = () => {
+    setPalletQr('')
+  }
   const dispatch = useDispatch()
 
   // Handle key press on input (only interested in 'Enter')
@@ -37,6 +41,7 @@ export default function ScanPalletQr({ workplace }: StatusProps) {
     if (event.key !== 'Enter') {
       return
     }
+    clearPalletQr()
 
     // Start transition (for loading state)
     startTransition(async () => {
@@ -53,7 +58,6 @@ export default function ScanPalletQr({ workplace }: StatusProps) {
 
         const status = result?.status
         toast.dismiss()
-        setPalletQr('')
 
         // Display toast message based on the result status
         switch (status) {

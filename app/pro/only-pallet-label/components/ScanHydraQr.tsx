@@ -30,6 +30,11 @@ export default function ScanHydraQr({ workplace }: StatusProps) {
   // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('')
 
+  // Function to clear the hydraBatch input field
+  const clearHydraBatch = () => {
+    setHydraBatch('')
+  }
+
   const dispatch = useDispatch()
 
   // Handle key press on input (only interested in 'Enter')
@@ -37,6 +42,8 @@ export default function ScanHydraQr({ workplace }: StatusProps) {
     if (event.key !== 'Enter') {
       return
     }
+
+    clearHydraBatch()
 
     // Start transition (for loading state)
     startTransition(async () => {
@@ -52,7 +59,6 @@ export default function ScanHydraQr({ workplace }: StatusProps) {
 
         const status = result?.status
         toast.dismiss()
-        setHydraBatch('')
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
