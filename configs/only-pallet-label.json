@@ -12,7 +12,7 @@
       {
         "number": 28042,
         "name": "M-153-K-C",
-        "palletSize": 1,
+        "palletSize": 30,
         "boxSize": 10,
         "hydraProc": ["090"]
       }
