@@ -1,4 +1,4 @@
-import { ReduxProvider } from '@/lib/redux/pro/provider'
+// import { ReduxProvider } from '@/lib/redux/pro/provider'
 
 import Toast from './components/Toast'
 
@@ -14,7 +14,8 @@ export default function OnlyPalletLabelLayout({
 }) {
   return (
     <>
-      <ReduxProvider>{children}</ReduxProvider>
+      {/* <ReduxProvider>{children}</ReduxProvider> */}
+      {children}
       <Toast />
     </>
   )

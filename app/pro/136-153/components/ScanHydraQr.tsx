@@ -1,22 +1,12 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { updateLastScan } from '@/lib/redux/pro/workplaceSlice'
+import { updateLastScan } from '@/lib/redux/pro/136-153/workplaceSlice'
 import { saveHydraBatch } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 
-type StatusProps = {
-  workplace: string
-}
-
 // Component to scan Hydra Batch
-export default function ScanHydraQr({ workplace }: StatusProps) {
-  // Use the article number from the Redux state
-  const articleNumber = useSelector(
-    (state: { article: { articleNumber: number; articleName: number } }) =>
-      state.article.articleNumber
-  )
-
+export default function ScanHydraQr() {
   // Use the operator number from the Redux state
   const operatorPersonalNumber = useSelector(
     (state: {
@@ -50,12 +40,7 @@ export default function ScanHydraQr({ workplace }: StatusProps) {
       toast.loading('Przetwarzanie...', { id: 'loading' })
 
       try {
-        const result = await saveHydraBatch(
-          hydraBatch,
-          workplace,
-          articleNumber,
-          operatorPersonalNumber
-        )
+        const result = await saveHydraBatch(hydraBatch, operatorPersonalNumber)
 
         const status = result?.status
         toast.dismiss()
