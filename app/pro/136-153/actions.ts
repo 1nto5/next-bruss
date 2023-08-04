@@ -23,8 +23,7 @@ export async function getBoxSize153() {
   return boxSize153
 }
 
-// const palletSize136 = 25
-const palletSize136 = 0
+const palletSize136 = 25
 export async function getPalletSize136() {
   return palletSize136
 }
@@ -123,7 +122,7 @@ export async function saveHydraBatch(
     const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase()
 
     // Connect to MongoDB
-    const collection = await connectToMongo('only_pallet_label')
+    const collection = await connectToMongo(collectionName)
 
     // Check for existing data
     const existingData = await collection.findOne({ hydra_batch: qrBatch })
