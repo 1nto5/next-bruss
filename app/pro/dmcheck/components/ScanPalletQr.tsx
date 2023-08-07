@@ -1,33 +1,28 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks'
-import {
-  toggleIsFull136,
-  toggleIsFull153,
-  updateLastScan,
-} from '@/lib/redux/pro/136-153/workplaceSlice'
+import { useAppSelector } from '@/lib/redux/pro/hooks'
+import { toggleIsFull, updateLastScan } from '@/lib/redux/pro/workplaceSlice'
 import { savePalletBatch } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 
-type Props = {
-  article: string
+type StatusProps = {
+  workplace: string
 }
 
 // Component to scan Pallet Batch
-export default function ScanPalletQr({ article }: Props) {
+export default function ScanPalletQr({ workplace }: StatusProps) {
+  // Use the article number from the Redux state
+  const articleNumber = useAppSelector((state) => state.article.articleNumber)
+
   // Use the operator number from the Redux state
   const operatorPersonalNumber = useAppSelector(
     (state) => state.operator.personalNumber
   )
 
-  const onPallet136 = useAppSelector((state) => state.workplace.onPallet136)
-  const boxSize136 = useAppSelector((state) => state.workplace.boxSize136)
-  const quantityOnPallet136 = onPallet136! * boxSize136!
-
-  const onPallet153 = useAppSelector((state) => state.workplace.onPallet153)
-  const boxSize153 = useAppSelector((state) => state.workplace.boxSize153)
-  const quantityOnPallet153 = onPallet153! * boxSize153!
+  const onPallet = useAppSelector((state) => state.workplace.onPallet)
+  const boxSize = useAppSelector((state) => state.workplace.boxSize)
+  const quantityOnPallet = onPallet! * boxSize!
 
   // React transition state
   const [isPending, startTransition] = useTransition()
@@ -53,44 +48,22 @@ export default function ScanPalletQr({ article }: Props) {
       toast.loading('Przetwarzanie...', { id: 'loading' })
 
       try {
-        let status
-        // 136
-        if (article === '28067') {
-          const result = await savePalletBatch(
-            palletQr,
-            28067,
-            quantityOnPallet136,
-            operatorPersonalNumber!
-          )
-          status = result?.status
-        }
+        const result = await savePalletBatch(
+          palletQr,
+          workplace,
+          articleNumber!,
+          quantityOnPallet,
+          operatorPersonalNumber!
+        )
 
-        // 153
-        if (article === '28042') {
-          const result = await savePalletBatch(
-            palletQr,
-            28042,
-            quantityOnPallet153,
-            operatorPersonalNumber!
-          )
-          status = result?.status
-        }
-
+        const status = result?.status
         toast.dismiss()
 
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
             dispatch(updateLastScan(palletQr))
-            // 136
-            if (article === '28067') {
-              dispatch(toggleIsFull136())
-            }
-            // 153
-            if (article === '28042') {
-              dispatch(toggleIsFull153())
-            }
-
+            dispatch(toggleIsFull())
             toast.success('Batch OK!', { id: 'success' })
             break
           case 'exists':

@@ -1,6 +1,6 @@
 'use server'
 import { connectToMongo } from '@/lib/mongo/connector'
-import { config136153 as configData } from '@/lib/utils/pro/configData'
+import { configDataOnlyPalletLabel as configData } from '@/lib/utils/pro/configData'
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr'
 
 // Define Types

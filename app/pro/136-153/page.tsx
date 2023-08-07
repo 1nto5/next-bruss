@@ -20,16 +20,12 @@ import ScanHydraQr from './components/ScanHydraQr'
 import ScanPalletQr from './components/ScanPalletQr'
 import PrintPalletLabel from './components/PrintPalletLabel'
 
-import {
-  countOnPallet136,
-  countOnPallet153,
-  getPalletSize136,
-  getPalletSize153,
-  getBoxSize136,
-  getBoxSize153,
-} from './actions'
+import { countOnPallet, getPalletSize, getBoxSize } from './actions'
 
 import toast from 'react-hot-toast'
+
+const lArticle = 28067
+const rArticle = 28042
 
 export default function OnlyPalletLabel() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
@@ -50,13 +46,13 @@ export default function OnlyPalletLabel() {
     startTransition(async () => {
       try {
         toast.loading('Ładowanie...', { id: 'loading' })
-        const onPallet136 = await countOnPallet136()
+        const onPallet136 = await countOnPallet(lArticle)
         dispatch(updateOnPallet136(onPallet136))
-        const onPallet153 = await countOnPallet153()
+        const onPallet153 = await countOnPallet(rArticle)
         dispatch(updateOnPallet153(onPallet153))
-        const palletSize136 = await getPalletSize136()
+        const palletSize136 = await getPalletSize(lArticle)
         dispatch(updatePalletSize136(palletSize136))
-        const palletSize153 = await getPalletSize153()
+        const palletSize153 = await getPalletSize(rArticle)
         dispatch(updatePalletSize153(palletSize153))
         if (onPallet136 >= palletSize136) {
           dispatch(toggleIsFull136())
@@ -64,9 +60,9 @@ export default function OnlyPalletLabel() {
         if (onPallet153 >= palletSize153) {
           dispatch(toggleIsFull153())
         }
-        const boxSize136 = await getBoxSize136()
+        const boxSize136 = await getBoxSize(lArticle)
         dispatch(updateBoxSize136(boxSize136))
-        const boxSize153 = await getBoxSize153()
+        const boxSize153 = await getBoxSize(rArticle)
         dispatch(updateBoxSize153(boxSize153))
         toast.dismiss('loading')
       } catch (error) {

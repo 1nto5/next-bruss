@@ -1,10 +1,11 @@
 'use server'
 import { connectToMongo } from '@/lib/mongo/connector'
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr'
+import { config136153 as config } from '@/lib/utils/pro/configData'
 
 // Define Types
 type ArticleConfig = {
-  number: number
+  article: number
   name: string
   palletSize: number
   boxSize: number
@@ -13,48 +14,32 @@ type ArticleConfig = {
 
 const collectionName = '136_153'
 
-const boxSize136 = 12
-export async function getBoxSize136() {
-  return boxSize136
-}
+export async function getPalletSize(article: number) {
+  const articleConfig = config.find(
+    (config: ArticleConfig) => config.article === article
+  )
 
-const boxSize153 = 10
-export async function getBoxSize153() {
-  return boxSize153
-}
-
-const palletSize136 = 25
-export async function getPalletSize136() {
-  return palletSize136
-}
-
-const palletSize153 = 30
-export async function getPalletSize153() {
-  return palletSize153
-}
-
-// Function to get the number of documents with a specific status and article number
-export async function countOnPallet136() {
-  try {
-    // Connect to MongoDB
-    const collection = await connectToMongo(collectionName)
-
-    // Query the collection
-    const count = await collection.countDocuments({
-      status: 'pallet',
-      article: 28067,
-    })
-
-    // Return the count
-    return count
-  } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while counting the documents.')
+  if (articleConfig) {
+    return articleConfig.palletSize
   }
+
+  return null
+}
+
+export async function getBoxSize(article: number) {
+  const articleConfig = config.find(
+    (config: ArticleConfig) => config.article === article
+  )
+
+  if (articleConfig) {
+    return articleConfig.boxSize
+  }
+
+  return null
 }
 
 // Function to get the number of documents with a specific status and article number,
-export async function countOnPallet153() {
+export async function countOnPallet(articleNumber: number) {
   try {
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName)
@@ -62,7 +47,7 @@ export async function countOnPallet153() {
     // Query the collection
     const count = await collection.countDocuments({
       status: 'pallet',
-      article: 28042,
+      article: articleNumber,
     })
 
     // Return the count
@@ -106,15 +91,19 @@ export async function saveHydraBatch(
     if (qrArticleNumber !== 28067 && qrArticleNumber !== 28042) {
       return { status: 'wrong article' }
     }
+
+    const articleConfig = config.find(
+      (config: ArticleConfig) => config.article === qrArticleNumber
+    )
     // Check quantity
     const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2))
-    if (qrQuantity !== boxSize136 && qrQuantity !== boxSize153) {
+    if (qrQuantity !== articleConfig.boxSize) {
       return { status: 'wrong quantity' }
     }
 
     // Check process
     const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2)
-    if (qrProcess !== '090') {
+    if (qrProcess !== articleConfig.hydraProc) {
       return { status: 'wrong process' }
     }
 
@@ -131,14 +120,9 @@ export async function saveHydraBatch(
     }
 
     // Check if pallet is full
-    const onPallet136 = await countOnPallet136()
-    const onPallet153 = await countOnPallet153()
+    const onPallet = await countOnPallet(qrArticleNumber)
 
-    if (onPallet136 >= palletSize136) {
-      return { status: 'full pallet' }
-    }
-
-    if (onPallet153 >= palletSize153) {
+    if (onPallet >= articleConfig.palletSize) {
       return { status: 'full pallet' }
     }
 

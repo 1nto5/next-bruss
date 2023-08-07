@@ -2,10 +2,16 @@ import fs from 'fs'
 import path from 'path'
 
 // only pallet label config
-const configPathOnlyPalletLabel = path.join(
+const configPath136153 = path.resolve(
   process.cwd(),
-  'configs/only-pallet-label.json'
+  'configs',
+  'config136-153.json'
 )
-export const configDataOnlyPalletLabel = JSON.parse(
-  fs.readFileSync(configPathOnlyPalletLabel, 'utf8')
+
+export const config136153 = JSON.parse(
+  fs.readFileSync(configPath136153, 'utf8')
 )
+
+const configPathEol80 = path.join(process.cwd(), 'configs/configEol80.json')
+
+export const configEol80 = JSON.parse(fs.readFileSync(configPathEol80, 'utf8'))
