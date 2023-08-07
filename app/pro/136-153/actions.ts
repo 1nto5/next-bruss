@@ -38,6 +38,18 @@ export async function getBoxSize(article: number) {
   return null
 }
 
+export async function getArticleName(article: number) {
+  const articleConfig = config.find(
+    (config: ArticleConfig) => config.article === article
+  )
+
+  if (articleConfig) {
+    return articleConfig.name
+  }
+
+  return null
+}
+
 // Function to get the number of documents with a specific status and article number,
 export async function countOnPallet(articleNumber: number) {
   try {

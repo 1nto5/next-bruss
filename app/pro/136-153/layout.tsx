@@ -2,7 +2,7 @@ import Header from './components/Header'
 import { ReduxProvider } from '@/lib/redux/pro/136-153/provider'
 
 export const metadata = {
-  title: '136/153 (Next BRUSS)',
+  title: 'M136 / M153 (Next BRUSS)',
   // description: 'Company helper applications',
 }
 
@@ -16,7 +16,7 @@ export default function OnlyPalletLabelLayout({
   return (
     <>
       <ReduxProvider>
-        <Header title={`136/153`} />
+        <Header title={`M136 / M153`} />
         {children}
       </ReduxProvider>
     </>

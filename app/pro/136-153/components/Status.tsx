@@ -46,15 +46,15 @@ export default function Status() {
       />
       <BoxSeparator />
       {isPending ? (
-        <StatusBoxSkeleton boxName="136 (28067) na palecie:" value="x/y" />
+        <StatusBoxSkeleton boxName="M136 (28067):" value="x/y" />
       ) : isFull136 ? (
         <StatusBoxBlinking
-          boxName="136 (28067) na palecie:"
+          boxName="M136 (28067):"
           value={`${onPallet136} / ${palletSize136} (${quantityOnPallet136} szt.)`}
         />
       ) : (
         <StatusBox
-          boxName="136 (28067) na palecie:"
+          boxName="M136 (28067):"
           value={
             onPallet136 === null || palletSize136 === null
               ? 'brak'
@@ -64,15 +64,15 @@ export default function Status() {
       )}
       <BoxSeparator />
       {isPending ? (
-        <StatusBoxSkeleton boxName="153 (28042) na palecie:" value="x/y" />
+        <StatusBoxSkeleton boxName="M153 (28042):" value="x/y" />
       ) : isFull153 ? (
         <StatusBoxBlinking
-          boxName="153 (28042) na palecie:"
+          boxName="M153 (28042):"
           value={`${onPallet153} / ${palletSize153} (${quantityOnPallet153} szt.)`}
         />
       ) : (
         <StatusBox
-          boxName="153 (28042) na palecie:"
+          boxName="M153 (28042):"
           value={
             onPallet153 === null || palletSize153 === null
               ? 'brak'
