@@ -104,6 +104,7 @@ export async function saveHydraBatch(
     // Check process
     const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2)
     if (qrProcess !== articleConfig.hydraProc) {
+      console.log(articleConfig.hydraProc)
       return { status: 'wrong process' }
     }
 

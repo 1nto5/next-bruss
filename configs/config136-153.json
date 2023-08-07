@@ -4,13 +4,13 @@
     "name": "M-136-K-1-A",
     "palletSize": 1,
     "boxSize": 12,
-    "hydraProc": ["090"]
+    "hydraProc": "090"
   },
   {
     "article": 28042,
     "name": "M-153-K-C",
     "palletSize": 1,
     "boxSize": 10,
-    "hydraProc": ["090"]
+    "hydraProc": "090"
   }
 ]
