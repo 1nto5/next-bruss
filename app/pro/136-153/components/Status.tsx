@@ -46,24 +46,6 @@ export default function Status() {
       />
       <BoxSeparator />
       {isPending ? (
-        <StatusBoxSkeleton boxName="M136 (28067):" value="x/y" />
-      ) : isFull136 ? (
-        <StatusBoxBlinking
-          boxName="M136 (28067):"
-          value={`${onPallet136} / ${palletSize136} (${quantityOnPallet136} szt.)`}
-        />
-      ) : (
-        <StatusBox
-          boxName="M136 (28067):"
-          value={
-            onPallet136 === null || palletSize136 === null
-              ? 'brak'
-              : `${onPallet136} / ${palletSize136} (${quantityOnPallet136} szt.)`
-          }
-        />
-      )}
-      <BoxSeparator />
-      {isPending ? (
         <StatusBoxSkeleton boxName="M153 (28042):" value="x/y" />
       ) : isFull153 ? (
         <StatusBoxBlinking
@@ -77,6 +59,24 @@ export default function Status() {
             onPallet153 === null || palletSize153 === null
               ? 'brak'
               : `${onPallet153} / ${palletSize153} (${quantityOnPallet153} szt.)`
+          }
+        />
+      )}
+      <BoxSeparator />
+      {isPending ? (
+        <StatusBoxSkeleton boxName="M136 (28067):" value="x/y" />
+      ) : isFull136 ? (
+        <StatusBoxBlinking
+          boxName="M136 (28067):"
+          value={`${onPallet136} / ${palletSize136} (${quantityOnPallet136} szt.)`}
+        />
+      ) : (
+        <StatusBox
+          boxName="M136 (28067):"
+          value={
+            onPallet136 === null || palletSize136 === null
+              ? 'brak'
+              : `${onPallet136} / ${palletSize136} (${quantityOnPallet136} szt.)`
           }
         />
       )}
