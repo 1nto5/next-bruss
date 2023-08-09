@@ -3,7 +3,7 @@ import { useAppSelector } from '@/lib/redux/pro/hooks'
 import QRCode from 'qrcode.react'
 import html2canvas from 'html2canvas'
 import Button from './Button'
-import { getPalletQr } from '../only-pallet-label/actions'
+import { getPalletQr } from '../actions'
 import toast from 'react-hot-toast'
 
 const PrintPalletLabel = () => {
