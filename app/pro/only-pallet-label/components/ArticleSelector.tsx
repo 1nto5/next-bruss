@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { setArticle } from '@/lib/redux/pro/articleSlice'
-import config from '@/configs/only-pallet-label.json'
+// import config from '@/configs/only-pallet-label.json'
 import toast from 'react-hot-toast'
 
 type StatusProps = {
