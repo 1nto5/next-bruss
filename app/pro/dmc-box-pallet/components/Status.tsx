@@ -1,4 +1,4 @@
-import { useAppSelector } from '@/lib/redux/pro/hooks'
+import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
 import {
   StatusBox,
   StatusBoxBlinking,
@@ -60,6 +60,24 @@ export default function Status() {
       ) : (
         <StatusBox
           boxName="na palecie:"
+          value={
+            onPallet === null || palletSize === null
+              ? 'brak'
+              : `${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`
+          }
+        />
+      )}
+      <BoxSeparator />
+      {isPending ? (
+        <StatusBoxSkeleton boxName="w boxie:" value="x/y" />
+      ) : isFull ? (
+        <StatusBoxBlinking
+          boxName="w boxie:"
+          value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
+        />
+      ) : (
+        <StatusBox
+          boxName="w boxie:"
           value={
             onPallet === null || palletSize === null
               ? 'brak'

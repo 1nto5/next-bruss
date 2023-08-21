@@ -1,9 +1,9 @@
 import { useRef, useTransition, useEffect, useState } from 'react'
-import { useAppSelector } from '@/lib/redux/pro/hooks'
+import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
 import QRCode from 'qrcode.react'
 import html2canvas from 'html2canvas'
-import Button from './Button'
-import { getPalletQr } from '../actions'
+import Button from '../../components/Button'
+import { getPalletQr } from '../../actions'
 import toast from 'react-hot-toast'
 
 const PrintPalletLabel = () => {

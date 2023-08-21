@@ -6,11 +6,7 @@ export const metadata = {
   // description: 'Company helper applications',
 }
 
-export default function OnlyPalletLabelLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   //  const workplace =  headers().get('referer')?.split('/').pop()
 
   return (

@@ -2,7 +2,7 @@
 
 import { useDispatch } from 'react-redux'
 import { logOut } from '@/lib/redux/pro/operatorSlice'
-import { clearArticle } from '@/lib/redux/pro/articleSlice'
+import { clearArticle } from '@/lib/redux/pro/dmc-box-pallet/articleSlice'
 import { useAppSelector } from '@/lib/redux/pro/hooks'
 import Button from '@/app/pro/components/Button'
 

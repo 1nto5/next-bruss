@@ -1,0 +1,44 @@
+[
+  {
+    "workplace:": "EOL74",
+    "article": 27097,
+    "name": "F-IWDR92,1L-ST",
+    "note": "boxon",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  },
+  {
+    "workplace:": "EOL74",
+    "article": 27279,
+    "name": "F-IWDR92,1L-ST",
+    "note": "karton",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  },
+  {
+    "workplace:": "EOL74",
+    "article": 27105,
+    "name": "F-IWDR92,1L-ST SERWIS",
+    "note": "serwis",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  }
+]

@@ -1,12 +1,11 @@
-import Header from '../../components/Header'
-// import { headers } from 'next/headers'
+import Header from '@/app/pro/dmc-box-pallet/components/Header'
 
 export const metadata = {
-  title: '136/153 Only Pallet Label (Next BRUSS)',
+  title: 'EOL74 (Next BRUSS)',
   // description: 'Company helper applications',
 }
 
-export default function OnlyPalletLabelLayout({
+export default function Eol74Layout({
   children,
 }: {
   children: React.ReactNode
@@ -15,7 +14,7 @@ export default function OnlyPalletLabelLayout({
 
   return (
     <>
-      <Header title={`136/153 Only Pallet Label`} />
+      <Header title={`EOL74`} />
       {children}
     </>
   )

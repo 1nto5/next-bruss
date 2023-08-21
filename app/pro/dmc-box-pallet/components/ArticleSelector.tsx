@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { setArticle } from '@/lib/redux/pro/articleSlice'
+import { setArticle } from '@/lib/redux/pro/dmc-box-pallet/articleSlice'
 import config from '@/configs/config136-153.json'
 import toast from 'react-hot-toast'
 

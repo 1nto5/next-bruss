@@ -1,8 +1,6 @@
 'use client'
 
-// full screen deosnt work properly
-
-import { useAppSelector } from '@/lib/redux/pro/hooks'
+import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
 import { useDispatch } from 'react-redux'
 import { usePathname } from 'next/navigation'
 import { useEffect, useTransition } from 'react'
@@ -12,13 +10,13 @@ import {
   updateOnPallet,
   updatePalletSize,
   updateBoxSize,
-} from '@/lib/redux/pro/workplaceSlice'
+} from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
 import Status from '../components/Status'
-import NumLogIn from '../../components/NumLogIn'
+import NumLogIn from '../components/NumLogIn'
 import ArticleSelector from '../components/ArticleSelector'
 import ScanHydraQr from '../components/ScanHydraQr'
 import ScanPalletQr from '../components/ScanPalletQr'
-import PrintPalletLabel from '../../components/PrintPalletLabel'
+import PrintPalletLabel from '../components/PrintPalletLabel'
 
 import { countOnPallet, getPalletSize, getBoxSize } from '../actions'
 

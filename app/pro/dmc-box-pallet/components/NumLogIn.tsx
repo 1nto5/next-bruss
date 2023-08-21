@@ -4,9 +4,9 @@
 
 import { useState, FormEvent } from 'react'
 import checkOperator from '@/lib/utils/pro/checkOperator'
-import { logIn } from '@/lib/redux/pro/operatorSlice'
+import { logIn } from '@/lib/redux/pro/dmc-box-pallet/operatorSlice'
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from '../../../lib/redux/pro/store'
+import { AppDispatch } from '@/lib/redux/pro/dmc-box-pallet/store'
 
 import toast from 'react-hot-toast'
 

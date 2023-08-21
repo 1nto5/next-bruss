@@ -15,7 +15,7 @@ import {
   updateBoxSize153,
 } from '@/lib/redux/pro/136-153/workplaceSlice'
 import Status from './components/Status'
-import NumLogIn from '../components/NumLogIn'
+import NumLogIn from '@/app/pro/136-153/components/NumLogIn'
 import ScanHydraQr from './components/ScanHydraQr'
 import ScanPalletQr from './components/ScanPalletQr'
 import PrintPalletLabel from './components/PrintPalletLabel'
