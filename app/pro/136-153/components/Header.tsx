@@ -1,9 +1,9 @@
 'use client'
 
 import { useDispatch } from 'react-redux'
-import { logOut } from '@/lib/redux/pro/operatorSlice'
+import { logOut } from '@/lib/redux/pro/136-153/operatorSlice'
 import { clearArticle } from '@/lib/redux/pro/dmc-box-pallet/articleSlice'
-import { useAppSelector } from '@/lib/redux/pro/hooks'
+import { useAppSelector } from '@/lib/redux/pro/136-153/hooks'
 import Button from '@/app/pro/components/Button'
 
 import toast from 'react-hot-toast'
