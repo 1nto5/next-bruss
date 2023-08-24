@@ -8,26 +8,27 @@ import {
 } from '@/lib/utils/pro/dmcDateValidation'
 
 // Define Types
-type ArticleObject = {
+type ArticleConfigObject = {
   workplace: string
   type: string
   article: number
   name: string
-  note?: string
-  baseDmc?: string
-  dmcFirVal?: [number, number]
-  dmcSecVal?: [number, number]
-  ford?: boolean
-  bmw?: boolean
+  note: string
+  baseDmc: string
+  dmcFirVal: [number, number]
+  dmcSecVal: [number, number]
+  ford: boolean
+  bmw: boolean
   palletSize: number
   boxSize: number
-  hydraProc: string // If hydraProc is supposed to be an array, use 'string[]'
+  hydraProc: string
+  palletProc: string
 }
 
 const collectionName = 'dmc'
 
 // Function to get the number of documents with a specific status, article number, and workplace
-export async function countInBox(workplace: string, articleNumber: number) {
+export async function countInBox(workplace: string, article: number) {
   try {
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName)
@@ -36,7 +37,7 @@ export async function countInBox(workplace: string, articleNumber: number) {
     const count = await collection.countDocuments({
       status: 'box',
       workplace: workplace,
-      article: articleNumber,
+      article: article,
     })
 
     // Return the count
@@ -48,7 +49,7 @@ export async function countInBox(workplace: string, articleNumber: number) {
 }
 
 // Function to get the number of documents with a specific status, article number, and workplace
-export async function countOnPallet(workplace: string, articleNumber: number) {
+export async function countOnPallet(workplace: string, article: number) {
   try {
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName)
@@ -57,7 +58,7 @@ export async function countOnPallet(workplace: string, articleNumber: number) {
     const count = await collection.countDocuments({
       status: 'pallet',
       workplace: workplace,
-      article: articleNumber,
+      article: article,
     })
 
     // Return the count
@@ -69,12 +70,12 @@ export async function countOnPallet(workplace: string, articleNumber: number) {
 }
 
 // Function to get the pallet size for a specific workplace and article
-export async function getPalletSize(workplace: string, articleNumber: number) {
+export async function getPalletSize(workplace: string, article: number) {
   try {
     // Find the article configuration
     const articleConfig = productionConfig.find(
-      (object: ArticleObject) =>
-        object.workplace === workplace && object.article === articleNumber
+      (object: ArticleConfigObject) =>
+        object.workplace === workplace && object.article === article
     )
 
     // Return the pallet size, or null if the article is not found
@@ -86,12 +87,12 @@ export async function getPalletSize(workplace: string, articleNumber: number) {
 }
 
 // Function to get the box size for a specific workplace and article
-export async function getBoxSize(workplace: string, articleNumber: number) {
+export async function getBoxSize(workplace: string, article: number) {
   try {
     // Find the article configuration
     const articleConfig = productionConfig.find(
-      (object: ArticleObject) =>
-        object.workplace === workplace && object.article === articleNumber
+      (object: ArticleConfigObject) =>
+        object.workplace === workplace && object.article === article
     )
 
     // Return the box size, or null if the article is not found
@@ -103,12 +104,14 @@ export async function getBoxSize(workplace: string, articleNumber: number) {
 }
 
 // Generate pallet QR
-export async function getPalletQr(
-  articleNumber: number,
-  quantityOnPallet: number
-) {
+export async function getPalletQr(article: number, quantityOnPallet: number) {
   try {
-    return generatePalletQr(articleNumber, quantityOnPallet, '876')
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleConfigObject) => object.article === article
+    )
+
+    return generatePalletQr(article, quantityOnPallet, articleConfig.palletProc)
   } catch (error) {
     console.error(error)
     throw new Error('An error occurred while generating pallet qr.')
@@ -116,18 +119,17 @@ export async function getPalletQr(
 }
 
 // Save DMC function
-// TODO
 export async function saveDmc(
   dmc: string,
   workplace: string,
-  articleNumber: number,
+  article: number,
   operatorPersonalNumber: number
 ) {
   try {
     // Find the article configuration
     const articleConfig = productionConfig.find(
-      (object: ArticleObject) =>
-        object.workplace === workplace && object.article === articleNumber
+      (object: ArticleConfigObject) =>
+        object.workplace === workplace && object.article === article
     )
 
     // DMC length
@@ -177,16 +179,16 @@ export async function saveDmc(
     }
 
     // Check if pallet is full
-    const onPallet = await countOnPallet(workplace, articleNumber)
-    const palletSize = await getPalletSize(workplace, articleNumber)
+    const onPallet = await countOnPallet(workplace, article)
+    const palletSize = await getPalletSize(workplace, article)
     if (onPallet >= palletSize) {
       return { status: 'full pallet' }
     }
 
     // Check if box is full
-    const inBox = await countInBox(workplace, articleNumber)
-    const boxSize = await getBoxSize(workplace, articleNumber)
-    if (onPallet >= palletSize) {
+    const inBox = await countInBox(workplace, article)
+    const boxSize = await getBoxSize(workplace, article)
+    if (inBox >= boxSize) {
       return { status: 'full box' }
     }
 
@@ -195,10 +197,12 @@ export async function saveDmc(
       status: 'box',
       dmc: dmc,
       workplace: workplace,
-      article: articleNumber,
+      article: article,
       operator: operatorPersonalNumber,
       time: new Date(),
     })
+
+    console.log(insertResult)
 
     if (insertResult) {
       return { status: 'saved' }
@@ -213,30 +217,28 @@ export async function saveDmc(
 export async function saveHydraBatch(
   hydraQr: string,
   workplace: string,
-  articleNumber: number,
+  article: number,
   operatorPersonalNumber: number
 ) {
   try {
-    // Find workplace and article configuration
-    const workplaceConfig = productionConfig.find(
-      (w: WorkplaceConfig) => w.workplace === workplace
-    )
-    const articleConfig = workplaceConfig?.articles.find(
-      (a: ArticleConfig) => a.number === articleNumber
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleConfigObject) =>
+        object.workplace === workplace && object.article === article
     )
 
-    // // Validate hydra QR code
+    // Validate hydra QR code
     if (hydraQr.length < 34 || !hydraQr.includes('|')) {
       return { status: 'invalid' }
     }
 
-    // // Split QR code
+    // Split QR code
     const splitHydraQr = hydraQr.split('|')
-    const qrArticleNumber =
+    const qrarticle =
       splitHydraQr[0].length === 7 && Number(splitHydraQr[0].substr(2))
 
-    // // Check article number
-    if (qrArticleNumber !== articleNumber) {
+    // Check article number
+    if (qrarticle !== article) {
       return { status: 'wrong article' }
     }
 
@@ -265,8 +267,8 @@ export async function saveHydraBatch(
     }
 
     // Check if pallet is full
-    const onPallet = await countOnPallet(workplace, articleNumber)
-    const palletSize = await getPalletSize(workplace, articleNumber)
+    const onPallet = await countOnPallet(workplace, article)
+    const palletSize = await getPalletSize(workplace, article)
     if (onPallet >= palletSize) {
       return { status: 'full pallet' }
     }
@@ -276,7 +278,7 @@ export async function saveHydraBatch(
       status: 'pallet',
       hydra_batch: qrBatch,
       workplace: workplace,
-      article: articleNumber,
+      article: article,
       quantity: qrQuantity,
       operator: operatorPersonalNumber,
       time: new Date(),
@@ -295,17 +297,15 @@ export async function saveHydraBatch(
 export async function savePalletBatch(
   palletQr: string,
   workplace: string,
-  articleNumber: number,
+  article: number,
   quantityOnPallet: number,
   operatorPersonalNumber: number
 ) {
   try {
-    // Find workplace and article configuration
-    const workplaceConfig = productionConfig.find(
-      (w: WorkplaceConfig) => w.workplace === workplace
-    )
-    const articleConfig = workplaceConfig?.articles.find(
-      (a: ArticleConfig) => a.number === articleNumber
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleConfigObject) =>
+        object.workplace === workplace && object.article === article
     )
 
     // // Validate hydra QR code
@@ -315,11 +315,11 @@ export async function savePalletBatch(
 
     // // Split QR code
     const splitPalletQr = palletQr.split('|')
-    const qrArticleNumber =
+    const qrarticle =
       splitPalletQr[0].length === 7 && Number(splitPalletQr[0].substr(2))
 
     // // Check article number
-    if (qrArticleNumber !== articleNumber) {
+    if (qrarticle !== article) {
       return { status: 'wrong article' }
     }
 
@@ -331,7 +331,7 @@ export async function savePalletBatch(
 
     // Check process
     const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2)
-    if (qrProcess !== '876') {
+    if (qrProcess !== articleConfig.palletProc) {
       return { status: 'wrong process' }
     }
 
@@ -355,7 +355,7 @@ export async function savePalletBatch(
       {
         status: 'pallet',
         workplace: workplace,
-        article: articleNumber,
+        article: article,
       },
       {
         $set: {
