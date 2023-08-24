@@ -5,12 +5,12 @@ import { saveDmc } from '../actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 
-type StatusProps = {
+type Props = {
   workplace: string
 }
 
 // Component to scan DMC
-export default function ScanDmc({ workplace }: StatusProps) {
+export default function ScanDmc({ workplace }: Props) {
   // Use the article number from the Redux state
   const articleNumber = useSelector(
     (state: { article: { articleNumber: number; articleName: number } }) =>
@@ -71,14 +71,8 @@ export default function ScanDmc({ workplace }: StatusProps) {
           case 'invalid':
             toast.error('DMC niepoprawny!', { id: 'error' })
             break
-          case 'wrong article':
-            toast.error('Błędny artykuł!', { id: 'error' })
-            break
-          case 'wrong quantity':
-            toast.error('Błędna ilość!', { id: 'error' })
-            break
-          case 'wrong process':
-            toast.error('Błędny proces!', { id: 'error' })
+          case 'full box':
+            toast.error('Pełny box!', { id: 'error' })
             break
           case 'full pallet':
             toast.error('Pełna paleta!', { id: 'error' })
@@ -100,7 +94,7 @@ export default function ScanDmc({ workplace }: StatusProps) {
         value={dmc}
         onChange={(event) => setDmc(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder="HYDRA QR"
+        placeholder="DMC"
         autoFocus
       />
     </div>

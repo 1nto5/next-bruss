@@ -1,6 +1,6 @@
 'use server'
 import { connectToMongo } from '@/lib/mongo/connector'
-import { configDmcBoxPallet as configData } from '@/lib/utils/pro/configData'
+import { productionConfig } from '@/lib/utils/pro/config'
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr'
 import {
   fordValidation,
@@ -8,17 +8,20 @@ import {
 } from '@/lib/utils/pro/dmcDateValidation'
 
 // Define Types
-type ArticleConfig = {
-  number: number
+type ArticleObject = {
+  workplace: string
+  type: string
+  article: number
   name: string
+  note?: string
+  baseDmc?: string
+  dmcFirVal?: [number, number]
+  dmcSecVal?: [number, number]
+  ford?: boolean
+  bmw?: boolean
   palletSize: number
   boxSize: number
-  hydraProcess: string[]
-}
-
-type WorkplaceConfig = {
-  workplace: string
-  articles: ArticleConfig[]
+  hydraProc: string // If hydraProc is supposed to be an array, use 'string[]'
 }
 
 const collectionName = 'dmc'
@@ -68,16 +71,14 @@ export async function countOnPallet(workplace: string, articleNumber: number) {
 // Function to get the pallet size for a specific workplace and article
 export async function getPalletSize(workplace: string, articleNumber: number) {
   try {
-    // Find the workplace and article configuration
-    const workplaceConfig = configData.find(
-      (w: WorkplaceConfig) => w.workplace === workplace
-    )
-    const articleConfig = workplaceConfig?.articles.find(
-      (a: ArticleConfig) => a.number === articleNumber
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleObject) =>
+        object.workplace === workplace && object.article === articleNumber
     )
 
-    // Return the pallet size
-    return articleConfig?.palletSize
+    // Return the pallet size, or null if the article is not found
+    return articleConfig ? articleConfig.palletSize : null
   } catch (error) {
     console.error('Error while getting the pallet size:', error)
     return null
@@ -87,16 +88,14 @@ export async function getPalletSize(workplace: string, articleNumber: number) {
 // Function to get the box size for a specific workplace and article
 export async function getBoxSize(workplace: string, articleNumber: number) {
   try {
-    // Find the workplace and article configuration
-    const workplaceConfig = configData.find(
-      (w: WorkplaceConfig) => w.workplace === workplace
-    )
-    const articleConfig = workplaceConfig?.articles.find(
-      (a: ArticleConfig) => a.number === articleNumber
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleObject) =>
+        object.workplace === workplace && object.article === articleNumber
     )
 
-    // Return the box size
-    return articleConfig?.boxSize
+    // Return the box size, or null if the article is not found
+    return articleConfig ? articleConfig.boxSize : null
   } catch (error) {
     console.error('Error while getting the box size:', error)
     return null
@@ -125,49 +124,54 @@ export async function saveDmc(
   operatorPersonalNumber: number
 ) {
   try {
-    // Find workplace and article configuration
-    const workplaceConfig = configData.find(
-      (w: WorkplaceConfig) => w.workplace === workplace
-    )
-    const articleConfig = workplaceConfig?.articles.find(
-      (a: ArticleConfig) => a.number === articleNumber
+    // Find the article configuration
+    const articleConfig = productionConfig.find(
+      (object: ArticleObject) =>
+        object.workplace === workplace && object.article === articleNumber
     )
 
-    // // Validate hydra QR code
-    if (hydraQr.length < 34 || !hydraQr.includes('|')) {
+    // DMC length
+    if (dmc.length !== articleConfig.baseDmc.length) {
       return { status: 'invalid' }
     }
 
-    // // Split QR code
-    const splitHydraQr = hydraQr.split('|')
-    const qrArticleNumber =
-      splitHydraQr[0].length === 7 && Number(splitHydraQr[0].substr(2))
-
-    // // Check article number
-    if (qrArticleNumber !== articleNumber) {
-      return { status: 'wrong article' }
+    // DMC content
+    if (
+      dmc.substring(articleConfig.dmcFirVal[0], articleConfig.dmcFirVal[1]) !==
+      articleConfig.baseDmc.substring(
+        articleConfig.dmcFirVal[0],
+        articleConfig.dmcFirVal[1]
+      )
+    ) {
+      return { status: 'invalid' }
     }
 
-    // Check quantity
-    const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2))
-    if (qrQuantity !== articleConfig.boxSize) {
-      return { status: 'wrong quantity' }
+    if (
+      articleConfig.dmcSecVal &&
+      dmc.substring(articleConfig.dmcSecVal[0], articleConfig.dmcSecVal[1]) !==
+        articleConfig.baseDmc.substring(
+          articleConfig.dmcSecVal[0],
+          articleConfig.dmcSecVal[1]
+        )
+    ) {
+      return { status: 'invalid' }
     }
 
-    // Check process
-    const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2)
-    if (!articleConfig.hydraProc.includes(qrProcess)) {
-      return { status: 'wrong process' }
+    // FORD date
+    if (articleConfig.ford && !fordValidation(dmc)) {
+      return { status: 'wrong date' }
     }
 
-    // Extract batch from QR code
-    const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase()
+    // BMW date
+    if (articleConfig.bmw && !bmwValidation(dmc)) {
+      return { status: 'wrong date' }
+    }
 
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName)
 
     // Check for existing data
-    const existingData = await collection.findOne({ hydra_batch: qrBatch })
+    const existingData = await collection.findOne({ dmc: dmc })
     if (existingData) {
       return { status: 'exists' }
     }
@@ -179,13 +183,19 @@ export async function saveDmc(
       return { status: 'full pallet' }
     }
 
+    // Check if box is full
+    const inBox = await countInBox(workplace, articleNumber)
+    const boxSize = await getBoxSize(workplace, articleNumber)
+    if (onPallet >= palletSize) {
+      return { status: 'full box' }
+    }
+
     // Insert data
     const insertResult = await collection.insertOne({
-      status: 'pallet',
-      hydra_batch: qrBatch,
+      status: 'box',
+      dmc: dmc,
       workplace: workplace,
       article: articleNumber,
-      quantity: qrQuantity,
       operator: operatorPersonalNumber,
       time: new Date(),
     })
@@ -208,7 +218,7 @@ export async function saveHydraBatch(
 ) {
   try {
     // Find workplace and article configuration
-    const workplaceConfig = configData.find(
+    const workplaceConfig = productionConfig.find(
       (w: WorkplaceConfig) => w.workplace === workplace
     )
     const articleConfig = workplaceConfig?.articles.find(
@@ -291,7 +301,7 @@ export async function savePalletBatch(
 ) {
   try {
     // Find workplace and article configuration
-    const workplaceConfig = configData.find(
+    const workplaceConfig = productionConfig.find(
       (w: WorkplaceConfig) => w.workplace === workplace
     )
     const articleConfig = workplaceConfig?.articles.find(

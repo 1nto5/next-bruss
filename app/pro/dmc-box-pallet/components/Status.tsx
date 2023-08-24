@@ -17,7 +17,9 @@ export default function Status() {
 
   const articleNumber = useAppSelector((state) => state.article.articleNumber)
   const articleName = useAppSelector((state) => state.article.articleName)
-  const isFull = useAppSelector((state) => state.workplace.isFull)
+  const isFullBox = useAppSelector((state) => state.workplace.isFullBox)
+  const isFullPallet = useAppSelector((state) => state.workplace.isFullPallet)
+  const inBox = useAppSelector((state) => state.workplace.inBox)
   const onPallet = useAppSelector((state) => state.workplace.onPallet)
   const palletSize = useAppSelector((state) => state.workplace.palletSize)
   const boxSize = useAppSelector((state) => state.workplace.boxSize)
@@ -52,7 +54,7 @@ export default function Status() {
       <BoxSeparator />
       {isPending ? (
         <StatusBoxSkeleton boxName="na palecie:" value="x/y" />
-      ) : isFull ? (
+      ) : isFullPallet ? (
         <StatusBoxBlinking
           boxName="na palecie:"
           value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
@@ -70,10 +72,10 @@ export default function Status() {
       <BoxSeparator />
       {isPending ? (
         <StatusBoxSkeleton boxName="w boxie:" value="x/y" />
-      ) : isFull ? (
+      ) : isFullBox ? (
         <StatusBoxBlinking
           boxName="w boxie:"
-          value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
+          value={`${inBox} / ${boxSize} (${quantityOnPallet} szt.)`}
         />
       ) : (
         <StatusBox
@@ -81,7 +83,7 @@ export default function Status() {
           value={
             onPallet === null || palletSize === null
               ? 'brak'
-              : `${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`
+              : `${inBox} / ${boxSize} szt.`
           }
         />
       )}

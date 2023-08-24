@@ -1,0 +1,65 @@
+[
+  {
+    "workplace": "136-153",
+    "type": "136-153",
+    "article": 28067,
+    "name": "M-136-K-1-A",
+    "palletSize": 25,
+    "boxSize": 12,
+    "hydraProc": "090"
+  },
+  {
+    "workplace": "136-153",
+    "type": "136-153",
+    "article": 28042,
+    "name": "M-153-K-C",
+    "palletSize": 30,
+    "boxSize": 10,
+    "hydraProc": "090"
+  },
+  {
+    "workplace": "eol74",
+    "type": "dmc-box-pallet",
+    "article": 27097,
+    "name": "F-IWDR92,1L-ST",
+    "note": "boxon",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  },
+  {
+    "workplace": "eol74",
+    "type": "dmc-box-pallet",
+    "article": 27279,
+    "name": "F-IWDR92,1L-ST",
+    "note": "karton",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  },
+  {
+    "workplace": "eol74",
+    "type": "dmc-box-pallet",
+    "article": 27105,
+    "name": "F-IWDR92,1L-ST SERWIS",
+    "note": "serwis",
+    "baseDmc": "C9E0CYYDAYAXXXXXGK2Q 6K301 AA",
+    "dmcFirVal": [0, 5],
+    "dmcSecVal": [16, 13],
+    "ford": true,
+    "bmw": false,
+    "palletSize": 20,
+    "boxSize": 44,
+    "hydraProc": "050"
+  }
+]

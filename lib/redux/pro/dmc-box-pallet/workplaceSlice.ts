@@ -2,19 +2,23 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type WorkplaceStatusState = {
   isPending: boolean
+  inBox: number | null
   onPallet: number | null
   palletSize: number | null
   boxSize: number | null
-  isFull: boolean
+  isFullBox: boolean
+  isFullPallet: boolean
   lastScan: string | null
 }
 
 const initialWorkplaceStatusState: WorkplaceStatusState = {
   isPending: false,
+  inBox: null,
   onPallet: null,
   palletSize: null,
   boxSize: null,
-  isFull: false,
+  isFullBox: false,
+  isFullPallet: false,
   lastScan: null,
 }
 
@@ -25,6 +29,9 @@ const workplaceSlice = createSlice({
     togglePending: (state, action: PayloadAction<boolean>) => {
       state.isPending = action.payload
     },
+    updateInBox: (state, action: PayloadAction<number>) => {
+      state.inBox = action.payload
+    },
     updateOnPallet: (state, action: PayloadAction<number>) => {
       state.onPallet = action.payload
     },
@@ -34,8 +41,11 @@ const workplaceSlice = createSlice({
     updateBoxSize: (state, action: PayloadAction<number>) => {
       state.boxSize = action.payload
     },
-    toggleIsFull: (state) => {
-      state.isFull = !state.isFull
+    toggleIsFullBox: (state) => {
+      state.isFullBox = !state.isFullBox
+    },
+    toggleIsFullPallet: (state) => {
+      state.isFullPallet = !state.isFullPallet
     },
     updateLastScan: (state, action: PayloadAction<string>) => {
       state.lastScan = action.payload
@@ -45,10 +55,12 @@ const workplaceSlice = createSlice({
 
 export const {
   togglePending,
+  updateInBox,
   updateOnPallet,
   updatePalletSize,
   updateBoxSize,
-  toggleIsFull,
+  toggleIsFullBox,
+  toggleIsFullPallet,
   updateLastScan,
 } = workplaceSlice.actions
 export default workplaceSlice.reducer

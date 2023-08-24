@@ -19,7 +19,8 @@ type WorkplaceState = {
   onPallet: number | null
   palletSize: number | null
   boxSize: number | null
-  isFull: boolean
+  isFullBox: boolean
+  isFullPallet: boolean
   lastScan: string | null
 }
 
@@ -39,7 +40,8 @@ const initialWorkplaceState: WorkplaceState = {
   onPallet: null,
   palletSize: null,
   boxSize: null,
-  isFull: false,
+  isFullBox: false,
+  isFullPallet: false,
   lastScan: null,
 }
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
 import {
-  toggleIsFull,
+  toggleIsFullPallet,
   updateLastScan,
 } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
 import { savePalletBatch } from '../actions'
@@ -66,7 +66,7 @@ export default function ScanPalletQr({ workplace }: StatusProps) {
         switch (status) {
           case 'saved':
             dispatch(updateLastScan(palletQr))
-            dispatch(toggleIsFull())
+            dispatch(toggleIsFullPallet())
             toast.success('Batch OK!', { id: 'success' })
             break
           case 'exists':

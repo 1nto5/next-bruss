@@ -6,7 +6,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useTransition } from 'react'
 import {
   togglePending,
-  toggleIsFull,
+  toggleIsFullBox,
+  toggleIsFullPallet,
+  updateInBox,
   updateOnPallet,
   updatePalletSize,
   updateBoxSize,
@@ -14,11 +16,17 @@ import {
 import Status from '../components/Status'
 import NumLogIn from '../components/NumLogIn'
 import ArticleSelector from '../components/ArticleSelector'
+import ScanDmc from '../components/ScanDmc'
 import ScanHydraQr from '../components/ScanHydraQr'
 import ScanPalletQr from '../components/ScanPalletQr'
 import PrintPalletLabel from '../components/PrintPalletLabel'
 
-import { countOnPallet, getPalletSize, getBoxSize } from '../actions'
+import {
+  countOnPallet,
+  getPalletSize,
+  getBoxSize,
+  countInBox,
+} from '../actions'
 
 import toast from 'react-hot-toast'
 
@@ -30,7 +38,8 @@ export default function OnlyPalletLabel() {
 
   const dispatch = useDispatch()
 
-  const isFull = useAppSelector((state) => state.workplace.isFull)
+  const isFullBox = useAppSelector((state) => state.workplace.isFullBox)
+  const isFullPallet = useAppSelector((state) => state.workplace.isFullPallet)
 
   const [isPending, startTransition] = useTransition()
 
@@ -43,15 +52,20 @@ export default function OnlyPalletLabel() {
       try {
         if (articleLogged) {
           toast.loading('Ładowanie...', { id: 'loading' })
+          const inBox = await countInBox(pathWorkplace, articleLogged)
+          dispatch(updateInBox(inBox))
+          const boxSize = await getBoxSize(pathWorkplace, articleLogged)
+          dispatch(updateBoxSize(boxSize))
           const onPallet = await countOnPallet(pathWorkplace, articleLogged)
           dispatch(updateOnPallet(onPallet))
           const palletSize = await getPalletSize(pathWorkplace, articleLogged)
           dispatch(updatePalletSize(palletSize))
-          if (onPallet >= palletSize) {
-            dispatch(toggleIsFull())
+          if (inBox >= boxSize) {
+            dispatch(toggleIsFullBox())
           }
-          const boxSize = await getBoxSize(pathWorkplace, articleLogged)
-          dispatch(updateBoxSize(boxSize))
+          if (onPallet >= palletSize) {
+            dispatch(toggleIsFullPallet())
+          }
         }
         toast.dismiss('loading')
       } catch (error) {
@@ -76,13 +90,15 @@ export default function OnlyPalletLabel() {
         articleLogged &&
         operatorLogged && (
           <>
-            {isFull ? (
+            {isFullPallet ? (
               <>
                 <ScanPalletQr workplace={pathWorkplace} />
                 <PrintPalletLabel />
               </>
-            ) : (
+            ) : isFullBox ? (
               <ScanHydraQr workplace={pathWorkplace} />
+            ) : (
+              <ScanDmc workplace={pathWorkplace} />
             )}
           </>
         )

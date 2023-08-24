@@ -1,7 +1,7 @@
 'use server'
 import { connectToMongo } from '@/lib/mongo/connector'
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr'
-import { config136153 as config } from '@/lib/utils/pro/configData'
+import { productionConfig } from '@/lib/utils/pro/config'
 
 // Define Types
 type ArticleConfig = {
