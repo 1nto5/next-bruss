@@ -71,6 +71,9 @@ export default function ScanDmc({ workplace }: Props) {
           case 'invalid':
             toast.error('DMC niepoprawny!', { id: 'error' })
             break
+          case 'wrong date':
+            toast.error('Data niepoprawna!', { id: 'error' })
+            break
           case 'full box':
             toast.error('Pełny box!', { id: 'error' })
             break

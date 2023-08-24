@@ -75,7 +75,7 @@ export default function Status() {
       ) : isFullBox ? (
         <StatusBoxBlinking
           boxName="w boxie:"
-          value={`${inBox} / ${boxSize} (${quantityOnPallet} szt.)`}
+          value={`${inBox} / ${boxSize} szt.`}
         />
       ) : (
         <StatusBox
