@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateLastScan } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
-import { saveDmc } from '../actions'
+import { saveDmc } from '@/app/pro/actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 

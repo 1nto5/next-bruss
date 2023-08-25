@@ -3,7 +3,7 @@ import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
 import QRCode from 'qrcode.react'
 import html2canvas from 'html2canvas'
 import Button from '../../components/Button'
-import { getPalletQr } from '../../actions'
+import { getPalletQr } from '@/app/pro/actions'
 import toast from 'react-hot-toast'
 
 const PrintPalletLabel = () => {

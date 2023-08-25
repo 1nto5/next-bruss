@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { updateLastScan } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
-import { saveHydraBatch } from '../actions'
+import { saveHydraBatch } from '@/app/pro/actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 

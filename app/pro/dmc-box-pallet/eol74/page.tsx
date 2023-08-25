@@ -26,7 +26,7 @@ import {
   getPalletSize,
   getBoxSize,
   countInBox,
-} from '../actions'
+} from '@/app/pro/actions'
 
 import toast from 'react-hot-toast'
 

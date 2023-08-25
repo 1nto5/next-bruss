@@ -1,6 +1,6 @@
 import { ReduxProvider } from '@/lib/redux/pro/dmc-box-pallet/provider'
 
-export default function Eol74Layout({
+export default function DmcBoxPallet({
   children,
 }: {
   children: React.ReactNode

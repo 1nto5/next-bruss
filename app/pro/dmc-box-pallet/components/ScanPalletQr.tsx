@@ -5,7 +5,7 @@ import {
   toggleIsFullPallet,
   updateLastScan,
 } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
-import { savePalletBatch } from '../actions'
+import { savePalletBatch } from '@/app/pro/actions'
 import { useTransition } from 'react'
 import toast from 'react-hot-toast'
 

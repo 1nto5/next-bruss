@@ -1,9 +1,7 @@
-// import { ReduxProvider } from '@/lib/redux/pro/provider'
-
 import Toast from './components/Toast'
 
 export const metadata = {
-  title: 'Next BRUSS: Only Pallet Label',
+  title: 'Next BRUSS: Production',
   // description: 'Company helper applications',
 }
 
@@ -14,7 +12,6 @@ export default function OnlyPalletLabelLayout({
 }) {
   return (
     <>
-      {/* <ReduxProvider>{children}</ReduxProvider> */}
       {children}
       <Toast />
     </>
