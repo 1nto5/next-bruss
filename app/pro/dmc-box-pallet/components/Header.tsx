@@ -17,6 +17,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
   const articleLogged = useAppSelector((state) => state.article.articleNumber)
+  const boxSize = useAppSelector((state) => state.workplace.boxSize) // TODO non series BOX (0 in config)
 
   const handleLogoutOperator = () => {
     dispatch(logOut()) // Logout operator
