@@ -26,7 +26,8 @@ const PrintPalletLabel = () => {
         toast.dismiss('loadingQr')
       })
     }
-  }, [articleNumber, quantity, quantityOnPallet])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const generatePrintWindow = (imgData: string) => {
     const printWindow = window.open()
