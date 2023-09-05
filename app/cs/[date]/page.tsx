@@ -1,5 +1,5 @@
-import Header from './components/Header'
-import Table from './components/Table'
+import Header from '../components/Header'
+import Table from '../components/Table'
 
 const data = [
   {
@@ -31,10 +31,10 @@ const columns = [
   // add more columns as needed
 ]
 
-export default function Cs() {
+export default function Page({ params }: { params: { date: string } }) {
   return (
     <>
-      <Header />
+      <Header selectedDate={'12.31.123'} />
       <Table data={data} columns={columns} />
     </>
   )

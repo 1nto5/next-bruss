@@ -4,7 +4,7 @@ import Link from 'next/link'
 import moment from 'moment'
 import { useState } from 'react'
 
-const Header: React.FC = () => {
+export default function Header({ selectedDate }: { selectedDate: string }) {
   const [date, setDate] = useState(moment())
 
   const handleDateChange = (newDate: moment.Moment) => {
@@ -19,6 +19,7 @@ const Header: React.FC = () => {
 
       <div>
         <p>Current week: {date.week()}</p>
+        <p>Wybrana data: {selectedDate}</p>
         <input
           type="date"
           value={date.format('YYYY-MM-DD')}
@@ -27,10 +28,7 @@ const Header: React.FC = () => {
       </div>
       <nav>
         <Link href="/login">Login</Link>
-        <Link href="/logout">Logout</Link>
       </nav>
     </div>
   )
 }
-
-export default Header
