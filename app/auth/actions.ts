@@ -34,6 +34,14 @@ function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
 }
 
+function isValidPassword(password: string): boolean {
+  const hasMinLength = password.length >= 6
+  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password)
+  const hasNumber = /\d/.test(password)
+
+  return hasMinLength && hasSpecialChar && hasNumber
+}
+
 export async function Register(fName: string, lName: string, password: string) {
   try {
     // Connect to MongoDB
@@ -53,14 +61,18 @@ export async function Register(fName: string, lName: string, password: string) {
       return { status: 'exists' }
     }
 
+    if (!isValidPassword(password)) {
+      return { status: 'wrong password' }
+    }
+
     // Encrypt the password before saving it to the database
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(password, salt)
 
     // Saving the user in the database
     const result = await collection.insertOne({
-      formattedFName,
-      formattedLName,
+      fName: formattedFName,
+      lName: formattedLName,
       email,
       password: hashedPassword,
     })

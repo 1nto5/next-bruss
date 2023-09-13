@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import DarkLightProvider from './theme-provider'
+import { AuthProvider } from './auth-provider'
 
 import Footer from './components/Footer'
 
@@ -21,7 +22,9 @@ export default function RootLayout({
       <head />
       <body className="bg-slate-50 dark:bg-slate-950">
         <DarkLightProvider>
-          <main>{children}</main>
+          <AuthProvider>
+            <main>{children}</main>
+          </AuthProvider>
           <Footer />
         </DarkLightProvider>
       </body>
