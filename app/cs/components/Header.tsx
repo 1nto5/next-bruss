@@ -27,7 +27,8 @@ export default function Header({ selectedDate }: { selectedDate: string }) {
         />
       </div>
       <nav>
-        <Link href="/login">Login</Link>
+        <Link href="/auth/login">Login</Link>
+        <Link href="/auth/logout">Logout</Link>
       </nav>
     </div>
   )
