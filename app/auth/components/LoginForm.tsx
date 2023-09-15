@@ -7,14 +7,14 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
 type LoginFormState = {
-  login: string
+  username: string
   password: string
 }
 
 export default function LoginForm() {
   // Initialize state for the form fields
   const [formState, setFormState] = useState<LoginFormState>({
-    login: '',
+    username: '',
     password: '',
   })
 
@@ -37,7 +37,7 @@ export default function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!formState.login || !formState.password) {
+    if (!formState.username || !formState.password) {
       setErrorMessage('All fields are necessary!')
       return
     }
@@ -45,7 +45,7 @@ export default function LoginForm() {
     startTransition(async () => {
       try {
         const res = await signIn('credentials', {
-          login: formState.login,
+          username: formState.username,
           password: formState.password,
           redirect: false,
         })
@@ -54,7 +54,7 @@ export default function LoginForm() {
           setErrorMessage('Invlid Credentials!')
           return
         }
-        router.replace('cs')
+        router.replace('/')
       } catch (error) {
         console.error('User login was unsuccessful.:', error)
         setErrorMessage('Please contact IT!')
@@ -71,8 +71,8 @@ export default function LoginForm() {
             className="w-[400px] border border-gray-200 bg-zinc-100/40 px-6 py-2"
             type="text"
             placeholder="Login (firstname.lastname)"
-            name="login"
-            value={formState.login}
+            name="username"
+            value={formState.username}
             onChange={handleInputChange}
           />
           <input

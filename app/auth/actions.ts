@@ -47,12 +47,9 @@ export async function Register(fName: string, lName: string, password: string) {
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName)
 
-    const formattedFName = capitalizeFirstLetter(fName)
-    const formattedLName = capitalizeFirstLetter(lName)
-
     // Constructing the email based on the provided fName and lName
-    const email = `${replacePolishChars(formattedFName)}.${replacePolishChars(
-      formattedLName
+    const email = `${replacePolishChars(fName)}.${replacePolishChars(
+      lName
     )}@bruss-group.com`.toLowerCase()
 
     // Checking if a user with the given email already exists
@@ -65,16 +62,14 @@ export async function Register(fName: string, lName: string, password: string) {
       return { status: 'wrong password' }
     }
 
-    // Encrypt the password before saving it to the database
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     // Saving the user in the database
     const result = await collection.insertOne({
-      fName: formattedFName,
-      lName: formattedLName,
+      name: `${capitalizeFirstLetter(fName)} ${capitalizeFirstLetter(lName)}`,
       email,
       password: hashedPassword,
+      roles: ['user'],
     })
 
     if (result.insertedId) {

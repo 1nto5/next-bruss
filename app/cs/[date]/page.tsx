@@ -1,6 +1,5 @@
 import Header from '../components/Header'
 import Table from '../components/Table'
-import UserInfo from '@/app/auth/components/UserInfo'
 
 const data = [
   {
@@ -36,7 +35,6 @@ export default function Page({ params }: { params: { date: string } }) {
   return (
     <>
       <Header selectedDate={'12.31.123'} />
-      <UserInfo />
       <Table data={data} columns={columns} />
     </>
   )

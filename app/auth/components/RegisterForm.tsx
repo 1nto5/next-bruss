@@ -50,6 +50,11 @@ export default function RegisterForm() {
       return
     }
 
+    if (formState.fName.length < 3 || formState.lName.length < 3) {
+      setErrorMessage('Please enter a valid first and last name.')
+      return
+    }
+
     startTransition(async () => {
       try {
         const result = await Register(
