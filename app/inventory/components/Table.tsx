@@ -1,26 +1,32 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useTransition } from 'react'
 import { useTable } from 'react-table'
 import Select from 'react-select'
-import { GetArticles } from '../actions' // Upewnij się, że ścieżka do funkcji jest poprawna
+import { GetArticles, GetCard, UpdateCard } from '../actions'
+import { usePathname } from 'next/navigation'
 
 const Table = () => {
+  const pathname = usePathname()
+  const cardNumber = pathname.split('/').pop()
+  console.log(cardNumber)
+
   const [articles, setArticles] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [preLoadingIsPending, startPreLoadingTransition] = useTransition()
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
         const data = await GetArticles()
         setArticles(data)
-        setLoading(false)
       } catch (error) {
         console.error('Nie udało się pobrać artykułów.', error)
-        setLoading(false)
       }
     }
-    fetchArticles()
+
+    startPreLoadingTransition(() => {
+      fetchArticles()
+    })
   }, [])
 
   const articleSelectOptions = useMemo(() => {
@@ -38,26 +44,23 @@ const Table = () => {
         Cell: () => <input type="checkbox" className="h-6 w-6" />,
       },
       {
-        Header: 'p.',
+        Header: 'pos.',
         accessor: 'p',
       },
       {
-        Header: 'numer - nazwa',
+        Header: 'number - name',
         accessor: 'number-name',
-        Cell: () =>
-          loading ? (
-            <span>Loading...</span>
-          ) : (
-            <Select
-              options={articleSelectOptions}
-              className="text-left"
-              placeholder="wybierz"
-              menuPortalTarget={document.body}
-            />
-          ),
+        Cell: () => (
+          <Select
+            options={articleSelectOptions}
+            className="text-left"
+            placeholder="choose"
+            menuPortalTarget={document.body}
+          />
+        ),
       },
       {
-        Header: 'ilość / waga',
+        Header: 'quantity / weight',
         accessor: 'quantity-weight',
         Cell: () => (
           <div className="flex items-center justify-center">
@@ -70,21 +73,21 @@ const Table = () => {
         ),
       },
       {
-        Header: 'etykieta',
+        Header: 'label print',
         accessor: 'label',
         Cell: () => (
           <button className="rounded bg-blue-500 px-4 py-1 text-white">
-            Wydruk
+            Print
           </button>
         ),
       },
       {
-        Header: 'oznacz',
+        Header: 'label placed',
         accessor: 'mark',
         Cell: () => <input type="checkbox" className="h-6 w-6" />,
       },
     ],
-    [articleSelectOptions, loading]
+    [articleSelectOptions]
   )
 
   const data = useMemo(() => Array.from({ length: 25 }, () => ({})), [])
@@ -93,43 +96,51 @@ const Table = () => {
     useTable({ columns, data })
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full" {...getTableProps()}>
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr
-              className="bg-gray-800 tracking-widest text-gray-50"
-              {...headerGroup.getHeaderGroupProps()}
-            >
-              {headerGroup.headers.map((column) => (
-                <th
-                  className="p-2 font-extralight"
-                  {...column.getHeaderProps()}
+    <div>
+      {preLoadingIsPending ? (
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-24 w-24 animate-spin rounded-full border-t-8 border-solid border-bruss"></div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full" {...getTableProps()}>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr
+                  className="bg-gray-800 tracking-widest text-gray-50"
+                  {...headerGroup.getHeaderGroupProps()}
                 >
-                  {column.render('Header')}
-                </th>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      className="p-2 font-extralight"
+                      {...column.getHeaderProps()}
+                    >
+                      {column.render('Header')}
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row)
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td
-                    className="border-gray-200 text-center"
-                    {...cell.getCellProps()}
-                  >
-                    {cell.render('Cell')}
-                  </td>
-                ))}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {rows.map((row) => {
+                prepareRow(row)
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => (
+                      <td
+                        className="border-gray-200 text-center"
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render('Cell')}
+                      </td>
+                    ))}
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }
