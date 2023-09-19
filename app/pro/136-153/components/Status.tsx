@@ -4,7 +4,7 @@ import {
   StatusBoxBlinking,
   BoxSeparator,
   StatusBoxSkeleton,
-} from '@/app/pro/components/StatusElements'
+} from '@/app/components/StatusElements'
 
 export default function Status() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn)

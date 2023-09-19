@@ -8,47 +8,71 @@ import {
   FindLowestFreePosition,
 } from '../actions'
 import { useSession } from 'next-auth/react'
-import CardChooser from './CardChooser'
 
 export default function PositionChooser() {
   const router = useRouter()
   const pathname = usePathname()
-  const cardNumber = Number(pathname.split('/').pop())
+  const matches = pathname.match(/card-(\d+)/)
+  const cardNumber = matches ? Number(matches[1]) : null
   const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
-  const [lowestAvailableNumber, setLowestAvailableNumber] = useState<string>('')
-  const [existingCardNumbers, setExistingPositionNumbers] = useState<number[]>(
-    []
-  )
+  const [lowestAvailableNumber, setLowestAvailableNumber] = useState<number>()
+  const [existingPositionNumbers, setExistingPositionNumbers] = useState<
+    number[]
+  >([])
+  const [positionNumber, setPositionNumber] = useState<string>('')
 
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     startTransition(async () => {
-      if (session?.user?.email) {
-        const result = await ReserveCard(cardNumber, session?.user.email)
-        const status = result?.status
-        if (status == 'reserved') {
+      if (session?.user?.email && cardNumber) {
+        const res = await ReserveCard(cardNumber, session?.user.email)
+        if (res == 'reserved') {
           setMessage(`Card number: ${cardNumber} reserved!`)
+          return
         }
-        if (status == 'exists') {
-          setErrorMessage(`Card number: ${cardNumber} exists!`)
+        if (res == 'exists') {
+          setMessage(`Card number: ${cardNumber} exists!`)
+          return
         }
-        if (status == 'error') {
-          setErrorMessage(`Please contact IT!`)
+        if (res == 'no access') {
+          router.push('/inventory')
+          return
         }
+        setErrorMessage(`Please contact IT!`)
+        return
       }
+    })
+  }, [cardNumber, router, session?.user.email])
+
+  useEffect(() => {
+    startTransition(async () => {
       async function fetchExistingPositions() {
-        if (session?.user?.email) {
-          const numbers = await GetExistingPositions(cardNumber)
-          setExistingPositionNumbers(numbers)
+        if (session?.user?.email && cardNumber) {
+          const res = await GetExistingPositions(cardNumber)
+          if (res) {
+            setExistingPositionNumbers(res)
+            return
+          }
+          setErrorMessage('Please contact IT!')
+          return
         }
       }
       async function fetchLowestFreePosition() {
-        if (session?.user?.email) {
-          const number = await FindLowestFreePosition(cardNumber)
-          setLowestAvailableNumber(number)
+        if (session?.user?.email && cardNumber) {
+          const res = await FindLowestFreePosition(cardNumber)
+          if (res === 'full') {
+            setErrorMessage('Card is full!')
+            return
+          }
+          if (res) {
+            setLowestAvailableNumber(res)
+            return
+          }
+          setErrorMessage('Please contact IT!')
+          return
         }
       }
 
@@ -59,54 +83,60 @@ export default function PositionChooser() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    router.push(`${pathname}/${cardNumber}`)
+    router.push(`${pathname}/position-${positionNumber}`)
   }
 
   if (isPending) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="mt-24 flex justify-center">
         <div className="h-24 w-24 animate-spin rounded-full border-t-8 border-solid border-bruss"></div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="rounded-lg border-green-400 p-5 shadow-lg">
+    <div className="mt-12 flex flex-col items-center justify-center">
+      <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
+        select position
+      </span>
+      <div className="rounded bg-slate-100 p-8 shadow-md dark:bg-slate-800">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex items-center justify-center">
             <select
-              value={cardNumber}
-              // onChange={(e) => setCardNumber(e.target.value)}
-              className="w-[150px] border border-gray-200 bg-zinc-100/40 px-6 py-2"
-              disabled={existingCardNumbers.length === 0}
+              value={positionNumber}
+              onChange={(e) => setPositionNumber(e.target.value)}
+              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-700"
+              disabled={existingPositionNumbers.length === 0}
             >
-              {existingCardNumbers.length > 0 ? (
-                existingCardNumbers.map((number) => (
+              <option value="" disabled hidden>
+                {existingPositionNumbers.length === 0 ? 'empty card' : 'select'}
+              </option>
+              {existingPositionNumbers.length > 0 &&
+                existingPositionNumbers.map((number) => (
                   <option key={number} value={number}>
                     {number}
                   </option>
-                ))
-              ) : (
-                <option>No cards</option>
-              )}
+                ))}
             </select>
           </div>
-          <div className="mt-3 flex justify-center space-x-3">
-            <button
-              type="submit"
-              className="flex h-10 items-center justify-center rounded bg-bruss px-4 py-2 text-white"
-            >
-              Confirm
-            </button>
+          <div className="mt-4 flex justify-center space-x-3">
             <button
               type="button"
               onClick={() =>
-                router.push(`${pathname}/${String(lowestAvailableNumber)}`)
+                router.push(
+                  `${pathname}/position-${String(lowestAvailableNumber)}`
+                )
               }
-              className="flex h-10 items-center justify-center rounded bg-blue-500 px-4 py-2 text-white"
+              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
             >
-              Lowest Available
+              first available
+            </button>
+            <button
+              type="submit"
+              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              onClick={() => router.push(`${pathname}/card-${cardNumber}`)}
+            >
+              confirm
             </button>
           </div>
         </form>

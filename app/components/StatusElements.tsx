@@ -36,6 +36,12 @@ export const BoxSeparator: FC = () => {
   )
 }
 
+export const BoxSeparatorInventory: FC = () => {
+  return (
+    <div className="h-12 border-l-2 border-slate-200 dark:border-slate-700"></div>
+  )
+}
+
 export const StatusBoxSkeleton: FC<StatusBoxProps> = ({ boxName, value }) => {
   return (
     <div className="ml-auto mr-auto box-border text-center">
