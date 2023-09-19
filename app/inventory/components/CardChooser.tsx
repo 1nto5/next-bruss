@@ -11,6 +11,8 @@ export default function CardChooser() {
   const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
   const [cardNumber, setCardNumber] = useState<string>('')
+  const [message, setMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lowestAvailableNumber, setLowestAvailableNumber] = useState<string>('')
   const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
 
@@ -27,7 +29,6 @@ export default function CardChooser() {
           setExistingCardNumbers(numbers)
         }
       }
-
       fetchLowestNumber()
       fetchExistingNumbers()
     })
@@ -35,7 +36,10 @@ export default function CardChooser() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    router.push(`${pathname}/card-${cardNumber}`)
+    if (cardNumber !== '') {
+      router.push(`${pathname}/card-${cardNumber}`)
+    }
+    setErrorMessage('Card not selected!')
   }
 
   if (isPending) {
@@ -84,11 +88,21 @@ export default function CardChooser() {
             <button
               type="submit"
               className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-              onClick={() => router.push(`${pathname}/card?${cardNumber}`)}
             >
               confirm
             </button>
           </div>
+          {message && (
+            <div className="mt-6 rounded bg-bruss text-center text-slate-100">
+              {message}
+            </div>
+          )}
+
+          {errorMessage && (
+            <div className="mt-6 rounded bg-red-500 text-center  text-slate-100 dark:bg-red-700">
+              {errorMessage}
+            </div>
+          )}
         </form>
       </div>
     </div>

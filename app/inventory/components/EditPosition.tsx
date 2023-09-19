@@ -94,6 +94,7 @@ export default function CardPositionForm() {
           article: selectedArticle?.value,
           quantity: 54,
           unit: 'szt',
+          WIP: wip,
         })
         router.replace(`position-${position + 1}`)
       }

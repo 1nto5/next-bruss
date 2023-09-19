@@ -21,7 +21,6 @@ export default function PositionChooser() {
     number[]
   >([])
   const [positionNumber, setPositionNumber] = useState<string>('')
-
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -83,7 +82,10 @@ export default function PositionChooser() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    router.push(`${pathname}/position-${positionNumber}`)
+    if (positionNumber !== '') {
+      router.push(`${pathname}/position-${positionNumber}`)
+    }
+    setErrorMessage('Position not selected!')
   }
 
   if (isPending) {
@@ -134,11 +136,21 @@ export default function PositionChooser() {
             <button
               type="submit"
               className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-              onClick={() => router.push(`${pathname}/card-${cardNumber}`)}
             >
               confirm
             </button>
           </div>
+          {message && (
+            <div className="mt-6 rounded bg-bruss text-center text-slate-100">
+              {message}
+            </div>
+          )}
+
+          {errorMessage && (
+            <div className="mt-6 rounded bg-red-500 text-center  text-slate-100 dark:bg-red-700">
+              {errorMessage}
+            </div>
+          )}
         </form>
       </div>
     </div>

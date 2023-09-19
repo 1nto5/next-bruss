@@ -81,7 +81,6 @@ export async function GetExistingPositions(cardNumber: number) {
       { projection: { positions: 1 } }
     )
     if (!card || !card.positions) return []
-
     const existingPositions = Object.keys(card.positions).map(Number)
     return existingPositions
   } catch (error) {
@@ -136,7 +135,6 @@ export async function SavePosition(
   positionNumber: number,
   positionData: any
 ) {
-  console.log(cardNumber, positionData, positionNumber)
   try {
     const collection = await connectToMongo('inventory_cards')
     await collection.updateOne(
