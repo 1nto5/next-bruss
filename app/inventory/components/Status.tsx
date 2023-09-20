@@ -17,18 +17,16 @@ export default function Status() {
   const position = matchesPosition ? String(matchesPosition[1]) : '-'
   const { data: session } = useSession()
   return (
-    <div className="flex flex-row items-center justify-between bg-slate-100  shadow-md dark:bg-slate-800">
-      {session?.user?.name ? (
-        <StatusBox boxName="user:" value={session?.user?.name} />
-      ) : (
-        <StatusBoxSkeleton boxName="user:" value="" />
-      )}
+    <div className="flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800">
+      <StatusBox
+        boxName="user:"
+        value={session?.user?.name ? 'Adrian Antosiak' : '...'}
+      />
 
       <BoxSeparatorInventory />
       <StatusBox boxName="card:" value={card} />
       <BoxSeparatorInventory />
       <StatusBox boxName="position:" value={position} />
-      <BoxSeparatorInventory />
     </div>
   )
 }

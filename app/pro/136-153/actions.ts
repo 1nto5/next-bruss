@@ -16,7 +16,7 @@ type ArticleConfigObject = {
   palletProc: string
 }
 
-const collectionName = '136_153'
+const collectionName = 'box_pallet'
 
 export async function getPalletSize(article: number) {
   // Find the article configuration

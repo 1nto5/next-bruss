@@ -8,10 +8,14 @@ import {
   FindLowestFreePosition,
 } from '../actions'
 import { useSession } from 'next-auth/react'
+import Loader from './Loader'
 
 export default function PositionChooser() {
   const router = useRouter()
   const pathname = usePathname()
+  if (!/\/card-\d+$/.test(pathname)) {
+    router.push('/inventory')
+  }
   const matches = pathname.match(/card-(\d+)/)
   const cardNumber = matches ? Number(matches[1]) : null
   const { data: session } = useSession()
@@ -84,30 +88,27 @@ export default function PositionChooser() {
     e.preventDefault()
     if (positionNumber !== '') {
       router.push(`${pathname}/position-${positionNumber}`)
+      return
     }
     setErrorMessage('Position not selected!')
   }
 
   if (isPending) {
-    return (
-      <div className="mt-24 flex justify-center">
-        <div className="h-24 w-24 animate-spin rounded-full border-t-8 border-solid border-bruss"></div>
-      </div>
-    )
+    return <Loader />
   }
 
   return (
-    <div className="mt-12 flex flex-col items-center justify-center">
+    <div className="mb-4 mt-4 flex flex-col items-center justify-center">
       <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         select position
       </span>
-      <div className="rounded bg-slate-100 p-8 shadow-md dark:bg-slate-800">
+      <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex items-center justify-center">
             <select
               value={positionNumber}
               onChange={(e) => setPositionNumber(e.target.value)}
-              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-700"
+              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-600"
               disabled={existingPositionNumbers.length === 0}
             >
               <option value="" disabled hidden>
@@ -121,7 +122,7 @@ export default function PositionChooser() {
                 ))}
             </select>
           </div>
-          <div className="mt-4 flex justify-center space-x-3">
+          <div className="mt-6 flex justify-center space-x-12">
             <button
               type="button"
               onClick={() =>
@@ -129,7 +130,7 @@ export default function PositionChooser() {
                   `${pathname}/position-${String(lowestAvailableNumber)}`
                 )
               }
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
             >
               first available
             </button>
@@ -145,7 +146,6 @@ export default function PositionChooser() {
               {message}
             </div>
           )}
-
           {errorMessage && (
             <div className="mt-6 rounded bg-red-500 text-center  text-slate-100 dark:bg-red-700">
               {errorMessage}

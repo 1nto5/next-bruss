@@ -38,6 +38,7 @@ export default function CardChooser() {
     e.preventDefault()
     if (cardNumber !== '') {
       router.push(`${pathname}/card-${cardNumber}`)
+      return
     }
     setErrorMessage('Card not selected!')
   }
@@ -51,17 +52,17 @@ export default function CardChooser() {
   }
 
   return (
-    <div className="mt-12 flex flex-col items-center justify-center">
+    <div className="mb-4 mt-4 flex flex-col items-center justify-center">
       <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         select card
       </span>
-      <div className="rounded bg-slate-100 p-8 shadow-md dark:bg-slate-800">
+      <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div className="flex items-center justify-center">
             <select
               value={cardNumber}
               onChange={(e) => setCardNumber(e.target.value)}
-              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-700"
+              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-600"
               disabled={existingCardNumbers.length === 0}
             >
               <option value="" disabled hidden>
@@ -75,13 +76,13 @@ export default function CardChooser() {
                 ))}
             </select>
           </div>
-          <div className="mt-4 flex justify-center space-x-3">
+          <div className="mt-6 flex justify-center space-x-12">
             <button
               type="button"
               onClick={() =>
                 router.push(`${pathname}/card-${String(lowestAvailableNumber)}`)
               }
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
             >
               first available
             </button>
