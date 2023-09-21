@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { GetArticlesOptions } from '../actions'
 import useSWR from 'swr'
@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react'
 import Select from 'react-select'
 import { SavePosition } from '../actions'
 import Loader from './Loader'
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 
 type ArticleOption = {
   value: number
@@ -115,60 +116,92 @@ export default function CardPositionForm() {
   const matchesCard = pathname.match(/card-(\d+)/)
   const position = matchesPosition ? Number(matchesPosition[1]) : null
   const card = matchesCard ? Number(matchesCard[1]) : null
+  const [message, setMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const { data: articles, error } = useSWR<ArticleOption[]>(
-    'articleOptionKey',
-    GetArticlesOptions
-  )
+  const [isPendingSaving, startSaveTransition] = useTransition()
+  const [isPending, setIsPending] = useState(false)
+  const { data: articlesOptions, error: getArticlesOptionsError } = useSWR<
+    ArticleOption[]
+  >('articlesOptionsKey', GetArticlesOptions)
 
   const [wip, setWip] = useState<boolean>(false)
   const [selectedArticle, setSelectedArticle] = useState<ArticleOption | null>(
     null
   )
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // const savePosition = (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   startSaveTransition(async () => {
+  //     if (card && position) {
+  //       try {
+  //         const res = await SavePosition(card, position, {
+  //           article: selectedArticle?.value,
+  //           quantity: 54,
+  //           unit: 'szt',
+  //           WIP: wip,
+  //         })
+  //         if (res === 'saved') {
+  //           setMessage(`Position ${position} saved!`)
+  //           return
+  //         }
+  //       } catch (error) {
+  //         setErrorMessage(`Saving position error. Please contact IT!`)
+  //       }
+  //     }
+  //   })
+  // }
+
+  //TODO: nie pozwalaj zapisywać gdy ręcznie nr karty w adresie
+  const savePosition = async (e: React.FormEvent) => {
     e.preventDefault()
-    startSaveTransition(async () => {
-      if (card && position) {
-        await SavePosition(card, position, {
+    if (card && position) {
+      try {
+        setIsPending(true)
+        const res = await SavePosition(card, position, {
           article: selectedArticle?.value,
           quantity: 54,
           unit: 'szt',
           WIP: wip,
         })
-        router.replace(`position-${position + 1}`)
+        if (res === 'saved') {
+          setMessage(`Position ${position} saved!`)
+          setIsPending(false)
+          return
+        }
+      } catch (error) {
+        setErrorMessage(`Saving position error. Please contact IT!`)
       }
-    })
+    }
   }
 
-  if (error) {
-    return <div>Wystąpił błąd podczas ładowania.</div>
+  if (getArticlesOptionsError) {
+    setErrorMessage('An error occurred during loading artiles options.')
   }
-  if (!articles) {
+  if (!articlesOptions) {
     return <Loader />
   }
-  // return isPendingArticles ? (
-  //   <Loader />
-  // ) : (
+  if (isPending) {
+    return <Loader />
+  }
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
-      <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
+      <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         edit position
       </span>
-      <div className="rounded bg-slate-100 p-8 shadow-md dark:bg-slate-800">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex items-center justify-center">
-            <Select
-              options={articles}
-              value={selectedArticle}
-              onChange={(option) => setSelectedArticle(option as ArticleOption)}
-              placeholder="select article"
-              className="w-80 text-center"
-              menuPlacement="auto"
-              styles={isDarkMode ? selectDarkTheme : selectLightTheme}
-            />
-          </div>
-          <div className="flex items-center justify-center">
+      <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
+        <div className="flex flex-col gap-3">
+          {message && (
+            <div className="rounded bg-bruss p-2 text-center text-slate-100">
+              {message}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
+              {errorMessage}
+            </div>
+          )}
+          <div className="flex items-center justify-start">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -178,37 +211,54 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
+          <div className="flex items-center justify-center">
+            <Select
+              options={articlesOptions}
+              value={selectedArticle}
+              onChange={(option) => setSelectedArticle(option as ArticleOption)}
+              placeholder="select article"
+              className="w-80 text-center"
+              menuPlacement="auto"
+              styles={isDarkMode ? selectDarkTheme : selectLightTheme}
+            />
+          </div>
           <div className="mt-4 flex justify-center space-x-3">
             <button
-              type="submit"
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              onClick={savePosition}
+              className=" w-3/4 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              disabled={isPendingSaving}
             >
-              {true ? (
-                <svg
-                  className="mx-auto h-5 w-5 animate-spin text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              ) : (
-                'confirm'
-              )}
+              save
             </button>
           </div>
-        </form>
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={(e) => {
+                if (position !== null) {
+                  if (position !== 1) {
+                    router.replace(`position-${position - 1}`)
+                  } else {
+                    e.preventDefault()
+                    setErrorMessage('No 0 position!')
+                  }
+                }
+              }}
+              className="rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-orange-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-orange-500"
+            >
+              <FaArrowLeft />
+            </button>
+            <button
+              onClick={() => {
+                if (position !== null && position != 25) {
+                  router.replace(`position-${position + 1}`)
+                }
+              }}
+              className="rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

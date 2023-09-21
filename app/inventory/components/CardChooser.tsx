@@ -53,7 +53,7 @@ export default function CardChooser() {
 
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
-      <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
+      <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         select card
       </span>
       <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">

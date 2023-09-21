@@ -36,10 +36,6 @@ export default function PositionChooser() {
           setMessage(`Card number: ${cardNumber} reserved!`)
           return
         }
-        if (res == 'exists') {
-          setMessage(`Card number: ${cardNumber} exists!`)
-          return
-        }
         if (res == 'no access') {
           router.push('/inventory')
           return
@@ -99,7 +95,7 @@ export default function PositionChooser() {
 
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
-      <span className="text-xl font-extralight tracking-widest text-slate-700 dark:text-slate-100">
+      <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         select position
       </span>
       <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">

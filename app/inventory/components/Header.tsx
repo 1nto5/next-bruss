@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <div className="mr-2 flex space-x-4">
         {pathname.includes('position-') && (
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(pathname.replace(/\/position-.*/, ''))}
             className="w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
             type="button"
           >
@@ -40,7 +40,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {session && (
           <button
             onClick={() => signOut()}
-            className="w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-red-500 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-red-700"
+            className="w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700"
             type="button"
           >
             logout

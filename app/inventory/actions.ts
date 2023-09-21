@@ -52,11 +52,12 @@ export async function ReserveCard(cardNumber: number, email: string) {
     const collection = await connectToMongo('inventory_cards')
     const existingCard = await collection.findOne({ number: cardNumber })
 
+    if (existingCard && existingCard.creator !== email) {
+      return 'no access'
+    }
+
     if (existingCard) {
-      if (existingCard.creator !== email) {
-        return 'no access'
-      }
-      return 'exists'
+      return 'reserved'
     }
 
     const result = await collection.insertOne({
@@ -137,7 +138,7 @@ export async function SavePosition(
 ) {
   try {
     const collection = await connectToMongo('inventory_cards')
-    await collection.updateOne(
+    const save = await collection.updateOne(
       { number: cardNumber },
       {
         $set: {
@@ -145,6 +146,9 @@ export async function SavePosition(
         },
       }
     )
+    if (save) {
+      return 'saved'
+    }
   } catch (error) {
     console.error(error)
     throw new Error('An error occurred while saving the position.')
