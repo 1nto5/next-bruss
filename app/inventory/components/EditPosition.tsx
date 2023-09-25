@@ -6,14 +6,9 @@ import { GetArticlesOptions } from '../actions'
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
 import Select from 'react-select'
-import { SavePosition } from '../actions'
+import { SavePosition, GetArticleConfig } from '../actions'
 import Loader from './Loader'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
-
-type ArticleOption = {
-  value: number
-  label: string
-}
 
 const selectDarkTheme = {
   option: (provided: any, state: any) => ({
@@ -81,6 +76,18 @@ const selectLightTheme = {
   }),
 }
 
+type ArticleOption = {
+  value: number
+  label: string
+}
+
+type ArticleConfig = {
+  number: number
+  name: string
+  unit: string
+  converter?: number
+}
+
 export default function CardPositionForm() {
   const [isDarkMode, setIsDarkMode] = useState(false)
   useEffect(() => {
@@ -129,28 +136,23 @@ export default function CardPositionForm() {
   const [selectedArticle, setSelectedArticle] = useState<ArticleOption | null>(
     null
   )
+  const [selectedArticleConfig, setSelectedArticleConfig] =
+    useState<ArticleConfig | null>(null)
 
-  // const savePosition = (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   startSaveTransition(async () => {
-  //     if (card && position) {
-  //       try {
-  //         const res = await SavePosition(card, position, {
-  //           article: selectedArticle?.value,
-  //           quantity: 54,
-  //           unit: 'szt',
-  //           WIP: wip,
-  //         })
-  //         if (res === 'saved') {
-  //           setMessage(`Position ${position} saved!`)
-  //           return
-  //         }
-  //       } catch (error) {
-  //         setErrorMessage(`Saving position error. Please contact IT!`)
-  //       }
-  //     }
-  //   })
-  // }
+  useEffect(() => {
+    const getArticleConfig = async (article: number) => {
+      setIsPending(true)
+      const articleConfig = await GetArticleConfig(article)
+      setSelectedArticleConfig(articleConfig as ArticleConfig)
+      setIsPending(false)
+    }
+    if (selectedArticle) {
+      getArticleConfig(selectedArticle.value)
+    }
+    return () => {}
+  }, [selectedArticle])
+
+  const [quantity, setQuantity] = useState<number>(0)
 
   //TODO: nie pozwalaj zapisywać gdy ręcznie nr karty w adresie
   const savePosition = async (e: React.FormEvent) => {
@@ -164,9 +166,9 @@ export default function CardPositionForm() {
           unit: 'szt',
           WIP: wip,
         })
+        setIsPending(false)
         if (res === 'saved') {
           setMessage(`Position ${position} saved!`)
-          setIsPending(false)
           return
         }
       } catch (error) {
@@ -222,6 +224,34 @@ export default function CardPositionForm() {
               styles={isDarkMode ? selectDarkTheme : selectLightTheme}
             />
           </div>
+
+          {/* QUANTITY */}
+          {selectedArticleConfig && (
+            <div className="flex items-center justify-center">
+              <input
+                type="number"
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                placeholder={
+                  selectedArticleConfig.converter
+                    ? 'Enter quantity in kg'
+                    : selectedArticleConfig.unit === 'kg'
+                    ? 'Enter quantity in kg'
+                    : selectedArticleConfig.unit === 'st'
+                    ? 'Enter quantity in pieces'
+                    : 'Wrong article'
+                }
+                className="w-50 rounded bg-white p-1 text-center shadow-sm outline-none dark:bg-slate-800"
+              />
+            </div>
+          )}
+
+          {/* CONVERTER */}
+          {selectedArticleConfig?.converter && (
+            <div className="flex items-center justify-center">
+              {Math.floor(quantity * selectedArticleConfig.converter)} st
+            </div>
+          )}
+
           <div className="mt-4 flex justify-center space-x-3">
             <button
               onClick={savePosition}
@@ -231,6 +261,7 @@ export default function CardPositionForm() {
               save
             </button>
           </div>
+
           <div className="mt-4 flex justify-between">
             <button
               onClick={(e) => {

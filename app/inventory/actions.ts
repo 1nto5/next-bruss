@@ -131,6 +131,33 @@ export async function GetArticlesOptions() {
   }
 }
 
+type ArticleConfig = {
+  number: number
+  name: string
+  unit: string
+  converter?: number
+}
+
+export async function GetArticleConfig(article: number) {
+  try {
+    const collection = await connectToMongo('inventory_articles')
+    const articleObject = await collection.findOne({ number: article })
+    if (articleObject) {
+      const { number, name, unit, converter } = articleObject
+      const config: ArticleConfig = { number, name, unit }
+      if (converter !== undefined) {
+        config.converter = converter
+      }
+      return config
+    }
+
+    return null
+  } catch (error) {
+    console.error(error)
+    throw new Error('An error occurred while getting article config.')
+  }
+}
+
 export async function SavePosition(
   cardNumber: number,
   positionNumber: number,
