@@ -1,6 +1,7 @@
 'use server'
 
 import { connectToMongo } from '@/lib/mongo/connector'
+import crypto from 'crypto'
 
 export async function GetExistingCardNumbers(email: string) {
   try {
@@ -158,23 +159,40 @@ export async function GetArticleConfig(article: number) {
   }
 }
 
+function generateUniqueLabel(): string {
+  return crypto.randomBytes(4).toString('hex').toUpperCase()
+}
+
+type PositionData = {
+  article: number
+  quantity: number
+  unit: string
+  wip: boolean
+  user: string
+}
+
 export async function SavePosition(
   cardNumber: number,
   positionNumber: number,
-  positionData: any
+  positionData: PositionData
 ) {
   try {
     const collection = await connectToMongo('inventory_cards')
+    const identifier = generateUniqueLabel()
+    const currentDate = new Date().toISOString()
+    const finalPositionData = { ...positionData, identifier, time: currentDate }
     const save = await collection.updateOne(
       { number: cardNumber },
       {
         $set: {
-          [`positions.${positionNumber}`]: positionData,
+          [`positions.${positionNumber}`]: finalPositionData,
         },
       }
     )
-    if (save) {
-      return 'saved'
+    if (save.modifiedCount > 0) {
+      return { status: 'saved', identifier }
+    } else {
+      return { status: 'not saved' }
     }
   } catch (error) {
     console.error(error)

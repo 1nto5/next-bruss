@@ -153,22 +153,51 @@ export default function CardPositionForm() {
   }, [selectedArticle])
 
   const [quantity, setQuantity] = useState<number>(0)
+  const [identifier, setIdentifier] = useState<string>('')
 
   //TODO: nie pozwalaj zapisywać gdy ręcznie nr karty w adresie
+  //TODO: prompt tylko jak faktycznie nadpisanie
   const savePosition = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (identifier !== null) {
+      if (
+        !window.confirm(
+          'Are you sure you want to save the position again? This will generate a new identifier and require it to be noted on the inventory item.'
+        )
+      ) {
+        return
+      }
+    }
     if (card && position) {
       try {
         setIsPending(true)
-        const res = await SavePosition(card, position, {
-          article: selectedArticle?.value,
-          quantity: 54,
-          unit: 'szt',
-          WIP: wip,
-        })
-        setIsPending(false)
-        if (res === 'saved') {
-          setMessage(`Position ${position} saved!`)
+        const converter = selectedArticleConfig?.converter
+        let finalQuantity
+        if (converter) {
+          finalQuantity = Math.floor(quantity * converter)
+        } else {
+          finalQuantity = quantity
+        }
+        if (
+          selectedArticle &&
+          selectedArticleConfig?.unit &&
+          session?.user.email
+        ) {
+          const res = await SavePosition(card, position, {
+            article: selectedArticle?.value,
+            quantity: finalQuantity,
+            unit: selectedArticleConfig?.unit,
+            wip: wip,
+            user: session?.user.email,
+          })
+          if (res?.status === 'saved') {
+            res?.identifier && setIdentifier(res?.identifier)
+            setMessage(`Position ${position} saved!`)
+          }
+          if (res?.status === 'not saved') {
+            setErrorMessage('Saving position error. Please contact IT!')
+          }
+          setIsPending(false)
           return
         }
       } catch (error) {
@@ -186,6 +215,7 @@ export default function CardPositionForm() {
   if (isPending) {
     return <Loader />
   }
+
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
@@ -196,6 +226,11 @@ export default function CardPositionForm() {
           {message && (
             <div className="rounded bg-bruss p-2 text-center text-slate-100">
               {message}
+            </div>
+          )}
+          {identifier && (
+            <div className="rounded bg-black p-2 text-center text-2xl font-semibold text-slate-100">
+              {identifier}
             </div>
           )}
           {errorMessage && (
@@ -231,24 +266,19 @@ export default function CardPositionForm() {
               <input
                 type="number"
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                placeholder={
-                  selectedArticleConfig.converter
-                    ? 'Enter quantity in kg'
-                    : selectedArticleConfig.unit === 'kg'
-                    ? 'Enter quantity in kg'
-                    : selectedArticleConfig.unit === 'st'
-                    ? 'Enter quantity in pieces'
-                    : 'Wrong article'
-                }
-                className="w-50 rounded bg-white p-1 text-center shadow-sm outline-none dark:bg-slate-800"
-              />
+                placeholder="quantity"
+                className="w-20 rounded bg-white p-1 text-center shadow-sm outline-none dark:bg-slate-800"
+              />{' '}
+              {!selectedArticleConfig.converter
+                ? selectedArticleConfig.unit
+                : 'kg'}
             </div>
           )}
 
           {/* CONVERTER */}
           {selectedArticleConfig?.converter && (
             <div className="flex items-center justify-center">
-              {Math.floor(quantity * selectedArticleConfig.converter)} st
+              = {Math.floor(quantity * selectedArticleConfig.converter)} st
             </div>
           )}
 
