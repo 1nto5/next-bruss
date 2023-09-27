@@ -139,15 +139,16 @@ export default function CardPositionForm() {
   const [selectedArticleConfig, setSelectedArticleConfig] =
     useState<ArticleConfig | null>(null)
 
+  //TODO: nie odświeza jak ten sam artykuł drugi raz z rzędu - brak inputa, trzeba odklikać
   useEffect(() => {
     const getArticleConfig = async (article: number) => {
-      setIsPending(true)
       const articleConfig = await GetArticleConfig(article)
       setSelectedArticleConfig(articleConfig as ArticleConfig)
-      setIsPending(false)
     }
     if (selectedArticle) {
+      setIsPending(true)
       getArticleConfig(selectedArticle.value)
+      setIsPending(false)
     }
     return () => {}
   }, [selectedArticle])
@@ -159,7 +160,7 @@ export default function CardPositionForm() {
   //TODO: prompt tylko jak faktycznie nadpisanie
   const savePosition = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (identifier !== null) {
+    if (identifier !== '') {
       if (
         !window.confirm(
           'Are you sure you want to save the position again? This will generate a new identifier and require it to be noted on the inventory item.'
