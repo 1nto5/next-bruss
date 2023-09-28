@@ -1,4 +1,4 @@
-import Toast from './components/Toast'
+import Toast from '@/app/pro/components/Toast'
 
 export const metadata = {
   title: 'Next BRUSS: Production',

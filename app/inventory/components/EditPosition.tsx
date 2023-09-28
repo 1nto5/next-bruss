@@ -191,6 +191,7 @@ export default function CardPositionForm() {
             wip: wip,
             user: session?.user.email,
           })
+
           if (res?.status === 'saved') {
             res?.identifier && setIdentifier(res?.identifier)
             setMessage(`Position ${position} saved!`)

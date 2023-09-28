@@ -2,6 +2,7 @@
 
 import { connectToMongo } from '@/lib/mongo/connector'
 import crypto from 'crypto'
+const moment = require('moment')
 
 export async function GetExistingCardNumbers(email: string) {
   try {
@@ -159,8 +160,17 @@ export async function GetArticleConfig(article: number) {
   }
 }
 
-function generateUniqueLabel(): string {
-  return crypto.randomBytes(4).toString('hex').toUpperCase()
+function generateUniqueIdentifier(): string {
+  const year = new Date().getFullYear().toString().slice(-2)
+  const week = moment().week().toString().padStart(2, '0')
+  let randomLetters = ''
+  while (randomLetters.length < 4) {
+    const randomBytes = crypto.randomBytes(3).toString('base64')
+    const extractedLetters = randomBytes.replace(/[^a-zA-Z]/g, '')
+    randomLetters += extractedLetters
+  }
+  randomLetters = randomLetters.substring(0, 4).toUpperCase()
+  return `${year}${randomLetters}${week}`
 }
 
 type PositionData = {
@@ -177,16 +187,29 @@ export async function SavePosition(
   positionData: PositionData
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    const identifier = generateUniqueLabel()
+    const cardCollection = await connectToMongo('inventory_cards')
+    const identifierCollection = await connectToMongo('inventory_identifiers')
+    let isUnique = false
+    let identifier
+    while (!isUnique) {
+      identifier = generateUniqueIdentifier()
+      // identifier = '23PHZJ39'
+      console.log('tu')
+      const existing = await identifierCollection.findOne({
+        identifier: identifier,
+      })
+      if (!existing) {
+        isUnique = true
+        await identifierCollection.insertOne({ identifier: identifier })
+      }
+    }
     const currentDate = new Date().toISOString()
     const finalPositionData = { ...positionData, identifier, time: currentDate }
-    const save = await collection.updateOne(
+
+    const save = await cardCollection.updateOne(
       { number: cardNumber },
       {
-        $set: {
-          [`positions.${positionNumber}`]: finalPositionData,
-        },
+        $set: { [`positions.${positionNumber}`]: finalPositionData },
       }
     )
     if (save.modifiedCount > 0) {
