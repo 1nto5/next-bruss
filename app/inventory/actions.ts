@@ -158,7 +158,7 @@ export async function GetPosition(cardNumber: number, positionNumber: number) {
       if (positionNumber > card.positions.length + 1) {
         return {
           status: 'skipped',
-          position: card.positions.length,
+          position: card.positions.length + 1,
         }
       }
       return { status: 'new' }

@@ -22,29 +22,6 @@ type Article = {
 }
 
 export default function CardPositionForm() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  useEffect(() => {
-    const checkDarkMode = () => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'))
-    }
-
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          checkDarkMode()
-        }
-      })
-    })
-
-    // Obserwuj zmiany w atrybutach elementu <html>
-    observer.observe(document.documentElement, { attributes: true })
-
-    // Sprawdź tryb ciemny przy pierwszym uruchomieniu
-    checkDarkMode()
-
-    // Czyść obserwatora podczas demontażu komponentu
-    return () => observer.disconnect()
-  }, [])
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -103,7 +80,6 @@ export default function CardPositionForm() {
     return () => {}
   }, [articles, card, position, router])
 
-  //TODO: nie pozwalaj zapisywać gdy ręcznie nr karty w adresie
   const savePosition = async () => {
     if (identifier !== '') {
       if (
@@ -118,7 +94,7 @@ export default function CardPositionForm() {
       setErrorMessage('Select an article!')
       return
     }
-    if (!quantity || quantity === 0) {
+    if (!quantity || quantity <= 0) {
       setErrorMessage('Enter the correct quantity!')
       return
     }
@@ -195,7 +171,7 @@ export default function CardPositionForm() {
             </div>
           )}
           {identifier && (
-            <div className="rounded bg-black p-2 text-center text-2xl font-semibold text-slate-100">
+            <div className="rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500">
               {identifier}
             </div>
           )}
@@ -204,7 +180,36 @@ export default function CardPositionForm() {
               {errorMessage}
             </div>
           )}
-          <div className="flex items-center justify-start">
+          <Select
+            options={articles}
+            value={selectedArticle}
+            onChange={selectArticle}
+            placeholder={'select article'}
+          />
+
+          {selectedArticle && (
+            <div className="mt-2 flex items-center justify-center">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="number"
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  placeholder="quantity"
+                  defaultValue={quantity !== 0 ? quantity : undefined}
+                  className="w-20 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600"
+                />
+                <span>
+                  {!selectedArticle.converter ? selectedArticle.unit : 'kg'}
+                  {selectedArticle.converter && (
+                    <>
+                      {' '}
+                      = {Math.floor(quantity * selectedArticle.converter)} st
+                    </>
+                  )}
+                </span>
+              </label>
+            </div>
+          )}
+          <div className=" flex items-center justify-end">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -214,45 +219,7 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
-
-          <Select
-            options={articles}
-            value={selectedArticle}
-            onChange={selectArticle}
-            placeholder={'select article'}
-          />
-
-          {/* QUANTITY */}
-          {selectedArticle && (
-            <div className="flex items-center justify-center">
-              <input
-                type="number"
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                placeholder="quantity"
-                defaultValue={quantity !== 0 ? quantity : undefined}
-                className="w-20 rounded bg-white p-1 text-center shadow-sm outline-none dark:bg-slate-800"
-              />{' '}
-              {!selectedArticle.converter ? selectedArticle.unit : 'kg'}
-            </div>
-          )}
-
-          {/* CONVERTER */}
-          {selectedArticle?.converter && (
-            <div className="flex items-center justify-center">
-              = {Math.floor(quantity * selectedArticle.converter)} st
-            </div>
-          )}
-
           <div className="mt-4 flex justify-center space-x-3">
-            <button
-              onClick={savePosition}
-              className=" w-3/4 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-            >
-              save
-            </button>
-          </div>
-
-          <div className="mt-4 flex justify-between">
             <button
               onClick={() => {
                 if (position !== null) {
@@ -267,6 +234,13 @@ export default function CardPositionForm() {
             >
               <FaArrowLeft />
             </button>
+            <button
+              onClick={savePosition}
+              className="w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+            >
+              save
+            </button>
+
             <button
               onClick={() => {
                 if (position !== null && position != 25) {

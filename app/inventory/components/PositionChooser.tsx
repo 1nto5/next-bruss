@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useTransition } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import {
   ReserveCard,
@@ -9,6 +9,12 @@ import {
 } from '../actions'
 import { useSession } from 'next-auth/react'
 import Loader from './Loader'
+import Select from './Select'
+
+type Option = {
+  value: number
+  label: string
+}
 
 export default function PositionChooser() {
   const router = useRouter()
@@ -19,7 +25,7 @@ export default function PositionChooser() {
   const matches = pathname.match(/card-(\d+)/)
   const cardNumber = matches ? Number(matches[1]) : null
   const { data: session } = useSession()
-  const [isPending, startTransition] = useTransition()
+  const [isPending, setIsPending] = useState(true)
   const [lowestAvailableNumber, setLowestAvailableNumber] = useState<number>()
   const [existingPositionNumbers, setExistingPositionNumbers] = useState<
     number[]
@@ -27,11 +33,14 @@ export default function PositionChooser() {
   const [positionNumber, setPositionNumber] = useState<string>('')
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [fullCard, setFullCard] = useState(false)
 
   useEffect(() => {
-    startTransition(async () => {
+    async function reserveCard() {
       if (session?.user?.email && cardNumber) {
+        setIsPending(true)
         const res = await ReserveCard(cardNumber, session?.user.email)
+        setIsPending(false)
         if (res == 'reserved') {
           setMessage(`Card number: ${cardNumber} reserved!`)
           return
@@ -47,50 +56,67 @@ export default function PositionChooser() {
         setErrorMessage(`Please contact IT!`)
         return
       }
-    })
+    }
+
+    async function fetchExistingPositions() {
+      if (session?.user?.email && cardNumber) {
+        const res = await GetExistingPositions(cardNumber)
+        if (res) {
+          setExistingPositionNumbers(res)
+          return
+        }
+        setErrorMessage('Please contact IT!')
+        return
+      }
+    }
+    async function fetchLowestFreePosition() {
+      if (session?.user?.email && cardNumber) {
+        const res = await FindLowestFreePosition(cardNumber)
+        if (res === 'full') {
+          setErrorMessage('Card is full!')
+          setFullCard(true)
+          return
+        }
+        if (res) {
+          setLowestAvailableNumber(res)
+          return
+        }
+        setErrorMessage('Please contact IT!')
+        return
+      }
+    }
+    setIsPending(true)
+    reserveCard()
+    fetchExistingPositions()
+    fetchLowestFreePosition()
+    setIsPending(false)
   }, [cardNumber, router, session?.user.email])
 
-  useEffect(() => {
-    startTransition(async () => {
-      async function fetchExistingPositions() {
-        if (session?.user?.email && cardNumber) {
-          const res = await GetExistingPositions(cardNumber)
-          if (res) {
-            setExistingPositionNumbers(res)
-            return
-          }
-          setErrorMessage('Please contact IT!')
-          return
-        }
-      }
-      async function fetchLowestFreePosition() {
-        if (session?.user?.email && cardNumber) {
-          const res = await FindLowestFreePosition(cardNumber)
-          if (res === 'full') {
-            setErrorMessage('Card is full!')
-            return
-          }
-          if (res) {
-            setLowestAvailableNumber(res)
-            return
-          }
-          setErrorMessage('Please contact IT!')
-          return
-        }
-      }
+  const prepareOptions = (numbers: number[]) => {
+    return numbers.map((number) => ({
+      value: number,
+      label: number.toString(),
+    }))
+  }
 
-      fetchExistingPositions()
-      fetchLowestFreePosition()
-    })
-  }, [cardNumber, session?.user.email])
+  const preparedOptions = prepareOptions(existingPositionNumbers)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (positionNumber !== '') {
+  const selectedOption = preparedOptions.find(
+    (option) => option.value.toString() === positionNumber
+  )
+
+  const handleConfirm = (e: React.FormEvent) => {
+    if (positionNumber) {
       router.push(`${pathname}/position-${positionNumber}`)
       return
     }
     setErrorMessage('Position not selected!')
+  }
+
+  const handleSelectChange = (selectedOption: Option | null) => {
+    if (selectedOption) {
+      setPositionNumber(selectedOption.value.toString())
+    }
   }
 
   if (isPending) {
@@ -114,42 +140,38 @@ export default function PositionChooser() {
               {errorMessage}
             </div>
           )}
-          <div className="flex items-center justify-center">
-            <select
-              value={positionNumber}
-              onChange={(e) => setPositionNumber(e.target.value)}
-              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-600"
-              disabled={existingPositionNumbers.length === 0}
-            >
-              <option value="" disabled hidden>
-                {existingPositionNumbers.length === 0 ? 'empty card' : 'select'}
-              </option>
-              {existingPositionNumbers.length > 0 &&
-                existingPositionNumbers.map((number) => (
-                  <option key={number} value={number}>
-                    {number}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="mt-6 flex justify-center space-x-12">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(
-                  `${pathname}/position-${String(lowestAvailableNumber)}`
-                )
-              }
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
-            >
-              first available
-            </button>
-            <button
-              type="submit"
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-            >
-              confirm
-            </button>
+          {preparedOptions.length > 0 && (
+            <Select
+              options={preparedOptions}
+              value={selectedOption}
+              onChange={handleSelectChange}
+              placeholder={'select position'}
+            />
+          )}
+
+          <div className="mt-4 flex w-full justify-center space-x-2">
+            {!fullCard && (
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `${pathname}/position-${String(lowestAvailableNumber)}`
+                  )
+                }
+                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+              >
+                {preparedOptions.length > 0 ? 'first free' : 'start card'}
+              </button>
+            )}
+            {preparedOptions.length > 0 && (
+              <button
+                type="submit"
+                onClick={handleConfirm}
+                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              >
+                confirm
+              </button>
+            )}
           </div>
         </div>
       </div>

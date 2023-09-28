@@ -4,6 +4,12 @@ import React, { useState, useEffect, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { FindLowestFreeCardNumber, GetExistingCardNumbers } from '../actions'
 import { useSession } from 'next-auth/react'
+import Select from './Select'
+
+type Option = {
+  value: number
+  label: string
+}
 
 export default function CardChooser() {
   const router = useRouter()
@@ -34,9 +40,27 @@ export default function CardChooser() {
     })
   }, [session?.user.email])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (cardNumber !== '') {
+  const prepareOptions = (numbers: number[]) => {
+    return numbers.map((number) => ({
+      value: number,
+      label: number.toString(),
+    }))
+  }
+
+  const preparedOptions = prepareOptions(existingCardNumbers)
+
+  const selectedOption = preparedOptions.find(
+    (option) => option.value.toString() === cardNumber
+  )
+
+  const handleSelectChange = (selectedOption: Option | null) => {
+    if (selectedOption) {
+      setCardNumber(selectedOption.value.toString())
+    }
+  }
+
+  const handleConfirm = (e: React.FormEvent) => {
+    if (cardNumber) {
       router.push(`${pathname}/card-${cardNumber}`)
       return
     }
@@ -56,55 +80,42 @@ export default function CardChooser() {
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         select card
       </span>
-      <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex items-center justify-center">
-            <select
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              className="rounded bg-slate-50 p-2 text-center text-lg font-light shadow-md outline-none dark:bg-slate-600"
-              disabled={existingCardNumbers.length === 0}
-            >
-              <option value="" disabled hidden>
-                {existingCardNumbers.length === 0 ? 'no cards' : 'select'}
-              </option>
-              {existingCardNumbers.length > 0 &&
-                existingCardNumbers.map((number) => (
-                  <option key={number} value={number}>
-                    {number}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="mt-6 flex justify-center space-x-12">
+      <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
+        <div className="flex flex-col gap-3">
+          {message && (
+            <div className="rounded bg-bruss p-2 text-center text-slate-100">
+              {message}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
+              {errorMessage}
+            </div>
+          )}
+          <Select
+            options={preparedOptions}
+            value={selectedOption}
+            onChange={handleSelectChange}
+            placeholder={'select card'}
+          />
+          <div className="mt-4 flex w-full justify-center space-x-2">
             <button
               type="button"
               onClick={() =>
                 router.push(`${pathname}/card-${String(lowestAvailableNumber)}`)
               }
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
             >
               first available
             </button>
             <button
-              type="submit"
-              className="rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              onClick={handleConfirm}
+              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
             >
               confirm
             </button>
           </div>
-          {message && (
-            <div className="mt-6 rounded bg-bruss text-center text-slate-100">
-              {message}
-            </div>
-          )}
-
-          {errorMessage && (
-            <div className="mt-6 rounded bg-red-500 text-center  text-slate-100 dark:bg-red-700">
-              {errorMessage}
-            </div>
-          )}
-        </form>
+        </div>
       </div>
     </div>
   )

@@ -10,8 +10,13 @@ type Article = {
   converter: number
 }
 
+type Option = {
+  value: number
+  label: string
+}
+
 type SelectProps = {
-  options: Article[]
+  options: Article[] | Option[]
   value: any
   onChange: any
   placeholder: string
@@ -107,7 +112,7 @@ export default function Select({
   }, [])
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="mt-4 flex items-center justify-center">
       <ReactSelect
         options={options}
         value={value}
