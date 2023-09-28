@@ -1,91 +1,24 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+// nie pozwalaj edytować pozycji gdy poprzednie nie zamknięta
+
+import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { GetArticlesOptions } from '../actions'
+
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
-import Select from 'react-select'
-import { SavePosition, GetArticleConfig } from '../actions'
+import { GetPosition, SavePosition, GetArticles } from '../actions'
+import Select from './Select'
 import Loader from './Loader'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 
-const selectDarkTheme = {
-  option: (provided: any, state: any) => ({
-    ...provided,
-    backgroundColor: state.isSelected ? '#2D3748' : '#1A202C',
-    color: '#F7FAFC', // slate-100 z Tailwind
-    '&:hover': {
-      backgroundColor: '#4A5568',
-    },
-  }),
-  menu: (provided: any) => ({
-    ...provided,
-    backgroundColor: '#1A202C',
-  }),
-  control: (provided: any) => ({
-    ...provided,
-    backgroundColor: '#1A202C',
-    borderColor: '#4A5568',
-    color: '#F7FAFC',
-  }),
-  singleValue: (provided: any) => ({
-    ...provided,
-    color: '#F7FAFC',
-  }),
-  input: (provided: any) => ({
-    ...provided,
-    color: '#F7FAFC',
-  }),
-  placeholder: (provided: any) => ({
-    ...provided,
-    color: '#A0AEC0', // slate-500 w ciemnym trybie powinien być dobrze widoczny
-  }),
-}
-
-const selectLightTheme = {
-  option: (provided: any, state: any) => ({
-    ...provided,
-    backgroundColor: state.isSelected ? '#EDF2F7' : 'white',
-    color: '#2D3748',
-    '&:hover': {
-      backgroundColor: '#E2E8F0', // slate-200 z Tailwind
-    },
-  }),
-  menu: (provided: any) => ({
-    ...provided,
-    backgroundColor: 'white',
-  }),
-  control: (provided: any) => ({
-    ...provided,
-    backgroundColor: 'white',
-    borderColor: '#CBD5E0',
-    color: '#2D3748',
-  }),
-  singleValue: (provided: any) => ({
-    ...provided,
-    color: '#2D3748',
-  }),
-  input: (provided: any) => ({
-    ...provided,
-    color: '#2D3748',
-  }),
-  placeholder: (provided: any) => ({
-    ...provided,
-    color: '#A0AEC0',
-  }),
-}
-
-type ArticleOption = {
-  value: number
+type Article = {
+  value: string
   label: string
-}
-
-type ArticleConfig = {
   number: number
   name: string
   unit: string
-  converter?: number
+  converter: number
 }
 
 export default function CardPositionForm() {
@@ -112,7 +45,6 @@ export default function CardPositionForm() {
     // Czyść obserwatora podczas demontażu komponentu
     return () => observer.disconnect()
   }, [])
-
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
@@ -125,41 +57,54 @@ export default function CardPositionForm() {
   const card = matchesCard ? Number(matchesCard[1]) : null
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  const [isPendingSaving, startSaveTransition] = useTransition()
   const [isPending, setIsPending] = useState(false)
-  const { data: articlesOptions, error: getArticlesOptionsError } = useSWR<
-    ArticleOption[]
-  >('articlesOptionsKey', GetArticlesOptions)
-
-  const [wip, setWip] = useState<boolean>(false)
-  const [selectedArticle, setSelectedArticle] = useState<ArticleOption | null>(
-    null
+  const { data: articles, error: getArticlesError } = useSWR<Article[]>(
+    'articlesKey',
+    GetArticles
   )
-  const [selectedArticleConfig, setSelectedArticleConfig] =
-    useState<ArticleConfig | null>(null)
-
-  //TODO: nie odświeza jak ten sam artykuł drugi raz z rzędu - brak inputa, trzeba odklikać
-  useEffect(() => {
-    const getArticleConfig = async (article: number) => {
-      const articleConfig = await GetArticleConfig(article)
-      setSelectedArticleConfig(articleConfig as ArticleConfig)
-    }
-    if (selectedArticle) {
-      setIsPending(true)
-      getArticleConfig(selectedArticle.value)
-      setIsPending(false)
-    }
-    return () => {}
-  }, [selectedArticle])
-
+  const [wip, setWip] = useState<boolean>(false)
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
   const [quantity, setQuantity] = useState<number>(0)
   const [identifier, setIdentifier] = useState<string>('')
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (card && position) {
+        const positionData = await GetPosition(card, position)
+        if (positionData) {
+          if (positionData.status == 'wrong position') {
+            router.push('/inventory')
+          }
+          positionData.status == 'no card' && setErrorMessage('No card!')
+          positionData.status == 'skipped' &&
+            setErrorMessage(
+              `Return to position number: ${positionData.position}!`
+            )
+          positionData.status == 'new' &&
+            setMessage('Editing a new position...')
+        }
+        if (positionData.status == 'found') {
+          setMessage('The position exists, content retrieved!')
+          setIdentifier(positionData.position.identifier)
+          setQuantity(positionData.position.quantity)
+          if (articles) {
+            const foundArticle = articles.find(
+              (article) =>
+                article.number === positionData.position.articleNumber
+            )
+            foundArticle && setSelectedArticle(foundArticle)
+          }
+        }
+      }
+    }
+    setIsPending(true)
+    fetchData()
+    setIsPending(false)
+    return () => {}
+  }, [articles, card, position, router])
+
   //TODO: nie pozwalaj zapisywać gdy ręcznie nr karty w adresie
-  //TODO: prompt tylko jak faktycznie nadpisanie
-  const savePosition = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const savePosition = async () => {
     if (identifier !== '') {
       if (
         !window.confirm(
@@ -169,49 +114,68 @@ export default function CardPositionForm() {
         return
       }
     }
+    if (!selectedArticle) {
+      setErrorMessage('Select an article!')
+      return
+    }
+    if (!quantity || quantity === 0) {
+      setErrorMessage('Enter the correct quantity!')
+      return
+    }
     if (card && position) {
       try {
-        setIsPending(true)
-        const converter = selectedArticleConfig?.converter
+        const converter = selectedArticle?.converter
         let finalQuantity
         if (converter) {
           finalQuantity = Math.floor(quantity * converter)
         } else {
           finalQuantity = quantity
         }
-        if (
-          selectedArticle &&
-          selectedArticleConfig?.unit &&
-          session?.user.email
-        ) {
-          const res = await SavePosition(card, position, {
-            article: selectedArticle?.value,
-            quantity: finalQuantity,
-            unit: selectedArticleConfig?.unit,
-            wip: wip,
-            user: session?.user.email,
-          })
 
-          if (res?.status === 'saved') {
+        if (selectedArticle && session?.user.email) {
+          setIsPending(true)
+          const res = await SavePosition(
+            card,
+            position,
+            selectedArticle.number,
+            selectedArticle.name,
+            finalQuantity,
+            selectedArticle.unit,
+            wip,
+            session.user.email
+          )
+
+          if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier)
-            setMessage(`Position ${position} saved!`)
-          }
-          if (res?.status === 'not saved') {
+            setErrorMessage(null)
+            setMessage(`Position ${position} added!`)
+          } else if (res?.status === 'updated') {
+            res?.identifier && setIdentifier(res?.identifier)
+            setErrorMessage(null)
+            setMessage(`Position ${position} updated!`)
+          } else if (
+            res?.status === 'not added' ||
+            res?.status === 'not updated'
+          ) {
             setErrorMessage('Saving position error. Please contact IT!')
           }
-          setIsPending(false)
-          return
         }
       } catch (error) {
-        setErrorMessage(`Saving position error. Please contact IT!`)
+        setErrorMessage('Saving position error. Please contact IT!')
+      } finally {
+        setIsPending(false)
       }
     }
   }
 
-  if (getArticlesOptionsError) {
+  const selectArticle = (option: Article | null) => {
+    setSelectedArticle(option)
+  }
+
+  if (getArticlesError) {
     setErrorMessage('An error occurred during loading artiles options.')
   }
-  if (!articlesOptions) {
+  if (!articles) {
     return <Loader />
   }
   if (isPending) {
@@ -250,37 +214,32 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
-          <div className="flex items-center justify-center">
-            <Select
-              options={articlesOptions}
-              value={selectedArticle}
-              onChange={(option) => setSelectedArticle(option as ArticleOption)}
-              placeholder="select article"
-              className="w-80 text-center"
-              menuPlacement="auto"
-              styles={isDarkMode ? selectDarkTheme : selectLightTheme}
-            />
-          </div>
+
+          <Select
+            options={articles}
+            value={selectedArticle}
+            onChange={selectArticle}
+            placeholder={'select article'}
+          />
 
           {/* QUANTITY */}
-          {selectedArticleConfig && (
+          {selectedArticle && (
             <div className="flex items-center justify-center">
               <input
                 type="number"
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 placeholder="quantity"
+                defaultValue={quantity !== 0 ? quantity : undefined}
                 className="w-20 rounded bg-white p-1 text-center shadow-sm outline-none dark:bg-slate-800"
               />{' '}
-              {!selectedArticleConfig.converter
-                ? selectedArticleConfig.unit
-                : 'kg'}
+              {!selectedArticle.converter ? selectedArticle.unit : 'kg'}
             </div>
           )}
 
           {/* CONVERTER */}
-          {selectedArticleConfig?.converter && (
+          {selectedArticle?.converter && (
             <div className="flex items-center justify-center">
-              = {Math.floor(quantity * selectedArticleConfig.converter)} st
+              = {Math.floor(quantity * selectedArticle.converter)} st
             </div>
           )}
 
@@ -288,7 +247,6 @@ export default function CardPositionForm() {
             <button
               onClick={savePosition}
               className=" w-3/4 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-              disabled={isPendingSaving}
             >
               save
             </button>
@@ -296,12 +254,11 @@ export default function CardPositionForm() {
 
           <div className="mt-4 flex justify-between">
             <button
-              onClick={(e) => {
+              onClick={() => {
                 if (position !== null) {
                   if (position !== 1) {
                     router.replace(`position-${position - 1}`)
                   } else {
-                    e.preventDefault()
                     setErrorMessage('No 0 position!')
                   }
                 }
@@ -314,6 +271,8 @@ export default function CardPositionForm() {
               onClick={() => {
                 if (position !== null && position != 25) {
                   router.replace(`position-${position + 1}`)
+                } else {
+                  setErrorMessage('The card is full!')
                 }
               }}
               className="rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"

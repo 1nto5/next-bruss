@@ -36,6 +36,10 @@ export default function PositionChooser() {
           setMessage(`Card number: ${cardNumber} reserved!`)
           return
         }
+        if (res == 'exists') {
+          setMessage(`Card number: ${cardNumber} selected!`)
+          return
+        }
         if (res == 'no access') {
           router.push('/inventory')
           return
@@ -96,10 +100,20 @@ export default function PositionChooser() {
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
-        select position
+        edit position
       </span>
-      <div className="rounded bg-slate-100 p-10 shadow-md dark:bg-slate-800">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
+        <div className="flex flex-col gap-3">
+          {message && (
+            <div className="rounded bg-bruss p-2 text-center text-slate-100">
+              {message}
+            </div>
+          )}
+          {errorMessage && (
+            <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
+              {errorMessage}
+            </div>
+          )}
           <div className="flex items-center justify-center">
             <select
               value={positionNumber}
@@ -137,17 +151,7 @@ export default function PositionChooser() {
               confirm
             </button>
           </div>
-          {message && (
-            <div className="mt-6 rounded bg-bruss text-center text-slate-100">
-              {message}
-            </div>
-          )}
-          {errorMessage && (
-            <div className="mt-6 rounded bg-red-500 text-center  text-slate-100 dark:bg-red-700">
-              {errorMessage}
-            </div>
-          )}
-        </form>
+        </div>
       </div>
     </div>
   )

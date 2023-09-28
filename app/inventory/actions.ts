@@ -59,7 +59,7 @@ export async function ReserveCard(cardNumber: number, email: string) {
     }
 
     if (existingCard) {
-      return 'reserved'
+      return 'exists'
     }
 
     const result = await collection.insertOne({
@@ -79,12 +79,11 @@ export async function ReserveCard(cardNumber: number, email: string) {
 export async function GetExistingPositions(cardNumber: number) {
   try {
     const collection = await connectToMongo('inventory_cards')
-    const card = await collection.findOne(
-      { number: cardNumber },
-      { projection: { positions: 1 } }
-    )
-    if (!card || !card.positions) return []
-    const existingPositions = Object.keys(card.positions).map(Number)
+    const card = await collection.findOne({ number: cardNumber })
+    if (!card || !Array.isArray(card.positions)) {
+      return []
+    }
+    const existingPositions = card.positions.map((pos) => pos.position)
     return existingPositions
   } catch (error) {
     console.error(error)
@@ -118,13 +117,17 @@ export async function FindLowestFreePosition(cardNumber: number) {
   }
 }
 
-export async function GetArticlesOptions() {
+export async function GetArticles() {
   try {
     const collection = await connectToMongo('inventory_articles')
     const articles = await collection.find({}).toArray()
     const formattedArticles = articles.map((article) => ({
-      value: article.number,
-      label: `${article.number} - ${article.name}`,
+      value: article.number as string,
+      label: `${article.number} - ${article.name}` as string,
+      number: article.number as number,
+      name: article.name as string,
+      unit: article.unit as string,
+      converter: article.converter as number,
     }))
     return formattedArticles
   } catch (error) {
@@ -133,30 +136,40 @@ export async function GetArticlesOptions() {
   }
 }
 
-type ArticleConfig = {
-  number: number
-  name: string
-  unit: string
-  converter?: number
-}
-
-export async function GetArticleConfig(article: number) {
+export async function GetPosition(cardNumber: number, positionNumber: number) {
   try {
-    const collection = await connectToMongo('inventory_articles')
-    const articleObject = await collection.findOne({ number: article })
-    if (articleObject) {
-      const { number, name, unit, converter } = articleObject
-      const config: ArticleConfig = { number, name, unit }
-      if (converter !== undefined) {
-        config.converter = converter
-      }
-      return config
-    }
+    const collection = await connectToMongo('inventory_cards')
+    const card = await collection.findOne({ number: cardNumber })
 
-    return null
+    if (!card) {
+      return { status: 'no card' }
+    }
+    if (positionNumber < 1 || positionNumber > 25) {
+      return { status: 'wrong position' }
+    }
+    if (!card.positions) {
+      return { status: 'new' }
+    }
+    const position = card.positions.find(
+      (pos: { position: number }) => pos.position === positionNumber
+    )
+
+    if (!position) {
+      if (positionNumber > card.positions.length + 1) {
+        return {
+          status: 'skipped',
+          position: card.positions.length,
+        }
+      }
+      return { status: 'new' }
+    }
+    return {
+      status: 'found',
+      position,
+    }
   } catch (error) {
     console.error(error)
-    throw new Error('An error occurred while getting article config.')
+    throw new Error('Wystąpił błąd podczas pobierania pozycji.')
   }
 }
 
@@ -173,49 +186,75 @@ function generateUniqueIdentifier(): string {
   return `${year}${randomLetters}${week}`
 }
 
-type PositionData = {
-  article: number
-  quantity: number
-  unit: string
-  wip: boolean
-  user: string
-}
-
 export async function SavePosition(
   cardNumber: number,
-  positionNumber: number,
-  positionData: PositionData
+  position: number,
+  articleNumber: number,
+  articleName: string,
+  quantity: number,
+  unit: string,
+  wip: boolean,
+  user: string
 ) {
   try {
-    const cardCollection = await connectToMongo('inventory_cards')
-    const identifierCollection = await connectToMongo('inventory_identifiers')
+    const collection = await connectToMongo('inventory_cards')
     let isUnique = false
     let identifier
     while (!isUnique) {
       identifier = generateUniqueIdentifier()
-      // identifier = '23PHZJ39'
-      console.log('tu')
-      const existing = await identifierCollection.findOne({
-        identifier: identifier,
-      })
-      if (!existing) {
+      const allIdentifiers = await collection
+        .find({}, { projection: { 'positions.identifier': 1 } })
+        .toArray()
+
+      const existingIdentifiers = allIdentifiers.flatMap((card) =>
+        Array.isArray(card.positions)
+          ? card.positions.map((pos) => pos.identifier)
+          : []
+      )
+
+      if (!existingIdentifiers.includes(identifier)) {
         isUnique = true
-        await identifierCollection.insertOne({ identifier: identifier })
       }
     }
     const currentDate = new Date().toISOString()
-    const finalPositionData = { ...positionData, identifier, time: currentDate }
-
-    const save = await cardCollection.updateOne(
-      { number: cardNumber },
+    const positionData = {
+      position: position,
+      identifier: identifier,
+      time: currentDate,
+      articleNumber: articleNumber,
+      articleName: articleName,
+      quantity: quantity,
+      unit: unit,
+      wip: wip,
+      user: user,
+    }
+    const updateResult = await collection.updateOne(
       {
-        $set: { [`positions.${positionNumber}`]: finalPositionData },
+        number: cardNumber,
+        'positions.position': position,
+      },
+      {
+        $set: { 'positions.$': positionData },
       }
     )
-    if (save.modifiedCount > 0) {
-      return { status: 'saved', identifier }
+    if (updateResult.matchedCount === 0) {
+      const insertResult = await collection.updateOne(
+        { number: cardNumber },
+        {
+          $push: { positions: positionData },
+        }
+      )
+      if (insertResult.modifiedCount > 0) {
+        return { status: 'added', identifier }
+      } else {
+        return { status: 'not added' }
+      }
     } else {
-      return { status: 'not saved' }
+      if (updateResult.modifiedCount > 0) {
+        return { status: 'updated', identifier }
+      } else {
+        return { status: 'not updated' }
+      }
     }
   } catch (error) {
     console.error(error)
