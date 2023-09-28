@@ -36,6 +36,18 @@ export default function PositionChooser() {
   const [fullCard, setFullCard] = useState(false)
 
   useEffect(() => {
+    if (errorMessage) {
+      setMessage(null)
+    }
+  }, [errorMessage])
+
+  useEffect(() => {
+    if (message) {
+      setErrorMessage(null)
+    }
+  }, [message])
+
+  useEffect(() => {
     async function reserveCard() {
       if (session?.user?.email && cardNumber) {
         setIsPending(true)

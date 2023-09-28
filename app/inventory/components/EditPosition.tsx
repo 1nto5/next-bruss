@@ -45,6 +45,18 @@ export default function CardPositionForm() {
   const [identifier, setIdentifier] = useState<string>('')
 
   useEffect(() => {
+    if (errorMessage) {
+      setMessage(null)
+    }
+  }, [errorMessage])
+
+  useEffect(() => {
+    if (message) {
+      setErrorMessage(null)
+    }
+  }, [message])
+
+  useEffect(() => {
     const fetchData = async () => {
       if (card && position) {
         const positionData = await GetPosition(card, position)
@@ -123,11 +135,9 @@ export default function CardPositionForm() {
 
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier)
-            setErrorMessage(null)
             setMessage(`Position ${position} added!`)
           } else if (res?.status === 'updated') {
             res?.identifier && setIdentifier(res?.identifier)
-            setErrorMessage(null)
             setMessage(`Position ${position} updated!`)
           } else if (
             res?.status === 'not added' ||

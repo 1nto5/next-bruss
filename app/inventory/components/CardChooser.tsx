@@ -23,6 +23,18 @@ export default function CardChooser() {
   const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
 
   useEffect(() => {
+    if (errorMessage) {
+      setMessage(null)
+    }
+  }, [errorMessage])
+
+  useEffect(() => {
+    if (message) {
+      setErrorMessage(null)
+    }
+  }, [message])
+
+  useEffect(() => {
     startTransition(() => {
       async function fetchLowestNumber() {
         const number = await FindLowestFreeCardNumber()
