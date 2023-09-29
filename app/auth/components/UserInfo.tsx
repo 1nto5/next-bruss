@@ -4,21 +4,17 @@ import { signOut } from 'next-auth/react'
 
 export default function UserInfo() {
   const { data: session } = useSession()
-  console.log(session?.user)
-  if (session?.user.roles?.includes('admin')) {
-    return (
-      <>
-        <p>You are an admin, welcome!</p>
-        <button onClick={() => signOut()}>Logout</button>
-      </>
-    )
-  }
   return (
     <>
-      <div>Email: {session?.user?.email}</div>
-      <div>Name: {session?.user?.name}</div>
-      <div>Role: {session?.user?.roles?.join(', ')}</div>
-      <button onClick={() => signOut()}>Logout</button>
+      <div className="text-center">
+        <p className="mt-10">
+          One day there will be something beautiful here, for now you can log
+          out:
+        </p>
+        <button onClick={() => signOut()}>Logout</button>
+        <p className="mt-10">Name: {session?.user?.name}</p>
+        <p className="mt-2">Roles: {session?.user?.roles?.join(', ')}</p>
+      </div>
     </>
   )
 }
