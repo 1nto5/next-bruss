@@ -6,7 +6,12 @@ export default function UserInfo() {
   const { data: session } = useSession()
   console.log(session?.user)
   if (session?.user.roles?.includes('admin')) {
-    return <p>You are an admin, welcome!</p>
+    return (
+      <>
+        <p>You are an admin, welcome!</p>
+        <button onClick={() => signOut()}>Logout</button>
+      </>
+    )
   }
   return (
     <>

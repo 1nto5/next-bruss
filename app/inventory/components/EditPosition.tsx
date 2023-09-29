@@ -43,6 +43,7 @@ export default function CardPositionForm() {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
   const [quantity, setQuantity] = useState<number>(0)
   const [identifier, setIdentifier] = useState<string>('')
+  const [blockNextPosition, setBlockNextPosition] = useState(false)
 
   useEffect(() => {
     if (errorMessage) {
@@ -65,12 +66,14 @@ export default function CardPositionForm() {
             router.push('/inventory')
           }
           positionData.status == 'no card' && setErrorMessage('No card!')
-          positionData.status == 'skipped' &&
-            setErrorMessage(
-              `Return to position number: ${positionData.position}!`
-            )
-          positionData.status == 'new' &&
+          if (positionData.status == 'skipped') {
+            router.replace(`position-${positionData.position}`)
+          }
+
+          if (positionData.status == 'new') {
+            setBlockNextPosition(true)
             setMessage('Editing a new position...')
+          }
         }
         if (positionData.status == 'found') {
           setMessage('The position exists, content retrieved!')
@@ -136,9 +139,11 @@ export default function CardPositionForm() {
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier)
             setMessage(`Position ${position} added!`)
+            setBlockNextPosition(false)
           } else if (res?.status === 'updated') {
             res?.identifier && setIdentifier(res?.identifier)
             setMessage(`Position ${position} updated!`)
+            setBlockNextPosition(false)
           } else if (
             res?.status === 'not added' ||
             res?.status === 'not updated'
@@ -229,6 +234,16 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
+          <div className=" flex items-center justify-start">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={wip}
+                onChange={(e) => setWip(e.target.checked)}
+              />
+              <span>Confirm</span>
+            </label>
+          </div>
           <div className="mt-4 flex justify-center space-x-3">
             <button
               onClick={() => {
@@ -253,10 +268,14 @@ export default function CardPositionForm() {
 
             <button
               onClick={() => {
-                if (position !== null && position != 25) {
-                  router.replace(`position-${position + 1}`)
+                if (!blockNextPosition) {
+                  if (position !== null && position != 25) {
+                    router.replace(`position-${position + 1}`)
+                  } else {
+                    setErrorMessage('The card is full!')
+                  }
                 } else {
-                  setErrorMessage('The card is full!')
+                  setErrorMessage('Save the current position!')
                 }
               }}
               className="rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"

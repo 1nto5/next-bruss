@@ -52,19 +52,22 @@ export default function PositionChooser() {
       if (session?.user?.email && cardNumber) {
         setIsPending(true)
         const res = await ReserveCard(cardNumber, session?.user.email)
-        setIsPending(false)
         if (res == 'reserved') {
           setMessage(`Card number: ${cardNumber} reserved!`)
+          setIsPending(false)
           return
         }
         if (res == 'exists') {
           setMessage(`Card number: ${cardNumber} selected!`)
+          setIsPending(false)
           return
         }
         if (res == 'no access') {
+          setIsPending(false)
           router.push('/inventory')
           return
         }
+        setIsPending(false)
         setErrorMessage(`Please contact IT!`)
         return
       }
@@ -75,9 +78,11 @@ export default function PositionChooser() {
         const res = await GetExistingPositions(cardNumber)
         if (res) {
           setExistingPositionNumbers(res)
+          setIsPending(false)
           return
         }
         setErrorMessage('Please contact IT!')
+        setIsPending(false)
         return
       }
     }
@@ -87,21 +92,23 @@ export default function PositionChooser() {
         if (res === 'full') {
           setErrorMessage('Card is full!')
           setFullCard(true)
+          setIsPending(false)
           return
         }
         if (res) {
           setLowestAvailableNumber(res)
+          setIsPending(false)
           return
         }
         setErrorMessage('Please contact IT!')
+        setIsPending(false)
         return
       }
     }
-    setIsPending(true)
+
     reserveCard()
     fetchExistingPositions()
     fetchLowestFreePosition()
-    setIsPending(false)
   }, [cardNumber, router, session?.user.email])
 
   const prepareOptions = (numbers: number[]) => {

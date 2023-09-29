@@ -5,7 +5,8 @@ import CardChooser from './components/CardChooser'
 
 export default async function Register() {
   const session = await getServerSession(authOptions)
-  if (!session) redirect('/auth/login')
+  if (!session || !session?.user?.roles?.includes('inventory'))
+    redirect('/auth/login')
 
   return <CardChooser />
 }
