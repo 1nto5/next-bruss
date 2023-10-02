@@ -41,6 +41,7 @@ export default function CardChooser() {
         setLowestAvailableNumber(number)
       }
 
+      // TODO: jeśli confirmer, wszystkie pozycje
       async function fetchExistingNumbers() {
         if (session?.user?.email) {
           const numbers = await GetExistingCardNumbers(session.user.email)

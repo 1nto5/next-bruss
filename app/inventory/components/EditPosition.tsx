@@ -1,13 +1,16 @@
 'use client'
 
-// nie pozwalaj edytować pozycji gdy poprzednie nie zamknięta
-
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
 import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
-import { GetPosition, SavePosition, GetArticles } from '../actions'
+import {
+  GetPosition,
+  SavePosition,
+  GetArticles,
+  ApprovePosition,
+} from '../actions'
 import Select from './Select'
 import Loader from './Loader'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
@@ -20,6 +23,8 @@ type Article = {
   unit: string
   converter: number
 }
+
+// TODO: jeśli pozycja nalzey do karty innego usera, przekieruj do /inventory
 
 export default function CardPositionForm() {
   const { data: session } = useSession()
@@ -39,24 +44,39 @@ export default function CardPositionForm() {
     'articlesKey',
     GetArticles
   )
-  const [wip, setWip] = useState<boolean>(false)
+  const [wip, setWip] = useState(false)
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null)
-  const [quantity, setQuantity] = useState<number>(0)
-  const [identifier, setIdentifier] = useState<string>('')
+  const [quantity, setQuantity] = useState(0)
+  const [confirmed, setConfirmed] = useState(false)
+  const [identifier, setIdentifier] = useState('')
   const [blockNextPosition, setBlockNextPosition] = useState(false)
 
-  useEffect(() => {
-    if (errorMessage) {
-      setMessage(null)
-    }
-  }, [errorMessage])
+  // prefetching
+  // useEffect(() => {
+  //   if (position) {
+  //     const newPathname = pathname.replace(
+  //       /(position-)(\d+)/,
+  //       (_, prefix, num) => {
+  //         console.log(`${prefix}${Number(num) + 1}`)
+  //         return `${prefix}${Number(num) + 1}`
+  //       }
+  //     )
+  //     console.log(newPathname)
+  //     router.prefetch(newPathname)
+  //   }
+  // }, [router])
 
-  useEffect(() => {
-    if (message) {
-      setErrorMessage(null)
-    }
-  }, [message])
+  const errorSetter = (message: string) => {
+    setErrorMessage(message)
+    setMessage(null)
+  }
 
+  const messageSetter = (message: string) => {
+    setMessage(message)
+    setErrorMessage(null)
+  }
+
+  // fetch existing position
   useEffect(() => {
     const fetchData = async () => {
       if (card && position) {
@@ -65,18 +85,18 @@ export default function CardPositionForm() {
           if (positionData.status == 'wrong position') {
             router.push('/inventory')
           }
-          positionData.status == 'no card' && setErrorMessage('No card!')
+          positionData.status == 'no card' && errorSetter('No card!')
           if (positionData.status == 'skipped') {
             router.replace(`position-${positionData.position}`)
           }
 
           if (positionData.status == 'new') {
             setBlockNextPosition(true)
-            setMessage('Editing a new position...')
+            messageSetter('Editing a new position...')
           }
         }
         if (positionData.status == 'found') {
-          setMessage('The position exists, content retrieved!')
+          messageSetter('The position exists, content retrieved!')
           setIdentifier(positionData.position.identifier)
           setQuantity(positionData.position.quantity)
           if (articles) {
@@ -95,6 +115,7 @@ export default function CardPositionForm() {
     return () => {}
   }, [articles, card, position, router])
 
+  // save position
   const savePosition = async () => {
     if (identifier !== '') {
       if (
@@ -106,11 +127,11 @@ export default function CardPositionForm() {
       }
     }
     if (!selectedArticle) {
-      setErrorMessage('Select an article!')
+      errorSetter('Select an article!')
       return
     }
     if (!quantity || quantity <= 0) {
-      setErrorMessage('Enter the correct quantity!')
+      errorSetter('Enter the correct quantity!')
       return
     }
     if (card && position) {
@@ -138,24 +159,47 @@ export default function CardPositionForm() {
 
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier)
-            setMessage(`Position ${position} added!`)
+            messageSetter(`Position ${position} added!`)
             setBlockNextPosition(false)
           } else if (res?.status === 'updated') {
             res?.identifier && setIdentifier(res?.identifier)
-            setMessage(`Position ${position} updated!`)
+            messageSetter(`Position ${position} updated!`)
             setBlockNextPosition(false)
           } else if (
             res?.status === 'not added' ||
             res?.status === 'not updated'
           ) {
-            setErrorMessage('Saving position error. Please contact IT!')
+            errorSetter('Saving position error. Please contact IT!')
           }
         }
       } catch (error) {
-        setErrorMessage('Saving position error. Please contact IT!')
+        errorSetter('Saving position error. Please contact IT!')
       } finally {
         setIsPending(false)
       }
+    }
+  }
+
+  // approve position
+  const approvePosition = async () => {
+    if (!window.confirm('Are you sure you want to approve the position?')) {
+      return
+    }
+    try {
+      if (card && position && session?.user.email) {
+        setIsPending(true)
+        const res = await ApprovePosition(card, position, session.user.email)
+
+        if (res?.status === 'approved') {
+          messageSetter('The position has been approved!')
+        } else if (res?.status === 'no changes') {
+          messageSetter('The position had already been approved!')
+        }
+      }
+    } catch (error) {
+      errorSetter('Saving position error. Please contact IT!')
+    } finally {
+      setIsPending(false)
     }
   }
 
@@ -164,7 +208,7 @@ export default function CardPositionForm() {
   }
 
   if (getArticlesError) {
-    setErrorMessage('An error occurred during loading artiles options.')
+    errorSetter('An error occurred during loading artiles options.')
   }
   if (!articles) {
     return <Loader />
@@ -185,16 +229,17 @@ export default function CardPositionForm() {
               {message}
             </div>
           )}
-          {identifier && (
-            <div className="rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500">
-              {identifier}
-            </div>
-          )}
           {errorMessage && (
             <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
               {errorMessage}
             </div>
           )}
+          {identifier && (
+            <div className="rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500">
+              {identifier}
+            </div>
+          )}
+
           <Select
             options={articles}
             value={selectedArticle}
@@ -234,16 +279,16 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
-          <div className=" flex items-center justify-start">
+          {/* <div className=" flex items-center justify-start">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={wip}
-                onChange={(e) => setWip(e.target.checked)}
+                checked={confirmed}
+                onChange={(e) => setConfirmed(e.target.checked)}
               />
-              <span>Confirm</span>
+              <span>confirm</span>
             </label>
-          </div>
+          </div> */}
           <div className="mt-4 flex justify-center space-x-3">
             <button
               onClick={() => {
@@ -251,7 +296,7 @@ export default function CardPositionForm() {
                   if (position !== 1) {
                     router.replace(`position-${position - 1}`)
                   } else {
-                    setErrorMessage('No 0 position!')
+                    errorSetter('No 0 position!')
                   }
                 }
               }}
@@ -265,6 +310,14 @@ export default function CardPositionForm() {
             >
               save
             </button>
+            {session?.user.roles?.includes('inventory_confirmer') && (
+              <button
+                onClick={approvePosition}
+                className="w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              >
+                approve
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -272,10 +325,10 @@ export default function CardPositionForm() {
                   if (position !== null && position != 25) {
                     router.replace(`position-${position + 1}`)
                   } else {
-                    setErrorMessage('The card is full!')
+                    errorSetter('The card is full!')
                   }
                 } else {
-                  setErrorMessage('Save the current position!')
+                  errorSetter('Save the current position!')
                 }
               }}
               className="rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"

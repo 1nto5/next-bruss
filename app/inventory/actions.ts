@@ -261,3 +261,30 @@ export async function SavePosition(
     throw new Error('An error occurred while saving the position.')
   }
 }
+
+export async function ApprovePosition(
+  cardNumber: number,
+  position: number,
+  user: string
+) {
+  try {
+    const collection = await connectToMongo('inventory_cards')
+    const updateResult = await collection.updateOne(
+      {
+        number: cardNumber,
+        'positions.position': position,
+      },
+      {
+        $set: { 'positions.$.approved': user },
+      }
+    )
+    if (updateResult.modifiedCount > 0) {
+      return { status: 'approved' }
+    } else {
+      return { status: 'no changes' }
+    }
+  } catch (error) {
+    console.error(error)
+    throw new Error('An error occurred while confirming the email.')
+  }
+}
