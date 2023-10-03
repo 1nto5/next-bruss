@@ -25,6 +25,7 @@ type Article = {
 }
 
 // TODO: jeśli pozycja nalzey do karty innego usera, przekieruj do /inventory
+// TODO: jeśli pozycja zatwierdzona, nie pozwalaj edytować, wyświetl zielony komunikat "pozycja zatwierdzona przez: ..."
 
 export default function CardPositionForm() {
   const { data: session } = useSession()
@@ -79,10 +80,17 @@ export default function CardPositionForm() {
   // fetch existing position
   useEffect(() => {
     const fetchData = async () => {
-      if (card && position) {
-        const positionData = await GetPosition(card, position)
+      if (card && position && session?.user.email) {
+        const positionData = await GetPosition(
+          card,
+          position,
+          session?.user.email
+        )
         if (positionData) {
           if (positionData.status == 'wrong position') {
+            router.push('/inventory')
+          }
+          if (positionData.status == 'no access') {
             router.push('/inventory')
           }
           positionData.status == 'no card' && errorSetter('No card!')
@@ -113,7 +121,7 @@ export default function CardPositionForm() {
     fetchData()
     setIsPending(false)
     return () => {}
-  }, [articles, card, position, router])
+  }, [articles, card, position, router, session?.user.email])
 
   // save position
   const savePosition = async () => {

@@ -136,13 +136,20 @@ export async function GetArticles() {
   }
 }
 
-export async function GetPosition(cardNumber: number, positionNumber: number) {
+export async function GetPosition(
+  cardNumber: number,
+  positionNumber: number,
+  user: string
+) {
   try {
     const collection = await connectToMongo('inventory_cards')
     const card = await collection.findOne({ number: cardNumber })
 
     if (!card) {
       return { status: 'no card' }
+    }
+    if (card.creator !== user) {
+      return { status: 'no access' }
     }
     if (positionNumber < 1 || positionNumber > 25) {
       return { status: 'wrong position' }

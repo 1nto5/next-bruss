@@ -17,6 +17,7 @@ type Option = {
 }
 
 //TODO: random position approver
+//TODO: aprrover list positions, not select ;)
 
 export default function PositionChooser() {
   const router = useRouter()
@@ -37,17 +38,15 @@ export default function PositionChooser() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [fullCard, setFullCard] = useState(false)
 
-  useEffect(() => {
-    if (errorMessage) {
-      setMessage(null)
-    }
-  }, [errorMessage])
+  const errorSetter = (message: string) => {
+    setErrorMessage(message)
+    setMessage(null)
+  }
 
-  useEffect(() => {
-    if (message) {
-      setErrorMessage(null)
-    }
-  }, [message])
+  const messageSetter = (message: string) => {
+    setMessage(message)
+    setErrorMessage(null)
+  }
 
   useEffect(() => {
     async function reserveCard() {
@@ -55,12 +54,12 @@ export default function PositionChooser() {
         setIsPending(true)
         const res = await ReserveCard(cardNumber, session?.user.email)
         if (res == 'reserved') {
-          setMessage(`Card number: ${cardNumber} reserved!`)
+          messageSetter(`Card number: ${cardNumber} reserved!`)
           setIsPending(false)
           return
         }
         if (res == 'exists') {
-          setMessage(`Card number: ${cardNumber} selected!`)
+          messageSetter(`Card number: ${cardNumber} selected!`)
           setIsPending(false)
           return
         }
@@ -70,7 +69,7 @@ export default function PositionChooser() {
           return
         }
         setIsPending(false)
-        setErrorMessage(`Please contact IT!`)
+        errorSetter(`Please contact IT!`)
         return
       }
     }
@@ -83,7 +82,7 @@ export default function PositionChooser() {
           setIsPending(false)
           return
         }
-        setErrorMessage('Please contact IT!')
+        errorSetter('Please contact IT!')
         setIsPending(false)
         return
       }
@@ -92,7 +91,7 @@ export default function PositionChooser() {
       if (session?.user?.email && cardNumber) {
         const res = await FindLowestFreePosition(cardNumber)
         if (res === 'full') {
-          setErrorMessage('Card is full!')
+          errorSetter('Card is full!')
           setFullCard(true)
           setIsPending(false)
           return
@@ -102,7 +101,7 @@ export default function PositionChooser() {
           setIsPending(false)
           return
         }
-        setErrorMessage('Please contact IT!')
+        errorSetter('Please contact IT!')
         setIsPending(false)
         return
       }
@@ -131,7 +130,7 @@ export default function PositionChooser() {
       router.push(`${pathname}/position-${positionNumber}`)
       return
     }
-    setErrorMessage('Position not selected!')
+    errorSetter('Position not selected!')
   }
 
   const handleSelectChange = (selectedOption: Option | null) => {

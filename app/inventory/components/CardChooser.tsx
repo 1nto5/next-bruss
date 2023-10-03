@@ -19,22 +19,9 @@ export default function CardChooser() {
   const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
   const [cardNumber, setCardNumber] = useState<string>('')
-  const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lowestAvailableNumber, setLowestAvailableNumber] = useState<string>('')
   const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
-
-  useEffect(() => {
-    if (errorMessage) {
-      setMessage(null)
-    }
-  }, [errorMessage])
-
-  useEffect(() => {
-    if (message) {
-      setErrorMessage(null)
-    }
-  }, [message])
 
   useEffect(() => {
     startTransition(() => {
@@ -97,11 +84,6 @@ export default function CardChooser() {
       </span>
       <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
         <div className="flex flex-col gap-3">
-          {message && (
-            <div className="rounded bg-bruss p-2 text-center text-slate-100">
-              {message}
-            </div>
-          )}
           {errorMessage && (
             <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
               {errorMessage}
