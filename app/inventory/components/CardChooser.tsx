@@ -11,6 +11,8 @@ type Option = {
   label: string
 }
 
+//TODO: random card approver
+
 export default function CardChooser() {
   const router = useRouter()
   const pathname = usePathname()

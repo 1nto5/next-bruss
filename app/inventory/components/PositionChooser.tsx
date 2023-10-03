@@ -16,6 +16,8 @@ type Option = {
   label: string
 }
 
+//TODO: random position approver
+
 export default function PositionChooser() {
   const router = useRouter()
   const pathname = usePathname()
