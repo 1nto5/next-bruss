@@ -17,7 +17,7 @@ type Option = {
 }
 
 //TODO: random position approver
-//TODO: aprrover list positions, not select ;)
+//TODO: list position with position data (article, identifier, quantity) ;)
 
 export default function PositionChooser() {
   const router = useRouter()
