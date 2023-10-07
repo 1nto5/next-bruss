@@ -18,7 +18,8 @@ export default function CardChooser() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
-  const [cardNumber, setCardNumber] = useState<string>('')
+  const [cardNumber, setCardNumber] = useState('')
+  const [warehouse, setWarehouse] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [lowestAvailableNumber, setLowestAvailableNumber] = useState<string>('')
   const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
@@ -42,22 +43,38 @@ export default function CardChooser() {
     })
   }, [session?.user.email])
 
-  const prepareOptions = (numbers: number[]) => {
+  const prepareCardOptions = (numbers: number[]) => {
     return numbers.map((number) => ({
       value: number,
       label: number.toString(),
     }))
   }
 
-  const preparedOptions = prepareOptions(existingCardNumbers)
+  const preparedCardOptions = prepareCardOptions(existingCardNumbers)
 
-  const selectedOption = preparedOptions.find(
+  const selectedCardOption = preparedCardOptions.find(
     (option) => option.value.toString() === cardNumber
   )
 
-  const handleSelectChange = (selectedOption: Option | null) => {
-    if (selectedOption) {
-      setCardNumber(selectedOption.value.toString())
+  const handleCardSelectChange = (selectedCardOption: Option | null) => {
+    if (selectedCardOption) {
+      setCardNumber(selectedCardOption.value.toString())
+    }
+  }
+
+  const warehouseSelectOptions = [
+    { value: 0, label: '000 - Rohstolfe und Fertigteile' },
+    { value: 35, label: '035 - Metalteile Taicang' },
+    { value: 54, label: '054 - Magazyn wstrzymangch' },
+    { value: 55, label: '055 - Cz.zablokowane GTM' },
+    { value: 111, label: '111 - Magazyn Launch' },
+    { value: 222, label: '222 - Magazyn zablokowany produkcja' },
+    // { value: 999, label: '999 - WIP' },
+  ]
+
+  const handleWarehouseSelectChange = (selectedCardOption: Option | null) => {
+    if (selectedCardOption) {
+      setWarehouse(selectedCardOption.value.toString())
     }
   }
 
@@ -90,10 +107,16 @@ export default function CardChooser() {
             </div>
           )}
           <Select
-            options={preparedOptions}
-            value={selectedOption}
-            onChange={handleSelectChange}
+            options={preparedCardOptions}
+            value={selectedCardOption}
+            onChange={handleCardSelectChange}
             placeholder={'select card'}
+          />
+          <Select
+            options={warehouseSelectOptions}
+            value={warehouse}
+            onChange={handleWarehouseSelectChange}
+            placeholder={'select warehouse'}
           />
           <div className="mt-4 flex w-full justify-center space-x-2">
             <button
