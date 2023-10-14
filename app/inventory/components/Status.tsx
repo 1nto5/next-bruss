@@ -11,8 +11,8 @@ import { useSession } from 'next-auth/react'
 
 export default function Status() {
   const pathname = usePathname()
-  const matchesCard = pathname.match(/card-(\d+)/)
-  const matchesPosition = pathname.match(/position-(\d+)/)
+  const matchesCard = pathname.match(/card=(\d+)/)
+  const matchesPosition = pathname.match(/position=(\d+)/)
   const card = matchesCard ? String(matchesCard[1]) : '-'
   const position = matchesPosition ? String(matchesPosition[1]) : '-'
   const { data: session } = useSession()

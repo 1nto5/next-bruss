@@ -31,16 +31,17 @@ export default function CardPositionForm() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const router = useRouter()
-  if (!/\/card-\d+$/.test(pathname) && !/\/position-\d+$/.test(pathname)) {
+  if (!/\/card=\d+$/.test(pathname) && !/\/position=\d+$/.test(pathname)) {
     router.push('/inventory')
   }
-  const matchesPosition = pathname.match(/position-(\d+)/)
-  const matchesCard = pathname.match(/card-(\d+)/)
+  const matchesPosition = pathname.match(/position=(\d+)/)
+  const matchesCard = pathname.match(/card=(\d+)/)
   const position = matchesPosition ? Number(matchesPosition[1]) : null
   const card = matchesCard ? Number(matchesCard[1]) : null
   const [message, setMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isPending, setIsPending] = useState(false)
+  // TODO: useTransition
   const { data: articles, error: getArticlesError } = useSWR<Article[]>(
     'articlesKey',
     GetArticles
@@ -95,7 +96,7 @@ export default function CardPositionForm() {
           }
           positionData.status == 'no card' && errorSetter('No card!')
           if (positionData.status == 'skipped') {
-            router.replace(`position-${positionData.position}`)
+            router.replace(`position=${positionData.position}`)
           }
 
           if (positionData.status == 'new') {
@@ -226,27 +227,33 @@ export default function CardPositionForm() {
   }
 
   return (
-    <div className="mb-4 mt-4 flex flex-col items-center justify-center">
+    <div className="justify-cente mb-4 mt-4 flex flex-col items-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
         edit position
       </span>
-      <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
-        <div className="flex flex-col gap-3">
-          {message && (
-            <div className="rounded bg-bruss p-2 text-center text-slate-100">
-              {message}
-            </div>
-          )}
-          {errorMessage && (
-            <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
-              {errorMessage}
-            </div>
-          )}
-          {identifier && (
-            <div className="rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500">
-              {identifier}
-            </div>
-          )}
+      <div className="flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
+        <div className="flex w-11/12 flex-col gap-3">
+          {message ||
+            errorMessage ||
+            (identifier && (
+              <div className="mt-4 flex flex-col items-center justify-center space-y-4">
+                {message && (
+                  <div className="rounded bg-bruss p-2 text-center text-slate-100">
+                    {message}
+                  </div>
+                )}
+                {errorMessage && (
+                  <div className="rounded bg-red-500 p-2 text-center text-slate-100 dark:bg-red-700">
+                    {errorMessage}
+                  </div>
+                )}
+                {identifier && (
+                  <div className="rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500">
+                    {identifier}
+                  </div>
+                )}
+              </div>
+            ))}
 
           <Select
             options={articles}
@@ -277,7 +284,7 @@ export default function CardPositionForm() {
               </label>
             </div>
           )}
-          <div className=" flex items-center justify-end">
+          <div className="mt-4 flex items-center justify-start">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -287,22 +294,12 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
-          {/* <div className=" flex items-center justify-start">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={confirmed}
-                onChange={(e) => setConfirmed(e.target.checked)}
-              />
-              <span>confirm</span>
-            </label>
-          </div> */}
           <div className="mt-4 flex justify-center space-x-3">
             <button
               onClick={() => {
                 if (position !== null) {
                   if (position !== 1) {
-                    router.replace(`position-${position - 1}`)
+                    router.replace(`position=${position - 1}`)
                   } else {
                     errorSetter('No 0 position!')
                   }
@@ -331,7 +328,7 @@ export default function CardPositionForm() {
               onClick={() => {
                 if (!blockNextPosition) {
                   if (position !== null && position != 25) {
-                    router.replace(`position-${position + 1}`)
+                    router.replace(`position=${position + 1}`)
                   } else {
                     errorSetter('The card is full!')
                   }

@@ -1,6 +1,5 @@
 'use client'
 
-import Button from '@/app/pro/components/Button'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -19,16 +18,16 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {title}
       </h1>
       <div className="mr-2 flex space-x-4">
-        {pathname.includes('position-') && (
+        {pathname.includes('position=') && (
           <button
-            onClick={() => router.push(pathname.replace(/\/position-.*/, ''))}
+            onClick={() => router.push(pathname.replace(/\/position=.*/, ''))}
             className="w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
             type="button"
           >
             position
           </button>
         )}
-        {pathname.includes('card-') && (
+        {pathname.includes('card=') && (
           <button
             onClick={() => router.push('/inventory')}
             className="w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"

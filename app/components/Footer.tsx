@@ -4,16 +4,14 @@ import Reload from './Reload'
 
 export default function Footer() {
   return (
-    <>
-      <div style={{ position: 'fixed', bottom: '10px', left: '10px' }}>
+    <footer className="mb-2 ml-4 mr-8 mt-24 flex items-center justify-between lg:fixed lg:inset-x-0 lg:bottom-0 ">
+      <div className="flex items-center">
         <Logo />
       </div>
-      <div style={{ position: 'fixed', bottom: '20px', right: '100px' }}>
+      <div className="flex items-center space-x-4">
         <ThemeSwitcher />
-      </div>
-      <div style={{ position: 'fixed', bottom: '20px', right: '30px' }}>
         <Reload />
       </div>
-    </>
+    </footer>
   )
 }

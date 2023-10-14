@@ -9,6 +9,7 @@ import {
 } from '../actions'
 import { useSession } from 'next-auth/react'
 import Select from './Select'
+import Loader from './Loader'
 
 type Option = {
   value: number
@@ -99,7 +100,7 @@ export default function CardChooser() {
         const number = await FindLowestFreeCardNumber()
         const res = await ReserveCard(number, session?.user.email)
         if (res == 'reserved') {
-          router.push(`${pathname}/card-${String(number)}`)
+          router.push(`${pathname}/card=${String(number)}`)
           return
         }
         errorSetter(`Please contact IT!`)
@@ -110,30 +111,30 @@ export default function CardChooser() {
 
   const handleConfirm = (e: React.FormEvent) => {
     if (cardNumber) {
-      router.push(`${pathname}/card-${cardNumber}`)
+      router.push(`${pathname}/card=${cardNumber}`)
       return
     }
     setErrorMessage('Card not selected!')
   }
 
   if (isPending) {
-    return (
-      <div className="mt-24 flex justify-center">
-        <div className="h-24 w-24 animate-spin rounded-full border-t-8 border-solid border-bruss"></div>
-      </div>
-    )
+    return <Loader />
   }
 
   return (
-    <div className="mb-4 mt-4 flex flex-col items-center justify-center">
+    <div className="justify-cente mb-4 mt-4 flex flex-col items-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
-        card
+        edit position
       </span>
-      <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
-        <div className="flex flex-col gap-3">
+      <div className="flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
+        <div className="flex w-11/12 flex-col gap-3">
           {errorMessage && (
-            <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
-              {errorMessage}
+            <div className="mt-4 flex flex-col items-center justify-center space-y-4">
+              {errorMessage && (
+                <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
+                  {errorMessage}
+                </div>
+              )}
             </div>
           )}
           {!warehouse && (
@@ -153,23 +154,20 @@ export default function CardChooser() {
             />
           )}
           <div className="mt-4 flex w-full justify-center space-x-2">
-            {warehouse && (
-              <button
-                type="button"
-                onClick={() => reserveCard()}
-                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
-              >
-                new card
-              </button>
-            )}
-            {cardNumber && (
-              <button
-                onClick={handleConfirm}
-                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-              >
-                confirm
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => reserveCard()}
+              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+            >
+              new card
+            </button>
+
+            <button
+              onClick={handleConfirm}
+              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+            >
+              confirm
+            </button>
           </div>
         </div>
       </div>

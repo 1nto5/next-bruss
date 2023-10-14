@@ -112,13 +112,13 @@ export default function Select({
   }, [])
 
   return (
-    <div className="mt-4 flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <ReactSelect
         options={options}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-80 text-center"
+        className="w-full max-w-xs text-center"
         menuPlacement="auto"
         styles={isDarkMode ? selectDarkTheme : selectLightTheme}
       />
