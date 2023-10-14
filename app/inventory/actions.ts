@@ -117,6 +117,14 @@ export async function FindLowestFreePosition(cardNumber: number) {
   }
 }
 
+export async function CheckIfFull(cardNumber: number) {
+  const existingPositions = await GetExistingPositions(cardNumber)
+  if (existingPositions.length === 25) {
+    return true
+  }
+  return false
+}
+
 export async function GetArticles() {
   try {
     const collection = await connectToMongo('inventory_articles')

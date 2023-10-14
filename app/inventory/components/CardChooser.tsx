@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { FindLowestFreeCardNumber, GetExistingCardNumbers } from '../actions'
+import {
+  FindLowestFreeCardNumber,
+  GetExistingCardNumbers,
+  ReserveCard,
+} from '../actions'
 import { useSession } from 'next-auth/react'
 import Select from './Select'
 
@@ -12,25 +16,31 @@ type Option = {
 }
 
 //TODO: random card approver
+// TODO: warunkwe pokazywanie przycisków
 
 export default function CardChooser() {
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
-  const [cardNumber, setCardNumber] = useState('')
+  const [cardNumber, setCardNumber] = useState<number | null>(null)
   const [warehouse, setWarehouse] = useState('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [lowestAvailableNumber, setLowestAvailableNumber] = useState<string>('')
+  const [message, setMessage] = useState<string | null>(null)
   const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
+
+  const errorSetter = (message: string) => {
+    setErrorMessage(message)
+    setMessage(null)
+  }
+
+  const messageSetter = (message: string) => {
+    setMessage(message)
+    setErrorMessage(null)
+  }
 
   useEffect(() => {
     startTransition(() => {
-      async function fetchLowestNumber() {
-        const number = await FindLowestFreeCardNumber()
-        setLowestAvailableNumber(number)
-      }
-
       // TODO: jeśli confirmer, wszystkie pozycje
       async function fetchExistingNumbers() {
         if (session?.user?.email) {
@@ -38,7 +48,6 @@ export default function CardChooser() {
           setExistingCardNumbers(numbers)
         }
       }
-      fetchLowestNumber()
       fetchExistingNumbers()
     })
   }, [session?.user.email])
@@ -53,12 +62,12 @@ export default function CardChooser() {
   const preparedCardOptions = prepareCardOptions(existingCardNumbers)
 
   const selectedCardOption = preparedCardOptions.find(
-    (option) => option.value.toString() === cardNumber
+    (option) => option.value === cardNumber
   )
 
   const handleCardSelectChange = (selectedCardOption: Option | null) => {
     if (selectedCardOption) {
-      setCardNumber(selectedCardOption.value.toString())
+      setCardNumber(selectedCardOption.value)
     }
   }
 
@@ -72,10 +81,31 @@ export default function CardChooser() {
     // { value: 999, label: '999 - WIP' },
   ]
 
-  const handleWarehouseSelectChange = (selectedCardOption: Option | null) => {
-    if (selectedCardOption) {
-      setWarehouse(selectedCardOption.value.toString())
+  const selectedWarehauseOption = warehouseSelectOptions.find(
+    (option) => option.value.toString() === warehouse
+  )
+
+  const handleWarehouseSelectChange = (
+    selectedWarehauseOption: Option | null
+  ) => {
+    if (selectedWarehauseOption) {
+      setWarehouse(selectedWarehauseOption.value.toString())
     }
+  }
+
+  const reserveCard = () => {
+    startTransition(async () => {
+      if (session?.user?.email) {
+        const number = await FindLowestFreeCardNumber()
+        const res = await ReserveCard(number, session?.user.email)
+        if (res == 'reserved') {
+          router.push(`${pathname}/card-${String(number)}`)
+          return
+        }
+        errorSetter(`Please contact IT!`)
+        return
+      }
+    })
   }
 
   const handleConfirm = (e: React.FormEvent) => {
@@ -97,7 +127,7 @@ export default function CardChooser() {
   return (
     <div className="mb-4 mt-4 flex flex-col items-center justify-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
-        select card
+        card
       </span>
       <div className="flex rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
         <div className="flex flex-col gap-3">
@@ -106,34 +136,40 @@ export default function CardChooser() {
               {errorMessage}
             </div>
           )}
-          <Select
-            options={preparedCardOptions}
-            value={selectedCardOption}
-            onChange={handleCardSelectChange}
-            placeholder={'select card'}
-          />
-          <Select
-            options={warehouseSelectOptions}
-            value={warehouse}
-            onChange={handleWarehouseSelectChange}
-            placeholder={'select warehouse'}
-          />
+          {!warehouse && (
+            <Select
+              options={preparedCardOptions}
+              value={selectedCardOption}
+              onChange={handleCardSelectChange}
+              placeholder={'select existing card'}
+            />
+          )}
+          {!cardNumber && (
+            <Select
+              options={warehouseSelectOptions}
+              value={selectedWarehauseOption}
+              onChange={handleWarehouseSelectChange}
+              placeholder={'select warehouse'}
+            />
+          )}
           <div className="mt-4 flex w-full justify-center space-x-2">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(`${pathname}/card-${String(lowestAvailableNumber)}`)
-              }
-              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
-            >
-              first available
-            </button>
-            <button
-              onClick={handleConfirm}
-              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
-            >
-              confirm
-            </button>
+            {warehouse && (
+              <button
+                type="button"
+                onClick={() => reserveCard()}
+                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+              >
+                new card
+              </button>
+            )}
+            {cardNumber && (
+              <button
+                onClick={handleConfirm}
+                className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              >
+                confirm
+              </button>
+            )}
           </div>
         </div>
       </div>

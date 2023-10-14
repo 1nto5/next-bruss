@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useTransition } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import {
-  ReserveCard,
   GetExistingPositions,
   FindLowestFreePosition,
+  CheckIfFull,
 } from '../actions'
 import { useSession } from 'next-auth/react'
 import Loader from './Loader'
@@ -28,8 +28,7 @@ export default function PositionChooser() {
   const matches = pathname.match(/card-(\d+)/)
   const cardNumber = matches ? Number(matches[1]) : null
   const { data: session } = useSession()
-  const [isPending, setIsPending] = useState(true)
-  const [lowestAvailableNumber, setLowestAvailableNumber] = useState<number>()
+  const [isPending, startTransition] = useTransition()
   const [existingPositionNumbers, setExistingPositionNumbers] = useState<
     number[]
   >([])
@@ -49,68 +48,21 @@ export default function PositionChooser() {
   }
 
   useEffect(() => {
-    async function reserveCard() {
+    startTransition(async () => {
       if (session?.user?.email && cardNumber) {
-        setIsPending(true)
-        const res = await ReserveCard(cardNumber, session?.user.email)
-        if (res == 'reserved') {
-          messageSetter(`Card number: ${cardNumber} reserved!`)
-          setIsPending(false)
-          return
+        const positions = await GetExistingPositions(cardNumber)
+        if (positions) {
+          setExistingPositionNumbers(positions)
+        } else {
+          errorSetter('Please contact IT!')
         }
-        if (res == 'exists') {
-          messageSetter(`Card number: ${cardNumber} selected!`)
-          setIsPending(false)
-          return
-        }
-        if (res == 'no access') {
-          setIsPending(false)
-          router.push('/inventory')
-          return
-        }
-        setIsPending(false)
-        errorSetter(`Please contact IT!`)
-        return
-      }
-    }
-
-    async function fetchExistingPositions() {
-      if (session?.user?.email && cardNumber) {
-        const res = await GetExistingPositions(cardNumber)
-        if (res) {
-          setExistingPositionNumbers(res)
-          setIsPending(false)
-          return
-        }
-        errorSetter('Please contact IT!')
-        setIsPending(false)
-        return
-      }
-    }
-    async function fetchLowestFreePosition() {
-      if (session?.user?.email && cardNumber) {
-        const res = await FindLowestFreePosition(cardNumber)
-        if (res === 'full') {
-          errorSetter('Card is full!')
+        const full = await CheckIfFull(cardNumber)
+        if (full) {
           setFullCard(true)
-          setIsPending(false)
-          return
         }
-        if (res) {
-          setLowestAvailableNumber(res)
-          setIsPending(false)
-          return
-        }
-        errorSetter('Please contact IT!')
-        setIsPending(false)
-        return
       }
-    }
-
-    reserveCard()
-    fetchExistingPositions()
-    fetchLowestFreePosition()
-  }, [cardNumber, router, session?.user.email])
+    })
+  }, [cardNumber, session?.user?.email])
 
   const prepareOptions = (numbers: number[]) => {
     return numbers.map((number) => ({
@@ -131,6 +83,20 @@ export default function PositionChooser() {
       return
     }
     errorSetter('Position not selected!')
+  }
+
+  const handleFirstFree = () => {
+    startTransition(async () => {
+      if (session?.user?.email && cardNumber) {
+        const res = await FindLowestFreePosition(cardNumber)
+        if (res) {
+          router.push(`${pathname}/position-${String(res)}`)
+          return
+        }
+        errorSetter(`Please contact IT!`)
+        return
+      }
+    })
   }
 
   const handleSelectChange = (selectedOption: Option | null) => {
@@ -173,11 +139,7 @@ export default function PositionChooser() {
             {!fullCard && (
               <button
                 type="button"
-                onClick={() =>
-                  router.push(
-                    `${pathname}/position-${String(lowestAvailableNumber)}`
-                  )
-                }
+                onClick={() => handleFirstFree()}
                 className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
               >
                 {preparedOptions.length > 0 ? 'first free' : 'start card'}
