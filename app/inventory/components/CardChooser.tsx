@@ -1,76 +1,76 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, useTransition } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import React, { useState, useEffect, useTransition } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   FindLowestFreeCardNumber,
-  GetExistingCardNumbers,
+  GetExistingCards,
   ReserveCard,
-} from '../actions'
-import { useSession } from 'next-auth/react'
-import Select from './Select'
-import Loader from './Loader'
+} from '../actions';
+import { useSession } from 'next-auth/react';
+import Select from './Select';
+import Loader from './Loader';
 
 type Option = {
-  value: number
-  label: string
-}
+  value: number;
+  label: string;
+};
 
 //TODO: random card approver
 // TODO: warunkwe pokazywanie przycisków
 
 export default function CardChooser() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { data: session } = useSession()
-  const [isPending, startTransition] = useTransition()
-  const [cardNumber, setCardNumber] = useState<number | null>(null)
-  const [warehouse, setWarehouse] = useState('')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-  const [existingCardNumbers, setExistingCardNumbers] = useState<number[]>([])
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session } = useSession();
+  const [isPending, startTransition] = useTransition();
+  const [cardNumber, setCardNumber] = useState<number | null>(null);
+  const [warehouse, setWarehouse] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [existingCards, setExistingCards] = useState<Option[]>([]);
 
   const errorSetter = (message: string) => {
-    setErrorMessage(message)
-    setMessage(null)
-  }
+    setErrorMessage(message);
+    setMessage(null);
+  };
 
   const messageSetter = (message: string) => {
-    setMessage(message)
-    setErrorMessage(null)
-  }
+    setMessage(message);
+    setErrorMessage(null);
+  };
 
   useEffect(() => {
     startTransition(() => {
       // TODO: jeśli confirmer, wszystkie pozycje
       async function fetchExistingNumbers() {
         if (session?.user?.email) {
-          const numbers = await GetExistingCardNumbers(session.user.email)
-          setExistingCardNumbers(numbers)
+          const cards = await GetExistingCards(session.user.email);
+          setExistingCards(cards);
         }
       }
-      fetchExistingNumbers()
-    })
-  }, [session?.user.email])
+      fetchExistingNumbers();
+    });
+  }, [session?.user.email]);
 
-  const prepareCardOptions = (numbers: number[]) => {
-    return numbers.map((number) => ({
-      value: number,
-      label: number.toString(),
-    }))
-  }
+  // const prepareCardOptions = (numbers: number[]) => {
+  //   return numbers.map((number) => ({
+  //     value: number,
+  //     label: `${number.toString()}`,
+  //   }))
+  // }
 
-  const preparedCardOptions = prepareCardOptions(existingCardNumbers)
+  // const preparedCardOptions = prepareCardOptions(existingCards)
 
-  const selectedCardOption = preparedCardOptions.find(
+  const selectedCardOption = existingCards.find(
     (option) => option.value === cardNumber
-  )
+  );
 
   const handleCardSelectChange = (selectedCardOption: Option | null) => {
     if (selectedCardOption) {
-      setCardNumber(selectedCardOption.value)
+      setCardNumber(selectedCardOption.value);
     }
-  }
+  };
 
   const warehouseSelectOptions = [
     { value: 0, label: '000 - Rohstolfe und Fertigteile' },
@@ -80,56 +80,60 @@ export default function CardChooser() {
     { value: 111, label: '111 - Magazyn Launch' },
     { value: 222, label: '222 - Magazyn zablokowany produkcja' },
     // { value: 999, label: '999 - WIP' },
-  ]
+  ];
 
   const selectedWarehauseOption = warehouseSelectOptions.find(
-    (option) => option.value.toString() === warehouse
-  )
+    (option) => option.value === warehouse
+  );
 
   const handleWarehouseSelectChange = (
     selectedWarehauseOption: Option | null
   ) => {
     if (selectedWarehauseOption) {
-      setWarehouse(selectedWarehauseOption.value.toString())
+      setWarehouse(selectedWarehauseOption.value);
     }
-  }
+  };
 
   const reserveCard = () => {
     startTransition(async () => {
-      if (session?.user?.email) {
-        const number = await FindLowestFreeCardNumber()
-        const res = await ReserveCard(number, session?.user.email)
-        if (res == 'reserved') {
-          router.push(`${pathname}/card=${String(number)}`)
-          return
-        }
-        errorSetter(`Please contact IT!`)
-        return
+      if (!warehouse) {
+        setErrorMessage('Warehause not selected!');
+        return;
       }
-    })
-  }
+      if (session?.user?.email) {
+        const number = await FindLowestFreeCardNumber();
+        const res = await ReserveCard(number, session?.user.email, warehouse);
+        if (res == 'reserved') {
+          router.push(`${pathname}/card=${String(number)}`);
+          return;
+        }
+        errorSetter(`Please contact IT!`);
+        return;
+      }
+    });
+  };
 
   const handleConfirm = (e: React.FormEvent) => {
     if (cardNumber) {
-      router.push(`${pathname}/card=${cardNumber}`)
-      return
+      router.push(`${pathname}/card=${cardNumber}`);
+      return;
     }
-    setErrorMessage('Card not selected!')
-  }
+    setErrorMessage('Card not selected!');
+  };
 
   if (isPending) {
-    return <Loader />
+    return <Loader />;
   }
 
   return (
     <div className="justify-cente mb-4 mt-4 flex flex-col items-center">
       <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
-        edit position
+        card chooser
       </span>
       <div className="flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
         <div className="flex w-11/12 flex-col gap-3">
           {errorMessage && (
-            <div className="mt-4 flex flex-col items-center justify-center space-y-4">
+            <div className="flex flex-col items-center justify-center space-y-4">
               {errorMessage && (
                 <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
                   {errorMessage}
@@ -137,23 +141,22 @@ export default function CardChooser() {
               )}
             </div>
           )}
-          {!warehouse && (
-            <Select
-              options={preparedCardOptions}
-              value={selectedCardOption}
-              onChange={handleCardSelectChange}
-              placeholder={'select existing card'}
-            />
-          )}
-          {!cardNumber && (
-            <Select
-              options={warehouseSelectOptions}
-              value={selectedWarehauseOption}
-              onChange={handleWarehouseSelectChange}
-              placeholder={'select warehouse'}
-            />
-          )}
-          <div className="mt-4 flex w-full justify-center space-x-2">
+
+          <Select
+            options={existingCards}
+            value={selectedCardOption}
+            onChange={handleCardSelectChange}
+            placeholder={'select existing card'}
+          />
+
+          <Select
+            options={warehouseSelectOptions}
+            value={selectedWarehauseOption}
+            onChange={handleWarehouseSelectChange}
+            placeholder={'select warehouse'}
+          />
+
+          <div className=" flex w-full justify-center space-x-2">
             <button
               type="button"
               onClick={() => reserveCard()}
@@ -172,5 +175,5 @@ export default function CardChooser() {
         </div>
       </div>
     </div>
-  )
+  );
 }

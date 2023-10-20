@@ -1,134 +1,158 @@
-'use server'
+'use server';
 
-import { connectToMongo } from '@/lib/mongo/connector'
-import crypto from 'crypto'
-const moment = require('moment')
+import { connectToMongo } from '@/lib/mongo/connector';
+import crypto from 'crypto';
+import moment from 'moment';
 
-export async function GetExistingCardNumbers(email: string) {
+// Options for the warehouse select input
+const warehouseSelectOptions = [
+  { value: 0, label: '000 - Rohstolfe und Fertigteile' },
+  { value: 35, label: '035 - Metalteile Taicang' },
+  { value: 54, label: '054 - Magazyn wstrzymangch' },
+  { value: 55, label: '055 - Cz.zablokowane GTM' },
+  { value: 111, label: '111 - Magazyn Launch' },
+  { value: 222, label: '222 - Magazyn zablokowany produkcja' },
+  // { value: 999, label: '999 - WIP' },
+];
+
+// Fetches existing cards for a given user
+export async function GetExistingCards(email: string) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    const cardNumbers = await collection
-      .find({ creator: email }, { projection: { _id: 0, number: 1 } })
-      .toArray()
-    const extractedNumbers = cardNumbers.map((card) => card.number)
-    return extractedNumbers
+    const collection = await connectToMongo('inventory_cards');
+    const cards = await collection.find({ creator: email }).toArray();
+    const extractedData = cards.map((card) => ({
+      value: card.number,
+      label: `${card.number} - ${card.warehause}`,
+    }));
+    return extractedData;
   } catch (error) {
-    console.error(error)
-    throw new Error('Wystąpił błąd podczas pobierania listy numerów kart.')
+    console.error(error);
+    throw new Error('Wystąpił błąd podczas pobierania listy kart.');
   }
 }
 
+// Finds the lowest free card number
 export async function FindLowestFreeCardNumber() {
   try {
-    const collection = await connectToMongo('inventory_cards')
+    const collection = await connectToMongo('inventory_cards');
     const cardNumbers = await collection
       .find({}, { projection: { _id: 0, number: 1 } })
-      .toArray()
+      .toArray();
     const sortedNumbers = cardNumbers
       .map((card) => card.number)
-      .sort((a, b) => a - b)
-    let lowestFreeNumber
+      .sort((a, b) => a - b);
+    let lowestFreeNumber;
     if (sortedNumbers[0] !== 1) {
-      return 1
+      return 1;
     }
     for (let i = 0; i < sortedNumbers.length - 1; i++) {
       if (sortedNumbers[i + 1] - sortedNumbers[i] > 1) {
-        lowestFreeNumber = sortedNumbers[i] + 1
-        break
+        lowestFreeNumber = sortedNumbers[i] + 1;
+        break;
       }
     }
     if (!lowestFreeNumber) {
-      lowestFreeNumber = sortedNumbers[sortedNumbers.length - 1] + 1
+      lowestFreeNumber = sortedNumbers[sortedNumbers.length - 1] + 1;
     }
-    return lowestFreeNumber
+    return lowestFreeNumber;
   } catch (error) {
-    console.error(error)
+    console.error(error);
     throw new Error(
-      'An error occurred while retrieving the list of card numbers.'
-    )
+      'An error occurred while retrieving the list of card numbers.',
+    );
   }
 }
 
-export async function ReserveCard(cardNumber: number, email: string) {
+// Reserves a card for a given user
+export async function ReserveCard(
+  cardNumber: number,
+  email: string,
+  warehause: number,
+) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    const existingCard = await collection.findOne({ number: cardNumber })
+    const collection = await connectToMongo('inventory_cards');
+    const existingCard = await collection.findOne({ number: cardNumber });
 
     if (existingCard && existingCard.creator !== email) {
-      return 'no access'
+      return 'no access';
     }
 
     if (existingCard) {
-      return 'exists'
+      return 'exists';
     }
 
     const result = await collection.insertOne({
       number: cardNumber,
       creator: email,
-    })
+      warehause: warehause,
+    });
 
     if (result.insertedId) {
-      return 'reserved'
+      return 'reserved';
     }
   } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while retrieving the list of articles.')
+    console.error(error);
+    throw new Error('An error occurred while retrieving the list of articles.');
   }
 }
 
+// Gets existing positions for a given card
 export async function GetExistingPositions(cardNumber: number) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    const card = await collection.findOne({ number: cardNumber })
+    const collection = await connectToMongo('inventory_cards');
+    const card = await collection.findOne({ number: cardNumber });
     if (!card || !Array.isArray(card.positions)) {
-      return []
+      return [];
     }
-    const existingPositions = card.positions.map((pos) => pos.position)
-    return existingPositions
+    const existingPositions = card.positions.map((pos) => pos.position);
+    return existingPositions;
   } catch (error) {
-    console.error(error)
+    console.error(error);
     throw new Error(
-      'An error occurred while retrieving the list of existing positions.'
-    )
+      'An error occurred while retrieving the list of existing positions.',
+    );
   }
 }
 
+// Finds the lowest free position for a given card
 export async function FindLowestFreePosition(cardNumber: number) {
   try {
-    const existingPositions = await GetExistingPositions(cardNumber)
+    const existingPositions = await GetExistingPositions(cardNumber);
     if (existingPositions.length === 0) {
-      return 1
+      return 1;
     }
     if (existingPositions.length === 25) {
-      return 'full'
+      return 'full';
     }
-    const sortedPositions = existingPositions.sort((a, b) => a - b)
+    const sortedPositions = existingPositions.sort((a, b) => a - b);
     for (let i = 1; i <= 25; i++) {
       if (!sortedPositions.includes(i)) {
-        return i
+        return i;
       }
     }
-    throw new Error('Nieoczekiwany błąd podczas wyszukiwania wolnej pozycji.')
+    throw new Error('Nieoczekiwany błąd podczas wyszukiwania wolnej pozycji.');
   } catch (error) {
-    console.error(error)
+    console.error(error);
     throw new Error(
-      'An error occurred while searching for the lowest available position on the card.'
-    )
+      'An error occurred while searching for the lowest available position on the card.',
+    );
   }
 }
 
+// Checks if a card is full
 export async function CheckIfFull(cardNumber: number) {
-  const existingPositions = await GetExistingPositions(cardNumber)
+  const existingPositions = await GetExistingPositions(cardNumber);
   if (existingPositions.length === 25) {
-    return true
+    return true;
   }
-  return false
+  return false;
 }
 
+// Gets a list of articles
 export async function GetArticles() {
   try {
-    const collection = await connectToMongo('inventory_articles')
-    const articles = await collection.find({}).toArray()
+    const collection = await connectToMongo('inventory_articles');
+    const articles = await collection.find({}).toArray();
     const formattedArticles = articles.map((article) => ({
       value: article.number as string,
       label: `${article.number} - ${article.name}` as string,
@@ -136,71 +160,74 @@ export async function GetArticles() {
       name: article.name as string,
       unit: article.unit as string,
       converter: article.converter as number,
-    }))
-    return formattedArticles
+    }));
+    return formattedArticles;
   } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while retrieving the list of articles.')
+    console.error(error);
+    throw new Error('An error occurred while retrieving the list of articles.');
   }
 }
 
+// Gets a position for a given card and position number
 export async function GetPosition(
   cardNumber: number,
   positionNumber: number,
-  user: string
+  user: string,
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    const card = await collection.findOne({ number: cardNumber })
+    const collection = await connectToMongo('inventory_cards');
+    const card = await collection.findOne({ number: cardNumber });
 
     if (!card) {
-      return { status: 'no card' }
+      return { status: 'no card' };
     }
     if (card.creator !== user) {
-      return { status: 'no access' }
+      return { status: 'no access' };
     }
     if (positionNumber < 1 || positionNumber > 25) {
-      return { status: 'wrong position' }
+      return { status: 'wrong position' };
     }
     if (!card.positions) {
-      return { status: 'new' }
+      return { status: 'new' };
     }
     const position = card.positions.find(
-      (pos: { position: number }) => pos.position === positionNumber
-    )
+      (pos: { position: number }) => pos.position === positionNumber,
+    );
 
     if (!position) {
       if (positionNumber > card.positions.length + 1) {
         return {
           status: 'skipped',
           position: card.positions.length + 1,
-        }
+        };
       }
-      return { status: 'new' }
+      return { status: 'new' };
     }
     return {
       status: 'found',
       position,
-    }
+    };
   } catch (error) {
-    console.error(error)
-    throw new Error('Wystąpił błąd podczas pobierania pozycji.')
+    console.error(error);
+    throw new Error('Wystąpił błąd podczas pobierania pozycji.');
   }
 }
 
+// Generates a unique identifier for a position
 function generateUniqueIdentifier(): string {
-  const year = new Date().getFullYear().toString().slice(-2)
-  const week = moment().week().toString().padStart(2, '0')
-  let randomLetters = ''
+  const year = new Date().getFullYear().toString().slice(-2);
+  const week = moment().week().toString().padStart(2, '0');
+  let randomLetters = '';
   while (randomLetters.length < 4) {
-    const randomBytes = crypto.randomBytes(3).toString('base64')
-    const extractedLetters = randomBytes.replace(/[^a-zA-Z]/g, '')
-    randomLetters += extractedLetters
+    const randomBytes = crypto.randomBytes(3).toString('base64');
+    const extractedLetters = randomBytes.replace(/[^a-zA-Z]/g, '');
+    randomLetters += extractedLetters;
   }
-  randomLetters = randomLetters.substring(0, 4).toUpperCase()
-  return `${year}${randomLetters}${week}`
+  randomLetters = randomLetters.substring(0, 4).toUpperCase();
+  return `${year}${randomLetters}${week}`;
 }
 
+// Saves a position to the database
 export async function SavePosition(
   cardNumber: number,
   position: number,
@@ -209,29 +236,29 @@ export async function SavePosition(
   quantity: number,
   unit: string,
   wip: boolean,
-  user: string
+  user: string,
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards')
-    let isUnique = false
-    let identifier
+    const collection = await connectToMongo('inventory_cards');
+    let isUnique = false;
+    let identifier;
     while (!isUnique) {
-      identifier = generateUniqueIdentifier()
+      identifier = generateUniqueIdentifier();
       const allIdentifiers = await collection
         .find({}, { projection: { 'positions.identifier': 1 } })
-        .toArray()
+        .toArray();
 
       const existingIdentifiers = allIdentifiers.flatMap((card) =>
         Array.isArray(card.positions)
           ? card.positions.map((pos) => pos.identifier)
-          : []
-      )
+          : [],
+      );
 
       if (!existingIdentifiers.includes(identifier)) {
-        isUnique = true
+        isUnique = true;
       }
     }
-    const currentDate = new Date().toISOString()
+    const currentDate = new Date().toISOString();
     const positionData = {
       position: position,
       identifier: identifier,
@@ -242,64 +269,65 @@ export async function SavePosition(
       unit: unit,
       wip: wip,
       user: user,
-    }
+    };
     const updateResult = await collection.updateOne(
       {
-        number: cardNumber,
+        'number': cardNumber,
         'positions.position': position,
       },
       {
         $set: { 'positions.$': positionData },
-      }
-    )
+      },
+    );
     if (updateResult.matchedCount === 0) {
       const insertResult = await collection.updateOne(
         { number: cardNumber },
         {
           $push: { positions: positionData },
-        }
-      )
+        },
+      );
       if (insertResult.modifiedCount > 0) {
-        return { status: 'added', identifier }
+        return { status: 'added', identifier };
       } else {
-        return { status: 'not added' }
+        return { status: 'not added' };
       }
     } else {
       if (updateResult.modifiedCount > 0) {
-        return { status: 'updated', identifier }
+        return { status: 'updated', identifier };
       } else {
-        return { status: 'not updated' }
+        return { status: 'not updated' };
       }
     }
   } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while saving the position.')
+    console.error(error);
+    throw new Error('An error occurred while saving the position.');
   }
 }
 
+// Approves a position for a given card and position number
 export async function ApprovePosition(
   cardNumber: number,
   position: number,
-  user: string
+  user: string,
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards')
+    const collection = await connectToMongo('inventory_cards');
     const updateResult = await collection.updateOne(
       {
-        number: cardNumber,
+        'number': cardNumber,
         'positions.position': position,
       },
       {
         $set: { 'positions.$.approved': user },
-      }
-    )
+      },
+    );
     if (updateResult.modifiedCount > 0) {
-      return { status: 'approved' }
+      return { status: 'approved' };
     } else {
-      return { status: 'no changes' }
+      return { status: 'no changes' };
     }
   } catch (error) {
-    console.error(error)
-    throw new Error('An error occurred while confirming the email.')
+    console.error(error);
+    throw new Error('An error occurred while confirming the email.');
   }
 }
