@@ -118,6 +118,19 @@ export async function ReserveCard(
   }
 }
 
+type PositionObject = {
+  position: number;
+  identifier: string;
+  time: string;
+  articleNumber: number;
+  articleName: string;
+  quantity: number;
+  unit: string;
+  wip: boolean;
+  user: string;
+  approved?: string;
+};
+
 // Gets existing positions for a given card
 export async function GetExistingPositions(cardNumber: number) {
   try {
@@ -126,8 +139,13 @@ export async function GetExistingPositions(cardNumber: number) {
     if (!card || !Array.isArray(card.positions)) {
       return [];
     }
-    const existingPositions = card.positions.map((pos) => pos.position);
-    return existingPositions;
+    const existingPositionsSelectOptions = card.positions.map(
+      (pos: PositionObject) => ({
+        value: pos.position,
+        label: `${pos.position} - ${pos.articleNumber} - ${pos.articleName} - ${pos.quantity} ${pos.unit} - ${pos.identifier}`,
+      }),
+    );
+    return existingPositionsSelectOptions;
   } catch (error) {
     console.error(error);
     throw new Error(
@@ -139,20 +157,22 @@ export async function GetExistingPositions(cardNumber: number) {
 // Finds the lowest free position for a given card
 export async function FindLowestFreePosition(cardNumber: number) {
   try {
-    const existingPositions = await GetExistingPositions(cardNumber);
-    if (existingPositions.length === 0) {
-      return 1;
+    const collection = await connectToMongo('inventory_cards');
+    const card = await collection.findOne({ number: cardNumber });
+    if (!card) {
+      throw new Error(`Card ${cardNumber} not found.`);
     }
-    if (existingPositions.length === 25) {
+    const positions = card.positions || [];
+    if (positions.length === 25) {
       return 'full';
     }
-    const sortedPositions = existingPositions.sort((a, b) => a - b);
+    const usedPositions = positions.map((pos: PositionObject) => pos.position);
     for (let i = 1; i <= 25; i++) {
-      if (!sortedPositions.includes(i)) {
+      if (!usedPositions.includes(i)) {
         return i;
       }
     }
-    throw new Error('Nieoczekiwany błąd podczas wyszukiwania wolnej pozycji.');
+    throw new Error('Unexpected error when searching for a free position.');
   } catch (error) {
     console.error(error);
     throw new Error(

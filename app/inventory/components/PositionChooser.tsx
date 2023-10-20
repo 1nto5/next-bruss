@@ -30,9 +30,9 @@ export default function PositionChooser() {
   const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
   const [existingPositionNumbers, setExistingPositionNumbers] = useState<
-    number[]
+    Option[]
   >([]);
-  const [positionNumber, setPositionNumber] = useState<string>('');
+  const [positionNumber, setPositionNumber] = useState<number | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fullCard, setFullCard] = useState(false);
@@ -64,17 +64,17 @@ export default function PositionChooser() {
     });
   }, [cardNumber, session?.user?.email]);
 
-  const prepareOptions = (numbers: number[]) => {
-    return numbers.map((number) => ({
-      value: number,
-      label: number.toString(),
-    }));
-  };
+  // const prepareOptions = (numbers: number[]) => {
+  //   return numbers.map((number) => ({
+  //     value: number,
+  //     label: number.toString(),
+  //   }));
+  // };
 
-  const preparedOptions = prepareOptions(existingPositionNumbers);
+  // const preparedOptions = prepareOptions(existingPositionNumbers);
 
-  const selectedOption = preparedOptions.find(
-    (option) => option.value.toString() === positionNumber,
+  const selectedOption = existingPositionNumbers.find(
+    (option) => option.value === positionNumber,
   );
 
   const handleConfirm = (e: React.FormEvent) => {
@@ -101,7 +101,7 @@ export default function PositionChooser() {
 
   const handleSelectChange = (selectedOption: Option | null) => {
     if (selectedOption) {
-      setPositionNumber(selectedOption.value.toString());
+      setPositionNumber(selectedOption.value);
     }
   };
 
@@ -131,9 +131,9 @@ export default function PositionChooser() {
                 )}
               </div>
             ))}
-          {preparedOptions.length > 0 && (
+          {existingPositionNumbers.length > 0 && (
             <Select
-              options={preparedOptions}
+              options={existingPositionNumbers}
               value={selectedOption}
               onChange={handleSelectChange}
               placeholder={'select position'}
@@ -147,10 +147,12 @@ export default function PositionChooser() {
                 onClick={() => handleFirstFree()}
                 className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
               >
-                {preparedOptions.length > 0 ? 'first free' : 'start card'}
+                {existingPositionNumbers.length > 0
+                  ? 'first free'
+                  : 'start card'}
               </button>
             )}
-            {preparedOptions.length > 0 && (
+            {existingPositionNumbers.length > 0 && (
               <button
                 type='submit'
                 onClick={handleConfirm}

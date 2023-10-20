@@ -11,7 +11,7 @@ type Article = {
 };
 
 type Option = {
-  value: string;
+  value: number | string;
   label: string;
 };
 
