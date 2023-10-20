@@ -1,32 +1,32 @@
-import { useEffect, useState } from 'react'
-import ReactSelect from 'react-select'
+import { useEffect, useState } from 'react';
+import ReactSelect from 'react-select';
 
 type Article = {
-  value: string
-  label: string
-  number: number
-  name: string
-  unit: string
-  converter: number
-}
+  value: string;
+  label: string;
+  number: number;
+  name: string;
+  unit: string;
+  converter: number;
+};
 
 type Option = {
-  value: number
-  label: string
-}
+  value: string;
+  label: string;
+};
 
 type SelectProps = {
-  options: Article[] | Option[]
-  value: any
-  onChange: any
-  placeholder: string
-}
+  options: Article[] | Option[];
+  value: any;
+  onChange: any;
+  placeholder: string;
+};
 
 const selectDarkTheme = {
   option: (provided: any, state: any) => ({
     ...provided,
-    backgroundColor: state.isSelected ? '#2D3748' : '#1A202C',
-    color: '#F7FAFC', // slate-100 z Tailwind
+    'backgroundColor': state.isSelected ? '#2D3748' : '#1A202C',
+    'color': '#F7FAFC', // slate-100 z Tailwind
     '&:hover': {
       backgroundColor: '#4A5568',
     },
@@ -53,13 +53,13 @@ const selectDarkTheme = {
     ...provided,
     color: '#A0AEC0', // slate-500 w ciemnym trybie powinien być dobrze widoczny
   }),
-}
+};
 
 const selectLightTheme = {
   option: (provided: any, state: any) => ({
     ...provided,
-    backgroundColor: state.isSelected ? '#EDF2F7' : 'white',
-    color: '#2D3748',
+    'backgroundColor': state.isSelected ? '#EDF2F7' : 'white',
+    'color': '#2D3748',
     '&:hover': {
       backgroundColor: '#E2E8F0', // slate-200 z Tailwind
     },
@@ -86,7 +86,7 @@ const selectLightTheme = {
     ...provided,
     color: '#A0AEC0',
   }),
-}
+};
 
 export default function Select({
   options,
@@ -94,34 +94,34 @@ export default function Select({
   onChange,
   placeholder,
 }: SelectProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
     const checkDarkMode = () => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'))
-    }
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
-          checkDarkMode()
+          checkDarkMode();
         }
-      })
-    })
-    observer.observe(document.documentElement, { attributes: true })
-    checkDarkMode()
-    return () => observer.disconnect()
-  }, [])
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+    checkDarkMode();
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="flex items-center justify-center">
+    <div className='flex items-center justify-center'>
       <ReactSelect
         options={options}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full max-w-xs text-center"
-        menuPlacement="auto"
+        className='w-full max-w-xs text-center'
+        menuPlacement='auto'
         styles={isDarkMode ? selectDarkTheme : selectLightTheme}
       />
     </div>
-  )
+  );
 }

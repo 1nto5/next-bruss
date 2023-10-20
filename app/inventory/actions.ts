@@ -6,29 +6,51 @@ import moment from 'moment';
 
 // Options for the warehouse select input
 const warehouseSelectOptions = [
-  { value: 0, label: '000 - Rohstolfe und Fertigteile' },
-  { value: 35, label: '035 - Metalteile Taicang' },
-  { value: 54, label: '054 - Magazyn wstrzymangch' },
-  { value: 55, label: '055 - Cz.zablokowane GTM' },
-  { value: 111, label: '111 - Magazyn Launch' },
-  { value: 222, label: '222 - Magazyn zablokowany produkcja' },
+  { value: '000', label: '000 - Rohstolfe und Fertigteile' },
+  { value: '035', label: '035 - Metalteile Taicang' },
+  { value: '054', label: '054 - Magazyn wstrzymanych' },
+  { value: '055', label: '055 - Cz.zablokowane GTM' },
+  { value: '111', label: '111 - Magazyn Launch' },
+  { value: '222', label: '222 - Magazyn zablokowany produkcja' },
   // { value: 999, label: '999 - WIP' },
 ];
 
 // Fetches existing cards for a given user
-export async function GetExistingCards(email: string) {
+type CardOption = {
+  value: string;
+  label: string;
+};
+
+export async function GetExistingCards(email: string): Promise<CardOption[]> {
+  if (!isValidEmail(email)) {
+    throw new Error('Invalid email address');
+  }
+
   try {
     const collection = await connectToMongo('inventory_cards');
     const cards = await collection.find({ creator: email }).toArray();
-    const extractedData = cards.map((card) => ({
-      value: card.number,
-      label: `${card.number} - ${card.warehause}`,
-    }));
-    return extractedData;
+    const cardOptions = cards.map((card) => {
+      const warehouseOption = warehouseSelectOptions.find(
+        (option) => option.value === card.warehause,
+      );
+      return {
+        value: card.number,
+        label: warehouseOption
+          ? `${card.number} -  ${warehouseOption.label}`
+          : 'wrong warehouse',
+      };
+    });
+    return cardOptions;
   } catch (error) {
     console.error(error);
-    throw new Error('Wystąpił błąd podczas pobierania listy kart.');
+    throw new Error('An error occurred while retrieving the list of cards');
   }
+}
+
+function isValidEmail(email: string): boolean {
+  // Use a regular expression to validate the email address
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 // Finds the lowest free card number
@@ -67,7 +89,7 @@ export async function FindLowestFreeCardNumber() {
 export async function ReserveCard(
   cardNumber: number,
   email: string,
-  warehause: number,
+  warehause: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');

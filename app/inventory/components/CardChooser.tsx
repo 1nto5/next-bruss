@@ -12,7 +12,7 @@ import Select from './Select';
 import Loader from './Loader';
 
 type Option = {
-  value: number;
+  value: string;
   label: string;
 };
 
@@ -24,8 +24,8 @@ export default function CardChooser() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
-  const [cardNumber, setCardNumber] = useState<number | null>(null);
-  const [warehouse, setWarehouse] = useState<number | null>(null);
+  const [cardNumber, setCardNumber] = useState<string | null>(null);
+  const [warehouse, setWarehouse] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [existingCards, setExistingCards] = useState<Option[]>([]);
@@ -53,17 +53,8 @@ export default function CardChooser() {
     });
   }, [session?.user.email]);
 
-  // const prepareCardOptions = (numbers: number[]) => {
-  //   return numbers.map((number) => ({
-  //     value: number,
-  //     label: `${number.toString()}`,
-  //   }))
-  // }
-
-  // const preparedCardOptions = prepareCardOptions(existingCards)
-
   const selectedCardOption = existingCards.find(
-    (option) => option.value === cardNumber
+    (option) => option.value === cardNumber,
   );
 
   const handleCardSelectChange = (selectedCardOption: Option | null) => {
@@ -73,21 +64,21 @@ export default function CardChooser() {
   };
 
   const warehouseSelectOptions = [
-    { value: 0, label: '000 - Rohstolfe und Fertigteile' },
-    { value: 35, label: '035 - Metalteile Taicang' },
-    { value: 54, label: '054 - Magazyn wstrzymangch' },
-    { value: 55, label: '055 - Cz.zablokowane GTM' },
-    { value: 111, label: '111 - Magazyn Launch' },
-    { value: 222, label: '222 - Magazyn zablokowany produkcja' },
+    { value: '000', label: '000 - Rohstolfe und Fertigteile' },
+    { value: '035', label: '035 - Metalteile Taicang' },
+    { value: '054', label: '054 - Magazyn wstrzymanych' },
+    { value: '055', label: '055 - Cz.zablokowane GTM' },
+    { value: '111', label: '111 - Magazyn Launch' },
+    { value: '222', label: '222 - Magazyn zablokowany produkcja' },
     // { value: 999, label: '999 - WIP' },
   ];
 
   const selectedWarehauseOption = warehouseSelectOptions.find(
-    (option) => option.value === warehouse
+    (option) => option.value === warehouse,
   );
 
   const handleWarehouseSelectChange = (
-    selectedWarehauseOption: Option | null
+    selectedWarehauseOption: Option | null,
   ) => {
     if (selectedWarehauseOption) {
       setWarehouse(selectedWarehauseOption.value);
@@ -126,16 +117,16 @@ export default function CardChooser() {
   }
 
   return (
-    <div className="justify-cente mb-4 mt-4 flex flex-col items-center">
-      <span className="text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100">
+    <div className='justify-cente mb-4 mt-4 flex flex-col items-center'>
+      <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
         card chooser
       </span>
-      <div className="flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800">
-        <div className="flex w-11/12 flex-col gap-3">
+      <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
+        <div className='flex w-11/12 flex-col gap-3'>
           {errorMessage && (
-            <div className="flex flex-col items-center justify-center space-y-4">
+            <div className='flex flex-col items-center justify-center space-y-4'>
               {errorMessage && (
-                <div className="rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700">
+                <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
                   {errorMessage}
                 </div>
               )}
@@ -156,18 +147,18 @@ export default function CardChooser() {
             placeholder={'select warehouse'}
           />
 
-          <div className=" flex w-full justify-center space-x-2">
+          <div className=' flex w-full justify-center space-x-2'>
             <button
-              type="button"
+              type='button'
               onClick={() => reserveCard()}
-              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600"
+              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
             >
               new card
             </button>
 
             <button
               onClick={handleConfirm}
-              className="w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss"
+              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
             >
               confirm
             </button>
