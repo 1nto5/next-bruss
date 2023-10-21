@@ -101,7 +101,6 @@ export default function CardPositionForm() {
 
           if (positionData.status == 'new') {
             setBlockNextPosition(true);
-            messageSetter('Editing a new position...');
           }
         }
         if (positionData.status == 'found') {
@@ -227,30 +226,31 @@ export default function CardPositionForm() {
   }
 
   return (
-    <div className='justify-cente mb-4 mt-4 flex flex-col items-center'>
+    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
         edit position
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col gap-3'>
-          <div className='mt-4 flex flex-col items-center justify-center space-y-4'>
-            {message && (
-              <div className='rounded bg-bruss p-2 text-center text-slate-100'>
-                {message}
-              </div>
-            )}
-            {errorMessage && (
-              <div className='rounded bg-red-500 p-2 text-center text-slate-100 dark:bg-red-700'>
-                {errorMessage}
-              </div>
-            )}
-            {identifier && (
-              <div className='rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500'>
-                {identifier}
-              </div>
-            )}
-          </div>
-
+          {message || errorMessage || identifier ? (
+            <div className='flex flex-col items-center justify-center space-y-4'>
+              {message && (
+                <div className='rounded bg-bruss p-2 text-center text-slate-100'>
+                  {message}
+                </div>
+              )}
+              {errorMessage && (
+                <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
+                  {errorMessage}
+                </div>
+              )}
+              {identifier && (
+                <div className='rounded bg-black p-2 text-center text-3xl font-semibold text-slate-100 dark:bg-white dark:text-red-500'>
+                  {identifier}
+                </div>
+              )}
+            </div>
+          ) : null}
           <Select
             options={articles}
             value={selectedArticle}
@@ -259,7 +259,7 @@ export default function CardPositionForm() {
           />
 
           {selectedArticle && (
-            <div className='mt-2 flex items-center justify-center'>
+            <div className='flex items-center justify-center'>
               <label className='flex items-center space-x-2'>
                 <input
                   type='number'
@@ -273,14 +273,14 @@ export default function CardPositionForm() {
                   {selectedArticle.converter && (
                     <>
                       {' '}
-                      = {Math.floor(quantity * selectedArticle.converter)} st
+                      = {Math.floor(quantity / selectedArticle.converter)} st
                     </>
                   )}
                 </span>
               </label>
             </div>
           )}
-          <div className='mt-4 flex items-center justify-start'>
+          <div className='flex items-center justify-start'>
             <label className='flex items-center space-x-2'>
               <input
                 type='checkbox'
@@ -290,7 +290,7 @@ export default function CardPositionForm() {
               <span>WIP</span>
             </label>
           </div>
-          <div className='mt-4 flex justify-center space-x-3'>
+          <div className='flex justify-center space-x-3'>
             <button
               onClick={() => {
                 if (position !== null) {

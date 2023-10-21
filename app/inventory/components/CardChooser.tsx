@@ -117,22 +117,26 @@ export default function CardChooser() {
   }
 
   return (
-    <div className='justify-cente mb-4 mt-4 flex flex-col items-center'>
+    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
         card chooser
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col gap-3'>
-          {errorMessage && (
+          {message || errorMessage ? (
             <div className='flex flex-col items-center justify-center space-y-4'>
+              {message && (
+                <div className='rounded bg-bruss p-2 text-center text-slate-100'>
+                  {message}
+                </div>
+              )}
               {errorMessage && (
                 <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
                   {errorMessage}
                 </div>
               )}
             </div>
-          )}
-
+          ) : null}
           <Select
             options={existingCards}
             value={selectedCardOption}
