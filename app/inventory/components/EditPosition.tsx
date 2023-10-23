@@ -50,6 +50,10 @@ export default function CardPositionForm() {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
   const [confirmed, setConfirmed] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<string | undefined>(
+    'default',
+  );
+
   const [identifier, setIdentifier] = useState('');
   const [blockNextPosition, setBlockNextPosition] = useState(false);
 
@@ -140,8 +144,8 @@ export default function CardPositionForm() {
       try {
         const converter = selectedArticle?.converter;
         let finalQuantity;
-        if (converter) {
-          finalQuantity = Math.floor(quantity * converter);
+        if (converter && selectedUnit !== 'st') {
+          finalQuantity = Math.floor(quantity / converter);
         } else {
           finalQuantity = quantity;
         }
@@ -254,7 +258,7 @@ export default function CardPositionForm() {
 
           {selectedArticle && (
             <div className='flex items-center justify-center'>
-              <label className='flex items-center space-x-2'>
+              <div className='flex items-center space-x-2'>
                 <input
                   type='number'
                   onChange={(e) => setQuantity(Number(e.target.value))}
@@ -262,16 +266,27 @@ export default function CardPositionForm() {
                   defaultValue={quantity !== 0 ? quantity : undefined}
                   className='w-20 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
                 />
+                {selectedArticle.converter && (
+                  <select
+                    onChange={(e) => setSelectedUnit(e.target.value)}
+                    className='w-12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+                    value={selectedUnit}
+                  >
+                    <option value='default'>kg</option>
+                    <option>st</option>
+                  </select>
+                )}
+
                 <span>
-                  {!selectedArticle.converter ? selectedArticle.unit : 'kg'}
-                  {selectedArticle.converter && (
+                  {!selectedArticle.converter && selectedArticle.unit}
+                  {selectedArticle.converter && selectedUnit !== 'st' && (
                     <>
                       {' '}
                       = {Math.floor(quantity / selectedArticle.converter)} st
                     </>
                   )}
                 </span>
-              </label>
+              </div>
             </div>
           )}
           <div className='flex items-center justify-start'>
