@@ -64,15 +64,6 @@ export default function PositionChooser() {
     });
   }, [cardNumber, session?.user?.email]);
 
-  // const prepareOptions = (numbers: number[]) => {
-  //   return numbers.map((number) => ({
-  //     value: number,
-  //     label: number.toString(),
-  //   }));
-  // };
-
-  // const preparedOptions = prepareOptions(existingPositionNumbers);
-
   const selectedOption = existingPositionNumbers.find(
     (option) => option.value === positionNumber,
   );

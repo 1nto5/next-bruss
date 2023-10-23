@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 import useSWR from 'swr';
@@ -22,6 +22,7 @@ type Article = {
   name: string;
   unit: string;
   converter: number;
+  max: number;
 };
 
 // TODO: jeśli pozycja nalzey do karty innego usera, przekieruj do /inventory
@@ -40,8 +41,7 @@ export default function CardPositionForm() {
   const card = matchesCard ? Number(matchesCard[1]) : null;
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
-  // TODO: useTransition
+  const [isPending, setIsPending] = useState(true);
   const { data: articles, error: getArticlesError } = useSWR<Article[]>(
     'articlesKey',
     GetArticles,
@@ -52,21 +52,6 @@ export default function CardPositionForm() {
   const [confirmed, setConfirmed] = useState(false);
   const [identifier, setIdentifier] = useState('');
   const [blockNextPosition, setBlockNextPosition] = useState(false);
-
-  // prefetching
-  // useEffect(() => {
-  //   if (position) {
-  //     const newPathname = pathname.replace(
-  //       /(position-)(\d+)/,
-  //       (_, prefix, num) => {
-  //         console.log(`${prefix}${Number(num) + 1}`)
-  //         return `${prefix}${Number(num) + 1}`
-  //       }
-  //     )
-  //     console.log(newPathname)
-  //     router.prefetch(newPathname)
-  //   }
-  // }, [router])
 
   const errorSetter = (message: string) => {
     setErrorMessage(message);
@@ -142,6 +127,15 @@ export default function CardPositionForm() {
       errorSetter('Enter the correct quantity!');
       return;
     }
+    if (selectedArticle?.max && quantity > selectedArticle?.max) {
+      const userConfirm = window.confirm(
+        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max}). Do you wish to continue?`,
+      );
+      if (!userConfirm) {
+        return;
+      }
+    }
+
     if (card && position) {
       try {
         const converter = selectedArticle?.converter;

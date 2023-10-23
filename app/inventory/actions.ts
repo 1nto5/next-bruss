@@ -202,6 +202,7 @@ export async function GetArticles() {
       name: article.name as string,
       unit: article.unit as string,
       converter: article.converter as number,
+      max: article.max as number,
     }));
     return formattedArticles;
   } catch (error) {
