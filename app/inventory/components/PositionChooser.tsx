@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import {
   GetExistingPositions,
   FindLowestFreePosition,
-  CheckIfFull,
+  CheckIsFull,
 } from '../actions';
 import { useSession } from 'next-auth/react';
 import Loader from './Loader';
@@ -50,19 +50,26 @@ export default function PositionChooser() {
   useEffect(() => {
     startTransition(async () => {
       if (session?.user?.email && cardNumber) {
-        const positions = await GetExistingPositions(cardNumber);
+        const positions = await GetExistingPositions(
+          cardNumber,
+          session.user.email,
+        );
+        if (positions === 'no access') {
+          router.push('/inventory');
+          return;
+        }
         if (positions) {
           setExistingPositionNumbers(positions);
         } else {
           errorSetter('Please contact IT!');
         }
-        const full = await CheckIfFull(cardNumber);
+        const full = await CheckIsFull(cardNumber);
         if (full) {
           setFullCard(true);
         }
       }
     });
-  }, [cardNumber, session?.user?.email]);
+  }, [cardNumber, router, session?.user.email]);
 
   const selectedOption = existingPositionNumbers.find(
     (option) => option.value === positionNumber,

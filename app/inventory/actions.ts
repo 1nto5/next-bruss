@@ -132,10 +132,16 @@ type PositionObject = {
 };
 
 // Gets existing positions for a given card
-export async function GetExistingPositions(cardNumber: number) {
+export async function GetExistingPositions(cardNumber: number, email: string) {
   try {
     const collection = await connectToMongo('inventory_cards');
     const card = await collection.findOne({ number: cardNumber });
+    if (
+      card?.creator !== email &&
+      !(await GetUserRoles(email)).includes('inventory_aprover')
+    ) {
+      return 'no access';
+    }
     if (!card || !Array.isArray(card.positions)) {
       return [];
     }
@@ -182,9 +188,10 @@ export async function FindLowestFreePosition(cardNumber: number) {
 }
 
 // Checks if a card is full
-export async function CheckIfFull(cardNumber: number) {
-  const existingPositions = await GetExistingPositions(cardNumber);
-  if (existingPositions.length === 25) {
+export async function CheckIsFull(cardNumber: number) {
+  const collection = await connectToMongo('inventory_cards');
+  const card = await collection.findOne({ number: cardNumber });
+  if (card?.position && card?.positions.length === 25) {
     return true;
   }
   return false;
@@ -211,6 +218,21 @@ export async function GetArticles() {
   }
 }
 
+async function GetUserRoles(email: string) {
+  try {
+    const collection = await connectToMongo('users');
+    const user = await collection.findOne({ email: email });
+    if (!user) {
+      return [];
+    } else {
+      return user.roles;
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the user roles.');
+  }
+}
+
 // Gets a position for a given card and position number
 export async function GetPosition(
   cardNumber: number,
@@ -224,7 +246,10 @@ export async function GetPosition(
     if (!card) {
       return { status: 'no card' };
     }
-    if (card.creator !== user) {
+    if (
+      card.creator !== user &&
+      !(await GetUserRoles(user)).includes('inventory_aprover')
+    ) {
       return { status: 'no access' };
     }
     if (positionNumber < 1 || positionNumber > 25) {
@@ -372,5 +397,52 @@ export async function ApprovePosition(
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while confirming the email.');
+  }
+}
+
+export async function GetAllPositions() {
+  try {
+    const collection = await connectToMongo('inventory_cards');
+    const cards = await collection.find({}).toArray();
+    const positions = cards.flatMap((card) =>
+      Array.isArray(card.positions) ? card.positions : [],
+    );
+
+    const formattedPositions = positions.map((position) => ({
+      value: position.identifier,
+      label: `${position.identifier} - ${position.articleNumber} - ${position.articleName} - ${position.quantity} ${position.unit}`,
+    }));
+
+    return formattedPositions;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the positions.');
+  }
+}
+
+export async function GetIdentifierCardNumberAndPositionNumber(
+  identifier: string,
+) {
+  try {
+    const collection = await connectToMongo('inventory_cards');
+    const cards = await collection.find({}).toArray();
+
+    for (const card of cards) {
+      const position = card.positions?.find(
+        (pos: { identifier: string }) => pos.identifier === identifier,
+      );
+
+      if (position) {
+        return {
+          cardNumber: card.number,
+          positionNumber: position.position,
+        };
+      }
+    }
+
+    return 'not found';
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the positions.');
   }
 }

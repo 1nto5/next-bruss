@@ -50,9 +50,7 @@ export default function CardPositionForm() {
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
   const [confirmed, setConfirmed] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState<string | undefined>(
-    'default',
-  );
+  const [selectedUnit, setSelectedUnit] = useState<string | undefined>('kg');
 
   const [identifier, setIdentifier] = useState('');
   const [blockNextPosition, setBlockNextPosition] = useState(false);
@@ -93,9 +91,10 @@ export default function CardPositionForm() {
           }
         }
         if (positionData.status == 'found') {
-          messageSetter('The position exists, content retrieved!');
           setIdentifier(positionData.position.identifier);
           setQuantity(positionData.position.quantity);
+          setWip(positionData.position.wip);
+          setSelectedUnit(positionData.position.unit);
           if (articles) {
             const foundArticle = articles.find(
               (article) =>
@@ -131,9 +130,24 @@ export default function CardPositionForm() {
       errorSetter('Enter the correct quantity!');
       return;
     }
+
+    if (
+      selectedArticle?.max &&
+      selectedArticle?.converter &&
+      selectedArticle?.unit === 'st' &&
+      selectedUnit === 'kg' &&
+      quantity / selectedArticle?.converter > selectedArticle?.max
+    ) {
+      const userConfirm = window.confirm(
+        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max} ${selectedArticle?.unit}). Do you wish to continue?`,
+      );
+      if (!userConfirm) {
+        return;
+      }
+    }
     if (selectedArticle?.max && quantity > selectedArticle?.max) {
       const userConfirm = window.confirm(
-        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max}). Do you wish to continue?`,
+        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max} ${selectedArticle?.unit}). Do you wish to continue?`,
       );
       if (!userConfirm) {
         return;
@@ -272,7 +286,7 @@ export default function CardPositionForm() {
                     className='w-12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
                     value={selectedUnit}
                   >
-                    <option value='default'>kg</option>
+                    <option>kg</option>
                     <option>st</option>
                   </select>
                 )}
@@ -320,7 +334,7 @@ export default function CardPositionForm() {
             >
               save
             </button>
-            {session?.user.roles?.includes('inventory_confirmer') && (
+            {session?.user.roles?.includes('inventory_aprover') && (
               <button
                 onClick={approvePosition}
                 className='w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'

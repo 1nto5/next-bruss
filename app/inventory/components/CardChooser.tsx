@@ -6,6 +6,8 @@ import {
   FindLowestFreeCardNumber,
   GetExistingCards,
   ReserveCard,
+  GetAllPositions,
+  GetIdentifierCardNumberAndPositionNumber,
 } from '../actions';
 import { useSession } from 'next-auth/react';
 import Select from './Select';
@@ -15,9 +17,6 @@ type Option = {
   value: string;
   label: string;
 };
-
-//TODO: random card approver
-// TODO: warunkwe pokazywanie przycisków
 
 export default function CardChooser() {
   const router = useRouter();
@@ -29,6 +28,10 @@ export default function CardChooser() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [existingCards, setExistingCards] = useState<Option[]>([]);
+  const [positionIdentifier, setPositionIdentifier] = useState<string | null>(
+    null,
+  );
+  const [existingPositions, setExistingPositions] = useState<Option[]>([]);
 
   const errorSetter = (message: string) => {
     setErrorMessage(message);
@@ -42,7 +45,6 @@ export default function CardChooser() {
 
   useEffect(() => {
     startTransition(() => {
-      // TODO: jeśli confirmer, wszystkie pozycje
       async function fetchExistingNumbers() {
         if (session?.user?.email) {
           const cards = await GetExistingCards(session.user.email);
@@ -50,16 +52,35 @@ export default function CardChooser() {
         }
       }
       fetchExistingNumbers();
+      async function getAllPositions() {
+        const positons = await GetAllPositions();
+        setExistingPositions(positons);
+      }
+      if (session?.user?.roles?.includes('inventory_aprover')) {
+        getAllPositions();
+      }
     });
-  }, [session?.user.email]);
+  }, [session?.user.email, session?.user?.roles]);
 
   const selectedCardOption = existingCards.find(
     (option) => option.value === cardNumber,
   );
 
+  const selectedPositionOption = existingPositions.find(
+    (option) => option.value === positionIdentifier,
+  );
+
   const handleCardSelectChange = (selectedCardOption: Option | null) => {
     if (selectedCardOption) {
       setCardNumber(selectedCardOption.value);
+    }
+  };
+
+  const handlePositionSelectChange = (
+    selectedPositionOption: Option | null,
+  ) => {
+    if (selectedPositionOption) {
+      setPositionIdentifier(selectedPositionOption.value);
     }
   };
 
@@ -104,12 +125,36 @@ export default function CardChooser() {
     });
   };
 
-  const handleConfirm = (e: React.FormEvent) => {
+  const handleConfirm = async (e: React.FormEvent) => {
     if (cardNumber) {
       router.push(`${pathname}/card=${cardNumber}`);
       return;
     }
-    setErrorMessage('Card not selected!');
+    let positionCardNumber: string | undefined;
+    let positionNumber: string | undefined;
+    if (positionIdentifier) {
+      startTransition(async () => {
+        const data = await GetIdentifierCardNumberAndPositionNumber(
+          positionIdentifier,
+        );
+        if (data === 'not found') {
+          errorSetter('Position not found!');
+          return;
+        }
+        positionCardNumber = data.cardNumber;
+        positionNumber = data.positionNumber;
+
+        if (positionCardNumber && positionNumber) {
+          router.push(
+            `${pathname}/card=${positionCardNumber}/position=${positionNumber}`,
+          );
+          return;
+        }
+      });
+    }
+    session?.user.roles?.includes('inventory_aprover')
+      ? setErrorMessage('Card or position not selected!')
+      : setErrorMessage('Card not selected!');
   };
 
   if (isPending) {
@@ -150,6 +195,15 @@ export default function CardChooser() {
             onChange={handleWarehouseSelectChange}
             placeholder={'select warehouse'}
           />
+
+          {session?.user.roles?.includes('inventory_aprover') && (
+            <Select
+              options={existingPositions}
+              value={selectedPositionOption}
+              onChange={handlePositionSelectChange}
+              placeholder={'search position'}
+            />
+          )}
 
           <div className=' flex w-full justify-center space-x-2'>
             <button
