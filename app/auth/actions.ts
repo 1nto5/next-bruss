@@ -30,10 +30,6 @@ function replacePolishChars(str: string): string {
   return str.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, (match) => polishChars[match]);
 }
 
-function capitalizeFirstLetter(string: string): string {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-}
-
 function isValidPassword(password: string): boolean {
   const hasMinLength = password.length >= 6;
   const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(
@@ -44,15 +40,10 @@ function isValidPassword(password: string): boolean {
   return hasMinLength && hasSpecialChar && hasNumber;
 }
 
-export async function Register(fName: string, lName: string, password: string) {
+export async function Register(email: string, password: string) {
   try {
     // Connect to MongoDB
     const collection = await connectToMongo(collectionName);
-
-    // Constructing the email based on the provided fName and lName
-    const email = `${replacePolishChars(fName)}.${replacePolishChars(
-      lName,
-    )}@bruss-group.com`.toLowerCase();
 
     // Checking if a user with the given email already exists
     const existingUser = await collection.findOne({ email });
