@@ -107,7 +107,7 @@ export default function PositionChooser() {
   }
 
   return (
-    <div className='justify-cente mb-4 mt-4 flex flex-col items-center'>
+    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
         choose position
       </span>
