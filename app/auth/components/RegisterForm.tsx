@@ -47,6 +47,18 @@ export default function RegisterForm() {
 
     startTransition(async () => {
       try {
+        if (
+          !formState.email ||
+          !formState.password ||
+          !formState.confirmPassword
+        ) {
+          setErrorMessage('All fields are necessary!');
+          return;
+        }
+        if (formState.password !== formState.confirmPassword) {
+          setErrorMessage('Passwords do not match!');
+          return;
+        }
         const result = await Register(formState.email, formState.password);
         const status = result?.status;
         if (status === 'registered') {
