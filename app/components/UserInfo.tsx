@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import formatEmailToName from '@/lib/utils/inventory/formatEmailToName';
 
 export default function UserInfo() {
   const { data: session } = useSession();
@@ -20,14 +21,18 @@ export default function UserInfo() {
         >
           logout
         </button>
-        <p className='mt-10'>Name: {session?.user?.name}</p>
+        <p className='mt-10'>
+          Name:{' '}
+          {formatEmailToName(
+            session?.user?.email ?? 'Unknown.User@bruss-group.com',
+          )}
+        </p>
         <p className='mb-10 mt-2'>Roles: {session?.user?.roles?.join(', ')}</p>
 
-        <Link
-          className='rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100'
-          href={'/inventory'}
-        >
-          inventory app
+        <Link href={'/inventory'}>
+          <button className='rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100'>
+            inventory app
+          </button>
         </Link>
       </div>
     </>
