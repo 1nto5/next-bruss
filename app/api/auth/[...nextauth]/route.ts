@@ -1,14 +1,14 @@
-import NextAuth, { SessionStrategy, Session, User } from 'next-auth'
-import { JWT } from 'next-auth/jwt'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { connectToMongo } from '@/lib/mongo/connector'
-import bcrypt from 'bcryptjs'
-const collectionName = 'users'
+import NextAuth, { SessionStrategy, Session, User } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { connectToMongo } from '@/lib/mongo/connector';
+import bcrypt from 'bcryptjs';
+const collectionName = 'users';
 
 type CredentialsType = {
-  username: string
-  password: string
-}
+  email: string;
+  password: string;
+};
 
 export const authOptions = {
   providers: [
@@ -17,22 +17,22 @@ export const authOptions = {
       credentials: {},
       // @ts-ignore
       async authorize(credentials: CredentialsType) {
-        const { username, password } = credentials
+        const { email, password } = credentials;
         try {
-          const collection = await connectToMongo(collectionName)
+          const collection = await connectToMongo(collectionName);
           const user = await collection.findOne({
-            email: `${username}@bruss-group.com`,
-          })
+            email: `${email}`,
+          });
           if (!user) {
-            return null
+            return null;
           }
-          const passwordMatch = await bcrypt.compare(password, user.password)
+          const passwordMatch = await bcrypt.compare(password, user.password);
           if (!passwordMatch) {
-            return null
+            return null;
           }
-          return user
+          return user;
         } catch (error) {
-          console.log('Error:', error)
+          console.log('Error:', error);
         }
       },
     }),
@@ -43,20 +43,20 @@ export const authOptions = {
       token,
       user,
     }: {
-      session: Session
-      token: JWT
-      user?: Session['user']
+      session: Session;
+      token: JWT;
+      user?: Session['user'];
     }) {
       // Add role value to user object so it is passed along with session
-      session.user.roles = user?.roles ? user.roles : token?.user?.roles
-      return session
+      session.user.roles = user?.roles ? user.roles : token?.user?.roles;
+      return session;
     },
     async jwt({ token, user }: { token: JWT; user?: User }) {
       //if the user logs in, you save your user in token
       if (user) {
-        token.user = user
+        token.user = user;
       }
-      return Promise.resolve(token)
+      return Promise.resolve(token);
     },
   },
   session: {
@@ -66,8 +66,8 @@ export const authOptions = {
   pages: {
     signIn: '/',
   },
-}
+};
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
