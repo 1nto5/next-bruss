@@ -44,22 +44,20 @@ export default function CardChooser() {
   };
 
   useEffect(() => {
-    startTransition(() => {
-      async function fetchExistingNumbers() {
-        if (session?.user?.email) {
-          const cards = await GetExistingCards(session.user.email);
-          setExistingCards(cards);
-        }
+    async function fetchExistingNumbers() {
+      if (session?.user.email && session?.user.roles) {
+        const cards = await GetExistingCards(session.user.email);
+        setExistingCards(cards);
       }
-      fetchExistingNumbers();
-      async function getAllPositions() {
-        const positons = await GetAllPositions();
-        setExistingPositions(positons);
-      }
-      if (session?.user?.roles?.includes('inventory_aprover')) {
-        getAllPositions();
-      }
-    });
+    }
+    fetchExistingNumbers();
+    async function getAllPositions() {
+      const positons = await GetAllPositions();
+      setExistingPositions(positons);
+    }
+    if (session?.user?.roles?.includes('inventory_aprover')) {
+      getAllPositions();
+    }
   }, [session?.user.email, session?.user?.roles]);
 
   const selectedCardOption = existingCards.find(

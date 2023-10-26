@@ -28,7 +28,13 @@ export async function GetExistingCards(email: string): Promise<CardOption[]> {
 
   try {
     const collection = await connectToMongo('inventory_cards');
-    const cards = await collection.find({ creator: email }).toArray();
+    let query: Record<string, any> = { creator: email };
+
+    if ((await GetUserRoles(email)).includes('inventory_aprover')) {
+      query = {};
+    }
+
+    const cards = await collection.find(query).toArray();
     const cardOptions = cards.map((card) => {
       const warehouseOption = warehouseSelectOptions.find(
         (option) => option.value === card.warehause,

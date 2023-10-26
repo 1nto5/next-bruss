@@ -16,8 +16,7 @@ type Option = {
   label: string;
 };
 
-//TODO: random position approver
-//TODO: list position with position data (article, identifier, quantity) ;)
+//TODO: random position for approver
 
 export default function PositionChooser() {
   const router = useRouter();

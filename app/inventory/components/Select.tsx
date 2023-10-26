@@ -20,6 +20,7 @@ type SelectProps = {
   value: any;
   onChange: any;
   placeholder: string;
+  isDisabled?: boolean;
 };
 
 const selectDarkTheme = {
@@ -93,6 +94,7 @@ export default function Select({
   value,
   onChange,
   placeholder,
+  isDisabled,
 }: SelectProps) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
@@ -121,6 +123,7 @@ export default function Select({
         className='w-full max-w-xs text-center'
         menuPlacement='auto'
         styles={isDarkMode ? selectDarkTheme : selectLightTheme}
+        isDisabled={isDisabled}
       />
     </div>
   );

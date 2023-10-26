@@ -25,9 +25,6 @@ type Article = {
   max: number;
 };
 
-// TODO: jeśli pozycja nalzey do karty innego usera, przekieruj do /inventory
-// TODO: jeśli pozycja zatwierdzona, nie pozwalaj edytować, wyświetl zielony komunikat "pozycja zatwierdzona przez: ..."
-
 export default function CardPositionForm() {
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -49,9 +46,8 @@ export default function CardPositionForm() {
   const [wip, setWip] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
-  const [confirmed, setConfirmed] = useState(false);
+  const [approved, setApproved] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<string | undefined>('kg');
-
   const [identifier, setIdentifier] = useState('');
   const [blockNextPosition, setBlockNextPosition] = useState(false);
 
@@ -95,6 +91,13 @@ export default function CardPositionForm() {
           setQuantity(positionData.position.quantity);
           setWip(positionData.position.wip);
           setSelectedUnit(positionData.position.unit);
+          if (positionData.position.approved) {
+            setApproved(true);
+            // TODO: format approver
+            errorSetter(
+              `Editing not allowed - the position has been approved by: ${positionData.position.approved}!`,
+            );
+          }
           if (articles) {
             const foundArticle = articles.find(
               (article) =>
@@ -130,7 +133,6 @@ export default function CardPositionForm() {
       errorSetter('Enter the correct quantity!');
       return;
     }
-
     if (
       selectedArticle?.max &&
       selectedArticle?.converter &&
@@ -212,6 +214,7 @@ export default function CardPositionForm() {
 
         if (res?.status === 'approved') {
           messageSetter('The position has been approved!');
+          setApproved(true);
         } else if (res?.status === 'no changes') {
           messageSetter('The position had already been approved!');
         }
@@ -268,9 +271,9 @@ export default function CardPositionForm() {
             value={selectedArticle}
             onChange={selectArticle}
             placeholder={'select article'}
+            isDisabled={approved}
           />
-
-          {selectedArticle && (
+          {selectedArticle && !approved && (
             <div className='flex items-center justify-center'>
               <div className='flex items-center space-x-2'>
                 <input
@@ -293,21 +296,45 @@ export default function CardPositionForm() {
 
                 <span>
                   {!selectedArticle.converter && selectedArticle.unit}
-                  {selectedArticle.converter && selectedUnit !== 'st' && (
+                  {selectedArticle.converter && selectedUnit === 'kg' && (
                     <>
                       {' '}
                       = {Math.floor(quantity / selectedArticle.converter)} st
+                    </>
+                  )}
+                  {selectedArticle.converter && selectedUnit === 'st' && (
+                    <>
+                      {' '}
+                      = {Math.floor(quantity * selectedArticle.converter)} kg
                     </>
                   )}
                 </span>
               </div>
             </div>
           )}
+          {approved && selectedArticle && (
+            <span className='flex justify-center'>
+              {!selectedArticle.converter && selectedArticle.unit === 'kg' && (
+                <>{quantity} kg</>
+              )}
+              {!selectedArticle.converter && selectedArticle.unit === 'st' && (
+                <>{quantity} st</>
+              )}
+              {selectedArticle.converter && (
+                <>
+                  {quantity} st ={' '}
+                  {Math.floor(quantity * selectedArticle.converter)} kg
+                </>
+              )}
+            </span>
+          )}
+
           <div className='flex items-center justify-start'>
             <label className='flex items-center space-x-2'>
               <input
                 type='checkbox'
                 checked={wip}
+                disabled={approved}
                 onChange={(e) => setWip(e.target.checked)}
               />
               <span>WIP</span>
@@ -330,14 +357,20 @@ export default function CardPositionForm() {
             </button>
             <button
               onClick={savePosition}
-              className='w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+              disabled={approved}
+              className={`w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
+                approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
+              } dark:bg-slate-700 dark:text-slate-100`}
             >
               save
             </button>
             {session?.user.roles?.includes('inventory_aprover') && (
               <button
                 onClick={approvePosition}
-                className='w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+                disabled={approved}
+                className={`w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
+                  approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
+                } dark:bg-slate-700 dark:text-slate-100`}
               >
                 approve
               </button>
