@@ -9,8 +9,7 @@ import { useTransition } from 'react';
 import { Register } from '../actions';
 
 type RegisterFormState = {
-  fName: string;
-  lName: string;
+  email: string;
   password: string;
   confirmPassword: string;
 };
@@ -18,8 +17,7 @@ type RegisterFormState = {
 export default function RegisterForm() {
   // Initialize state for the form fields
   const [formState, setFormState] = useState<RegisterFormState>({
-    fName: '',
-    lName: '',
+    email: '',
     password: '',
     confirmPassword: '',
   });
@@ -40,35 +38,20 @@ export default function RegisterForm() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      !formState.fName ||
-      !formState.lName ||
-      !formState.password ||
-      !formState.confirmPassword
-    ) {
+    if (!formState.email || !formState.password || !formState.confirmPassword) {
       setErrorMessage('All fields are necessary!');
-      return;
-    }
-
-    if (formState.fName.length < 3 || formState.lName.length < 3) {
-      setErrorMessage('Please enter a valid first and last name.');
       return;
     }
 
     startTransition(async () => {
       try {
-        const result = await Register(
-          formState.fName,
-          formState.lName,
-          formState.password,
-        );
+        const result = await Register(formState.email, formState.password);
         const status = result?.status;
         if (status === 'registered') {
           setFormState({
-            fName: '',
-            lName: '',
+            email: '',
             password: '',
             confirmPassword: '',
           });
@@ -99,80 +82,62 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className='grid h-screen place-items-center'>
-      <div className='rounded-lg border-green-400 p-5 shadow-lg'>
-        <form onSubmit={handleSubmit} className='flex flex-col gap-3'>
-          <input
-            className='w-[400px] border border-gray-200 bg-zinc-100/40 px-6 py-2'
-            type='text'
-            placeholder='First name'
-            name='fName'
-            value={formState.fName}
-            onChange={handleInputChange}
-          />
-          <input
-            className='w-[400px] border border-gray-200 bg-zinc-100/40 px-6 py-2'
-            type='text'
-            placeholder='Last name'
-            name='lName'
-            value={formState.lName}
-            onChange={handleInputChange}
-          />
-          <input
-            className='w-[400px] border border-gray-200 bg-zinc-100/40 px-6 py-2'
-            type='password'
-            placeholder='Password'
-            name='password'
-            value={formState.password}
-            onChange={handleInputChange}
-          />
-          <input
-            className='w-[400px] border border-gray-200 bg-zinc-100/40 px-6 py-2'
-            type='password'
-            placeholder='Confirm Password'
-            name='confirmPassword'
-            value={formState.confirmPassword}
-            onChange={handleInputChange}
-          />
-          <button
-            type='submit'
-            className='relative mt-3 flex h-10 items-center justify-center rounded bg-bruss px-4 py-2 text-white'
-            disabled={isPending}
-          >
-            {isPending ? (
-              <svg
-                className='mx-auto h-5 w-5 animate-spin text-white'
-                fill='none'
-                viewBox='0 0 24 24'
-              >
-                <circle
-                  className='opacity-25'
-                  cx='12'
-                  cy='12'
-                  r='10'
-                  stroke='currentColor'
-                  strokeWidth='4'
-                ></circle>
-                <path
-                  className='opacity-75'
-                  fill='currentColor'
-                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                ></path>
-              </svg>
-            ) : (
-              'Register'
-            )}
-          </button>
-
-          {errorMessage && (
-            <div className='mt-2 w-fit max-w-[400px] break-words rounded-md bg-red-500 px-3 text-lg text-white'>
-              {errorMessage}
+    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
+      <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
+        register form
+      </span>
+      <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
+        <div className='flex w-11/12 flex-col items-center justify-center gap-3'>
+          {errorMessage ? (
+            <div className='flex flex-col items-center justify-center space-y-4'>
+              {errorMessage && (
+                <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
+                  {errorMessage}
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
+          <form
+            onSubmit={handleRegister}
+            className='flex w-11/12 flex-col items-center justify-center gap-3'
+          >
+            <input
+              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+              type='email'
+              name='email'
+              placeholder='email'
+              value={formState.email}
+              onChange={handleInputChange}
+            />
+            <input
+              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+              type='password'
+              name='password'
+              placeholder='password'
+              value={formState.password}
+              onChange={handleInputChange}
+            />
+            <input
+              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+              type='password'
+              name='confirmPassword'
+              placeholder='confirm password'
+              value={formState.confirmPassword}
+              onChange={handleInputChange}
+            />
+
+            <button
+              type='submit'
+              className='w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+              disabled={isPending}
+            >
+              {isPending ? 'registering...' : 'register'}
+            </button>
+          </form>
           <Link className='mt-3 text-right text-sm' href={'/auth/login'}>
             Already have an account? <span className='underline'>Login</span>
           </Link>
-        </form>
+        </div>
       </div>
     </div>
   );
