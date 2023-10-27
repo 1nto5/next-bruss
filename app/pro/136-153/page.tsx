@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks'
-import { useDispatch } from 'react-redux'
-import { useEffect, useTransition } from 'react'
+import { useAppSelector } from '@/lib/redux/pro/136-153/hooks';
+import { useDispatch } from 'react-redux';
+import { useEffect, useTransition } from 'react';
 import {
   togglePending,
   toggleIsFull136,
@@ -13,66 +13,66 @@ import {
   updatePalletSize153,
   updateBoxSize136,
   updateBoxSize153,
-} from '@/lib/redux/pro/136-153/workplaceSlice'
-import Status from './components/Status'
-import NumLogIn from '@/app/pro/136-153/components/NumLogIn'
-import ScanHydraQr from './components/ScanHydraQr'
-import ScanPalletQr from './components/ScanPalletQr'
-import PrintPalletLabel from './components/PrintPalletLabel'
+} from '@/lib/redux/pro/136-153/workplaceSlice';
+import Status from './components/Status';
+import NumLogIn from '@/app/pro/136-153/components/NumLogIn';
+import ScanHydraQr from './components/ScanHydraQr';
+import ScanPalletQr from './components/ScanPalletQr';
+import PrintPalletLabel from './components/PrintPalletLabel';
 
-import { countOnPallet, getPalletSize, getBoxSize } from './actions'
+import { countOnPallet, getPalletSize, getBoxSize } from './actions';
 
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
 
-const lArticle = 28067
-const rArticle = 28042
+const lArticle = 28067;
+const rArticle = 28042;
 
 export default function OnlyPalletLabel() {
-  const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
-  const lastScan = useAppSelector((state) => state.workplace.lastScan)
+  const operatorLogged = useAppSelector((state) => state.operator.loggedIn);
+  const lastScan = useAppSelector((state) => state.workplace.lastScan);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const isFull136 = useAppSelector((state) => state.workplace.isFull136)
-  const isFull153 = useAppSelector((state) => state.workplace.isFull153)
+  const isFull136 = useAppSelector((state) => state.workplace.isFull136);
+  const isFull153 = useAppSelector((state) => state.workplace.isFull153);
 
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    dispatch(togglePending(isPending))
-  }, [dispatch, isPending])
+    dispatch(togglePending(isPending));
+  }, [dispatch, isPending]);
 
   useEffect(() => {
     startTransition(async () => {
       try {
-        toast.loading('Ładowanie...', { id: 'loading' })
-        const onPallet136 = await countOnPallet(lArticle)
-        dispatch(updateOnPallet136(onPallet136))
-        const onPallet153 = await countOnPallet(rArticle)
-        dispatch(updateOnPallet153(onPallet153))
-        const palletSize136 = await getPalletSize(lArticle)
-        dispatch(updatePalletSize136(palletSize136))
-        const palletSize153 = await getPalletSize(rArticle)
-        dispatch(updatePalletSize153(palletSize153))
+        toast.loading('Ładowanie...', { id: 'loading' });
+        const onPallet136 = await countOnPallet(lArticle);
+        dispatch(updateOnPallet136(onPallet136));
+        const onPallet153 = await countOnPallet(rArticle);
+        dispatch(updateOnPallet153(onPallet153));
+        const palletSize136 = await getPalletSize(lArticle);
+        dispatch(updatePalletSize136(palletSize136));
+        const palletSize153 = await getPalletSize(rArticle);
+        dispatch(updatePalletSize153(palletSize153));
         if (onPallet136 >= palletSize136) {
-          dispatch(toggleIsFull136())
+          dispatch(toggleIsFull136());
         }
         if (onPallet153 >= palletSize153) {
-          dispatch(toggleIsFull153())
+          dispatch(toggleIsFull153());
         }
-        const boxSize136 = await getBoxSize(lArticle)
-        dispatch(updateBoxSize136(boxSize136))
-        const boxSize153 = await getBoxSize(rArticle)
-        dispatch(updateBoxSize153(boxSize153))
-        toast.dismiss('loading')
+        const boxSize136 = await getBoxSize(lArticle);
+        dispatch(updateBoxSize136(boxSize136));
+        const boxSize153 = await getBoxSize(rArticle);
+        dispatch(updateBoxSize153(boxSize153));
+        toast.dismiss('loading');
       } catch (error) {
         console.error(
           'Failed to fetch quantity on a pallet, pallet size or box size:',
-          error
-        )
+          error,
+        );
       }
-    })
-  }, [dispatch, lastScan])
+    });
+  }, [dispatch, lastScan]);
 
   return (
     <div>
@@ -85,19 +85,19 @@ export default function OnlyPalletLabel() {
           <>
             {isFull136 && (
               <>
-                <ScanPalletQr article="28067" />
+                <ScanPalletQr article='28067' />
                 <PrintPalletLabel
                   articleNumber={28067}
-                  articleName="M-136-K-1-A"
+                  articleName='M-136-K-1-A'
                 />
               </>
             )}
             {isFull153 && (
               <>
-                <ScanPalletQr article="28042" />
+                <ScanPalletQr article='28042' />
                 <PrintPalletLabel
                   articleNumber={28042}
-                  articleName="M-153-K-C"
+                  articleName='M-153-K-C'
                 />
               </>
             )}
@@ -106,5 +106,5 @@ export default function OnlyPalletLabel() {
         )
       )}
     </div>
-  )
+  );
 }
