@@ -1,105 +1,105 @@
-import { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { updateLastScan } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice'
-import { saveDmc } from '@/app/pro/actions'
-import { useTransition } from 'react'
-import toast from 'react-hot-toast'
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateLastScan } from '@/lib/redux/pro/dmc-box-pallet/workplaceSlice';
+import { saveDmc } from '@/app/pro/actions';
+import { useTransition } from 'react';
+import toast from 'react-hot-toast';
 
 type Props = {
-  workplace: string
-}
+  workplace: string;
+};
 
 // Component to scan DMC
 export default function ScanDmc({ workplace }: Props) {
   // Use the article number from the Redux state
   const articleNumber = useSelector(
     (state: { article: { articleNumber: number; articleName: number } }) =>
-      state.article.articleNumber
-  )
+      state.article.articleNumber,
+  );
 
   // Use the operator number from the Redux state
   const operatorPersonalNumber = useSelector(
     (state: {
-      operator: { personalNumber: number; name: string; loggedIn: boolean }
-    }) => state.operator.personalNumber
-  )
+      operator: { personalNumber: number; name: string; loggedIn: boolean };
+    }) => state.operator.personalNumber,
+  );
 
   // React transition state
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
 
   // Local state for the hydra batch
-  const [dmc, setDmc] = useState('')
+  const [dmc, setDmc] = useState('');
 
   // Function to clear input field
   const clearInput = () => {
-    setDmc('')
-  }
+    setDmc('');
+  };
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
-      return
+      return;
     }
 
-    clearInput()
+    clearInput();
 
     // Start transition (for loading state)
     startTransition(async () => {
-      toast.loading('Przetwarzanie...', { id: 'loading' })
+      toast.loading('Przetwarzanie...', { id: 'loading' });
 
       try {
         const result = await saveDmc(
           dmc,
           workplace,
           articleNumber,
-          operatorPersonalNumber
-        )
+          operatorPersonalNumber,
+        );
 
-        const status = result?.status
-        toast.dismiss()
+        const status = result?.status;
+        toast.dismiss();
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
-            dispatch(updateLastScan(dmc))
-            toast.success('DMC OK!', { id: 'success' })
-            break
+            dispatch(updateLastScan(dmc));
+            toast.success('DMC OK!', { id: 'success' });
+            break;
           case 'exists':
-            toast.error('DMC istnieje!', { id: 'error' })
-            break
+            toast.error('DMC istnieje!', { id: 'error' });
+            break;
           case 'invalid':
-            toast.error('DMC niepoprawny!', { id: 'error' })
-            break
+            toast.error('DMC niepoprawny!', { id: 'error' });
+            break;
           case 'wrong date':
-            toast.error('Data niepoprawna!', { id: 'error' })
-            break
+            toast.error('Data niepoprawna!', { id: 'error' });
+            break;
           case 'full box':
-            toast.error('Pełny box!', { id: 'error' })
-            break
+            toast.error('Pełny box!', { id: 'error' });
+            break;
           case 'full pallet':
-            toast.error('Pełna paleta!', { id: 'error' })
-            break
+            toast.error('Pełna paleta!', { id: 'error' });
+            break;
           default:
-            toast.error('Zgłoś się do IT!', { id: 'error' })
+            toast.error('Zgłoś się do IT!', { id: 'error' });
         }
       } catch (err) {
-        toast.error('Zgłoś się do IT!', { id: 'error' })
+        toast.error('Zgłoś się do IT!', { id: 'error' });
       }
-    })
-  }
+    });
+  };
 
   //TODO color if choosed
   return (
-    <div className="mt-10 flex items-center justify-center">
+    <div className='mt-10 flex items-center justify-center'>
       <input
-        className="w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none dark:bg-slate-800"
+        className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
         value={dmc}
         onChange={(event) => setDmc(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder="DMC"
+        placeholder='DMC'
         autoFocus
       />
     </div>
-  )
+  );
 }
