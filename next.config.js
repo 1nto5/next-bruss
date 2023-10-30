@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverActions: true,
+    // serverActions: true,
   },
-}
+  exclude: ['./app/cs/**'],
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
