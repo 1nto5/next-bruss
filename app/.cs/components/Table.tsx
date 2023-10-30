@@ -1,22 +1,28 @@
-'use client'
+'use client';
 
-import { useTable, Column, CellProps, HeaderGroupProps, Row } from 'react-table'
+import {
+  useTable,
+  Column,
+  CellProps,
+  HeaderGroupProps,
+  Row,
+} from 'react-table';
 
 type DataType = {
-  [key: string]: any
-}
+  [key: string]: any;
+};
 
 interface DataTableProps {
-  data: DataType[]
-  columns: Column<DataType>[]
+  data: DataType[];
+  columns: Column<DataType>[];
 }
 
 export default function DataTable({ data, columns }: DataTableProps) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable({ columns, data })
+    useTable({ columns, data });
 
   return (
-    <table {...getTableProps()} className="table-auto">
+    <table {...getTableProps()} className='table-auto'>
       <thead>
         {headerGroups.map((headerGroup: HeaderGroupProps<DataType>, i) => (
           <tr {...headerGroup.getHeaderGroupProps()} key={i}>
@@ -30,7 +36,7 @@ export default function DataTable({ data, columns }: DataTableProps) {
       </thead>
       <tbody {...getTableBodyProps()}>
         {rows.map((row: Row<DataType>, i) => {
-          prepareRow(row)
+          prepareRow(row);
           return (
             <tr {...row.getRowProps()} key={i}>
               {row.cells.map((cell: CellProps<DataType>, j) => (
@@ -39,9 +45,9 @@ export default function DataTable({ data, columns }: DataTableProps) {
                 </td>
               ))}
             </tr>
-          )
+          );
         })}
       </tbody>
     </table>
-  )
+  );
 }

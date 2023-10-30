@@ -1,19 +1,9 @@
-import Toast from '@/app/pro/components/Toast'
+import { ReduxProvider } from '@/lib/redux/pro/dmc-box-pallet/provider';
 
-export const metadata = {
-  title: 'Next BRUSS: Production',
-  // description: 'Company helper applications',
-}
-
-export default function OnlyPalletLabelLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DmcBox({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {children}
-      <Toast />
+      <ReduxProvider>{children}</ReduxProvider>
     </>
-  )
+  );
 }

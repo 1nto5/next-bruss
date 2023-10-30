@@ -1,5 +1,5 @@
-import Header from '../components/Header'
-import Table from '../components/Table'
+import Header from '../components/Header';
+import Table from '../components/Table';
 
 const data = [
   {
@@ -13,7 +13,7 @@ const data = [
     age: 25,
   },
   // add more objects as needed
-]
+];
 
 const columns = [
   {
@@ -29,7 +29,7 @@ const columns = [
     accessor: 'age',
   },
   // add more columns as needed
-]
+];
 
 export default function Page({ params }: { params: { date: string } }) {
   return (
@@ -37,5 +37,5 @@ export default function Page({ params }: { params: { date: string } }) {
       <Header selectedDate={'12.31.123'} />
       <Table data={data} columns={columns} />
     </>
-  )
+  );
 }
