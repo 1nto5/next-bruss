@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useTransition } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useState, useEffect, useContext } from 'react';
+import { PersonsContext } from '../lib/PersonsContext';
+import { InventoryContext } from '../lib/InventoryContext';
 import {
   FindLowestFreeCardNumber,
   GetExistingCards,
   ReserveCard,
-  GetAllPositions,
-  GetIdentifierCardNumberAndPositionNumber,
 } from '../actions';
-import { useSession } from 'next-auth/react';
 import Select from './Select';
 import Loader from './Loader';
 
@@ -19,66 +17,39 @@ type Option = {
 };
 
 export default function CardChooser() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session } = useSession();
-  const [isPending, startTransition] = useTransition();
+  const personsContext = useContext(PersonsContext);
+  const inventoryContext = useContext(InventoryContext);
+  const [isPending, setIsPending] = useState(true);
   const [cardNumber, setCardNumber] = useState<string | null>(null);
   const [warehouse, setWarehouse] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [existingCards, setExistingCards] = useState<Option[]>([]);
-  const [positionIdentifier, setPositionIdentifier] = useState<string | null>(
-    null,
-  );
-  const [existingPositions, setExistingPositions] = useState<Option[]>([]);
-
-  const errorSetter = (message: string) => {
-    setErrorMessage(message);
-    setMessage(null);
-  };
-
-  const messageSetter = (message: string) => {
-    setMessage(message);
-    setErrorMessage(null);
-  };
 
   useEffect(() => {
-    async function fetchExistingNumbers() {
-      if (session?.user.email && session?.user.roles) {
-        const cards = await GetExistingCards(session.user.email);
-        setExistingCards(cards);
+    (async () => {
+      if (personsContext?.persons.first && personsContext?.persons.second) {
+        setIsPending(true);
+        try {
+          const cards = await GetExistingCards(personsContext.persons);
+          setExistingCards(cards);
+        } catch (error) {
+          console.error('Error fetching existing cards:', error);
+          setErrorMessage('Skontaktuj się z IT!');
+        } finally {
+          setIsPending(false);
+        }
       }
-    }
-    fetchExistingNumbers();
-    async function getAllPositions() {
-      const positons = await GetAllPositions();
-      setExistingPositions(positons);
-    }
-    if (session?.user?.roles?.includes('inventory_aprover')) {
-      getAllPositions();
-    }
-  }, [session?.user.email, session?.user?.roles]);
+    })();
+  }, [personsContext?.persons]);
 
   const selectedCardOption = existingCards.find(
     (option) => option.value === cardNumber,
   );
 
-  const selectedPositionOption = existingPositions.find(
-    (option) => option.value === positionIdentifier,
-  );
-
   const handleCardSelectChange = (selectedCardOption: Option | null) => {
     if (selectedCardOption) {
       setCardNumber(selectedCardOption.value);
-    }
-  };
-
-  const handlePositionSelectChange = (
-    selectedPositionOption: Option | null,
-  ) => {
-    if (selectedPositionOption) {
-      setPositionIdentifier(selectedPositionOption.value);
     }
   };
 
@@ -104,65 +75,53 @@ export default function CardChooser() {
     }
   };
 
-  const reserveCard = () => {
-    startTransition(async () => {
-      if (!warehouse) {
-        setErrorMessage('Warehause not selected!');
-        return;
-      }
-      if (session?.user?.email) {
-        const number = await FindLowestFreeCardNumber();
-        const res = await ReserveCard(number, session?.user.email, warehouse);
-        if (res == 'reserved') {
-          router.push(`${pathname}/card=${String(number)}`);
-          return;
-        }
-        errorSetter(`Please contact IT!`);
-        return;
-      }
-    });
-  };
-
-  const handleConfirm = async (e: React.FormEvent) => {
-    if (cardNumber) {
-      router.push(`${pathname}/card=${cardNumber}`);
+  const reserveCard = async () => {
+    if (!warehouse) {
+      setErrorMessage('Nie wybrano magazynu!');
       return;
     }
-    let positionCardNumber: string | undefined;
-    let positionNumber: string | undefined;
-    if (positionIdentifier) {
-      startTransition(async () => {
-        const data = await GetIdentifierCardNumberAndPositionNumber(
-          positionIdentifier,
+    try {
+      if (personsContext?.persons.first && personsContext?.persons.second) {
+        const number = await FindLowestFreeCardNumber();
+        const res = await ReserveCard(
+          number,
+          personsContext.persons,
+          warehouse,
         );
-        if (data === 'not found') {
-          errorSetter('Position not found!');
+        if (res == 'reserved') {
+          inventoryContext?.setInventory((prevState) => ({
+            ...prevState,
+            card: number,
+          }));
           return;
         }
-        positionCardNumber = data.cardNumber;
-        positionNumber = data.positionNumber;
-
-        if (positionCardNumber && positionNumber) {
-          router.push(
-            `${pathname}/card=${positionCardNumber}/position=${positionNumber}`,
-          );
-          return;
-        }
-      });
+        setErrorMessage(`Please contact IT!`);
+        return;
+      }
+    } catch (error) {
+      console.error('Failed card reservation:', error);
+      setErrorMessage('Skontaktuj się z IT!');
+      return;
+    } finally {
+      setIsPending(false);
     }
-    session?.user.roles?.includes('inventory_aprover')
-      ? setErrorMessage('Card or position not selected!')
-      : setErrorMessage('Card not selected!');
   };
 
-  if (isPending) {
-    return <Loader />;
-  }
+  const handleConfirm = (e: React.FormEvent) => {
+    if (cardNumber) {
+      inventoryContext?.setInventory((prevState) => ({
+        ...prevState,
+        card: parseInt(cardNumber),
+        position: null,
+      }));
+      return;
+    }
+  };
 
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        card chooser
+        wybór karty
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col gap-3'>
@@ -193,15 +152,6 @@ export default function CardChooser() {
             onChange={handleWarehouseSelectChange}
             placeholder={'select warehouse'}
           />
-
-          {session?.user.roles?.includes('inventory_aprover') && (
-            <Select
-              options={existingPositions}
-              value={selectedPositionOption}
-              onChange={handlePositionSelectChange}
-              placeholder={'search position'}
-            />
-          )}
 
           <div className=' flex w-full justify-center space-x-2'>
             <button

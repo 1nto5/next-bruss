@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, createContext, useLayoutEffect, ReactNode } from 'react';
 
 type PersonType = {

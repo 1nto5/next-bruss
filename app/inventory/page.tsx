@@ -5,6 +5,7 @@ import { InventoryProvider } from './lib/InventoryContext';
 import Status from './components/Status';
 import Header from './components/Header';
 import Login from './components/Login';
+import Form from './components/Form';
 
 export default function Page() {
   return (
@@ -13,6 +14,7 @@ export default function Page() {
         <Header title='inventory' />
         <Status />
         <Login />
+        <Form />
       </InventoryProvider>
     </PersonsProvider>
   );

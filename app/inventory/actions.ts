@@ -2,6 +2,27 @@
 
 import { connectToMongo } from '@/lib/mongo/connector';
 import moment from 'moment';
+import crypto from 'crypto';
+
+type PersonType = {
+  first: string | null;
+  second: string | null;
+};
+
+type CardOption = {
+  value: string;
+  label: string;
+};
+
+const warehouseSelectOptions = [
+  { value: '000', label: '000 - Rohstolfe und Fertigteile' },
+  { value: '035', label: '035 - Metalteile Taicang' },
+  { value: '054', label: '054 - Magazyn wstrzymanych' },
+  { value: '055', label: '055 - Cz.zablokowane GTM' },
+  { value: '111', label: '111 - Magazyn Launch' },
+  { value: '222', label: '222 - Magazyn zablokowany produkcja' },
+  // { value: 999, label: '999 - WIP' },
+];
 
 export async function Login(personalNumber: string, password: string) {
   try {
@@ -20,30 +41,19 @@ export async function Login(personalNumber: string, password: string) {
   }
 }
 
-import crypto from 'crypto';
-
-const warehouseSelectOptions = [
-  { value: '000', label: '000 - Rohstolfe und Fertigteile' },
-  { value: '035', label: '035 - Metalteile Taicang' },
-  { value: '054', label: '054 - Magazyn wstrzymanych' },
-  { value: '055', label: '055 - Cz.zablokowane GTM' },
-  { value: '111', label: '111 - Magazyn Launch' },
-  { value: '222', label: '222 - Magazyn zablokowany produkcja' },
-  // { value: 999, label: '999 - WIP' },
-];
-
-type CardOption = {
-  value: string;
-  label: string;
-};
-
-export async function GetExistingCards(persons: string): Promise<CardOption[]> {
+export async function GetExistingCards(
+  persons: PersonType,
+): Promise<CardOption[]> {
   try {
     const collection = await connectToMongo('inventory_cards');
-    const cards = await collection.find({ creator: persons }).toArray();
+    const personsArray = [persons.first, persons.second].filter(Boolean);
+    const cards = await collection
+      .find({ creators: { $in: personsArray } })
+      .toArray();
+
     const cardOptions = cards.map((card) => {
       const warehouseOption = warehouseSelectOptions.find(
-        (option) => option.value === card.warehause,
+        (option) => option.value === card.warehouse,
       );
       return {
         value: card.number,
@@ -91,17 +101,22 @@ export async function FindLowestFreeCardNumber() {
   }
 }
 
-// Reserves a card for a given user
 export async function ReserveCard(
   cardNumber: number,
-  email: string,
-  warehause: string,
+  persons: PersonType,
+  warehouse: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');
     const existingCard = await collection.findOne({ number: cardNumber });
 
-    if (existingCard && existingCard.creator !== email) {
+    const hasAccess =
+      persons.first &&
+      persons.second &&
+      Object.values(existingCard?.creators).includes(persons.first) &&
+      Object.values(existingCard?.creators).includes(persons.second);
+
+    if (existingCard && !hasAccess) {
       return 'no access';
     }
 
@@ -111,8 +126,8 @@ export async function ReserveCard(
 
     const result = await collection.insertOne({
       number: cardNumber,
-      creator: email,
-      warehause: warehause,
+      creators: persons,
+      warehouse: warehouse,
     });
 
     if (result.insertedId) {
@@ -120,7 +135,7 @@ export async function ReserveCard(
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while retrieving the list of articles.');
+    throw new Error('An error occurred while attempting to reserve the card.');
   }
 }
 

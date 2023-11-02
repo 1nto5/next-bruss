@@ -1,5 +1,6 @@
-// PersonContext.tsx
-import React, { useState, createContext, ReactNode } from 'react';
+'use client';
+
+import { useState, createContext, ReactNode } from 'react';
 
 type InventoryType = {
   card: number | null;
