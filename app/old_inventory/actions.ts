@@ -1,27 +1,10 @@
 'use server';
 
 import { connectToMongo } from '@/lib/mongo/connector';
+import crypto from 'crypto';
 import moment from 'moment';
 
-export async function Login(personalNumber: string, password: string) {
-  try {
-    const collection = await connectToMongo('persons');
-    const person = await collection.findOne({ personalNumber });
-    if (!person) {
-      return false;
-    }
-    if (password !== person.password) {
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred during login process.');
-  }
-}
-
-import crypto from 'crypto';
-
+// Options for the warehouse select input
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Rohstolfe und Fertigteile' },
   { value: '035', label: '035 - Metalteile Taicang' },
@@ -32,15 +15,26 @@ const warehouseSelectOptions = [
   // { value: 999, label: '999 - WIP' },
 ];
 
+// Fetches existing cards for a given user
 type CardOption = {
   value: string;
   label: string;
 };
 
-export async function GetExistingCards(persons: string): Promise<CardOption[]> {
+export async function GetExistingCards(email: string): Promise<CardOption[]> {
+  if (!isValidEmail(email)) {
+    throw new Error('Invalid email address');
+  }
+
   try {
     const collection = await connectToMongo('inventory_cards');
-    const cards = await collection.find({ creator: persons }).toArray();
+    let query: Record<string, any> = { creator: email };
+
+    if ((await GetUserRoles(email)).includes('inventory_aprover')) {
+      query = {};
+    }
+
+    const cards = await collection.find(query).toArray();
     const cardOptions = cards.map((card) => {
       const warehouseOption = warehouseSelectOptions.find(
         (option) => option.value === card.warehause,
@@ -57,6 +51,12 @@ export async function GetExistingCards(persons: string): Promise<CardOption[]> {
     console.error(error);
     throw new Error('An error occurred while retrieving the list of cards');
   }
+}
+
+function isValidEmail(email: string): boolean {
+  // Use a regular expression to validate the email address
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 // Finds the lowest free card number
