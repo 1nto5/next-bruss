@@ -93,7 +93,6 @@ export default function CardPositionForm() {
           setSelectedUnit(positionData.position.unit);
           if (positionData.position.approved) {
             setApproved(true);
-            // TODO: format approver
             errorSetter(
               `Editing not allowed - the position has been approved by: ${positionData.position.approved}!`,
             );

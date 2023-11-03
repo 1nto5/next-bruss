@@ -1,43 +1,43 @@
-import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
+import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks';
 import {
   StatusBox,
   StatusBoxBlinking,
   BoxSeparator,
   StatusBoxSkeleton,
-} from '@/app/components/StatusElements'
+} from '@/app/components/old_StatusElements';
 
 export default function Status() {
-  const operatorLogged = useAppSelector((state) => state.operator.loggedIn)
-  const articleLogged = useAppSelector((state) => state.article.articleNumber)
+  const operatorLogged = useAppSelector((state) => state.operator.loggedIn);
+  const articleLogged = useAppSelector((state) => state.article.articleNumber);
 
-  const operatorName = useAppSelector((state) => state.operator.name)
+  const operatorName = useAppSelector((state) => state.operator.name);
   const operatorNumber = useAppSelector(
-    (state) => state.operator.personalNumber
-  )
+    (state) => state.operator.personalNumber,
+  );
 
-  const articleNumber = useAppSelector((state) => state.article.articleNumber)
-  const articleName = useAppSelector((state) => state.article.articleName)
-  const isFullBox = useAppSelector((state) => state.workplace.isFullBox)
-  const isFullPallet = useAppSelector((state) => state.workplace.isFullPallet)
-  const inBox = useAppSelector((state) => state.workplace.inBox)
-  const onPallet = useAppSelector((state) => state.workplace.onPallet)
-  const palletSize = useAppSelector((state) => state.workplace.palletSize)
-  const boxSize = useAppSelector((state) => state.workplace.boxSize)
-  const quantityOnPallet = onPallet! * boxSize!
-  const isPending = useAppSelector((state) => state.workplace.isPending)
+  const articleNumber = useAppSelector((state) => state.article.articleNumber);
+  const articleName = useAppSelector((state) => state.article.articleName);
+  const isFullBox = useAppSelector((state) => state.workplace.isFullBox);
+  const isFullPallet = useAppSelector((state) => state.workplace.isFullPallet);
+  const inBox = useAppSelector((state) => state.workplace.inBox);
+  const onPallet = useAppSelector((state) => state.workplace.onPallet);
+  const palletSize = useAppSelector((state) => state.workplace.palletSize);
+  const boxSize = useAppSelector((state) => state.workplace.boxSize);
+  const quantityOnPallet = onPallet! * boxSize!;
+  const isPending = useAppSelector((state) => state.workplace.isPending);
 
   const formatOperator = (name: string, personalNumber: number) => {
-    const parts = name.split(' ')
+    const parts = name.split(' ');
     if (parts.length === 2) {
-      return `${parts[0]} ${parts[1].charAt(0)}. (${personalNumber})`
+      return `${parts[0]} ${parts[1].charAt(0)}. (${personalNumber})`;
     }
-    return name
-  }
+    return name;
+  };
 
   return (
-    <div className="flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800">
+    <div className='flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800'>
       <StatusBox
-        boxName="operator:"
+        boxName='operator:'
         value={
           operatorLogged && operatorName && operatorNumber
             ? formatOperator(operatorName, operatorNumber)
@@ -46,22 +46,22 @@ export default function Status() {
       />
       <BoxSeparator />
       <StatusBox
-        boxName="artykuł:"
+        boxName='artykuł:'
         value={
           articleLogged ? `${articleName} (${articleNumber})` : 'nie wybrany'
         }
       />
       <BoxSeparator />
       {isPending ? (
-        <StatusBoxSkeleton boxName="na palecie:" value="x/y" />
+        <StatusBoxSkeleton boxName='na palecie:' value='x/y' />
       ) : isFullPallet ? (
         <StatusBoxBlinking
-          boxName="na palecie:"
+          boxName='na palecie:'
           value={`${onPallet} / ${palletSize} (${quantityOnPallet} szt.)`}
         />
       ) : (
         <StatusBox
-          boxName="na palecie:"
+          boxName='na palecie:'
           value={
             onPallet === null || palletSize === null
               ? 'brak'
@@ -71,15 +71,15 @@ export default function Status() {
       )}
       <BoxSeparator />
       {isPending ? (
-        <StatusBoxSkeleton boxName="w boxie:" value="x/y" />
+        <StatusBoxSkeleton boxName='w boxie:' value='x/y' />
       ) : isFullBox ? (
         <StatusBoxBlinking
-          boxName="w boxie:"
+          boxName='w boxie:'
           value={`${inBox} / ${boxSize} szt.`}
         />
       ) : (
         <StatusBox
-          boxName="w boxie:"
+          boxName='w boxie:'
           value={
             onPallet === null || palletSize === null
               ? 'brak'
@@ -88,5 +88,5 @@ export default function Status() {
         />
       )}
     </div>
-  )
+  );
 }

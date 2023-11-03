@@ -3,6 +3,7 @@
 import { useContext, useState, useRef } from 'react';
 import { Login } from '../actions';
 import { PersonsContext } from '../lib/PersonsContext';
+import clsx from 'clsx';
 
 type LoginFormState = {
   personalNumber: string;
@@ -60,7 +61,7 @@ export default function LoginForm() {
         return;
       }
       if (personsContext?.persons.first === formState.personalNumber) {
-        setErrorMessage('Wpisz poprawny nr personalny drugiej osoby!');
+        setErrorMessage('Wpisz nr. personalny drugiej osoby!');
         setMessage(null);
         return;
       }
@@ -81,10 +82,6 @@ export default function LoginForm() {
       setIsPending(false);
     }
   };
-
-  if (personsContext?.persons.first && personsContext?.persons.second) {
-    return null;
-  }
 
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
@@ -132,7 +129,10 @@ export default function LoginForm() {
             />
             <button
               type='submit'
-              className='w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+              className={clsx(
+                `w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss`,
+                { 'animate-pulse': isPending === true },
+              )}
               disabled={isPending}
             >
               {isPending ? 'logowanie...' : 'zaloguj'}

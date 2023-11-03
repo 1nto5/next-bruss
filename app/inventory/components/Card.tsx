@@ -9,17 +9,18 @@ import {
   ReserveCard,
 } from '../actions';
 import Select from './Select';
-import Loader from './Loader';
+import clsx from 'clsx';
 
 type Option = {
   value: string;
   label: string;
 };
 
-export default function CardChooser() {
+export default function Card() {
   const personsContext = useContext(PersonsContext);
   const inventoryContext = useContext(InventoryContext);
-  const [isPending, setIsPending] = useState(true);
+  const [isPendingExistingCards, setIsPendingExistingCards] = useState(true);
+  const [isPendingNewCard, setIsPendingNewCard] = useState(false);
   const [cardNumber, setCardNumber] = useState<string | null>(null);
   const [warehouse, setWarehouse] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export default function CardChooser() {
   useEffect(() => {
     (async () => {
       if (personsContext?.persons.first && personsContext?.persons.second) {
-        setIsPending(true);
+        setIsPendingExistingCards(true);
         try {
           const cards = await GetExistingCards(personsContext.persons);
           setExistingCards(cards);
@@ -37,7 +38,7 @@ export default function CardChooser() {
           console.error('Error fetching existing cards:', error);
           setErrorMessage('Skontaktuj się z IT!');
         } finally {
-          setIsPending(false);
+          setIsPendingExistingCards(false);
         }
       }
     })();
@@ -75,12 +76,13 @@ export default function CardChooser() {
     }
   };
 
-  const reserveCard = async () => {
+  const newCard = async () => {
     if (!warehouse) {
-      setErrorMessage('Nie wybrano magazynu!');
+      setErrorMessage('Nie wybrano obszaru!');
       return;
     }
     try {
+      setIsPendingNewCard(true);
       if (personsContext?.persons.first && personsContext?.persons.second) {
         const number = await FindLowestFreeCardNumber();
         const res = await ReserveCard(
@@ -103,7 +105,7 @@ export default function CardChooser() {
       setErrorMessage('Skontaktuj się z IT!');
       return;
     } finally {
-      setIsPending(false);
+      setIsPendingNewCard(false);
     }
   };
 
@@ -116,10 +118,11 @@ export default function CardChooser() {
       }));
       return;
     }
+    setErrorMessage('Nie wybrano karty!');
   };
 
   return (
-    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
+    <>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
         wybór karty
       </span>
@@ -139,38 +142,45 @@ export default function CardChooser() {
               )}
             </div>
           ) : null}
-          <Select
-            options={existingCards}
-            value={selectedCardOption}
-            onChange={handleCardSelectChange}
-            placeholder={'select existing card'}
-          />
 
           <Select
             options={warehouseSelectOptions}
             value={selectedWarehauseOption}
             onChange={handleWarehouseSelectChange}
-            placeholder={'select warehouse'}
+            placeholder={'wybierz obszar dla nowej karty'}
+          />
+          <Select
+            options={existingCards}
+            value={selectedCardOption}
+            onChange={handleCardSelectChange}
+            placeholder={
+              isPendingExistingCards
+                ? 'pobieranie kart'
+                : 'wybierz istniejącą kartę'
+            }
           />
 
           <div className=' flex w-full justify-center space-x-2'>
             <button
               type='button'
-              onClick={() => reserveCard()}
-              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
+              onClick={newCard}
+              className={clsx(
+                'w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600',
+                { 'animate-pulse': isPendingNewCard === true },
+              )}
             >
-              new card
+              {isPendingNewCard ? 'tworzenie karty' : 'nowa karta'}
             </button>
 
             <button
               onClick={handleConfirm}
               className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
             >
-              confirm
+              potwierdź
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

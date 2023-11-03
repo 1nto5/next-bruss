@@ -3,10 +3,8 @@
 import { useContext } from 'react';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
-import {
-  StatusBox,
-  BoxSeparatorInventory,
-} from '@/app/components/StatusElements';
+import { BoxSeparatorInventory } from '@/app/components/old_StatusElements';
+import StatusBox from '@/app/components/StatusBox';
 
 export default function Status() {
   const personsContext = useContext(PersonsContext);
@@ -18,21 +16,22 @@ export default function Status() {
 
   return (
     <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
-      {personsContext?.persons?.first && personsContext.persons.second && (
-        <StatusBox
-          boxName='zalogowani:'
-          value={`${personsContext?.persons?.first} + ${personsContext.persons.second}`}
-        />
-      )}
-      <BoxSeparatorInventory />
       <StatusBox
-        boxName='karta:'
-        value={inventoryContext?.inventory.card?.toString() ?? 'brak'}
+        name='zalogowani:'
+        value={`${personsContext?.persons?.first} + ${personsContext.persons.second}`}
+        width='w-2/4'
       />
       <BoxSeparatorInventory />
       <StatusBox
-        boxName='pozycja:'
-        value={inventoryContext?.inventory.position?.toString() ?? 'brak'}
+        name='karta:'
+        value={inventoryContext?.inventory.card ?? 'brak'}
+        width='w-1/4'
+      />
+      <BoxSeparatorInventory />
+      <StatusBox
+        name='pozycja:'
+        value={inventoryContext?.inventory.position ?? 'brak'}
+        width='w-1/4'
       />
     </div>
   );

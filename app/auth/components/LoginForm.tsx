@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: match styles
-
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import React, { useState } from 'react';

@@ -1,18 +1,12 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-
+import { useState, useEffect, useContext, use } from 'react';
+import clsx from 'clsx';
+import { PersonsContext } from '../lib/PersonsContext';
+import { InventoryContext } from '../lib/InventoryContext';
 import useSWR from 'swr';
-import { useSession } from 'next-auth/react';
-import {
-  GetPosition,
-  SavePosition,
-  GetArticles,
-  ApprovePosition,
-} from '../actions';
+import { GetPosition, SavePosition, GetArticlesOptions } from '../actions';
 import Select from './Select';
-import Loader from './Loader';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 type Article = {
@@ -25,24 +19,16 @@ type Article = {
   max: number;
 };
 
-export default function CardPositionForm() {
-  const { data: session } = useSession();
-  const pathname = usePathname();
-  const router = useRouter();
-  if (!/\/card=\d+$/.test(pathname) && !/\/position=\d+$/.test(pathname)) {
-    router.push('/inventory');
-  }
-  const matchesPosition = pathname.match(/position=(\d+)/);
-  const matchesCard = pathname.match(/card=(\d+)/);
-  const position = matchesPosition ? Number(matchesPosition[1]) : null;
-  const card = matchesCard ? Number(matchesCard[1]) : null;
+export default function Edit() {
+  const personsContext = useContext(PersonsContext);
+  const inventoryContext = useContext(InventoryContext);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(true);
-  const { data: articles, error: getArticlesError } = useSWR<Article[]>(
-    'articlesKey',
-    GetArticles,
-  );
+  const [isPendingPosition, setIsPendingPosition] = useState(true);
+  const [isPendingSaving, setIsPendingSaving] = useState(false);
+  const { data: articlesOptions, error: getArticlesOptionsError } = useSWR<
+    Article[]
+  >('articlesOptionsKey', GetArticlesOptions);
   const [wip, setWip] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
@@ -51,86 +37,115 @@ export default function CardPositionForm() {
   const [identifier, setIdentifier] = useState('');
   const [blockNextPosition, setBlockNextPosition] = useState(false);
 
-  const errorSetter = (message: string) => {
-    setErrorMessage(message);
-    setMessage(null);
-  };
-
-  const messageSetter = (message: string) => {
-    setMessage(message);
-    setErrorMessage(null);
-  };
-
-  // fetch existing position
   useEffect(() => {
-    const fetchData = async () => {
-      if (card && position && session?.user.email) {
-        const positionData = await GetPosition(
-          card,
-          position,
-          session?.user.email,
-        );
-        if (positionData) {
-          if (positionData.status == 'wrong position') {
-            router.push('/inventory');
-          }
-          if (positionData.status == 'no access') {
-            router.push('/inventory');
-          }
-          positionData.status == 'no card' && errorSetter('No card!');
-          if (positionData.status == 'skipped') {
-            router.replace(`position=${positionData.position}`);
-          }
+    setErrorMessage(null);
+    setMessage(null);
+    setIdentifier('');
+    setSelectedArticle(null);
+    setQuantity(0);
+    setApproved(false);
+    setSelectedUnit('kg');
+  }, [inventoryContext?.inventory.position]);
 
-          if (positionData.status == 'new') {
-            setBlockNextPosition(true);
+  useEffect(() => {
+    setErrorMessage(null);
+  }, [message]);
+
+  useEffect(() => {
+    setMessage(null);
+  }, [errorMessage]);
+
+  useEffect(() => {
+    (async () => {
+      if (
+        inventoryContext?.inventory.card &&
+        inventoryContext?.inventory.position &&
+        personsContext?.persons.first &&
+        personsContext?.persons.second
+      ) {
+        try {
+          setIsPendingPosition(true);
+          const positionData = await GetPosition(
+            inventoryContext?.inventory.card,
+            inventoryContext.inventory.position,
+            personsContext?.persons,
+          );
+          if (positionData) {
+            if (positionData.status == 'wrong position') {
+              inventoryContext.setInventory((prevState) => ({
+                ...prevState,
+                position: null,
+              }));
+            }
+            if (positionData.status == 'no access') {
+              inventoryContext.setInventory((prevState) => ({
+                ...prevState,
+                card: null,
+              }));
+            }
+            positionData.status == 'no card' && setErrorMessage('No card!');
+            if (positionData.status == 'skipped') {
+              inventoryContext.setInventory((prevState) => ({
+                ...prevState,
+                position: positionData.position.position,
+              }));
+            }
+            if (positionData.status == 'new') {
+              setBlockNextPosition(true);
+            }
           }
-        }
-        if (positionData.status == 'found') {
-          setIdentifier(positionData.position.identifier);
-          setQuantity(positionData.position.quantity);
-          setWip(positionData.position.wip);
-          setSelectedUnit(positionData.position.unit);
-          if (positionData.position.approved) {
-            setApproved(true);
-            // TODO: format approver
-            errorSetter(
-              `Editing not allowed - the position has been approved by: ${positionData.position.approved}!`,
-            );
+          if (positionData.status == 'found') {
+            setIdentifier(positionData.positionOnCard.identifier);
+            setQuantity(positionData.positionOnCard.quantity);
+            setWip(positionData.positionOnCard.wip);
+            setSelectedUnit(positionData.positionOnCard.unit);
+            if (positionData.positionOnCard.approved) {
+              setApproved(true);
+              setErrorMessage(
+                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${positionData.position.approved}!`,
+              );
+            }
+            setBlockNextPosition(false);
+            if (articlesOptions) {
+              const foundArticle = articlesOptions.find(
+                (article) =>
+                  article.number === positionData.positionOnCard.articleNumber,
+              );
+              foundArticle && setSelectedArticle(foundArticle);
+            }
           }
-          if (articles) {
-            const foundArticle = articles.find(
-              (article) =>
-                article.number === positionData.position.articleNumber,
-            );
-            foundArticle && setSelectedArticle(foundArticle);
-          }
+        } catch (error) {
+          console.error('Error fetching position:', error);
+          setErrorMessage('Skontaktuj się z IT!');
+        } finally {
+          setIsPendingPosition(false);
         }
       }
-    };
-    setIsPending(true);
-    fetchData();
-    setIsPending(false);
-    return () => {};
-  }, [articles, card, position, router, session?.user.email]);
+    })();
+  }, [
+    articlesOptions,
+    inventoryContext,
+    inventoryContext?.inventory.position,
+    personsContext?.persons,
+  ]);
 
   // save position
   const savePosition = async () => {
     if (identifier !== '') {
       if (
         !window.confirm(
-          'Are you sure you want to save the position again? This will generate a new identifier and require it to be noted on the inventory item.',
+          'Czy na pewno chcesz ponownie zapisać pozycję? Spowoduje to wygenerowanie nowego identyfikatora i konieczność jego zapisania na inwentaryzowanym artykule.',
         )
       ) {
         return;
       }
     }
     if (!selectedArticle) {
-      errorSetter('Select an article!');
+      setErrorMessage('Wybierz artykuł!');
       return;
     }
     if (!quantity || quantity <= 0) {
-      errorSetter('Enter the correct quantity!');
+      setErrorMessage('Podaj poprawną ilość!');
       return;
     }
     if (
@@ -140,23 +155,34 @@ export default function CardPositionForm() {
       selectedUnit === 'kg' &&
       quantity / selectedArticle?.converter > selectedArticle?.max
     ) {
-      const userConfirm = window.confirm(
-        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max} ${selectedArticle?.unit}). Do you wish to continue?`,
+      // const userConfirm = window.confirm(
+      //   `Wprowadzona wartość przekracza domyślną wartość dla tego artykułu: (${selectedArticle?.max} ${selectedArticle?.unit}). Czy na pewno chcesz kontynuuować?`,
+      // );
+      // if (!userConfirm) {
+      //   return;
+      // }
+      setErrorMessage(
+        'Wprowadzona wartość przekracza domyślną wartość dla tego artykułu!',
       );
-      if (!userConfirm) {
-        return;
-      }
+      return;
     }
     if (selectedArticle?.max && quantity > selectedArticle?.max) {
-      const userConfirm = window.confirm(
-        `The entered quantity exceeds the maximum allowed for this article (${selectedArticle?.max} ${selectedArticle?.unit}). Do you wish to continue?`,
+      // const userConfirm = window.confirm(
+      //   `Wprowadzona wartość przekracza domyślną wartość dla tego artykułu: (${selectedArticle?.max} ${selectedArticle?.unit}). Czy na pewno chcesz kontynuuować?`,
+      // );
+      // if (!userConfirm) {
+      //   return;
+      // }
+      setErrorMessage(
+        'Wprowadzona wartość przekracza domyślną wartość dla tego artykułu!',
       );
-      if (!userConfirm) {
-        return;
-      }
+      return;
     }
 
-    if (card && position) {
+    if (
+      inventoryContext?.inventory.card &&
+      inventoryContext.inventory.position
+    ) {
       try {
         const converter = selectedArticle?.converter;
         let finalQuantity;
@@ -166,63 +192,47 @@ export default function CardPositionForm() {
           finalQuantity = quantity;
         }
 
-        if (selectedArticle && session?.user.email) {
-          setIsPending(true);
+        if (
+          selectedArticle &&
+          personsContext?.persons.first &&
+          personsContext?.persons.second
+        ) {
+          setIsPendingSaving(true);
           const res = await SavePosition(
-            card,
-            position,
+            inventoryContext.inventory.card,
+            inventoryContext.inventory.position,
             selectedArticle.number,
             selectedArticle.name,
             finalQuantity,
             selectedArticle.unit,
             wip,
-            session.user.email,
+            personsContext.persons,
           );
 
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier);
-            messageSetter(`Position ${position} added!`);
+            setMessage(
+              `Pozycja: ${inventoryContext.inventory.position} zapisana!`,
+            );
             setBlockNextPosition(false);
           } else if (res?.status === 'updated') {
             res?.identifier && setIdentifier(res?.identifier);
-            messageSetter(`Position ${position} updated!`);
+            setMessage(
+              `Pozycja: ${inventoryContext.inventory.position} zaktualizowana!`,
+            );
             setBlockNextPosition(false);
           } else if (
             res?.status === 'not added' ||
             res?.status === 'not updated'
           ) {
-            errorSetter('Saving position error. Please contact IT!');
+            setErrorMessage('Skontaktuj się z IT!');
           }
         }
       } catch (error) {
-        errorSetter('Saving position error. Please contact IT!');
+        setErrorMessage('Skontaktuj się z IT!');
       } finally {
-        setIsPending(false);
+        setIsPendingSaving(false);
       }
-    }
-  };
-
-  // approve position
-  const approvePosition = async () => {
-    if (!window.confirm('Are you sure you want to approve the position?')) {
-      return;
-    }
-    try {
-      if (card && position && session?.user.email) {
-        setIsPending(true);
-        const res = await ApprovePosition(card, position, session.user.email);
-
-        if (res?.status === 'approved') {
-          messageSetter('The position has been approved!');
-          setApproved(true);
-        } else if (res?.status === 'no changes') {
-          messageSetter('The position had already been approved!');
-        }
-      }
-    } catch (error) {
-      errorSetter('Saving position error. Please contact IT!');
-    } finally {
-      setIsPending(false);
     }
   };
 
@@ -230,20 +240,10 @@ export default function CardPositionForm() {
     setSelectedArticle(option);
   };
 
-  if (getArticlesError) {
-    errorSetter('An error occurred during loading artiles options.');
-  }
-  if (!articles) {
-    return <Loader />;
-  }
-  if (isPending) {
-    return <Loader />;
-  }
-
   return (
-    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
+    <>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        edit position
+        {isPendingPosition ? 'pobieranie pozycji' : 'edycja pozycji'}
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col gap-3'>
@@ -267,10 +267,16 @@ export default function CardPositionForm() {
             </div>
           ) : null}
           <Select
-            options={articles}
+            options={articlesOptions ?? []}
             value={selectedArticle}
             onChange={selectArticle}
-            placeholder={'select article'}
+            placeholder={
+              !getArticlesOptionsError
+                ? articlesOptions
+                  ? 'wybierz artykuł'
+                  : 'pobieranie'
+                : 'błąd pobierania'
+            }
             isDisabled={approved}
           />
           {selectedArticle && !approved && (
@@ -279,7 +285,7 @@ export default function CardPositionForm() {
                 <input
                   type='number'
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  placeholder='quantity'
+                  placeholder='ilość'
                   defaultValue={quantity !== 0 ? quantity : undefined}
                   className='w-20 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
                 />
@@ -343,11 +349,16 @@ export default function CardPositionForm() {
           <div className='flex justify-center space-x-3'>
             <button
               onClick={() => {
-                if (position !== null) {
-                  if (position !== 1) {
-                    router.replace(`position=${position - 1}`);
+                if (inventoryContext?.inventory.position) {
+                  if (inventoryContext?.inventory.position !== 1) {
+                    inventoryContext.setInventory((prevState) => ({
+                      ...prevState,
+                      position:
+                        inventoryContext.inventory.position &&
+                        inventoryContext.inventory.position - 1,
+                    }));
                   } else {
-                    errorSetter('No 0 position!');
+                    setErrorMessage('Karta nie posiada pozycji 0!');
                   }
                 }
               }}
@@ -358,34 +369,34 @@ export default function CardPositionForm() {
             <button
               onClick={savePosition}
               disabled={approved}
-              className={`w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
-                approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
-              } dark:bg-slate-700 dark:text-slate-100`}
-            >
-              save
-            </button>
-            {session?.user.roles?.includes('inventory_aprover') && (
-              <button
-                onClick={approvePosition}
-                disabled={approved}
-                className={`w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
+              className={clsx(
+                `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
                   approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
-                } dark:bg-slate-700 dark:text-slate-100`}
-              >
-                approve
-              </button>
-            )}
+                } dark:bg-slate-700 dark:text-slate-100`,
+                { 'animate-pulse': isPendingSaving === true },
+              )}
+            >
+              {isPendingSaving ? 'zapisywanie' : 'zapisz'}
+            </button>
 
             <button
               onClick={() => {
                 if (!blockNextPosition) {
-                  if (position !== null && position != 25) {
-                    router.replace(`position=${position + 1}`);
+                  if (
+                    inventoryContext?.inventory.position &&
+                    inventoryContext?.inventory.position !== 25
+                  ) {
+                    inventoryContext.setInventory((prevState) => ({
+                      ...prevState,
+                      position:
+                        inventoryContext.inventory.position &&
+                        inventoryContext.inventory.position + 1,
+                    }));
                   } else {
-                    errorSetter('The card is full!');
+                    setErrorMessage('Karta jest pełna!');
                   }
                 } else {
-                  errorSetter('Save the current position!');
+                  setErrorMessage('Najpierw zapisz aktualną pozycję!');
                 }
               }}
               className='rounded bg-slate-200 p-3 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
@@ -395,6 +406,6 @@ export default function CardPositionForm() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

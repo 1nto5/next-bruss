@@ -22,8 +22,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {inventoryContext?.inventory.card && (
           <button
             onClick={() =>
-              inventoryContext?.setInventory((prevState) => ({
-                ...prevState,
+              inventoryContext?.setInventory(() => ({
+                position: null,
                 card: null,
               }))
             }
