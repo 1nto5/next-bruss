@@ -63,6 +63,8 @@ export default function LoginForm() {
       if (personsContext?.persons.first === formState.personalNumber) {
         setErrorMessage('Wpisz nr. personalny drugiej osoby!');
         setMessage(null);
+        personalNumberInputRef.current &&
+          personalNumberInputRef.current.focus();
         return;
       }
       if (!personsContext?.persons.second) {
