@@ -1,22 +1,10 @@
 'use server';
 
 import { connectToMongo } from '@/lib/mongo/connector';
-import moment from 'moment';
 import crypto from 'crypto';
-import { getLastNameFirstLetter } from './lib/utils/nameFormat';
+import moment from 'moment';
 
-type PersonsType = {
-  first: string | null;
-  nameFirst: string | null;
-  second: string | null;
-  nameSecond: string | null;
-};
-
-type CardOption = {
-  value: string;
-  label: string;
-};
-
+// Options for the warehouse select input
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Rohstolfe und Fertigteile' },
   { value: '035', label: '035 - Metalteile Taicang' },
@@ -27,51 +15,48 @@ const warehouseSelectOptions = [
   // { value: 999, label: '999 - WIP' },
 ];
 
-export async function Login(personalNumber: string, password: string) {
-  try {
-    const collection = await connectToMongo('persons');
-    const person = await collection.findOne({ personalNumber });
-    if (!person) {
-      return null;
-    }
-    if (password !== person.password) {
-      return null;
-    }
-    return person.name;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred during the login process.');
-  }
-}
+// Fetches existing cards for a given user
+type CardOption = {
+  value: string;
+  label: string;
+};
 
-export async function GetExistingCards(
-  persons: PersonsType,
-): Promise<CardOption[]> {
+export async function GetExistingCards(email: string): Promise<CardOption[]> {
+  if (!isValidEmail(email)) {
+    throw new Error('Invalid email address');
+  }
+
   try {
     const collection = await connectToMongo('inventory_cards');
-    const cards = await collection.find({}).toArray();
-    const filteredCards = cards.filter(
-      (card) =>
-        card.creators.includes(persons.first) &&
-        card.creators.includes(persons.second),
-    );
-    const cardOptions = filteredCards.map((card) => {
+    let query: Record<string, any> = { creator: email };
+
+    if ((await GetUserRoles(email)).includes('inventory_aprover')) {
+      query = {};
+    }
+
+    const cards = await collection.find(query).toArray();
+    const cardOptions = cards.map((card) => {
       const warehouseOption = warehouseSelectOptions.find(
-        (option) => option.value === card.warehouse,
+        (option) => option.value === card.warehause,
       );
       return {
         value: card.number,
         label: warehouseOption
-          ? `${card.number} - ${warehouseOption.label}`
+          ? `${card.number} -  ${warehouseOption.label}`
           : 'wrong warehouse',
       };
     });
-
     return cardOptions;
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while retrieving the list of cards');
   }
+}
+
+function isValidEmail(email: string): boolean {
+  // Use a regular expression to validate the email address
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 // Finds the lowest free card number
@@ -106,20 +91,17 @@ export async function FindLowestFreeCardNumber() {
   }
 }
 
+// Reserves a card for a given user
 export async function ReserveCard(
   cardNumber: number,
-  persons: PersonsType,
-  warehouse: string,
+  email: string,
+  warehause: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');
     const existingCard = await collection.findOne({ number: cardNumber });
 
-    const hasAccess =
-      existingCard?.creators.includes(persons.first) &&
-      existingCard?.creators.includes(persons.second);
-
-    if (existingCard && !hasAccess) {
+    if (existingCard && existingCard.creator !== email) {
       return 'no access';
     }
 
@@ -129,8 +111,8 @@ export async function ReserveCard(
 
     const result = await collection.insertOne({
       number: cardNumber,
-      creators: [persons.first, persons.second],
-      warehouse: warehouse,
+      creator: email,
+      warehause: warehause,
     });
 
     if (result.insertedId) {
@@ -138,7 +120,7 @@ export async function ReserveCard(
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while attempting to reserve the card.');
+    throw new Error('An error occurred while retrieving the list of articles.');
   }
 }
 
@@ -151,26 +133,25 @@ type PositionObject = {
   quantity: number;
   unit: string;
   wip: boolean;
-  creators: string[];
+  user: string;
   approved?: string;
 };
 
 // Gets existing positions for a given card
-export async function GetExistingPositions(card: number, persons: PersonsType) {
+export async function GetExistingPositions(cardNumber: number, email: string) {
   try {
     const collection = await connectToMongo('inventory_cards');
-    const existingCard = await collection.findOne({ number: card });
+    const card = await collection.findOne({ number: cardNumber });
     if (
-      !existingCard?.creators.includes(persons.first) ||
-      !existingCard?.creators.includes(persons.second)
+      card?.creator !== email &&
+      !(await GetUserRoles(email)).includes('inventory_aprover')
     ) {
       return 'no access';
     }
-    console.log(existingCard);
-    if (!card || !Array.isArray(existingCard.positions)) {
+    if (!card || !Array.isArray(card.positions)) {
       return [];
     }
-    const existingPositionsSelectOptions = existingCard.positions.map(
+    const existingPositionsSelectOptions = card.positions.map(
       (pos: PositionObject) => ({
         value: pos.position,
         label: `${pos.position} - ${pos.articleNumber} - ${pos.articleName} - ${pos.quantity} ${pos.unit} - ${pos.identifier}`,
@@ -223,7 +204,7 @@ export async function CheckIsFull(cardNumber: number) {
 }
 
 // Gets a list of articles
-export async function GetArticlesOptions() {
+export async function GetArticles() {
   try {
     const collection = await connectToMongo('inventory_articles');
     const articles = await collection.find({}).toArray();
@@ -243,84 +224,100 @@ export async function GetArticlesOptions() {
   }
 }
 
+async function GetUserRoles(email: string) {
+  try {
+    const collection = await connectToMongo('users');
+    const user = await collection.findOne({ email: email });
+    if (!user) {
+      return [];
+    } else {
+      return user.roles;
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the user roles.');
+  }
+}
+
 // Gets a position for a given card and position number
 export async function GetPosition(
-  card: number,
-  position: number,
-  persons: PersonsType,
+  cardNumber: number,
+  positionNumber: number,
+  user: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');
-    const existingCard = await collection.findOne({ number: card });
+    const card = await collection.findOne({ number: cardNumber });
 
-    if (!existingCard) {
+    if (!card) {
       return { status: 'no card' };
     }
     if (
-      !existingCard.creators.includes(persons.first) ||
-      !existingCard.creators.includes(persons.second)
+      card.creator !== user &&
+      !(await GetUserRoles(user)).includes('inventory_aprover')
     ) {
       return { status: 'no access' };
     }
-    if (position < 1 || position > 25) {
+    if (positionNumber < 1 || positionNumber > 25) {
       return { status: 'wrong position' };
     }
-    if (!existingCard.positions) {
+    if (!card.positions) {
       return { status: 'new' };
     }
-    const positionOnCard = existingCard.positions.find(
-      (pos: { position: number }) => pos.position === position,
+    const position = card.positions.find(
+      (pos: { position: number }) => pos.position === positionNumber,
     );
 
-    if (!positionOnCard) {
-      if (positionOnCard > existingCard.positions.length + 1) {
+    if (!position) {
+      if (positionNumber > card.positions.length + 1) {
         return {
           status: 'skipped',
-          position: existingCard.positions.length + 1,
+          position: card.positions.length + 1,
         };
       }
       return { status: 'new' };
     }
     return {
       status: 'found',
-      positionOnCard,
+      position,
     };
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while retrieving the position.');
+    throw new Error('Wystąpił błąd podczas pobierania pozycji.');
   }
 }
 
 // Generates a unique identifier for a position
-// TODO: format the identifier: K001P01LBAA
-function generateIdentifier(
-  card: number,
-  position: number,
-  persons: PersonsType,
-): string {
-  const personInitials =
-    getLastNameFirstLetter(persons.nameFirst || '') +
-    getLastNameFirstLetter(persons.nameSecond || '');
-  return `${card}${personInitials}${position}`;
+function generateUniqueIdentifier(): string {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const week = moment().week().toString().padStart(2, '0');
+  let randomLetters = '';
+  while (randomLetters.length < 4) {
+    const randomBytes = crypto.randomBytes(3).toString('base64');
+    const extractedLetters = randomBytes.replace(/[^a-zA-Z]/g, '');
+    randomLetters += extractedLetters;
+  }
+  randomLetters = randomLetters.substring(0, 4).toUpperCase();
+  return `${year}${randomLetters}${week}`;
 }
 
 // Saves a position to the database
 export async function SavePosition(
-  card: number,
+  cardNumber: number,
   position: number,
   articleNumber: number,
   articleName: string,
   quantity: number,
   unit: string,
   wip: boolean,
-  persons: PersonsType,
+  user: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');
     let isUnique = false;
     let identifier;
     while (!isUnique) {
-      identifier = generateIdentifier(card, position, persons);
+      identifier = generateUniqueIdentifier();
       const allIdentifiers = await collection
         .find({}, { projection: { 'positions.identifier': 1 } })
         .toArray();
@@ -345,11 +342,11 @@ export async function SavePosition(
       quantity: quantity,
       unit: unit,
       wip: wip,
-      user: [persons.first, persons.second],
+      user: user,
     };
     const updateResult = await collection.updateOne(
       {
-        'number': card,
+        'number': cardNumber,
         'positions.position': position,
       },
       {
@@ -358,7 +355,7 @@ export async function SavePosition(
     );
     if (updateResult.matchedCount === 0) {
       const insertResult = await collection.updateOne(
-        { number: card },
+        { number: cardNumber },
         {
           $push: { positions: positionData },
         },
@@ -378,5 +375,80 @@ export async function SavePosition(
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving the position.');
+  }
+}
+
+// Approves a position for a given card and position number
+export async function ApprovePosition(
+  cardNumber: number,
+  position: number,
+  user: string,
+) {
+  try {
+    const collection = await connectToMongo('inventory_cards');
+    const updateResult = await collection.updateOne(
+      {
+        'number': cardNumber,
+        'positions.position': position,
+      },
+      {
+        $set: { 'positions.$.approved': user },
+      },
+    );
+    if (updateResult.modifiedCount > 0) {
+      return { status: 'approved' };
+    } else {
+      return { status: 'no changes' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while confirming the email.');
+  }
+}
+
+export async function GetAllPositions() {
+  try {
+    const collection = await connectToMongo('inventory_cards');
+    const cards = await collection.find({}).toArray();
+    const positions = cards.flatMap((card) =>
+      Array.isArray(card.positions) ? card.positions : [],
+    );
+
+    const formattedPositions = positions.map((position) => ({
+      value: position.identifier,
+      label: `${position.identifier} - ${position.articleNumber} - ${position.articleName} - ${position.quantity} ${position.unit}`,
+    }));
+
+    return formattedPositions;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the positions.');
+  }
+}
+
+export async function GetIdentifierCardNumberAndPositionNumber(
+  identifier: string,
+) {
+  try {
+    const collection = await connectToMongo('inventory_cards');
+    const cards = await collection.find({}).toArray();
+
+    for (const card of cards) {
+      const position = card.positions?.find(
+        (pos: { identifier: string }) => pos.identifier === identifier,
+      );
+
+      if (position) {
+        return {
+          cardNumber: card.number,
+          positionNumber: position.position,
+        };
+      }
+    }
+
+    return 'not found';
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the positions.');
   }
 }

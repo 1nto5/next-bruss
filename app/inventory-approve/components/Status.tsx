@@ -1,33 +1,42 @@
 'use client';
 
-import {
-  StatusBox,
-  BoxSeparatorInventory,
-} from '@/app/components/old_StatusElements';
-
-import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import formatEmailToName from '@/lib/utils/inventory/formatEmailToName';
+import { useContext } from 'react';
+import { PersonsContext } from '../lib/PersonsContext';
+import { InventoryContext } from '../lib/InventoryContext';
+import StatusBox from '@/app/components/StatusBox';
+import { formatEmailToName } from '../lib/utils/nameFormat';
 
 export default function Status() {
-  const pathname = usePathname();
-  const matchesCard = pathname.match(/card=(\d+)/);
-  const matchesPosition = pathname.match(/position=(\d+)/);
-  const card = matchesCard ? String(matchesCard[1]) : '-';
-  const position = matchesPosition ? String(matchesPosition[1]) : '-';
   const { data: session } = useSession();
+  const personsContext = useContext(PersonsContext);
+  const inventoryContext = useContext(InventoryContext);
+
+  if (!personsContext?.persons?.first || !personsContext.persons.second) {
+    return null;
+  }
+
   return (
-    <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
+    <div className=' w-1/ flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
       <StatusBox
-        boxName='user:'
+        name='zalogowany:'
         value={formatEmailToName(
           session?.user?.email ?? 'Unknown.User@bruss-group.com',
         )}
+        width='w-2/4'
       />
-      <BoxSeparatorInventory />
-      <StatusBox boxName='card:' value={card ?? '-'} />
-      <BoxSeparatorInventory />
-      <StatusBox boxName='position:' value={position ?? '-'} />
+      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+      <StatusBox
+        name='karta:'
+        value={inventoryContext?.inventory.card ?? 'brak'}
+        width='w-1/4'
+      />
+      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+      <StatusBox
+        name='pozycja:'
+        value={inventoryContext?.inventory.position ?? 'brak'}
+        width='w-1/4'
+      />
     </div>
   );
 }

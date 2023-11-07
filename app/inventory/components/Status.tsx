@@ -24,7 +24,7 @@ export default function Status() {
         )})`}
         width='w-2/6'
       />
-      <BoxSeparatorInventory />
+      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
       <StatusBox
         name='zalogowany 2:'
         value={`${personsContext?.persons?.second} (${shortenLastName(
@@ -32,13 +32,13 @@ export default function Status() {
         )})`}
         width='w-2/6'
       />
-      <BoxSeparatorInventory />
+      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
       <StatusBox
         name='karta:'
         value={inventoryContext?.inventory.card ?? 'brak'}
         width='w-1/6'
       />
-      <BoxSeparatorInventory />
+      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
       <StatusBox
         name='pozycja:'
         value={inventoryContext?.inventory.position ?? 'brak'}
