@@ -5,6 +5,7 @@ import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import { BoxSeparatorInventory } from '@/app/components/old_StatusElements';
 import StatusBox from '@/app/components/StatusBox';
+import { shortenLastName } from '../lib/utils/nameFormat';
 
 export default function Status() {
   const personsContext = useContext(PersonsContext);
@@ -15,23 +16,33 @@ export default function Status() {
   }
 
   return (
-    <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
+    <div className=' w-1/ flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
       <StatusBox
-        name='zalogowani:'
-        value={`${personsContext?.persons?.first} + ${personsContext.persons.second}`}
-        width='w-2/4'
+        name='zalogowany 1:'
+        value={`${personsContext?.persons?.first} (${shortenLastName(
+          personsContext?.persons?.nameFirst ?? '',
+        )})`}
+        width='w-2/6'
+      />
+      <BoxSeparatorInventory />
+      <StatusBox
+        name='zalogowany 2:'
+        value={`${personsContext?.persons?.second} (${shortenLastName(
+          personsContext?.persons?.nameSecond ?? '',
+        )})`}
+        width='w-2/6'
       />
       <BoxSeparatorInventory />
       <StatusBox
         name='karta:'
         value={inventoryContext?.inventory.card ?? 'brak'}
-        width='w-1/4'
+        width='w-1/6'
       />
       <BoxSeparatorInventory />
       <StatusBox
         name='pozycja:'
         value={inventoryContext?.inventory.position ?? 'brak'}
-        width='w-1/4'
+        width='w-1/6'
       />
     </div>
   );

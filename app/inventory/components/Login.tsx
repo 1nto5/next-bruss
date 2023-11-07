@@ -53,6 +53,7 @@ export default function LoginForm() {
         personsContext?.setPersons((prevState) => ({
           ...prevState,
           first: formState.personalNumber,
+          nameFirst: res,
         }));
         setMessage('Zalogowano pierwszą osobę!');
         setErrorMessage(null);
@@ -71,6 +72,7 @@ export default function LoginForm() {
         personsContext?.setPersons((prevState) => ({
           ...prevState,
           second: formState.personalNumber,
+          nameSecond: res,
         }));
         setMessage(null);
         setErrorMessage(null);

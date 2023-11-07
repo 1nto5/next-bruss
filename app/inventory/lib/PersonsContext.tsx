@@ -4,7 +4,9 @@ import { useState, createContext, useLayoutEffect, ReactNode } from 'react';
 
 type PersonsType = {
   first: string | null;
+  nameFirst: string | null;
   second: string | null;
+  nameSecond: string | null;
 };
 
 type PersonsContextType = {
@@ -26,9 +28,11 @@ export const PersonsProvider: React.FC<PersonsProviderProps> = ({
   const [persons, setPersons] = useState<PersonsType>(() => {
     if (typeof window !== 'undefined') {
       const localData = localStorage.getItem('inventory.persons');
-      return localData ? JSON.parse(localData) : { first: null, second: null };
+      return localData
+        ? JSON.parse(localData)
+        : { first: null, nameFirst: null, second: null, nameSecond: null };
     }
-    return { first: null, second: null };
+    return { first: null, nameFirst: null, second: null, nameSecond: null };
   });
 
   useLayoutEffect(() => {
