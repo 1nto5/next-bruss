@@ -3,10 +3,13 @@
 import { connectToMongo } from '@/lib/mongo/connector';
 import moment from 'moment';
 import crypto from 'crypto';
+import { getLastNameFirstLetter } from './lib/utils/nameFormat';
 
 type PersonsType = {
   first: string | null;
+  nameFirst: string | null;
   second: string | null;
+  nameSecond: string | null;
 };
 
 type CardOption = {
@@ -29,15 +32,15 @@ export async function Login(personalNumber: string, password: string) {
     const collection = await connectToMongo('persons');
     const person = await collection.findOne({ personalNumber });
     if (!person) {
-      return false;
+      return null;
     }
     if (password !== person.password) {
-      return false;
+      return null;
     }
-    return true;
+    return person.name;
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred during login process.');
+    throw new Error('An error occurred during the login process.');
   }
 }
 
@@ -163,6 +166,7 @@ export async function GetExistingPositions(card: number, persons: PersonsType) {
     ) {
       return 'no access';
     }
+    console.log(existingCard);
     if (!card || !Array.isArray(existingCard.positions)) {
       return [];
     }
@@ -289,17 +293,15 @@ export async function GetPosition(
 
 // Generates a unique identifier for a position
 // TODO: format the identifier: K001P01LBAA
-function generateUniqueIdentifier(): string {
-  const year = new Date().getFullYear().toString().slice(-2);
-  const week = moment().week().toString().padStart(2, '0');
-  let randomLetters = '';
-  while (randomLetters.length < 4) {
-    const randomBytes = crypto.randomBytes(3).toString('base64');
-    const extractedLetters = randomBytes.replace(/[^a-zA-Z]/g, '');
-    randomLetters += extractedLetters;
-  }
-  randomLetters = randomLetters.substring(0, 4).toUpperCase();
-  return `${year}${randomLetters}${week}`;
+function generateIdentifier(
+  card: number,
+  position: number,
+  persons: PersonsType,
+): string {
+  const personInitials =
+    getLastNameFirstLetter(persons.nameFirst || '') +
+    getLastNameFirstLetter(persons.nameSecond || '');
+  return `${card}${personInitials}${position}`;
 }
 
 // Saves a position to the database
@@ -318,7 +320,7 @@ export async function SavePosition(
     let isUnique = false;
     let identifier;
     while (!isUnique) {
-      identifier = generateUniqueIdentifier();
+      identifier = generateIdentifier(card, position, persons);
       const allIdentifiers = await collection
         .find({}, { projection: { 'positions.identifier': 1 } })
         .toArray();

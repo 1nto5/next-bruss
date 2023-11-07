@@ -31,7 +31,7 @@ export default function Position() {
   const [fullCard, setFullCard] = useState(false);
 
   useEffect(() => {
-    async () => {
+    (async () => {
       if (
         inventoryContext?.inventory.card &&
         personsContext?.persons.first &&
@@ -43,18 +43,23 @@ export default function Position() {
             inventoryContext?.inventory.card,
             personsContext?.persons,
           );
+
           if (res === 'no access') {
             inventoryContext.setInventory((prevState) => ({
               ...prevState,
               card: null,
+              position: null,
             }));
             return;
           }
+
+          console.log('res:', res);
           if (res) {
             setExistingPositionNumbers(res);
           } else {
             setErrorMessage('Skontaktuj się z IT!');
           }
+
           const full = await CheckIsFull(inventoryContext?.inventory.card);
           if (full) {
             setFullCard(true);
@@ -66,7 +71,7 @@ export default function Position() {
           setIsPendingExistingPositions(false);
         }
       }
-    };
+    })();
   }, [inventoryContext, personsContext?.persons]);
 
   const selectedOption = existingPositionNumbers.find(
