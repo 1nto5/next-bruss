@@ -41,7 +41,7 @@ export default function UserInfo() {
             </p>
 
             <Link href={'/inventory-approve'}>
-              <button className='rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100'>
+              <button className='rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
                 inventory approve app
               </button>
             </Link>
