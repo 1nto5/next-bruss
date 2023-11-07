@@ -25,14 +25,14 @@ export const PersonsProvider: React.FC<PersonsProviderProps> = ({
 }) => {
   const [persons, setPersons] = useState<PersonsType>(() => {
     if (typeof window !== 'undefined') {
-      const localData = localStorage.getItem('inventoryPersons');
+      const localData = localStorage.getItem('inventory.persons');
       return localData ? JSON.parse(localData) : { first: null, second: null };
     }
     return { first: null, second: null };
   });
 
   useLayoutEffect(() => {
-    localStorage.setItem('inventoryPersons', JSON.stringify(persons));
+    localStorage.setItem('inventory.persons', JSON.stringify(persons));
   }, [persons]);
 
   return (
