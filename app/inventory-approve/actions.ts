@@ -1,8 +1,7 @@
 'use server';
 
 import { connectToMongo } from '@/lib/mongo/connector';
-import moment from 'moment';
-import crypto from 'crypto';
+import { formatEmailToInitials } from './lib/utils/nameFormat';
 
 type PersonsType = {
   first: string | null;
@@ -26,7 +25,7 @@ const warehouseSelectOptions = [
   // { value: 999, label: '999 - WIP' },
 ];
 
-export async function GetAllCards(): Promise<CardOption[]> {
+export async function getAllCards(): Promise<CardOption[]> {
   try {
     const collection = await connectToMongo('inventory_cards');
     const cards = await collection.find({}).toArray();
@@ -37,7 +36,7 @@ export async function GetAllCards(): Promise<CardOption[]> {
       return {
         value: card.number,
         label: warehouseOption
-          ? `${card.number} - ${warehouseOption.label}`
+          ? `K: ${card.number} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${warehouseOption.label}`
           : 'wrong warehouse',
       };
     });
@@ -49,18 +48,32 @@ export async function GetAllCards(): Promise<CardOption[]> {
   }
 }
 
-export async function GetAllPositions() {
+type PositionOption = {
+  value: string;
+  label: string;
+  card: number;
+  position: number;
+};
+
+export async function getAllPositions(): Promise<PositionOption[]> {
   try {
     const collection = await connectToMongo('inventory_cards');
     const cards = await collection.find({}).toArray();
-    const positions = cards.flatMap((card) =>
-      Array.isArray(card.positions) ? card.positions : [],
-    );
 
-    const formattedPositions = positions.map((position) => ({
-      value: position.identifier,
-      label: `${position.identifier} - ${position.articleNumber} - ${position.articleName} - ${position.quantity} ${position.unit}`,
-    }));
+    let formattedPositions: PositionOption[] = [];
+
+    cards.forEach((card) => {
+      if (Array.isArray(card.positions)) {
+        card.positions.forEach((pos) => {
+          formattedPositions.push({
+            value: pos.identifier,
+            label: `K: ${card.number} | P: ${pos.position} | art: ${pos.articleNumber} - ${pos.articleName} | ilość: ${pos.quantity} ${pos.unit} | id: ${pos.identifier} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${card.warehouse}`,
+            card: card.number,
+            position: pos.position,
+          });
+        });
+      }
+    });
 
     return formattedPositions;
   } catch (error) {
@@ -70,7 +83,7 @@ export async function GetAllPositions() {
 }
 
 // Finds the lowest free card number
-export async function FindLowestFreeCardNumber() {
+export async function findLowestFreeCardNumber() {
   try {
     const collection = await connectToMongo('inventory_cards');
     const cardNumbers = await collection
@@ -101,7 +114,7 @@ export async function FindLowestFreeCardNumber() {
   }
 }
 
-export async function ReserveCard(
+export async function reserveCard(
   cardNumber: number,
   persons: PersonsType,
   warehouse: string,
@@ -146,24 +159,32 @@ type PositionObject = {
   quantity: number;
   unit: string;
   wip: boolean;
-  creators: string[];
+  creators?: string[];
   approved?: string;
 };
 
 // Gets existing positions for a given card
-export async function GetExistingPositions(card: number) {
+export async function getExistingPositions(card: number) {
   try {
     const collection = await connectToMongo('inventory_cards');
     const existingCard = await collection.findOne({ number: card });
     if (!existingCard || !Array.isArray(existingCard.positions)) {
       return [];
     }
+
     const existingPositionsSelectOptions = existingCard.positions.map(
-      (pos: PositionObject) => ({
+      (pos) => ({
         value: pos.position,
-        label: `P: ${pos.position} A:${pos.articleNumber} - ${pos.articleName} Q: ${pos.quantity} ${pos.unit} I: ${pos.identifier} U: ${pos.creators}`,
+        label: `K: ${existingCard.number} | P: ${pos.position} | art: ${
+          pos.articleNumber
+        } - ${pos.articleName} | ilość: ${pos.quantity} ${pos.unit} | id: ${
+          pos.identifier
+        } | osoby: ${existingCard.creators.join(' + ')} | sektor: ${
+          existingCard.warehouse
+        }`,
       }),
     );
+
     return existingPositionsSelectOptions;
   } catch (error) {
     console.error(error);
@@ -174,7 +195,7 @@ export async function GetExistingPositions(card: number) {
 }
 
 // Checks if a card is full
-export async function CheckIsFull(cardNumber: number) {
+export async function checkIsFull(cardNumber: number) {
   const collection = await connectToMongo('inventory_cards');
   const card = await collection.findOne({ number: cardNumber });
   if (card?.position && card?.positions.length === 25) {
@@ -184,7 +205,7 @@ export async function CheckIsFull(cardNumber: number) {
 }
 
 // Gets a list of articles
-export async function GetArticlesOptions() {
+export async function getArticlesOptions() {
   try {
     const collection = await connectToMongo('inventory_articles');
     const articles = await collection.find({}).toArray();
@@ -205,11 +226,7 @@ export async function GetArticlesOptions() {
 }
 
 // Gets a position for a given card and position number
-export async function GetPosition(
-  card: number,
-  position: number,
-  persons: PersonsType,
-) {
+export async function getPosition(card: number, position: number) {
   try {
     const collection = await connectToMongo('inventory_cards');
     const existingCard = await collection.findOne({ number: card });
@@ -217,12 +234,7 @@ export async function GetPosition(
     if (!existingCard) {
       return { status: 'no card' };
     }
-    if (
-      !existingCard.creators.includes(persons.first) ||
-      !existingCard.creators.includes(persons.second)
-    ) {
-      return { status: 'no access' };
-    }
+
     if (position < 1 || position > 25) {
       return { status: 'wrong position' };
     }
@@ -252,8 +264,7 @@ export async function GetPosition(
   }
 }
 
-// Saves a position to the database
-export async function SavePosition(
+export async function savePosition(
   card: number,
   position: number,
   articleNumber: number,
@@ -261,38 +272,51 @@ export async function SavePosition(
   quantity: number,
   unit: string,
   wip: boolean,
+  editor: string,
 ) {
   try {
     const collection = await connectToMongo('inventory_cards');
 
-    const currentDate = new Date().toISOString();
-    const positionData = {
-      position: position,
-      time: currentDate,
-      articleNumber: articleNumber,
-      articleName: articleName,
-      quantity: quantity,
-      unit: unit,
-      wip: wip,
+    const updateFields = {
+      'positions.$.articleNumber': articleNumber,
+      'positions.$.articleName': articleName,
+      'positions.$.quantity': quantity,
+      'positions.$.unit': unit,
+      'positions.$.wip': wip,
+      'positions.$.editor': editor,
+      'positions.$.editor-time': new Date(),
     };
+
     const updateResult = await collection.updateOne(
-      {
-        'number': card,
-        'positions.position': position,
-      },
-      {
-        $set: { 'positions.$': positionData },
-      },
+      { 'number': card, 'positions.position': position },
+      { $set: updateFields },
     );
+
     if (updateResult.matchedCount === 0) {
+      const identifier = `${card}${formatEmailToInitials(editor)}${position}`;
       const insertResult = await collection.updateOne(
         { number: card },
         {
-          $push: { positions: positionData },
+          $push: {
+            positions: {
+              position,
+              identifier,
+              articleNumber,
+              articleName,
+              quantity,
+              unit,
+              wip,
+              editor,
+              'editor-time': new Date(),
+            },
+          },
         },
       );
       if (insertResult.modifiedCount > 0) {
-        return { status: 'added' };
+        return {
+          status: 'added',
+          identifier,
+        };
       } else {
         return { status: 'not added' };
       }

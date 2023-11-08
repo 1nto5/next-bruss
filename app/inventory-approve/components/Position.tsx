@@ -3,11 +3,7 @@
 import { useState, useEffect, useContext } from 'react';
 import clsx from 'clsx';
 import { InventoryContext } from '../lib/InventoryContext';
-import {
-  GetExistingPositions,
-  FindLowestFreePosition,
-  CheckIsFull,
-} from '../actions';
+import { getExistingPositions, checkIsFull } from '../actions';
 import Select from './Select';
 
 type Option = {
@@ -30,23 +26,12 @@ export default function Position() {
 
   useEffect(() => {
     (async () => {
-      if (
-        inventoryContext?.inventory.card &&
-      ) {
+      if (inventoryContext?.inventory.card) {
         setIsPendingExistingPositions(true);
         try {
-          const res = await GetExistingPositions(
-            inventoryContext?.inventory.card
+          const res = await getExistingPositions(
+            inventoryContext?.inventory.card,
           );
-
-          if (res === 'no access') {
-            inventoryContext.setInventory((prevState) => ({
-              ...prevState,
-              card: null,
-              position: null,
-            }));
-            return;
-          }
 
           console.log('res:', res);
           if (res) {
@@ -55,7 +40,7 @@ export default function Position() {
             setErrorMessage('Skontaktuj się z IT!');
           }
 
-          const full = await CheckIsFull(inventoryContext?.inventory.card);
+          const full = await checkIsFull(inventoryContext?.inventory.card);
           if (full) {
             setFullCard(true);
           }
@@ -67,7 +52,7 @@ export default function Position() {
         }
       }
     })();
-  }, [inventoryContext, personsContext?.persons]);
+  }, [inventoryContext?.inventory.card]);
 
   const selectedOption = existingPositionNumbers.find(
     (option) => option.value === positionNumber,
@@ -82,39 +67,6 @@ export default function Position() {
       return;
     }
     setErrorMessage('Pozycja nie została wybrana!');
-  };
-
-  const handleFirstFree = async () => {
-    try {
-      if (
-        personsContext?.persons.first &&
-        personsContext.persons.second &&
-        inventoryContext?.inventory.card
-      ) {
-        setIsPendingFirstFree(true);
-        const res = await FindLowestFreePosition(
-          inventoryContext?.inventory.card,
-        );
-        if (res === 'full') {
-          setErrorMessage('Karta jest pełna!');
-          return;
-        }
-        if (res) {
-          inventoryContext.setInventory((prevState) => ({
-            ...prevState,
-            position: res,
-          }));
-          return;
-        }
-        setErrorMessage(`Skontaktuj się z IT!`);
-        return;
-      }
-    } catch (error) {
-      console.error('Failed to find lowest free position:', error);
-      setErrorMessage(`Skontaktuj się z IT!`);
-    } finally {
-      setIsPendingFirstFree(false);
-    }
   };
 
   const handleSelectChange = (selectedOption: Option | null) => {
@@ -159,31 +111,13 @@ export default function Position() {
           />
 
           <div className='flex w-full justify-center space-x-2'>
-            {!fullCard && (
-              <button
-                type='button'
-                onClick={handleFirstFree}
-                className={clsx(
-                  'w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600',
-                  { 'animate-pulse': isPendingFirstFree === true },
-                )}
-              >
-                {isPendingFirstFree
-                  ? 'wyszukiwanie pozycji'
-                  : existingPositionNumbers.length > 0
-                  ? 'pierwsza wolna'
-                  : 'rozpocznij kartę'}
-              </button>
-            )}
-            {existingPositionNumbers.length > 0 && (
-              <button
-                type='submit'
-                onClick={handleConfirm}
-                className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
-              >
-                potwierdź
-              </button>
-            )}
+            <button
+              type='submit'
+              onClick={handleConfirm}
+              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+            >
+              potwierdź
+            </button>
           </div>
         </div>
       </div>

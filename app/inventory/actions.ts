@@ -1,8 +1,6 @@
 'use server';
 
 import { connectToMongo } from '@/lib/mongo/connector';
-import moment from 'moment';
-import crypto from 'crypto';
 import { getLastNameFirstLetter } from './lib/utils/nameFormat';
 
 type PersonsType = {
@@ -335,11 +333,11 @@ export async function SavePosition(
         isUnique = true;
       }
     }
-    const currentDate = new Date().toISOString();
+
     const positionData = {
       position: position,
       identifier: identifier,
-      time: currentDate,
+      time: new Date(),
       articleNumber: articleNumber,
       articleName: articleName,
       quantity: quantity,

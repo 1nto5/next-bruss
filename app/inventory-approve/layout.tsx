@@ -20,7 +20,7 @@ export default async function Layout({
   if (!session?.user?.roles?.includes('inventory-approve')) {
     return (
       <div className='text-center'>
-        <p className='mt-10'>No access to inventory application!</p>
+        <p className='mt-10'>No access to inventory approve application!</p>
       </div>
     );
   }

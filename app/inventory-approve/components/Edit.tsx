@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useContext, use } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import clsx from 'clsx';
 import { InventoryContext } from '../lib/InventoryContext';
 import useSWR from 'swr';
-import { GetPosition, SavePosition, GetArticlesOptions } from '../actions';
+import { getPosition, getArticlesOptions, savePosition } from '../actions';
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
 
 type Article = {
   value: string;
@@ -18,7 +19,10 @@ type Article = {
   max: number;
 };
 
+// TODO: add approve and delete trash
+
 export default function Edit() {
+  const { data: session } = useSession();
   const inventoryContext = useContext(InventoryContext);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -26,7 +30,7 @@ export default function Edit() {
   const [isPendingSaving, setIsPendingSaving] = useState(false);
   const { data: articlesOptions, error: getArticlesOptionsError } = useSWR<
     Article[]
-  >('articlesOptionsKey', GetArticlesOptions);
+  >('articlesOptionsKey', getArticlesOptions);
   const [wip, setWip] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
@@ -61,7 +65,7 @@ export default function Edit() {
       ) {
         try {
           setIsPendingPosition(true);
-          const positionData = await GetPosition(
+          const positionData = await getPosition(
             inventoryContext?.inventory.card,
             inventoryContext.inventory.position,
           );
@@ -119,14 +123,9 @@ export default function Edit() {
     })();
   }, [articlesOptions, inventoryContext, inventoryContext?.inventory.position]);
 
-  // save position
-  const savePosition = async () => {
+  const handleSavePosition = async () => {
     if (identifier !== '') {
-      if (
-        !window.confirm(
-          'Czy na pewno chcesz ponownie zapisać pozycję? Spowoduje to wygenerowanie nowego identyfikatora i konieczność jego zapisania na inwentaryzowanym artykule.',
-        )
-      ) {
+      if (!window.confirm('Czy na pewno chcesz zmodyfikować pozycję?')) {
         return;
       }
     }
@@ -182,13 +181,9 @@ export default function Edit() {
           finalQuantity = quantity;
         }
 
-        if (
-          selectedArticle &&
-          personsContext?.persons.first &&
-          personsContext?.persons.second
-        ) {
+        if (selectedArticle && session?.user.email) {
           setIsPendingSaving(true);
-          const res = await SavePosition(
+          const res = await savePosition(
             inventoryContext.inventory.card,
             inventoryContext.inventory.position,
             selectedArticle.number,
@@ -196,24 +191,22 @@ export default function Edit() {
             finalQuantity,
             selectedArticle.unit,
             wip,
-            personsContext.persons,
+            session?.user.email,
           );
-
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier);
             setMessage(
-              `Pozycja: ${inventoryContext.inventory.position} zapisana!`,
+              `Pozycja: ${inventoryContext.inventory.position} dodana!`,
             );
             setBlockNextPosition(false);
           } else if (res?.status === 'updated') {
-            res?.identifier && setIdentifier(res?.identifier);
             setMessage(
               `Pozycja: ${inventoryContext.inventory.position} zaktualizowana!`,
             );
             setBlockNextPosition(false);
           } else if (
-            res?.status === 'not added' ||
-            res?.status === 'not updated'
+            res?.status === 'not updated' ||
+            res?.status === 'not added'
           ) {
             setErrorMessage('Skontaktuj się z IT!');
           }
@@ -357,7 +350,7 @@ export default function Edit() {
               <FaArrowLeft />
             </button>
             <button
-              onClick={savePosition}
+              onClick={handleSavePosition}
               disabled={approved}
               className={clsx(
                 `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
@@ -368,7 +361,18 @@ export default function Edit() {
             >
               {isPendingSaving ? 'zapisywanie' : 'zapisz'}
             </button>
-
+            {/* <button
+              onClick={savePosition}
+              disabled={approved}
+              className={clsx(
+                `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
+                  approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
+                } dark:bg-slate-700 dark:text-slate-100`,
+                { 'animate-pulse': isPendingSaving === true },
+              )}
+            >
+              {isPendingSaving ? 'zapisywanie' : 'zapisz'}
+            </button> */}
             <button
               onClick={() => {
                 if (!blockNextPosition) {

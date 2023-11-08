@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react';
 import { InventoryContext } from '../lib/InventoryContext';
-import { GetAllCards, GetAllPositions } from '../actions';
+import { getAllCards, getAllPositions } from '../actions';
 import Select from './Select';
 import clsx from 'clsx';
 
@@ -11,17 +11,25 @@ type Option = {
   label: string;
 };
 
+type PositionOption = {
+  value: string;
+  label: string;
+  card: number;
+  position: number;
+};
+
 export default function CardOrPosition() {
   const inventoryContext = useContext(InventoryContext);
   const [isPendingExistingCards, setIsPendingExistingCards] = useState(true);
   const [isPendingExistingPositions, setIsPendingExistingPositions] =
     useState(false);
   const [cardNumber, setCardNumber] = useState<string | null>(null);
-  const [warehouse, setWarehouse] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [existingCards, setExistingCards] = useState<Option[]>([]);
-  const [existingPositions, setExistingPositions] = useState<Option[]>([]);
+  const [existingPositions, setExistingPositions] = useState<PositionOption[]>(
+    [],
+  );
   const [positionIdentifier, setPositionIdentifier] = useState<string | null>(
     null,
   );
@@ -30,7 +38,7 @@ export default function CardOrPosition() {
     (async () => {
       setIsPendingExistingCards(true);
       try {
-        const cards = await GetAllCards();
+        const cards = await getAllCards();
         setExistingCards(cards);
       } catch (error) {
         console.error('Error fetching existing cards:', error);
@@ -45,7 +53,7 @@ export default function CardOrPosition() {
     (async () => {
       setIsPendingExistingPositions(true);
       try {
-        const positions = await GetAllPositions();
+        const positions = await getAllPositions();
         setExistingPositions(positions);
       } catch (error) {
         console.error('Error fetching existing positins:', error);
@@ -78,26 +86,30 @@ export default function CardOrPosition() {
     }
   };
 
-  const warehouseSelectOptions = [
-    { value: '000', label: '000 - Rohstolfe und Fertigteile' },
-    { value: '035', label: '035 - Metalteile Taicang' },
-    { value: '054', label: '054 - Magazyn wstrzymanych' },
-    { value: '055', label: '055 - Cz.zablokowane GTM' },
-    { value: '111', label: '111 - Magazyn Launch' },
-    { value: '222', label: '222 - Magazyn zablokowany produkcja' },
-    // { value: 999, label: '999 - WIP' },
-  ];
-
   const handleConfirm = (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (cardNumber) {
       inventoryContext?.setInventory((prevState) => ({
         ...prevState,
         card: parseInt(cardNumber),
         position: null,
       }));
-      return;
+    } else if (positionIdentifier) {
+      const selectedOption = existingPositions.find(
+        (option) => option.value === positionIdentifier,
+      );
+
+      if (selectedOption) {
+        inventoryContext?.setInventory((prevState) => ({
+          ...prevState,
+          card: selectedOption.card,
+          position: selectedOption.position,
+        }));
+      }
+    } else {
+      setErrorMessage('Nie wybrano karty ani pozycji!');
     }
-    setErrorMessage('Nie wybrano karty!');
   };
 
   return (
