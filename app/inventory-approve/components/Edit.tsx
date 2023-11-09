@@ -4,10 +4,16 @@ import { useState, useEffect, useContext } from 'react';
 import clsx from 'clsx';
 import { InventoryContext } from '../lib/InventoryContext';
 import useSWR from 'swr';
-import { getPosition, getArticlesOptions, savePosition } from '../actions';
+import {
+  getPosition,
+  getArticlesOptions,
+  savePosition,
+  approvePosition,
+} from '../actions';
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
+import formatEmailToName from '@/lib/utils/formatEmailToName';
 
 type Article = {
   value: string;
@@ -98,10 +104,12 @@ export default function Edit() {
             setQuantity(positionData.positionOnCard.quantity);
             setWip(positionData.positionOnCard.wip);
             setSelectedUnit(positionData.positionOnCard.unit);
-            if (positionData.positionOnCard.approved) {
+            if (positionData.positionOnCard.approver) {
               setApproved(true);
               setErrorMessage(
-                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${positionData.position.approved}!`,
+                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${formatEmailToName(
+                  positionData.positionOnCard.approver,
+                )}!`,
               );
             }
             setBlockNextPosition(false);
@@ -122,6 +130,10 @@ export default function Edit() {
       }
     })();
   }, [articlesOptions, inventoryContext, inventoryContext?.inventory.position]);
+
+  const selectArticle = (option: Article | null) => {
+    setSelectedArticle(option);
+  };
 
   const handleSavePosition = async () => {
     if (identifier !== '') {
@@ -219,8 +231,31 @@ export default function Edit() {
     }
   };
 
-  const selectArticle = (option: Article | null) => {
-    setSelectedArticle(option);
+  const handleApprovePosition = async () => {
+    if (identifier !== '') {
+      if (!window.confirm('Czy na pewno chcesz zatwierdzić pozycję?')) {
+        return;
+      }
+      try {
+        if (
+          inventoryContext?.inventory.card &&
+          inventoryContext?.inventory.position &&
+          session?.user.email
+        ) {
+          const res = await approvePosition(
+            inventoryContext?.inventory.card,
+            inventoryContext?.inventory.position,
+            session?.user.email,
+          );
+          if (res.status === 'approved') {
+            setApproved(true);
+            setMessage(
+              `Pozycja: ${inventoryContext.inventory.position} zatwierdzona!`,
+            );
+          }
+        }
+      } catch (error) {}
+    }
   };
 
   return (
@@ -361,18 +396,20 @@ export default function Edit() {
             >
               {isPendingSaving ? 'zapisywanie' : 'zapisz'}
             </button>
-            {/* <button
-              onClick={savePosition}
-              disabled={approved}
-              className={clsx(
-                `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
-                  approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
-                } dark:bg-slate-700 dark:text-slate-100`,
-                { 'animate-pulse': isPendingSaving === true },
-              )}
-            >
-              {isPendingSaving ? 'zapisywanie' : 'zapisz'}
-            </button> */}
+            {identifier && (
+              <button
+                onClick={handleApprovePosition}
+                disabled={approved}
+                className={clsx(
+                  `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
+                    approved ? 'cursor-not-allowed' : 'hover:bg-bruss'
+                  } dark:bg-slate-700 dark:text-slate-100`,
+                  { 'animate-pulse': isPendingSaving === true },
+                )}
+              >
+                {isPendingSaving ? 'zatwierdzanie' : 'zatwierdź'}
+              </button>
+            )}
             <button
               onClick={() => {
                 if (!blockNextPosition) {

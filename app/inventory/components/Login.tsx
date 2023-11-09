@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, useState, useRef } from 'react';
-import { Login } from '../actions';
+import { login } from '../actions';
 import { PersonsContext } from '../lib/PersonsContext';
 import clsx from 'clsx';
 
@@ -42,7 +42,7 @@ export default function LoginForm() {
 
     setIsPending(true);
     try {
-      const res = await Login(formState.personalNumber, formState.password);
+      const res = await login(formState.personalNumber, formState.password);
       if (!res) {
         setErrorMessage('Dane niepoprawne!');
         return;

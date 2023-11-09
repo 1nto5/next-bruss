@@ -4,9 +4,9 @@ import { useState, useEffect, useContext } from 'react';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import {
-  FindLowestFreeCardNumber,
-  GetExistingCards,
-  ReserveCard,
+  findLowestFreeCardNumber,
+  getExistingCards,
+  reserveCard,
 } from '../actions';
 import Select from './Select';
 import clsx from 'clsx';
@@ -32,7 +32,7 @@ export default function Card() {
       if (personsContext?.persons.first && personsContext?.persons.second) {
         setIsPendingExistingCards(true);
         try {
-          const cards = await GetExistingCards(personsContext.persons);
+          const cards = await getExistingCards(personsContext.persons);
           setExistingCards(cards);
         } catch (error) {
           console.error('Error fetching existing cards:', error);
@@ -84,8 +84,8 @@ export default function Card() {
     try {
       setIsPendingNewCard(true);
       if (personsContext?.persons.first && personsContext?.persons.second) {
-        const number = await FindLowestFreeCardNumber();
-        const res = await ReserveCard(
+        const number = await findLowestFreeCardNumber();
+        const res = await reserveCard(
           number,
           personsContext.persons,
           warehouse,

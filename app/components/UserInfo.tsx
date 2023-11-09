@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import formatEmailToName from '@/lib/utils/inventory/formatEmailToName';
+import formatEmailToName from '@/lib/utils/formatEmailToName';
 
 export default function UserInfo() {
   const { data: session } = useSession();

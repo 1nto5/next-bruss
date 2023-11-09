@@ -5,9 +5,9 @@ import clsx from 'clsx';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import {
-  GetExistingPositions,
-  FindLowestFreePosition,
-  CheckIsFull,
+  getExistingPositions,
+  findLowestFreePosition,
+  checkIsFull,
 } from '../actions';
 import Select from './Select';
 
@@ -39,7 +39,7 @@ export default function Position() {
       ) {
         setIsPendingExistingPositions(true);
         try {
-          const res = await GetExistingPositions(
+          const res = await getExistingPositions(
             inventoryContext?.inventory.card,
             personsContext?.persons,
           );
@@ -52,15 +52,13 @@ export default function Position() {
             }));
             return;
           }
-
-          console.log('res:', res);
           if (res) {
             setExistingPositionNumbers(res);
           } else {
             setErrorMessage('Skontaktuj się z IT!');
           }
 
-          const full = await CheckIsFull(inventoryContext?.inventory.card);
+          const full = await checkIsFull(inventoryContext?.inventory.card);
           if (full) {
             setFullCard(true);
           }
@@ -97,7 +95,7 @@ export default function Position() {
         inventoryContext?.inventory.card
       ) {
         setIsPendingFirstFree(true);
-        const res = await FindLowestFreePosition(
+        const res = await findLowestFreePosition(
           inventoryContext?.inventory.card,
         );
         if (res === 'full') {

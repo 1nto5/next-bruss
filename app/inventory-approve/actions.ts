@@ -31,16 +31,23 @@ export async function getAllCards(): Promise<CardOption[]> {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection(collectionName);
+    const collection = db.collection('inventory_cards');
     const cards = await collection.find({}).toArray();
+
     const cardOptions = cards.map((card) => {
+      const totalPositions = card.positions.length;
+      const approvedPositions = card.positions.filter(
+        (p: any) => p.approver,
+      ).length;
+
       const warehouseOption = warehouseSelectOptions.find(
         (option) => option.value === card.warehouse,
       );
+
       return {
         value: card.number,
         label: warehouseOption
-          ? `K: ${card.number} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${warehouseOption.label}`
+          ? `K: ${card.number} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${warehouseOption.label} | zatwierdzone: ${approvedPositions}/${totalPositions}`
           : 'wrong warehouse',
       };
     });
@@ -73,7 +80,15 @@ export async function getAllPositions(): Promise<PositionOption[]> {
         card.positions.forEach((pos) => {
           formattedPositions.push({
             value: pos.identifier,
-            label: `K: ${card.number} | P: ${pos.position} | art: ${pos.articleNumber} - ${pos.articleName} | ilość: ${pos.quantity} ${pos.unit} | id: ${pos.identifier} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${card.warehouse}`,
+            label: `${pos.approver ? 'zatwierdzona | ' : ''} K: ${
+              card.number
+            } | P: ${pos.position} | art: ${pos.articleNumber} - ${
+              pos.articleName
+            } | ilość: ${pos.quantity} ${pos.unit} | id: ${
+              pos.identifier
+            } | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${
+              card.warehouse
+            }`,
             card: card.number,
             position: pos.position,
           });
@@ -187,9 +202,11 @@ export async function getExistingPositions(card: number) {
     const existingPositionsSelectOptions = existingCard.positions.map(
       (pos) => ({
         value: pos.position,
-        label: `K: ${existingCard.number} | P: ${pos.position} | art: ${
-          pos.articleNumber
-        } - ${pos.articleName} | ilość: ${pos.quantity} ${pos.unit} | id: ${
+        label: `${pos.approver ? 'zatwierdzona | ' : ''}K: ${
+          existingCard.number
+        } | P: ${pos.position} | art: ${pos.articleNumber} - ${
+          pos.articleName
+        } | ilość: ${pos.quantity} ${pos.unit} | id: ${
           pos.identifier
         } | osoby: ${existingCard.creators.join(' + ')} | sektor: ${
           existingCard.warehouse
@@ -223,7 +240,7 @@ export async function getArticlesOptions() {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection(collectionName);
+    const collection = db.collection('inventory_articles');
     const articles = await collection.find({}).toArray();
     const formattedArticles = articles.map((article) => ({
       value: article.number as string,
@@ -350,5 +367,35 @@ export async function savePosition(
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving the position.');
+  }
+}
+
+export async function approvePosition(
+  card: number,
+  position: number,
+  approver: string,
+) {
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+
+    const updateResult = await collection.updateOne(
+      { 'number': card, 'positions.position': position },
+      {
+        $set: {
+          'positions.$.approver': approver,
+          'positions.$.approver-time': new Date(),
+        },
+      },
+    );
+    if (updateResult.modifiedCount > 0) {
+      return { status: 'approved' };
+    } else {
+      return { status: 'not approved' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while approving the position.');
   }
 }

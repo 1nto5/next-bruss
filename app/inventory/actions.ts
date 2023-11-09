@@ -27,7 +27,30 @@ const warehouseSelectOptions = [
   // { value: 999, label: '999 - WIP' },
 ];
 
-export async function Login(personalNumber: string, password: string) {
+// Gets a list of articles
+export async function getArticlesOptions() {
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection('inventory_articles');
+    const articles = await collection.find({}).toArray();
+    const formattedArticles = articles.map((article) => ({
+      value: article.number as string,
+      label: `${article.number} - ${article.name}` as string,
+      number: article.number as number,
+      name: article.name as string,
+      unit: article.unit as string,
+      converter: article.converter as number,
+      max: article.max as number,
+    }));
+    return formattedArticles;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the list of articles.');
+  }
+}
+
+export async function login(personalNumber: string, password: string) {
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -46,7 +69,7 @@ export async function Login(personalNumber: string, password: string) {
   }
 }
 
-export async function GetExistingCards(
+export async function getExistingCards(
   persons: PersonsType,
 ): Promise<CardOption[]> {
   try {
@@ -79,7 +102,7 @@ export async function GetExistingCards(
 }
 
 // Finds the lowest free card number
-export async function FindLowestFreeCardNumber() {
+export async function findLowestFreeCardNumber() {
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -112,7 +135,7 @@ export async function FindLowestFreeCardNumber() {
   }
 }
 
-export async function ReserveCard(
+export async function reserveCard(
   cardNumber: number,
   persons: PersonsType,
   warehouse: string,
@@ -164,7 +187,7 @@ type PositionObject = {
 };
 
 // Gets existing positions for a given card
-export async function GetExistingPositions(card: number, persons: PersonsType) {
+export async function getExistingPositions(card: number, persons: PersonsType) {
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -195,7 +218,7 @@ export async function GetExistingPositions(card: number, persons: PersonsType) {
 }
 
 // Finds the lowest free position for a given card
-export async function FindLowestFreePosition(cardNumber: number) {
+export async function findLowestFreePosition(cardNumber: number) {
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -224,7 +247,7 @@ export async function FindLowestFreePosition(cardNumber: number) {
 }
 
 // Checks if a card is full
-export async function CheckIsFull(cardNumber: number) {
+export async function checkIsFull(cardNumber: number) {
   const client = await clientPromise;
   const db = client.db();
   const collection = db.collection(collectionName);
@@ -235,31 +258,8 @@ export async function CheckIsFull(cardNumber: number) {
   return false;
 }
 
-// Gets a list of articles
-export async function GetArticlesOptions() {
-  try {
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-    const articles = await collection.find({}).toArray();
-    const formattedArticles = articles.map((article) => ({
-      value: article.number as string,
-      label: `${article.number} - ${article.name}` as string,
-      number: article.number as number,
-      name: article.name as string,
-      unit: article.unit as string,
-      converter: article.converter as number,
-      max: article.max as number,
-    }));
-    return formattedArticles;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while retrieving the list of articles.');
-  }
-}
-
 // Gets a position for a given card and position number
-export async function GetPosition(
+export async function getPosition(
   card: number,
   position: number,
   persons: PersonsType,
@@ -322,7 +322,7 @@ function generateIdentifier(
 }
 
 // Saves a position to the database
-export async function SavePosition(
+export async function savePosition(
   card: number,
   position: number,
   articleNumber: number,
@@ -364,7 +364,7 @@ export async function SavePosition(
       quantity: quantity,
       unit: unit,
       wip: wip,
-      user: [persons.first, persons.second],
+      persons: [persons.first, persons.second],
     };
     const updateResult = await collection.updateOne(
       {

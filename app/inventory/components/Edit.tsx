@@ -5,9 +5,10 @@ import clsx from 'clsx';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import useSWR from 'swr';
-import { GetPosition, SavePosition, GetArticlesOptions } from '../actions';
+import { getPosition, savePosition, getArticlesOptions } from '../actions';
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import formatEmailToName from '@/lib/utils/formatEmailToName';
 
 type Article = {
   value: string;
@@ -28,7 +29,7 @@ export default function Edit() {
   const [isPendingSaving, setIsPendingSaving] = useState(false);
   const { data: articlesOptions, error: getArticlesOptionsError } = useSWR<
     Article[]
-  >('articlesOptionsKey', GetArticlesOptions);
+  >('articlesOptionsKey', getArticlesOptions);
   const [wip, setWip] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [quantity, setQuantity] = useState(0);
@@ -65,7 +66,7 @@ export default function Edit() {
       ) {
         try {
           setIsPendingPosition(true);
-          const positionData = await GetPosition(
+          const positionData = await getPosition(
             inventoryContext?.inventory.card,
             inventoryContext.inventory.position,
             personsContext?.persons,
@@ -94,15 +95,18 @@ export default function Edit() {
               setBlockNextPosition(true);
             }
           }
+          console.log('positionData:', positionData);
           if (positionData.status == 'found') {
             setIdentifier(positionData.positionOnCard.identifier);
             setQuantity(positionData.positionOnCard.quantity);
             setWip(positionData.positionOnCard.wip);
             setSelectedUnit(positionData.positionOnCard.unit);
-            if (positionData.positionOnCard.approved) {
+            if (positionData.positionOnCard.approver) {
               setApproved(true);
               setErrorMessage(
-                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${positionData.position.approved}!`,
+                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${formatEmailToName(
+                  positionData.positionOnCard.approver,
+                )}!`,
               );
             }
             setBlockNextPosition(false);
@@ -130,7 +134,7 @@ export default function Edit() {
   ]);
 
   // save position
-  const savePosition = async () => {
+  const handleSavePosition = async () => {
     if (identifier !== '') {
       if (
         !window.confirm(
@@ -198,7 +202,7 @@ export default function Edit() {
           personsContext?.persons.second
         ) {
           setIsPendingSaving(true);
-          const res = await SavePosition(
+          const res = await savePosition(
             inventoryContext.inventory.card,
             inventoryContext.inventory.position,
             selectedArticle.number,
@@ -367,7 +371,7 @@ export default function Edit() {
               <FaArrowLeft />
             </button>
             <button
-              onClick={savePosition}
+              onClick={handleSavePosition}
               disabled={approved}
               className={clsx(
                 `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm ${
