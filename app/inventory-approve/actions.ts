@@ -1,6 +1,6 @@
 'use server';
 
-import { connectToMongo } from '@/lib/mongo/connector';
+import clientPromise from '@/lib/mongo';
 import { formatEmailToInitials } from './lib/utils/nameFormat';
 
 type PersonsType = {
@@ -15,6 +15,8 @@ type CardOption = {
   label: string;
 };
 
+const collectionName = 'inventory_cards';
+
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Rohstolfe und Fertigteile' },
   { value: '035', label: '035 - Metalteile Taicang' },
@@ -27,7 +29,9 @@ const warehouseSelectOptions = [
 
 export async function getAllCards(): Promise<CardOption[]> {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const cards = await collection.find({}).toArray();
     const cardOptions = cards.map((card) => {
       const warehouseOption = warehouseSelectOptions.find(
@@ -57,7 +61,9 @@ type PositionOption = {
 
 export async function getAllPositions(): Promise<PositionOption[]> {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const cards = await collection.find({}).toArray();
 
     let formattedPositions: PositionOption[] = [];
@@ -85,7 +91,9 @@ export async function getAllPositions(): Promise<PositionOption[]> {
 // Finds the lowest free card number
 export async function findLowestFreeCardNumber() {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const cardNumbers = await collection
       .find({}, { projection: { _id: 0, number: 1 } })
       .toArray();
@@ -120,7 +128,9 @@ export async function reserveCard(
   warehouse: string,
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const existingCard = await collection.findOne({ number: cardNumber });
 
     const hasAccess =
@@ -166,7 +176,9 @@ type PositionObject = {
 // Gets existing positions for a given card
 export async function getExistingPositions(card: number) {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const existingCard = await collection.findOne({ number: card });
     if (!existingCard || !Array.isArray(existingCard.positions)) {
       return [];
@@ -196,7 +208,9 @@ export async function getExistingPositions(card: number) {
 
 // Checks if a card is full
 export async function checkIsFull(cardNumber: number) {
-  const collection = await connectToMongo('inventory_cards');
+  const client = await clientPromise;
+  const db = client.db();
+  const collection = db.collection(collectionName);
   const card = await collection.findOne({ number: cardNumber });
   if (card?.position && card?.positions.length === 25) {
     return true;
@@ -207,7 +221,9 @@ export async function checkIsFull(cardNumber: number) {
 // Gets a list of articles
 export async function getArticlesOptions() {
   try {
-    const collection = await connectToMongo('inventory_articles');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const articles = await collection.find({}).toArray();
     const formattedArticles = articles.map((article) => ({
       value: article.number as string,
@@ -228,7 +244,9 @@ export async function getArticlesOptions() {
 // Gets a position for a given card and position number
 export async function getPosition(card: number, position: number) {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
     const existingCard = await collection.findOne({ number: card });
 
     if (!existingCard) {
@@ -275,7 +293,9 @@ export async function savePosition(
   editor: string,
 ) {
   try {
-    const collection = await connectToMongo('inventory_cards');
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     const updateFields = {
       'positions.$.articleNumber': articleNumber,

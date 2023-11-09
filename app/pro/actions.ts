@@ -1,5 +1,5 @@
 'use server';
-import { connectToMongo } from '@/lib/mongo/connector';
+import clientPromise from '@/lib/mongo';
 import { productionConfig } from '@/lib/utils/pro/config';
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr';
 import {
@@ -31,7 +31,9 @@ const collectionName = 'dmc';
 export async function countInBox(workplace: string, article: number) {
   try {
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Query the collection
     const count = await collection.countDocuments({
@@ -52,7 +54,9 @@ export async function countInBox(workplace: string, article: number) {
 export async function countOnPallet(workplace: string, article: number) {
   try {
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Query the collection
     const count = await collection.countDocuments({
@@ -174,7 +178,9 @@ export async function saveDmc(
     }
 
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Check for existing data
     const existingData = await collection.findOne({ dmc: dmc });
@@ -260,7 +266,9 @@ export async function saveHydraBatch(
     const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
 
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Check for existing data
     const existingData = await collection.findOne({ hydra_batch: qrBatch });
@@ -345,7 +353,9 @@ export async function savePalletBatch(
     }
 
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Check for existing data
     const existingData = await collection.findOne({ pallet_batch: qrBatch });

@@ -1,5 +1,5 @@
 'use server';
-import { connectToMongo } from '@/lib/mongo/connector';
+import clientPromise from '@/lib/mongo';
 import generatePalletQr from '@/lib/utils/pro/generatePalletQr';
 import { productionConfig } from '@/lib/utils/pro/config';
 
@@ -16,7 +16,7 @@ type ArticleConfigObject = {
   palletProc: string;
 };
 
-const collectionName = 'box_pallet';
+const collectionName = 'scans';
 
 export async function getPalletSize(article: number) {
   // Find the article configuration
@@ -64,7 +64,9 @@ export async function getArticleName(article: number) {
 export async function countOnPallet(article: number) {
   try {
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Query the collection
     const count = await collection.countDocuments({
@@ -142,7 +144,9 @@ export async function saveHydraBatch(
     const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
 
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Check for existing data
     const existingData = await collection.findOne({ hydra_batch: qrBatch });
@@ -220,7 +224,9 @@ export async function savePalletBatch(
     }
 
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Check for existing data
     const existingData = await collection.findOne({ pallet_batch: qrBatch });

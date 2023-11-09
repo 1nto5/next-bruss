@@ -1,7 +1,6 @@
 'use client';
 
 import { useContext } from 'react';
-import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import Card from './CardOrPosition';
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { connectToMongo } from '@/lib/mongo/connector';
+import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
 
 const collectionName = 'users';
@@ -18,7 +18,9 @@ function isValidPassword(password: string): boolean {
 export async function Register(email: string, password: string) {
   try {
     // Connect to MongoDB
-    const collection = await connectToMongo(collectionName);
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
     // Checking if a user with the given email already exists
     const existingUser = await collection.findOne({ email });

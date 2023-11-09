@@ -1,7 +1,7 @@
 import NextAuth, { SessionStrategy, Session, User } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { connectToMongo } from '@/lib/mongo/connector';
+import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
 const collectionName = 'users';
 
@@ -19,7 +19,9 @@ export const authOptions = {
       async authorize(credentials: CredentialsType) {
         const { email, password } = credentials;
         try {
-          const collection = await connectToMongo(collectionName);
+          const client = await clientPromise;
+          const db = client.db();
+          const collection = db.collection(collectionName);
           const user = await collection.findOne({
             email: `${email}`,
           });
