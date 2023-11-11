@@ -1,7 +1,7 @@
 'use server';
 
 import clientPromise from '@/lib/mongo';
-import { getLastNameFirstLetter } from './lib/utils/nameFormat';
+import { getLastNameFirstLetter } from '../../lib/utils/nameFormat';
 
 type PersonsType = {
   first: string | null;
@@ -308,8 +308,6 @@ export async function getPosition(
   }
 }
 
-// Generates a unique identifier for a position
-// TODO: format the identifier: K001P01LBAA
 function generateIdentifier(
   card: number,
   position: number,

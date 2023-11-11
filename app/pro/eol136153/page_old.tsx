@@ -1,21 +1,8 @@
 'use client';
 
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks';
-import { useDispatch } from 'react-redux';
 import { useEffect, useTransition } from 'react';
-import {
-  togglePending,
-  toggleIsFull136,
-  toggleIsFull153,
-  updateOnPallet136,
-  updateOnPallet153,
-  updatePalletSize136,
-  updatePalletSize153,
-  updateBoxSize136,
-  updateBoxSize153,
-} from '@/lib/redux/pro/136-153/workplaceSlice';
 import Status from './components/Status';
-import NumLogIn from '@/app/pro/136-153/components/NumLogIn';
+import NumLogIn from '@/app/pro/components/NumLogIn';
 import ScanHydraQr from './components/ScanHydraQr';
 import ScanPalletQr from './components/ScanPalletQr';
 import PrintPalletLabel from './components/PrintPalletLabel';
@@ -24,10 +11,10 @@ import { countOnPallet, getPalletSize, getBoxSize } from './actions';
 
 import toast from 'react-hot-toast';
 
-const lArticle = 28067;
-const rArticle = 28042;
+const lArticle = '28067';
+const rArticle = '28042';
 
-export default function OnlyPalletLabel() {
+export default function Page() {
   const operatorLogged = useAppSelector((state) => state.operator.loggedIn);
   const lastScan = useAppSelector((state) => state.workplace.lastScan);
 

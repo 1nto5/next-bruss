@@ -1,14 +1,11 @@
 'use client';
 
-//TODO multi person login
-
-import { useState, FormEvent } from 'react';
-import checkOperator from '@/app/pro/lib/utils/checkOperator';
-import { logIn } from '@/lib/redux/pro/dmc-box-pallet/operatorSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/lib/redux/pro/dmc-box-pallet/store';
+import { useState, FormEvent, useContext } from 'react';
+import { PersonContext } from '../lib/PersonContext';
+import { loginPerson } from '../actions';
 
 import toast from 'react-hot-toast';
+import { login } from '@/app/inventory/actions';
 
 type NumberButtonProps = {
   onClick: () => void;
@@ -28,9 +25,9 @@ const NumberButton: React.FC<NumberButtonProps> = ({ onClick, value }) => (
 const NumLogIn = () => {
   const [personalNumber, setPersonalNumber] = useState('');
 
-  const dispatch = useDispatch<AppDispatch>();
+  const personContext = useContext(PersonContext);
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!personalNumber) {
@@ -38,12 +35,13 @@ const NumLogIn = () => {
       return;
     }
 
-    const operator = checkOperator(Number(personalNumber));
-
-    if (operator) {
-      dispatch(
-        logIn({ personalNumber: Number(personalNumber), name: operator.name }),
-      );
+    const res = await loginPerson(personalNumber);
+    console.log('res', res);
+    if (res) {
+      personContext?.setPerson({
+        number: personalNumber,
+        name: res,
+      });
       toast.success(`${personalNumber} zalogowany!`, { id: 'success' });
     } else {
       toast.error(`${personalNumber} nie istnieje!`, { id: 'error' });

@@ -1,11 +1,11 @@
 'use server';
 import clientPromise from '@/lib/mongo';
-import { productionConfig } from '@/lib/utils/pro/config';
-import generatePalletQr from '@/lib/utils/pro/generatePalletQr';
+import { productionConfig } from '@/app/pro/lib/utils/config';
+import generatePalletQr from '@/app/pro/lib/utils/generatePalletQr';
 import {
   fordValidation,
   bmwValidation,
-} from '@/lib/utils/pro/dmcDateValidation';
+} from '@/app/pro/lib/utils/dmcDateValidation';
 
 // Define Types
 type ArticleConfigObject = {

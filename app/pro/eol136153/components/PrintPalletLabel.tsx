@@ -1,44 +1,44 @@
-import { useRef, useTransition, useEffect, useState } from 'react'
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks'
-import QRCode from 'qrcode.react'
-import html2canvas from 'html2canvas'
-import Button from '@/app/pro/components//Button'
-import { getPalletQr } from '../actions'
-import toast from 'react-hot-toast'
+import { useRef, useTransition, useEffect, useState } from 'react';
+import { useAppSelector } from '@/lib/redux/pro/136-153/hooks';
+import QRCode from 'qrcode.react';
+import html2canvas from 'html2canvas';
+import Button from '@/app/pro/components//Button';
+import { getPalletQr } from '../actions';
+import toast from 'react-hot-toast';
 
 type Props = {
-  articleNumber: number
-  articleName: string
-}
+  articleNumber: number;
+  articleName: string;
+};
 
 const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
-  const qrCodeRef = useRef<HTMLDivElement>(null)
+  const qrCodeRef = useRef<HTMLDivElement>(null);
 
-  const quantity136 = useAppSelector((state) => state.workplace.onPallet136)
-  const boxSize136 = useAppSelector((state) => state.workplace.boxSize136)
-  const quantityOnPallet136 = quantity136! * boxSize136!
+  const quantity136 = useAppSelector((state) => state.workplace.onPallet136);
+  const boxSize136 = useAppSelector((state) => state.workplace.boxSize136);
+  const quantityOnPallet136 = quantity136! * boxSize136!;
 
-  const quantity153 = useAppSelector((state) => state.workplace.onPallet153)
-  const boxSize153 = useAppSelector((state) => state.workplace.boxSize153)
-  const quantityOnPallet153 = quantity153! * boxSize153!
+  const quantity153 = useAppSelector((state) => state.workplace.onPallet153);
+  const boxSize153 = useAppSelector((state) => state.workplace.boxSize153);
+  const quantityOnPallet153 = quantity153! * boxSize153!;
 
-  const [palletQr, setPalletQr] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [palletQr, setPalletQr] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (articleNumber) {
       startTransition(async () => {
-        toast.loading('Generowanie QR...', { id: 'loadingQr' })
-        let qr
+        toast.loading('Generowanie QR...', { id: 'loadingQr' });
+        let qr;
         if (articleNumber === 28067) {
-          qr = await getPalletQr(articleNumber, quantityOnPallet136)
+          qr = await getPalletQr(articleNumber, quantityOnPallet136);
         }
         if (articleNumber === 28042) {
-          qr = await getPalletQr(articleNumber, quantityOnPallet153)
+          qr = await getPalletQr(articleNumber, quantityOnPallet153);
         }
-        qr && setPalletQr(qr)
-        toast.dismiss('loadingQr')
-      })
+        qr && setPalletQr(qr);
+        toast.dismiss('loadingQr');
+      });
     }
   }, [
     articleNumber,
@@ -46,10 +46,10 @@ const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
     quantityOnPallet136,
     quantity153,
     quantityOnPallet153,
-  ])
+  ]);
 
   const generatePrintWindow = (imgData: string) => {
-    const printWindow = window.open()
+    const printWindow = window.open();
     printWindow!.document.write(`
       <html>
         <head>
@@ -104,35 +104,35 @@ const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
           </div>
         </body>
       </html>
-    `)
-    printWindow!.document.close()
-    printWindow!.focus()
+    `);
+    printWindow!.document.close();
+    printWindow!.focus();
     setTimeout(() => {
-      printWindow!.print()
-      printWindow!.close()
-    }, 1500)
-  }
+      printWindow!.print();
+      printWindow!.close();
+    }, 1500);
+  };
 
   const handlePrint = () => {
-    const qrCodeCanvas = qrCodeRef.current!.querySelector('canvas')
+    const qrCodeCanvas = qrCodeRef.current!.querySelector('canvas');
     html2canvas(qrCodeCanvas!, { scale: 2 })
       .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png')
-        generatePrintWindow(imgData)
+        const imgData = canvas.toDataURL('image/png');
+        generatePrintWindow(imgData);
       })
       .catch((error) => {
-        console.error('Error generating canvas from QR code:', error)
-      })
-  }
+        console.error('Error generating canvas from QR code:', error);
+      });
+  };
 
   return (
-    <div className="mt-8 flex flex-col items-center justify-center">
+    <div className='mt-8 flex flex-col items-center justify-center'>
       <Button text={`wydruk QR dla ${articleNumber}`} onClick={handlePrint} />
       <div style={{ opacity: 0 }} ref={qrCodeRef}>
         <QRCode value={palletQr!} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PrintPalletLabel
+export default PrintPalletLabel;

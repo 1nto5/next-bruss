@@ -1,16 +1,21 @@
 'use server';
 import clientPromise from '@/lib/mongo';
-import generatePalletQr from '@/lib/utils/pro/generatePalletQr';
-import { productionConfig } from '@/lib/utils/pro/config';
+import generatePalletQr from '@/app/pro/lib/utils/generatePalletQr';
+import config from '@/app/pro/config';
 
 // Define Types
-type ArticleConfigObject = {
+type ArticleConfig = {
+  article: string;
   workplace: string;
   type: string;
-  article: number;
   name: string;
   note?: string;
-  palletSize: number;
+  baseDmc?: string;
+  dmcFirVal?: number[];
+  dmcSecVal?: number[];
+  ford?: boolean;
+  bmw?: boolean;
+  palletSize?: number;
   boxSize: number;
   hydraProc: string;
   palletProc: string;
@@ -18,11 +23,10 @@ type ArticleConfigObject = {
 
 const collectionName = 'scans';
 
-export async function getPalletSize(article: number) {
+export async function getPalletSize(article: string) {
   // Find the article configuration
-  const articleConfig = productionConfig.find(
-    (object: ArticleConfigObject) =>
-      object.workplace === '136-153' && object.article === article,
+  const articleConfig = config.find(
+    (object: ArticleConfig) => object.article === article,
   );
 
   if (articleConfig) {
@@ -32,11 +36,10 @@ export async function getPalletSize(article: number) {
   return null;
 }
 
-export async function getBoxSize(article: number) {
+export async function getBoxSize(article: string) {
   // Find the article configuration
-  const articleConfig = productionConfig.find(
-    (object: ArticleConfigObject) =>
-      object.workplace === '136-153' && object.article === article,
+  const articleConfig = config.find(
+    (object: ArticleConfig) => object.article === article,
   );
 
   if (articleConfig) {
@@ -46,11 +49,10 @@ export async function getBoxSize(article: number) {
   return null;
 }
 
-export async function getArticleName(article: number) {
+export async function getArticleName(article: string) {
   // Find the article configuration
-  const articleConfig = productionConfig.find(
-    (object: ArticleConfigObject) =>
-      object.workplace === '136-153' && object.article === article,
+  const articleConfig = config.find(
+    (object: ArticleConfig) => object.article === article,
   );
 
   if (articleConfig) {
@@ -61,7 +63,7 @@ export async function getArticleName(article: number) {
 }
 
 // Function to get the number of documents with a specific status and article number,
-export async function countOnPallet(article: number) {
+export async function countOnPallet(article: string) {
   try {
     // Connect to MongoDB
     const client = await clientPromise;
@@ -83,13 +85,15 @@ export async function countOnPallet(article: number) {
 }
 
 // Generate pallet QR
-export async function getPalletQr(article: number, quantityOnPallet: number) {
+export async function getPalletQr(article: string, quantityOnPallet: number) {
   try {
     // Find the article configuration
-    const articleConfig = productionConfig.find(
-      (object: ArticleConfigObject) =>
-        object.workplace === '136-153' && object.article === article,
+    const articleConfig = config.find(
+      (object: ArticleConfig) => object.article === article,
     );
+    if (!articleConfig) {
+      throw new Error('Article not found.');
+    }
     return generatePalletQr(
       article,
       quantityOnPallet,
@@ -114,19 +118,21 @@ export async function saveHydraBatch(
 
     // // Split QR code
     const splitHydraQr = hydraQr.split('|');
-    const qrarticle =
-      splitHydraQr[0].length === 7 && Number(splitHydraQr[0].substr(2));
+    const qrarticle = splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
 
     // // Check article number
-    if (qrarticle !== 28067 && qrarticle !== 28042) {
+    if (qrarticle !== '28067' && qrarticle !== '28042') {
       return { status: 'wrong article' };
     }
 
     // Find the article configuration
-    const articleConfig = productionConfig.find(
-      (object: ArticleConfigObject) =>
-        object.workplace === '136-153' && object.article === qrarticle,
+    const articleConfig = config.find(
+      (object: ArticleConfig) => object.article === qrarticle,
     );
+
+    if (!articleConfig) {
+      throw new Error('Article not found.');
+    }
 
     // Check quantity
     const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
@@ -157,6 +163,10 @@ export async function saveHydraBatch(
     // Check if pallet is full
     const onPallet = await countOnPallet(qrarticle);
 
+    if (!articleConfig.palletSize) {
+      throw new Error('Pallet size not found.');
+    }
+
     if (onPallet >= articleConfig.palletSize) {
       return { status: 'full pallet' };
     }
@@ -184,7 +194,7 @@ export async function saveHydraBatch(
 // Save Pallet Batch function
 export async function savePalletBatch(
   palletQr: string,
-  article: number,
+  article: string,
   quantityOnPallet: number,
   operatorPersonalNumber: number,
 ) {
@@ -197,7 +207,7 @@ export async function savePalletBatch(
     // // Split QR code
     const splitPalletQr = palletQr.split('|');
     const qrarticle =
-      splitPalletQr[0].length === 7 && Number(splitPalletQr[0].substr(2));
+      splitPalletQr[0].length === 7 && splitPalletQr[0].substr(2);
 
     // // Check article number
     if (qrarticle !== article) {

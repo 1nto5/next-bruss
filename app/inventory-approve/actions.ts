@@ -15,6 +15,27 @@ type CardOption = {
   label: string;
 };
 
+type PositionOption = {
+  value: string;
+  label: string;
+  card: number;
+  position: number;
+};
+
+type Position = {
+  'position': number;
+  'identifier': string;
+  'articleNumber': number;
+  'articleName': string;
+  'quantity': number;
+  'unit': string;
+  'wip': boolean;
+  'approver'?: string;
+  'approver-time'?: Date;
+  'editor'?: string;
+  'editor-time'?: Date;
+};
+
 const collectionName = 'inventory_cards';
 
 const warehouseSelectOptions = [
@@ -33,11 +54,10 @@ export async function getAllCards(): Promise<CardOption[]> {
     const db = client.db();
     const collection = db.collection('inventory_cards');
     const cards = await collection.find({}).toArray();
-
     const cardOptions = cards.map((card) => {
       const totalPositions = card.positions.length;
       const approvedPositions = card.positions.filter(
-        (p: any) => p.approver,
+        (p: Position) => p.approver,
       ).length;
 
       const warehouseOption = warehouseSelectOptions.find(
@@ -58,13 +78,6 @@ export async function getAllCards(): Promise<CardOption[]> {
     throw new Error('An error occurred while retrieving the list of cards');
   }
 }
-
-type PositionOption = {
-  value: string;
-  label: string;
-  card: number;
-  position: number;
-};
 
 export async function getAllPositions(): Promise<PositionOption[]> {
   try {

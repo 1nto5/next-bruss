@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import { getPosition, savePosition, getArticlesOptions } from '../actions';
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import formatEmailToName from '@/lib/utils/formatEmailToName';
+import formatEmailToName from '@/app/pro/lib/utils/formatEmailToName';
 
 type Article = {
   value: string;

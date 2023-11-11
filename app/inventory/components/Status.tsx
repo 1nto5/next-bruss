@@ -5,7 +5,7 @@ import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
 import { BoxSeparatorInventory } from '@/app/components/old_StatusElements';
 import StatusBox from '@/app/components/StatusBox';
-import { shortenLastName } from '../lib/utils/nameFormat';
+import { shortenLastName } from '../../../lib/utils/nameFormat';
 
 export default function Status() {
   const personsContext = useContext(PersonsContext);

@@ -13,7 +13,7 @@ import {
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
-import formatEmailToName from '@/lib/utils/formatEmailToName';
+import formatEmailToName from '@/app/pro/lib/utils/formatEmailToName';
 
 type Article = {
   value: string;
@@ -24,8 +24,6 @@ type Article = {
   converter: number;
   max: number;
 };
-
-// TODO: add approve and delete trash
 
 export default function Edit() {
   const { data: session } = useSession();
