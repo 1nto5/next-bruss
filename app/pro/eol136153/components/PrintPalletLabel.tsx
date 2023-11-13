@@ -1,52 +1,28 @@
 import { useRef, useTransition, useEffect, useState } from 'react';
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import Button from '@/app/pro/components//Button';
-import { getPalletQr } from '../actions';
+import { getPalletQr } from '../../actions';
 import toast from 'react-hot-toast';
 
 type Props = {
-  articleNumber: number;
+  articleNumber: string;
   articleName: string;
+  quantityOnPallet: number;
 };
 
-const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
+const PrintPalletLabel = (props: Props) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
-
-  const quantity136 = useAppSelector((state) => state.workplace.onPallet136);
-  const boxSize136 = useAppSelector((state) => state.workplace.boxSize136);
-  const quantityOnPallet136 = quantity136! * boxSize136!;
-
-  const quantity153 = useAppSelector((state) => state.workplace.onPallet153);
-  const boxSize153 = useAppSelector((state) => state.workplace.boxSize153);
-  const quantityOnPallet153 = quantity153! * boxSize153!;
-
-  const [palletQr, setPalletQr] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  const [palletQr, setPalletQr] = useState<string | null>(null);
+
   useEffect(() => {
-    if (articleNumber) {
-      startTransition(async () => {
-        toast.loading('Generowanie QR...', { id: 'loadingQr' });
-        let qr;
-        if (articleNumber === 28067) {
-          qr = await getPalletQr(articleNumber, quantityOnPallet136);
-        }
-        if (articleNumber === 28042) {
-          qr = await getPalletQr(articleNumber, quantityOnPallet153);
-        }
-        qr && setPalletQr(qr);
-        toast.dismiss('loadingQr');
-      });
-    }
-  }, [
-    articleNumber,
-    quantity136,
-    quantityOnPallet136,
-    quantity153,
-    quantityOnPallet153,
-  ]);
+    startTransition(async () => {
+      const qr = await getPalletQr(props.articleNumber, props.quantityOnPallet);
+      qr && setPalletQr(qr);
+    });
+  }, [props.articleNumber, props.quantityOnPallet]);
 
   const generatePrintWindow = (imgData: string) => {
     const printWindow = window.open();
@@ -91,13 +67,9 @@ const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
               </thead>
               <tbody>
                 <tr>
-                  <td>${articleNumber}</td>
-                  <td>${articleName}</td> 
-                  <td>${
-                    articleNumber === 28067
-                      ? quantityOnPallet136
-                      : quantityOnPallet153
-                  }</td>
+                  <td>${props.articleNumber}</td>
+                  <td>${props.articleName}</td> 
+                  <td>${props.quantityOnPallet}</td>
                 </tr>
               </tbody>
             </table>
@@ -127,7 +99,12 @@ const PrintPalletLabel = ({ articleNumber, articleName }: Props) => {
 
   return (
     <div className='mt-8 flex flex-col items-center justify-center'>
-      <Button text={`wydruk QR dla ${articleNumber}`} onClick={handlePrint} />
+      {isPending && (
+        <Button
+          text={`wydruk QR dla ${props.articleNumber}`}
+          onClick={handlePrint}
+        />
+      )}
       <div style={{ opacity: 0 }} ref={qrCodeRef}>
         <QRCode value={palletQr!} />
       </div>

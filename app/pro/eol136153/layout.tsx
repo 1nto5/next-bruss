@@ -1,5 +1,5 @@
 export const metadata = {
-  title: '`EOL136153 (Next BRUSS)',
+  title: 'EOL136153 (Next BRUSS)',
   // description: 'Company helper applications',
 };
 

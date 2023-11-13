@@ -1,31 +1,22 @@
-import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { updateLastScan } from '@/lib/redux/pro/136-153/workplaceSlice';
-import { saveHydraBatch } from '../actions';
+import { useState, useContext, useEffect } from 'react';
+import { ScanContext } from '../../lib/ScanContext';
+import { saveHydraBatch136153 } from '../actions';
 import { useTransition } from 'react';
 import toast from 'react-hot-toast';
 
+type Props = {
+  operator: string;
+};
+
 // Component to scan Hydra Batch
-export default function ScanHydraQr() {
-  // Use the operator number from the Redux state
-  const operatorPersonalNumber = useSelector(
-    (state: {
-      operator: { personalNumber: number; name: string; loggedIn: boolean };
-    }) => state.operator.personalNumber,
-  );
-
-  // React transition state
+export default function ScanHydraQr(props: Props) {
+  const scanContext = useContext(ScanContext);
   const [isPending, startTransition] = useTransition();
-
-  // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('');
 
-  // Function to clear the hydraBatch input field
   const clearHydraBatch = () => {
     setHydraBatch('');
   };
-
-  const dispatch = useDispatch();
 
   // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -37,17 +28,14 @@ export default function ScanHydraQr() {
 
     // Start transition (for loading state)
     startTransition(async () => {
-      toast.loading('Przetwarzanie...', { id: 'loading' });
-
       try {
-        const result = await saveHydraBatch(hydraBatch, operatorPersonalNumber);
-
+        toast.loading('zapisywanie...', { id: 'saving' });
+        const result = await saveHydraBatch136153(hydraBatch, props.operator);
         const status = result?.status;
-        toast.dismiss();
-        // Display toast message based on the result status
+
         switch (status) {
           case 'saved':
-            dispatch(updateLastScan(hydraBatch));
+            scanContext?.setScan({ last: hydraBatch });
             toast.success('Batch OK!', { id: 'success' });
             break;
           case 'exists':
@@ -73,6 +61,8 @@ export default function ScanHydraQr() {
         }
       } catch (err) {
         toast.error('Zgłoś się do IT!', { id: 'error' });
+      } finally {
+        toast.dismiss('saving');
       }
     });
   };

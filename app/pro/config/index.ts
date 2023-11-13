@@ -19,7 +19,7 @@ const articles: ArticleConfig[] = [
   {
     article: '28067',
     workplace: 'eol136153',
-    type: 'box-pallet',
+    type: 'eol136153',
     name: 'M-136-K-1-A',
     palletSize: 25,
     boxSize: 12,
@@ -29,9 +29,9 @@ const articles: ArticleConfig[] = [
   {
     article: '28042',
     workplace: 'eol136153',
-    type: 'box-pallet',
+    type: 'eol136153',
     name: 'M-153-K-C',
-    palletSize: 30,
+    palletSize: 5,
     boxSize: 10,
     hydraProc: '090',
     palletProc: '876',

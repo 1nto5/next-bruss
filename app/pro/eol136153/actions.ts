@@ -2,6 +2,7 @@
 import clientPromise from '@/lib/mongo';
 import generatePalletQr from '@/app/pro/lib/utils/generatePalletQr';
 import config from '@/app/pro/config';
+import { countOnPallet } from '../actions';
 
 // Define Types
 type ArticleConfig = {
@@ -23,93 +24,8 @@ type ArticleConfig = {
 
 const collectionName = 'scans';
 
-export async function getPalletSize(article: string) {
-  // Find the article configuration
-  const articleConfig = config.find(
-    (object: ArticleConfig) => object.article === article,
-  );
-
-  if (articleConfig) {
-    return articleConfig.palletSize;
-  }
-
-  return null;
-}
-
-export async function getBoxSize(article: string) {
-  // Find the article configuration
-  const articleConfig = config.find(
-    (object: ArticleConfig) => object.article === article,
-  );
-
-  if (articleConfig) {
-    return articleConfig.boxSize;
-  }
-
-  return null;
-}
-
-export async function getArticleName(article: string) {
-  // Find the article configuration
-  const articleConfig = config.find(
-    (object: ArticleConfig) => object.article === article,
-  );
-
-  if (articleConfig) {
-    return articleConfig.name;
-  }
-
-  return null;
-}
-
-// Function to get the number of documents with a specific status and article number,
-export async function countOnPallet(article: string) {
-  try {
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-
-    // Query the collection
-    const count = await collection.countDocuments({
-      status: 'pallet',
-      article: article,
-    });
-
-    // Return the count
-    return count;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while counting the documents.');
-  }
-}
-
-// Generate pallet QR
-export async function getPalletQr(article: string, quantityOnPallet: number) {
-  try {
-    // Find the article configuration
-    const articleConfig = config.find(
-      (object: ArticleConfig) => object.article === article,
-    );
-    if (!articleConfig) {
-      throw new Error('Article not found.');
-    }
-    return generatePalletQr(
-      article,
-      quantityOnPallet,
-      articleConfig.palletProc,
-    );
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while generating pallet qr.');
-  }
-}
-
 // Save Hydra Batch function
-export async function saveHydraBatch(
-  hydraQr: string,
-  operatorPersonalNumber: number,
-) {
+export async function saveHydraBatch136153(hydraQr: string, operator: string) {
   try {
     // // Validate hydra QR code
     if (hydraQr.length < 34 || !hydraQr.includes('|')) {
@@ -161,7 +77,7 @@ export async function saveHydraBatch(
     }
 
     // Check if pallet is full
-    const onPallet = await countOnPallet(qrarticle);
+    const onPallet = await countOnPallet('eol136153', qrarticle);
 
     if (!articleConfig.palletSize) {
       throw new Error('Pallet size not found.');
@@ -175,11 +91,11 @@ export async function saveHydraBatch(
     const insertResult = await collection.insertOne({
       status: 'pallet',
       hydra_batch: qrBatch,
-      workplace: '136-153',
+      workplace: 'eol136153',
       article: qrarticle,
       quantity: qrQuantity,
-      operator: operatorPersonalNumber,
-      time: new Date(),
+      operator: operator,
+      hydra_time: new Date(),
     });
 
     if (insertResult) {
@@ -188,83 +104,5 @@ export async function saveHydraBatch(
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving the hydra batch.');
-  }
-}
-
-// Save Pallet Batch function
-export async function savePalletBatch(
-  palletQr: string,
-  article: string,
-  quantityOnPallet: number,
-  operatorPersonalNumber: number,
-) {
-  try {
-    // // Validate hydra QR code
-    if (palletQr.length < 34 || !palletQr.includes('|')) {
-      return { status: 'invalid' };
-    }
-
-    // // Split QR code
-    const splitPalletQr = palletQr.split('|');
-    const qrarticle =
-      splitPalletQr[0].length === 7 && splitPalletQr[0].substr(2);
-
-    // // Check article number
-    if (qrarticle !== article) {
-      return { status: 'wrong article' };
-    }
-
-    // Check quantity
-    const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
-    if (qrQuantity !== quantityOnPallet) {
-      return { status: 'wrong quantity' };
-    }
-
-    // Check process
-    const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2);
-    if (qrProcess !== '876') {
-      return { status: 'wrong process' };
-    }
-
-    // Extract batch from QR code and test length
-    const qrBatch =
-      splitPalletQr[3] && splitPalletQr[3].substr(2).toUpperCase();
-    if (!qrBatch || qrBatch.length !== 10) {
-      return { status: 'invalid' };
-    }
-
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-
-    // Check for existing data
-    const existingData = await collection.findOne({ pallet_batch: qrBatch });
-    if (existingData) {
-      return { status: 'exists' };
-    }
-
-    // Update documents with matching criteria
-    const updateResult = await collection.updateMany(
-      {
-        status: 'pallet',
-        article: article,
-      },
-      {
-        $set: {
-          status: 'warehouse',
-          pallet_batch: qrBatch,
-          pallet_time: new Date(),
-          pallet_operator: operatorPersonalNumber,
-        },
-      },
-    );
-
-    if (updateResult) {
-      return { status: 'saved' };
-    }
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while saving the pallet batch.');
   }
 }

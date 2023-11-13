@@ -88,22 +88,22 @@ export async function countOnPallet(workplace: string, article: string) {
   }
 }
 
-// // Function to get the pallet size for a specific workplace and article
-// export async function getPalletSize(workplace: string, article: string) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) =>
-//         object.workplace === workplace && object.article === article,
-//     );
+// Function to get the pallet size for a specific workplace and article
+export async function getPalletSize(workplace: string, article: string) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
 
-//     // Return the pallet size, or null if the article is not found
-//     return articleConfig ? articleConfig.palletSize : null;
-//   } catch (error) {
-//     console.error('Error while getting the pallet size:', error);
-//     return null;
-//   }
-// }
+    // Return the pallet size, or null if the article is not found
+    return articleConfig ? articleConfig.palletSize : null;
+  } catch (error) {
+    console.error('Error while getting the pallet size:', error);
+    return null;
+  }
+}
 
 // // Function to get the box size for a specific workplace and article
 // export async function getBoxSize(workplace: string, article: string) {
@@ -122,28 +122,28 @@ export async function countOnPallet(workplace: string, article: string) {
 //   }
 // }
 
-// // Generate pallet QR
-// export async function getPalletQr(article: string, quantityOnPallet: number) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) => object.article === article,
-//     );
+// Generate pallet QR
+export async function getPalletQr(article: string, quantityOnPallet: number) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) => object.article === article,
+    );
 
-//     if (!articleConfig) {
-//       throw new Error('Article not found.');
-//     }
+    if (!articleConfig) {
+      throw new Error('Article not found.');
+    }
 
-//     return generatePalletQr(
-//       article,
-//       quantityOnPallet,
-//       articleConfig.palletProc,
-//     );
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while generating pallet qr.');
-//   }
-// }
+    return generatePalletQr(
+      article,
+      quantityOnPallet,
+      articleConfig.palletProc,
+    );
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while generating pallet qr.');
+  }
+}
 
 // // Save DMC function
 // export async function saveDmc(
@@ -338,92 +338,92 @@ export async function countOnPallet(workplace: string, article: string) {
 //   }
 // }
 
-// // Save Pallet Batch function
-// export async function savePalletBatch(
-//   palletQr: string,
-//   workplace: string,
-//   article: string,
-//   quantityOnPallet: number,
-//   operatorPersonalNumber: number,
-// ) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) =>
-//         object.workplace === workplace && object.article === article,
-//     );
+// Save Pallet Batch function
+export async function savePalletBatch(
+  palletQr: string,
+  workplace: string,
+  article: string,
+  quantityOnPallet: number,
+  operator: string,
+) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
 
-//     if (!articleConfig) {
-//       throw new Error('Article config problem!');
-//     }
+    if (!articleConfig) {
+      throw new Error('Article config problem!');
+    }
 
-//     // // Validate hydra QR code
-//     if (palletQr.length < 34 || !palletQr.includes('|')) {
-//       return { status: 'invalid' };
-//     }
+    // // Validate hydra QR code
+    if (palletQr.length < 34 || !palletQr.includes('|')) {
+      return { status: 'invalid' };
+    }
 
-//     // // Split QR code
-//     const splitPalletQr = palletQr.split('|');
-//     const qrarticle =
-//       splitPalletQr[0].length === 7 && splitPalletQr[0].substr(2);
+    // // Split QR code
+    const splitPalletQr = palletQr.split('|');
+    const qrarticle =
+      splitPalletQr[0].length === 7 && splitPalletQr[0].substr(2);
 
-//     // // Check article number
-//     if (qrarticle !== article) {
-//       return { status: 'wrong article' };
-//     }
+    // // Check article number
+    if (qrarticle !== article) {
+      return { status: 'wrong article' };
+    }
 
-//     // Check quantity
-//     const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
-//     if (qrQuantity !== quantityOnPallet) {
-//       return { status: 'wrong quantity' };
-//     }
+    // Check quantity
+    const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
+    if (qrQuantity !== quantityOnPallet) {
+      return { status: 'wrong quantity' };
+    }
 
-//     // Check process
-//     const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2);
-//     if (qrProcess !== articleConfig.palletProc) {
-//       return { status: 'wrong process' };
-//     }
+    // Check process
+    const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2);
+    if (qrProcess !== articleConfig.palletProc) {
+      return { status: 'wrong process' };
+    }
 
-//     // Extract batch from QR code and test length
-//     const qrBatch =
-//       splitPalletQr[3] && splitPalletQr[3].substr(2).toUpperCase();
-//     if (!qrBatch || qrBatch.length !== 10) {
-//       return { status: 'invalid' };
-//     }
+    // Extract batch from QR code and test length
+    const qrBatch =
+      splitPalletQr[3] && splitPalletQr[3].substr(2).toUpperCase();
+    if (!qrBatch || qrBatch.length !== 10) {
+      return { status: 'invalid' };
+    }
 
-//     // Connect to MongoDB
-//     const client = await clientPromise;
-//     const db = client.db();
-//     const collection = db.collection(collectionName);
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
-//     // Check for existing data
-//     const existingData = await collection.findOne({ pallet_batch: qrBatch });
-//     if (existingData) {
-//       return { status: 'exists' };
-//     }
+    // Check for existing data
+    const existingData = await collection.findOne({ pallet_batch: qrBatch });
+    if (existingData) {
+      return { status: 'exists' };
+    }
 
-//     // Update documents with matching criteria
-//     const updateResult = await collection.updateMany(
-//       {
-//         status: 'pallet',
-//         workplace: workplace,
-//         article: article,
-//       },
-//       {
-//         $set: {
-//           status: 'warehouse',
-//           pallet_batch: qrBatch,
-//           pallet_time: new Date(),
-//           pallet_operator: operatorPersonalNumber,
-//         },
-//       },
-//     );
+    // Update documents with matching criteria
+    const updateResult = await collection.updateMany(
+      {
+        status: 'pallet',
+        workplace: workplace,
+        article: article,
+      },
+      {
+        $set: {
+          status: 'warehouse',
+          pallet_batch: qrBatch,
+          pallet_time: new Date(),
+          pallet_operator: operator,
+        },
+      },
+    );
 
-//     if (updateResult) {
-//       return { status: 'saved' };
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while saving the pallet batch.');
-//   }
-// }
+    if (updateResult) {
+      return { status: 'saved' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the pallet batch.');
+  }
+}

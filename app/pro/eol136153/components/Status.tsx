@@ -3,11 +3,21 @@
 import { useContext } from 'react';
 import StatusBox from '@/app/components/StatusBox';
 import { PersonContext } from '../../lib/PersonContext';
-import { countOnPallet } from '../../actions';
 import { shortenLastName } from '@/lib/utils/nameFormat';
 
-export default function Status() {
+type StatusProps = {
+  onPallet153: number;
+  palletSize153: number;
+  onPallet136: number;
+  palletSize136: number;
+  isFull153: boolean;
+  isFull136: boolean;
+  isPending: boolean;
+};
+
+export default function Status(props: StatusProps) {
   const personContext = useContext(PersonContext);
+
   return (
     <div className='flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800'>
       <StatusBox
@@ -20,9 +30,23 @@ export default function Status() {
               })`
             : 'brak'
         }
-        width='w-1/4'
+        width='w-6/12'
       />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+      <StatusBox
+        name='153 (28042)'
+        value={`${props.onPallet153}/${props.palletSize153}`}
+        width='3/12'
+        loading={props.isPending}
+        full={props.isFull153}
+      />
+      <StatusBox
+        name='136 (28067)'
+        value={`${props.onPallet136}/${props.palletSize136}`}
+        width='3/12'
+        loading={props.isPending}
+        full={props.isFull136}
+        separator={false}
+      />
     </div>
   );
 }

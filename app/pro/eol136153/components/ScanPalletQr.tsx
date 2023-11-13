@@ -1,96 +1,51 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '@/lib/redux/pro/136-153/hooks';
-import {
-  toggleIsFull136,
-  toggleIsFull153,
-  updateLastScan,
-} from '@/lib/redux/pro/136-153/workplaceSlice';
-import { savePalletBatch } from '../actions';
+import { useState, useContext, useEffect } from 'react';
+
+import { savePalletBatch } from '../../actions';
 import { useTransition } from 'react';
 import toast from 'react-hot-toast';
+import { ScanContext } from '../../lib/ScanContext';
 
 type Props = {
+  workplace: string;
+  operator: string;
   article: string;
+  quantityOnPallet: number;
+  palletSize: number;
 };
 
 // Component to scan Pallet Batch
-export default function ScanPalletQr({ article }: Props) {
-  // Use the operator number from the Redux state
-  const operatorPersonalNumber = useAppSelector(
-    (state) => state.operator.personalNumber,
-  );
-
-  const onPallet136 = useAppSelector((state) => state.workplace.onPallet136);
-  const boxSize136 = useAppSelector((state) => state.workplace.boxSize136);
-  const quantityOnPallet136 = onPallet136! * boxSize136!;
-
-  const onPallet153 = useAppSelector((state) => state.workplace.onPallet153);
-  const boxSize153 = useAppSelector((state) => state.workplace.boxSize153);
-  const quantityOnPallet153 = onPallet153! * boxSize153!;
-
-  // React transition state
+export default function ScanPalletQr(props: Props) {
+  const scanContext = useContext(ScanContext);
   const [isPending, startTransition] = useTransition();
-
-  // Local state for the pallet batch
   const [palletQr, setPalletQr] = useState('');
 
-  // Function to clear the hydraBatch input field
   const clearPalletQr = () => {
     setPalletQr('');
   };
-  const dispatch = useDispatch();
-
-  // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
       return;
     }
     clearPalletQr();
 
-    // Start transition (for loading state)
     startTransition(async () => {
-      toast.loading('Przetwarzanie...', { id: 'loading' });
-
       try {
-        let status;
-        // 136
-        if (article === '28067') {
-          const result = await savePalletBatch(
-            palletQr,
-            28067,
-            quantityOnPallet136,
-            operatorPersonalNumber!,
-          );
-          status = result?.status;
-        }
-
-        // 153
-        if (article === '28042') {
-          const result = await savePalletBatch(
-            palletQr,
-            28042,
-            quantityOnPallet153,
-            operatorPersonalNumber!,
-          );
-          status = result?.status;
-        }
-
-        toast.dismiss();
+        toast.loading('zapisywanie...', { id: 'saving' });
+        const result = await savePalletBatch(
+          palletQr,
+          props.workplace,
+          props.article,
+          props.quantityOnPallet,
+          props.operator,
+        );
+        const status = result?.status;
 
         // Display toast message based on the result status
         switch (status) {
           case 'saved':
-            dispatch(updateLastScan(palletQr));
-            // 136
-            if (article === '28067') {
-              dispatch(toggleIsFull136());
-            }
-            // 153
-            if (article === '28042') {
-              dispatch(toggleIsFull153());
-            }
-
+            scanContext?.setScan(() => ({
+              last: palletQr,
+            }));
             toast.success('Batch OK!', { id: 'success' });
             break;
           case 'exists':
@@ -116,6 +71,8 @@ export default function ScanPalletQr({ article }: Props) {
         }
       } catch (err) {
         toast.error('Zgłoś się do IT!', { id: 'error' });
+      } finally {
+        toast.dismiss('saving');
       }
     });
   };
