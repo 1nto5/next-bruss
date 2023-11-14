@@ -25,7 +25,6 @@ export default function RootLayout({
       >
         <DarkLightProvider>
           <AuthProvider>{children}</AuthProvider>
-          {/* {children} */}
           <Footer />
         </DarkLightProvider>
       </body>

@@ -8,9 +8,14 @@ import toast from 'react-hot-toast';
 type HeaderProps = {
   title: string;
   showArticleLogOut?: boolean;
+  showPersonLogOut?: boolean;
 };
 
-const Header: React.FC<HeaderProps> = ({ title, showArticleLogOut = true }) => {
+const Header: React.FC<HeaderProps> = ({
+  title,
+  showArticleLogOut = true,
+  showPersonLogOut = true,
+}) => {
   const personContext = useContext(PersonContext);
   const articleContext = useContext(ArticleContext);
   return (
@@ -34,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({ title, showArticleLogOut = true }) => {
             artykuł
           </button>
         )}
-        {personContext?.person.number && (
+        {showPersonLogOut && personContext?.person.number && (
           <button
             onClick={() => {
               toast.success(`${personContext.person.number} wylogowany!`, {

@@ -28,11 +28,16 @@ export default function App() {
   const pathname = usePathname();
   const workplace = pathname.split('/').pop();
   const workplaceType = pathname.split('/')[2];
-  console.log('workplaceType', workplaceType);
   const workplaceExists = config.some(
     (item) => item.workplace === workplace && item.type === workplaceType,
   );
-  const [isPending, setIsPending] = useState(true);
+  const articleExists = config.some(
+    (item) =>
+      item.article === articleContext?.article.number &&
+      item.type === workplaceType &&
+      item.workplace === workplace,
+  );
+  const [isPending, setIsPending] = useState(false);
   const [inBox, setInBox] = useState(0);
   const [boxSize, setBoxSize] = useState(0);
   const [isFullBox, setIsFullBox] = useState(false);
@@ -41,17 +46,26 @@ export default function App() {
   const [isFullPallet, setIsFullPallet] = useState(false);
 
   useEffect(() => {
+    if (
+      !workplace ||
+      !articleContext?.article.number ||
+      !personContext?.person.number
+    ) {
+      return;
+    }
+    if (!articleExists) {
+      articleContext?.setArticle(() => ({
+        number: null,
+        name: null,
+      }));
+      return;
+    }
     (async () => {
       setIsPending(true);
       toast.loading('Ładowanie...', { id: 'loading' });
       try {
         if (!articleContext?.article.number) {
-          toast.error('Skontaktuj się z IT!', { id: 'error' });
           throw new Error('Article number is missing');
-        }
-        if (!workplace) {
-          toast.error('Skontaktuj się z IT!', { id: 'error' });
-          throw new Error('Workplace is missing');
         }
         const [onPallet, palletSize, inBox, boxSize] = await Promise.all([
           countOnPallet(workplace, articleContext?.article.number),
@@ -77,7 +91,14 @@ export default function App() {
         toast.dismiss('loading');
       }
     })();
-  }, [workplace, scanContext?.scan.last, articleContext?.article.number]);
+  }, [
+    workplace,
+    scanContext?.scan.last,
+    articleContext?.article.number,
+    articleContext,
+    personContext?.person.number,
+    articleExists,
+  ]);
 
   if (!workplaceExists || !workplace) {
     return (

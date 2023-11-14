@@ -3,7 +3,6 @@
 import { useContext } from 'react';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
-import { BoxSeparatorInventory } from '@/app/components/old_StatusElements';
 import StatusBox from '@/app/components/StatusBox';
 import { shortenLastName } from '../../../lib/utils/nameFormat';
 
@@ -16,7 +15,7 @@ export default function Status() {
   }
 
   return (
-    <div className=' w-1/ flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
+    <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
       <StatusBox
         name='zalogowany 1:'
         value={`${personsContext?.persons?.first} (${shortenLastName(
