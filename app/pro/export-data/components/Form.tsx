@@ -102,7 +102,7 @@ export default function Form() {
           </div>
           <input
             type='text'
-            className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+            className='items-center rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
             placeholder='wyszukaj DMC / hydra batch / pallet batch'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
