@@ -20,8 +20,8 @@ export default function App() {
   const scanContext = useContext(ScanContext);
   const pathname = usePathname();
   const workplace = pathname.split('pro/')[1];
-  console.log('pathname: ', workplace);
-  const [isPending, startTransition] = useTransition();
+  //   const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(true);
   const [onPallet136, setOnPallet136] = useState(0);
   const [palletSize136, setPalletSize136] = useState(0);
   const [isFull136, setIsFull136] = useState(false);
@@ -30,9 +30,10 @@ export default function App() {
   const [isFull153, setIsFull153] = useState(false);
 
   useEffect(() => {
-    startTransition(async () => {
+    (async () => {
+      setIsPending(true);
+      toast.loading('Ładowanie...', { id: 'loading' });
       try {
-        toast.loading('ładowanie...', { id: 'loading' });
         const [onPallet136, onPallet153, palletSize136, palletSize153] =
           await Promise.all([
             countOnPallet(workplace, article136),
@@ -40,8 +41,8 @@ export default function App() {
             getPalletSize(workplace, article136),
             getPalletSize(workplace, article153),
           ]);
-        setOnPallet136(onPallet136 || 0);
-        setOnPallet153(onPallet153 || 0);
+        setOnPallet136(onPallet136);
+        setOnPallet153(onPallet153);
         if (!palletSize136 || !palletSize153) {
           throw new Error('Failed to fetch pallet size');
         }
@@ -52,9 +53,10 @@ export default function App() {
       } catch (error) {
         console.error('Failed to fetch quantity on a pallet:', error);
       } finally {
+        setIsPending(false);
         toast.dismiss('loading');
       }
-    });
+    })();
   }, [workplace, scanContext?.scan.last]);
 
   return (
@@ -73,9 +75,13 @@ export default function App() {
             isPending={isPending}
           />
           {!isFull136 && !isFull153 ? (
-            <ScanHydraQr operator={personContext.person.number} />
+            <>
+              {!isPending && (
+                <ScanHydraQr operator={personContext.person.number} />
+              )}
+            </>
           ) : (
-            (isFull136 && (
+            (!isPending && isFull136 && (
               <>
                 <ScanPalletQr
                   workplace='eol136153'
@@ -91,7 +97,7 @@ export default function App() {
                 />
               </>
             ),
-            isFull153 && (
+            !isPending && isFull153 && (
               <>
                 <ScanPalletQr
                   workplace='eol136153'

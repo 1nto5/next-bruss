@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import formatEmailToName from '@/app/pro/lib/utils/formatEmailToName';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 
 export default function UserInfo() {
   const { data: session } = useSession();
@@ -32,7 +32,7 @@ export default function UserInfo() {
             </button>
             <p className='mt-10'>
               Name:{' '}
-              {formatEmailToName(
+              {extractNameFromEmail(
                 session?.user?.email ?? 'Unknown.User@bruss-group.com',
               )}
             </p>

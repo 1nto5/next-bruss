@@ -1,36 +1,35 @@
-import { useRef, useTransition, useEffect, useState } from 'react'
-import { useAppSelector } from '@/lib/redux/pro/dmc-box-pallet/hooks'
-import QRCode from 'qrcode.react'
-import html2canvas from 'html2canvas'
-import Button from '../../components/Button'
-import { getPalletQr } from '@/app/pro/actions'
-import toast from 'react-hot-toast'
+import { useRef, useEffect, useState } from 'react';
+import QRCode from 'qrcode.react';
+import html2canvas from 'html2canvas';
+import Button from '@/app/pro/components//Button';
+import { getPalletQr } from '../../actions';
 
-const PrintPalletLabel = () => {
-  const qrCodeRef = useRef<HTMLDivElement>(null)
-  const articleNumber = useAppSelector((state) => state.article.articleNumber)
-  const articleName = useAppSelector((state) => state.article.articleName)
-  const quantity = useAppSelector((state) => state.workplace.onPallet)
-  const boxSize = useAppSelector((state) => state.workplace.boxSize)
-  const quantityOnPallet = quantity! * boxSize!
+type Props = {
+  articleNumber: string;
+  articleName: string;
+  quantityOnPallet: number;
+};
 
-  const [palletQr, setPalletQr] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+const PrintPalletLabel = (props: Props) => {
+  const qrCodeRef = useRef<HTMLDivElement>(null);
+  const [palletQr, setPalletQr] = useState<string | null>(null);
 
   useEffect(() => {
-    if (articleNumber && quantity) {
-      startTransition(async () => {
-        toast.loading('Generowanie QR...', { id: 'loadingQr' })
-        const qr = await getPalletQr(articleNumber, quantityOnPallet)
-        setPalletQr(qr)
-        toast.dismiss('loadingQr')
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    (async () => {
+      try {
+        const qr = await getPalletQr(
+          props.articleNumber,
+          props.quantityOnPallet,
+        );
+        qr && setPalletQr(qr);
+      } catch (error) {
+        console.error('Error fetching pallet QR:', error);
+      }
+    })();
+  }, [props.articleNumber, props.quantityOnPallet]);
 
   const generatePrintWindow = (imgData: string) => {
-    const printWindow = window.open()
+    const printWindow = window.open();
     printWindow!.document.write(`
       <html>
         <head>
@@ -72,44 +71,47 @@ const PrintPalletLabel = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td>${articleNumber}</td>
-                  <td>${articleName}</td> 
-                  <td>${quantityOnPallet}</td>
+                  <td>${props.articleNumber}</td>
+                  <td>${props.articleName}</td> 
+                  <td>${props.quantityOnPallet}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </body>
       </html>
-    `)
-    printWindow!.document.close()
-    printWindow!.focus()
+    `);
+    printWindow!.document.close();
+    printWindow!.focus();
     setTimeout(() => {
-      printWindow!.print()
-      printWindow!.close()
-    }, 1500)
-  }
+      printWindow!.print();
+      printWindow!.close();
+    }, 1500);
+  };
 
   const handlePrint = () => {
-    const qrCodeCanvas = qrCodeRef.current!.querySelector('canvas')
+    const qrCodeCanvas = qrCodeRef.current!.querySelector('canvas');
     html2canvas(qrCodeCanvas!, { scale: 2 })
       .then((canvas) => {
-        const imgData = canvas.toDataURL('image/png')
-        generatePrintWindow(imgData)
+        const imgData = canvas.toDataURL('image/png');
+        generatePrintWindow(imgData);
       })
       .catch((error) => {
-        console.error('Error generating canvas from QR code:', error)
-      })
-  }
+        console.error('Error generating canvas from QR code:', error);
+      });
+  };
 
   return (
-    <div className="mt-8 flex flex-col items-center justify-center">
-      <Button text="wydruk QR" onClick={handlePrint} />
+    <div className='mt-8 flex flex-col items-center justify-center'>
+      <Button
+        text={`wydruk Paleta QR dla ${props.articleNumber}`}
+        onClick={handlePrint}
+      />
       <div style={{ opacity: 0 }} ref={qrCodeRef}>
         <QRCode value={palletQr!} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PrintPalletLabel
+export default PrintPalletLabel;

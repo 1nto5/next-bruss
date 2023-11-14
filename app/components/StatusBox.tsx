@@ -34,7 +34,9 @@ export default function StatusBox({
           {value ?? '-'}
         </p>
       </div>
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+      {separator && (
+        <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+      )}
     </>
   );
 }

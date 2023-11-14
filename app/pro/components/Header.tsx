@@ -13,15 +13,13 @@ type HeaderProps = {
 const Header: React.FC<HeaderProps> = ({ title, showArticleLogOut = true }) => {
   const personContext = useContext(PersonContext);
   const articleContext = useContext(ArticleContext);
-
   return (
-    <div className='flex items-center justify-between border-b border-slate-200 bg-slate-100 p-2 shadow-md dark:border-slate-700 dark:bg-slate-800'>
+    <div className='flex h-16 items-center justify-between border-b border-slate-200 bg-slate-100 p-2 shadow-md dark:border-slate-700 dark:bg-slate-800'>
       <h1 className='ml-2 mr-4 text-lg font-thin text-slate-900 dark:text-slate-100'>
         {title}
       </h1>
-
       <div className='mr-2 flex space-x-4'>
-        {showArticleLogOut && articleContext?.article && (
+        {showArticleLogOut && articleContext?.article.number && (
           <button
             onClick={() => {
               toast.success(`Artykuł wylogowany!`, { id: 'success' });
@@ -36,7 +34,6 @@ const Header: React.FC<HeaderProps> = ({ title, showArticleLogOut = true }) => {
             artykuł
           </button>
         )}
-
         {personContext?.person.number && (
           <button
             onClick={() => {

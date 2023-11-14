@@ -1,18 +1,23 @@
 import { useState, useContext } from 'react';
-import { ScanContext } from '../../lib/ScanContext';
-import { saveHydraBatch136153 } from '../actions';
+import { saveHydraBatch } from '@/app/pro/actions';
+import { ScanContext } from '@/app/pro/lib/ScanContext';
 import toast from 'react-hot-toast';
 
-type Props = {
+type StatusProps = {
+  workplace: string;
+  article: string;
   operator: string;
 };
 
 // Component to scan Hydra Batch
-export default function ScanHydraQr(props: Props) {
+export default function ScanHydraQr(props: StatusProps) {
   const scanContext = useContext(ScanContext);
   const [isPending, setIsPending] = useState(false);
+
+  // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('');
 
+  // Function to clear the hydraBatch input field
   const clearHydraBatch = () => {
     setHydraBatch('');
   };
@@ -24,13 +29,22 @@ export default function ScanHydraQr(props: Props) {
     }
 
     clearHydraBatch();
+
+    // Start transition (for loading state)
+
+    toast.loading('Przetwarzanie...', { id: 'loading' });
     setIsPending(true);
-    toast.loading('Zapisywanie...', { id: 'saving' });
 
     try {
-      const result = await saveHydraBatch136153(hydraBatch, props.operator);
-      const status = result?.status;
+      const result = await saveHydraBatch(
+        hydraBatch,
+        props.workplace,
+        props.article,
+        props.operator,
+      );
 
+      const status = result?.status;
+      // Display toast message based on the result status
       switch (status) {
         case 'saved':
           scanContext?.setScan({ last: hydraBatch });
@@ -60,11 +74,12 @@ export default function ScanHydraQr(props: Props) {
     } catch (err) {
       toast.error('Zgłoś się do IT!', { id: 'error' });
     } finally {
+      toast.dismiss('loading');
       setIsPending(false);
-      toast.dismiss('saving');
     }
   };
 
+  //TODO color if choosed
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
@@ -72,7 +87,7 @@ export default function ScanHydraQr(props: Props) {
         value={hydraBatch}
         onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={`${!isPending ? 'HYDRA QR' : 'zapisywanie...'}`}
+        placeholder={isPending ? 'Zapisywanie...' : 'Hydra QR'}
         autoFocus
       />
     </div>

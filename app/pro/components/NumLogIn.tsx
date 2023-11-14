@@ -36,7 +36,6 @@ const NumLogIn = () => {
     }
 
     const res = await loginPerson(personalNumber);
-    console.log('res', res);
     if (res) {
       personContext?.setPerson({
         number: personalNumber,

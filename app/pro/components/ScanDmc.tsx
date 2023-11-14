@@ -1,28 +1,26 @@
 import { useState, useContext } from 'react';
-import { savePalletBatch } from '@/app/pro/actions';
+
 import { ScanContext } from '@/app/pro/lib/ScanContext';
+import { saveDmc } from '@/app/pro/actions';
 import toast from 'react-hot-toast';
 
-type StatusProps = {
+type Props = {
   workplace: string;
   article: string;
   operator: string;
-  onPallet: number;
-  boxSize: number;
 };
 
-// Component to scan Pallet Batch
-export default function ScanPalletQr(props: StatusProps) {
+// Component to scan DMC
+export default function ScanDmc(props: Props) {
   const scanContext = useContext(ScanContext);
-  const quantityOnPallet = props.onPallet * props.boxSize;
   const [isPending, setIsPending] = useState(false);
 
-  // Local state for the pallet batch
-  const [palletQr, setPalletQr] = useState('');
+  // Local state for the hydra batch
+  const [dmc, setDmc] = useState('');
 
-  // Function to clear the hydraBatch input field
-  const clearPalletQr = () => {
-    setPalletQr('');
+  // Function to clear input field
+  const clearInput = () => {
+    setDmc('');
   };
 
   // Handle key press on input (only interested in 'Enter')
@@ -30,44 +28,41 @@ export default function ScanPalletQr(props: StatusProps) {
     if (event.key !== 'Enter') {
       return;
     }
-    clearPalletQr();
-
-    // Start transition (for loading state)
+    clearInput();
     toast.loading('Przetwarzanie...', { id: 'loading' });
     setIsPending(true);
-
     try {
-      const result = await savePalletBatch(
-        palletQr,
+      if (!props.article || !props.operator) {
+        toast.error('Skontaktuj się z IT!', { id: 'error' });
+        return;
+      }
+
+      const result = await saveDmc(
+        dmc,
         props.workplace,
         props.article,
-        quantityOnPallet,
         props.operator,
       );
 
       const status = result?.status;
-      toast.dismiss();
 
       // Display toast message based on the result status
       switch (status) {
         case 'saved':
-          scanContext?.setScan({ last: palletQr });
-          toast.success('Batch OK!', { id: 'success' });
+          scanContext?.setScan({ last: dmc });
+          toast.success('DMC OK!', { id: 'success' });
           break;
         case 'exists':
-          toast.error('Batch istnieje!', { id: 'error' });
+          toast.error('DMC istnieje!', { id: 'error' });
           break;
         case 'invalid':
-          toast.error('Batch niepoprawny!', { id: 'error' });
+          toast.error('DMC niepoprawny!', { id: 'error' });
           break;
-        case 'wrong article':
-          toast.error('Błędny artykuł!', { id: 'error' });
+        case 'wrong date':
+          toast.error('Data niepoprawna!', { id: 'error' });
           break;
-        case 'wrong quantity':
-          toast.error('Błędna ilość!', { id: 'error' });
-          break;
-        case 'wrong process':
-          toast.error('Błędny proces!', { id: 'error' });
+        case 'full box':
+          toast.error('Pełny box!', { id: 'error' });
           break;
         case 'full pallet':
           toast.error('Pełna paleta!', { id: 'error' });
@@ -82,15 +77,15 @@ export default function ScanPalletQr(props: StatusProps) {
       setIsPending(false);
     }
   };
-  //TODO color if choosed
+
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
         className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
-        value={palletQr}
-        onChange={(event) => setPalletQr(event.target.value)}
+        value={dmc}
+        onChange={(event) => setDmc(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={isPending ? 'Zapisywanie...' : 'Paleta QR'}
+        placeholder={isPending ? 'Zapisywanie...' : 'DMC'}
         autoFocus
       />
     </div>

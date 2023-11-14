@@ -13,7 +13,7 @@ import {
 import Select from './Select';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { useSession } from 'next-auth/react';
-import formatEmailToName from '@/app/pro/lib/utils/formatEmailToName';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 
 type Article = {
   value: string;
@@ -105,7 +105,7 @@ export default function Edit() {
             if (positionData.positionOnCard.approver) {
               setApproved(true);
               setErrorMessage(
-                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${formatEmailToName(
+                `Edycja niedozowolona, pozycja została zatwierdzona przez: ${extractNameFromEmail(
                   positionData.positionOnCard.approver,
                 )}!`,
               );

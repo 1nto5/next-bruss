@@ -17,7 +17,6 @@ type StatusProps = {
 
 export default function Status(props: StatusProps) {
   const personContext = useContext(PersonContext);
-
   return (
     <div className='flex flex-row items-center justify-between bg-slate-100 pb-4 pt-4 shadow-md dark:bg-slate-800'>
       <StatusBox
@@ -30,19 +29,19 @@ export default function Status(props: StatusProps) {
               })`
             : 'brak'
         }
-        width='w-6/12'
+        width='w-1/3'
       />
       <StatusBox
-        name='153 (28042)'
+        name='153 (28042):'
         value={`${props.onPallet153}/${props.palletSize153}`}
-        width='3/12'
+        width='w-1/3'
         loading={props.isPending}
         full={props.isFull153}
       />
       <StatusBox
-        name='136 (28067)'
+        name='136 (28067):'
         value={`${props.onPallet136}/${props.palletSize136}`}
-        width='3/12'
+        width='w-1/3'
         loading={props.isPending}
         full={props.isFull136}
         separator={false}

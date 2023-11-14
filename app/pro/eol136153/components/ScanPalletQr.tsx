@@ -1,7 +1,5 @@
-import { useState, useContext, useEffect } from 'react';
-
+import { useState, useContext } from 'react';
 import { savePalletBatch } from '../../actions';
-import { useTransition } from 'react';
 import toast from 'react-hot-toast';
 import { ScanContext } from '../../lib/ScanContext';
 
@@ -16,7 +14,7 @@ type Props = {
 // Component to scan Pallet Batch
 export default function ScanPalletQr(props: Props) {
   const scanContext = useContext(ScanContext);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const [palletQr, setPalletQr] = useState('');
 
   const clearPalletQr = () => {
@@ -27,54 +25,53 @@ export default function ScanPalletQr(props: Props) {
       return;
     }
     clearPalletQr();
+    setIsPending(true);
+    toast.loading('Zapisywanie...', { id: 'saving' });
 
-    startTransition(async () => {
-      try {
-        toast.loading('zapisywanie...', { id: 'saving' });
-        const result = await savePalletBatch(
-          palletQr,
-          props.workplace,
-          props.article,
-          props.quantityOnPallet,
-          props.operator,
-        );
-        const status = result?.status;
+    try {
+      const result = await savePalletBatch(
+        palletQr,
+        props.workplace,
+        props.article,
+        props.quantityOnPallet,
+        props.operator,
+      );
+      const status = result?.status;
 
-        // Display toast message based on the result status
-        switch (status) {
-          case 'saved':
-            scanContext?.setScan(() => ({
-              last: palletQr,
-            }));
-            toast.success('Batch OK!', { id: 'success' });
-            break;
-          case 'exists':
-            toast.error('Batch istnieje!', { id: 'error' });
-            break;
-          case 'invalid':
-            toast.error('Batch niepoprawny!', { id: 'error' });
-            break;
-          case 'wrong article':
-            toast.error('Błędny artykuł!', { id: 'error' });
-            break;
-          case 'wrong quantity':
-            toast.error('Błędna ilość!', { id: 'error' });
-            break;
-          case 'wrong process':
-            toast.error('Błędny proces!', { id: 'error' });
-            break;
-          case 'full pallet':
-            toast.error('Pełna paleta!', { id: 'error' });
-            break;
-          default:
-            toast.error('Zgłoś się do IT!', { id: 'error' });
-        }
-      } catch (err) {
-        toast.error('Zgłoś się do IT!', { id: 'error' });
-      } finally {
-        toast.dismiss('saving');
+      switch (status) {
+        case 'saved':
+          scanContext?.setScan(() => ({
+            last: palletQr,
+          }));
+          toast.success('Batch OK!', { id: 'success' });
+          break;
+        case 'exists':
+          toast.error('Batch istnieje!', { id: 'error' });
+          break;
+        case 'invalid':
+          toast.error('Batch niepoprawny!', { id: 'error' });
+          break;
+        case 'wrong article':
+          toast.error('Błędny artykuł!', { id: 'error' });
+          break;
+        case 'wrong quantity':
+          toast.error('Błędna ilość!', { id: 'error' });
+          break;
+        case 'wrong process':
+          toast.error('Błędny proces!', { id: 'error' });
+          break;
+        case 'full pallet':
+          toast.error('Pełna paleta!', { id: 'error' });
+          break;
+        default:
+          toast.error('Zgłoś się do IT!', { id: 'error' });
       }
-    });
+    } catch (err) {
+      toast.error('Zgłoś się do IT!', { id: 'error' });
+    } finally {
+      toast.dismiss('saving');
+      setIsPending(false);
+    }
   };
 
   return (
@@ -84,7 +81,7 @@ export default function ScanPalletQr(props: Props) {
         value={palletQr}
         onChange={(event) => setPalletQr(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder='Paleta QR'
+        placeholder={`${!isPending ? 'Paleta QR' : 'zapisywanie...'}`}
         autoFocus
       />
     </div>

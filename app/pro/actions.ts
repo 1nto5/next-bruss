@@ -43,28 +43,27 @@ export async function loginPerson(number: string) {
   }
 }
 
-// // Function to get the number of documents with a specific status, article number, and workplace
-// export async function countInBox(workplace: string, article: string) {
-//   try {
-//     // Connect to MongoDB
-//     const client = await clientPromise;
-//     const db = client.db();
-//     const collection = db.collection(collectionName);
+export async function countInBox(workplace: string, article: string) {
+  try {
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
-//     // Query the collection
-//     const count = await collection.countDocuments({
-//       status: 'box',
-//       workplace: workplace,
-//       article: article,
-//     });
+    // Query the collection
+    const count = await collection.countDocuments({
+      status: 'box',
+      workplace: workplace,
+      article: article,
+    });
 
-//     // Return the count
-//     return count;
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while counting the documents.');
-//   }
-// }
+    // Return the count
+    return count;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while counting the documents.');
+  }
+}
 
 export async function countOnPallet(workplace: string, article: string) {
   try {
@@ -105,22 +104,22 @@ export async function getPalletSize(workplace: string, article: string) {
   }
 }
 
-// // Function to get the box size for a specific workplace and article
-// export async function getBoxSize(workplace: string, article: string) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) =>
-//         object.workplace === workplace && object.article === article,
-//     );
+// Function to get the box size for a specific workplace and article
+export async function getBoxSize(workplace: string, article: string) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
 
-//     // Return the box size, or null if the article is not found
-//     return articleConfig ? articleConfig.boxSize : null;
-//   } catch (error) {
-//     console.error('Error while getting the box size:', error);
-//     return null;
-//   }
-// }
+    // Return the box size, or null if the article is not found
+    return articleConfig ? articleConfig.boxSize : null;
+  } catch (error) {
+    console.error('Error while getting the box size:', error);
+    return null;
+  }
+}
 
 // Generate pallet QR
 export async function getPalletQr(article: string, quantityOnPallet: number) {
@@ -145,198 +144,205 @@ export async function getPalletQr(article: string, quantityOnPallet: number) {
   }
 }
 
-// // Save DMC function
-// export async function saveDmc(
-//   dmc: string,
-//   workplace: string,
-//   article: string,
-//   operatorPersonalNumber: number,
-// ) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) =>
-//         object.workplace === workplace && object.article === article,
-//     );
+// Save DMC function
+export async function saveDmc(
+  dmc: string,
+  workplace: string,
+  article: string,
+  operator: string,
+) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
 
-//     if (!articleConfig || !articleConfig.baseDmc || !articleConfig.dmcFirVal) {
-//       throw new Error('Article config problem!');
-//     }
+    if (!articleConfig || !articleConfig.baseDmc || !articleConfig.dmcFirVal) {
+      throw new Error('Article config problem!');
+    }
 
-//     // DMC length
-//     if (dmc.length !== articleConfig.baseDmc.length) {
-//       return { status: 'invalid' };
-//     }
+    // DMC length
+    if (dmc.length !== articleConfig.baseDmc.length) {
+      return { status: 'invalid' };
+    }
 
-//     // DMC content
-//     if (
-//       dmc.substring(articleConfig.dmcFirVal[0], articleConfig.dmcFirVal[1]) !==
-//       articleConfig.baseDmc.substring(
-//         articleConfig.dmcFirVal[0],
-//         articleConfig.dmcFirVal[1],
-//       )
-//     ) {
-//       return { status: 'invalid' };
-//     }
+    // DMC content
+    if (
+      dmc.substring(articleConfig.dmcFirVal[0], articleConfig.dmcFirVal[1]) !==
+      articleConfig.baseDmc.substring(
+        articleConfig.dmcFirVal[0],
+        articleConfig.dmcFirVal[1],
+      )
+    ) {
+      return { status: 'invalid' };
+    }
 
-//     if (
-//       articleConfig.dmcSecVal &&
-//       dmc.substring(articleConfig.dmcSecVal[0], articleConfig.dmcSecVal[1]) !==
-//         articleConfig.baseDmc.substring(
-//           articleConfig.dmcSecVal[0],
-//           articleConfig.dmcSecVal[1],
-//         )
-//     ) {
-//       return { status: 'invalid' };
-//     }
+    if (
+      articleConfig.dmcSecVal &&
+      dmc.substring(articleConfig.dmcSecVal[0], articleConfig.dmcSecVal[1]) !==
+        articleConfig.baseDmc.substring(
+          articleConfig.dmcSecVal[0],
+          articleConfig.dmcSecVal[1],
+        )
+    ) {
+      return { status: 'invalid' };
+    }
 
-//     // FORD date
-//     if (articleConfig.ford && !fordValidation(dmc)) {
-//       return { status: 'wrong date' };
-//     }
+    // FORD date
+    if (articleConfig.ford && !fordValidation(dmc)) {
+      return { status: 'wrong date' };
+    }
 
-//     // BMW date
-//     if (articleConfig.bmw && !bmwValidation(dmc)) {
-//       return { status: 'wrong date' };
-//     }
+    // BMW date
+    if (articleConfig.bmw && !bmwValidation(dmc)) {
+      return { status: 'wrong date' };
+    }
 
-//     // Connect to MongoDB
-//     const client = await clientPromise;
-//     const db = client.db();
-//     const collection = db.collection(collectionName);
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
-//     // Check for existing data
-//     const existingData = await collection.findOne({ dmc: dmc });
-//     if (existingData) {
-//       return { status: 'exists' };
-//     }
+    // Check for existing data
+    const existingData = await collection.findOne({ dmc: dmc });
+    if (existingData) {
+      return { status: 'exists' };
+    }
 
-//     // Check if pallet is full
-//     const onPallet = await countOnPallet(workplace, article);
-//     const palletSize = await getPalletSize(workplace, article);
-//     if (!palletSize) {
-//       throw new Error('Pallet size not found.');
-//     }
-//     if (onPallet >= palletSize) {
-//       return { status: 'full pallet' };
-//     }
+    // Check if pallet is full
+    const onPallet = await countOnPallet(workplace, article);
+    const palletSize = await getPalletSize(workplace, article);
+    if (!palletSize) {
+      throw new Error('Pallet size not found.');
+    }
+    if (onPallet >= palletSize) {
+      return { status: 'full pallet' };
+    }
 
-//     // Check if box is full
-//     const inBox = await countInBox(workplace, article);
-//     const boxSize = await getBoxSize(workplace, article);
-//     if (!boxSize) {
-//       throw new Error('Box size not found.');
-//     }
-//     if (inBox >= boxSize) {
-//       return { status: 'full box' };
-//     }
+    // Check if box is full
+    const inBox = await countInBox(workplace, article);
+    const boxSize = await getBoxSize(workplace, article);
+    if (!boxSize) {
+      throw new Error('Box size not found.');
+    }
+    if (inBox >= boxSize) {
+      return { status: 'full box' };
+    }
 
-//     // Insert data
-//     const insertResult = await collection.insertOne({
-//       status: 'box',
-//       dmc: dmc,
-//       workplace: workplace,
-//       article: article,
-//       operator: operatorPersonalNumber,
-//       time: new Date(),
-//     });
+    // Insert data
+    const insertResult = await collection.insertOne({
+      status: 'box',
+      dmc: dmc,
+      workplace: workplace,
+      article: article,
+      operator: operator,
+      time: new Date(),
+    });
 
-//     if (insertResult) {
-//       return { status: 'saved' };
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while saving the hydra batch.');
-//   }
-// }
+    if (insertResult) {
+      return { status: 'saved' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the hydra batch.');
+  }
+}
 
 // // Save Hydra Batch function
-// export async function saveHydraBatch(
-//   hydraQr: string,
-//   workplace: string,
-//   article: string,
-//   operatorPersonalNumber: number,
-// ) {
-//   try {
-//     // Find the article configuration
-//     const articleConfig = config.find(
-//       (object: ArticleConfig) =>
-//         object.workplace === workplace && object.article === article,
-//     );
+export async function saveHydraBatch(
+  hydraQr: string,
+  workplace: string,
+  article: string,
+  operator: string,
+) {
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
 
-//     if (!articleConfig) {
-//       throw new Error('Article config problem!');
-//     }
+    if (!articleConfig) {
+      throw new Error('Article config problem!');
+    }
 
-//     // Validate hydra QR code
-//     if (hydraQr.length < 34 || !hydraQr.includes('|')) {
-//       return { status: 'invalid' };
-//     }
+    // Validate hydra QR code
+    if (hydraQr.length < 34 || !hydraQr.includes('|')) {
+      return { status: 'invalid' };
+    }
 
-//     // Split QR code
-//     const splitHydraQr = hydraQr.split('|');
-//     const qrarticle = splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
+    // Split QR code
+    const splitHydraQr = hydraQr.split('|');
+    const qrarticle = splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
 
-//     // Check article number
-//     if (qrarticle !== article) {
-//       return { status: 'wrong article' };
-//     }
+    // Check article number
+    if (qrarticle !== article) {
+      return { status: 'wrong article' };
+    }
 
-//     // Check quantity
-//     const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
-//     if (qrQuantity !== articleConfig.boxSize) {
-//       return { status: 'wrong quantity' };
-//     }
+    // Check quantity
+    const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
+    if (qrQuantity !== articleConfig.boxSize) {
+      return { status: 'wrong quantity' };
+    }
 
-//     // Check process
-//     const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
-//     if (!articleConfig.hydraProc.includes(qrProcess)) {
-//       return { status: 'wrong process' };
-//     }
+    // Check process
+    const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
+    if (!articleConfig.hydraProc.includes(qrProcess)) {
+      return { status: 'wrong process' };
+    }
 
-//     // Extract batch from QR code
-//     const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
+    // Extract batch from QR code
+    const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
 
-//     // Connect to MongoDB
-//     const client = await clientPromise;
-//     const db = client.db();
-//     const collection = db.collection(collectionName);
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
 
-//     // Check for existing data
-//     const existingData = await collection.findOne({ hydra_batch: qrBatch });
-//     if (existingData) {
-//       return { status: 'exists' };
-//     }
+    // Check for existing data
+    const existingBatch = await collection.findOne({ hydra_batch: qrBatch });
+    if (existingBatch) {
+      return { status: 'exists' };
+    }
 
-//     // Check if pallet is full
-//     const onPallet = await countOnPallet(workplace, article);
-//     const palletSize = await getPalletSize(workplace, article);
-//     if (!palletSize) {
-//       throw new Error('Pallet size not found.');
-//     }
-//     if (onPallet >= palletSize) {
-//       return { status: 'full pallet' };
-//     }
+    // Check if pallet is full
+    const onPallet = await countOnPallet(workplace, article);
+    const palletSize = await getPalletSize(workplace, article);
+    if (!palletSize) {
+      throw new Error('Pallet size not found.');
+    }
+    if (onPallet >= palletSize) {
+      return { status: 'full pallet' };
+    }
 
-//     // Insert data
-//     const insertResult = await collection.insertOne({
-//       status: 'pallet',
-//       hydra_batch: qrBatch,
-//       workplace: workplace,
-//       article: article,
-//       quantity: qrQuantity,
-//       operator: operatorPersonalNumber,
-//       time: new Date(),
-//     });
+    const existingData = await collection.findOne({
+      workplace: workplace,
+      article: article,
+    });
 
-//     if (insertResult) {
-//       return { status: 'saved' };
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while saving the hydra batch.');
-//   }
-// }
+    if (existingData) {
+      const updateResult = await collection.updateOne(
+        { workplace: workplace, article: article },
+        {
+          $set: {
+            status: 'pallet',
+            hydra_batch: qrBatch,
+            hydra_operator: operator,
+            hydra_time: new Date(),
+          },
+        },
+      );
+      if (updateResult.modifiedCount > 0) {
+        return { status: 'saved' };
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the hydra batch.');
+  }
+}
 
 // Save Pallet Batch function
 export async function savePalletBatch(

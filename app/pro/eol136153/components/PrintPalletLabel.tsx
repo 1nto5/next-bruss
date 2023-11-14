@@ -1,9 +1,8 @@
-import { useRef, useTransition, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import Button from '@/app/pro/components//Button';
 import { getPalletQr } from '../../actions';
-import toast from 'react-hot-toast';
 
 type Props = {
   articleNumber: string;
@@ -13,15 +12,20 @@ type Props = {
 
 const PrintPalletLabel = (props: Props) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
-  const [isPending, startTransition] = useTransition();
-
   const [palletQr, setPalletQr] = useState<string | null>(null);
 
   useEffect(() => {
-    startTransition(async () => {
-      const qr = await getPalletQr(props.articleNumber, props.quantityOnPallet);
-      qr && setPalletQr(qr);
-    });
+    (async () => {
+      try {
+        const qr = await getPalletQr(
+          props.articleNumber,
+          props.quantityOnPallet,
+        );
+        qr && setPalletQr(qr);
+      } catch (error) {
+        console.error('Error fetching pallet QR:', error);
+      }
+    })();
   }, [props.articleNumber, props.quantityOnPallet]);
 
   const generatePrintWindow = (imgData: string) => {
@@ -99,12 +103,10 @@ const PrintPalletLabel = (props: Props) => {
 
   return (
     <div className='mt-8 flex flex-col items-center justify-center'>
-      {isPending && (
-        <Button
-          text={`wydruk QR dla ${props.articleNumber}`}
-          onClick={handlePrint}
-        />
-      )}
+      <Button
+        text={`wydruk Paleta QR dla ${props.articleNumber}`}
+        onClick={handlePrint}
+      />
       <div style={{ opacity: 0 }} ref={qrCodeRef}>
         <QRCode value={palletQr!} />
       </div>
