@@ -90,11 +90,11 @@ export async function saveHydraBatch136153(hydraQr: string, operator: string) {
     // Insert data
     const insertResult = await collection.insertOne({
       status: 'pallet',
-      hydra_batch: qrBatch,
       workplace: 'eol136153',
       article: qrarticle,
-      quantity: qrQuantity,
-      operator: operator,
+      // quantity: qrQuantity,
+      hydra_batch: qrBatch,
+      hydra_operator: operator,
       hydra_time: new Date(),
     });
 

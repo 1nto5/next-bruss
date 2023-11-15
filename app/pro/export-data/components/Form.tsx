@@ -29,9 +29,45 @@ export default function Form() {
     { label: 'na magazynie', value: 'warehouse' },
   ];
 
-  const generateExcel = async () => {
+  const generateExcel = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+
+    const formData = {
+      workplace: selectedWorkplace,
+      article: selectedArticle,
+      status: selectedStatus,
+      //   timeFrom: timeFrom,
+      //   timeTo: timeTo,
+      searchTerm: searchTerm,
+    };
+
     try {
-    } catch (error) {}
+      const response = await fetch('/api/generate-excel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Create a Blob from the response
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `${selectedWorkplace}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    } catch (error) {
+      console.error('There was an error generating the Excel file:', error);
+    }
   };
 
   return (
