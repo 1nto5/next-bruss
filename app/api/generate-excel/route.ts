@@ -36,10 +36,9 @@ export async function POST(req: NextRequest) {
     const db = client.db();
     const collection = db.collection('scans');
 
-    // Build your query based on the request body
     const timeQuery: TimeQuery = {};
-    if (body.timeFrom) timeQuery['$gte'] = body.timeFrom;
-    if (body.timeTo) timeQuery['$lte'] = body.timeTo;
+    if (body.timeFrom) timeQuery['$gte'] = new Date(body.timeFrom);
+    if (body.timeTo) timeQuery['$lte'] = new Date(body.timeTo);
 
     const query = {
       ...(body.workplace && { workplace: body.workplace }),
@@ -54,6 +53,8 @@ export async function POST(req: NextRequest) {
         ],
       }),
     };
+
+    console.log('query', query);
 
     const data = await collection.find(query).toArray();
     const workbook = new Workbook();

@@ -36,8 +36,8 @@ export default function Form() {
       workplace: selectedWorkplace,
       article: selectedArticle,
       status: selectedStatus,
-      //   timeFrom: timeFrom,
-      //   timeTo: timeTo,
+      timeFrom: timeFrom,
+      timeTo: timeTo,
       searchTerm: searchTerm,
     };
 
