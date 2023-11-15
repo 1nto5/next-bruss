@@ -92,10 +92,10 @@ export async function saveHydraBatch136153(hydraQr: string, operator: string) {
       status: 'pallet',
       workplace: 'eol136153',
       article: qrarticle,
-      // quantity: qrQuantity,
+      time: new Date(),
       hydra_batch: qrBatch,
       hydra_operator: operator,
-      hydra_time: new Date(),
+      // hydra_time: new Date(),
     });
 
     if (insertResult) {
