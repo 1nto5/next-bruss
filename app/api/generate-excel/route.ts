@@ -54,8 +54,6 @@ export async function POST(req: NextRequest) {
       }),
     };
 
-    console.log('query', query);
-
     const data = await collection.find(query).toArray();
     const workbook = new Workbook();
     const sheet = workbook.addWorksheet('Scans');
@@ -91,10 +89,10 @@ export async function POST(req: NextRequest) {
         workplace: item.workplace.toUpperCase(),
         status:
           item.status === 'box'
-            ? 'podczas pakowania'
+            ? 'box'
             : item.status === 'pallet'
-            ? 'na palecie'
-            : 'na magazynie',
+            ? 'paleta'
+            : 'magazyn',
         time: item.time
           ? convertToLocalTimeWithMoment(new Date(item.time))
           : null,

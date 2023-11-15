@@ -18,15 +18,16 @@ export default function Form() {
   });
   const [timeTo, setTimeTo] = useState<Date | null>(new Date());
   const [searchTerm, setSearchTerm] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
   const workplaces = Array.from(new Set(config.map((item) => item.workplace)));
-  const filteredArticles = config.filter(
-    (item) => item.workplace === selectedWorkplace,
-  );
+  const filteredArticles = selectedWorkplace
+    ? config.filter((item) => item.workplace === selectedWorkplace)
+    : config;
   const statusOptions = [
-    { label: 'podczas pakowania', value: 'box' },
-    { label: 'na palecie', value: 'pallet' },
-    { label: 'na magazynie', value: 'warehouse' },
+    { label: 'box', value: 'box' },
+    { label: 'paleta', value: 'pallet' },
+    { label: 'magazyn', value: 'warehouse' },
   ];
 
   const generateExcel = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -40,7 +41,7 @@ export default function Form() {
       timeTo: timeTo,
       searchTerm: searchTerm,
     };
-
+    setIsPending(true);
     try {
       const response = await fetch('/api/generate-excel', {
         method: 'POST',
@@ -59,7 +60,7 @@ export default function Form() {
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.setAttribute('download', `${selectedWorkplace}.xlsx`);
+      link.setAttribute('download', `exported-data.xlsx`);
       document.body.appendChild(link);
       link.click();
       if (link.parentNode) {
@@ -67,6 +68,8 @@ export default function Form() {
       }
     } catch (error) {
       console.error('There was an error generating the Excel file:', error);
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -87,29 +90,26 @@ export default function Form() {
             }
             placeholder='wybierz stanowisko'
           />
-          {selectedWorkplace && (
-            <Select
-              options={filteredArticles.map((article) => ({
-                label: `${article.name} (${article.article})`,
-                value: article.article,
-              }))}
-              onChange={(option: { value: SetStateAction<null> }) =>
-                setSelectedArticle(option.value)
-              }
-              placeholder='wybierz artykuł'
-              isDisabled={!selectedWorkplace}
-            />
-          )}
-          {selectedArticle && selectedWorkplace && (
-            <Select
-              options={statusOptions}
-              onChange={(option: { value: SetStateAction<null> }) =>
-                setSelectedStatus(option.value)
-              }
-              placeholder='wybierz status'
-              isDisabled={!selectedWorkplace}
-            />
-          )}
+
+          <Select
+            options={filteredArticles.map((article) => ({
+              label: `${article.name} (${article.article})`,
+              value: article.article,
+            }))}
+            onChange={(option: { value: SetStateAction<null> }) =>
+              setSelectedArticle(option.value)
+            }
+            placeholder='wybierz artykuł'
+          />
+
+          <Select
+            options={statusOptions}
+            onChange={(option: { value: SetStateAction<null> }) =>
+              setSelectedStatus(option.value)
+            }
+            placeholder='wybierz status'
+          />
+
           <div className='flex justify-center space-x-2'>
             <div className='flex flex-col items-center'>
               <label className='mb-1 text-sm text-slate-700'>data od:</label>
@@ -147,11 +147,10 @@ export default function Form() {
             type='submit'
             className={clsx(
               `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100`,
-              { 'animate-pulse': false },
+              { 'animate-pulse': isPending === true },
             )}
-            disabled={!selectedWorkplace}
           >
-            generuj excel
+            {!isPending ? 'generuj excel' : 'generowanie'}
           </button>
         </form>
       </div>
