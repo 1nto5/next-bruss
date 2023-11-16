@@ -11,7 +11,7 @@ export default function Page() {
     <PersonProvider>
       <ArticleProvider>
         <ScanProvider>
-          <Header title='eol136153' showArticleLogOut={false} />
+          <Header title='EOL136153' showArticleLogOut={false} />
           <App />
         </ScanProvider>
       </ArticleProvider>
