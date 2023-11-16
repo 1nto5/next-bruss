@@ -20,10 +20,7 @@ export default function UserInfo() {
           </button>
         ) : (
           <>
-            <p className='mt-10'>
-              One day there will be something beautiful here, for now you can
-              log out:
-            </p>
+            <p className='mt-10'>Niedługo powstanie tu panel dostępu...</p>
             <button
               className='mt-2 w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
               onClick={() => signOut()}
@@ -41,8 +38,14 @@ export default function UserInfo() {
             </p>
 
             <Link href={'/inventory-approve'}>
-              <button className='rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
+              <button className='m-2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
                 inventory approve app
+              </button>
+            </Link>
+
+            <Link href={'/pro/export-data'}>
+              <button className='m-3 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
+                export data
               </button>
             </Link>
           </>

@@ -20,6 +20,6 @@ export function extractNameFromEmail(email: string): string {
     firstName.charAt(0).toUpperCase() +
     firstName.slice(1) +
     ' ' +
-    lastNameInitial
+    lastNameInitial.toUpperCase()
   );
 }
