@@ -82,7 +82,6 @@ export default function ScanPalletQr(props: StatusProps) {
       setIsPending(false);
     }
   };
-  //TODO color if choosed
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input

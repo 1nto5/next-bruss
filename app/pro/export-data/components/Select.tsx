@@ -1,3 +1,5 @@
+//TODO: format Select with tailwind: https://www.jussivirtanen.fi/writing/styling-react-select-with-tailwind
+
 import { useEffect, useState } from 'react';
 import ReactSelect from 'react-select';
 
