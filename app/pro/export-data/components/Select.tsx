@@ -7,8 +7,8 @@ type Option = {
 };
 
 type SelectProps = {
-  options: Option[];
-  // value: any;
+  options: Option[] | string[];
+  value: any;
   onChange: any;
   placeholder: string;
   isDisabled?: boolean;
@@ -17,11 +17,12 @@ type SelectProps = {
 const selectDarkTheme = {
   option: (provided: any, state: any) => ({
     ...provided,
-    'backgroundColor': state.isSelected ? '#2D3748' : '#1A202C',
-    'color': '#F7FAFC', // slate-100 z Tailwind
-    '&:hover': {
-      backgroundColor: '#4A5568',
-    },
+    backgroundColor: state.isFocused
+      ? '#4A5568'
+      : state.isSelected
+      ? '#2D3748'
+      : '#1A202C',
+    color: '#F7FAFC', // slate-100 z Tailwind
   }),
   menu: (provided: any) => ({
     ...provided,
@@ -50,11 +51,12 @@ const selectDarkTheme = {
 const selectLightTheme = {
   option: (provided: any, state: any) => ({
     ...provided,
-    'backgroundColor': state.isSelected ? '#EDF2F7' : 'white',
-    'color': '#2D3748',
-    '&:hover': {
-      backgroundColor: '#E2E8F0', // slate-200 z Tailwind
-    },
+    backgroundColor: state.isFocused
+      ? '#E2E8F0'
+      : state.isSelected
+      ? '#EDF2F7'
+      : 'white',
+    color: '#2D3748',
   }),
   menu: (provided: any) => ({
     ...provided,
@@ -82,7 +84,7 @@ const selectLightTheme = {
 
 export default function Select({
   options,
-  // value,
+  value,
   onChange,
   placeholder,
   isDisabled,
@@ -108,13 +110,14 @@ export default function Select({
     <div className='flex items-center justify-center'>
       <ReactSelect
         options={options}
-        // value={value}
+        value={value}
         onChange={onChange}
         placeholder={placeholder}
         className='w-full max-w-xs text-center'
         menuPlacement='auto'
         styles={isDarkMode ? selectDarkTheme : selectLightTheme}
         isDisabled={isDisabled}
+        isClearable={true}
       />
     </div>
   );

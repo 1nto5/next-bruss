@@ -85,10 +85,26 @@ export default function Form() {
               label: workplace.toUpperCase(),
               value: workplace,
             }))}
-            onChange={(option: { value: SetStateAction<null> }) =>
-              setSelectedWorkplace(option.value)
+            value={
+              workplaces.find((workplace) => workplace === selectedWorkplace)
+                ? {
+                    label:
+                      selectedWorkplace &&
+                      (selectedWorkplace as String).toUpperCase(),
+                    value: selectedWorkplace,
+                  }
+                : null
             }
-            placeholder='wybierz stanowisko'
+            onChange={(option: { value: SetStateAction<null> }) => {
+              if (option) {
+                setSelectedWorkplace(option.value);
+                setSelectedArticle(null);
+              } else {
+                setSelectedWorkplace(null);
+                setSelectedArticle(null);
+              }
+            }}
+            placeholder='stanowisko'
           />
 
           <Select
@@ -96,27 +112,61 @@ export default function Form() {
               label: `${article.name} (${article.article})`,
               value: article.article,
             }))}
-            onChange={(option: { value: SetStateAction<null> }) =>
-              setSelectedArticle(option.value)
+            value={
+              filteredArticles.find(
+                (article) => article.article === selectedArticle,
+              )
+                ? {
+                    label: `${
+                      filteredArticles.find(
+                        (article) => article.article === selectedArticle,
+                      )?.name
+                    } (${selectedArticle})`,
+                    value: selectedArticle,
+                  }
+                : null
             }
-            placeholder='wybierz artykuł'
+            onChange={(option: { value: SetStateAction<null> }) => {
+              if (option) {
+                setSelectedArticle(option.value);
+              } else {
+                setSelectedArticle(null);
+              }
+            }}
+            placeholder='artykuł'
           />
 
           <Select
             options={statusOptions}
-            onChange={(option: { value: SetStateAction<null> }) =>
-              setSelectedStatus(option.value)
+            value={
+              statusOptions.find((option) => option.value === selectedStatus)
+                ? {
+                    label: statusOptions.find(
+                      (option) => option.value === selectedStatus,
+                    )?.label,
+                    value: selectedStatus,
+                  }
+                : null
             }
-            placeholder='wybierz status'
+            onChange={(option: { value: SetStateAction<null> }) => {
+              if (option) {
+                setSelectedStatus(option.value);
+              } else {
+                setSelectedStatus(null);
+              }
+            }}
+            placeholder='status'
           />
 
           <div className='flex justify-center space-x-2'>
             <div className='flex flex-col items-center'>
-              <label className='mb-1 text-sm text-slate-700'>data od:</label>
+              <label className='mb-1 text-sm text-slate-700 dark:text-slate-300'>
+                data od:
+              </label>
               <DatePicker
                 selected={timeFrom}
                 onChange={(date) => setTimeFrom(date)}
-                className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+                className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
                 showTimeSelect
                 timeIntervals={15}
                 dateFormat='P HH:mm'
@@ -124,11 +174,13 @@ export default function Form() {
               />
             </div>
             <div className='flex flex-col items-center'>
-              <label className='mb-1 text-sm text-slate-700'>data do:</label>
+              <label className='mb-1 text-sm text-slate-700 dark:text-slate-300'>
+                data do:
+              </label>
               <DatePicker
                 selected={timeTo}
                 onChange={(date) => setTimeTo(date)}
-                className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+                className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
                 showTimeSelect
                 timeIntervals={15}
                 dateFormat='P HH:mm'
@@ -138,7 +190,7 @@ export default function Form() {
           </div>
           <input
             type='text'
-            className='items-center rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+            className='items-center rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
             placeholder='wyszukaj DMC / hydra batch / pallet batch'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -146,7 +198,7 @@ export default function Form() {
           <button
             type='submit'
             className={clsx(
-              `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100`,
+              `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss`,
               { 'animate-pulse': isPending === true },
             )}
           >
