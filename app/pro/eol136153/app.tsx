@@ -81,7 +81,7 @@ export default function App() {
               )}
             </>
           ) : (
-            (!isPending && isFull136 && (
+            (isFull136 && (
               <>
                 <ScanPalletQr
                   workplace='eol136153'
@@ -97,7 +97,7 @@ export default function App() {
                 />
               </>
             ),
-            !isPending && isFull153 && (
+            isFull153 && (
               <>
                 <ScanPalletQr
                   workplace='eol136153'
