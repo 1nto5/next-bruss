@@ -1,6 +1,5 @@
 'use server';
 import clientPromise from '@/lib/mongo';
-import generatePalletQr from '@/app/pro/lib/utils/generatePalletQr';
 import config from '@/app/pro/config';
 import { countOnPallet } from '../actions';
 
@@ -91,6 +90,7 @@ export async function saveHydraBatch136153(hydraQr: string, operator: string) {
     const insertResult = await collection.insertOne({
       status: 'pallet',
       workplace: 'eol136153',
+      type: articleConfig.type,
       article: qrarticle,
       time: new Date(),
       hydra_batch: qrBatch,
