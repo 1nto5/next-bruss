@@ -79,6 +79,7 @@ export async function countOnPallet(workplace: string, article: string) {
       article: article,
     });
 
+    console.log('on pallet', count);
     // Return the count
     return count;
   } catch (error) {
@@ -330,7 +331,7 @@ export async function saveHydraBatch(
     });
 
     if (existingData) {
-      const updateResult = await collection.updateOne(
+      const updateResult = await collection.updateMany(
         { workplace: workplace, article: article },
         {
           $set: {
