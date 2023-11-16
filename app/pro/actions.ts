@@ -312,13 +312,16 @@ export async function saveHydraBatch(
     }
 
     // Check if pallet is full
-    const onPallet = await countOnPallet(workplace, article);
-    const palletSize = await getPalletSize(workplace, article);
-    if (!palletSize) {
-      throw new Error('Pallet size not found.');
-    }
-    if (onPallet >= palletSize) {
-      return { status: 'full pallet' };
+    if (articleConfig.palletSize) {
+      const onPallet = await countOnPallet(workplace, article);
+      const palletSize = await getPalletSize(workplace, article);
+      console.log(workplace, article);
+      if (!palletSize) {
+        throw new Error('Pallet size not found.');
+      }
+      if (onPallet >= palletSize) {
+        return { status: 'full pallet' };
+      }
     }
 
     const existingData = await collection.findOne({
