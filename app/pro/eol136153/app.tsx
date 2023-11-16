@@ -74,45 +74,40 @@ export default function App() {
             isFull136={isFull136}
             isPending={isPending}
           />
-          {!isFull136 && !isFull153 ? (
+          {!isFull136 && !isFull153 && !isPending && (
+            <ScanHydraQr operator={personContext.person.number} />
+          )}
+          {isFull136 && !isPending && (
             <>
-              {!isPending && (
-                <ScanHydraQr operator={personContext.person.number} />
-              )}
+              <ScanPalletQr
+                workplace='eol136153'
+                operator={personContext.person.number}
+                article={article136}
+                quantityOnPallet={onPallet136}
+                palletSize={palletSize136}
+              />
+              <PrintPalletLabel
+                articleNumber='28067'
+                articleName='M-136-K-1-A'
+                quantityOnPallet={onPallet136}
+              />
             </>
-          ) : (
-            (isFull136 && (
-              <>
-                <ScanPalletQr
-                  workplace='eol136153'
-                  operator={personContext.person.number}
-                  article={article136}
-                  quantityOnPallet={onPallet136}
-                  palletSize={palletSize136}
-                />
-                <PrintPalletLabel
-                  articleNumber='28067'
-                  articleName='M-136-K-1-A'
-                  quantityOnPallet={onPallet136}
-                />
-              </>
-            ),
-            isFull153 && (
-              <>
-                <ScanPalletQr
-                  workplace='eol136153'
-                  operator={personContext.person.number}
-                  article={article153}
-                  quantityOnPallet={onPallet153}
-                  palletSize={palletSize153}
-                />
-                <PrintPalletLabel
-                  articleNumber='28042'
-                  articleName='M-153-K-C'
-                  quantityOnPallet={onPallet153}
-                />
-              </>
-            ))
+          )}
+          {isFull153 && !isPending && (
+            <>
+              <ScanPalletQr
+                workplace='eol136153'
+                operator={personContext.person.number}
+                article={article153}
+                quantityOnPallet={onPallet153}
+                palletSize={palletSize153}
+              />
+              <PrintPalletLabel
+                articleNumber='28042'
+                articleName='M-153-K-C'
+                quantityOnPallet={onPallet153}
+              />
+            </>
           )}
         </>
       )}
