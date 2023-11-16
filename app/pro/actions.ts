@@ -235,6 +235,7 @@ export async function saveDmc(
       status: 'box',
       dmc: dmc,
       workplace: workplace,
+      type: articleConfig.type,
       article: article,
       operator: operator,
       time: new Date(),
