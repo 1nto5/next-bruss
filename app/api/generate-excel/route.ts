@@ -54,13 +54,14 @@ export async function POST(req: NextRequest) {
       }),
     };
 
-    const data = await collection.find(query).toArray();
+    const data = await collection.find(query).limit(10000).toArray();
     const workbook = new Workbook();
     const sheet = workbook.addWorksheet('Scans');
 
     sheet.columns = [
       { header: 'ID', key: '_id', width: 10, hidden: true },
       { header: 'Stanowisko', key: 'workplace', width: 10 },
+      { header: 'Typ', key: 'type', width: 10 },
       { header: 'Artykuł', key: 'article', width: 10 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'DMC', key: 'dmc', width: 30 },
@@ -87,21 +88,21 @@ export async function POST(req: NextRequest) {
         ...item,
         _id: item._id.toString(),
         workplace: item.workplace.toUpperCase(),
+        type: item.type ? item.type.toUpperCase() : '',
         status:
-          item.status === 'box'
-            ? 'box'
-            : item.status === 'pallet'
-            ? 'paleta'
-            : 'magazyn',
+          (item.status === 'box' && 'box') ||
+          (item.status === 'pallet' && 'paleta') ||
+          (item.status === 'warehouse' && 'magazyn') ||
+          'błąd',
         time: item.time
           ? convertToLocalTimeWithMoment(new Date(item.time))
-          : null,
+          : '',
         hydra_time: item.hydra_time
           ? convertToLocalTimeWithMoment(new Date(item.hydra_time))
-          : null,
+          : '',
         pallet_time: item.pallet_time
           ? convertToLocalTimeWithMoment(new Date(item.pallet_time))
-          : null,
+          : '',
       };
 
       sheet.addRow(row);
