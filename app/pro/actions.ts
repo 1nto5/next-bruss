@@ -79,7 +79,6 @@ export async function countOnPallet(workplace: string, article: string) {
       article: article,
     });
 
-    console.log('on pallet', count);
     // Return the count
     return count;
   } catch (error) {
@@ -215,7 +214,6 @@ export async function saveDmc(
     if (articleConfig.palletSize) {
       const onPallet = await countOnPallet(workplace, article);
       const palletSize = await getPalletSize(workplace, article);
-      console.log(workplace, article);
       if (!palletSize) {
         throw new Error('Pallet size not found.');
       }
@@ -316,7 +314,6 @@ export async function saveHydraBatch(
     if (articleConfig.palletSize) {
       const onPallet = await countOnPallet(workplace, article);
       const palletSize = await getPalletSize(workplace, article);
-      console.log(workplace, article);
       if (!palletSize) {
         throw new Error('Pallet size not found.');
       }
