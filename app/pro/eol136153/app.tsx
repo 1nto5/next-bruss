@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useTransition, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { PersonContext } from '../lib/PersonContext';
 import { ScanContext } from '../lib/ScanContext';
