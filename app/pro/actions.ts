@@ -27,6 +27,8 @@ type ArticleConfig = {
 
 const collectionName = 'scans';
 
+// TODO: change names to more meaningful (quantity on pallet, boxes on pallet etc.)
+
 export async function loginPerson(number: string) {
   try {
     const client = await clientPromise;
@@ -122,7 +124,7 @@ export async function getBoxSize(workplace: string, article: string) {
 }
 
 // Generate pallet QR
-export async function getPalletQr(article: string, quantityOnPallet: number) {
+export async function getPalletQr(article: string, boxesOnPallet: number) {
   try {
     // Find the article configuration
     const articleConfig = config.find(
@@ -135,7 +137,7 @@ export async function getPalletQr(article: string, quantityOnPallet: number) {
 
     return generatePalletQr(
       article,
-      quantityOnPallet,
+      boxesOnPallet * articleConfig.boxSize,
       articleConfig.palletProc,
     );
   } catch (error) {

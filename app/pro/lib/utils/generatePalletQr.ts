@@ -2,10 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 const generatePalletQr = (
   article: string,
-  quantityOnPallet: number,
+  piecesOnPallet: number,
   processNumber: string,
 ) => {
-  return `A:${article}|O:${processNumber}|Q:${quantityOnPallet}|B:AA${uuidv4()
+  return `A:${article}|O:${processNumber}|Q:${piecesOnPallet}|B:AA${uuidv4()
     .slice(0, 8)
     .toUpperCase()}|C:G`;
 };
