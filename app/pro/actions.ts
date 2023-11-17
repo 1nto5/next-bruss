@@ -134,12 +134,12 @@ export async function getPalletQr(article: string, boxesOnPallet: number) {
     if (!articleConfig) {
       throw new Error('Article not found.');
     }
-
-    return generatePalletQr(
+    const qr = generatePalletQr(
       article,
       boxesOnPallet * articleConfig.boxSize,
       articleConfig.palletProc,
     );
+    return { qr: qr, piecesOnPallet: boxesOnPallet * articleConfig.boxSize };
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while generating pallet qr.');

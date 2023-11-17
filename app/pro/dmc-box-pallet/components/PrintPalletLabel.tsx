@@ -13,15 +13,17 @@ type Props = {
 const PrintPalletLabel = (props: Props) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const [palletQr, setPalletQr] = useState<string | null>(null);
+  const [piecesOnPallet, setPiecesOnPallet] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
       try {
-        const qr = await getPalletQr(
+        const res = await getPalletQr(
           props.articleNumber,
           props.quantityOnPallet,
         );
-        qr && setPalletQr(qr);
+        res.qr && setPalletQr(res.qr);
+        res.piecesOnPallet && setPiecesOnPallet(res.piecesOnPallet);
       } catch (error) {
         console.error('Error fetching pallet QR:', error);
       }
@@ -73,7 +75,7 @@ const PrintPalletLabel = (props: Props) => {
                 <tr>
                   <td>${props.articleNumber}</td>
                   <td>${props.articleName}</td> 
-                  <td>${props.quantityOnPallet}</td>
+                  <td>${piecesOnPallet}</td>
                 </tr>
               </tbody>
             </table>
