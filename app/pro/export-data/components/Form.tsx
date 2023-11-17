@@ -7,6 +7,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import config from '@/app/pro/config';
 import clsx from 'clsx';
 
+// TODO: match styles (Select, input, datapicker) with the rest of the app in dark and light, make it responsive and format width datapicker
+
 export default function Form() {
   const [selectedWorkplace, setSelectedWorkplace] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -202,7 +204,7 @@ export default function Form() {
               { 'animate-pulse': isPending === true },
             )}
           >
-            {!isPending ? 'generuj excel' : 'generowanie'}
+            {!isPending ? 'pobierz excel' : 'generowanie'}
           </button>
         </form>
       </div>
