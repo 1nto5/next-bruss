@@ -254,26 +254,41 @@ export async function saveDmc(
       return { status: 'exists' };
     }
 
-    // Check if pallet is full
+    // Check if pallet is full and if box is full
     if (articleConfig.palletSize) {
-      const boxesOnPallet = await countBoxesOnPallet(workplace, article);
-      const palletSize = await getPalletSize(workplace, article);
+      // When palletSize is present, check both pallet and box simultaneously
+      const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
+        countBoxesOnPallet(workplace, article),
+        getPalletSize(workplace, article),
+        countInBox(workplace, article),
+        getBoxSize(workplace, article),
+      ]);
+
       if (!palletSize) {
         throw new Error('Pallet size not found.');
       }
       if (boxesOnPallet >= palletSize) {
         return { status: 'full pallet' };
       }
-    }
+      if (!boxSize) {
+        throw new Error('Box size not found.');
+      }
+      if (inBox >= boxSize) {
+        return { status: 'full box' };
+      }
+    } else {
+      // When palletSize is not present, check only the box
+      const [inBox, boxSize] = await Promise.all([
+        countInBox(workplace, article),
+        getBoxSize(workplace, article),
+      ]);
 
-    // Check if box is full
-    const inBox = await countInBox(workplace, article);
-    const boxSize = await getBoxSize(workplace, article);
-    if (!boxSize) {
-      throw new Error('Box size not found.');
-    }
-    if (inBox >= boxSize) {
-      return { status: 'full box' };
+      if (!boxSize) {
+        throw new Error('Box size not found.');
+      }
+      if (inBox >= boxSize) {
+        return { status: 'full box' };
+      }
     }
 
     // Insert data
@@ -356,8 +371,12 @@ export async function saveHydraBatch(
 
     // Check if pallet is full
     if (articleConfig.palletSize) {
-      const boxesOnPallet = await countBoxesOnPallet(workplace, article);
-      const palletSize = await getPalletSize(workplace, article);
+      // Execute countBoxesOnPallet and getPalletSize in parallel
+      const [boxesOnPallet, palletSize] = await Promise.all([
+        countBoxesOnPallet(workplace, article),
+        getPalletSize(workplace, article),
+      ]);
+
       if (!palletSize) {
         throw new Error('Pallet size not found.');
       }
