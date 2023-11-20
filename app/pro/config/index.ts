@@ -132,7 +132,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -144,7 +144,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -156,7 +156,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -180,7 +180,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -204,7 +204,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -216,7 +216,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
@@ -228,7 +228,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 17],
     bmw: true,
     boxSize: 16,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '405',
   },
   {
