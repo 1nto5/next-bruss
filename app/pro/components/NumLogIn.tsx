@@ -61,7 +61,7 @@ const NumLogIn = () => {
       onSubmit={handleLogin}
     >
       <input
-        className='font mt-4 h-24 w-3/12 rounded-lg bg-slate-100 text-center text-4xl text-slate-900 shadow-sm outline-none dark:bg-slate-700 dark:text-slate-100'
+        className='w-1/5 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
         type='text'
         value={personalNumber}
         onChange={(e) => setPersonalNumber(e.target.value)}
