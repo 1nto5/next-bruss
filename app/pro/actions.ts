@@ -373,7 +373,7 @@ export async function saveHydraBatch(
 
     if (existingData) {
       const updateResult = await collection.updateMany(
-        { workplace: workplace, article: article },
+        { status: 'box', workplace: workplace, article: article },
         {
           $set: {
             status: 'pallet',
