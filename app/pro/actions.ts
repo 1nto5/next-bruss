@@ -417,7 +417,7 @@ export async function savePalletBatch(
   palletQr: string,
   workplace: string,
   article: string,
-  quantityOnPallet: number,
+  boxesOnPallet: number,
   operator: string,
 ) {
   try {
@@ -448,7 +448,7 @@ export async function savePalletBatch(
 
     // Check quantity
     const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
-    if (qrQuantity !== quantityOnPallet) {
+    if (qrQuantity !== boxesOnPallet * articleConfig.boxSize) {
       return { status: 'wrong quantity' };
     }
 

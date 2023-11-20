@@ -14,7 +14,7 @@ type StatusProps = {
 // Component to scan Pallet Batch
 export default function ScanPalletQr(props: StatusProps) {
   const scanContext = useContext(ScanContext);
-  const quantityOnPallet = props.onPallet * props.boxSize;
+  // const quantityOnPallet = props.onPallet * props.boxSize;
   const [isPending, setIsPending] = useState(false);
 
   // Local state for the pallet batch
@@ -41,7 +41,8 @@ export default function ScanPalletQr(props: StatusProps) {
         palletQr,
         props.workplace,
         props.article,
-        quantityOnPallet,
+        // quantityOnPallet,
+        props.onPallet,
         props.operator,
       );
 
