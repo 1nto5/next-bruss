@@ -448,7 +448,7 @@ export async function savePalletBatch(
 
     // Check quantity
     const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
-    if (qrQuantity !== quantityOnPallet * articleConfig.boxSize) {
+    if (qrQuantity !== quantityOnPallet) {
       return { status: 'wrong quantity' };
     }
 
