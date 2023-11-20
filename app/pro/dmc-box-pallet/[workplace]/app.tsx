@@ -156,7 +156,7 @@ export default function App() {
                     <PrintPalletLabel
                       articleNumber={articleContext?.article.number}
                       articleName={articleContext?.article.name}
-                      quantityOnPallet={onPallet}
+                      boxesOnPallet={onPallet}
                     />
                   </>
                 )}
