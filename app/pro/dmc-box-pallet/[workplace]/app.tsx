@@ -151,7 +151,7 @@ export default function App() {
                     workplace={workplace}
                     operator={personContext.person.number}
                     article={articleContext?.article.number}
-                    onPallet={boxesOnPallet}
+                    boxesOnPallet={boxesOnPallet}
                     boxSize={palletSize}
                   />
                   <PrintPalletLabel
