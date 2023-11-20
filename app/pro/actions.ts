@@ -69,6 +69,12 @@ export async function countInBox(workplace: string, article: string) {
 
 export async function countOnPallet(workplace: string, article: string) {
   try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
+
     // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
@@ -81,8 +87,12 @@ export async function countOnPallet(workplace: string, article: string) {
       article: article,
     });
 
+    if (!articleConfig || !articleConfig.boxSize) {
+      throw new Error('Article config problem!');
+    }
+
     // Return the count
-    return count;
+    return count / articleConfig.boxSize;
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while counting the documents.');
