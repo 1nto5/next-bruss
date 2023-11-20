@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       }),
     };
 
-    const data = await collection.find(query).limit(10000).toArray();
+    const data = await collection.find(query).limit(100000).toArray();
     const workbook = new Workbook();
     const sheet = workbook.addWorksheet('Scans');
 
