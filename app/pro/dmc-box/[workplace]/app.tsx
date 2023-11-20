@@ -105,33 +105,32 @@ export default function App() {
         isFullBox={isFullBox}
         isPending={isPending}
       />
-      {!isPending &&
-        (!personContext?.person.number ? (
-          <NumLogIn />
-        ) : (
-          <>
-            {!articleContext?.article.number || !articleContext.article.name ? (
-              <ArticleSelector workplace={workplace} />
-            ) : (
-              <>
-                {!isFullBox && (
-                  <ScanDmc
-                    workplace={workplace}
-                    article={articleContext.article.number}
-                    operator={personContext.person.number}
-                  />
-                )}
-                {isFullBox && (
-                  <ScanHydraQr
-                    workplace={workplace}
-                    article={articleContext.article.number}
-                    operator={personContext.person.number}
-                  />
-                )}
-              </>
-            )}
-          </>
-        ))}
+      {!personContext?.person.number ? (
+        <NumLogIn />
+      ) : (
+        <>
+          {!articleContext?.article.number || !articleContext.article.name ? (
+            <ArticleSelector workplace={workplace} />
+          ) : (
+            <>
+              {!isFullBox && (
+                <ScanDmc
+                  workplace={workplace}
+                  article={articleContext.article.number}
+                  operator={personContext.person.number}
+                />
+              )}
+              {isFullBox && (
+                <ScanHydraQr
+                  workplace={workplace}
+                  article={articleContext.article.number}
+                  operator={personContext.person.number}
+                />
+              )}
+            </>
+          )}
+        </>
+      )}
     </>
   );
 }

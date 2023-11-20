@@ -74,10 +74,10 @@ export default function App() {
             isFull136={isFull136}
             isPending={isPending}
           />
-          {!isFull136 && !isFull153 && !isPending && (
+          {!isFull136 && !isFull153 && (
             <ScanHydraQr operator={personContext.person.number} />
           )}
-          {isFull136 && !isPending && (
+          {isFull136 && (
             <>
               <ScanPalletQr
                 workplace='eol136153'
@@ -93,7 +93,7 @@ export default function App() {
               />
             </>
           )}
-          {isFull153 && !isPending && (
+          {isFull153 && (
             <>
               <ScanPalletQr
                 workplace='eol136153'

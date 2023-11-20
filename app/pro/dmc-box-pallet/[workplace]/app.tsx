@@ -123,49 +123,48 @@ export default function App() {
         isFullBox={isFullBox}
         isPending={isPending}
       />
-      {!isPending &&
-        (!personContext?.person.number ? (
-          <NumLogIn />
-        ) : (
-          <>
-            {!articleContext?.article.number || !articleContext.article.name ? (
-              <ArticleSelector workplace={workplace} />
-            ) : (
-              <>
-                {!isFullPallet && !isFullBox && (
-                  <ScanDmc
+      {!personContext?.person.number ? (
+        <NumLogIn />
+      ) : (
+        <>
+          {!articleContext?.article.number || !articleContext.article.name ? (
+            <ArticleSelector workplace={workplace} />
+          ) : (
+            <>
+              {!isFullPallet && !isFullBox && (
+                <ScanDmc
+                  workplace={workplace}
+                  article={articleContext.article.number}
+                  operator={personContext.person.number}
+                />
+              )}
+              {isFullBox && (
+                <ScanHydraQr
+                  workplace={workplace}
+                  article={articleContext.article.number}
+                  operator={personContext.person.number}
+                />
+              )}
+              {isFullPallet && (
+                <>
+                  <ScanPalletQr
                     workplace={workplace}
-                    article={articleContext.article.number}
                     operator={personContext.person.number}
+                    article={articleContext?.article.number}
+                    onPallet={boxesOnPallet}
+                    boxSize={palletSize}
                   />
-                )}
-                {isFullBox && (
-                  <ScanHydraQr
-                    workplace={workplace}
-                    article={articleContext.article.number}
-                    operator={personContext.person.number}
+                  <PrintPalletLabel
+                    articleNumber={articleContext?.article.number}
+                    articleName={articleContext?.article.name}
+                    boxesOnPallet={boxesOnPallet}
                   />
-                )}
-                {isFullPallet && (
-                  <>
-                    <ScanPalletQr
-                      workplace={workplace}
-                      operator={personContext.person.number}
-                      article={articleContext?.article.number}
-                      onPallet={boxesOnPallet}
-                      boxSize={palletSize}
-                    />
-                    <PrintPalletLabel
-                      articleNumber={articleContext?.article.number}
-                      articleName={articleContext?.article.name}
-                      boxesOnPallet={boxesOnPallet}
-                    />
-                  </>
-                )}
-              </>
-            )}
-          </>
-        ))}
+                </>
+              )}
+            </>
+          )}
+        </>
+      )}
     </>
   );
 }
