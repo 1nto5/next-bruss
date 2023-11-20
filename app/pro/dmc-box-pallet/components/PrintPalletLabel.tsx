@@ -2,12 +2,12 @@ import { useRef, useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import Button from '@/app/pro/components//Button';
-import { getPalletQr } from '../../actions';
+import { getPalletQrValueAndPiecesOnPallet } from '../../actions';
 
 type Props = {
   articleNumber: string;
   articleName: string;
-  quantityOnPallet: number;
+  boxesOnPallet: number;
 };
 
 const PrintPalletLabel = (props: Props) => {
@@ -18,9 +18,9 @@ const PrintPalletLabel = (props: Props) => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await getPalletQr(
+        const res = await getPalletQrValueAndPiecesOnPallet(
           props.articleNumber,
-          props.quantityOnPallet,
+          props.boxesOnPallet,
         );
         res.qr && setPalletQr(res.qr);
         res.piecesOnPallet && setPiecesOnPallet(res.piecesOnPallet);
@@ -28,7 +28,7 @@ const PrintPalletLabel = (props: Props) => {
         console.error('Error fetching pallet QR:', error);
       }
     })();
-  }, [props.articleNumber, props.quantityOnPallet]);
+  }, [props.articleNumber, props.boxesOnPallet]);
 
   const generatePrintWindow = (imgData: string) => {
     const printWindow = window.open();

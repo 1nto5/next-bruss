@@ -124,7 +124,10 @@ export async function getBoxSize(workplace: string, article: string) {
 }
 
 // Generate pallet QR
-export async function getPalletQr(article: string, boxesOnPallet: number) {
+export async function getPalletQrValueAndPiecesOnPallet(
+  article: string,
+  boxesOnPallet: number,
+) {
   try {
     // Find the article configuration
     const articleConfig = config.find(

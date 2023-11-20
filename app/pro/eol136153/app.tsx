@@ -89,7 +89,7 @@ export default function App() {
               <PrintPalletLabel
                 articleNumber='28067'
                 articleName='M-136-K-1-A'
-                quantityOnPallet={onPallet136}
+                boxesOnPallet={onPallet136}
               />
             </>
           )}
@@ -105,7 +105,7 @@ export default function App() {
               <PrintPalletLabel
                 articleNumber='28042'
                 articleName='M-153-K-C'
-                quantityOnPallet={onPallet153}
+                boxesOnPallet={onPallet153}
               />
             </>
           )}
