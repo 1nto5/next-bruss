@@ -87,6 +87,35 @@ export async function countOnPallet(workplace: string, article: string) {
       article: article,
     });
 
+    // Return the count
+    return count;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while counting the documents.');
+  }
+}
+
+export async function countBoxesOnPallet(workplace: string, article: string) {
+  //TODO: -> countBoxesOnPallet
+  try {
+    // Find the article configuration
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
+
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+
+    // Query the collection
+    const count = await collection.countDocuments({
+      status: 'pallet',
+      workplace: workplace,
+      article: article,
+    });
+
     if (!articleConfig || !articleConfig.boxSize) {
       throw new Error('Article config problem!');
     }

@@ -10,6 +10,7 @@ import {
   getPalletSize,
   countInBox,
   getBoxSize,
+  countBoxesOnPallet,
 } from '@/app/pro/actions';
 import NumLogIn from '@/app/pro/components/NumLogIn';
 import Status from './../components/Status';
@@ -41,7 +42,7 @@ export default function App() {
   const [inBox, setInBox] = useState(0);
   const [boxSize, setBoxSize] = useState(0);
   const [isFullBox, setIsFullBox] = useState(false);
-  const [onPallet, setOnPallet] = useState(0);
+  const [boxesOnPallet, setBoxesOnPallet] = useState(0);
   const [palletSize, setPalletSize] = useState(0);
   const [isFullPallet, setIsFullPallet] = useState(false);
 
@@ -67,13 +68,13 @@ export default function App() {
         if (!articleContext?.article.number) {
           throw new Error('Article number is missing');
         }
-        const [onPallet, palletSize, inBox, boxSize] = await Promise.all([
-          countOnPallet(workplace, articleContext?.article.number),
+        const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
+          countBoxesOnPallet(workplace, articleContext?.article.number),
           getPalletSize(workplace, articleContext?.article.number),
           countInBox(workplace, articleContext?.article.number),
           getBoxSize(workplace, articleContext?.article.number),
         ]);
-        setOnPallet(onPallet);
+        setBoxesOnPallet(boxesOnPallet);
         setInBox(inBox);
         if (!palletSize || !boxSize) {
           toast.error('Skontaktuj się z IT!', { id: 'error' });
@@ -81,7 +82,7 @@ export default function App() {
         }
         setPalletSize(palletSize);
         setBoxSize(boxSize);
-        setIsFullPallet(onPallet === palletSize);
+        setIsFullPallet(boxesOnPallet === palletSize);
         setIsFullBox(inBox === boxSize);
       } catch (error) {
         toast.error('Skontaktuj się z IT!', { id: 'error' });
@@ -98,6 +99,7 @@ export default function App() {
     articleContext,
     personContext?.person.number,
     articleExists,
+    boxesOnPallet,
   ]);
 
   if (!workplaceExists || !workplace) {
@@ -113,7 +115,7 @@ export default function App() {
   return (
     <>
       <Status
-        onPallet={onPallet}
+        onPallet={boxesOnPallet}
         palletSize={palletSize}
         isFullPallet={isFullPallet}
         inBox={inBox}
@@ -150,13 +152,13 @@ export default function App() {
                       workplace={workplace}
                       operator={personContext.person.number}
                       article={articleContext?.article.number}
-                      onPallet={onPallet}
+                      onPallet={boxesOnPallet}
                       boxSize={palletSize}
                     />
                     <PrintPalletLabel
                       articleNumber={articleContext?.article.number}
                       articleName={articleContext?.article.name}
-                      boxesOnPallet={onPallet}
+                      boxesOnPallet={boxesOnPallet}
                     />
                   </>
                 )}
