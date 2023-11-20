@@ -7,7 +7,7 @@ type StatusProps = {
   workplace: string;
   article: string;
   operator: string;
-  onPallet: number;
+  boxesOnPallet: number;
   boxSize: number;
 };
 
@@ -42,7 +42,7 @@ export default function ScanPalletQr(props: StatusProps) {
         props.workplace,
         props.article,
         // quantityOnPallet,
-        props.onPallet,
+        props.boxesOnPallet,
         props.operator,
       );
 
