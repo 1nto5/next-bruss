@@ -8,6 +8,7 @@ import config from '@/app/pro/config';
 import clsx from 'clsx';
 
 // TODO: match styles (Select, input, datapicker) with the rest of the app in dark and light, make it responsive and format width datapicker
+// TODO: width data selector
 
 export default function Form() {
   const [selectedWorkplace, setSelectedWorkplace] = useState(null);
