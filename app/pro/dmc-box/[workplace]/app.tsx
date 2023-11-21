@@ -120,7 +120,7 @@ export default function App() {
                   operator={personContext.person.number}
                 />
               )}
-              {isFullBox && (
+              {!isPending && isFullBox && (
                 <ScanHydraQr
                   workplace={workplace}
                   article={articleContext.article.number}

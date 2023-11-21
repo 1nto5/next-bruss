@@ -25,7 +25,7 @@ export default function StatusBox({
         </p>
         <p
           className={clsx('text-xl md:text-3xl', {
-            'animate-pulse text-slate-300 dark:text-slate-500':
+            'animate-pulse text-slate-200 dark:text-slate-600':
               loading === true,
             'text-slate-900 dark:text-slate-50': full === false,
             'animate-bounce text-bruss dark:text-bruss': full === true,

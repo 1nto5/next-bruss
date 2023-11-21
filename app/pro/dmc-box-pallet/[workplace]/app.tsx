@@ -137,14 +137,14 @@ export default function App() {
                   operator={personContext.person.number}
                 />
               )}
-              {isFullBox && (
+              {!isPending && isFullBox && (
                 <ScanHydraQr
                   workplace={workplace}
                   article={articleContext.article.number}
                   operator={personContext.person.number}
                 />
               )}
-              {isFullPallet && (
+              {!isPending && isFullPallet && (
                 <>
                   <ScanPalletQr
                     workplace={workplace}
