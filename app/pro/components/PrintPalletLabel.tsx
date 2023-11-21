@@ -2,33 +2,44 @@ import { useRef, useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import Button from '@/app/pro/components//Button';
-import { getPalletQrValueAndPiecesOnPallet } from '../../actions';
+import { getPalletQr, countQuantityOnPallet } from '../actions';
+import toast from 'react-hot-toast';
 
 type Props = {
+  workplace: string;
   articleNumber: string;
   articleName: string;
-  boxesOnPallet: number;
 };
 
 const PrintPalletLabel = (props: Props) => {
   const qrCodeRef = useRef<HTMLDivElement>(null);
   const [palletQr, setPalletQr] = useState<string | null>(null);
-  const [piecesOnPallet, setPiecesOnPallet] = useState<number>(0);
+  const [quantityOnPallet, setQuantityOnPallet] = useState<number>(0);
+  const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
     (async () => {
+      setIsPending(true);
+      toast.loading('Generowanie...', { id: 'loading' });
       try {
-        const res = await getPalletQrValueAndPiecesOnPallet(
-          props.articleNumber,
-          props.boxesOnPallet,
-        );
-        res.qr && setPalletQr(res.qr);
-        res.piecesOnPallet && setPiecesOnPallet(res.piecesOnPallet);
+        const [qr, count] = await Promise.all([
+          getPalletQr(props.workplace, props.articleNumber),
+          countQuantityOnPallet(props.workplace, props.articleNumber),
+        ]);
+        if (qr) {
+          setPalletQr(qr);
+        }
+        if (count) {
+          setQuantityOnPallet(count);
+        }
       } catch (error) {
-        console.error('Error fetching pallet QR:', error);
+        console.error('Error fetching pallet qr or quantity on pallet:', error);
+      } finally {
+        setIsPending(false);
+        toast.dismiss('loading');
       }
     })();
-  }, [props.articleNumber, props.boxesOnPallet]);
+  }, [props.articleNumber, props.workplace]);
 
   const generatePrintWindow = (imgData: string) => {
     const printWindow = window.open();
@@ -75,7 +86,7 @@ const PrintPalletLabel = (props: Props) => {
                 <tr>
                   <td>${props.articleNumber}</td>
                   <td>${props.articleName}</td> 
-                  <td>${piecesOnPallet}</td>
+                  <td>${quantityOnPallet}</td>
                 </tr>
               </tbody>
             </table>
@@ -102,6 +113,10 @@ const PrintPalletLabel = (props: Props) => {
         console.error('Error generating canvas from QR code:', error);
       });
   };
+
+  if (isPending) {
+    return null;
+  }
 
   return (
     <div className='mt-8 flex flex-col items-center justify-center'>

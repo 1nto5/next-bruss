@@ -6,19 +6,18 @@ import { PersonContext } from '@/app/pro/lib/PersonContext';
 import { ScanContext } from '@/app/pro/lib/ScanContext';
 import { ArticleContext } from '@/app/pro/lib/ArticleContext';
 import {
-  countOnPallet,
+  countBoxesOnPallet,
   getPalletSize,
   countInBox,
   getBoxSize,
-  countBoxesOnPallet,
 } from '@/app/pro/actions';
 import NumLogIn from '@/app/pro/components/NumLogIn';
 import Status from './../components/Status';
 import ArticleSelector from '@/app/pro/components/ArticleSelector';
 import ScanDmc from '@/app/pro/components/ScanDmc';
 import ScanHydraQr from '@/app/pro/components/ScanHydraQr';
-import ScanPalletQr from './../components/ScanPalletQr';
-import PrintPalletLabel from './../components/PrintPalletLabel';
+import ScanPalletQr from '@/app/pro/components/ScanPalletQr';
+import PrintPalletLabel from '@/app/pro/components/PrintPalletLabel';
 import toast from 'react-hot-toast';
 import config from '@/app/pro/config';
 
@@ -151,13 +150,11 @@ export default function App() {
                     workplace={workplace}
                     operator={personContext.person.number}
                     article={articleContext?.article.number}
-                    boxesOnPallet={boxesOnPallet}
-                    boxSize={palletSize}
                   />
                   <PrintPalletLabel
+                    workplace={workplace}
                     articleNumber={articleContext?.article.number}
                     articleName={articleContext?.article.name}
-                    boxesOnPallet={boxesOnPallet}
                   />
                 </>
               )}

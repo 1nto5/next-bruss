@@ -7,7 +7,6 @@ import {
   bmwValidation,
 } from '@/app/pro/lib/utils/dmcDateValidation';
 
-// Define Types
 type ArticleConfig = {
   article: string;
   workplace: string;
@@ -27,8 +26,6 @@ type ArticleConfig = {
 
 const collectionName = 'scans';
 
-// TODO: change names to more meaningful (quantity on pallet, boxes on pallet etc.)
-
 export async function loginPerson(number: string) {
   try {
     const client = await clientPromise;
@@ -47,19 +44,14 @@ export async function loginPerson(number: string) {
 
 export async function countInBox(workplace: string, article: string) {
   try {
-    // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-
-    // Query the collection
     const count = await collection.countDocuments({
       status: 'box',
       workplace: workplace,
       article: article,
     });
-
-    // Return the count
     return count;
   } catch (error) {
     console.error(error);
@@ -67,27 +59,19 @@ export async function countInBox(workplace: string, article: string) {
   }
 }
 
-export async function countOnPallet(workplace: string, article: string) {
+export async function countQuantityOnPallet(
+  workplace: string,
+  article: string,
+) {
   try {
-    // Find the article configuration
-    const articleConfig = config.find(
-      (object: ArticleConfig) =>
-        object.workplace === workplace && object.article === article,
-    );
-
-    // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-
-    // Query the collection
     const count = await collection.countDocuments({
       status: 'pallet',
       workplace: workplace,
       article: article,
     });
-
-    // Return the count
     return count;
   } catch (error) {
     console.error(error);
@@ -95,49 +79,12 @@ export async function countOnPallet(workplace: string, article: string) {
   }
 }
 
-export async function countBoxesOnPallet(workplace: string, article: string) {
-  //TODO: -> countBoxesOnPallet
-  try {
-    // Find the article configuration
-    const articleConfig = config.find(
-      (object: ArticleConfig) =>
-        object.workplace === workplace && object.article === article,
-    );
-
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-
-    // Query the collection
-    const count = await collection.countDocuments({
-      status: 'pallet',
-      workplace: workplace,
-      article: article,
-    });
-
-    if (!articleConfig || !articleConfig.boxSize) {
-      throw new Error('Article config problem!');
-    }
-
-    // Return the count
-    return count / articleConfig.boxSize;
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while counting the documents.');
-  }
-}
-
-// Function to get the pallet size for a specific workplace and article
 export async function getPalletSize(workplace: string, article: string) {
   try {
-    // Find the article configuration
     const articleConfig = config.find(
       (object: ArticleConfig) =>
         object.workplace === workplace && object.article === article,
     );
-
-    // Return the pallet size, or null if the article is not found
     return articleConfig ? articleConfig.palletSize : null;
   } catch (error) {
     console.error('Error while getting the pallet size:', error);
@@ -145,16 +92,29 @@ export async function getPalletSize(workplace: string, article: string) {
   }
 }
 
-// Function to get the box size for a specific workplace and article
-export async function getBoxSize(workplace: string, article: string) {
+export async function countBoxesOnPallet(workplace: string, article: string) {
   try {
-    // Find the article configuration
     const articleConfig = config.find(
       (object: ArticleConfig) =>
         object.workplace === workplace && object.article === article,
     );
+    if (!articleConfig || !articleConfig.boxSize) {
+      throw new Error('Article config problem!');
+    }
+    const count = await countQuantityOnPallet(workplace, article);
+    return count / articleConfig.boxSize;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while counting the documents.');
+  }
+}
 
-    // Return the box size, or null if the article is not found
+export async function getBoxSize(workplace: string, article: string) {
+  try {
+    const articleConfig = config.find(
+      (object: ArticleConfig) =>
+        object.workplace === workplace && object.article === article,
+    );
     return articleConfig ? articleConfig.boxSize : null;
   } catch (error) {
     console.error('Error while getting the box size:', error);
@@ -162,33 +122,6 @@ export async function getBoxSize(workplace: string, article: string) {
   }
 }
 
-// Generate pallet QR
-export async function getPalletQrValueAndPiecesOnPallet(
-  article: string,
-  boxesOnPallet: number,
-) {
-  try {
-    // Find the article configuration
-    const articleConfig = config.find(
-      (object: ArticleConfig) => object.article === article,
-    );
-
-    if (!articleConfig) {
-      throw new Error('Article not found.');
-    }
-    const qr = generatePalletQr(
-      article,
-      boxesOnPallet * articleConfig.boxSize,
-      articleConfig.palletProc,
-    );
-    return { qr: qr, piecesOnPallet: boxesOnPallet * articleConfig.boxSize };
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while generating pallet qr.');
-  }
-}
-
-// Save DMC function
 export async function saveDmc(
   dmc: string,
   workplace: string,
@@ -196,22 +129,16 @@ export async function saveDmc(
   operator: string,
 ) {
   try {
-    // Find the article configuration
     const articleConfig = config.find(
       (object: ArticleConfig) =>
         object.workplace === workplace && object.article === article,
     );
-
     if (!articleConfig || !articleConfig.baseDmc || !articleConfig.dmcFirVal) {
       throw new Error('Article config problem!');
     }
-
-    // DMC length
     if (dmc.length !== articleConfig.baseDmc.length) {
       return { status: 'invalid' };
     }
-
-    // DMC content
     if (
       dmc.substring(articleConfig.dmcFirVal[0], articleConfig.dmcFirVal[1]) !==
       articleConfig.baseDmc.substring(
@@ -221,7 +148,6 @@ export async function saveDmc(
     ) {
       return { status: 'invalid' };
     }
-
     if (
       articleConfig.dmcSecVal &&
       dmc.substring(articleConfig.dmcSecVal[0], articleConfig.dmcSecVal[1]) !==
@@ -232,31 +158,20 @@ export async function saveDmc(
     ) {
       return { status: 'invalid' };
     }
-
-    // FORD date
     if (articleConfig.ford && !fordValidation(dmc)) {
       return { status: 'wrong date' };
     }
-
-    // BMW date
     if (articleConfig.bmw && !bmwValidation(dmc)) {
       return { status: 'wrong date' };
     }
-
-    // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-
-    // Check for existing data
     const existingData = await collection.findOne({ dmc: dmc });
     if (existingData) {
       return { status: 'exists' };
     }
-
-    // Check if pallet is full and if box is full
     if (articleConfig.palletSize) {
-      // When palletSize is present, check both pallet and box simultaneously
       const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
         countBoxesOnPallet(workplace, article),
         getPalletSize(workplace, article),
@@ -277,7 +192,6 @@ export async function saveDmc(
         return { status: 'full box' };
       }
     } else {
-      // When palletSize is not present, check only the box
       const [inBox, boxSize] = await Promise.all([
         countInBox(workplace, article),
         getBoxSize(workplace, article),
@@ -290,8 +204,6 @@ export async function saveDmc(
         return { status: 'full box' };
       }
     }
-
-    // Insert data
     const insertResult = await collection.insertOne({
       status: 'box',
       dmc: dmc,
@@ -301,7 +213,6 @@ export async function saveDmc(
       operator: operator,
       time: new Date(),
     });
-
     if (insertResult) {
       return { status: 'saved' };
     }
@@ -311,7 +222,6 @@ export async function saveDmc(
   }
 }
 
-// // Save Hydra Batch function
 export async function saveHydraBatch(
   hydraQr: string,
   workplace: string,
@@ -319,59 +229,38 @@ export async function saveHydraBatch(
   operator: string,
 ) {
   try {
-    // Find the article configuration
     const articleConfig = config.find(
       (object: ArticleConfig) =>
         object.workplace === workplace && object.article === article,
     );
-
     if (!articleConfig) {
       throw new Error('Article config problem!');
     }
-
-    // Validate hydra QR code
     if (hydraQr.length < 34 || !hydraQr.includes('|')) {
       return { status: 'invalid' };
     }
-
-    // Split QR code
     const splitHydraQr = hydraQr.split('|');
     const qrarticle = splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
-
-    // Check article number
     if (qrarticle !== article) {
       return { status: 'wrong article' };
     }
-
-    // Check quantity
     const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
     if (qrQuantity !== articleConfig.boxSize) {
       return { status: 'wrong quantity' };
     }
-
-    // Check process
     const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
     if (!articleConfig.hydraProc.includes(qrProcess)) {
       return { status: 'wrong process' };
     }
-
-    // Extract batch from QR code
     const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
-
-    // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-
-    // Check for existing data
     const existingBatch = await collection.findOne({ hydra_batch: qrBatch });
     if (existingBatch) {
       return { status: 'exists' };
     }
-
-    // Check if pallet is full
     if (articleConfig.palletSize) {
-      // Execute countBoxesOnPallet and getPalletSize in parallel
       const [boxesOnPallet, palletSize] = await Promise.all([
         countBoxesOnPallet(workplace, article),
         getPalletSize(workplace, article),
@@ -384,12 +273,10 @@ export async function saveHydraBatch(
         return { status: 'full pallet' };
       }
     }
-
     const existingData = await collection.findOne({
       workplace: workplace,
       article: article,
     });
-
     if (existingData) {
       const updateResult = await collection.updateMany(
         { status: 'box', workplace: workplace, article: article },
@@ -412,71 +299,71 @@ export async function saveHydraBatch(
   }
 }
 
-// Save Pallet Batch function
+export async function getPalletQr(workplace: string, article: string) {
+  try {
+    const articleConfig = config.find(
+      (object: ArticleConfig) => object.article === article,
+    );
+    if (!articleConfig) {
+      throw new Error('Article not found.');
+    }
+    const quantityOnPallet = await countQuantityOnPallet(workplace, article);
+    const qr = generatePalletQr(
+      article,
+      quantityOnPallet,
+      articleConfig.palletProc,
+    );
+    return qr;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while generating pallet qr.');
+  }
+}
+
 export async function savePalletBatch(
   palletQr: string,
   workplace: string,
   article: string,
-  boxesOnPallet: number,
   operator: string,
 ) {
   try {
-    // Find the article configuration
     const articleConfig = config.find(
       (object: ArticleConfig) =>
         object.workplace === workplace && object.article === article,
     );
-
     if (!articleConfig) {
       throw new Error('Article config problem!');
     }
-
-    // // Validate hydra QR code
     if (palletQr.length < 34 || !palletQr.includes('|')) {
       return { status: 'invalid' };
     }
-
-    // // Split QR code
     const splitPalletQr = palletQr.split('|');
     const qrarticle =
       splitPalletQr[0].length === 7 && splitPalletQr[0].substr(2);
-
-    // // Check article number
     if (qrarticle !== article) {
       return { status: 'wrong article' };
     }
-
-    // Check quantity
     const qrQuantity = splitPalletQr[2] && parseInt(splitPalletQr[2].substr(2));
-    if (qrQuantity !== boxesOnPallet * articleConfig.boxSize) {
+    const quantityOnPallet = await countQuantityOnPallet(workplace, article);
+    if (qrQuantity !== quantityOnPallet) {
       return { status: 'wrong quantity' };
     }
-
-    // Check process
     const qrProcess = splitPalletQr[1] && splitPalletQr[1].substr(2);
     if (qrProcess !== articleConfig.palletProc) {
       return { status: 'wrong process' };
     }
-
-    // Extract batch from QR code and test length
     const qrBatch =
       splitPalletQr[3] && splitPalletQr[3].substr(2).toUpperCase();
     if (!qrBatch || qrBatch.length !== 10) {
       return { status: 'invalid' };
     }
-
-    // Connect to MongoDB
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-
-    // Check for existing data
     const existingData = await collection.findOne({ pallet_batch: qrBatch });
     if (existingData) {
       return { status: 'exists' };
     }
-
-    // Update documents with matching criteria
     const updateResult = await collection.updateMany(
       {
         status: 'pallet',
@@ -492,7 +379,6 @@ export async function savePalletBatch(
         },
       },
     );
-
     if (updateResult) {
       return { status: 'saved' };
     }

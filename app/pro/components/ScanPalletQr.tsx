@@ -1,58 +1,45 @@
 import { useState, useContext } from 'react';
-import { savePalletBatch } from '@/app/pro/actions';
-import { ScanContext } from '@/app/pro/lib/ScanContext';
+import { savePalletBatch } from '../actions';
 import toast from 'react-hot-toast';
+import { ScanContext } from '../lib/ScanContext';
 
-type StatusProps = {
+type Props = {
   workplace: string;
   article: string;
   operator: string;
-  boxesOnPallet: number;
-  boxSize: number;
 };
 
 // Component to scan Pallet Batch
-export default function ScanPalletQr(props: StatusProps) {
+export default function ScanPalletQr(props: Props) {
   const scanContext = useContext(ScanContext);
-  // const quantityOnPallet = props.onPallet * props.boxSize;
   const [isPending, setIsPending] = useState(false);
-
-  // Local state for the pallet batch
   const [palletQr, setPalletQr] = useState('');
 
-  // Function to clear the hydraBatch input field
   const clearPalletQr = () => {
     setPalletQr('');
   };
-
-  // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
       return;
     }
     clearPalletQr();
-
-    // Start transition (for loading state)
-    toast.loading('Przetwarzanie...', { id: 'loading' });
     setIsPending(true);
+    toast.loading('Zapisywanie...', { id: 'saving' });
 
     try {
       const result = await savePalletBatch(
         palletQr,
         props.workplace,
         props.article,
-        // quantityOnPallet,
-        props.boxesOnPallet,
         props.operator,
       );
-
       const status = result?.status;
-      toast.dismiss();
 
-      // Display toast message based on the result status
       switch (status) {
         case 'saved':
-          scanContext?.setScan({ last: palletQr });
+          scanContext?.setScan(() => ({
+            last: palletQr,
+          }));
           toast.success('Batch OK!', { id: 'success' });
           break;
         case 'exists':
@@ -79,10 +66,11 @@ export default function ScanPalletQr(props: StatusProps) {
     } catch (err) {
       toast.error('Zgłoś się do IT!', { id: 'error' });
     } finally {
-      toast.dismiss('loading');
+      toast.dismiss('saving');
       setIsPending(false);
     }
   };
+
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
@@ -90,7 +78,7 @@ export default function ScanPalletQr(props: StatusProps) {
         value={palletQr}
         onChange={(event) => setPalletQr(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={isPending ? 'Zapisywanie...' : 'Paleta QR'}
+        placeholder={`${!isPending ? 'Paleta QR' : 'zapisywanie...'}`}
         autoFocus
       />
     </div>
