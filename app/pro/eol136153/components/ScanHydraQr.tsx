@@ -72,7 +72,7 @@ export default function ScanHydraQr(props: Props) {
         value={hydraBatch}
         onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={`${!isPending ? 'HYDRA QR' : 'zapisywanie...'}`}
+        placeholder='HYDRA QR'
         autoFocus
       />
     </div>

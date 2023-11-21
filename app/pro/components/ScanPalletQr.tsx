@@ -71,6 +71,10 @@ export default function ScanPalletQr(props: Props) {
     }
   };
 
+  if (isPending) {
+    return null;
+  }
+
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
@@ -78,7 +82,7 @@ export default function ScanPalletQr(props: Props) {
         value={palletQr}
         onChange={(event) => setPalletQr(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={`${!isPending ? 'Paleta QR' : 'zapisywanie...'}`}
+        placeholder='Paleta QR'
         autoFocus
       />
     </div>

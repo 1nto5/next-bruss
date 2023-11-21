@@ -29,7 +29,7 @@ export default function ScanDmc(props: Props) {
       return;
     }
     clearInput();
-    toast.loading('Przetwarzanie...', { id: 'loading' });
+    toast.loading('Zapisywanie...', { id: 'saving' });
     setIsPending(true);
     try {
       if (!props.article || !props.operator) {
@@ -73,7 +73,7 @@ export default function ScanDmc(props: Props) {
     } catch (err) {
       toast.error('Zgłoś się do IT!', { id: 'error' });
     } finally {
-      toast.dismiss('loading');
+      toast.dismiss('saving');
       setIsPending(false);
     }
   };
@@ -85,7 +85,7 @@ export default function ScanDmc(props: Props) {
         value={dmc}
         onChange={(event) => setDmc(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={isPending ? 'Zapisywanie...' : 'DMC'}
+        placeholder='DMC'
         autoFocus
       />
     </div>

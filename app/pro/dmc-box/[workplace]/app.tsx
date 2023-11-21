@@ -54,7 +54,7 @@ export default function App() {
     }
     (async () => {
       setIsPending(true);
-      toast.loading('Ładowanie...', { id: 'loading' });
+      // toast.loading('Ładowanie...', { id: 'loading' });
       try {
         if (!articleContext?.article.number) {
           throw new Error('Article number is missing');
@@ -75,7 +75,7 @@ export default function App() {
         console.error('Failed to fetch quantity on a pallet:', error);
       } finally {
         setIsPending(false);
-        toast.dismiss('loading');
+        // toast.dismiss('loading');
       }
     })();
   }, [

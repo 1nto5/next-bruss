@@ -30,9 +30,7 @@ export default function ScanHydraQr(props: StatusProps) {
 
     clearHydraBatch();
 
-    // Start transition (for loading state)
-
-    toast.loading('Przetwarzanie...', { id: 'loading' });
+    toast.loading('Zapisywanie...', { id: 'saving' });
     setIsPending(true);
 
     try {
@@ -74,10 +72,14 @@ export default function ScanHydraQr(props: StatusProps) {
     } catch (err) {
       toast.error('Zgłoś się do IT!', { id: 'error' });
     } finally {
-      toast.dismiss('loading');
+      toast.dismiss('saving');
       setIsPending(false);
     }
   };
+
+  if (isPending) {
+    return null;
+  }
 
   return (
     <div className='mt-10 flex items-center justify-center'>
@@ -86,7 +88,7 @@ export default function ScanHydraQr(props: StatusProps) {
         value={hydraBatch}
         onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder={isPending ? 'Zapisywanie...' : 'Hydra QR'}
+        placeholder='Hydra QR'
         autoFocus
       />
     </div>
