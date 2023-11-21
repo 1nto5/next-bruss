@@ -1,12 +1,12 @@
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast';
 
 const Toast = () => {
   return (
     <Toaster
-      position="bottom-center"
+      position='bottom-center'
       reverseOrder={false}
       gutter={8}
-      containerClassName=""
+      containerClassName=''
       containerStyle={{
         bottom: '15%',
       }}
@@ -27,7 +27,7 @@ const Toast = () => {
           style: {
             background: 'rgb(139 182 59)',
             color: 'white',
-            fontWeight: '400',
+            fontWeight: '600',
           },
         },
 
@@ -41,7 +41,7 @@ const Toast = () => {
         },
       }}
     />
-  )
-}
+  );
+};
 
-export default Toast
+export default Toast;
