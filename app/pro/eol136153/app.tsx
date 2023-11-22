@@ -4,7 +4,7 @@ import { useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { PersonContext } from '../lib/PersonContext';
 import { ScanContext } from '../lib/ScanContext';
-import { countBoxesOnPallet, getPalletSize } from '../actions';
+import { countQuantityOnPallet, getPalletSize } from '../actions';
 import NumLogIn from '../components/NumLogIn';
 import Status from './components/Status';
 import ScanHydraQr from './components/ScanHydraQr';
@@ -39,8 +39,8 @@ export default function App() {
           palletSize136,
           palletSize153,
         ] = await Promise.all([
-          countBoxesOnPallet(workplace, article136),
-          countBoxesOnPallet(workplace, article153),
+          countQuantityOnPallet(workplace, article136),
+          countQuantityOnPallet(workplace, article153),
           getPalletSize(workplace, article136),
           getPalletSize(workplace, article153),
         ]);
