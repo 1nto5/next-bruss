@@ -72,6 +72,16 @@ export async function countQuantityOnPallet(
       workplace: workplace,
       article: article,
     });
+    if (workplace === 'eol136153') {
+      const articleConfig = config.find(
+        (object: ArticleConfig) =>
+          object.workplace === workplace && object.article === article,
+      );
+      if (!articleConfig || !articleConfig.boxSize) {
+        throw new Error('Article config problem!');
+      }
+      return count * articleConfig.boxSize;
+    }
     return count;
   } catch (error) {
     console.error(error);
