@@ -31,7 +31,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       setIsPending(true);
-      toast.loading('Ładowanie...', { id: 'loading' });
+      // toast.loading('Ładowanie...', { id: 'loading' });
       try {
         const [
           boxesOnPallet136,
@@ -57,7 +57,7 @@ export default function App() {
         console.error('Failed to fetch quantity on a pallet:', error);
       } finally {
         setIsPending(false);
-        toast.dismiss('loading');
+        // toast.dismiss('loading');
       }
     })();
   }, [workplace, scanContext?.scan.last]);
