@@ -21,7 +21,7 @@ type ArticleConfig = {
   palletSize?: number;
   boxSize: number;
   hydraProc: string;
-  palletProc: string;
+  palletProc?: string;
 };
 
 const collectionName = 'scans';
@@ -321,7 +321,7 @@ export async function getPalletQr(workplace: string, article: string) {
     const qr = generatePalletQr(
       article,
       quantityOnPallet,
-      articleConfig.palletProc,
+      articleConfig.palletProc ? articleConfig.palletProc : '000',
     );
     return qr;
   } catch (error) {
