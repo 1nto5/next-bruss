@@ -18,7 +18,7 @@ type ArticleConfig = {
   palletSize?: number;
   boxSize: number;
   hydraProc: string;
-  palletProc: string;
+  palletProc?: string;
 };
 
 const collectionName = 'scans';
