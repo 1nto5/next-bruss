@@ -12,7 +12,7 @@ type ArticleConfig = {
   palletSize?: number;
   boxSize: number;
   hydraProc: string;
-  palletProc: string;
+  palletProc?: string;
 };
 
 const articles: ArticleConfig[] = [
@@ -118,7 +118,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 5],
     dmcSecVal: [16, 29],
     ford: true,
-    palletSize: 30,
+    palletSize: 24, // 30
     boxSize: 40,
     hydraProc: '050',
     palletProc: '829',
