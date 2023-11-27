@@ -118,7 +118,7 @@ const articles: ArticleConfig[] = [
     dmcFirVal: [0, 5],
     dmcSecVal: [16, 29],
     ford: true,
-    palletSize: 24, // 30
+    palletSize: 30,
     boxSize: 40,
     hydraProc: '050',
     palletProc: '829',
