@@ -5,6 +5,8 @@ import { useState, createContext, ReactNode } from 'react';
 type InventoryType = {
   card: number | null;
   position: number | null;
+  warehouse: string | null;
+  sector: string | null;
 };
 
 type InventoryContextType = {
@@ -27,6 +29,8 @@ export const InventoryProvider: React.FC<InventoryProviderProps> = ({
   const [inventory, setInventory] = useState<InventoryType>({
     card: null,
     position: null,
+    warehouse: null,
+    sector: null,
   });
 
   return (

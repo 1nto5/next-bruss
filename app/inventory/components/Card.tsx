@@ -6,6 +6,7 @@ import { InventoryContext } from '../lib/InventoryContext';
 import {
   findLowestFreeCardNumber,
   getExistingCards,
+  getCardWarehouseAndSector,
   reserveCard,
 } from '../actions';
 import Select from './Select';
@@ -21,8 +22,10 @@ export default function Card() {
   const inventoryContext = useContext(InventoryContext);
   const [isPendingExistingCards, setIsPendingExistingCards] = useState(true);
   const [isPendingNewCard, setIsPendingNewCard] = useState(false);
+  const [isPendingCardData, setIsPendingCardData] = useState(false);
   const [cardNumber, setCardNumber] = useState<string | null>(null);
   const [warehouse, setWarehouse] = useState<string | null>(null);
+  const [sector, setSector] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [existingCards, setExistingCards] = useState<Option[]>([]);
@@ -64,8 +67,30 @@ export default function Card() {
     // { value: 999, label: '999 - WIP' },
   ];
 
+  const sectorsSelectOptions = [
+    { value: 'S1', label: 'S1' },
+    { value: 'S2', label: 'S2' },
+    { value: 'S3', label: 'S3' },
+    { value: 'S4', label: 'S4' },
+    { value: 'S5', label: 'S5' },
+    { value: 'S6', label: 'S6' },
+    { value: 'S7', label: 'S7' },
+    { value: 'S8', label: 'S8' },
+    { value: 'S9', label: 'S9' },
+    { value: 'S10', label: 'S10' },
+    { value: 'S900', label: 'S900' },
+    { value: 'Launch', label: 'Launch' },
+    { value: 'Sedia', label: 'Sedia' },
+    { value: 'GTM - Gizycka 9', label: 'GTM - Gizycka 9' },
+    { value: 'GTM - Kolejowa', label: 'GTM - Kolejowa' },
+  ];
+
   const selectedWarehauseOption = warehouseSelectOptions.find(
     (option) => option.value === warehouse,
+  );
+
+  const selectedSectorOption = sectorsSelectOptions.find(
+    (option) => option.value === sector,
   );
 
   const handleWarehouseSelectChange = (
@@ -76,9 +101,15 @@ export default function Card() {
     }
   };
 
+  const handleSectorSelectChange = (selectedSectorOption: Option | null) => {
+    if (selectedSectorOption) {
+      setSector(selectedSectorOption.value);
+    }
+  };
+
   const newCard = async () => {
-    if (!warehouse) {
-      setErrorMessage('Nie wybrano obszaru!');
+    if (!warehouse || !sector) {
+      setErrorMessage('Nie wybrano obszaru lub sektoru!');
       return;
     }
     try {
@@ -89,11 +120,14 @@ export default function Card() {
           number,
           personsContext.persons,
           warehouse,
+          sector,
         );
         if (res == 'reserved') {
           inventoryContext?.setInventory((prevState) => ({
             ...prevState,
             card: number,
+            warehouse: warehouse,
+            sector: sector,
           }));
           return;
         }
@@ -109,14 +143,27 @@ export default function Card() {
     }
   };
 
-  const handleConfirm = (e: React.FormEvent) => {
+  const handleConfirm = async (e: React.FormEvent) => {
     if (cardNumber) {
-      inventoryContext?.setInventory((prevState) => ({
-        ...prevState,
-        card: parseInt(cardNumber),
-        position: null,
-      }));
-      return;
+      try {
+        setIsPendingCardData(true);
+        const cardNumberAsNumber = Number(cardNumber);
+        const card = await getCardWarehouseAndSector(cardNumberAsNumber);
+        inventoryContext?.setInventory((prevState) => ({
+          ...prevState,
+          card: parseInt(cardNumber),
+          position: null,
+          warehouse: card?.warehouse,
+          sector: card?.sector,
+        }));
+        return;
+      } catch (error) {
+        console.error('Failed card data fetching:', error);
+        setErrorMessage('Skontaktuj się z IT!');
+        return;
+      } finally {
+        setIsPendingCardData(false);
+      }
     }
     setErrorMessage('Nie wybrano karty!');
   };
@@ -149,6 +196,13 @@ export default function Card() {
             onChange={handleWarehouseSelectChange}
             placeholder={'wybierz obszar dla nowej karty'}
           />
+
+          <Select
+            options={sectorsSelectOptions}
+            value={selectedSectorOption}
+            onChange={handleSectorSelectChange}
+            placeholder={'wybierz sektor dla nowej karty'}
+          />
           <Select
             options={existingCards}
             value={selectedCardOption}
@@ -176,7 +230,7 @@ export default function Card() {
               onClick={handleConfirm}
               className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
             >
-              potwierdź
+              {isPendingCardData ? 'pobieranie danych' : 'wybierz kartę'}
             </button>
           </div>
         </div>

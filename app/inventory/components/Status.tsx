@@ -23,7 +23,7 @@ export default function Status() {
         )})`}
         width='w-2/6'
       />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+
       <StatusBox
         name='zalogowany 2:'
         value={`${personsContext?.persons?.second} (${shortenLastName(
@@ -31,16 +31,31 @@ export default function Status() {
         )})`}
         width='w-2/6'
       />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+
       <StatusBox
-        name='karta:'
-        value={inventoryContext?.inventory.card ?? 'brak'}
+        name='karta/pozycja:'
+        value={
+          inventoryContext?.inventory.card
+            ? `${inventoryContext.inventory.card.toString().padStart(3, '0')}${
+                inventoryContext.inventory.position
+                  ? inventoryContext.inventory.position
+                      .toString()
+                      .padStart(2, '0')
+                  : '00'
+              }`
+            : 'brak'
+        }
         width='w-1/6'
       />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+
       <StatusBox
-        name='pozycja:'
-        value={inventoryContext?.inventory.position ?? 'brak'}
+        name='obszar/sektor:'
+        value={
+          inventoryContext?.inventory.warehouse &&
+          inventoryContext?.inventory.sector
+            ? `${inventoryContext?.inventory.warehouse} / ${inventoryContext?.inventory.sector}`
+            : 'brak'
+        }
         width='w-1/6'
       />
     </div>

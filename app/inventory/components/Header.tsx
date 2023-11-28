@@ -25,6 +25,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
               inventoryContext?.setInventory(() => ({
                 position: null,
                 card: null,
+                warehouse: null,
+                sector: null,
               }))
             }
             className='w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'

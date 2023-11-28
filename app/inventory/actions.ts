@@ -135,10 +135,27 @@ export async function findLowestFreeCardNumber() {
   }
 }
 
+export async function getCardWarehouseAndSector(cardNumber: number) {
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+    const card = await collection.findOne({ number: cardNumber });
+    if (!card) {
+      return null;
+    }
+    return { warehouse: card.warehouse, sector: card.sector };
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the card data.');
+  }
+}
+
 export async function reserveCard(
   cardNumber: number,
   persons: PersonsType,
   warehouse: string,
+  sector: string,
 ) {
   try {
     const client = await clientPromise;
@@ -162,6 +179,7 @@ export async function reserveCard(
       number: cardNumber,
       creators: [persons.first, persons.second],
       warehouse: warehouse,
+      sector: sector,
     });
 
     if (result.insertedId) {
