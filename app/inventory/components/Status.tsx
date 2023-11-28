@@ -43,7 +43,7 @@ export default function Status() {
                       .padStart(2, '0')
                   : 'brak'
               }`
-            : 'brak / brak'
+            : 'brak'
         }
         width='w-1/6'
       />
@@ -51,10 +51,9 @@ export default function Status() {
       <StatusBox
         name='obszar/sektor:'
         value={
-          inventoryContext?.inventory.warehouse &&
-          inventoryContext?.inventory.sector
-            ? `${inventoryContext?.inventory.warehouse}/${inventoryContext?.inventory.sector}`
-            : 'brak'
+          (inventoryContext?.inventory.warehouse &&
+            inventoryContext?.inventory.sector) ??
+          `${inventoryContext?.inventory.warehouse}/${inventoryContext?.inventory.sector}`
         }
         width='w-1/6'
       />
