@@ -51,9 +51,10 @@ export default function Status() {
       <StatusBox
         name='obszar/sektor:'
         value={
-          (inventoryContext?.inventory.warehouse &&
-            inventoryContext?.inventory.sector) ??
-          `${inventoryContext?.inventory.warehouse}/${inventoryContext?.inventory.sector}`
+          inventoryContext?.inventory.warehouse &&
+          inventoryContext?.inventory.sector
+            ? `${inventoryContext?.inventory.warehouse}/${inventoryContext?.inventory.sector}`
+            : 'brak'
         }
         width='w-1/6'
       />
