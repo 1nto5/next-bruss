@@ -235,9 +235,9 @@ export async function getExistingPositions(card: number) {
           pos.articleName
         } | ilość: ${pos.quantity} ${pos.unit} | id: ${
           pos.identifier
-        } | osoby: ${existingCard.creators.join(' + ')} | sektor: ${
+        } | osoby: ${existingCard.creators.join(' + ')} | obszar: ${
           existingCard.warehouse
-        }`,
+        } | sektor: ${existingCard.sector}`,
       }),
     );
 
