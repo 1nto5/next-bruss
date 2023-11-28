@@ -55,19 +55,31 @@ export async function getAllCards(): Promise<CardOption[]> {
     const collection = db.collection('inventory_cards');
     const cards = await collection.find({}).toArray();
     const cardOptions = cards.map((card) => {
-      const totalPositions = card.positions.length;
-      const approvedPositions = card.positions.filter(
-        (p: Position) => p.approver,
-      ).length;
+      // Check if positions exist and calculate total and approved positions
+      const totalPositions = card.positions ? card.positions.length : 0;
+      const approvedPositions = card.positions
+        ? card.positions.filter((p: Position) => p.approver).length
+        : 0;
 
+      // Check for warehouse option
       const warehouseOption = warehouseSelectOptions.find(
         (option) => option.value === card.warehouse,
       );
 
+      // Ensure creators array has at least two elements
+      const creator1 =
+        card.creators && card.creators.length > 0
+          ? card.creators[0]
+          : 'unknown';
+      const creator2 =
+        card.creators && card.creators.length > 1
+          ? card.creators[1]
+          : 'unknown';
+
       return {
         value: card.number,
         label: warehouseOption
-          ? `K: ${card.number} | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${warehouseOption.label} | zatwierdzone: ${approvedPositions}/${totalPositions}`
+          ? `K: ${card.number} | osoby: ${creator1} + ${creator2} | obszar: ${warehouseOption.label} | sektor: ${card.sector} | zatwierdzone: ${approvedPositions}/${totalPositions}`
           : 'wrong warehouse',
       };
     });
@@ -99,9 +111,9 @@ export async function getAllPositions(): Promise<PositionOption[]> {
               pos.articleName
             } | ilość: ${pos.quantity} ${pos.unit} | id: ${
               pos.identifier
-            } | osoby: ${card.creators[0]} + ${card.creators[1]} | sektor: ${
+            } | osoby: ${card.creators[0]} + ${card.creators[1]} | obszar: ${
               card.warehouse
-            }`,
+            } | sektor: ${card.sector}`,
             card: card.number,
             position: pos.position,
           });
@@ -154,6 +166,7 @@ export async function reserveCard(
   cardNumber: number,
   persons: PersonsType,
   warehouse: string,
+  sector: string,
 ) {
   try {
     const client = await clientPromise;
@@ -177,6 +190,7 @@ export async function reserveCard(
       number: cardNumber,
       creators: [persons.first, persons.second],
       warehouse: warehouse,
+      sector: sector,
     });
 
     if (result.insertedId) {

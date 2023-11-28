@@ -17,19 +17,24 @@ export default function Status() {
         value={formatEmailToName(
           session?.user?.email ?? 'Unknown.User@bruss-group.com',
         )}
-        width='w-2/4'
+        width='w-1/2'
       />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+
       <StatusBox
-        name='karta:'
-        value={inventoryContext?.inventory.card ?? 'brak'}
-        width='w-1/4'
-      />
-      <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
-      <StatusBox
-        name='pozycja:'
-        value={inventoryContext?.inventory.position ?? 'brak'}
-        width='w-1/4'
+        name='karta/pozycja:'
+        value={
+          inventoryContext?.inventory.card
+            ? `${inventoryContext.inventory.card.toString().padStart(3, '0')}/${
+                inventoryContext.inventory.position
+                  ? inventoryContext.inventory.position
+                      .toString()
+                      .padStart(2, '0')
+                  : 'brak'
+              }`
+            : 'brak'
+        }
+        width='w-1/2'
+        separator={false}
       />
     </div>
   );

@@ -144,6 +144,7 @@ export default function Card() {
   };
 
   const handleConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (cardNumber) {
       try {
         setIsPendingCardData(true);
