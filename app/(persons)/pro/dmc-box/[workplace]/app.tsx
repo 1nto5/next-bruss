@@ -2,17 +2,17 @@
 
 import { useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { PersonContext } from '@/app/pro/lib/PersonContext';
-import { ScanContext } from '@/app/pro/lib/ScanContext';
-import { ArticleContext } from '@/app/pro/lib/ArticleContext';
-import { countInBox, getBoxSize } from '@/app/pro/actions';
-import NumLogIn from '@/app/pro/components/NumLogIn';
-import Status from './../components/Status';
-import ArticleSelector from '@/app/pro/components/ArticleSelector';
-import ScanDmc from '@/app/pro/components/ScanDmc';
-import ScanHydraQr from '@/app/pro/components/ScanHydraQr';
+import { PersonContext } from '@/app/(persons)/pro/lib/PersonContext';
+import { ScanContext } from '@/app/(persons)/pro/lib/ScanContext';
+import { ArticleContext } from '@/app/(persons)/pro/lib/ArticleContext';
+import { countInBox, getBoxSize } from '@/app/(persons)/pro/actions';
+import NumLogIn from '@/app/(persons)/pro/components/NumLogIn';
+import Status from '../components/Status';
+import ArticleSelector from '@/app/(persons)/pro/components/ArticleSelector';
+import ScanDmc from '@/app/(persons)/pro/components/ScanDmc';
+import ScanHydraQr from '@/app/(persons)/pro/components/ScanHydraQr';
 import toast from 'react-hot-toast';
-import config from '@/app/pro/config';
+import config from '@/app/(persons)/pro/config';
 
 export default function App() {
   const personContext = useContext(PersonContext);

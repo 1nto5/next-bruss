@@ -4,7 +4,7 @@ import { SetStateAction, useState } from 'react';
 import Select from './Select';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import config from '@/app/pro/config';
+import config from '@/app/(persons)/pro/config';
 import clsx from 'clsx';
 
 // TODO: match styles (Select, input, datapicker) with the rest of the app in dark and light, make it responsive and format width datapicker

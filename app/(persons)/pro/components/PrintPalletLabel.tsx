@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import html2canvas from 'html2canvas';
-import Button from '@/app/pro/components//Button';
+import Button from '@/app/(persons)/pro/components/Button';
 import { getPalletQr, countQuantityOnPallet } from '../actions';
 import toast from 'react-hot-toast';
 

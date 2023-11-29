@@ -1,7 +1,7 @@
 import { useContext } from 'react';
-import config from '@/app/pro/config';
+import config from '@/app/(persons)/pro/config';
 import toast from 'react-hot-toast';
-import { ArticleContext } from '@/app/pro/lib/ArticleContext';
+import { ArticleContext } from '@/app/(persons)/pro/lib/ArticleContext';
 type StatusProps = {
   workplace: string;
 };

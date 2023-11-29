@@ -5,7 +5,7 @@ import { PersonContext } from '../lib/PersonContext';
 import { loginPerson } from '../actions';
 
 import toast from 'react-hot-toast';
-import { login } from '@/app/inventory/actions';
+import { login } from '@/app/(persons)/inventory/actions';
 
 type NumberButtonProps = {
   onClick: () => void;
