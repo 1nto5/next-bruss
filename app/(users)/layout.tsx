@@ -2,6 +2,7 @@ import '../globals.css';
 import { AuthProvider } from '../auth-provider';
 import { Inter } from 'next/font/google';
 import DarkLightProvider from '../theme-provider';
+import Navbar from './components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,10 +20,13 @@ export default function RootLayout({
     <html suppressHydrationWarning>
       <head />
       <body
-        className={`${inter.className} bg-slate-50 antialiased dark:bg-slate-950`}
+        className={`${inter.className}  mt-20 bg-slate-50 antialiased dark:bg-slate-950`}
       >
         <AuthProvider>
-          <DarkLightProvider>{children}</DarkLightProvider>
+          <DarkLightProvider>
+            <Navbar />
+            {children}
+          </DarkLightProvider>
         </AuthProvider>
       </body>
     </html>

@@ -8,9 +8,5 @@ export default async function Home() {
 
   // if (!session) redirect('/auth/login');
 
-  return (
-    <>
-      <UserInfo />
-    </>
-  );
+  return <>{/* <UserInfo /> */}</>;
 }

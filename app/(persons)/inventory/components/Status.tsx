@@ -3,7 +3,7 @@
 import { useContext } from 'react';
 import { PersonsContext } from '../lib/PersonsContext';
 import { InventoryContext } from '../lib/InventoryContext';
-import StatusBox from '@/app/components/StatusBox';
+import StatusBox from '@/app/(persons)/components/StatusBox';
 import { shortenLastName } from '../../../../lib/utils/nameFormat';
 
 export default function Status() {

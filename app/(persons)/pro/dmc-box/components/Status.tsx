@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import StatusBox from '@/app/components/StatusBox';
+import StatusBox from '@/app/(persons)/components/StatusBox';
 import { PersonContext } from '../../lib/PersonContext';
 import { ArticleContext } from '../../lib/ArticleContext';
 import { shortenLastName } from '@/lib/utils/nameFormat';
