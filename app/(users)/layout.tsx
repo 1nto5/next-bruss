@@ -1,7 +1,7 @@
 import '../globals.css';
 import { AuthProvider } from '../auth-provider';
 import { Inter } from 'next/font/google';
-import { Theme } from '@radix-ui/themes';
+import DarkLightProvider from '../theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
         className={`${inter.className} bg-slate-50 antialiased dark:bg-slate-950`}
       >
         <AuthProvider>
-          <Theme>{children}</Theme>
+          <DarkLightProvider>{children}</DarkLightProvider>
         </AuthProvider>
       </body>
     </html>

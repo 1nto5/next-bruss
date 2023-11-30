@@ -1,6 +1,6 @@
 import '../globals.css';
 import Footer from './components/Footer';
-import DarkLightProvider from './theme-provider';
+import DarkLightProvider from '../theme-provider';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
