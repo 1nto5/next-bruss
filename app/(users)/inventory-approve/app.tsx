@@ -14,7 +14,7 @@ export default function App() {
     <>
       <Status />
       <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
-        {!inventoryContext?.inventory.card ? (
+        {!inventoryContext?.inventory?.card ? (
           <CardOrPosition />
         ) : !inventoryContext?.inventory.position ? (
           <Position />

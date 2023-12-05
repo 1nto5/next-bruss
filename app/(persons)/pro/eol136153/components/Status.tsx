@@ -22,7 +22,7 @@ export default function Status(props: StatusProps) {
       <StatusBox
         name='operator:'
         value={
-          personContext?.person.number
+          personContext?.person?.number
             ? `${personContext?.person.number} (${
                 personContext.person.name &&
                 shortenLastName(personContext?.person.name)

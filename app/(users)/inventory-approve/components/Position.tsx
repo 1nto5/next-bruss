@@ -26,7 +26,7 @@ export default function Position() {
 
   useEffect(() => {
     (async () => {
-      if (inventoryContext?.inventory.card) {
+      if (inventoryContext?.inventory?.card) {
         setIsPendingExistingPositions(true);
         try {
           const res = await getExistingPositions(
@@ -52,7 +52,7 @@ export default function Position() {
         }
       }
     })();
-  }, [inventoryContext?.inventory.card]);
+  }, [inventoryContext?.inventory?.card]);
 
   const selectedOption = existingPositionNumbers.find(
     (option) => option.value === positionNumber,

@@ -21,7 +21,7 @@ export default function Status(props: StatusProps) {
       <StatusBox
         name='operator:'
         value={
-          personContext?.person.number
+          personContext?.person?.number
             ? `${personContext?.person.number} (${
                 personContext.person.name &&
                 shortenLastName(personContext?.person.name)
@@ -33,7 +33,7 @@ export default function Status(props: StatusProps) {
       <StatusBox
         name={`artykuł:`}
         value={
-          articleContext?.article.number
+          articleContext?.article?.number
             ? `${articleContext?.article.name} (${articleContext?.article.number})`
             : 'brak'
         }

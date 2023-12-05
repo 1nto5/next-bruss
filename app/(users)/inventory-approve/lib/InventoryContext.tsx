@@ -3,8 +3,8 @@
 import { useState, createContext, ReactNode, useEffect } from 'react';
 
 type InventoryType = {
-  card: number | null;
-  position: number | null;
+  card?: number | null;
+  position?: number | null;
 } | null;
 
 type InventoryContextType = {

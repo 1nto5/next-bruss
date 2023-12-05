@@ -15,13 +15,13 @@ export default function App() {
 
   return (
     <>
-      {!personsContext?.persons.first || !personsContext?.persons.second ? (
+      {!personsContext?.persons?.first || !personsContext?.persons.second ? (
         <Login />
       ) : (
         <>
           <Status />
           <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
-            {!inventoryContext?.inventory.card ? (
+            {!inventoryContext?.inventory?.card ? (
               <Card />
             ) : !inventoryContext?.inventory.position ? (
               <Position />

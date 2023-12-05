@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       </h1>
 
       <div className='mr-2 flex space-x-4'>
-        {inventoryContext?.inventory.card && (
+        {inventoryContext?.inventory?.card && (
           <button
             onClick={() =>
               inventoryContext?.setInventory(() => ({
@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             karta/pozycja
           </button>
         )}
-        {inventoryContext?.inventory.position && (
+        {inventoryContext?.inventory?.position && (
           <button
             onClick={() =>
               inventoryContext?.setInventory((prevState) => ({

@@ -23,7 +23,7 @@ export default function Status() {
       <StatusBox
         name='karta/pozycja:'
         value={
-          inventoryContext?.inventory.card
+          inventoryContext?.inventory?.card
             ? `${inventoryContext.inventory.card.toString().padStart(3, '0')}/${
                 inventoryContext.inventory.position
                   ? inventoryContext.inventory.position

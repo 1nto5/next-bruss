@@ -24,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({
         {title}
       </h1>
       <div className='mr-2 flex space-x-4'>
-        {showArticleLogOut && articleContext?.article.number && (
+        {showArticleLogOut && articleContext?.article?.number && (
           <button
             onClick={() => {
               toast.success(`Artykuł wylogowany!`, { id: 'success' });
@@ -39,10 +39,10 @@ const Header: React.FC<HeaderProps> = ({
             artykuł
           </button>
         )}
-        {showPersonLogOut && personContext?.person.number && (
+        {showPersonLogOut && personContext?.person?.number && (
           <button
             onClick={() => {
-              toast.success(`${personContext.person.number} wylogowany!`, {
+              toast.success(`${personContext.person?.number} wylogowany!`, {
                 id: 'success',
               });
               personContext.setPerson(() => ({

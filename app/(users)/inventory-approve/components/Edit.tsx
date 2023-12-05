@@ -51,7 +51,7 @@ export default function Edit() {
     setQuantity(0);
     setApproved(false);
     setSelectedUnit('kg');
-  }, [inventoryContext?.inventory.position]);
+  }, [inventoryContext?.inventory?.position]);
 
   useEffect(() => {
     setErrorMessage(null);
@@ -64,7 +64,7 @@ export default function Edit() {
   useEffect(() => {
     (async () => {
       if (
-        inventoryContext?.inventory.card &&
+        inventoryContext?.inventory?.card &&
         inventoryContext?.inventory.position
       ) {
         try {
@@ -127,7 +127,11 @@ export default function Edit() {
         }
       }
     })();
-  }, [articlesOptions, inventoryContext, inventoryContext?.inventory.position]);
+  }, [
+    articlesOptions,
+    inventoryContext,
+    inventoryContext?.inventory?.position,
+  ]);
 
   const selectArticle = (option: Article | null) => {
     setSelectedArticle(option);
@@ -179,7 +183,7 @@ export default function Edit() {
     }
 
     if (
-      inventoryContext?.inventory.card &&
+      inventoryContext?.inventory?.card &&
       inventoryContext.inventory.position
     ) {
       try {
@@ -236,7 +240,7 @@ export default function Edit() {
       }
       try {
         if (
-          inventoryContext?.inventory.card &&
+          inventoryContext?.inventory?.card &&
           inventoryContext?.inventory.position &&
           session?.user.email
         ) {
@@ -365,12 +369,12 @@ export default function Edit() {
           <div className='flex justify-center space-x-3'>
             <button
               onClick={() => {
-                if (inventoryContext?.inventory.position) {
+                if (inventoryContext?.inventory?.position) {
                   if (inventoryContext?.inventory.position !== 1) {
                     inventoryContext.setInventory((prevState) => ({
                       ...prevState,
                       position:
-                        inventoryContext.inventory.position &&
+                        inventoryContext.inventory?.position &&
                         inventoryContext.inventory.position - 1,
                     }));
                   } else {
@@ -412,13 +416,13 @@ export default function Edit() {
               onClick={() => {
                 if (!blockNextPosition) {
                   if (
-                    inventoryContext?.inventory.position &&
+                    inventoryContext?.inventory?.position &&
                     inventoryContext?.inventory.position !== 25
                   ) {
                     inventoryContext.setInventory((prevState) => ({
                       ...prevState,
                       position:
-                        inventoryContext.inventory.position &&
+                        inventoryContext.inventory?.position &&
                         inventoryContext.inventory.position + 1,
                     }));
                   } else {

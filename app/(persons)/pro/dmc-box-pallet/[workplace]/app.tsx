@@ -33,7 +33,7 @@ export default function App() {
   );
   const articleExists = config.some(
     (item) =>
-      item.article === articleContext?.article.number &&
+      item.article === articleContext?.article?.number &&
       item.type === workplaceType &&
       item.workplace === workplace,
   );
@@ -48,8 +48,8 @@ export default function App() {
   useEffect(() => {
     if (
       !workplace ||
-      !articleContext?.article.number ||
-      !personContext?.person.number
+      !articleContext?.article?.number ||
+      !personContext?.person?.number
     ) {
       return;
     }
@@ -64,7 +64,7 @@ export default function App() {
       setIsPending(true);
       // toast.loading('Ładowanie...', { id: 'loading' });
       try {
-        if (!articleContext?.article.number) {
+        if (!articleContext?.article?.number) {
           throw new Error('Article number is missing');
         }
         const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
@@ -94,9 +94,9 @@ export default function App() {
   }, [
     workplace,
     scanContext?.scan.last,
-    articleContext?.article.number,
+    articleContext?.article?.number,
     articleContext,
-    personContext?.person.number,
+    personContext?.person?.number,
     articleExists,
     boxesOnPallet,
   ]);
@@ -122,11 +122,11 @@ export default function App() {
         isFullBox={isFullBox}
         isPending={isPending}
       />
-      {!personContext?.person.number ? (
+      {!personContext?.person?.number ? (
         <NumLogIn />
       ) : (
         <>
-          {!articleContext?.article.number || !articleContext.article.name ? (
+          {!articleContext?.article?.number || !articleContext.article.name ? (
             <ArticleSelector workplace={workplace} />
           ) : (
             <>

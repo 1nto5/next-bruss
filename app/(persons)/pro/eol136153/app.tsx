@@ -64,7 +64,7 @@ export default function App() {
 
   return (
     <>
-      {!personContext?.person.number ? (
+      {!personContext?.person?.number ? (
         <NumLogIn />
       ) : (
         <>
