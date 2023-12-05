@@ -33,8 +33,8 @@ export default function Position() {
   useEffect(() => {
     (async () => {
       if (
-        inventoryContext?.inventory.card &&
-        personsContext?.persons.first &&
+        inventoryContext?.inventory?.card &&
+        personsContext?.persons?.first &&
         personsContext?.persons.second
       ) {
         setIsPendingExistingPositions(true);
@@ -90,9 +90,9 @@ export default function Position() {
   const handleFirstFree = async () => {
     try {
       if (
-        personsContext?.persons.first &&
-        personsContext.persons.second &&
-        inventoryContext?.inventory.card
+        personsContext?.persons?.first &&
+        personsContext.persons?.second &&
+        inventoryContext?.inventory?.card
       ) {
         setIsPendingFirstFree(true);
         const res = await findLowestFreePosition(

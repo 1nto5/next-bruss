@@ -32,7 +32,7 @@ export default function Card() {
 
   useEffect(() => {
     (async () => {
-      if (personsContext?.persons.first && personsContext?.persons.second) {
+      if (personsContext?.persons?.first && personsContext?.persons.second) {
         setIsPendingExistingCards(true);
         try {
           const cards = await getExistingCards(personsContext.persons);
@@ -114,7 +114,7 @@ export default function Card() {
     }
     try {
       setIsPendingNewCard(true);
-      if (personsContext?.persons.first && personsContext?.persons.second) {
+      if (personsContext?.persons?.first && personsContext?.persons.second) {
         const number = await findLowestFreeCardNumber();
         const res = await reserveCard(
           number,

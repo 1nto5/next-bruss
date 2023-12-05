@@ -20,6 +20,13 @@ type Article = {
   max: number;
 };
 
+type PersonsType = {
+  first: string | null;
+  nameFirst: string | null;
+  second: string | null;
+  nameSecond: string | null;
+};
+
 export default function Edit() {
   const personsContext = useContext(PersonsContext);
   const inventoryContext = useContext(InventoryContext);
@@ -46,7 +53,7 @@ export default function Edit() {
     setQuantity(0);
     setApproved(false);
     setSelectedUnit('kg');
-  }, [inventoryContext?.inventory.position]);
+  }, [inventoryContext?.inventory?.position]);
 
   useEffect(() => {
     setErrorMessage(null);
@@ -59,15 +66,15 @@ export default function Edit() {
   useEffect(() => {
     (async () => {
       if (
-        inventoryContext?.inventory.card &&
-        inventoryContext?.inventory.position &&
-        personsContext?.persons.first &&
-        personsContext?.persons.second
+        inventoryContext?.inventory?.card &&
+        inventoryContext?.inventory?.position &&
+        personsContext?.persons?.first &&
+        personsContext?.persons?.second
       ) {
         try {
           setIsPendingPosition(true);
           const positionData = await getPosition(
-            inventoryContext?.inventory.card,
+            inventoryContext?.inventory?.card,
             inventoryContext.inventory.position,
             personsContext?.persons,
           );
@@ -129,18 +136,14 @@ export default function Edit() {
   }, [
     articlesOptions,
     inventoryContext,
-    inventoryContext?.inventory.position,
+    inventoryContext?.inventory?.position,
     personsContext?.persons,
   ]);
 
   // save position
   const handleSavePosition = async () => {
     if (identifier !== '') {
-      if (
-        !window.confirm(
-          'Czy na pewno chcesz ponownie zapisać pozycję? Spowoduje to wygenerowanie nowego identyfikatora i konieczność jego zapisania na inwentaryzowanym artykule.',
-        )
-      ) {
+      if (!window.confirm('Czy na pewno chcesz ponownie zapisać pozycję?')) {
         return;
       }
     }
@@ -184,7 +187,7 @@ export default function Edit() {
     }
 
     if (
-      inventoryContext?.inventory.card &&
+      inventoryContext?.inventory?.card &&
       inventoryContext.inventory.position
     ) {
       try {
@@ -198,8 +201,8 @@ export default function Edit() {
 
         if (
           selectedArticle &&
-          personsContext?.persons.first &&
-          personsContext?.persons.second
+          personsContext?.persons?.first &&
+          personsContext?.persons?.second
         ) {
           setIsPendingSaving(true);
           const res = await savePosition(
@@ -210,7 +213,7 @@ export default function Edit() {
             finalQuantity,
             selectedArticle.unit,
             wip,
-            personsContext.persons,
+            personsContext?.persons,
           );
 
           if (res?.status === 'added') {
@@ -353,13 +356,13 @@ export default function Edit() {
           <div className='flex justify-center space-x-3'>
             <button
               onClick={() => {
-                if (inventoryContext?.inventory.position) {
-                  if (inventoryContext?.inventory.position !== 1) {
+                if (inventoryContext?.inventory?.position) {
+                  if (inventoryContext?.inventory?.position !== 1) {
                     inventoryContext.setInventory((prevState) => ({
                       ...prevState,
                       position:
-                        inventoryContext.inventory.position &&
-                        inventoryContext.inventory.position - 1,
+                        inventoryContext?.inventory?.position &&
+                        inventoryContext?.inventory?.position - 1,
                     }));
                   } else {
                     setErrorMessage('Karta nie posiada pozycji 0!');
@@ -387,14 +390,14 @@ export default function Edit() {
               onClick={() => {
                 if (!blockNextPosition) {
                   if (
-                    inventoryContext?.inventory.position &&
-                    inventoryContext?.inventory.position !== 25
+                    inventoryContext?.inventory?.position &&
+                    inventoryContext?.inventory?.position !== 25
                   ) {
-                    inventoryContext.setInventory((prevState) => ({
+                    inventoryContext?.setInventory((prevState) => ({
                       ...prevState,
                       position:
-                        inventoryContext.inventory.position &&
-                        inventoryContext.inventory.position + 1,
+                        inventoryContext?.inventory?.position &&
+                        inventoryContext?.inventory?.position + 1,
                     }));
                   } else {
                     setErrorMessage('Karta jest pełna!');

@@ -4,10 +4,10 @@ import clientPromise from '@/lib/mongo';
 import { getLastNameFirstLetter } from '../../../lib/utils/nameFormat';
 
 type PersonsType = {
-  first: string | null;
-  nameFirst: string | null;
-  second: string | null;
-  nameSecond: string | null;
+  first?: string | null;
+  nameFirst?: string | null;
+  second?: string | null;
+  nameSecond?: string | null;
 };
 
 type CardOption = {
@@ -352,24 +352,8 @@ export async function savePosition(
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
-    let isUnique = false;
-    let identifier;
-    while (!isUnique) {
-      identifier = generateIdentifier(card, position, persons);
-      const allIdentifiers = await collection
-        .find({}, { projection: { 'positions.identifier': 1 } })
-        .toArray();
 
-      const existingIdentifiers = allIdentifiers.flatMap((card) =>
-        Array.isArray(card.positions)
-          ? card.positions.map((pos) => pos.identifier)
-          : [],
-      );
-
-      if (!existingIdentifiers.includes(identifier)) {
-        isUnique = true;
-      }
-    }
+    const identifier = generateIdentifier(card, position, persons);
 
     const positionData = {
       position: position,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, createContext, useLayoutEffect, ReactNode } from 'react';
+import { useState, createContext, ReactNode } from 'react';
 
 type ScanType = {
   last: string | null;
@@ -20,17 +20,9 @@ type ScanProviderProps = {
 };
 
 export const ScanProvider: React.FC<ScanProviderProps> = ({ children }) => {
-  const [scan, setScan] = useState<ScanType>(() => {
-    // if (typeof window !== 'undefined') {
-    //   const localData = localStorage.getItem('pro.scan');
-    //   return localData ? JSON.parse(localData) : { scan: null, name: null };
-    // }
-    return { last: null };
-  });
-
-  // useLayoutEffect(() => {
-  //   localStorage.setItem('pro.scan', JSON.stringify(scan));
-  // }, [article]);
+  const [scan, setScan] = useState<ScanType>(() => ({
+    last: null,
+  }));
 
   return (
     <ScanContext.Provider value={{ scan, setScan }}>

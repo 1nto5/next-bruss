@@ -49,7 +49,7 @@ export default function LoginForm() {
       }
       setFormState({ personalNumber: '', password: '' });
 
-      if (!personsContext?.persons.first) {
+      if (!personsContext?.persons?.first) {
         personsContext?.setPersons((prevState) => ({
           ...prevState,
           first: formState.personalNumber,
@@ -90,7 +90,7 @@ export default function LoginForm() {
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        logowanie {!personsContext?.persons.first ? 'pierwszej' : 'drugiej'}{' '}
+        logowanie {!personsContext?.persons?.first ? 'pierwszej' : 'drugiej'}{' '}
         osoby
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>

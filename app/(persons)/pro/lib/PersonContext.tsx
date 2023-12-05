@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, createContext, useLayoutEffect, ReactNode } from 'react';
+import { useState, createContext, useEffect, ReactNode } from 'react';
 
 type PersonType = {
   number: string | null;
   name: string | null;
-};
+} | null;
 
 type PersonContextType = {
   person: PersonType;
@@ -21,17 +21,25 @@ type PersonProviderProps = {
 };
 
 export const PersonProvider: React.FC<PersonProviderProps> = ({ children }) => {
-  const [person, setPerson] = useState<PersonType>(() => {
-    if (typeof window !== 'undefined') {
-      const localData = localStorage.getItem('pro.person');
-      return localData ? JSON.parse(localData) : { number: null, name: null };
-    }
-    return { number: null, name: null };
-  });
+  const [person, setPerson] = useState<PersonType | null>(null);
 
-  useLayoutEffect(() => {
-    localStorage.setItem('pro.person', JSON.stringify(person));
+  useEffect(() => {
+    const localData = localStorage.getItem('pro.person');
+    const data = localData
+      ? JSON.parse(localData)
+      : { number: null, name: null };
+    setPerson(data);
+  }, []);
+
+  useEffect(() => {
+    if (person) {
+      localStorage.setItem('pro.person', JSON.stringify(person));
+    }
   }, [person]);
+
+  if (!person) {
+    return null;
+  }
 
   return (
     <PersonContext.Provider value={{ person, setPerson }}>

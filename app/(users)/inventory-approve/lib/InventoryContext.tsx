@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, createContext, ReactNode } from 'react';
+import { useState, createContext, ReactNode, useEffect } from 'react';
 
 type InventoryType = {
   card: number | null;
   position: number | null;
-};
+} | null;
 
 type InventoryContextType = {
   inventory: InventoryType;
@@ -24,10 +24,25 @@ type InventoryProviderProps = {
 export const InventoryProvider: React.FC<InventoryProviderProps> = ({
   children,
 }) => {
-  const [inventory, setInventory] = useState<InventoryType>({
-    card: null,
-    position: null,
-  });
+  const [inventory, setInventory] = useState<InventoryType | null>(null);
+
+  useEffect(() => {
+    const localData = localStorage.getItem('inventory-approve');
+    const data = localData
+      ? JSON.parse(localData)
+      : { card: null, position: null };
+    setInventory(data);
+  }, []);
+
+  useEffect(() => {
+    if (inventory) {
+      localStorage.setItem('inventory-approve', JSON.stringify(inventory));
+    }
+  }, [inventory]);
+
+  if (!inventory) {
+    return null;
+  }
 
   return (
     <InventoryContext.Provider value={{ inventory, setInventory }}>

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, createContext, useLayoutEffect, ReactNode } from 'react';
+import { useState, createContext, ReactNode, useEffect } from 'react';
 
 type ArticleType = {
   number: string | null;
   name: string | null;
-};
+} | null;
 
 type ArticleContextType = {
   article: ArticleType;
@@ -23,17 +23,25 @@ type ArticleProviderProps = {
 export const ArticleProvider: React.FC<ArticleProviderProps> = ({
   children,
 }) => {
-  const [article, setArticle] = useState<ArticleType>(() => {
-    if (typeof window !== 'undefined') {
-      const localData = localStorage.getItem('pro.article');
-      return localData ? JSON.parse(localData) : { number: null, name: null };
-    }
-    return { number: null, name: null };
-  });
+  const [article, setArticle] = useState<ArticleType | null>(null);
 
-  useLayoutEffect(() => {
-    localStorage.setItem('pro.article', JSON.stringify(article));
+  useEffect(() => {
+    const localData = localStorage.getItem('pro.article');
+    const data = localData
+      ? JSON.parse(localData)
+      : { number: null, name: null };
+    setArticle(data);
+  }, []);
+
+  useEffect(() => {
+    if (article) {
+      localStorage.setItem('inventory.article', JSON.stringify(article));
+    }
   }, [article]);
+
+  if (!article) {
+    return null;
+  }
 
   return (
     <ArticleContext.Provider value={{ article, setArticle }}>

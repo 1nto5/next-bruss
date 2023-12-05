@@ -10,7 +10,7 @@ export default function Form() {
 
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
-      {!inventoryContext?.inventory.card && <Card />}
+      {!inventoryContext?.inventory?.card && <Card />}
     </div>
   );
 }
