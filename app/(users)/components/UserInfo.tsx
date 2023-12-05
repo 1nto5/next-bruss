@@ -11,45 +11,20 @@ export default function UserInfo() {
   return (
     <>
       <div className='text-center'>
-        {!session ? (
-          <button
-            onClick={() => router.push('/auth/login')}
-            className='mt-4 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100'
-          >
-            login
-          </button>
-        ) : (
-          <>
-            <p className='mt-10'>Niedługo powstanie tu panel dostępu...</p>
-            <button
-              className='mt-2 w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
-              onClick={() => signOut()}
-            >
-              logout
-            </button>
-            <p className='mt-10'>
-              Name:{' '}
-              {extractNameFromEmail(
-                session?.user?.email ?? 'Unknown.User@bruss-group.com',
-              )}
-            </p>
-            <p className='mb-10 mt-2'>
-              Roles: {session?.user?.roles?.join(', ')}
-            </p>
+        <p className='mt-10'>
+          Cześć! Cały czas pracuję nad rozwiązaniami, które tu znajdziesz.
+          Proszę o cierpliwość!
+        </p>
 
-            <Link href={'/inventory-approve'}>
-              <button className='m-2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
-                inventory approve app
-              </button>
-            </Link>
-
-            <Link href={'/pro/export-data'}>
-              <button className='m-3 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'>
-                export data
-              </button>
-            </Link>
-          </>
-        )}
+        <p className='mt-10'>
+          Zalogowany:{' '}
+          {extractNameFromEmail(
+            session?.user?.email ?? 'Unknown.User@bruss-group.com',
+          )}
+        </p>
+        <p className='mb-10 mt-2'>
+          Grupy uprawnień: {session?.user?.roles?.join(', ')}
+        </p>
       </div>
     </>
   );

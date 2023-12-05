@@ -20,10 +20,11 @@ export default function RootLayout({
     <html suppressHydrationWarning>
       <head />
       <body
-        className={`${inter.className}  mt-20 bg-slate-50 antialiased dark:bg-slate-950`}
+        className={`${inter.className} bg-slate-50 antialiased dark:bg-slate-950`}
       >
         <AuthProvider>
           <DarkLightProvider>
+            <div className='h-16'></div>
             <Navbar />
             {children}
           </DarkLightProvider>
