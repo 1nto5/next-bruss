@@ -94,7 +94,7 @@ export default function RegisterForm() {
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        register form
+        rejestracja
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col items-center justify-center gap-3'>
@@ -123,7 +123,7 @@ export default function RegisterForm() {
               className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
               type='password'
               name='password'
-              placeholder='password'
+              placeholder='hasło'
               value={formState.password}
               onChange={handleInputChange}
             />
@@ -131,7 +131,7 @@ export default function RegisterForm() {
               className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
               type='password'
               name='confirmPassword'
-              placeholder='confirm password'
+              placeholder='powtórz hasło'
               value={formState.confirmPassword}
               onChange={handleInputChange}
             />
@@ -141,11 +141,11 @@ export default function RegisterForm() {
               className='w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
               disabled={isPending}
             >
-              {isPending ? 'registering...' : 'register'}
+              {isPending ? 'rejestrowanie...' : 'zarejestruj'}
             </button>
           </form>
           <Link className='mt-3 text-right text-sm' href={'/auth/login'}>
-            Already have an account? <span className='underline'>Login</span>
+            Masz konto? <span className='underline'>Zaloguj się</span>
           </Link>
         </div>
       </div>

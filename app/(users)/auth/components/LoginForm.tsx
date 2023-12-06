@@ -47,14 +47,14 @@ export default function LoginForm() {
         const res = await signIn('credentials', {
           email: formState.email,
           password: formState.password,
-          redirect: false,
+          redirect: true, // Redirect to the callback URL on successful sign in. It was false by default.
         });
 
         if (res && res.error) {
           setErrorMessage('Invlid Credentials!');
           return;
         }
-        router.replace('/');
+        // router.replace('/');
       } catch (error) {
         console.error('User login was unsuccessful.:', error);
         setErrorMessage('Please contact IT!');
@@ -66,7 +66,7 @@ export default function LoginForm() {
   return (
     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        login form
+        logowanie
       </span>
       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
         <div className='flex w-11/12 flex-col items-center justify-center gap-3'>
@@ -96,7 +96,7 @@ export default function LoginForm() {
               className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
               type='password'
               name='password'
-              placeholder='password'
+              placeholder='hasło'
               value={formState.password}
               onChange={handleInputChange}
             />
@@ -105,12 +105,11 @@ export default function LoginForm() {
               className='w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
               disabled={isPending}
             >
-              {isPending ? 'logging...' : 'login'}
+              {isPending ? 'logowanie...' : 'zaloguj'}
             </button>
           </form>
           <Link className='mt-3 text-right text-sm' href={'/auth/register'}>
-            Don&apos;t have an account?{' '}
-            <span className='underline'>Register</span>
+            Nie masz konta? <span className='underline'>Zarejestruj się</span>
           </Link>
         </div>
       </div>

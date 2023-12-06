@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaBars, FaTimes, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { useSession, signOut } from 'next-auth/react';
