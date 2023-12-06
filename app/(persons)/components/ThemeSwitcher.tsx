@@ -1,40 +1,43 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useTheme } from 'next-themes'
-import { FaSun, FaMoon } from 'react-icons/fa'
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 const ThemeSwitcher = () => {
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
-    return null
+    return null;
   }
 
   const toggleTheme = () => {
     if (theme === 'light') {
-      setTheme('dark')
+      setTheme('dark');
     } else {
-      setTheme('light')
+      setTheme('light');
     }
-  }
+  };
 
   return (
-    <div className="mr-2">
-      <button onClick={toggleTheme} className="text-3xl">
+    <div className='mr-2'>
+      <button
+        onClick={toggleTheme}
+        className='text-lg sm:text-xl md:text-2xl lg:text-3xl'
+      >
         {theme === 'light' ? (
-          <FaMoon className="text-gray-700" />
+          <FaMoon className='text-gray-700' />
         ) : (
-          <FaSun className="text-yellow-400" />
+          <FaSun className='text-yellow-400' />
         )}
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default ThemeSwitcher
+export default ThemeSwitcher;

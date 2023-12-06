@@ -171,20 +171,20 @@ export default function Card() {
 
   return (
     <>
-      <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
+      <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100 sm:text-base lg:text-lg'>
         wybór karty
       </span>
-      <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
-        <div className='flex w-11/12 flex-col gap-3'>
+      <div className='flex w-11/12 max-w-2xl justify-center rounded bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800 sm:pb-4 sm:pt-4'>
+        <div className='flex w-11/12 flex-col gap-2 sm:gap-3'>
           {message || errorMessage ? (
-            <div className='flex flex-col items-center justify-center space-y-4'>
+            <div className='flex flex-col items-center justify-center space-y-2 text-sm sm:space-y-4 sm:text-base lg:text-lg'>
               {message && (
                 <div className='rounded bg-bruss p-2 text-center text-slate-100'>
                   {message}
                 </div>
               )}
               {errorMessage && (
-                <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
+                <div className='rounded bg-red-500 p-2 text-center text-sm text-slate-100 dark:bg-red-700 sm:text-base lg:text-lg'>
                   {errorMessage}
                 </div>
               )}
@@ -215,12 +215,12 @@ export default function Card() {
             }
           />
 
-          <div className=' flex w-full justify-center space-x-2'>
+          <div className='mt-2 flex w-full justify-center space-x-4'>
             <button
               type='button'
               onClick={newCard}
               className={clsx(
-                'w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600',
+                'w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600 sm:text-base lg:text-lg',
                 { 'animate-pulse': isPendingNewCard === true },
               )}
             >
@@ -229,7 +229,7 @@ export default function Card() {
 
             <button
               onClick={handleConfirm}
-              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+              className='w-1/2 rounded bg-slate-200 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             >
               {isPendingCardData ? 'pobieranie danych' : 'wybierz kartę'}
             </button>

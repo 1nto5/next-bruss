@@ -19,12 +19,12 @@ export default function StatusBox({
 }: StatusBoxProps) {
   return (
     <>
-      <div className={`${width} box-border text-center`}>
-        <p className='text-lg font-thin  tracking-widest text-slate-900 dark:text-slate-100 md:text-xl'>
+      <div className={`${width} box-border pl-1 pr-1 text-center`}>
+        <p className='text-xs font-thin tracking-widest text-slate-900 dark:text-slate-100 sm:text-lg md:text-xl lg:text-xl'>
           {name}
         </p>
         <p
-          className={clsx('text-xl md:text-3xl', {
+          className={clsx('text-xs sm:text-xl md:text-2xl lg:text-2xl', {
             'animate-pulse text-slate-200 dark:text-slate-600':
               loading === true,
             'text-slate-900 dark:text-slate-50': full === false,
@@ -35,7 +35,7 @@ export default function StatusBox({
         </p>
       </div>
       {separator && (
-        <div className='h-20 border-l-2 border-slate-200 dark:border-slate-700'></div>
+        <div className='h-8 border-l-2 border-slate-200 dark:border-slate-700 sm:h-12 md:h-16 lg:h-20'></div>
       )}
     </>
   );

@@ -15,48 +15,54 @@ export default function Status() {
   }
 
   return (
-    <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800'>
+    <div className='flex flex-row items-center justify-between bg-slate-100 pb-2 pt-2 shadow-md dark:bg-slate-800 '>
       <StatusBox
-        name='zalogowany 1:'
-        value={`${personsContext?.persons?.first} (${shortenLastName(
-          personsContext?.persons?.nameFirst ?? '',
-        )})`}
-        width='w-2/6'
+        name='os. 1:'
+        value={personsContext?.persons?.first}
+        width='w-1/4'
       />
 
       <StatusBox
-        name='zalogowany 2:'
-        value={`${personsContext?.persons?.second} (${shortenLastName(
-          personsContext?.persons?.nameSecond ?? '',
-        )})`}
-        width='w-2/6'
+        name='os. 2:'
+        value={personsContext?.persons?.second}
+        width='w-1/4'
       />
 
       <StatusBox
-        name='karta/pozycja:'
+        name='karta:'
         value={
           inventoryContext?.inventory?.card
-            ? `${inventoryContext.inventory.card.toString().padStart(3, '0')}/${
-                inventoryContext.inventory.position
-                  ? inventoryContext.inventory.position
-                      .toString()
-                      .padStart(2, '0')
-                  : 'brak'
-              }`
-            : 'brak'
+            ? inventoryContext?.inventory?.card.toString()
+            : '-'
         }
-        width='w-1/6'
+        width='w-1/4'
       />
 
       <StatusBox
-        name='obszar/sektor:'
+        name='poz.:'
         value={
-          inventoryContext?.inventory?.warehouse &&
-          inventoryContext?.inventory.sector
-            ? `${inventoryContext?.inventory.warehouse}/${inventoryContext?.inventory.sector}`
-            : 'brak'
+          inventoryContext?.inventory?.position
+            ? inventoryContext?.inventory?.position.toString()
+            : '-'
         }
-        width='w-1/6'
+        width='w-1/4'
+      />
+
+      <StatusBox
+        name='sektor:'
+        value={
+          inventoryContext?.inventory?.sector
+            ? inventoryContext.inventory.sector.split(' ')[0] + ''
+            : '-'
+        }
+        width='w-1/4'
+      />
+
+      <StatusBox
+        name='obszar:'
+        value={inventoryContext?.inventory?.warehouse ?? '-'}
+        width='w-1/4'
+        separator={false}
       />
     </div>
   );

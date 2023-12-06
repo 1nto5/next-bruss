@@ -9,7 +9,7 @@ export default function Footer() {
       <div className='flex items-center'>
         <Logo />
       </div>
-      <div className='pointer-events-auto flex items-center space-x-4'>
+      <div className='pointer-events-auto flex items-center space-x-2 sm:space-x-4'>
         <ThemeSwitcher />
         <Reload />
       </div>

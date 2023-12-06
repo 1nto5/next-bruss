@@ -122,7 +122,7 @@ export default function Select({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className='w-full max-w-xs text-center'
+        className='w-full text-center text-xs sm:text-base lg:text-lg'
         menuPlacement='auto'
         styles={isDarkMode ? selectDarkTheme : selectLightTheme}
         isDisabled={isDisabled}
