@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       { header: 'Artykuł', key: 'article', width: 10 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'DMC', key: 'dmc', width: 30 },
-      { header: 'Operator', key: 'operator', width: 12 }, // TODO: with name from db
+      { header: 'Operator', key: 'operator', width: 12 },
       { header: 'Data', key: 'time', width: 12 },
       { header: 'Hydra Batch', key: 'hydra_batch', width: 15 },
       { header: 'Hydra Data', key: 'hydra_time', width: 12 },

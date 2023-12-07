@@ -4,6 +4,8 @@ import { InventoryProvider } from './lib/InventoryContext';
 import Header from './components/Header';
 import App from './app';
 
+//TODO: match styles with inventory
+
 export default function Page() {
   return (
     <InventoryProvider>
