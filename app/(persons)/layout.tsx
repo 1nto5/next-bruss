@@ -1,6 +1,6 @@
 import '../globals.css';
 import Footer from './components/Footer';
-import DarkLightProvider from '../theme-provider';
+import { ThemeProvider } from '@/components/theme-provider';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -19,13 +19,16 @@ export default function RootLayout({
     // <html suppressHydrationWarning>
     <html>
       <head />
-      <body
-        className={`${inter.className} bg-slate-50 antialiased dark:bg-slate-950`}
-      >
-        <DarkLightProvider>
+      <body>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
           <Footer />
-        </DarkLightProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
