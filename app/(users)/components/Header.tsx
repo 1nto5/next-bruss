@@ -1,0 +1,206 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import Container from '@/components/ui/container';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ThemeModeToggle } from './ThemeModeToggle';
+import { LoginLogout } from './LoginLogout';
+import { signIn, signOut, useSession } from 'next-auth/react';
+
+const inventory = [
+  {
+    href: '/',
+    title: 'Products',
+    description: 'Browse our inventory of products.',
+  },
+  {
+    href: '/',
+    title: 'Categories',
+    description: 'Browse our inventory of products.',
+  },
+];
+
+const routes = [
+  {
+    title: 'Inwentaryzacja',
+    submenu: [
+      {
+        href: '/inventory',
+        title: 'Inwentaryzacja',
+        description: 'Aplikacja wspierająca proces inwentaryzacji.',
+      },
+      {
+        href: '/inventory-approve',
+        title: 'Zatwierdzanie inwentaryzacji',
+        description: 'Narzędzie do potwierdzania zinwentaryzowanych pozycji.',
+      },
+    ],
+  },
+
+  {
+    title: 'Produkcja',
+    submenu: [
+      {
+        href: '/export-data',
+        title: 'Export danych',
+        description: 'Generowanie pliku excel z danymi systemu skanowania.',
+      },
+      {
+        href: '/manage-scanning',
+        title: 'Zarządzanie',
+        description:
+          'Zarządzanie skanowaniem na liniach - usuwanie kodów DMC, zmiana ustawień, rework.',
+      },
+    ],
+  },
+  {
+    title: 'Nadgodziny',
+    href: '/extra-hours',
+  },
+];
+
+const Header = () => {
+  const session = useSession();
+  const isAuthenticated = session.status === 'authenticated';
+  return (
+    <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
+      <Container>
+        <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center'>
+            <Sheet>
+              <SheetTrigger>
+                <Menu className='h-6 w-6 md:hidden' />
+              </SheetTrigger>
+              <SheetContent side='left' className='w-[300px] sm:w-[400px]'>
+                <nav className='flex flex-col gap-4'>
+                  {routes.map((route, i) =>
+                    route.submenu ? (
+                      <div key={i}>
+                        <span className='block px-2 py-1 text-sm'>
+                          {route.title}
+                        </span>
+                        <div className='ml-4'>
+                          {route.submenu.map((sub) => (
+                            <Link
+                              key={sub.title}
+                              href={sub.href}
+                              className='block px-2 py-1 text-lg'
+                            >
+                              {sub.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <Link
+                        key={i}
+                        href={route.href}
+                        className='block px-2 py-1 text-lg'
+                      >
+                        {route.title}
+                      </Link>
+                    ),
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+            <Link href='/' className='ml-4 lg:ml-0'>
+              <h1 className='text-xl font-bold'>Next BRUSS</h1>
+            </Link>
+          </div>
+          <nav className='mx-6 flex hidden items-center space-x-4 md:block lg:space-x-6'>
+            <NavigationMenu>
+              <NavigationMenuList>
+                {routes.map((route) =>
+                  route.submenu ? (
+                    <NavigationMenuItem key={route.title}>
+                      <NavigationMenuTrigger>
+                        {route.title}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+                          {route.submenu.map((subItem) => (
+                            <ListItem
+                              key={subItem.title}
+                              title={subItem.title}
+                              href={subItem.href}
+                            >
+                              {subItem.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  ) : (
+                    <NavigationMenuItem key={route.title}>
+                      <Link href={route.href} legacyBehavior passHref>
+                        <NavigationMenuLink
+                          className={navigationMenuTriggerStyle()}
+                        >
+                          {route.title}
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuItem>
+                  ),
+                )}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </nav>
+          <div className='flex items-center gap-x-4'>
+            <ThemeModeToggle buttonStyle='' />
+            <LoginLogout
+              isLoggedIn={isAuthenticated}
+              onLogin={() => {
+                signIn();
+              }}
+              onLogout={() => {
+                signOut();
+              }}
+              buttonStyle='mr-4 lg:mr-0'
+            />
+          </div>
+        </div>
+      </Container>
+    </header>
+  );
+};
+
+const ListItem = React.forwardRef<
+  React.ElementRef<'a'>,
+  React.ComponentPropsWithoutRef<'a'>
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className,
+          )}
+          {...props}
+        >
+          <div className='text-sm font-medium leading-none'>{title}</div>
+          <p className='line-clamp-2 text-sm leading-snug text-muted-foreground'>
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = 'ListItem';
+
+export default Header;

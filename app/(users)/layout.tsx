@@ -1,10 +1,7 @@
 import '../globals.css';
 import { AuthProvider } from '../auth-provider';
-import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
-import Navbar from './components/Navbar';
-
-const inter = Inter({ subsets: ['latin'] });
+import Header from '../(users)/components/Header';
 
 export const metadata = {
   title: 'Next BRUSS',
@@ -27,8 +24,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className='h-16'></div>
-            <Navbar />
+            <Header />
             {children}
           </ThemeProvider>
         </AuthProvider>
