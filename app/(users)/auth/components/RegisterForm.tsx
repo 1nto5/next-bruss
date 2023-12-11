@@ -1,10 +1,22 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import { useTransition } from 'react';
+import Link from 'next/link';
 import { Register } from '../actions';
+import { useToast } from '@/components/ui/use-toast';
 
 type RegisterFormState = {
   email: string;
@@ -13,7 +25,7 @@ type RegisterFormState = {
 };
 
 export default function RegisterForm() {
-  // Initialize state for the form fields
+  const { toast } = useToast();
   const [formState, setFormState] = useState<RegisterFormState>({
     email: '',
     password: '',
@@ -22,133 +34,134 @@ export default function RegisterForm() {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
 
   const router = useRouter();
-
-  // Function to handle changes in input fields
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Update state with the new field values
     setFormState({
       ...formState,
       [name]: value,
     });
   };
 
-  const handleRegister = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!formState.email || !formState.password || !formState.confirmPassword) {
       setErrorMessage('All fields are necessary!');
       return;
     }
 
-    startTransition(async () => {
-      try {
-        if (
-          !formState.email ||
-          !formState.password ||
-          !formState.confirmPassword
-        ) {
-          setErrorMessage('All fields are necessary!');
-          return;
-        }
-        if (formState.password !== formState.confirmPassword) {
-          setErrorMessage('Passwords do not match!');
-          return;
-        }
-        const result = await Register(formState.email, formState.password);
-        const status = result?.status;
-        if (status === 'registered') {
-          setFormState({
-            email: '',
-            password: '',
-            confirmPassword: '',
-          });
-          setErrorMessage(null);
-          router.push('/auth/login');
-        }
-        if (status === 'wrong password') {
-          setErrorMessage(
-            'The password must contain 6 characters, a special character, a number, and an uppercase letter!',
-          );
-          return;
-        }
-
-        if (status === 'exists') {
-          setErrorMessage('User exists!');
-          return;
-        }
-        if (status === 'error') {
-          setErrorMessage('Please contact IT!');
-          return;
-        }
-      } catch (error) {
-        console.error('User registration was unsuccessful.:', error);
-        setErrorMessage('Please contact IT!');
+    try {
+      setIsPending(true);
+      if (
+        !formState.email ||
+        !formState.password ||
+        !formState.confirmPassword
+      ) {
+        setErrorMessage('Uzupełnij wszystkie pola!');
         return;
       }
-    });
+      if (formState.password !== formState.confirmPassword) {
+        setErrorMessage('Hasła nie są zgodne!');
+        return;
+      }
+      const result = await Register(formState.email, formState.password);
+      const status = result?.status;
+      if (status === 'registered') {
+        setFormState({
+          email: '',
+          password: '',
+          confirmPassword: '',
+        });
+        toast({
+          title: `Zarejestrowano: ${formState.email}!`,
+        });
+        setErrorMessage(null);
+        router.push('/auth/login');
+      }
+      if (status === 'wrong password') {
+        setErrorMessage(
+          'Hasło musi zawierać 6 znaków, znak specjalny, cyfrę i wielką literę!',
+        );
+        return;
+      }
+
+      if (status === 'exists') {
+        setErrorMessage('Konto istnieje!');
+        return;
+      }
+      if (status === 'error') {
+        setErrorMessage('Skontaktuj się z IT!');
+        return;
+      }
+    } catch (error) {
+      console.error('User registration was unsuccessful.:', error);
+      setErrorMessage('Skontaktuj się z IT!');
+
+      return;
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
-    <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
-      <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-        rejestracja
-      </span>
-      <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
-        <div className='flex w-11/12 flex-col items-center justify-center gap-3'>
-          {errorMessage ? (
-            <div className='flex flex-col items-center justify-center space-y-4'>
-              {errorMessage && (
-                <div className='rounded bg-red-500 p-2 text-center  text-slate-100 dark:bg-red-700'>
-                  {errorMessage}
-                </div>
-              )}
+    <Card className='w-[350px]'>
+      <CardHeader>
+        <CardTitle>Rejestracja</CardTitle>
+        <CardDescription className='text-red-700'>
+          {errorMessage}
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleRegister}>
+        <CardContent>
+          <div className='grid w-full items-center gap-4'>
+            <div className='flex flex-col space-y-1.5'>
+              <Label htmlFor='email'>Email</Label>
+              <Input
+                id='email'
+                name='email'
+                type='email'
+                value={formState.email}
+                onChange={handleInputChange}
+              />
             </div>
-          ) : null}
-          <form
-            onSubmit={handleRegister}
-            className='flex w-11/12 flex-col items-center justify-center gap-3'
-          >
-            <input
-              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
-              type='email'
-              name='email'
-              placeholder='email'
-              value={formState.email}
-              onChange={handleInputChange}
-            />
-            <input
-              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
-              type='password'
-              name='password'
-              placeholder='hasło'
-              value={formState.password}
-              onChange={handleInputChange}
-            />
-            <input
-              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
-              type='password'
-              name='confirmPassword'
-              placeholder='powtórz hasło'
-              value={formState.confirmPassword}
-              onChange={handleInputChange}
-            />
-
-            <button
-              type='submit'
-              className='w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
-              disabled={isPending}
-            >
-              {isPending ? 'rejestrowanie...' : 'zarejestruj'}
-            </button>
-          </form>
-          <Link className='mt-3 text-right text-sm' href={'/auth/login'}>
-            Masz konto? <span className='underline'>Zaloguj się</span>
-          </Link>
-        </div>
-      </div>
-    </div>
+            <div className='flex flex-col space-y-1.5'>
+              <Label htmlFor='password'>Hasło</Label>
+              <Input
+                id='password'
+                name='password'
+                type='password'
+                value={formState.password}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className='flex flex-col space-y-1.5'>
+              <Label htmlFor='confirmPassword'>Potwierdź hasło</Label>
+              <Input
+                id='confirmPassword'
+                name='confirmPassword'
+                type='password'
+                value={formState.confirmPassword}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className='flex justify-between'>
+          <Button type='button' variant='secondary'>
+            <Link href='/auth/login'>Logowanie </Link>
+          </Button>
+          {isPending ? (
+            <Button disabled>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Rejestrowanie
+            </Button>
+          ) : (
+            <Button type='submit'>Utwórz konto</Button>
+          )}
+        </CardFooter>
+      </form>
+    </Card>
   );
 }

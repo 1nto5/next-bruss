@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import { LoginLogout } from './LoginLogout';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import Logo from './Logo';
 
 const inventory = [
   {
@@ -75,7 +76,7 @@ const Header = () => {
   const session = useSession();
   const isAuthenticated = session.status === 'authenticated';
   return (
-    <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
+    <header className='mb-4 border-b px-4 py-3 sm:flex sm:justify-between'>
       <Container>
         <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center'>
@@ -116,8 +117,9 @@ const Header = () => {
                 </nav>
               </SheetContent>
             </Sheet>
-            <Link href='/' className='ml-4 lg:ml-0'>
-              <h1 className='text-xl font-bold'>Next BRUSS</h1>
+            <Link href='/' className='ml-4 flex items-center lg:ml-0'>
+              <h1 className='font-bold'>Next</h1>
+              <Logo logoStyles='mr-2' /> {/* Logo z dodatkowym marginesem */}
             </Link>
           </div>
           <nav className='mx-6 flex hidden items-center space-x-4 md:block lg:space-x-6'>

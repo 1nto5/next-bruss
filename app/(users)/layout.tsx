@@ -2,6 +2,7 @@ import '../globals.css';
 import { AuthProvider } from '../auth-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '../(users)/components/Header';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
   title: 'Next BRUSS',
@@ -25,7 +26,8 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            {children}
+            <main className='flex justify-center'>{children}</main>
+            <Toaster />
           </ThemeProvider>
         </AuthProvider>
       </body>
