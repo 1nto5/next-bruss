@@ -26,7 +26,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            <main className='flex justify-center'>{children}</main>
+            {children}
             <Toaster />
           </ThemeProvider>
         </AuthProvider>

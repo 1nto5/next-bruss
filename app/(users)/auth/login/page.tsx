@@ -6,5 +6,9 @@ import authOptions from '@/lib/auth/authOptions';
 export default async function Login() {
   const session = await getServerSession(authOptions);
   if (session) redirect('/');
-  return <LoginForm />;
+  return (
+    <main className='flex justify-center'>
+      <LoginForm />
+    </main>
+  );
 }

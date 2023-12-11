@@ -62,6 +62,14 @@ export default function RegisterForm() {
         setErrorMessage('Uzupełnij wszystkie pola!');
         return;
       }
+
+      if (!formState.email.endsWith('@bruss-group.com')) {
+        setErrorMessage(
+          'Użyj służbowy adres email (imie.nazwisko@bruss-group.com)!',
+        );
+        return;
+      }
+
       if (formState.password !== formState.confirmPassword) {
         setErrorMessage('Hasła nie są zgodne!');
         return;

@@ -19,31 +19,20 @@ import { ThemeModeToggle } from './ThemeModeToggle';
 import { LoginLogout } from './LoginLogout';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Logo from './Logo';
-
-const inventory = [
-  {
-    href: '/',
-    title: 'Products',
-    description: 'Browse our inventory of products.',
-  },
-  {
-    href: '/',
-    title: 'Categories',
-    description: 'Browse our inventory of products.',
-  },
-];
+import UserAvatar from './UserAvatar';
+import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 
 const routes = [
   {
     title: 'Inwentaryzacja',
     submenu: [
       {
-        href: '/inventory',
+        href: '/inventory/main',
         title: 'Inwentaryzacja',
         description: 'Aplikacja wspierająca proces inwentaryzacji.',
       },
       {
-        href: '/inventory-approve',
+        href: '/inventory/approve',
         title: 'Zatwierdzanie inwentaryzacji',
         description: 'Narzędzie do potwierdzania zinwentaryzowanych pozycji.',
       },
@@ -54,7 +43,7 @@ const routes = [
     title: 'Produkcja',
     submenu: [
       {
-        href: '/export-data',
+        href: '/pro/export-data',
         title: 'Export danych',
         description: 'Generowanie pliku excel z danymi systemu skanowania.',
       },
@@ -73,8 +62,9 @@ const routes = [
 ];
 
 const Header = () => {
-  const session = useSession();
-  const isAuthenticated = session.status === 'authenticated';
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated';
+
   return (
     <header className='mb-4 border-b px-4 py-3 sm:flex sm:justify-between'>
       <Container>
@@ -160,8 +150,12 @@ const Header = () => {
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <div className='flex items-center gap-x-4'>
-            <ThemeModeToggle buttonStyle='' />
+          <div className='flex items-center gap-x-2 lg:gap-x-4'>
+            {isAuthenticated && session?.user.email && (
+              <UserAvatar
+                userInitials={getInitialsFromEmail(session?.user.email)}
+              />
+            )}
             <LoginLogout
               isLoggedIn={isAuthenticated}
               onLogin={() => {
@@ -170,8 +164,9 @@ const Header = () => {
               onLogout={() => {
                 signOut();
               }}
-              buttonStyle='mr-4 lg:mr-0'
+              buttonStyle=''
             />
+            <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>
         </div>
       </Container>

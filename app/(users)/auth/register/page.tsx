@@ -7,7 +7,7 @@ export default async function Register() {
   const session = await getServerSession(authOptions);
   if (session) redirect('/');
   return (
-    <main>
+    <main className='flex justify-center'>
       <RegisterForm />
     </main>
   );

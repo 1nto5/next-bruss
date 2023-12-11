@@ -23,3 +23,16 @@ export function extractNameFromEmail(email: string): string {
     lastNameInitial.toUpperCase()
   );
 }
+
+export function getInitialsFromEmail(email: string): string {
+  let emailNamePart = email.split('@')[0];
+  let nameParts = emailNamePart.split('.');
+
+  if (nameParts.length < 2) {
+    return nameParts[0].charAt(0).toUpperCase(); // Jeśli jest tylko jedna część, zwraca jej pierwszą literę
+  }
+
+  let initials = nameParts.map((part) => part.charAt(0).toUpperCase()).join('');
+
+  return initials;
+}
