@@ -66,7 +66,7 @@ const Header = () => {
   const isAuthenticated = status === 'authenticated';
 
   return (
-    <header className='mb-4 border-b px-4 py-3 sm:flex sm:justify-between'>
+    <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
       <Container>
         <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center'>
@@ -151,10 +151,12 @@ const Header = () => {
             </NavigationMenu>
           </nav>
           <div className='flex items-center gap-x-2 lg:gap-x-4'>
-            {isAuthenticated && session?.user.email && (
+            {isAuthenticated && session?.user.email ? (
               <UserAvatar
                 userInitials={getInitialsFromEmail(session?.user.email)}
               />
+            ) : (
+              <UserAvatar userInitials='NU' />
             )}
             <LoginLogout
               isLoggedIn={isAuthenticated}

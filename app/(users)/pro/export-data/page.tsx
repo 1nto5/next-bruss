@@ -4,7 +4,7 @@ import Form from './components/Form';
 
 export default async function Page() {
   return (
-    <main className='flex justify-center'>
+    <main className='m-2 flex justify-center'>
       <Form />
     </main>
   );

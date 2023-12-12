@@ -1,11 +1,9 @@
 'use client';
 
-import { SetStateAction, useState } from 'react';
-import Select from './Select';
-import DatePicker from 'react-datepicker';
+import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import config from '@/app/(persons)/pro/config';
-import clsx from 'clsx';
+
 import {
   Card,
   CardContent,
@@ -16,7 +14,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Scroll } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,29 +30,30 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
-
-// TODO: match styles (Select, input, datapicker) with the rest of the app in dark and light, make it responsive and format width datapicker
-// TODO: width data selector
+// import { ScrollArea } from '@/components/ui/scroll-area';
+import { Calendar } from '@/components/ui/calendar';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import { addDays, format } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
 export default function Form() {
   const [openWorkplace, setOpenWorkplace] = useState(false);
   const [openArticle, setOpenArticle] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
 
   const [selectedWorkplace, setSelectedWorkplace] = useState<string | null>(
     null,
   );
   const [selectedArticle, setSelectedArticle] = useState<string | null>(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [timeFrom, setTimeFrom] = useState<Date | null>(() => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday;
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 3),
   });
-  const [timeTo, setTimeTo] = useState<Date | null>(new Date());
+
   const [searchTerm, setSearchTerm] = useState('');
   const [isPending, setIsPending] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const workplaces = Array.from(new Set(config.map((item) => item.workplace)));
   const filteredArticles = selectedWorkplace
@@ -76,12 +75,27 @@ export default function Form() {
     setOpenArticle(false);
   };
 
+  const handleSelectStatus = (status: string) => {
+    setSelectedStatus(status);
+    setOpenStatus(false);
+  };
+
+  const getLabelForStatus = (status: string) => {
+    const statusOption = statusOptions.find(
+      (option) => option.value === status,
+    );
+    return statusOption ? statusOption.label : 'Wybierz...';
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
   const handleClear = () => {
     setSelectedWorkplace(null);
     setSelectedArticle(null);
     setSelectedStatus(null);
-    setTimeFrom(null);
-    setTimeTo(null);
+    setDate({ from: new Date(), to: addDays(new Date(), 3) });
     setSearchTerm('');
   };
 
@@ -92,8 +106,8 @@ export default function Form() {
       workplace: selectedWorkplace,
       article: selectedArticle,
       status: selectedStatus,
-      timeFrom: timeFrom,
-      timeTo: timeTo,
+      timeFrom: date?.from,
+      timeTo: date?.to,
       searchTerm: searchTerm,
     };
     setIsPending(true);
@@ -129,11 +143,12 @@ export default function Form() {
   };
 
   return (
-    <Card className='w-[350px]'>
+    <Card className='w-[450px]'>
       <CardHeader>
         <CardTitle>Eksport danych</CardTitle>
-        <CardDescription className='text-red-700'>
-          {errorMessage}
+        <CardDescription>
+          W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000
+          najnowszych rekordów.
         </CardDescription>
       </CardHeader>
       <form onSubmit={generateExcel}>
@@ -141,13 +156,17 @@ export default function Form() {
           <div className='grid w-full items-center gap-4'>
             <div className='flex flex-col space-y-1.5'>
               <Label htmlFor='workplace'>Stanowisko</Label>
-              <Popover open={openWorkplace} onOpenChange={setOpenWorkplace}>
+              <Popover
+                open={openWorkplace}
+                onOpenChange={setOpenWorkplace}
+                modal={true} // ???
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant='outline'
                     role='combobox'
                     aria-expanded={openWorkplace}
-                    className='justify-between'
+                    className='justify-between font-normal'
                   >
                     {selectedWorkplace
                       ? selectedWorkplace.toUpperCase()
@@ -155,14 +174,16 @@ export default function Form() {
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className='p-0'>
+                <PopoverContent>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
-                    <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                    <CommandGroup>
+
+                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    <CommandGroup className='max-h-48 overflow-y-auto'>
                       {workplaces.map((workplace) => (
                         <CommandItem
                           key={workplace}
+                          value={workplace}
                           onSelect={() => handleSelectWorkplace(workplace)}
                           className='uppercase'
                         >
@@ -183,16 +204,16 @@ export default function Form() {
               </Popover>
               <Label htmlFor='article'>Artykuł</Label>
               <Popover
-                modal={true}
                 open={openArticle}
                 onOpenChange={setOpenArticle}
+                modal={true} // ???
               >
                 <PopoverTrigger asChild>
                   <Button
                     variant='outline'
                     role='combobox'
                     aria-expanded={openArticle}
-                    className='justify-between'
+                    className='justify-between font-normal'
                   >
                     {selectedArticle
                       ? (() => {
@@ -207,17 +228,19 @@ export default function Form() {
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className='p-0'>
+                <PopoverContent>
                   <Command>
-                    <CommandInput placeholder='Wyszukaj artykuł...' />
-                    <ScrollArea className='h-12' />
-                    <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                    <CommandGroup>
+                    <CommandInput placeholder='Wyszukaj...' />
+                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    {/* Scroll working with: */}
+                    <CommandGroup className='max-h-48 overflow-y-auto'>
+                      {/* not with: */}
+                      {/* <ScrollArea /> */}
                       {filteredArticles.map((article) => (
                         <CommandItem
                           key={article.article}
+                          value={article.article}
                           onSelect={() => handleSelectArticle(article.article)}
-                          className='uppercase'
                         >
                           <Check
                             className={cn(
@@ -230,11 +253,92 @@ export default function Form() {
                           {`${article.article} - ${article.name}`}
                         </CommandItem>
                       ))}
+                      {/* <ScrollArea /> */}
                     </CommandGroup>
-                    <ScrollArea />
                   </Command>
                 </PopoverContent>
               </Popover>
+              <Label htmlFor='status'>Status</Label>
+              <Popover open={openStatus} onOpenChange={setOpenStatus}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant='outline'
+                    role='combobox'
+                    aria-expanded={openStatus}
+                    className='justify-between font-normal'
+                  >
+                    {selectedStatus
+                      ? getLabelForStatus(selectedStatus)
+                      : 'Wybierz...'}
+                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Command>
+                    <CommandInput placeholder='Wyszukaj...' />
+                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    <CommandGroup className='max-h-48 overflow-y-auto'>
+                      {statusOptions.map((statusOption) => (
+                        <CommandItem
+                          key={statusOption.value}
+                          onSelect={() =>
+                            handleSelectStatus(statusOption.value)
+                          }
+                        >
+                          {statusOption.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <Label htmlFor='date'>Zakres czasu</Label>
+              {/* className in '' if needed */}
+              <div className={cn('grid gap-2', '')}>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id='date'
+                      variant={'outline'}
+                      className={cn(
+                        'justify-between font-normal',
+                        !date && 'text-muted-foreground',
+                      )}
+                    >
+                      <CalendarIcon className='mr-2 h-4 w-4' />
+                      {date?.from ? (
+                        date.to ? (
+                          <>
+                            {format(date.from, 'LLL dd, y')} -{' '}
+                            {format(date.to, 'LLL dd, y')}
+                          </>
+                        ) : (
+                          format(date.from, 'LLL dd, y')
+                        )
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='p-0' align='center'>
+                    <Calendar
+                      initialFocus
+                      mode='range'
+                      defaultMonth={date?.from}
+                      selected={date}
+                      onSelect={setDate}
+                      numberOfMonths={1}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
+                <Input
+                  type='text'
+                  placeholder='Wpisz dowolny...'
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
           </div>
         </CardContent>
@@ -245,7 +349,7 @@ export default function Form() {
           {isPending ? (
             <Button disabled>
               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Trwa generowanie
+              Generowanie
             </Button>
           ) : (
             <Button type='submit'>Pobierz plik</Button>
