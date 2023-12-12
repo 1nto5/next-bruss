@@ -124,7 +124,6 @@ export default function Form() {
         throw new Error('Network response was not ok');
       }
 
-      // Create a Blob from the response
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
