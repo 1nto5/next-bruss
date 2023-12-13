@@ -24,6 +24,27 @@ import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 
 const routes = [
   {
+    title: 'Produkcja',
+    submenu: [
+      {
+        href: '/pro/export-data',
+        title: 'Export danych',
+        description: 'Generowanie pliku excel z danymi systemu skanowania.',
+      },
+      {
+        href: '/pro/management',
+        title: 'Zarządzanie',
+        description:
+          'Zarządzanie skanowaniem na liniach - usuwanie kodów DMC, zmiana ustawień, rework.',
+      },
+      {
+        href: '/pro/management/rework',
+        title: 'Rework',
+        description: 'Oznaczanie partii jako rework - ponowne skanowanie',
+      },
+    ],
+  },
+  {
     title: 'Inwentaryzacja',
     submenu: [
       {
@@ -39,22 +60,6 @@ const routes = [
     ],
   },
 
-  {
-    title: 'Produkcja',
-    submenu: [
-      {
-        href: '/pro/export-data',
-        title: 'Export danych',
-        description: 'Generowanie pliku excel z danymi systemu skanowania.',
-      },
-      {
-        href: '/manage-scanning',
-        title: 'Zarządzanie',
-        description:
-          'Zarządzanie skanowaniem na liniach - usuwanie kodów DMC, zmiana ustawień, rework.',
-      },
-    ],
-  },
   {
     title: 'Nadgodziny',
     href: '/extra-hours',
