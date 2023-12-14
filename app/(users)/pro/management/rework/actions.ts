@@ -6,12 +6,15 @@ type Position = {
   article: string;
   status: string;
   workplace: string;
+  type: string;
   count: string;
 };
 
 const collectionName = 'scans';
 
-export async function searchPositions(searchTerm: string): Promise<Position[]> {
+export async function searchPositions(
+  searchTerm: string,
+): Promise<(Position & { type: string })[]> {
   try {
     const client = await clientPromise;
     const db = client.db();
@@ -28,13 +31,31 @@ export async function searchPositions(searchTerm: string): Promise<Position[]> {
         },
       },
       {
+        $addFields: {
+          type: {
+            $cond: [
+              { $eq: ['$dmc', searchTerm] },
+              'dmc',
+              {
+                $cond: [
+                  { $eq: ['$hydra_batch', searchTerm] },
+                  'hydra',
+                  'pallet',
+                ],
+              },
+            ],
+          },
+        },
+      },
+      {
         $group: {
           _id: {
             article: '$article',
             status: '$status',
             workplace: '$workplace',
+            type: '$type',
           },
-          count: { $sum: 1 }, // Zliczanie dokumentów dla każdej grupy
+          count: { $sum: 1 },
         },
       },
       {
@@ -43,18 +64,19 @@ export async function searchPositions(searchTerm: string): Promise<Position[]> {
           article: '$_id.article',
           status: '$_id.status',
           workplace: '$_id.workplace',
-          count: 1, // Włączenie liczby dokumentów w wyniku
+          type: '$_id.type',
+          count: 1,
         },
       },
     ];
 
     const result = await collection.aggregate(aggregation).toArray();
-    // console.log(result);
     if (result.length === 0) return [];
     return result.map((item) => ({
       article: item.article,
       status: item.status,
       workplace: item.workplace,
+      type: item.type,
       count: item.count,
     }));
   } catch (error) {
@@ -62,6 +84,7 @@ export async function searchPositions(searchTerm: string): Promise<Position[]> {
     throw new Error('An error occurred while searching for positions.');
   }
 }
+
 export async function setReworkStatus(
   condition: string,
   reason: string,
@@ -82,7 +105,7 @@ export async function setReworkStatus(
     const update = {
       $set: {
         status: 'rework',
-        reason: reason,
+        rework_reason: reason,
       },
     };
 

@@ -24,6 +24,7 @@ type Position = {
   article: string;
   status: string;
   workplace: string;
+  type: string;
   count: string;
 };
 
@@ -94,7 +95,16 @@ export default function ReworkCard() {
   return (
     <Card className='w-[450px]'>
       <CardHeader>
-        <CardTitle>Rework </CardTitle>
+        <CardTitle>
+          Rework
+          {positions.length > 0 && (
+            <>
+              {positions[0].type === 'dmc' && ' DMC:'}
+              {positions[0].type === 'hydra' && ' batch hydra:'}
+              {positions[0].type === 'pallet' && ' batch paleta:'}
+            </>
+          )}
+        </CardTitle>
         {positions.length > 0 && (
           <CardDescription className='font-bold text-bruss'>
             {searchTerm}
@@ -114,7 +124,6 @@ export default function ReworkCard() {
         <form onSubmit={positions.length > 0 ? markAsRework : search}>
           <div className='grid w-full items-center gap-4'>
             {positions.length === 0 ? (
-              // Interfejs do wyszukiwania
               <>
                 <div className='flex flex-col space-y-1.5'>
                   <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
