@@ -18,8 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 
 import ReworkTable from './ReworkTable';
-import { searchPositions } from '../actions';
-import { position } from 'html2canvas/dist/types/css/property-descriptors/position';
+import { searchPositions, setReworkStatus } from '../actions';
 
 type Position = {
   article: string;
@@ -34,17 +33,26 @@ export default function ReworkCard() {
   const [error, setError] = useState('');
   const [positions, setPositions] = useState<Position[]>([]);
   const [reason, setReason] = useState('');
+  const [isPendingSetting, setIsPendingSetting] = useState(false);
+  const [updated, setUpdated] = useState(0);
 
   const search = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent the default form submission behavior
+    setUpdated(0);
     if (!searchTerm) {
       setError('Brak wartości do wyszukania!');
       return;
     }
     try {
       setIsPendingSearching(true);
-      setPositions(await searchPositions(searchTerm));
-      // console.log('search', search);
+      const search = await searchPositions(searchTerm);
+      console.log('search', search);
+      if (search.length === 0) {
+        setError('Nie znaleziono żadnej pozycji!');
+        return;
+      }
+      setError('');
+      setPositions(search);
     } catch (error) {
       console.error('There was an error searcihing:', error);
     } finally {
@@ -55,22 +63,31 @@ export default function ReworkCard() {
   const markAsRework = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent the default form submission behavior
     if (!searchTerm) {
-      setError('Brak wartości do wyszukania!');
+      setError('Skontaktuj się z IT!');
+      return;
+    }
+    if (!reason) {
+      setError('Wprowadź powód!');
+      return;
+    }
+    if (reason.length < 20) {
+      setError('Powód musi mieć co najmniej 20 znaków!');
       return;
     }
     try {
-      setIsPendingSearching(true);
-      const search = await searchPositions(searchTerm);
-      console.log('search', search);
-      if (search.length === 0) {
-        setError('Nie znaleziono adnej pozycji!');
+      setIsPendingSetting(true);
+      const updated = await setReworkStatus(searchTerm, reason);
+      if (updated) {
+        setPositions([]);
+        setReason('');
+        setSearchTerm('');
+        setError('');
+        setUpdated(updated);
       }
-      setPositions(search);
-      // console.log('search', search);
     } catch (error) {
       console.error('There was an error searcihing:', error);
     } finally {
-      setIsPendingSearching(false);
+      setIsPendingSetting(false);
     }
   };
 
@@ -120,7 +137,6 @@ export default function ReworkCard() {
                 </div>
               </>
             ) : (
-              // Interfejs po wyszukaniu
               <>
                 <ReworkTable data={positions} />
                 <Separator />
@@ -130,6 +146,7 @@ export default function ReworkCard() {
                     placeholder='Wprowadź krótki opis reworku.'
                     id='reason'
                     value={reason}
+                    className={reason.length >= 20 ? 'border-bruss' : ''}
                     onChange={(e) => setReason(e.target.value)}
                   />
                 </div>
@@ -141,18 +158,31 @@ export default function ReworkCard() {
                       setPositions([]);
                       setReason('');
                       setSearchTerm('');
-                      setError(''); // Dodatkowo czyści błąd
+                      setError('');
+                      setUpdated(0);
                     }}
                   >
                     Wyczyść
                   </Button>
-                  <Button type='submit'>Oznacz jako rework</Button>
+                  {isPendingSetting ? (
+                    <Button disabled>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Zapisywanie
+                    </Button>
+                  ) : (
+                    <Button type='submit'>Oznacz jako rework</Button>
+                  )}
                 </div>
               </>
             )}
           </div>
         </form>
       </CardContent>
+      {updated > 0 && (
+        <CardFooter className='font-bold text-bruss'>
+          Zaktualizowano pozycji: {updated}!
+        </CardFooter>
+      )}
     </Card>
   );
 }

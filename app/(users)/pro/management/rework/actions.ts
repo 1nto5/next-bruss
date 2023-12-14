@@ -49,7 +49,7 @@ export async function searchPositions(searchTerm: string): Promise<Position[]> {
     ];
 
     const result = await collection.aggregate(aggregation).toArray();
-    console.log(result);
+    // console.log(result);
     if (result.length === 0) return [];
     return result.map((item) => ({
       article: item.article,
@@ -60,5 +60,36 @@ export async function searchPositions(searchTerm: string): Promise<Position[]> {
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while searching for positions.');
+  }
+}
+export async function setReworkStatus(
+  condition: string,
+  reason: string,
+): Promise<number> {
+  try {
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+
+    const filter = {
+      $or: [
+        { dmc: condition },
+        { hydra_batch: condition },
+        { pallet_batch: condition },
+      ],
+    };
+
+    const update = {
+      $set: {
+        status: 'rework',
+        reason: reason,
+      },
+    };
+
+    const result = await collection.updateMany(filter, update);
+    return result.modifiedCount;
+  } catch (error) {
+    console.error(error);
+    return 0;
   }
 }
