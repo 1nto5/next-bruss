@@ -47,6 +47,7 @@ export async function searchPositions(
           },
         },
       },
+
       {
         $group: {
           _id: {
@@ -55,7 +56,7 @@ export async function searchPositions(
             workplace: '$workplace',
             type: '$type',
           },
-          count: { $sum: 1 },
+          dmc: { $addToSet: '$dmc' },
         },
       },
       {
@@ -65,7 +66,7 @@ export async function searchPositions(
           status: '$_id.status',
           workplace: '$_id.workplace',
           type: '$_id.type',
-          count: 1,
+          count: { $size: '$dmc' },
         },
       },
     ];
@@ -95,10 +96,15 @@ export async function setReworkStatus(
     const collection = db.collection(collectionName);
 
     const filter = {
-      $or: [
-        { dmc: condition },
-        { hydra_batch: condition },
-        { pallet_batch: condition },
+      $and: [
+        {
+          $or: [
+            { dmc: condition },
+            { hydra_batch: condition },
+            { pallet_batch: condition },
+          ],
+        },
+        { status: { $ne: 'rework' } },
       ],
     };
 
