@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'export data (Next BRUSS)',
+  title: 'rework (Next BRUSS)',
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
