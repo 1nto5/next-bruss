@@ -3,7 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Container from '@/components/ui/container';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from '@/components/ui/sheet';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -32,13 +37,7 @@ const routes = [
         description: 'Generowanie pliku excel z danymi systemu skanowania.',
       },
       {
-        href: '/pro/management',
-        title: 'Zarządzanie',
-        description:
-          'Zarządzanie skanowaniem na liniach - usuwanie kodów DMC, zmiana ustawień, rework.',
-      },
-      {
-        href: '/pro/management/rework',
+        href: '/pro/rework',
         title: 'Rework',
         description: 'Oznaczanie partii jako rework - ponowne skanowanie',
       },
@@ -59,7 +58,6 @@ const routes = [
       },
     ],
   },
-
   {
     title: 'Nadgodziny',
     href: '/extra-hours',
@@ -89,24 +87,27 @@ const Header = () => {
                         </span>
                         <div className='ml-4'>
                           {route.submenu.map((sub) => (
-                            <Link
-                              key={sub.title}
-                              href={sub.href}
-                              className='block px-2 py-1 text-lg'
-                            >
-                              {sub.title}
-                            </Link>
+                            <SheetClose key={sub.title} asChild>
+                              <Link
+                                href={sub.href}
+                                className='block px-2 py-1 text-lg'
+                              >
+                                {sub.title}
+                              </Link>
+                            </SheetClose>
                           ))}
                         </div>
                       </div>
                     ) : (
-                      <Link
-                        key={i}
-                        href={route.href}
-                        className='block px-2 py-1 text-lg'
-                      >
-                        {route.title}
-                      </Link>
+                      <SheetClose key={i} asChild>
+                        <Link
+                          key={i}
+                          href={route.href}
+                          className='block px-2 py-1 text-lg'
+                        >
+                          {route.title}
+                        </Link>
+                      </SheetClose>
                     ),
                   )}
                 </nav>
