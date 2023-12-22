@@ -156,10 +156,10 @@ export default function CardOrPosition() {
                 : 'wybierz istniejącą pozycję'
             }
           />
-          <div className=' flex w-full justify-center space-x-2'>
+          <div className='mt-2 flex w-full justify-center space-x-4'>
             <button
               onClick={handleConfirm}
-              className='w-1/2 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
+              className='w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             >
               potwierdź
             </button>

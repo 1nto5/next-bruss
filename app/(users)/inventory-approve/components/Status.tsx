@@ -17,10 +17,10 @@ export default function Status() {
         value={formatEmailToName(
           session?.user?.email ?? 'Unknown.User@bruss-group.com',
         )}
-        width='w-1/2'
+        width='w-1/3'
       />
 
-      <StatusBox
+      {/* <StatusBox
         name='karta/pozycja:'
         value={
           inventoryContext?.inventory?.card
@@ -35,6 +35,25 @@ export default function Status() {
         }
         width='w-1/2'
         separator={false}
+      /> */}
+      <StatusBox
+        name='karta:'
+        value={
+          inventoryContext?.inventory?.card
+            ? inventoryContext?.inventory?.card.toString()
+            : '-'
+        }
+        width='w-1/3'
+      />
+
+      <StatusBox
+        name='poz.:'
+        value={
+          inventoryContext?.inventory?.position
+            ? inventoryContext?.inventory?.position.toString()
+            : '-'
+        }
+        width='w-1/3'
       />
     </div>
   );

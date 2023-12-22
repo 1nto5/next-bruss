@@ -39,12 +39,12 @@ type Position = {
 const collectionName = 'inventory_cards';
 
 const warehouseSelectOptions = [
-  { value: '000', label: '000 - Rohstolfe und Fertigteile' },
-  { value: '035', label: '035 - Metalteile Taicang' },
-  { value: '054', label: '054 - Magazyn wstrzymanych' },
-  { value: '055', label: '055 - Cz.zablokowane GTM' },
-  { value: '111', label: '111 - Magazyn Launch' },
-  { value: '222', label: '222 - Magazyn zablokowany produkcja' },
+  { value: '000', label: '000 - Produkcja + Magazyn' },
+  { value: '035', label: '035 - stal niepowleczona z Chin' },
+  { value: '054', label: '054 - magazyn zablokowany JAKOŚĆ' },
+  { value: '055', label: '055 - magazyn zablokowany GTM' },
+  { value: '111', label: '111 - magazyn LAUNCH' },
+  { value: '222', label: '222 - magazyn zablokowany PRODUKCJA' },
   // { value: 999, label: '999 - WIP' },
 ];
 

@@ -307,7 +307,7 @@ export default function Edit() {
                   onChange={(e) => setQuantity(Number(e.target.value))}
                   placeholder='ilość'
                   defaultValue={quantity !== 0 ? quantity : undefined}
-                  className='w-20 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+                  className='rounded border-slate-700 bg-white p-2 text-center font-bold shadow-sm dark:bg-slate-900 dark:outline-slate-600'
                 />
                 {selectedArticle.converter && (
                   <select
