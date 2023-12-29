@@ -32,10 +32,10 @@ const formSchema = z
   .object({
     email: z
       .string()
-      .min(23, { message: 'Email jest za krótki!' })
       .regex(/@bruss-group\.com$/, {
         message: 'Podany email nie należy do domeny bruss-group.com!',
-      }),
+      })
+      .min(23, { message: 'Email jest za krótki!' }),
     password: z
       .string()
       .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
@@ -73,13 +73,7 @@ export default function RegisterForm() {
       const result = await register(values.email, values.password);
       const status = result?.status;
       if (status === 'registered') {
-        // setFormState({
-        //   email: '',
-        //   password: '',
-        //   confirmPassword: '',
-        // });
         toast.success('Konto zostało utworzone!');
-        // setErrorMessage(null);
         router.push('/auth');
       }
       if (status === 'exists') {
@@ -98,72 +92,6 @@ export default function RegisterForm() {
       setIsPending(false);
     }
   }
-
-  // const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   if (!formState.email || !formState.password || !formState.confirmPassword) {
-  //     setErrorMessage('All fields are necessary!');
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsPending(true);
-  //     if (
-  //       !formState.email ||
-  //       !formState.password ||
-  //       !formState.confirmPassword
-  //     ) {
-  //       setErrorMessage('Uzupełnij wszystkie pola!');
-  //       return;
-  //     }
-
-  //     if (!formState.email.endsWith('@bruss-group.com')) {
-  //       setErrorMessage(
-  //         'Użyj służbowy adres email (imie.nazwisko@bruss-group.com)!',
-  //       );
-  //       return;
-  //     }
-
-  //     if (formState.password !== formState.confirmPassword) {
-  //       setErrorMessage('Hasła nie są zgodne!');
-  //       return;
-  //     }
-  //     const result = await Register(formState.email, formState.password);
-  //     const status = result?.status;
-  //     if (status === 'registered') {
-  //       setFormState({
-  //         email: '',
-  //         password: '',
-  //         confirmPassword: '',
-  //       });
-  //       toast.success('Konto zostało utworzone!');
-  //       setErrorMessage(null);
-  //       router.push('/auth/login');
-  //     }
-  //     if (status === 'wrong password') {
-  //       setErrorMessage(
-  //         'Hasło musi zawierać 6 znaków, znak specjalny, cyfrę i wielką literę!',
-  //       );
-  //       return;
-  //     }
-
-  //     if (status === 'exists') {
-  //       setErrorMessage('Konto istnieje!');
-  //       return;
-  //     }
-  //     if (status === 'error') {
-  //       setErrorMessage('Skontaktuj się z IT!');
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     console.error('User registration was unsuccessful.:', error);
-  //     setErrorMessage('Skontaktuj się z IT!');
-
-  //     return;
-  //   } finally {
-  //     setIsPending(false);
-  //   }
-  // };
 
   return (
     <Card>

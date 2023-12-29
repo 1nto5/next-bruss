@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { signIn } from 'next-auth/react';
+import { resetPassword } from '../actions';
 
 import {
   Form,
@@ -53,7 +54,7 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values.email, values.password);
+    // console.log(values.email, values.password);
     try {
       setIsPending(true);
       const res = await signIn('credentials', {
@@ -75,6 +76,28 @@ export default function LoginForm() {
       return;
     } finally {
       setIsPending(false);
+    }
+  }
+
+  async function onResetPassword() {
+    const email = form.getValues('email');
+    if (!email) {
+      toast.error('Wprowadź email by zresetować hasło!');
+      return;
+    }
+    const res = await resetPassword(email);
+    if (!res) {
+      toast.error('Skontaktuj się z IT!');
+      return;
+    }
+    if (res.status === 'not exists') {
+      toast.error('Brak użytkownika o podanym adresie email!');
+      return;
+    }
+
+    if (res.status === 'sent') {
+      toast.success('Wysłano link do resetowania hasła!');
+      return;
     }
   }
 
@@ -121,7 +144,10 @@ export default function LoginForm() {
               )}
             />
           </CardContent>
-          <CardFooter className='flex justify-end'>
+          <CardFooter className='flex justify-between'>
+            <Button type='button' onClick={onResetPassword} variant='secondary'>
+              Reset hasła
+            </Button>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
