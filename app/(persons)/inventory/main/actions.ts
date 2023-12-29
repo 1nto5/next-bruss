@@ -1,7 +1,7 @@
 'use server';
 
 import clientPromise from '@/lib/mongo';
-import { getLastNameFirstLetter } from '../../../lib/utils/nameFormat';
+import { getLastNameFirstLetter } from '../../../../lib/utils/nameFormat';
 
 type PersonsType = {
   first?: string | null;

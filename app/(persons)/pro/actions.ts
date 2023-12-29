@@ -168,19 +168,30 @@ export async function saveDmc(
     ) {
       return { status: 'invalid' };
     }
-    if (articleConfig.ford && !fordValidation(dmc)) {
-      return { status: 'wrong date' };
-    }
-    if (articleConfig.bmw && !bmwValidation(dmc)) {
-      return { status: 'wrong date' };
-    }
+
     const client = await clientPromise;
     const db = client.db();
     const collection = db.collection(collectionName);
     const existingData = await collection.findOne({ dmc: dmc });
-    if (existingData) {
+    console.log(existingData?.status);
+    if (
+      existingData?.status !== 'rework' &&
+      articleConfig.bmw &&
+      !bmwValidation(dmc)
+    ) {
+      return { status: 'wrong date' };
+    }
+    if (
+      existingData?.status !== 'rework' &&
+      articleConfig.ford &&
+      !fordValidation(dmc)
+    ) {
+      return { status: 'wrong date' };
+    }
+    if (existingData && existingData.status !== 'rework') {
       return { status: 'exists' };
     }
+
     if (articleConfig.palletSize) {
       const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
         countBoxesOnPallet(workplace, article),
