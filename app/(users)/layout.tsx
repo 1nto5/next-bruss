@@ -2,7 +2,7 @@ import '../globals.css';
 import { AuthProvider } from '../auth-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '../(users)/components/Header';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata = {
   title: 'Next BRUSS',

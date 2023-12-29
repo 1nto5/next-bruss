@@ -15,7 +15,7 @@ function isValidPassword(password: string): boolean {
   return hasMinLength && hasSpecialChar && hasNumber;
 }
 
-export async function Register(email: string, password: string) {
+export async function register(email: string, password: string) {
   try {
     // Connect to MongoDB
     const client = await clientPromise;

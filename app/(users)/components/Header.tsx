@@ -26,6 +26,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import Logo from './Logo';
 import UserAvatar from './UserAvatar';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
+// import { toast } from 'sonner';
 
 const routes = [
   {
@@ -115,10 +116,11 @@ const Header = () => {
             </Sheet>
             <Link href='/' className='ml-4 flex items-center lg:ml-0'>
               <h1 className='font-bold'>Next</h1>
-              <Logo logoStyles='mr-2' /> {/* Logo z dodatkowym marginesem */}
+              <Logo logoStyles='mr-2' />
             </Link>
           </div>
-          <nav className='mx-6 flex hidden items-center space-x-4 md:block lg:space-x-6'>
+          <nav className='mx-6 hidden items-center space-x-4 md:block lg:space-x-6'>
+            {/* do i need flex className?  */}
             <NavigationMenu>
               <NavigationMenuList>
                 {routes.map((route) =>
@@ -157,12 +159,10 @@ const Header = () => {
             </NavigationMenu>
           </nav>
           <div className='flex items-center gap-x-2 lg:gap-x-4'>
-            {isAuthenticated && session?.user.email ? (
+            {isAuthenticated && session?.user.email && (
               <UserAvatar
                 userInitials={getInitialsFromEmail(session?.user.email)}
               />
-            ) : (
-              <UserAvatar userInitials='NU' />
             )}
             <LoginLogout
               isLoggedIn={isAuthenticated}
@@ -171,6 +171,7 @@ const Header = () => {
               }}
               onLogout={() => {
                 signOut();
+                // toast.success('Wylogowano!');
               }}
               buttonStyle=''
             />

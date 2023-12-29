@@ -1,175 +1,241 @@
 'use client';
 
 import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import {
+  Form,
+  FormControl,
+  // FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
+  // CardHeader,
+  // CardTitle,
+  // CardDescription,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Register } from '../actions';
-import { useToast } from '@/components/ui/use-toast';
+import { register } from '../actions';
+import { toast } from 'sonner';
 
-type RegisterFormState = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-export default function RegisterForm() {
-  const { toast } = useToast();
-  const [formState, setFormState] = useState<RegisterFormState>({
-    email: '',
-    password: '',
-    confirmPassword: '',
+const formSchema = z
+  .object({
+    email: z
+      .string()
+      .min(23, { message: 'Email jest za krótki!' })
+      .regex(/@bruss-group\.com$/, {
+        message: 'Podany email nie należy do domeny bruss-group.com!',
+      }),
+    password: z
+      .string()
+      .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: 'Hasło musi zawierać przynajmniej jeden znak specjalny!',
+      }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: 'Potiwerdzenie hasła jest wymagane!' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Hasła nie są zgodne!',
   });
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+export default function RegisterForm() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
   const [isPending, setIsPending] = useState(false);
 
   const router = useRouter();
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormState({
-      ...formState,
-      [name]: value,
-    });
-  };
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!formState.email || !formState.password || !formState.confirmPassword) {
-      setErrorMessage('All fields are necessary!');
-      return;
-    }
-
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values.email, values.password);
     try {
       setIsPending(true);
-      if (
-        !formState.email ||
-        !formState.password ||
-        !formState.confirmPassword
-      ) {
-        setErrorMessage('Uzupełnij wszystkie pola!');
-        return;
-      }
 
-      if (!formState.email.endsWith('@bruss-group.com')) {
-        setErrorMessage(
-          'Użyj służbowy adres email (imie.nazwisko@bruss-group.com)!',
-        );
-        return;
-      }
-
-      if (formState.password !== formState.confirmPassword) {
-        setErrorMessage('Hasła nie są zgodne!');
-        return;
-      }
-      const result = await Register(formState.email, formState.password);
+      const result = await register(values.email, values.password);
       const status = result?.status;
       if (status === 'registered') {
-        setFormState({
-          email: '',
-          password: '',
-          confirmPassword: '',
-        });
-        toast({
-          title: `Zarejestrowano: ${formState.email}!`,
-        });
-        setErrorMessage(null);
-        router.push('/auth/login');
+        // setFormState({
+        //   email: '',
+        //   password: '',
+        //   confirmPassword: '',
+        // });
+        toast.success('Konto zostało utworzone!');
+        // setErrorMessage(null);
+        router.push('/auth');
       }
-      if (status === 'wrong password') {
-        setErrorMessage(
-          'Hasło musi zawierać 6 znaków, znak specjalny, cyfrę i wielką literę!',
-        );
-        return;
-      }
-
       if (status === 'exists') {
-        setErrorMessage('Konto istnieje!');
+        toast.error('Konto istnieje!');
         return;
       }
       if (status === 'error') {
-        setErrorMessage('Skontaktuj się z IT!');
+        toast.error('Skontaktuj się z IT!');
         return;
       }
     } catch (error) {
       console.error('User registration was unsuccessful.:', error);
-      setErrorMessage('Skontaktuj się z IT!');
-
+      toast.error('Skontaktuj się z IT!');
       return;
     } finally {
       setIsPending(false);
     }
-  };
+  }
+
+  // const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   if (!formState.email || !formState.password || !formState.confirmPassword) {
+  //     setErrorMessage('All fields are necessary!');
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsPending(true);
+  //     if (
+  //       !formState.email ||
+  //       !formState.password ||
+  //       !formState.confirmPassword
+  //     ) {
+  //       setErrorMessage('Uzupełnij wszystkie pola!');
+  //       return;
+  //     }
+
+  //     if (!formState.email.endsWith('@bruss-group.com')) {
+  //       setErrorMessage(
+  //         'Użyj służbowy adres email (imie.nazwisko@bruss-group.com)!',
+  //       );
+  //       return;
+  //     }
+
+  //     if (formState.password !== formState.confirmPassword) {
+  //       setErrorMessage('Hasła nie są zgodne!');
+  //       return;
+  //     }
+  //     const result = await Register(formState.email, formState.password);
+  //     const status = result?.status;
+  //     if (status === 'registered') {
+  //       setFormState({
+  //         email: '',
+  //         password: '',
+  //         confirmPassword: '',
+  //       });
+  //       toast.success('Konto zostało utworzone!');
+  //       setErrorMessage(null);
+  //       router.push('/auth/login');
+  //     }
+  //     if (status === 'wrong password') {
+  //       setErrorMessage(
+  //         'Hasło musi zawierać 6 znaków, znak specjalny, cyfrę i wielką literę!',
+  //       );
+  //       return;
+  //     }
+
+  //     if (status === 'exists') {
+  //       setErrorMessage('Konto istnieje!');
+  //       return;
+  //     }
+  //     if (status === 'error') {
+  //       setErrorMessage('Skontaktuj się z IT!');
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.error('User registration was unsuccessful.:', error);
+  //     setErrorMessage('Skontaktuj się z IT!');
+
+  //     return;
+  //   } finally {
+  //     setIsPending(false);
+  //   }
+  // };
 
   return (
-    <Card className='w-[350px]'>
-      <CardHeader>
-        <CardTitle>Rejestracja</CardTitle>
-        <CardDescription className='text-red-700'>
-          {errorMessage}
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleRegister}>
-        <CardContent>
-          <div className='grid w-full items-center gap-4'>
-            <div className='flex flex-col space-y-1.5'>
-              <Label htmlFor='email'>Email</Label>
-              <Input
-                id='email'
-                name='email'
-                type='email'
-                value={formState.email}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className='flex flex-col space-y-1.5'>
-              <Label htmlFor='password'>Hasło</Label>
-              <Input
-                id='password'
-                name='password'
-                type='password'
-                value={formState.password}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className='flex flex-col space-y-1.5'>
-              <Label htmlFor='confirmPassword'>Potwierdź hasło</Label>
-              <Input
-                id='confirmPassword'
-                name='confirmPassword'
-                type='password'
-                value={formState.confirmPassword}
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className='flex justify-between'>
-          <Button type='button' variant='secondary'>
-            <Link href='/auth/login'>Logowanie </Link>
-          </Button>
-          {isPending ? (
-            <Button disabled>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Rejestrowanie
-            </Button>
-          ) : (
-            <Button type='submit'>Utwórz konto</Button>
-          )}
-        </CardFooter>
-      </form>
+    <Card>
+      {/* <CardHeader>
+        <CardTitle>Wprowadź dane logowania</CardTitle>
+        <CardDescription>Wprowadź dane aby się zalogować:</CardDescription>
+      </CardHeader> */}
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className='mt-4 grid w-full items-center gap-4'>
+            <FormField
+              control={form.control}
+              name='email'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                        Wprowadź służbowy adres email.
+                      </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='password'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hasło</FormLabel>
+                  <FormControl>
+                    <Input type='password' placeholder='' {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                        Wprowadź służbowy adres email.
+                      </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='confirmPassword'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormControl>
+                    <Input type='password' placeholder='' {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                        Wprowadź służbowy adres email.
+                      </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <CardFooter className='flex justify-end'>
+            {isPending ? (
+              <Button disabled>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Rejestracja
+              </Button>
+            ) : (
+              <Button type='submit'>Zarejestruj</Button>
+            )}
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   );
 }
