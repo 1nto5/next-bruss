@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { signIn } from 'next-auth/react';
-import { resetPassword } from '../actions';
+import { sentResetPasswordEmail } from '../actions';
 
 import {
   Form,
@@ -44,6 +44,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
+  const [isPendingSending, setIsPendingSending] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,14 +58,15 @@ export default function LoginForm() {
     // console.log(values.email, values.password);
     try {
       setIsPending(true);
-      const res = await signIn('credentials', {
+      const result = await signIn('credentials', {
         email: values.email,
         password: values.password,
         redirect: false,
       });
 
-      if (res?.error) {
+      if (result?.error) {
         toast.error('Niepoprawne dane logowania!');
+        console.error('User login was unsuccessful.:', result?.error);
         return;
       } else {
         toast.success('Zalogowano!');
@@ -81,23 +83,39 @@ export default function LoginForm() {
 
   async function onResetPassword() {
     const email = form.getValues('email');
+    console.log('email: ', email);
     if (!email) {
       toast.error('Wprowadź email by zresetować hasło!');
       return;
     }
-    const res = await resetPassword(email);
-    if (!res) {
+    try {
+      setIsPendingSending(true);
+      const result = await sentResetPasswordEmail(email);
+      if (!result) {
+        toast.error('Skontaktuj się z IT!');
+        return;
+      }
+
+      if (result.status === 'sent') {
+        toast.success('Wysłano link do resetowania hasła!');
+        return;
+      }
+
+      if (result?.error) {
+        toast.error('Skontaktuj się z IT!');
+        console.error('User password reset was unsuccessful.:', result?.error);
+      }
+
+      if (result.status === 'not exists') {
+        toast.error('Brak użytkownika o podanym adresie email!');
+        return;
+      }
+    } catch (error) {
+      console.error('User password reset was unsuccessful.:', error);
       toast.error('Skontaktuj się z IT!');
       return;
-    }
-    if (res.status === 'not exists') {
-      toast.error('Brak użytkownika o podanym adresie email!');
-      return;
-    }
-
-    if (res.status === 'sent') {
-      toast.success('Wysłano link do resetowania hasła!');
-      return;
+    } finally {
+      setIsPendingSending(false);
     }
   }
 
@@ -145,9 +163,20 @@ export default function LoginForm() {
             />
           </CardContent>
           <CardFooter className='flex justify-between'>
-            <Button type='button' onClick={onResetPassword} variant='secondary'>
-              Reset hasła
-            </Button>
+            {isPendingSending ? (
+              <Button type='button' variant='destructive' disabled>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Wysyłanie email
+              </Button>
+            ) : (
+              <Button
+                onClick={onResetPassword}
+                type='button'
+                variant='destructive'
+              >
+                Reset hasła
+              </Button>
+            )}
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

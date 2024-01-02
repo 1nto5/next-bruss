@@ -32,16 +32,15 @@ export async function register(email: string, password: string) {
     if (result.insertedId) {
       return { status: 'registered' };
     } else {
-      return { status: 'error' };
-      throw new Error('Failed to register the user.');
+      return { error: 'user not added' };
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while registering.');
+    return { error: error };
   }
 }
 
-export async function resetPassword(email: string) {
+export async function sentResetPasswordEmail(email: string) {
   try {
     // Connect to MongoDB
     const client = await clientPromise;
@@ -58,34 +57,53 @@ export async function resetPassword(email: string) {
     const hashedToken = await bcrypt.hash(resetToken, 10);
     const tokenExpiry = Date.now() + 3600000;
 
-    const resetUrl = `${process.env.URL}/${resetToken}`;
+    const resetUrl = `${process.env.URL}/auth/reset-password/${resetToken}`;
     console.log(resetUrl);
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      host: 'smtp.gmail.com',
+      service: process.env.NODEMAILER_SERVICE,
+      host: process.env.NODEMAILER_HOST,
       secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.NODEMAILER_EMAIL,
         pass: process.env.NODEMAILER_PASSSWORD,
       },
     });
+
+    // const transporter = nodemailer.createTransport({
+    //   host: process.env.NODEMAILER_HOST,
+    //   port: 587,
+    //   secure: false, // use TLS
+    //   auth: {
+    //     user: process.env.NODEMAILER_USER,
+    //     pass: process.env.NODEMAILER_PASSSWORD,
+    //   },
+    //   tls: {
+    //     ciphers: 'SSLv3',
+    //     rejectUnauthorized: false, // do not fail on invalid certs
+    //   },
+    // });
+
+    console.log(transporter);
     try {
       const send = await transporter.sendMail({
-        from: '"Message bot"<your@gmail.com>', // sender address
+        from: '"Next BRUSS"<your@gmail.com>', // sender address
         to: email, // list of receivers
-        subject: `Message from`, // Subject line
+        subject: `Reset hasła dla konta: ${email}`, // Subject line
         text: resetUrl, // plain text body
-        html: 'test', // html body
+        html: `
+          <h1>Resetowanie hasła</h1>
+          <p>Aby zresetować hasło, kliknij w poniższy link:</p>
+          <a href="${resetUrl}">Resetuj hasło</a>
+        `, // html body
       });
-      console.log(send);
       return { status: 'sent' };
     } catch (err) {
       console.log(err);
-      return { status: 'error' };
+      return { error: err };
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while registering.');
+    return { error: error };
   }
 }
