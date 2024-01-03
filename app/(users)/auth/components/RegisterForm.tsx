@@ -74,7 +74,7 @@ export default function RegisterForm() {
 
       if (result?.status === 'registered') {
         toast.success('Konto zostało utworzone!');
-        router.push('/auth');
+        router.replace('/auth');
       }
       if (result?.status === 'exists') {
         toast.error('Konto istnieje!');

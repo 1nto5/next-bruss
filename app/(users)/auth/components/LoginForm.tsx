@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { signIn } from 'next-auth/react';
-import { sentResetPasswordEmail } from '../actions';
+import { resetPassword } from '../actions';
 
 import {
   Form,
@@ -90,7 +90,7 @@ export default function LoginForm() {
     }
     try {
       setIsPendingSending(true);
-      const result = await sentResetPasswordEmail(email);
+      const result = await resetPassword(email);
       if (!result) {
         toast.error('Skontaktuj się z IT!');
         return;

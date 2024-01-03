@@ -40,7 +40,7 @@ export async function register(email: string, password: string) {
   }
 }
 
-export async function sentResetPasswordEmail(email: string) {
+export async function resetPassword(email: string) {
   try {
     // Connect to MongoDB
     const client = await clientPromise;
@@ -56,6 +56,16 @@ export async function sentResetPasswordEmail(email: string) {
     const resetToken = await crypto.randomBytes(32).toString('hex');
     const hashedToken = await bcrypt.hash(resetToken, 10);
     const tokenExpiry = Date.now() + 3600000;
+
+    await collection.updateOne(
+      { email },
+      {
+        $set: {
+          passwordResetToken: hashedToken,
+          passwordResetExpires: tokenExpiry,
+        },
+      },
+    );
 
     const resetUrl = `${process.env.URL}/auth/reset-password/${resetToken}`;
     console.log(resetUrl);
@@ -102,6 +112,88 @@ export async function sentResetPasswordEmail(email: string) {
       console.log(err);
       return { error: err };
     }
+  } catch (error) {
+    console.error(error);
+    return { error: error };
+  }
+}
+
+export async function setNewPassword(
+  resetToken: string,
+  password: string,
+  confirmPassword: string,
+) {
+  try {
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+
+    // Find the user with the reset token and check if it's still valid
+    const user = await collection.findOne({
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return { status: 'token expired or not found' };
+    }
+
+    // Compare the provided token with the hashed token in the database
+    const isMatch = await bcrypt.compare(resetToken, user.passwordResetToken);
+
+    if (!isMatch) {
+      return { status: 'token does not match' };
+    }
+
+    // Check if the passwords match
+    if (password !== confirmPassword) {
+      return { status: 'passwords do not match' };
+    }
+
+    // Hash the new password and update the user document
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await collection.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          password: hashedPassword,
+          passwordResetToken: undefined,
+          passwordResetExpires: undefined,
+        },
+      },
+    );
+
+    return { status: 'password updated' };
+  } catch (error) {
+    console.error(error);
+    return { error: error };
+  }
+}
+
+export async function findToken(token: string) {
+  try {
+    // Connect to MongoDB
+    const client = await clientPromise;
+    const db = client.db();
+    const collection = db.collection(collectionName);
+
+    // Find the user with the reset token and check if it's still valid
+    const user = await collection.findOne({
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return { status: 'token expired or not found' };
+    }
+
+    // Compare the provided token with the hashed token in the database
+    const isMatch = await bcrypt.compare(token, user.passwordResetToken);
+
+    if (!isMatch) {
+      return { status: 'not match' };
+    }
+
+    return { status: 'found' };
   } catch (error) {
     console.error(error);
     return { error: error };
