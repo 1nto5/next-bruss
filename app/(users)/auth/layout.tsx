@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth/next';
+import { auth } from '@/auth';
 
 export const metadata = {
   title: 'Logowanie / rejestracja (Next BRUSS)',
@@ -10,7 +10,7 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
+  const session = await auth();
 
   if (session) {
     redirect('/');

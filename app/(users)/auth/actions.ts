@@ -4,6 +4,8 @@ import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { signOut, signIn, auth } from '@/auth';
+import { redirect } from 'next/dist/server/api-utils';
 
 const collectionName = 'users';
 
@@ -198,4 +200,26 @@ export async function findToken(token: string) {
     console.error(error);
     return { error: error };
   }
+}
+
+export async function logout() {
+  await signOut();
+}
+
+export async function login(email: string, password: string) {
+  const success = await signIn('credentials', {
+    email,
+    password,
+    // redirect: false,
+  });
+  if (success) {
+    return { status: 'logged' };
+  } else {
+    return { error: 'invalid credentials' };
+  }
+}
+
+export async function getSession() {
+  const session = await auth();
+  return session;
 }

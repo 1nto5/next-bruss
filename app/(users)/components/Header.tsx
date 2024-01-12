@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Container from '@/components/ui/container';
 import {
@@ -22,10 +22,13 @@ import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import { LoginLogout } from './LoginLogout';
-import { signIn, signOut, useSession } from 'next-auth/react';
+
 import Logo from './Logo';
 import UserAvatar from './UserAvatar';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
+import { logout, getSession } from '../auth/actions';
+import { Session } from 'next-auth';
+import { useRouter } from 'next/navigation';
 // import { toast } from 'sonner';
 
 const routes = [
@@ -65,9 +68,27 @@ const routes = [
   },
 ];
 
-const Header = () => {
-  const { data: session, status } = useSession();
-  const isAuthenticated = status === 'authenticated';
+export default function Header() {
+  // const { data: session, status } = useSession();
+  // const session = await getSession();
+  // console.log('session: ', session);
+  // const isAuthenticated = status === 'authenticated';
+  // console.log('session: ', session);
+
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      console.log('session: ', sessionData);
+      setSession(sessionData);
+      setIsAuthenticated(!!sessionData);
+    };
+    fetchSession();
+  }, []);
+
+  const router = useRouter();
 
   return (
     <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
@@ -167,10 +188,10 @@ const Header = () => {
             <LoginLogout
               isLoggedIn={isAuthenticated}
               onLogin={() => {
-                signIn();
+                router.push('/auth');
               }}
               onLogout={() => {
-                signOut();
+                logout();
                 // toast.success('Wylogowano!');
               }}
               buttonStyle=''
@@ -181,7 +202,7 @@ const Header = () => {
       </Container>
     </header>
   );
-};
+}
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -208,5 +229,3 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = 'ListItem';
-
-export default Header;

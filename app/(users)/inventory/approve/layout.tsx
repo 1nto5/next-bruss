@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth';
+import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import authOptions from '@/lib/auth/authOptions';
 
 export const metadata = {
   title: 'Inventory approve (Next BRUSS)',
@@ -12,7 +11,8 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
+  console.log('session: ', session);
   if (!session) {
     redirect('/auth/login');
   }

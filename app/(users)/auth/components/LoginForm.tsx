@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
-import { signIn } from 'next-auth/react';
-import { resetPassword } from '../actions';
+import { resetPassword, login } from '../actions';
 
 import {
   Form,
@@ -58,19 +56,16 @@ export default function LoginForm() {
     // console.log(values.email, values.password);
     try {
       setIsPending(true);
-      const result = await signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
+      const result = await login(values.email, values.password);
+
+      // if (result?.status === 'logged') {
+      //   toast.success('Zalogowano!');
+      // }
 
       if (result?.error) {
         toast.error('Niepoprawne dane logowania!');
         console.error('User login was unsuccessful.:', result?.error);
         return;
-      } else {
-        toast.success('Zalogowano!');
-        router.replace('/');
       }
     } catch (error) {
       console.error('User login was unsuccessful.:', error);
@@ -83,7 +78,7 @@ export default function LoginForm() {
 
   async function onResetPassword() {
     const email = form.getValues('email');
-    console.log('email: ', email);
+    // console.log('email: ', email);
     if (!email) {
       toast.error('Wprowadź email by zresetować hasło!');
       return;
