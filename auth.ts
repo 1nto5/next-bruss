@@ -11,28 +11,6 @@ type CredentialsType = {
   password: string;
 };
 
-// type User = {
-//   email: string;
-//   password: string;
-//   roles: string[];
-// };
-
-// async function getUser(email: string): Promise<User | undefined> {
-//   try {
-//     const client = await clientPromise;
-//     const db = client.db();
-//     const collection = db.collection(collectionName);
-//     const user = await collection.findOne({ email });
-//     if (user) {
-//       return { email: user.email, password: user.password, roles: user.roles };
-//     }
-//     return undefined;
-//   } catch (error) {
-//     console.error('Failed to fetch user:', error);
-//     throw new Error('Failed to fetch user.');
-//   }
-// }
-
 export const { auth, signIn, signOut } = NextAuth({
   // ...authConfig,
   providers: [
@@ -46,7 +24,7 @@ export const { auth, signIn, signOut } = NextAuth({
           const collection = db.collection(collectionName);
           const user = await collection.findOne({ email });
           if (!user) {
-            console.log('User not found');
+            // console.log('User not found');
             return null;
           }
           const passwordMatch = await bcrypt.compare(password, user.password);
@@ -55,7 +33,7 @@ export const { auth, signIn, signOut } = NextAuth({
             return user;
           }
           console.log('Invalid credentials');
-          return user;
+          return null;
         } catch (error) {
           console.log('Error:', error);
           return null;

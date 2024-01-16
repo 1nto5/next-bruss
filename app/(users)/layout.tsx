@@ -1,5 +1,4 @@
 import '../globals.css';
-import { AuthProvider } from '../auth-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import Header from '../(users)/components/Header';
 import { Toaster } from '@/components/ui/sonner';
@@ -18,18 +17,16 @@ export default function RootLayout({
     <html suppressHydrationWarning>
       <head />
       <body>
-        <AuthProvider>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Header />
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
