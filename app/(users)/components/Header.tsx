@@ -18,7 +18,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-import { Skeleton } from '@/components/ui/skeleton';
+// import { Skeleton } from '@/components/ui/skeleton';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeModeToggle } from './ThemeModeToggle';
@@ -69,25 +69,11 @@ const routes = [
   },
 ];
 
-export default function Header() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isPendingSession, setIsPendingSession] = useState(true);
+type HeaderProps = {
+  session: Session | null;
+};
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        const sessionData = await getSession();
-        console.log('session: ', sessionData?.user);
-        setSession(sessionData);
-      } catch (error) {
-        console.log('Session fetching error: ', error);
-      } finally {
-        setIsPendingSession(false);
-      }
-    };
-    fetchSession();
-  }, []);
-
+export default function Header({ session }: HeaderProps) {
   const router = useRouter();
 
   return (
@@ -180,34 +166,25 @@ export default function Header() {
             </NavigationMenu>
           </nav>
           <div className='flex items-center gap-x-2 lg:gap-x-4'>
-            {isPendingSession ? (
-              <>
-                <Skeleton className='relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full' />
-                <Skeleton className='h-10 w-10' />
-              </>
-            ) : (
-              <>
-                <UserAvatar
-                  userInitials={
-                    session?.user.email
-                      ? getInitialsFromEmail(session?.user.email)
-                      : 'NU'
-                  }
-                />
+            <UserAvatar
+              userInitials={
+                session?.user.email
+                  ? getInitialsFromEmail(session?.user.email)
+                  : 'NU'
+              }
+            />
 
-                <LoginLogout
-                  isLoggedIn={!!session}
-                  onLogin={() => {
-                    router.push('/auth');
-                  }}
-                  onLogout={() => {
-                    logout();
-                    // toast.success('Wylogowano!');
-                  }}
-                  buttonStyle=''
-                />
-              </>
-            )}
+            <LoginLogout
+              isLoggedIn={!!session}
+              onLogin={() => {
+                router.push('/auth');
+              }}
+              onLogout={() => {
+                logout();
+                // toast.success('Wylogowano!');
+              }}
+              buttonStyle=''
+            />
 
             <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>

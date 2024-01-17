@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { signOut, signIn, auth } from '@/auth';
-import { redirect } from 'next/dist/server/api-utils';
 
 const collectionName = 'users';
 

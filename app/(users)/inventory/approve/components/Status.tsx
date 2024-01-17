@@ -1,13 +1,31 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { getSession } from '@/app/(users)/auth/actions';
+import { Session } from 'next-auth';
 import { useContext } from 'react';
 import { InventoryContext } from '../lib/InventoryContext';
 import StatusBox from '@/app/(persons)/components/StatusBox';
 import { formatEmailToName } from '../lib/utils/nameFormat';
 
 export default function Status() {
-  const { data: session } = useSession();
+  const [session, setSession] = useState<Session | null>(null);
+  const [isPendingSession, setIsPendingSession] = useState(true);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const sessionData = await getSession();
+        // console.log('session: ', sessionData?.user);
+        setSession(sessionData);
+      } catch (error) {
+        console.log('Session fetching error: ', error);
+      } finally {
+        setIsPendingSession(false);
+      }
+    };
+    fetchSession();
+  }, []);
   const inventoryContext = useContext(InventoryContext);
 
   return (

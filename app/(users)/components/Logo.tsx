@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 type LogoProps = {
-  logoStyles?: string; // Dodawanie opcjonalnego propa className
+  logoStyles?: string;
 };
 
 export default function Logo({ logoStyles }: LogoProps) {

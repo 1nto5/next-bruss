@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
+import { getSession } from '@/app/(users)/auth/actions';
+import { Session } from 'next-auth';
 import clsx from 'clsx';
 import { InventoryContext } from '../lib/InventoryContext';
 import useSWR from 'swr';
@@ -26,7 +28,23 @@ type Article = {
 };
 
 export default function Edit() {
-  const { data: session } = useSession();
+  const [session, setSession] = useState<Session | null>(null);
+  const [isPendingSession, setIsPendingSession] = useState(true);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const sessionData = await getSession();
+        // console.log('session: ', sessionData?.user);
+        setSession(sessionData);
+      } catch (error) {
+        console.log('Session fetching error: ', error);
+      } finally {
+        setIsPendingSession(false);
+      }
+    };
+    fetchSession();
+  }, []);
   const inventoryContext = useContext(InventoryContext);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

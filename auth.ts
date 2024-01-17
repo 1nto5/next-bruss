@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-// import { authConfig } from './auth.config';
 import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
 
@@ -11,10 +10,24 @@ type CredentialsType = {
   password: string;
 };
 
-export const { auth, signIn, signOut } = NextAuth({
-  // ...authConfig,
+type User = {
+  email: string;
+  password: string;
+  roles?: string[];
+};
+
+export const {
+  auth,
+  signIn,
+  signOut,
+  handlers: { GET, POST },
+} = NextAuth({
+  pages: {
+    signIn: '/auth',
+  },
   providers: [
     Credentials({
+      name: 'credentials',
       // @ts-ignore
       async authorize(credentials: CredentialsType) {
         const { email, password } = credentials;
@@ -29,10 +42,10 @@ export const { auth, signIn, signOut } = NextAuth({
           }
           const passwordMatch = await bcrypt.compare(password, user.password);
           if (passwordMatch) {
-            console.log(user);
+            // console.log(user);
             return user;
           }
-          console.log('Invalid credentials');
+          // console.log('Invalid credentials');
           return null;
         } catch (error) {
           console.log('Error:', error);
@@ -41,4 +54,18 @@ export const { auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.roles = user.roles;
+      }
+      return token;
+    },
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.roles = token.roles as string[];
+      }
+      return session;
+    },
+  },
 });
