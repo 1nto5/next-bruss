@@ -8,6 +8,7 @@ type Props = {
   workplace: string;
   article: string;
   operator: string;
+  boxSize: number;
 };
 
 // Component to scan DMC
@@ -42,6 +43,7 @@ export default function ScanDmc(props: Props) {
         props.workplace,
         props.article,
         props.operator,
+        props.boxSize,
       );
 
       const status = result?.status;
@@ -53,25 +55,25 @@ export default function ScanDmc(props: Props) {
           toast.success('DMC in Ordnung!', { id: 'success' });
           break;
         case 'exists':
-          toast.error('DMC istnieje!', { id: 'error' });
+          toast.error('DMC existiert!', { id: 'error' });
           break;
         case 'invalid':
-          toast.error('DMC niepoprawny!', { id: 'error' });
+          toast.error('DMC ungültig!', { id: 'error' });
           break;
         case 'wrong date':
-          toast.error('Data niepoprawna!', { id: 'error' });
+          toast.error('Falsches Datum!', { id: 'error' });
           break;
         case 'full box':
-          toast.error('Pełny box!', { id: 'error' });
+          toast.error('Box voll!', { id: 'error' });
           break;
         case 'full pallet':
-          toast.error('Pełna paleta!', { id: 'error' });
+          toast.error('Palette voll!', { id: 'error' });
           break;
         default:
-          toast.error('Zgłoś się do IT!', { id: 'error' });
+          toast.error('Melden Sie sich bei der IT!', { id: 'error' });
       }
     } catch (err) {
-      toast.error('Zgłoś się do IT!', { id: 'error' });
+      toast.error('Melden Sie sich bei der IT!', { id: 'error' });
     } finally {
       toast.dismiss('saving');
       setIsPending(false);

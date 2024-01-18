@@ -27,10 +27,11 @@ const Header: React.FC<HeaderProps> = ({
         {showArticleLogOut && articleContext?.article?.number && (
           <button
             onClick={() => {
-              toast.success(`Artykuł wylogowany!`, { id: 'success' });
+              toast.success(`Artikel abgemeldet!`, { id: 'success' });
               articleContext.setArticle(() => ({
                 number: null,
                 name: null,
+                boxSize: null,
               }));
             }}
             className='w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'

@@ -5,6 +5,7 @@ import { useState, createContext, ReactNode, useEffect } from 'react';
 type ArticleType = {
   number: string | null;
   name: string | null;
+  boxSize: number | number[] | null;
 } | null;
 
 type ArticleContextType = {
@@ -35,7 +36,7 @@ export const ArticleProvider: React.FC<ArticleProviderProps> = ({
 
   useEffect(() => {
     if (article) {
-      localStorage.setItem('inventory.article', JSON.stringify(article));
+      localStorage.setItem('pro.article', JSON.stringify(article));
     }
   }, [article]);
 

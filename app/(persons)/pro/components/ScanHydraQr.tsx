@@ -7,22 +7,18 @@ type StatusProps = {
   workplace: string;
   article: string;
   operator: string;
+  boxSize: number;
 };
 
-// Component to scan Hydra Batch
 export default function ScanHydraQr(props: StatusProps) {
   const scanContext = useContext(ScanContext);
   const [isPending, setIsPending] = useState(false);
-
-  // Local state for the hydra batch
   const [hydraBatch, setHydraBatch] = useState('');
 
-  // Function to clear the hydraBatch input field
   const clearHydraBatch = () => {
     setHydraBatch('');
   };
 
-  // Handle key press on input (only interested in 'Enter')
   const handleEnter = async (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') {
       return;
@@ -30,7 +26,7 @@ export default function ScanHydraQr(props: StatusProps) {
 
     clearHydraBatch();
 
-    toast.loading('Zapisywanie...', { id: 'saving' });
+    toast.loading('Speichern...', { id: 'saving' });
     setIsPending(true);
 
     try {
@@ -39,38 +35,39 @@ export default function ScanHydraQr(props: StatusProps) {
         props.workplace,
         props.article,
         props.operator,
+        props.boxSize,
       );
 
       const status = result?.status;
-      // Display toast message based on the result status
+
       switch (status) {
         case 'saved':
           scanContext?.setScan({ last: hydraBatch });
           toast.success('Batch OK!', { id: 'success' });
           break;
         case 'exists':
-          toast.error('Batch istnieje!', { id: 'error' });
+          toast.error('Batch existiert!', { id: 'error' });
           break;
         case 'invalid':
-          toast.error('Batch niepoprawny!', { id: 'error' });
+          toast.error('Ungültiger Batch!', { id: 'error' });
           break;
         case 'wrong article':
-          toast.error('Błędny artykuł!', { id: 'error' });
+          toast.error('Falscher Artikel!', { id: 'error' });
           break;
         case 'wrong quantity':
-          toast.error('Błędna ilość!', { id: 'error' });
+          toast.error('Falsche Menge!', { id: 'error' });
           break;
         case 'wrong process':
-          toast.error('Błędny proces!', { id: 'error' });
+          toast.error('Falscher Prozess!', { id: 'error' });
           break;
         case 'full pallet':
-          toast.error('Pełna paleta!', { id: 'error' });
+          toast.error('Vollpalette!', { id: 'error' });
           break;
         default:
-          toast.error('Zgłoś się do IT!', { id: 'error' });
+          toast.error('Wenden Sie sich an die IT!', { id: 'error' });
       }
     } catch (err) {
-      toast.error('Zgłoś się do IT!', { id: 'error' });
+      toast.error('Wenden Sie sich an die IT!', { id: 'error' });
     } finally {
       toast.dismiss('saving');
       setIsPending(false);
@@ -84,7 +81,7 @@ export default function ScanHydraQr(props: StatusProps) {
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
-        className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
+        className='dark-bg-slate-800 w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss'
         value={hydraBatch}
         onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}

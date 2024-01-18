@@ -26,7 +26,7 @@ export default function Status(props: StatusProps) {
                 personContext.person.name &&
                 shortenLastName(personContext?.person.name)
               })`
-            : 'brak'
+            : 'keine'
         }
         width='w-4/12'
       />
@@ -35,7 +35,7 @@ export default function Status(props: StatusProps) {
         value={
           articleContext?.article?.number
             ? `${articleContext?.article.name} (${articleContext?.article.number})`
-            : 'brak'
+            : 'keine'
         }
         width='w-6/12'
       />

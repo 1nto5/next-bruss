@@ -8,11 +8,21 @@ type StatusProps = {
 
 export default function ArticleSelector(props: StatusProps) {
   const articleContext = useContext(ArticleContext);
-  // const articles = config.filter((item) => item.workplace === props.workplace);
-  const articles = config; // BRI
+  const articles = config
+    .filter((item) => item.article !== '')
+    .sort((a, b) =>
+      a.article.localeCompare(b.article, undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      }),
+    );
 
-  const handleClick = (number: string, name: string) => {
-    articleContext?.setArticle({ number, name });
+  const handleClick = (
+    number: string,
+    name: string,
+    boxSize: number | number[],
+  ) => {
+    articleContext?.setArticle({ number, name, boxSize });
     toast.success('Artikel eingeloggt!', { id: 'success' });
   };
 
@@ -21,7 +31,7 @@ export default function ArticleSelector(props: StatusProps) {
       {articles?.map((item) => (
         <button
           key={item.article}
-          onClick={() => handleClick(item.article, item.name)}
+          onClick={() => handleClick(item.article, item.name, item.boxSize)}
           className='m-8 rounded bg-slate-200 p-6 text-center text-3xl text-slate-900 shadow-sm hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
         >
           <div className='flex flex-col items-center'>
