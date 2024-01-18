@@ -36,13 +36,13 @@ const Header: React.FC<HeaderProps> = ({
             className='w-20 rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss'
             type='button'
           >
-            artykuł
+            artikel
           </button>
         )}
         {showPersonLogOut && personContext?.person?.number && (
           <button
             onClick={() => {
-              toast.success(`${personContext.person?.number} wylogowany!`, {
+              toast.success(`Abgemeldet!`, {
                 id: 'success',
               });
               personContext.setPerson(() => ({
@@ -50,10 +50,10 @@ const Header: React.FC<HeaderProps> = ({
                 name: null,
               }));
             }}
-            className='w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
+            className='w-24 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
             type='button'
           >
-            wyloguj
+            abmelden
           </button>
         )}
       </div>

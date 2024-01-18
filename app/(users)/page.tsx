@@ -3,10 +3,10 @@ import Info from './components/Info';
 export default async function Home() {
   const infoDescription = (
     <>
-      Strona oraz aplikacje są w trakcie budowy. Proszę o zgłaszanie napotkanych
-      błędów na{' '}
+      Die Website und die Anwendungen werden derzeit überarbeitet. Bitte melden
+      Sie alle Fehler an{' '}
       <a
-        href={`mailto:support@bruss-group.com?subject=Next BRUSS: zgłoszenie błędu`}
+        href={`mailto:adrian.antosiak@bruss-group.com?subject=Next BRUSS BRI: error`}
         className='text-blue-600 hover:text-blue-800'
       >
         support@bruss-group.com
@@ -16,7 +16,7 @@ export default async function Home() {
   );
   return (
     <main className='m-2 flex justify-center'>
-      <Info title='Cześć!' description={infoDescription} />
+      <Info title='Hallo!' description={infoDescription} />
     </main>
   );
 }

@@ -29,11 +29,11 @@ export default function ScanDmc(props: Props) {
       return;
     }
     clearInput();
-    toast.loading('Zapisywanie...', { id: 'saving' });
+    toast.loading('Aufnahme...', { id: 'saving' });
     setIsPending(true);
     try {
       if (!props.article || !props.operator) {
-        toast.error('Skontaktuj się z IT!', { id: 'error' });
+        toast.error('Kontaktieren Sie die IT!', { id: 'error' });
         return;
       }
 
@@ -50,7 +50,7 @@ export default function ScanDmc(props: Props) {
       switch (status) {
         case 'saved':
           scanContext?.setScan({ last: dmc });
-          toast.success('DMC OK!', { id: 'success' });
+          toast.success('DMC in Ordnung!', { id: 'success' });
           break;
         case 'exists':
           toast.error('DMC istnieje!', { id: 'error' });

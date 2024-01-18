@@ -18,7 +18,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
-// import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeModeToggle } from './ThemeModeToggle';
@@ -34,39 +34,41 @@ import { useRouter } from 'next/navigation';
 
 const routes = [
   {
-    title: 'Produkcja',
+    title: 'Produktion',
+    href: '/', //TODO fix mapping to prevent type error
     submenu: [
       {
         href: '/pro/export-data',
-        title: 'Export danych',
-        description: 'Generowanie pliku excel z danymi systemu skanowania.',
+        title: 'Datenexport',
+        description:
+          'Erstellung einer Excel-Datei mit Daten aus dem Scansystem.',
       },
       {
         href: '/pro/rework',
         title: 'Rework',
-        description: 'Oznaczanie partii jako rework - ponowne skanowanie',
+        description: 'Markierung von Chargen zur Nacharbeit - erneutes Scannen',
       },
     ],
   },
-  {
-    title: 'Inwentaryzacja',
-    submenu: [
-      {
-        href: '/inventory/main',
-        title: 'Inwentaryzacja',
-        description: 'Aplikacja wspierająca proces inwentaryzacji.',
-      },
-      {
-        href: '/inventory/approve',
-        title: 'Zatwierdzanie inwentaryzacji',
-        description: 'Narzędzie do potwierdzania zinwentaryzowanych pozycji.',
-      },
-    ],
-  },
-  {
-    title: 'Nadgodziny',
-    href: '/extra-hours',
-  },
+  // {
+  //   title: 'Inwentaryzacja',
+  //   submenu: [
+  //     {
+  //       href: '/inventory/main',
+  //       title: 'Inwentaryzacja',
+  //       description: 'Aplikacja wspierająca proces inwentaryzacji.',
+  //     },
+  //     {
+  //       href: '/inventory/approve',
+  //       title: 'Zatwierdzanie inwentaryzacji',
+  //       description: 'Narzędzie do potwierdzania zinwentaryzowanych pozycji.',
+  //     },
+  //   ],
+  // },
+  // {
+  //   title: 'Nadgodziny',
+  //   href: '/extra-hours',
+  // },
 ];
 
 type HeaderProps = {

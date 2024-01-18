@@ -1,19 +1,19 @@
-import Toast from './components/Toast'
+import Toast from './components/Toast';
 
 export const metadata = {
-  title: 'Next BRUSS: Production',
+  title: 'Next BRUSS: Produktion',
   // description: 'Company helper applications',
-}
+};
 
 export default function OnlyPalletLabelLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <>
       {children}
       <Toast />
     </>
-  )
+  );
 }

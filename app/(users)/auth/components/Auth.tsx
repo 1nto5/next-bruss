@@ -6,8 +6,8 @@ export default function Auth() {
   return (
     <Tabs defaultValue='login' className='w-[400px]'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='login'>Logowanie</TabsTrigger>
-        <TabsTrigger value='register'>Rejestracja</TabsTrigger>
+        <TabsTrigger value='login'>Logging</TabsTrigger>
+        <TabsTrigger value='register'>Registrierung</TabsTrigger>
       </TabsList>
       <TabsContent value='login'>
         <LoginForm />

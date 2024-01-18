@@ -5,22 +5,21 @@ import { PersonContext } from '../lib/PersonContext';
 import { loginPerson } from '../actions';
 
 import toast from 'react-hot-toast';
-import { login } from '@/app/(persons)/inventory/main/actions';
 
-type NumberButtonProps = {
-  onClick: () => void;
-  value: number;
-};
+// type NumberButtonProps = {
+//   onClick: () => void;
+//   value: number;
+// };
 
-const NumberButton: React.FC<NumberButtonProps> = ({ onClick, value }) => (
-  <button
-    className='m-2 inline-block h-24 w-24 rounded bg-slate-100 text-center text-4xl text-slate-900 shadow-sm hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
-    onClick={onClick}
-    type='button'
-  >
-    {value}
-  </button>
-);
+// const NumberButton: React.FC<NumberButtonProps> = ({ onClick, value }) => (
+//   <button
+//     className='m-2 inline-block h-24 w-24 rounded bg-slate-100 text-center text-4xl text-slate-900 shadow-sm hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
+//     onClick={onClick}
+//     type='button'
+//   >
+//     {value}
+//   </button>
+// );
 
 const NumLogIn = () => {
   const [personalNumber, setPersonalNumber] = useState('');
@@ -31,7 +30,7 @@ const NumLogIn = () => {
     e.preventDefault();
 
     if (!personalNumber) {
-      toast.error('Nie wpisano numeru!', { id: 'error' });
+      toast.error('Nicht gescannt', { id: 'error' });
       return;
     }
 
@@ -41,19 +40,19 @@ const NumLogIn = () => {
         number: personalNumber,
         name: res,
       });
-      toast.success(`${personalNumber} zalogowany!`, { id: 'success' });
+      toast.success(`${personalNumber} Eingeloggt!`, { id: 'success' });
     } else {
-      toast.error(`${personalNumber} nie istnieje!`, { id: 'error' });
+      toast.error(`${personalNumber} Falscher Code!`, { id: 'error' });
     }
   };
 
-  const handleClickNumber = (calcNum: number) => {
-    setPersonalNumber(personalNumber + calcNum.toString());
-  };
+  // const handleClickNumber = (calcNum: number) => {
+  //   setPersonalNumber(personalNumber + calcNum.toString());
+  // };
 
-  const handleClickClear = () => {
-    setPersonalNumber('');
-  };
+  // const handleClickClear = () => {
+  //   setPersonalNumber('');
+  // };
 
   return (
     <form
@@ -65,10 +64,10 @@ const NumLogIn = () => {
         type='text'
         value={personalNumber}
         onChange={(e) => setPersonalNumber(e.target.value)}
-        placeholder='nr personalny'
+        placeholder='Mitarbeitercode'
         autoFocus
       />
-      <div className='mt-4'>
+      {/* <div className='mt-4'>
         <div>
           <NumberButton onClick={() => handleClickNumber(1)} value={1} />
           <NumberButton onClick={() => handleClickNumber(2)} value={2} />
@@ -100,7 +99,7 @@ const NumLogIn = () => {
             OK
           </button>
         </div>
-      </div>
+      </div> */}
     </form>
   );
 };

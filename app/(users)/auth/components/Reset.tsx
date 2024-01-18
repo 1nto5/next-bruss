@@ -32,17 +32,17 @@ const formSchema = z
   .object({
     password: z
       .string()
-      .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
+      .min(6, { message: 'Das Passwort muss mindestens 6 Zeichen enthalten!' })
       .regex(/[^a-zA-Z0-9]/, {
-        message: 'Hasło musi zawierać przynajmniej jeden znak specjalny!',
+        message: 'Das Passwort muss mindestens ein Sonderzeichen enthalten!',
       }),
     confirmPassword: z
       .string()
-      .min(1, { message: 'Potiwerdzenie hasła jest wymagane!' }),
+      .min(1, { message: 'Passwortbestätigung ist erforderlich!' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
-    message: 'Hasła nie są zgodne!',
+    message: 'Die Passwörter stimmen nicht überein!',
   });
 
 export default function Reset({ token }: { token: string }) {
@@ -62,7 +62,7 @@ export default function Reset({ token }: { token: string }) {
       return response;
     } catch (error) {
       console.error('Finding token was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Kontaktieren Sie die IT-Abteilung!');
       return null;
     }
   }
@@ -95,15 +95,15 @@ export default function Reset({ token }: { token: string }) {
 
       if (response.error || response.status !== 'password updated') {
         console.error(response.error || 'Password update was unsuccessful.');
-        toast.error('Skontaktuj się z IT!');
+        toast.error('Kontaktieren Sie die IT-Abteilung');
         return;
       }
 
-      toast.success('Hasło zostało zaktualizowane!');
+      toast.success('Das Passwort wurde aktualisiert!');
       router.replace('/auth');
     } catch (error) {
       console.error('User login was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Kontaktieren Sie die IT-Abteilung');
     } finally {
       setIsPending(false);
     }
@@ -124,7 +124,7 @@ export default function Reset({ token }: { token: string }) {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nowe hasło</FormLabel>
+                  <FormLabel>Neues Passwort</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -140,7 +140,7 @@ export default function Reset({ token }: { token: string }) {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormLabel>Passwort wiederholen</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -156,10 +156,10 @@ export default function Reset({ token }: { token: string }) {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Zapisywanie
+                Aufnahme
               </Button>
             ) : (
-              <Button type='submit'>Zatwierdź</Button>
+              <Button type='submit'>Genehmigen Sie</Button>
             )}
           </CardFooter>
         </form>

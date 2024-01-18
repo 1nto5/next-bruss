@@ -8,11 +8,14 @@ type StatusProps = {
 
 export default function ArticleSelector(props: StatusProps) {
   const articleContext = useContext(ArticleContext);
-  const articles = config.filter((item) => item.workplace === props.workplace);
+  // const articles = config.filter((item) => item.workplace === props.workplace);
+  const articles = config; // BRI
+
   const handleClick = (number: string, name: string) => {
     articleContext?.setArticle({ number, name });
-    toast.success('Artykuł zalogowany!', { id: 'success' });
+    toast.success('Artikel eingeloggt!', { id: 'success' });
   };
+
   return (
     <div className='mb-4 mt-4 flex flex-wrap items-center justify-center'>
       {articles?.map((item) => (

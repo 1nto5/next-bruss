@@ -21,14 +21,14 @@ export default function App() {
   const pathname = usePathname();
   const workplace = pathname.split('/').pop();
   const workplaceType = pathname.split('/')[2];
-  const workplaceExists = config.some(
-    (item) => item.workplace === workplace && item.type === workplaceType,
-  );
+  // const workplaceExists = config.some(
+  //   (item) => item.workplace === workplace && item.type === workplaceType,
+  // );
   const articleExists = config.some(
     (item) =>
       item.article === articleContext?.article?.number &&
-      item.type === workplaceType &&
-      item.workplace === workplace,
+      item.type === workplaceType,
+    // && item.workplace === workplace,
   );
   const [isPending, setIsPending] = useState(true);
   const [inBox, setInBox] = useState(0);
@@ -65,13 +65,13 @@ export default function App() {
         ]);
         setInBox(inBox);
         if (!boxSize) {
-          toast.error('Niepoprawny artykuł!', { id: 'error' });
+          toast.error('Falscher Artikel!', { id: 'error' });
           throw new Error('Box size is missing');
         }
         setBoxSize(boxSize);
         setIsFullBox(inBox === boxSize);
       } catch (error) {
-        toast.error('Skontaktuj się z IT!', { id: 'error' });
+        toast.error('Kontaktieren Sie die IT-Abteilung!', { id: 'error' });
         console.error('Failed to fetch quantity on a pallet:', error);
       } finally {
         setIsPending(false);
@@ -87,11 +87,22 @@ export default function App() {
     articleExists,
   ]);
 
-  if (!workplaceExists || !workplace) {
+  // if (!workplaceExists || !workplace) {
+  //   return (
+  //     <div className='text-center'>
+  //       <p className='mt-10'>
+  //         Der Arbeitsplatz ist in der Konfiguration nicht vorhanden!
+  //       </p>
+  //     </div>
+  //   );
+  // }
+
+  // BRI
+  if (!workplace) {
     return (
       <div className='text-center'>
         <p className='mt-10'>
-          The workplace does not exist in the configuration!
+          Problem beim Herunterladen der Stellenbezeichnung!
         </p>
       </div>
     );

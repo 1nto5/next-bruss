@@ -32,9 +32,9 @@ import { toast } from 'sonner';
 const formSchema = z.object({
   email: z
     .string()
-    .min(23, { message: 'Email jest za krótki!' })
+    .min(23, { message: 'E-Mail ist zu kurz!' })
     .regex(/@bruss-group\.com$/, {
-      message: 'Podany email nie należy do domeny bruss-group.com!',
+      message: 'Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!',
     }),
   password: z.string(),
 });
@@ -63,13 +63,13 @@ export default function LoginForm() {
       // }
 
       if (result?.error) {
-        toast.error('Niepoprawne dane logowania!');
+        toast.error('Ungültige Anmeldedaten!');
         console.error('User login was unsuccessful.:', result?.error);
         return;
       }
     } catch (error) {
       console.error('User login was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Kontaktieren Sie die IT-Abteilung!');
       return;
     } finally {
       setIsPending(false);
@@ -80,34 +80,36 @@ export default function LoginForm() {
     const email = form.getValues('email');
     // console.log('email: ', email);
     if (!email) {
-      toast.error('Wprowadź email by zresetować hasło!');
+      toast.error('Geben Sie Ihre E-Mail ein, um das Passwort zurückzusetzen!');
       return;
     }
     try {
       setIsPendingSending(true);
       const result = await resetPassword(email);
       if (!result) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error('Kontaktieren Sie die IT-Abteilung!');
         return;
       }
 
       if (result.status === 'sent') {
-        toast.success('Wysłano link do resetowania hasła!');
+        toast.success('Link zum Zurücksetzen des Passworts gesendet!');
         return;
       }
 
       if (result?.error) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error('Kontaktieren Sie die IT-Abteilung!');
         console.error('User password reset was unsuccessful.:', result?.error);
       }
 
       if (result.status === 'not exists') {
-        toast.error('Brak użytkownika o podanym adresie email!');
+        toast.error(
+          'Kein Benutzer unter der angegebenen E-Mail-Adresse gefunden!',
+        );
         return;
       }
     } catch (error) {
       console.error('User password reset was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Kontaktieren Sie die IT-Abteilung!');
       return;
     } finally {
       setIsPendingSending(false);
@@ -145,7 +147,7 @@ export default function LoginForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło</FormLabel>
+                  <FormLabel>Passwort</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -161,7 +163,7 @@ export default function LoginForm() {
             {isPendingSending ? (
               <Button type='button' variant='destructive' disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Wysyłanie email
+                Versenden einer E-Mail
               </Button>
             ) : (
               <Button
@@ -169,16 +171,16 @@ export default function LoginForm() {
                 type='button'
                 variant='destructive'
               >
-                Reset hasła
+                Passwort zurücksetzen
               </Button>
             )}
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Logowanie
+                Logging
               </Button>
             ) : (
-              <Button type='submit'>Zaloguj</Button>
+              <Button type='submit'>Anmelden</Button>
             )}
           </CardFooter>
         </form>

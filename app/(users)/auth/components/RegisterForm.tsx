@@ -33,22 +33,23 @@ const formSchema = z
     email: z
       .string()
       .regex(/@bruss-group\.com$/, {
-        message: 'Podany email nie należy do domeny bruss-group.com!',
+        message:
+          'Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!',
       })
-      .min(23, { message: 'Email jest za krótki!' }),
+      .min(23, { message: 'E-Mail ist zu kurz!' }),
     password: z
       .string()
-      .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
+      .min(6, { message: 'Das Passwort muss mindestens 6 Zeichen enthalten!' })
       .regex(/[^a-zA-Z0-9]/, {
-        message: 'Hasło musi zawierać przynajmniej jeden znak specjalny!',
+        message: 'Das Passwort muss mindestens ein Sonderzeichen enthalten!',
       }),
     confirmPassword: z
       .string()
-      .min(1, { message: 'Potiwerdzenie hasła jest wymagane!' }),
+      .min(1, { message: 'Passwortbestätigung ist erforderlich!' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
-    message: 'Hasła nie są zgodne!',
+    message: 'Die Passwörter stimmen nicht überein!',
   });
 
 export default function RegisterForm() {
@@ -73,21 +74,21 @@ export default function RegisterForm() {
       const result = await register(values.email, values.password);
 
       if (result?.status === 'registered') {
-        toast.success('Konto zostało utworzone!');
+        toast.success('Konto wurde erstellt!');
         router.replace('/auth');
       }
       if (result?.status === 'exists') {
-        toast.error('Konto istnieje!');
+        toast.error('Konto existiert bereits!');
         return;
       }
       if (result?.error) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error('Kontaktieren Sie die IT-Abteilung!');
         console.log('User registration was unsuccessful.:', result?.error);
         return;
       }
     } catch (error) {
       console.error('User registration was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Kontaktieren Sie die IT-Abteilung!');
       return;
     } finally {
       setIsPending(false);
@@ -125,7 +126,7 @@ export default function RegisterForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło</FormLabel>
+                  <FormLabel>Passwort</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -141,7 +142,7 @@ export default function RegisterForm() {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormLabel>Wiederholen Sie das Passwort</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -157,10 +158,10 @@ export default function RegisterForm() {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Rejestracja
+                Anmeldung
               </Button>
             ) : (
-              <Button type='submit'>Zarejestruj</Button>
+              <Button type='submit'>Register</Button>
             )}
           </CardFooter>
         </form>

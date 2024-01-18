@@ -31,7 +31,7 @@ export default function Status(props: StatusProps) {
         width='w-4/12'
       />
       <StatusBox
-        name={`artykuł:`}
+        name={`artikel:`}
         value={
           articleContext?.article?.number
             ? `${articleContext?.article.name} (${articleContext?.article.number})`
@@ -40,7 +40,7 @@ export default function Status(props: StatusProps) {
         width='w-6/12'
       />
       <StatusBox
-        name='w boxie:'
+        name='menge:'
         value={`${props.inBox}/${props.boxSize}`}
         width='w-2/12'
         loading={props.isPending}
