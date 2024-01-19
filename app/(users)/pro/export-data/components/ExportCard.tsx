@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: combobox style, margin at top?
-
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import config from '@/app/(persons)/pro/config';
@@ -102,8 +100,7 @@ export default function ExportCard() {
   };
 
   const generateExcel = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-
+    event.preventDefault();
     const formData = {
       workplace: selectedWorkplace,
       article: selectedArticle,
@@ -167,7 +164,7 @@ export default function ExportCard() {
                     variant='outline'
                     role='combobox'
                     aria-expanded={openWorkplace}
-                    className='justify-between font-normal'
+                    className='justify-between font-normal '
                   >
                     {selectedWorkplace
                       ? selectedWorkplace.toUpperCase()
@@ -175,10 +172,9 @@ export default function ExportCard() {
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent>
+                <PopoverContent className=' w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
-
                     <CommandEmpty>Nie znaleziono</CommandEmpty>
                     <CommandGroup className='max-h-48 overflow-y-auto'>
                       {workplaces.map((workplace) => (
@@ -229,7 +225,7 @@ export default function ExportCard() {
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent>
+                <PopoverContent className='w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
                     <CommandEmpty>Nie znaleziono</CommandEmpty>
@@ -274,7 +270,7 @@ export default function ExportCard() {
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent>
+                <PopoverContent className='w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
                     <CommandEmpty>Nie znaleziono</CommandEmpty>
@@ -360,140 +356,3 @@ export default function ExportCard() {
     </Card>
   );
 }
-
-//   return (
-//     <div className='mb-4 mt-4 flex flex-col items-center justify-center'>
-//       <span className='text-sm font-extralight tracking-widest text-slate-700 dark:text-slate-100'>
-//         wybór kryteriów exportu
-//       </span>
-//       <div className='flex w-11/12 max-w-lg justify-center rounded bg-slate-100 p-4 shadow-md dark:bg-slate-800'>
-//         <form className='flex w-11/12 flex-col gap-3' onSubmit={generateExcel}>
-//           <Select
-//             options={workplaces.map((workplace) => ({
-//               label: workplace.toUpperCase(),
-//               value: workplace,
-//             }))}
-//             value={
-//               workplaces.find((workplace) => workplace === selectedWorkplace)
-//                 ? {
-//                     label:
-//                       selectedWorkplace &&
-//                       (selectedWorkplace as String).toUpperCase(),
-//                     value: selectedWorkplace,
-//                   }
-//                 : null
-//             }
-//             onChange={(option: { value: SetStateAction<null> }) => {
-//               if (option) {
-//                 setSelectedWorkplace(option.value);
-//                 setSelectedArticle(null);
-//               } else {
-//                 setSelectedWorkplace(null);
-//                 setSelectedArticle(null);
-//               }
-//             }}
-//             placeholder='stanowisko'
-//           />
-
-//           <Select
-//             options={filteredArticles.map((article) => ({
-//               label: `${article.name} (${article.article})`,
-//               value: article.article,
-//             }))}
-//             value={
-//               filteredArticles.find(
-//                 (article) => article.article === selectedArticle,
-//               )
-//                 ? {
-//                     label: `${
-//                       filteredArticles.find(
-//                         (article) => article.article === selectedArticle,
-//                       )?.name
-//                     } (${selectedArticle})`,
-//                     value: selectedArticle,
-//                   }
-//                 : null
-//             }
-//             onChange={(option: { value: SetStateAction<null> }) => {
-//               if (option) {
-//                 setSelectedArticle(option.value);
-//               } else {
-//                 setSelectedArticle(null);
-//               }
-//             }}
-//             placeholder='artykuł'
-//           />
-
-//           <Select
-//             options={statusOptions}
-//             value={
-//               statusOptions.find((option) => option.value === selectedStatus)
-//                 ? {
-//                     label: statusOptions.find(
-//                       (option) => option.value === selectedStatus,
-//                     )?.label,
-//                     value: selectedStatus,
-//                   }
-//                 : null
-//             }
-//             onChange={(option: { value: SetStateAction<null> }) => {
-//               if (option) {
-//                 setSelectedStatus(option.value);
-//               } else {
-//                 setSelectedStatus(null);
-//               }
-//             }}
-//             placeholder='status'
-//           />
-
-//           <div className='flex justify-center space-x-2'>
-//             <div className='flex flex-col items-center'>
-//               <label className='mb-1 text-sm text-slate-700 dark:text-slate-300'>
-//                 data od:
-//               </label>
-//               <DatePicker
-//                 selected={timeFrom}
-//                 onChange={(date) => setTimeFrom(date)}
-//                 className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
-//                 showTimeSelect
-//                 timeIntervals={15}
-//                 dateFormat='P HH:mm'
-//                 timeFormat='HH:mm'
-//               />
-//             </div>
-//             <div className='flex flex-col items-center'>
-//               <label className='mb-1 text-sm text-slate-700 dark:text-slate-300'>
-//                 data do:
-//               </label>
-//               <DatePicker
-//                 selected={timeTo}
-//                 onChange={(date) => setTimeTo(date)}
-//                 className='rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
-//                 showTimeSelect
-//                 timeIntervals={15}
-//                 dateFormat='P HH:mm'
-//                 timeFormat='HH:mm'
-//               />
-//             </div>
-//           </div>
-//           <input
-//             type='text'
-//             className='items-center rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900'
-//             placeholder='wyszukaj DMC / hydra batch / pallet batch'
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//           />
-//           <button
-//             type='submit'
-//             className={clsx(
-//               `w-full rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss`,
-//               { 'animate-pulse': isPending === true },
-//             )}
-//           >
-//             {!isPending ? 'pobierz excel' : 'generowanie'}
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
