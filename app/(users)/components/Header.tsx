@@ -46,6 +46,11 @@ const routes = [
         title: 'Rework',
         description: 'Oznaczanie partii jako rework - ponowne skanowanie',
       },
+      {
+        href: '/pro/article-config',
+        title: 'Konfiguracja artykułów',
+        description: 'Dodawanie i edycja artykułów w systmie skanowania DMC.',
+      },
     ],
   },
   {
