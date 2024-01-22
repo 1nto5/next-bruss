@@ -192,6 +192,7 @@ export async function saveDmc(
       return { status: 'exists' };
     }
 
+    // skip it if you want to save DMC faster
     if (articleConfig.palletSize) {
       const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
         countBoxesOnPallet(workplace, article),

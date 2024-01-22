@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EditArticleConfig from './EditArticleConfig';
+import AddArticleConfig from './AddArticleConfig';
 // import LoginForm from './LoginForm';
 // import RegisterForm from './RegisterForm';
 
@@ -10,10 +11,10 @@ export default function Auth() {
         <TabsTrigger value='edit'>Edytuj</TabsTrigger>
         <TabsTrigger value='add'>Dodaj</TabsTrigger>
       </TabsList>
-      <TabsContent value='edit'>
-        <EditArticleConfig />
+      <TabsContent value='edit'>{/* <EditArticleConfig /> */}</TabsContent>
+      <TabsContent value='add'>
+        <AddArticleConfig />
       </TabsContent>
-      <TabsContent value='add'>{/* <LoginForm /> */}</TabsContent>
     </Tabs>
   );
 }
