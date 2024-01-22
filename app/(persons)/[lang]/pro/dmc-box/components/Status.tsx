@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext } from 'react';
-import StatusBox from '@/app/(persons)/components/StatusBox';
+import StatusBox from '@/app/(persons)/[lang]/components/StatusBox';
 import { PersonContext } from '../../lib/PersonContext';
 import { ArticleContext } from '../../lib/ArticleContext';
 import { shortenLastName } from '@/lib/utils/nameFormat';
@@ -9,10 +9,7 @@ import { shortenLastName } from '@/lib/utils/nameFormat';
 type StatusProps = {
   inBox: number;
   boxSize: number;
-  onPallet: number;
-  palletSize: number;
   isFullBox: boolean;
-  isFullPallet: boolean;
   isPending: boolean;
 };
 
@@ -40,7 +37,7 @@ export default function Status(props: StatusProps) {
             ? `${articleContext?.article.name} (${articleContext?.article.number})`
             : 'brak'
         }
-        width='w-4/12'
+        width='w-6/12'
       />
       <StatusBox
         name='w boxie:'
@@ -48,14 +45,6 @@ export default function Status(props: StatusProps) {
         width='w-2/12'
         loading={props.isPending}
         full={props.isFullBox}
-      />
-      <StatusBox
-        name='na palecie:'
-        value={`${props.onPallet}/${props.palletSize}`}
-        width='w-2/12'
-        loading={props.isPending}
-        full={props.isFullPallet}
-        separator={false}
       />
     </div>
   );

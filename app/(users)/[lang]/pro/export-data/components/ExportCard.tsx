@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import config from '@/app/(persons)/pro/config';
+import config from '@/app/(persons)/[lang]/pro/config';
 
 import {
   Card,

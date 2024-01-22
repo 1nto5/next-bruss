@@ -1,7 +1,7 @@
 'use server';
 
 import clientPromise from '@/lib/mongo';
-import config from '@/app/(persons)/pro/config';
+import config from '@/app/(persons)/[lang]/pro/config';
 import { countBoxesOnPallet } from '../actions';
 
 type ArticleConfig = {

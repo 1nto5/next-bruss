@@ -1,26 +1,25 @@
 import { useState, useContext } from 'react';
-
-import { ScanContext } from '@/app/(persons)/pro/lib/ScanContext';
-import { saveDmc } from '@/app/(persons)/pro/actions';
+import { saveHydraBatch } from '@/app/(persons)/[lang]/pro/actions';
+import { ScanContext } from '@/app/(persons)/[lang]/pro/lib/ScanContext';
 import toast from 'react-hot-toast';
 
-type Props = {
+type StatusProps = {
   workplace: string;
   article: string;
   operator: string;
 };
 
-// Component to scan DMC
-export default function ScanDmc(props: Props) {
+// Component to scan Hydra Batch
+export default function ScanHydraQr(props: StatusProps) {
   const scanContext = useContext(ScanContext);
   const [isPending, setIsPending] = useState(false);
 
   // Local state for the hydra batch
-  const [dmc, setDmc] = useState('');
+  const [hydraBatch, setHydraBatch] = useState('');
 
-  // Function to clear input field
-  const clearInput = () => {
-    setDmc('');
+  // Function to clear the hydraBatch input field
+  const clearHydraBatch = () => {
+    setHydraBatch('');
   };
 
   // Handle key press on input (only interested in 'Enter')
@@ -28,41 +27,41 @@ export default function ScanDmc(props: Props) {
     if (event.key !== 'Enter') {
       return;
     }
-    clearInput();
+
+    clearHydraBatch();
+
     toast.loading('Zapisywanie...', { id: 'saving' });
     setIsPending(true);
-    try {
-      if (!props.article || !props.operator) {
-        toast.error('Skontaktuj się z IT!', { id: 'error' });
-        return;
-      }
 
-      const result = await saveDmc(
-        dmc,
+    try {
+      const result = await saveHydraBatch(
+        hydraBatch,
         props.workplace,
         props.article,
         props.operator,
       );
 
       const status = result?.status;
-
       // Display toast message based on the result status
       switch (status) {
         case 'saved':
-          scanContext?.setScan({ last: dmc });
-          toast.success('DMC OK!', { id: 'success' });
+          scanContext?.setScan({ last: hydraBatch });
+          toast.success('Batch OK!', { id: 'success' });
           break;
         case 'exists':
-          toast.error('DMC istnieje!', { id: 'error' });
+          toast.error('Batch istnieje!', { id: 'error' });
           break;
         case 'invalid':
-          toast.error('DMC niepoprawny!', { id: 'error' });
+          toast.error('Batch niepoprawny!', { id: 'error' });
           break;
-        case 'wrong date':
-          toast.error('Data niepoprawna!', { id: 'error' });
+        case 'wrong article':
+          toast.error('Błędny artykuł!', { id: 'error' });
           break;
-        case 'full box':
-          toast.error('Pełny box!', { id: 'error' });
+        case 'wrong quantity':
+          toast.error('Błędna ilość!', { id: 'error' });
+          break;
+        case 'wrong process':
+          toast.error('Błędny proces!', { id: 'error' });
           break;
         case 'full pallet':
           toast.error('Pełna paleta!', { id: 'error' });
@@ -78,14 +77,18 @@ export default function ScanDmc(props: Props) {
     }
   };
 
+  if (isPending) {
+    return null;
+  }
+
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
         className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
-        value={dmc}
-        onChange={(event) => setDmc(event.target.value)}
+        value={hydraBatch}
+        onChange={(event) => setHydraBatch(event.target.value)}
         onKeyDown={handleEnter}
-        placeholder='DMC'
+        placeholder='Hydra QR'
         autoFocus
       />
     </div>

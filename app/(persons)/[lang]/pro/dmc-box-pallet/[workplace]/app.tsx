@@ -2,24 +2,24 @@
 
 import { useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { PersonContext } from '@/app/(persons)/pro/lib/PersonContext';
-import { ScanContext } from '@/app/(persons)/pro/lib/ScanContext';
-import { ArticleContext } from '@/app/(persons)/pro/lib/ArticleContext';
+import { PersonContext } from '@/app/(persons)/[lang]/pro/lib/PersonContext';
+import { ScanContext } from '@/app/(persons)/[lang]/pro/lib/ScanContext';
+import { ArticleContext } from '@/app/(persons)/[lang]/pro/lib/ArticleContext';
 import {
   countBoxesOnPallet,
   getPalletSize,
   countInBox,
   getBoxSize,
-} from '@/app/(persons)/pro/actions';
-import NumLogIn from '@/app/(persons)/pro/components/NumLogIn';
+} from '@/app/(persons)/[lang]/pro/actions';
+import NumLogIn from '@/app/(persons)/[lang]/pro/components/NumLogIn';
 import Status from '../components/Status';
-import ArticleSelector from '@/app/(persons)/pro/components/ArticleSelector';
-import ScanDmc from '@/app/(persons)/pro/components/ScanDmc';
-import ScanHydraQr from '@/app/(persons)/pro/components/ScanHydraQr';
-import ScanPalletQr from '@/app/(persons)/pro/components/ScanPalletQr';
-import PrintPalletLabel from '@/app/(persons)/pro/components/PrintPalletLabel';
+import ArticleSelector from '@/app/(persons)/[lang]/pro/components/ArticleSelector';
+import ScanDmc from '@/app/(persons)/[lang]/pro/components/ScanDmc';
+import ScanHydraQr from '@/app/(persons)/[lang]/pro/components/ScanHydraQr';
+import ScanPalletQr from '@/app/(persons)/[lang]/pro/components/ScanPalletQr';
+import PrintPalletLabel from '@/app/(persons)/[lang]/pro/components/PrintPalletLabel';
 import toast from 'react-hot-toast';
-import config from '@/app/(persons)/pro/config';
+import config from '@/app/(persons)/[lang]/pro/config';
 
 export default function App() {
   const personContext = useContext(PersonContext);

@@ -1,4 +1,4 @@
-import '../globals.css';
+import '@/app/globals.css';
 import Footer from './components/Footer';
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -8,8 +8,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // <html suppressHydrationWarning>
-    <html>
+    <html suppressHydrationWarning>
+      {/* <html> */}
       <head />
       <body>
         <ThemeProvider

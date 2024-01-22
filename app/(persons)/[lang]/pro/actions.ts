@@ -1,11 +1,11 @@
 'use server';
 import clientPromise from '@/lib/mongo';
-import config from '@/app/(persons)/pro/config';
-import generatePalletQr from '@/app/(persons)/pro/lib/utils/generatePalletQr';
+import config from '@/app/(persons)/[lang]/pro/config';
+import generatePalletQr from '@/app/(persons)/[lang]/pro/lib/utils/generatePalletQr';
 import {
   fordValidation,
   bmwValidation,
-} from '@/app/(persons)/pro/lib/utils/dmcDateValidation';
+} from '@/app/(persons)/[lang]/pro/lib/utils/dmcDateValidation';
 
 type ArticleConfig = {
   article: string;
