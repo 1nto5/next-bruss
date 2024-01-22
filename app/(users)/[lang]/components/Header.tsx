@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Container from '@/components/ui/container';
 import {
@@ -32,54 +32,57 @@ import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
 // import { toast } from 'sonner';
 
-const routes = [
-  {
-    title: 'Produkcja',
-    submenu: [
-      {
-        href: '/pro/export-data',
-        title: 'Export danych',
-        description: 'Generowanie pliku excel z danymi systemu skanowania.',
-      },
-      {
-        href: '/pro/rework',
-        title: 'Rework',
-        description: 'Oznaczanie partii jako rework - ponowne skanowanie',
-      },
-      {
-        href: '/pro/article-config',
-        title: 'Konfiguracja artykułów',
-        description: 'Dodawanie i edycja artykułów w systmie skanowania DMC.',
-      },
-    ],
-  },
-  {
-    title: 'Inwentaryzacja',
-    submenu: [
-      {
-        href: '/inventory/main',
-        title: 'Inwentaryzacja',
-        description: 'Aplikacja wspierająca proces inwentaryzacji.',
-      },
-      {
-        href: '/inventory/approve',
-        title: 'Zatwierdzanie inwentaryzacji',
-        description: 'Narzędzie do potwierdzania zinwentaryzowanych pozycji.',
-      },
-    ],
-  },
-  {
-    title: 'Nadgodziny',
-    href: '/extra-hours',
-  },
-];
-
 type HeaderProps = {
   session: Session | null;
+  dict: any;
 };
 
-export default function Header({ session }: HeaderProps) {
+export default function Header({ session, dict }: HeaderProps) {
   const router = useRouter();
+
+  const routes = [
+    {
+      title: `${dict?.header?.production?.title}`,
+      href: '',
+      submenu: [
+        {
+          href: `/pro/export-data`,
+          title: `${dict?.header?.production?.exportData.title}`,
+          description: `${dict?.header?.production?.exportData.description}`,
+        },
+        {
+          href: '/pro/rework',
+          title: `${dict?.header?.production?.rework.title}`,
+          description: `${dict?.header?.production?.rework.description}`,
+        },
+        {
+          href: '/pro/article-config',
+          title: `${dict?.header?.production?.articleConfig.title}`,
+          description: `${dict?.header?.production?.articleConfig.description}`,
+        },
+      ],
+    },
+    {
+      title: `${dict?.header?.inventory?.title}`,
+      href: '',
+      submenu: [
+        {
+          href: '/inventory/main',
+          title: `${dict?.header?.inventory?.inventory.title}`,
+          description: `${dict?.header?.inventory?.inventory.description}`,
+        },
+        {
+          href: '/inventory/approve',
+          title: `${dict?.header?.inventory?.inventoryApprove.title}`,
+          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
+        },
+      ],
+    },
+    // {
+    //   title: 'Nadgodziny',
+    //   href: '/extra-hours',
+    // },
+  ];
 
   return (
     <header className='border-b px-4 py-3 sm:flex sm:justify-between'>

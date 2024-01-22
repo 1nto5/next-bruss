@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
-import '../globals.css';
+import '@/app/globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import Header from '../(users)/components/Header';
+import { Locale } from '@/i18n.config';
+import Header from './components/Header';
 import { Toaster } from '@/components/ui/sonner';
 import { auth } from '@/auth';
+import { getDictionary } from '@/lib/dictionary';
 
 export const metadata: Metadata = {
   title: 'Next BRUSS',
@@ -12,12 +14,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  params: { lang },
 }: {
   children: React.ReactNode;
+  params: { lang: Locale };
 }) {
   const session = await auth();
+  const dictionary = await getDictionary(lang);
   return (
-    <html suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head />
       <body>
         <ThemeProvider
@@ -26,7 +31,7 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header session={session} />
+          <Header session={session} dict={dictionary} />
           {children}
           <Toaster />
         </ThemeProvider>

@@ -40,129 +40,28 @@ const formSchema = z.object({
     .regex(/^[0-9]{5}$/, {
       message: 'Article number must be numeric!',
     }),
-  password: z.string(),
 });
 
-export default function AddArticleConfig() {
+export default function AddArticleConfig({ dict }: any) {
   const [isPendingSearching, setIsPendingSearching] = useState(false);
   const [error, setError] = useState('');
   const [isPendingSetting, setIsPendingSetting] = useState(false);
   const [updated, setUpdated] = useState(0);
   const [openArticle, setOpenArticle] = useState(false);
 
-  const search = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-    setUpdated(0);
-    if (!searchTerm) {
-      setError('Brak wartości do wyszukania!');
-      return;
-    }
-    try {
-      setIsPendingSearching(true);
-      const search = await searchPositions(searchTerm);
-      console.log('search', search);
-      if (search.length === 0) {
-        setError('Nie znaleziono żadnej pozycji!');
-        return;
-      }
-      setError('');
-      setPositions(search);
-    } catch (error) {
-      console.error('There was an error searcihing:', error);
-    } finally {
-      setIsPendingSearching(false);
-    }
-  };
-
-  const markAsRework = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent the default form submission behavior
-    if (!searchTerm) {
-      setError('Skontaktuj się z IT!');
-      return;
-    }
-    if (!reason) {
-      setError('Wprowadź powód!');
-      return;
-    }
-    if (reason.length < 20) {
-      setError('Powód musi mieć co najmniej 20 znaków!');
-      return;
-    }
-    try {
-      setIsPendingSetting(true);
-      const updated = await setReworkStatus(searchTerm, reason);
-      if (updated) {
-        setPositions([]);
-        setReason('');
-        setSearchTerm('');
-        setError('');
-        setUpdated(updated);
-      }
-    } catch (error) {
-      console.error('There was an error searcihing:', error);
-    } finally {
-      setIsPendingSetting(false);
-    }
-  };
-
   return (
-    <Card className='w-[700px]'>
+    <Card className='w-[450px]'>
       <CardHeader>
-        <CardTitle>Edycja konfiguracji artykułów</CardTitle>
+        <CardTitle>{dict?.articleConfig?.add.cardTitle}</CardTitle>
         {!error ? (
           <CardDescription>
-            Wybierz artykuł z listy aby aby zmodyfikować jego konfigurację.
+            {dict?.articleConfig?.add.cardDescription}
           </CardDescription>
         ) : (
           <CardDescription className='text-red-700'>{error}</CardDescription>
         )}
       </CardHeader>
       <CardContent>
-        <Popover
-          open={openArticle}
-          onOpenChange={setOpenArticle}
-          modal={true} // ???
-        >
-          <PopoverTrigger asChild>
-            <Button
-              variant='outline'
-              role='combobox'
-              aria-expanded={openArticle}
-              className='justify-between font-normal '
-            >
-              {selectedWorkplace
-                ? selectedWorkplace.toUpperCase()
-                : 'Wybierz...'}
-              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className=' w-fit p-0'>
-            <Command>
-              <CommandInput placeholder='Wyszukaj...' />
-              <CommandEmpty>Nie znaleziono</CommandEmpty>
-              <CommandGroup className='max-h-48 overflow-y-auto'>
-                {workplaces.map((workplace) => (
-                  <CommandItem
-                    key={workplace}
-                    value={workplace}
-                    onSelect={() => handleSelectWorkplace(workplace)}
-                    className='uppercase'
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        selectedWorkplace === workplace
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {workplace}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
         {/* <form onSubmit={positions.length > 0 ? markAsRework : search}>
           <div className='grid w-full items-center gap-4'>
             {positions.length === 0 ? (

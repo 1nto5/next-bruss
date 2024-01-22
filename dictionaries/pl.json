@@ -1,0 +1,44 @@
+{
+  "header": {
+    "production": {
+      "title": "Produkcja",
+      "exportData": {
+        "title": "Export danych",
+        "description": "Generowanie pliku excel z danymi systemu skanowania."
+      },
+      "rework": {
+        "title": "Rework",
+        "description": "Oznaczanie partii jako rework - ponowne skanowanie."
+      },
+      "articleConfig": {
+        "title": "Konfiguracja artykułów",
+        "description": "Dodawanie i edycja artykułów w systmie skanowania DMC."
+      }
+    },
+    "inventory": {
+      "title": "Inwentaryzacja",
+      "inventory": {
+        "title": "Inwentaryzacja",
+        "description": "Aplikacja wspierająca proces inwentaryzacji."
+      },
+      "inventoryApprove": {
+        "title": "Zatwierdzanie inwentaryzacji",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      }
+    }
+  },
+  "home": {
+    "title": "Cześć!"
+  },
+  "exportData": {},
+  "articleConfig": {
+    "tabs": {
+      "edit": "Edytuj",
+      "add": "Dodaj"
+    },
+    "add": {
+      "cardTitle": "Dodaj artykuł",
+      "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł."
+    }
+  }
+}

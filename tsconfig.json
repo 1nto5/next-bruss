@@ -24,6 +24,13 @@
     },
     "typeRoots": ["./types"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "middleware.js",
+    "app/[lang]/dictionaries.js"
+  ],
   "exclude": ["node_modules"]
 }

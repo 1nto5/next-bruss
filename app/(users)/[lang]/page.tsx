@@ -1,6 +1,13 @@
+import { Locale } from '@/i18n.config';
 import Info from './components/Info';
+import { getDictionary } from '@/lib/dictionary';
 
-export default async function Home() {
+export default async function Home({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
+  const dict = await getDictionary(lang);
   const infoDescription = (
     <>
       Strona oraz aplikacje są w trakcie budowy. Proszę o zgłaszanie napotkanych
@@ -16,7 +23,7 @@ export default async function Home() {
   );
   return (
     <main className='m-2 flex justify-center'>
-      <Info title='Cześć!' description={infoDescription} />
+      <Info title={dict?.home?.title} description={infoDescription} />
     </main>
   );
 }
