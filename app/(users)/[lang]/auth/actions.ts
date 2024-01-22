@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { signOut, signIn, auth } from '@/auth';
+// import { AuthError } from 'next-auth';
 
 const collectionName = 'users';
 
@@ -205,17 +206,35 @@ export async function logout() {
   await signOut();
 }
 
+// TODO: 500 internal server error while wrong credientials, fallowing function helps but login doesn't work properly (first time gives error)
+
+// export async function login(email: string, password: string) {
+//   try {
+//     const success = await signIn('credentials', { email, password });
+//     return undefined;
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       const { type, cause } = error as AuthError;
+//       switch (type) {
+//         case 'CredentialsSignin':
+//           return 'invalid';
+//         case 'CallbackRouteError':
+//           return cause?.err?.toString();
+//         default:
+//           return 'Something went wrong.';
+//       }
+//     }
+
+//     throw error;
+//   }
+// }
+
 export async function login(email: string, password: string) {
-  const success = await signIn('credentials', {
+  const res = await signIn('credentials', {
     email,
     password,
     // redirect: false,
   });
-  if (success) {
-    return { status: 'logged' };
-  } else {
-    return { error: 'invalid credentials' };
-  }
 }
 
 export async function getSession() {

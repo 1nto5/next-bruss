@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { resetPassword, login } from '../actions';
+import { AuthError } from 'next-auth';
 
 import {
   Form,
@@ -36,7 +37,7 @@ const formSchema = z.object({
     .regex(/@bruss-group\.com$/, {
       message: 'Podany email nie należy do domeny bruss-group.com!',
     }),
-  password: z.string(),
+  password: z.string().min(1, { message: 'Password cannot be empty' }),
 });
 
 export default function LoginForm() {
@@ -56,20 +57,16 @@ export default function LoginForm() {
     // console.log(values.email, values.password);
     try {
       setIsPending(true);
-      const result = await login(values.email, values.password);
-
-      // if (result?.status === 'logged') {
-      //   toast.success('Zalogowano!');
+      await login(values.email, values.password);
+      // if (!res) {
+      //   toast.error('Nieprawidłowe dane logowania!');
+      //   return;
       // }
-
-      if (result?.error) {
-        toast.error('Niepoprawne dane logowania!');
-        console.error('User login was unsuccessful.:', result?.error);
-        return;
-      }
+      // console.log('res: ', res);
     } catch (error) {
-      console.error('User login was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      // console.error(error);
+      // toast.error('Skontaktuj się z IT!');
+      toast.error('Nieprawidłowe dane logowania!');
       return;
     } finally {
       setIsPending(false);

@@ -1,3 +1,5 @@
+// TODO: [auth][error] while wrong credentials in server console?
+
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import clientPromise from '@/lib/mongo';
@@ -48,7 +50,7 @@ export const {
           // console.log('Invalid credentials');
           return null;
         } catch (error) {
-          console.log('Error:', error);
+          // console.log('Error:', error);
           return null;
         }
       },
