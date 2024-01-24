@@ -124,7 +124,7 @@ export default function App() {
             <ArticleSelector workplace={workplace} />
           ) : (
             <>
-              {!isPending && !isFullPallet && !isFullBox && (
+              {!isFullPallet && !isFullBox && (
                 <ScanDmc
                   workplace={workplace}
                   article={articleContext.article.number}
