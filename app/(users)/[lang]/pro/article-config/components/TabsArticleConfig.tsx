@@ -6,7 +6,7 @@ import AddArticleConfig from './AddArticleConfig';
 
 export default function TabsArticleConfig({ dict }: any) {
   return (
-    <Tabs defaultValue='edit' className='w-[450px]'>
+    <Tabs defaultValue='add' className='w-[450px]'>
       <TabsList className='grid w-full grid-cols-2'>
         <TabsTrigger value='edit'>
           {dict?.articleConfig?.tabs?.edit}

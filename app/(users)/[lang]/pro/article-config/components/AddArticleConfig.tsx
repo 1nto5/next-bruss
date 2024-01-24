@@ -1,6 +1,10 @@
+// TODO: adding additional FormField -> no zod validation
+
 'use client';
 
 import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,16 +34,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 import {} from '../actions';
 
 const formSchema = z.object({
   articleNumber: z
     .string()
-    .length(5, { message: 'Article number must be exactly 5 digits!' })
-    .regex(/^[0-9]{5}$/, {
-      message: 'Article number must be numeric!',
+    .min(23, { message: 'Email jest za krótki!' })
+    .regex(/@bruss-group\.com$/, {
+      message: 'Podany email nie należy do domeny bruss-group.com!',
     }),
+  workplace: z.string().min(1, { message: 'Password cannot be empty' }),
 });
 
 export default function AddArticleConfig({ dict }: any) {
@@ -48,6 +62,31 @@ export default function AddArticleConfig({ dict }: any) {
   const [isPendingSetting, setIsPendingSetting] = useState(false);
   const [updated, setUpdated] = useState(0);
   const [openArticle, setOpenArticle] = useState(false);
+
+  // it should be under function declaration -> no recreate on every render but how to add translations?
+  // const formSchema = z.object({
+  //   articleNumber: z
+  //     .string()
+  //     .length(5, { message: dict?.articleConfig?.add.z.articleNumber })
+  //     .regex(/^[0-9]{5}$/, {
+  //       message: dict?.articleConfig?.add.z.articleNumber,
+  //     }),
+  //   workplace: z.string().regex(/^[a-zA-Z]{3}\d{2}$/, {
+  //     message: dict?.articleConfig?.add.z.workplace,
+  //   }),
+  // });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      articleNumber: '',
+      workplace: '',
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log('co się dzieje?');
+  };
 
   return (
     <Card className='w-[450px]'>
@@ -61,78 +100,54 @@ export default function AddArticleConfig({ dict }: any) {
           <CardDescription className='text-red-700'>{error}</CardDescription>
         )}
       </CardHeader>
-      <CardContent>
-        {/* <form onSubmit={positions.length > 0 ? markAsRework : search}>
-          <div className='grid w-full items-center gap-4'>
-            {positions.length === 0 ? (
-              <>
-                <div className='flex flex-col space-y-1.5'>
-                  <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
-                  <Input
-                    type='text'
-                    placeholder='Wpisz dowolny...'
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className='flex justify-center'>
-                  {isPendingSearching ? (
-                    <Button disabled>
-                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Szukanie
-                    </Button>
-                  ) : (
-                    <Button type='submit'>Wyszukaj</Button>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <ReworkTable data={positions} />
-                <Separator />
-                <div className='grid w-full gap-1.5'>
-                  <Label htmlFor='message'>Powód</Label>
-                  <Textarea
-                    placeholder='Wprowadź krótki opis reworku.'
-                    id='reason'
-                    value={reason}
-                    className={reason.length >= 20 ? 'border-bruss' : ''}
-                    onChange={(e) => setReason(e.target.value)}
-                  />
-                </div>
-                <div className='flex justify-between'>
-                  <Button
-                    variant='destructive'
-                    type='button'
-                    onClick={() => {
-                      setPositions([]);
-                      setReason('');
-                      setSearchTerm('');
-                      setError('');
-                      setUpdated(0);
-                    }}
-                  >
-                    Wyczyść
-                  </Button>
-                  {isPendingSetting ? (
-                    <Button disabled>
-                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Zapisywanie
-                    </Button>
-                  ) : (
-                    <Button type='submit'>Oznacz jako rework</Button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </form> */}
-      </CardContent>
-      {updated > 0 && (
-        <CardFooter className='font-bold text-bruss'>
-          Zaktualizowano pozycji: {updated}!
-        </CardFooter>
-      )}
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className='mt-4 grid w-full items-center gap-4'>
+            <FormField
+              control={form.control}
+              name='articleNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {dict?.articleConfig?.add.articleFormLabel}
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                    Wprowadź służbowy adres email.
+                  </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='workplace'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {dict?.articleConfig?.add.workplaceFormLabel}
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                    Wprowadź służbowy adres email.
+                  </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </form>
+      </Form>
+      {/* {updated > 0 && (
+            <CardFooter className='font-bold text-bruss'>
+              Zaktualizowano pozycji: {updated}!
+            </CardFooter>
+          )} */}
     </Card>
   );
 }

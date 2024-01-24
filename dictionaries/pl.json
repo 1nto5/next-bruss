@@ -37,8 +37,14 @@
       "add": "Dodaj"
     },
     "add": {
+      "z": {
+        "articleNumber": "Numer artykułu to zawsze 5 cyfr!",
+        "workplace": "Numer stanowiska to zawsze 3 litery oraz 2 cyfry! (np. EOL74)"
+      },
       "cardTitle": "Dodaj artykuł",
-      "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł."
+      "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
+      "articleFormLabel": "Artykuł",
+      "workplaceFormLabel": "Stanowisko"
     }
   }
 }
