@@ -12,7 +12,7 @@ export default function Logo({ logoStyles }: LogoProps) {
       width={80}
       height={100}
       alt='BRUSS'
-      priority={false}
+      // priority={false}
     />
   );
 }
