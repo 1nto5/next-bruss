@@ -34,12 +34,12 @@ export default function ScanPalletQr(props: Props) {
         props.operator,
       );
       const status = result?.status;
+      scanContext?.setScan(() => ({
+        last: palletQr,
+      }));
 
       switch (status) {
         case 'saved':
-          scanContext?.setScan(() => ({
-            last: palletQr,
-          }));
           toast.success('Batch OK!', { id: 'success' });
           break;
         case 'exists':

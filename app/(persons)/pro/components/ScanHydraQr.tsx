@@ -42,10 +42,10 @@ export default function ScanHydraQr(props: StatusProps) {
       );
 
       const status = result?.status;
+      scanContext?.setScan({ last: hydraBatch });
       // Display toast message based on the result status
       switch (status) {
         case 'saved':
-          scanContext?.setScan({ last: hydraBatch });
           toast.success('Batch OK!', { id: 'success' });
           break;
         case 'exists':

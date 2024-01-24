@@ -46,10 +46,10 @@ export default function ScanDmc(props: Props) {
 
       const status = result?.status;
 
+      scanContext?.setScan({ last: dmc });
       // Display toast message based on the result status
       switch (status) {
         case 'saved':
-          scanContext?.setScan({ last: dmc });
           toast.success('DMC OK!', { id: 'success' });
           break;
         case 'exists':
