@@ -75,6 +75,6 @@ module.exports = {
   },
   plugins: [
     require('tailwindcss-animate'),
-    // require('prettier-plugin-tailwindcss'), old version? 
+    require('prettier-plugin-tailwindcss'),
   ],
 };
