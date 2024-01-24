@@ -37,6 +37,7 @@ export default function ScanDmc(props: Props) {
         return;
       }
 
+      scanContext?.setScan({ last: dmc });
       const result = await saveDmc(
         dmc,
         props.workplace,
@@ -46,7 +47,6 @@ export default function ScanDmc(props: Props) {
 
       const status = result?.status;
 
-      scanContext?.setScan({ last: dmc });
       // Display toast message based on the result status
       switch (status) {
         case 'saved':
