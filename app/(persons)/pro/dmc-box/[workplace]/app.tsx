@@ -78,14 +78,8 @@ export default function App() {
         // toast.dismiss('loading');
       }
     })();
-  }, [
-    workplace,
-    scanContext?.scan.last,
-    articleContext?.article?.number,
-    articleContext,
-    personContext?.person?.number,
-    articleExists,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scanContext?.scan.last, articleContext?.article?.number]);
 
   if (!workplaceExists || !workplace) {
     return (
