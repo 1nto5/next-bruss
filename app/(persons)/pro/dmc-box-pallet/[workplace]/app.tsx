@@ -113,7 +113,8 @@ export default function App() {
         inBox={inBox}
         boxSize={boxSize}
         isFullBox={isFullBox}
-        isPending={isPending}
+        // isPending={isPending}
+        isPending={false} // temp fix long
       />
       {!personContext?.person?.number ? (
         <NumLogIn />
