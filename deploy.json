@@ -5,7 +5,8 @@
       "script": "./node_modules/next/dist/bin/next",
       "args": "start",
       "env": {
-        "PORT": "80"
+        "PORT": "80",
+        "NODE_ENV": "production"
       }
     }
   ]
