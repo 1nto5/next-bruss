@@ -334,7 +334,7 @@ const articles: ArticleConfig[] = [
     name: 'M357 - Długi korek / traye 250 sztuk',
     baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
     dmcFirVal: [0, 19],
-    boxSize: 12, //250
+    boxSize: 250,
     hydraProc: '050',
     palletProc: '843',
   },
