@@ -10,7 +10,7 @@ import { resetPassword, login } from '@/app/(users)/[lang]/auth/actions';
 import {
   Form,
   FormControl,
-  // FormDescription,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -35,14 +35,19 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { Checkbox } from '@/components/ui/checkbox';
+
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import NoDict from '../../../components/NoDict';
 
 export default function AddArticleConfig({ dict }: any) {
-  const router = useRouter();
+  const cDict = dict?.articleConfig?.add;
+
+  // const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [isPendingSending, setIsPendingSending] = useState(false);
 
@@ -51,11 +56,6 @@ export default function AddArticleConfig({ dict }: any) {
     workplace: z.string().regex(/^[a-zA-Z]{3}\d{2}$/, {
       message: dict?.articleConfig?.add.z.workplace,
     }),
-    workplaceType: z
-      .string()
-      .refine((value) => value === 'dmc-box' || value === 'dmc-box-pallet', {
-        message: dict?.articleConfig?.add.z.workplaceType,
-      }),
     articleNumber: z
       .string()
       .length(5, { message: dict?.articleConfig?.add.z.articleNumber })
@@ -64,21 +64,40 @@ export default function AddArticleConfig({ dict }: any) {
       }),
     articleName: z
       .string()
-      .length(10, { message: dict?.articleConfig?.add.z.articleName }),
+      .min(10, { message: dict?.articleConfig?.add.z.articleName }),
+    pallet: z.boolean().default(false).optional(),
+    boxesPerPallet: z.string().optional(),
+    dmc: z.string().min(10, { message: dict?.articleConfig?.add.z.dmc }),
+    dmcFirstValidation: z
+      .string()
+      .min(5, { message: dict?.articleConfig?.add.z.dmcFirstValidation }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      workplace: '',
-      workplaceType: '',
+      workplace: '', // TODO: workplaces list?
       articleNumber: '',
       articleName: '',
+      pallet: false,
+      dmcFirstValidation: '',
     },
   });
+  const isPalletChecked = form.watch('pallet');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // console.log(values.email, values.password);
+    if (
+      values.pallet &&
+      (!values.boxesPerPallet ||
+        isNaN(parseInt(values.boxesPerPallet)) ||
+        parseInt(values.boxesPerPallet) <= 3)
+    ) {
+      form.setError('boxesPerPallet', {
+        type: 'manual',
+        message: cDict.z.boxesPerPallet,
+      });
+      return;
+    }
     try {
       setIsPending(true);
       await login(values.articleNumber, values.workplace);
@@ -135,63 +154,26 @@ export default function AddArticleConfig({ dict }: any) {
     }
   }
 
+  if (!cDict) return <NoDict />;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle> {dict.articleConfig?.add.workplaceFormLabel}</CardTitle>
-        <CardDescription>Wprowadź dane aby się zalogować:</CardDescription>
+        <CardTitle>{cDict.cardTitle}</CardTitle>
+        <CardDescription>{cDict.cardDescription}</CardDescription>
       </CardHeader>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className='mt-4 grid w-full items-center gap-4'>
+          <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
               name='workplace'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {dict.articleConfig?.add.workplaceFormLabel}
-                  </FormLabel>
+                  <FormLabel>{cDict.workplaceFormLabel}</FormLabel>
                   <FormControl>
-                    <Input type='password' placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                        Wprowadź służbowy adres email.
-                      </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='workplaceType'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    {' '}
-                    {dict.articleConfig?.add.workplaceTypeFormLabel}
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='dmc-box'>
-                        Skanowanie DMC oraz etykiet HYDRA
-                      </SelectItem>
-                      <SelectItem value='dmc-box-pallet'>Ge</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {/* <FormDescription>
-                    You can manage email addresses in your{' '}
-                    <Link href='/examples/forms'>email settings</Link>.
-                  </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -201,15 +183,10 @@ export default function AddArticleConfig({ dict }: any) {
               name='articleNumber'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {dict.articleConfig?.add.articleNumberFormLabel}
-                  </FormLabel>
+                  <FormLabel>{cDict.articleNumberFormLabel}</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                        Wprowadź służbowy adres email.
-                      </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -219,15 +196,72 @@ export default function AddArticleConfig({ dict }: any) {
               name='articleName'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {dict.articleConfig?.add.articleNameFormLabel}
-                  </FormLabel>
+                  <FormLabel>{cDict.articleNameFormLabel}</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                        Wprowadź służbowy adres email.
-                      </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='pallet'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>{cDict.palletFormLabel}</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+            {isPalletChecked && (
+              <FormField
+                control={form.control}
+                name='boxesPerPallet'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{cDict.boxesPerPalletFormLabel}</FormLabel>
+                    <FormControl>
+                      <Input placeholder='' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            <FormField
+              control={form.control}
+              name='dmc'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{cDict.dmcFormLabel}</FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  <FormDescription>{cDict.dmcFormDescription}</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='dmcFirstValidation'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{cDict.dmcFirstValidationFormLabel}</FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {cDict.dmcFirstValidationFormDescription}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

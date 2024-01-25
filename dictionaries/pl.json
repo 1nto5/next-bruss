@@ -38,17 +38,24 @@
     },
     "add": {
       "z": {
-        "workplace": "Numer stanowiska to zawsze 3 litery oraz 2 cyfry! (np. EOL74)",
-        "workplaceType": "Wybierz typ stanowiska!",
-        "articleNumber": "Numer artykułu to zawsze 5 cyfr!",
-        "articleName": "Nazwa artykułu to minimum 10 znaków!"
+        "workplace": "Podaj 3 litery oraz 2 cyfry! (np. EOL74)",
+        "articleNumber": "Podaj 5 cyfr!",
+        "articleName": "Minimum 10 znaków!",
+        "boxesPerPallet": "Wartość musi być większa niż 3!",
+        "dmc": "Minimum 10 znaków!",
+        "dmcFirstValidation": "Minimum 4 znaki!"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
       "workplaceFormLabel": "Stanowisko",
-      "workplaceTypeFormLabel": "Typ stanowiska",
       "articleNumberFormLabel": "Numer artykułu",
-      "articleNameFormLabel": "Nazwa artykułu"
+      "articleNameFormLabel": "Nazwa artykułu",
+      "palletFormLabel": "Etykiety zbiorcze na paletę",
+      "boxesPerPalletFormLabel": "Ilość boxów na palecie",
+      "dmcFormLabel": "DMC",
+      "dmcFormDescription": "Pełna zawartość skanowanego kodu DMC",
+      "dmcFirstValidationFormLabel": "Walidowana wartość DMC",
+      "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC"
     }
   }
 }
