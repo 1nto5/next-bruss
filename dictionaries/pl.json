@@ -38,12 +38,15 @@
     },
     "add": {
       "z": {
+        "workplace": "Numer stanowiska to zawsze 3 litery oraz 2 cyfry! (np. EOL74)",
+        "workplaceType": "Wybierz typ stanowiska!",
         "articleNumber": "Numer artykułu to zawsze 5 cyfr!",
-        "workplace": "Numer stanowiska to zawsze 3 litery oraz 2 cyfry! (np. EOL74)"
+        "articleName": "Nazwa artykułu to minimum 10 znaków!"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
-      "articleFormLabel": "Artykuł",
+      "articleNumberFormLabel": "Numer artykułu",
+      "articleNameFormLabel": "Nazwa artykułu",
       "workplaceFormLabel": "Stanowisko"
     }
   }

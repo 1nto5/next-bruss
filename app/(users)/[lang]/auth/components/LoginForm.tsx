@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { resetPassword, login } from '../actions';
-import { AuthError } from 'next-auth';
+// import { AuthError } from 'next-auth';
 
 import {
   Form,
