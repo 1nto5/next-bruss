@@ -63,6 +63,7 @@ export const {
       }
       return token;
     },
+    // @ts-ignore
     session: async ({ session, token }) => {
       if (session?.user) {
         session.user.roles = token.roles as string[];

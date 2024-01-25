@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import EditArticleConfig from './EditArticleConfig';
+// import EditArticleConfig from './EditArticleConfig';
 import AddArticleConfig from './AddArticleConfig';
 // import LoginForm from './LoginForm';
 // import RegisterForm from './RegisterForm';
