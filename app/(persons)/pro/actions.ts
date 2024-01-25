@@ -182,40 +182,39 @@ export async function saveDmc(
       return { status: 'exists' };
     }
 
-    // temp turn off for performance test
-    // if (articleConfig.palletSize) {
-    //   const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
-    //     countBoxesOnPallet(workplace, article),
-    //     getPalletSize(workplace, article),
-    //     countInBox(workplace, article),
-    //     getBoxSize(workplace, article),
-    //   ]);
+    if (articleConfig.palletSize) {
+      const [boxesOnPallet, palletSize, inBox, boxSize] = await Promise.all([
+        countBoxesOnPallet(workplace, article),
+        getPalletSize(workplace, article),
+        countInBox(workplace, article),
+        getBoxSize(workplace, article),
+      ]);
 
-    //   if (!palletSize) {
-    //     throw new Error('Pallet size not found.');
-    //   }
-    //   if (boxesOnPallet >= palletSize) {
-    //     return { status: 'full pallet' };
-    //   }
-    //   if (!boxSize) {
-    //     throw new Error('Box size not found.');
-    //   }
-    //   if (inBox >= boxSize) {
-    //     return { status: 'full box' };
-    //   }
-    // } else {
-    //   const [inBox, boxSize] = await Promise.all([
-    //     countInBox(workplace, article),
-    //     getBoxSize(workplace, article),
-    //   ]);
+      if (!palletSize) {
+        throw new Error('Pallet size not found.');
+      }
+      if (boxesOnPallet >= palletSize) {
+        return { status: 'full pallet' };
+      }
+      if (!boxSize) {
+        throw new Error('Box size not found.');
+      }
+      if (inBox >= boxSize) {
+        return { status: 'full box' };
+      }
+    } else {
+      const [inBox, boxSize] = await Promise.all([
+        countInBox(workplace, article),
+        getBoxSize(workplace, article),
+      ]);
 
-    //   if (!boxSize) {
-    //     throw new Error('Box size not found.');
-    //   }
-    //   if (inBox >= boxSize) {
-    //     return { status: 'full box' };
-    //   }
-    // }
+      if (!boxSize) {
+        throw new Error('Box size not found.');
+      }
+      if (inBox >= boxSize) {
+        return { status: 'full box' };
+      }
+    }
     const insertResult = await collection.insertOne({
       status: 'box',
       dmc: dmc,
