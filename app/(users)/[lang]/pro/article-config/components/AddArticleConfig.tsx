@@ -20,9 +20,9 @@ import {
   Card,
   CardContent,
   CardFooter,
-  // CardHeader,
-  // CardTitle,
-  // CardDescription,
+  CardHeader,
+  CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 
 import {
@@ -137,10 +137,10 @@ export default function AddArticleConfig({ dict }: any) {
 
   return (
     <Card>
-      {/* <CardHeader>
-        <CardTitle>Wprowadź dane logowania</CardTitle>
+      <CardHeader>
+        <CardTitle> {dict.articleConfig?.add.workplaceFormLabel}</CardTitle>
         <CardDescription>Wprowadź dane aby się zalogować:</CardDescription>
-      </CardHeader> */}
+      </CardHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -168,7 +168,10 @@ export default function AddArticleConfig({ dict }: any) {
               name='workplaceType'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Typ stanowiska</FormLabel>
+                  <FormLabel>
+                    {' '}
+                    {dict.articleConfig?.add.workplaceTypeFormLabel}
+                  </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

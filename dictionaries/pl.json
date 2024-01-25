@@ -45,9 +45,10 @@
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
+      "workplaceFormLabel": "Stanowisko",
+      "workplaceTypeFormLabel": "Typ stanowiska",
       "articleNumberFormLabel": "Numer artykułu",
-      "articleNameFormLabel": "Nazwa artykułu",
-      "workplaceFormLabel": "Stanowisko"
+      "articleNameFormLabel": "Nazwa artykułu"
     }
   }
 }
