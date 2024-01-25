@@ -335,7 +335,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
     dmcFirVal: [0, 19],
     boxSize: 12, //250
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
 
@@ -347,7 +347,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
     dmcFirVal: [0, 19],
     boxSize: 168,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
   {
@@ -358,7 +358,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'G4D3-6L073-EA C9E0C 26082019A 08261',
     dmcFirVal: [0, 19],
     boxSize: 250,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
   {
@@ -369,7 +369,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'G4D3-6L073-EA C9E0C 26082019A 08261',
     dmcFirVal: [0, 19],
     boxSize: 168,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
 
@@ -381,7 +381,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'J3P3-6L073-AC C9E0C 25042018A 12272',
     dmcFirVal: [0, 19],
     boxSize: 168,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
   {
@@ -392,7 +392,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'M4D3-6L073-AB C9E0C 30072020A 13380',
     dmcFirVal: [0, 19],
     boxSize: 250,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
   {
@@ -403,7 +403,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'M4D3-6L073-AB C9E0C 30072020A 13380',
     dmcFirVal: [0, 19],
     boxSize: 168,
-    hydraProc: '090',
+    hydraProc: '050',
     palletProc: '843',
   },
 ];
