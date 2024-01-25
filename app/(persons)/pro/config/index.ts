@@ -339,7 +339,7 @@ const articles: ArticleConfig[] = [
     palletProc: '843',
   },
   {
-    article: '30126',
+    article: '30126x12',
     workplace: 'eol43',
     type: 'dmc-box',
     name: 'M357 - Długi korek / serwis 12 sztuk',
