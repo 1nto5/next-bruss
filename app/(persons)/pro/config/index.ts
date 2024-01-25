@@ -334,21 +334,11 @@ const articles: ArticleConfig[] = [
     name: 'M357 - Długi korek / traye 250 sztuk',
     baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
     dmcFirVal: [0, 19],
-    boxSize: 250,
+    boxSize: 12, //250
     hydraProc: '090',
     palletProc: '843',
   },
-  {
-    article: '30126x12',
-    workplace: 'eol43',
-    type: 'dmc-box',
-    name: 'M357 - Długi korek / serwis 12 sztuk',
-    baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
-    dmcFirVal: [0, 19],
-    boxSize: 12,
-    hydraProc: '090',
-    palletProc: '843',
-  },
+
   {
     article: '30140',
     workplace: 'eol43',
