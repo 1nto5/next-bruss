@@ -41,21 +41,27 @@
         "workplace": "Podaj 3 litery oraz 2 cyfry! (np. EOL74)",
         "articleNumber": "Podaj 5 cyfr!",
         "articleName": "Minimum 10 znaków!",
-        "boxesPerPallet": "Wartość musi być większa niż 3!",
+        "boxesPerPallet": "Wprowadź liczbę całkowitą!",
         "dmc": "Minimum 10 znaków!",
-        "dmcFirstValidation": "Minimum 4 znaki!"
+        "dmcFirstValidation": "Minimum 4 znaki!",
+        "piecesPerBox": "Wprowadź liczbę całkowitą!",
+        "dmcSecondValidation": "Minimum 4 znaki!"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
       "workplaceFormLabel": "Stanowisko",
       "articleNumberFormLabel": "Numer artykułu",
       "articleNameFormLabel": "Nazwa artykułu",
+      "piecesPerBoxFormLabel": "Ilość sztuk w boxie",
       "palletFormLabel": "Etykiety zbiorcze na paletę",
       "boxesPerPalletFormLabel": "Ilość boxów na palecie",
       "dmcFormLabel": "DMC",
       "dmcFormDescription": "Pełna zawartość skanowanego kodu DMC",
       "dmcFirstValidationFormLabel": "Walidowana wartość DMC",
-      "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC"
+      "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC",
+      "secondValidationCheckboxFormLabel": "Walidacja dwóch ciągów znaków",
+      "dmcSecondValidationFormLabel": "Druga walidowana wartość DMC",
+      "dmcSecondValidationFormDescription": "Używaj tylko w przyadku gdy DMC zawiera dwa stałe ciągi znaków (początek i koniec)!"
     }
   }
 }

@@ -52,26 +52,56 @@ export default function AddArticleConfig({ dict }: any) {
   const [isPendingSending, setIsPendingSending] = useState(false);
 
   // it should be under function declaration -> no recreate on every render but how to add translations?
-  const formSchema = z.object({
-    workplace: z.string().regex(/^[a-zA-Z]{3}\d{2}$/, {
-      message: dict?.articleConfig?.add.z.workplace,
-    }),
-    articleNumber: z
-      .string()
-      .length(5, { message: dict?.articleConfig?.add.z.articleNumber })
-      .regex(/^[0-9]{5}$/, {
-        message: dict?.articleConfig?.add.z.articleNumber,
+  const formSchema = z
+    .object({
+      workplace: z.string().regex(/^[a-zA-Z]{3}\d{2}$/, {
+        message: cDict.z.workplace,
       }),
-    articleName: z
-      .string()
-      .min(10, { message: dict?.articleConfig?.add.z.articleName }),
-    pallet: z.boolean().default(false).optional(),
-    boxesPerPallet: z.string().optional(),
-    dmc: z.string().min(10, { message: dict?.articleConfig?.add.z.dmc }),
-    dmcFirstValidation: z
-      .string()
-      .min(5, { message: dict?.articleConfig?.add.z.dmcFirstValidation }),
-  });
+      articleNumber: z
+        .string()
+        .length(5, { message: cDict.z.articleNumber })
+        .regex(/^[0-9]{5}$/, {
+          message: cDict.z.articleNumber,
+        }),
+      articleName: z.string().min(10, { message: cDict.z.articleName }),
+      piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
+        message: cDict.z.piecesPerBox,
+      }),
+      pallet: z.boolean().default(false).optional(),
+      boxesPerPallet: z.string().optional(),
+      dmc: z
+        .string({ required_error: cDict.z.dmc })
+        .min(10, { message: cDict.z.dmc }),
+      dmcFirstValidation: z
+        .string()
+        .min(4, { message: cDict.z.dmcFirstValidation }),
+      secondValidation: z.boolean().default(false).optional(),
+      dmcSecondValidation: z.string().optional(),
+    })
+    .refine(
+      (data) =>
+        data.pallet && data.boxesPerPallet && /^\d+$/.test(data.boxesPerPallet),
+      {
+        message: cDict.z.boxesPerPallet,
+        path: ['boxesPerPallet'],
+      },
+    )
+    .refine((data) => !(data.secondValidation && !data.dmcSecondValidation), {
+      message: cDict.z.dmcSecondValidation,
+      path: ['dmcSecondValidation'],
+    })
+    .refine(
+      (data) =>
+        !(
+          data.secondValidation &&
+          data.dmcSecondValidation &&
+          data.dmcSecondValidation.length < 4
+        ),
+      {
+        message: cDict.z.dmcSecondValidation,
+        path: ['dmcSecondValidation'],
+      },
+    );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,25 +109,30 @@ export default function AddArticleConfig({ dict }: any) {
       workplace: '', // TODO: workplaces list?
       articleNumber: '',
       articleName: '',
+      piecesPerBox: '',
       pallet: false,
+      boxesPerPallet: '',
       dmcFirstValidation: '',
+      secondValidation: false,
     },
   });
   const isPalletChecked = form.watch('pallet');
+  const isSecondValidationChecked = form.watch('secondValidation');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (
-      values.pallet &&
-      (!values.boxesPerPallet ||
-        isNaN(parseInt(values.boxesPerPallet)) ||
-        parseInt(values.boxesPerPallet) <= 3)
-    ) {
-      form.setError('boxesPerPallet', {
-        type: 'manual',
-        message: cDict.z.boxesPerPallet,
-      });
-      return;
-    }
+    // if (
+    //   values.pallet &&
+    //   (!values.boxesPerPallet ||
+    //     isNaN(parseInt(values.boxesPerPallet)) ||
+    //     parseInt(values.boxesPerPallet) <= 3)
+    // ) {
+    //   form.setError('boxesPerPallet', {
+    //     type: 'manual',
+    //     message: cDict.z.boxesPerPallet,
+    //   });
+    //   return;
+    // }
+
     try {
       setIsPending(true);
       await login(values.articleNumber, values.workplace);
@@ -206,6 +241,19 @@ export default function AddArticleConfig({ dict }: any) {
             />
             <FormField
               control={form.control}
+              name='piecesPerBox'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{cDict.piecesPerBoxFormLabel}</FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name='pallet'
               render={({ field }) => (
                 <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
@@ -266,6 +314,43 @@ export default function AddArticleConfig({ dict }: any) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name='secondValidation'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>
+                      {cDict.secondValidationCheckboxFormLabel}
+                    </FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+            {isSecondValidationChecked && (
+              <FormField
+                control={form.control}
+                name='dmcSecondValidation'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{cDict.dmcSecondValidationFormLabel}</FormLabel>
+                    <FormControl>
+                      <Input placeholder='' {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      {cDict.dmcSecondValidationFormDescription}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
           <CardFooter className='flex justify-between'>
             {isPendingSending ? (
