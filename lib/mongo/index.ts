@@ -1,28 +1,3 @@
-// import { MongoClient, Collection } from 'mongodb'
-
-// let client: MongoClient | null = null
-
-// export async function connectToMongo(
-//   collectionName: string
-// ): Promise<Collection> {
-//   if (!client) {
-//     client = new MongoClient(process.env.MONGO_URI as string)
-//     const dbName = process.env.DB_NAME
-
-//     try {
-//       await client.connect()
-//       // console.log('Connected successfully to MongoDB server')
-//     } catch (e) {
-//       console.error('Failed to connect to MongoDB', e)
-//       throw e
-//     }
-//   }
-
-//   const db = client.db(process.env.DB_NAME as string)
-//   const collection = db.collection(collectionName)
-//   return collection
-// }
-
 import { MongoClient } from 'mongodb';
 
 const URI = process.env.MONGO_URI;
@@ -49,3 +24,11 @@ if (!globalWithMongo._mongoClientPromise) {
 clientPromise = globalWithMongo._mongoClientPromise;
 
 export default clientPromise;
+
+// slow migration to:
+
+export async function dbc(collectionName: string) {
+  const client = await clientPromise;
+  const db = client.db();
+  return db.collection(collectionName);
+}

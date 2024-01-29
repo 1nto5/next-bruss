@@ -1,124 +1,33 @@
 'use server';
 
-import clientPromise from '@/lib/mongo';
+import { dbc } from '@/lib/mongo';
 
-type Position = {
-  article: string;
-  status: string;
-  workplace: string;
-  type: string;
-  count: string;
+type ArticleConfig = {
+  workplace: string; // Matches z.string().regex()
+  articleNumber: string; // Matches z.string().length().regex()
+  articleName: string; // Matches z.string().min()
+  articleNote?: string; // Matches z.string().optional()
+  piecesPerBox: string; // Matches z.string().refine()
+  pallet?: boolean; // Matches z.boolean().default().optional()
+  boxesPerPallet?: string; // Matches z.string().optional()
+  dmc: string; // Matches z.string().min()
+  dmcFirstValidation: string; // Matches z.string().min()
+  secondValidation?: boolean; // Matches z.boolean().default().optional()
+  dmcSecondValidation?: string; // Matches z.string().optional()
+  hydraProcess: string; // Matches z.string().refine()
+  ford?: boolean; // Matches z.boolean().default().optional()
+  bmw?: boolean; // Matches z.boolean().default().optional()
 };
 
-const collectionName = 'scans';
-
-export async function searchPositions(
-  searchTerm: string,
-): Promise<(Position & { type: string })[]> {
+export async function saveArticleConfig(
+  config: ArticleConfig,
+): Promise<boolean> {
   try {
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-
-    const aggregation = [
-      {
-        $match: {
-          $or: [
-            { dmc: searchTerm },
-            { hydra_batch: searchTerm },
-            { pallet_batch: searchTerm },
-          ],
-        },
-      },
-      {
-        $addFields: {
-          type: {
-            $cond: [
-              { $eq: ['$dmc', searchTerm] },
-              'dmc',
-              {
-                $cond: [
-                  { $eq: ['$hydra_batch', searchTerm] },
-                  'hydra',
-                  'pallet',
-                ],
-              },
-            ],
-          },
-        },
-      },
-
-      {
-        $group: {
-          _id: {
-            article: '$article',
-            status: '$status',
-            workplace: '$workplace',
-            type: '$type',
-          },
-          dmc: { $addToSet: '$dmc' },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          article: '$_id.article',
-          status: '$_id.status',
-          workplace: '$_id.workplace',
-          type: '$_id.type',
-          count: { $size: '$dmc' },
-        },
-      },
-    ];
-
-    const result = await collection.aggregate(aggregation).toArray();
-    if (result.length === 0) return [];
-    return result.map((item) => ({
-      article: item.article,
-      status: item.status,
-      workplace: item.workplace,
-      type: item.type,
-      count: item.count,
-    }));
+    const collection = await dbc('articles_config');
+    const result = await collection.insertOne(config);
+    return result;
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while searching for positions.');
-  }
-}
-
-export async function setReworkStatus(
-  condition: string,
-  reason: string,
-): Promise<number> {
-  try {
-    const client = await clientPromise;
-    const db = client.db();
-    const collection = db.collection(collectionName);
-
-    const filter = {
-      $and: [
-        {
-          $or: [
-            { dmc: condition },
-            { hydra_batch: condition },
-            { pallet_batch: condition },
-          ],
-        },
-        { status: { $ne: 'rework' } },
-      ],
-    };
-
-    const update = {
-      $set: {
-        status: 'rework',
-        rework_reason: reason,
-      },
-    };
-
-    const result = await collection.updateMany(filter, update);
-    return result.modifiedCount;
-  } catch (error) {
-    console.error(error);
-    return 0;
+    throw new Error('An error occurred while saving article config.');
   }
 }

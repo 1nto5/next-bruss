@@ -45,7 +45,8 @@
         "dmc": "Minimum 10 znaków!",
         "dmcFirstValidation": "Minimum 4 znaki!",
         "piecesPerBox": "Wprowadź liczbę całkowitą!",
-        "dmcSecondValidation": "Minimum 4 znaki!"
+        "dmcSecondValidation": "Minimum 4 znaki!",
+        "hydraProcess": "Wybierz proces!"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
@@ -61,7 +62,16 @@
       "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC",
       "secondValidationCheckboxFormLabel": "Walidacja dwóch ciągów znaków",
       "dmcSecondValidationFormLabel": "Druga walidowana wartość DMC",
-      "dmcSecondValidationFormDescription": "Używaj tylko w przyadku gdy DMC zawiera dwa stałe ciągi znaków (początek i koniec)!"
+      "dmcSecondValidationFormDescription": "Używaj tylko w przyadku gdy DMC zawiera dwa stałe ciągi znaków (początek i koniec)!",
+      "fordCheckboxFormLabel": "Walidacja daty FORD",
+      "bmwCheckboxFormLabel": "Walidacja daty BMW",
+      "hydraProcessFormLabel": "Proces Hydra",
+      "hydraProcessFormDescription": "Proeces HYDRA z którego pochodzi artykuł.",
+      "hydraProcessSelectOption050": "050 - po kontroli ciśnieniowej EOL",
+      "hydraProcessSelectOption090": "090 - Q3",
+      "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",
+      "articleNoteFormLabel": "Notatka do artykułu",
+      "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)"
     }
   }
 }

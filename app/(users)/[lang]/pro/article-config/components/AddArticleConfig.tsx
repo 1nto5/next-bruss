@@ -43,6 +43,7 @@ import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import NoDict from '../../../components/NoDict';
+import { saveArticleConfig } from '../actions';
 
 export default function AddArticleConfig({ dict }: any) {
   const cDict = dict?.articleConfig?.add;
@@ -64,6 +65,7 @@ export default function AddArticleConfig({ dict }: any) {
           message: cDict.z.articleNumber,
         }),
       articleName: z.string().min(10, { message: cDict.z.articleName }),
+      articleNote: z.string().optional(),
       piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
         message: cDict.z.piecesPerBox,
       }),
@@ -77,6 +79,13 @@ export default function AddArticleConfig({ dict }: any) {
         .min(4, { message: cDict.z.dmcFirstValidation }),
       secondValidation: z.boolean().default(false).optional(),
       dmcSecondValidation: z.string().optional(),
+      hydraProcess: z
+        .string({ required_error: cDict.z.hydraProcess })
+        .refine((value) => (value.match(/\d/g) || []).length >= 3, {
+          message: cDict.z.hydraProcess,
+        }),
+      ford: z.boolean().default(false).optional(),
+      bmw: z.boolean().default(false).optional(),
     })
     .refine(
       (data) =>
@@ -106,41 +115,28 @@ export default function AddArticleConfig({ dict }: any) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      workplace: '', // TODO: workplaces list?
+      workplace: '', // TODO: workplaces list with possiblity to add new workplace
       articleNumber: '',
       articleName: '',
+      articleNote: '',
       piecesPerBox: '',
       pallet: false,
       boxesPerPallet: '',
       dmcFirstValidation: '',
       secondValidation: false,
+      dmcSecondValidation: '',
+      hydraProcess: '',
+      ford: false,
+      bmw: false,
     },
   });
   const isPalletChecked = form.watch('pallet');
   const isSecondValidationChecked = form.watch('secondValidation');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // if (
-    //   values.pallet &&
-    //   (!values.boxesPerPallet ||
-    //     isNaN(parseInt(values.boxesPerPallet)) ||
-    //     parseInt(values.boxesPerPallet) <= 3)
-    // ) {
-    //   form.setError('boxesPerPallet', {
-    //     type: 'manual',
-    //     message: cDict.z.boxesPerPallet,
-    //   });
-    //   return;
-    // }
-
     try {
       setIsPending(true);
-      await login(values.articleNumber, values.workplace);
-      // if (!res) {
-      //   toast.error('Nieprawidłowe dane logowania!');
-      //   return;
-      // }
-      // console.log('res: ', res);
+      await saveArticleConfig(values);
     } catch (error) {
       // console.error(error);
       // toast.error('Skontaktuj się z IT!');
@@ -148,44 +144,6 @@ export default function AddArticleConfig({ dict }: any) {
       return;
     } finally {
       setIsPending(false);
-    }
-  }
-
-  async function onResetPassword() {
-    const email = form.getValues('articleNumber');
-    // console.log('email: ', email);
-    if (!email) {
-      toast.error('Wprowadź email by zresetować hasło!');
-      return;
-    }
-    try {
-      setIsPendingSending(true);
-      const result = await resetPassword(email);
-      if (!result) {
-        toast.error('Skontaktuj się z IT!');
-        return;
-      }
-
-      if (result.status === 'sent') {
-        toast.success('Wysłano link do resetowania hasła!');
-        return;
-      }
-
-      if (result?.error) {
-        toast.error('Skontaktuj się z IT!');
-        console.error('User password reset was unsuccessful.:', result?.error);
-      }
-
-      if (result.status === 'not exists') {
-        toast.error('Brak użytkownika o podanym adresie email!');
-        return;
-      }
-    } catch (error) {
-      console.error('User password reset was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
-      return;
-    } finally {
-      setIsPendingSending(false);
     }
   }
 
@@ -235,6 +193,22 @@ export default function AddArticleConfig({ dict }: any) {
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='articleNote'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{cDict.articleNoteFormLabel}</FormLabel>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {cDict.articleNoteFormDescription}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -351,29 +325,87 @@ export default function AddArticleConfig({ dict }: any) {
                 )}
               />
             )}
+
+            <FormField
+              control={form.control}
+              name='hydraProcess'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>HYDRA proces</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={cDict.hydraProcessSelectPlaceholder}
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+
+                    <SelectContent>
+                      <SelectItem value='050'>
+                        {cDict.hydraProcessSelectOption050}
+                      </SelectItem>
+                      <SelectItem value='090'>
+                        {' '}
+                        {cDict.hydraProcessSelectOption090}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {/* <FormDescription>
+                    You can manage email addresses in your{' '}
+                  </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='ford'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>{cDict.fordCheckboxFormLabel}</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='bmw'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className='space-y-1 leading-none'>
+                    <FormLabel>{cDict.bmwCheckboxFormLabel}</FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
           </CardContent>
-          <CardFooter className='flex justify-between'>
-            {isPendingSending ? (
-              <Button type='button' variant='destructive' disabled>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Wysyłanie email
-              </Button>
-            ) : (
-              <Button
-                onClick={onResetPassword}
-                type='button'
-                variant='destructive'
-              >
-                Reset hasła
-              </Button>
-            )}
+          <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Logowanie
+                Dodawanie
               </Button>
             ) : (
-              <Button type='submit'>Zaloguj</Button>
+              <Button type='submit'>Dodaj</Button>
             )}
           </CardFooter>
         </form>
