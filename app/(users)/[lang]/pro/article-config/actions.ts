@@ -19,13 +19,32 @@ type ArticleConfig = {
   bmw?: boolean; // Matches z.boolean().default().optional()
 };
 
-export async function saveArticleConfig(
-  config: ArticleConfig,
-): Promise<boolean> {
+export async function saveArticleConfig(config: ArticleConfig) {
   try {
     const collection = await dbc('articles_config');
-    const result = await collection.insertOne(config);
-    return result;
+
+    let exists;
+
+    exists = await collection.findOne({
+      articleNumber: config.articleNumber,
+      workplace: config.workplace,
+      piecesPerBox: config.piecesPerBox,
+    });
+
+    if (exists && config.pallet) {
+      exists = await collection.findOne({
+        articleNumber: config.articleNumber,
+        workplace: config.workplace,
+        boxesPerPallet: config.boxesPerPallet,
+      });
+    }
+
+    if (exists) {
+      return { error: 'exists' };
+    }
+
+    const res = await collection.insertOne(config);
+    if (res) return { success: 'inserted' };
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving article config.');

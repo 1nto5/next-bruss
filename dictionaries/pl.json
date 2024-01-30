@@ -38,14 +38,14 @@
     },
     "add": {
       "z": {
-        "workplace": "Podaj 3 litery oraz 2 cyfry! (np. EOL74)",
+        "workplace": "Podaj 3 małe litery oraz 2 cyfry! (np. eol74)",
         "articleNumber": "Podaj 5 cyfr!",
         "articleName": "Minimum 10 znaków!",
         "boxesPerPallet": "Wprowadź liczbę całkowitą!",
         "dmc": "Minimum 10 znaków!",
-        "dmcFirstValidation": "Minimum 4 znaki!",
+        "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC!",
+        "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"!",
         "piecesPerBox": "Wprowadź liczbę całkowitą!",
-        "dmcSecondValidation": "Minimum 4 znaki!",
         "hydraProcess": "Wybierz proces!"
       },
       "cardTitle": "Dodaj artykuł",

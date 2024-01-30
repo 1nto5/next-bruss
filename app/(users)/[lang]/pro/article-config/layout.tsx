@@ -24,7 +24,7 @@ export default async function Layout({
     </>
   );
   const session = await auth();
-  if (!session?.user.roles?.includes('rework')) {
+  if (!session?.user.roles?.includes('article-config')) {
     return (
       <main className='m-2 flex justify-center'>
         <Info title='Brak uprawnień!' description={infoDescription} />

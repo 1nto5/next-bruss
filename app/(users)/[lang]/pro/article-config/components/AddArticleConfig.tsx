@@ -41,9 +41,9 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import NoDict from '../../../components/NoDict';
+import NoAvailable from '../../../components/NoAvailable';
 import { saveArticleConfig } from '../actions';
-import { useQuery } from '@tanstack/react-query';
+// import { useQuery } from '@tanstack/react-query';
 
 export default function AddArticleConfig({ dict }: any) {
   const cDict = dict?.articleConfig?.add;
@@ -112,39 +112,39 @@ export default function AddArticleConfig({ dict }: any) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    // defaultValues: {
-    //   workplace: '', // TODO: workplaces list with possiblity to add new workplace
-    //   articleNumber: '',
-    //   articleName: '',
-    //   articleNote: '',
-    //   piecesPerBox: '',
-    //   pallet: false,
-    //   boxesPerPallet: '',
-    //   dmc: '',
-    //   dmcFirstValidation: '',
-    //   secondValidation: false,
-    //   dmcSecondValidation: '',
-    //   hydraProcess: '',
-    //   ford: false,
-    //   bmw: false,
-    // },
-
     defaultValues: {
-      workplace: 'eol34', // TODO: workplaces list with possiblity to add new workplace
-      articleNumber: '12345',
-      articleName: 'Test Article',
-      articleNote: 'This is a test note',
-      piecesPerBox: '10',
-      pallet: true,
-      boxesPerPallet: '20',
-      dmc: 'Test DM 123455',
-      dmcFirstValidation: 'Test DMC First Validation',
-      secondValidation: true,
-      dmcSecondValidation: 'Test DMC Second Validation',
-      hydraProcess: '050',
+      workplace: '', // TODO: workplaces list with possiblity to add new workplace
+      articleNumber: '',
+      articleName: '',
+      articleNote: '',
+      piecesPerBox: '',
+      pallet: false,
+      boxesPerPallet: '',
+      dmc: '',
+      dmcFirstValidation: '',
+      secondValidation: false,
+      dmcSecondValidation: '',
+      hydraProcess: '',
       ford: false,
       bmw: false,
     },
+
+    // defaultValues: {
+    //   workplace: 'eol34', // TODO: workplaces list with possiblity to add new workplace
+    //   articleNumber: '12345',
+    //   articleName: 'Test Article',
+    //   articleNote: 'This is a test note',
+    //   piecesPerBox: '10',
+    //   pallet: true,
+    //   boxesPerPallet: '20',
+    //   dmc: 'Test DM 123455',
+    //   dmcFirstValidation: 'Test DMC First Validation',
+    //   secondValidation: true,
+    //   dmcSecondValidation: 'Test DMC Second Validation',
+    //   hydraProcess: '050',
+    //   ford: false,
+    //   bmw: false,
+    // },
   });
 
   const isPalletChecked = form.watch('pallet');
@@ -164,7 +164,7 @@ export default function AddArticleConfig({ dict }: any) {
     }
   };
 
-  if (!cDict) return <NoDict />;
+  if (!cDict) return <NoAvailable />;
 
   return (
     <Card>
