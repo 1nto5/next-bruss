@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { resetPassword, login } from '@/app/(users)/[lang]/auth/actions';
 // import { AuthError } from 'next-auth';
 
 import {
@@ -44,18 +43,15 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import NoDict from '../../../components/NoDict';
 import { saveArticleConfig } from '../actions';
+import { useQuery } from '@tanstack/react-query';
 
 export default function AddArticleConfig({ dict }: any) {
   const cDict = dict?.articleConfig?.add;
 
-  // const router = useRouter();
-  const [isPending, setIsPending] = useState(false);
-  const [isPendingSending, setIsPendingSending] = useState(false);
-
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z
     .object({
-      workplace: z.string().regex(/^[a-zA-Z]{3}\d{2}$/, {
+      workplace: z.string().regex(/^[a-z]{3}\d{2}$/, {
         message: cDict.z.workplace,
       }),
       articleNumber: z
@@ -74,9 +70,7 @@ export default function AddArticleConfig({ dict }: any) {
       dmc: z
         .string({ required_error: cDict.z.dmc })
         .min(10, { message: cDict.z.dmc }),
-      dmcFirstValidation: z
-        .string()
-        .min(4, { message: cDict.z.dmcFirstValidation }),
+      dmcFirstValidation: z.string().min(4, { message: cDict.z.dmcValidation }),
       secondValidation: z.boolean().default(false).optional(),
       dmcSecondValidation: z.string().optional(),
       hydraProcess: z
@@ -95,17 +89,21 @@ export default function AddArticleConfig({ dict }: any) {
         path: ['boxesPerPallet'],
       },
     )
+    .refine((data) => data.dmc.includes(data.dmcFirstValidation), {
+      message: cDict.z.dmcValidation,
+      path: ['dmcFirstValidation'],
+    })
     .refine((data) => !(data.secondValidation && !data.dmcSecondValidation), {
       message: cDict.z.dmcSecondValidation,
       path: ['dmcSecondValidation'],
     })
     .refine(
       (data) =>
-        !(
-          data.secondValidation &&
-          data.dmcSecondValidation &&
-          data.dmcSecondValidation.length < 4
-        ),
+        data.secondValidation &&
+        data.dmcSecondValidation &&
+        data.dmc.includes(data.dmcSecondValidation) &&
+        data.dmcSecondValidation.length >= 4 &&
+        data.dmcSecondValidation !== data.dmcFirstValidation,
       {
         message: cDict.z.dmcSecondValidation,
         path: ['dmcSecondValidation'],
@@ -114,38 +112,57 @@ export default function AddArticleConfig({ dict }: any) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    // defaultValues: {
+    //   workplace: '', // TODO: workplaces list with possiblity to add new workplace
+    //   articleNumber: '',
+    //   articleName: '',
+    //   articleNote: '',
+    //   piecesPerBox: '',
+    //   pallet: false,
+    //   boxesPerPallet: '',
+    //   dmc: '',
+    //   dmcFirstValidation: '',
+    //   secondValidation: false,
+    //   dmcSecondValidation: '',
+    //   hydraProcess: '',
+    //   ford: false,
+    //   bmw: false,
+    // },
+
     defaultValues: {
-      workplace: '', // TODO: workplaces list with possiblity to add new workplace
-      articleNumber: '',
-      articleName: '',
-      articleNote: '',
-      piecesPerBox: '',
-      pallet: false,
-      boxesPerPallet: '',
-      dmcFirstValidation: '',
-      secondValidation: false,
-      dmcSecondValidation: '',
-      hydraProcess: '',
+      workplace: 'eol34', // TODO: workplaces list with possiblity to add new workplace
+      articleNumber: '12345',
+      articleName: 'Test Article',
+      articleNote: 'This is a test note',
+      piecesPerBox: '10',
+      pallet: true,
+      boxesPerPallet: '20',
+      dmc: 'Test DM 123455',
+      dmcFirstValidation: 'Test DMC First Validation',
+      secondValidation: true,
+      dmcSecondValidation: 'Test DMC Second Validation',
+      hydraProcess: '050',
       ford: false,
       bmw: false,
     },
   });
+
   const isPalletChecked = form.watch('pallet');
   const isSecondValidationChecked = form.watch('secondValidation');
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setIsPending(true);
-      await saveArticleConfig(values);
-    } catch (error) {
-      // console.error(error);
-      // toast.error('Skontaktuj się z IT!');
-      toast.error('Nieprawidłowe dane logowania!');
-      return;
-    } finally {
-      setIsPending(false);
+  const [isPending, setIsPending] = useState(false);
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsPending(true);
+    const res = await saveArticleConfig(data);
+    setIsPending(false);
+    if (res?.success) {
+      toast.success('sukces');
+      // form.reset();
+    } else if (res?.error === 'exists') {
+      toast.error('exists');
     }
-  }
+  };
 
   if (!cDict) return <NoDict />;
 
@@ -398,7 +415,14 @@ export default function AddArticleConfig({ dict }: any) {
               )}
             />
           </CardContent>
-          <CardFooter className='flex justify-end'>
+          <CardFooter className='flex justify-between'>
+            <Button
+              variant='destructive'
+              type='button'
+              onClick={() => form.reset()}
+            >
+              Wyczyść
+            </Button>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
