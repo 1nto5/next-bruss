@@ -32,6 +32,7 @@
   },
   "exportData": {},
   "articleConfig": {
+    "noAccess": "Nie posiadasz uprawnień do funkcji rework. Kliknij by wysłać zgłoszenie w celu ich nadania:",
     "tabs": {
       "edit": "Edytuj",
       "add": "Dodaj"

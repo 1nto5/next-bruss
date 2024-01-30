@@ -1,4 +1,7 @@
 import { auth } from '@/auth';
+import { Locale } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
+
 import Info from '../../components/Info';
 
 export const metadata = {
@@ -7,13 +10,16 @@ export const metadata = {
 
 export default async function Layout({
   children,
+  params: { lang },
 }: {
   children: React.ReactNode;
+  params: { lang: Locale };
 }) {
+  const dict = await getDictionary(lang);
+  const cDict = dict.articleConfig;
   const infoDescription = (
     <>
-      Nie posiadasz uprawnień do funkcji oznaczania jako części rework. Kliknij
-      by wysłać zgłoszenie w celu ich nadania:{' '}
+      {cDict.noAccess}{' '}
       <a
         href={`mailto:support@bruss-group.com?subject=Next BRUSS: uprawnienia rework`}
         className='text-blue-600 hover:text-blue-800'
