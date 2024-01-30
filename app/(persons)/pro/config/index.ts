@@ -388,7 +388,7 @@ const articles: ArticleConfig[] = [
     article: '30172',
     workplace: 'eol43',
     type: 'dmc-box',
-    name: 'M357 Bondal - Korek  / karton 168 sztuk',
+    name: 'M357 Bondal - Korek  / traye 250 sztuk',
     baseDmc: 'M4D3-6L073-AB C9E0C 30072020A 13380',
     dmcFirVal: [0, 19],
     boxSize: 250,
