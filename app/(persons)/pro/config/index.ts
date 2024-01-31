@@ -347,7 +347,7 @@ const articles: ArticleConfig[] = [
     baseDmc: 'G4D3-6L073-DC C9E0C 09072019A 13405',
     dmcFirVal: [0, 19],
     boxSize: 168,
-    hydraProc: '040',
+    hydraProc: '050',
     palletProc: '843',
   },
   {
