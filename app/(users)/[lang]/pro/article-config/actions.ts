@@ -1,6 +1,7 @@
 'use server';
 
 import { dbc } from '@/lib/mongo';
+// import { revalidatePath } from 'next/cache';
 
 type ArticleConfig = {
   workplace: string; // Matches z.string().regex()
@@ -45,6 +46,7 @@ export async function saveArticleConfig(config: ArticleConfig) {
 
     const res = await collection.insertOne(config);
     if (res) return { success: 'inserted' };
+    // revalidatePath('/', 'layout');
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving article config.');

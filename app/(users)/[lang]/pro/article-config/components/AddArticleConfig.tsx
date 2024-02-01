@@ -96,55 +96,56 @@ export default function AddArticleConfig({ dict }: any) {
     .refine((data) => !(data.secondValidation && !data.dmcSecondValidation), {
       message: cDict.z.dmcSecondValidation,
       path: ['dmcSecondValidation'],
-    })
-    .refine(
-      (data) =>
-        data.secondValidation &&
-        data.dmcSecondValidation &&
-        data.dmc.includes(data.dmcSecondValidation) &&
-        data.dmcSecondValidation.length >= 4 &&
-        data.dmcSecondValidation !== data.dmcFirstValidation,
-      {
-        message: cDict.z.dmcSecondValidation,
-        path: ['dmcSecondValidation'],
-      },
-    );
+    });
+
+  // TODO: complete validation
+  // .refine(
+  //   (data) =>
+  //     data.secondValidation &&
+  //     ( data.dmcSecondValidation &&
+  //       data.dmcSecondValidation.length < 4 ||
+  //       data.dmc.includes(data.dmcSecondValidation)),
+  //   {
+  //     message: cDict.z.dmcSecondValidation,
+  //     path: ['dmcSecondValidation'],
+  //   },
+  // );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      workplace: '', // TODO: workplaces list with possiblity to add new workplace
-      articleNumber: '',
-      articleName: '',
-      articleNote: '',
-      piecesPerBox: '',
-      pallet: false,
-      boxesPerPallet: '',
-      dmc: '',
-      dmcFirstValidation: '',
-      secondValidation: false,
-      dmcSecondValidation: '',
-      hydraProcess: '',
-      ford: false,
-      bmw: false,
-    },
-
     // defaultValues: {
-    //   workplace: 'eol34', // TODO: workplaces list with possiblity to add new workplace
-    //   articleNumber: '12345',
-    //   articleName: 'Test Article',
-    //   articleNote: 'This is a test note',
-    //   piecesPerBox: '10',
-    //   pallet: true,
-    //   boxesPerPallet: '20',
-    //   dmc: 'Test DM 123455',
-    //   dmcFirstValidation: 'Test DMC First Validation',
-    //   secondValidation: true,
-    //   dmcSecondValidation: 'Test DMC Second Validation',
-    //   hydraProcess: '050',
+    //   workplace: '', // TODO: workplaces list with possiblity to add new workplace
+    //   articleNumber: '',
+    //   articleName: '',
+    //   articleNote: '',
+    //   piecesPerBox: '',
+    //   pallet: false,
+    //   boxesPerPallet: '',
+    //   dmc: '',
+    //   dmcFirstValidation: '',
+    //   secondValidation: false,
+    //   dmcSecondValidation: '',
+    //   hydraProcess: '',
     //   ford: false,
     //   bmw: false,
     // },
+
+    defaultValues: {
+      workplace: 'eol34',
+      articleNumber: '12345',
+      articleName: 'Test Article',
+      articleNote: 'This is a test note',
+      piecesPerBox: '10',
+      pallet: true,
+      boxesPerPallet: '20',
+      dmc: 'Test DM 123455',
+      dmcFirstValidation: 'Test',
+      secondValidation: false,
+      dmcSecondValidation: '',
+      hydraProcess: '050',
+      ford: false,
+      bmw: false,
+    },
   });
 
   const isPalletChecked = form.watch('pallet');
@@ -153,6 +154,7 @@ export default function AddArticleConfig({ dict }: any) {
   const [isPending, setIsPending] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log('Submitting form', data);
     setIsPending(true);
     const res = await saveArticleConfig(data);
     setIsPending(false);

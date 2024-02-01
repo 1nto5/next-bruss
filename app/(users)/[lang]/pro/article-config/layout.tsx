@@ -1,11 +1,12 @@
 import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { redirect } from 'next/navigation';
 
 import Info from '../../components/Info';
 
 export const metadata = {
-  title: 'rework (Next BRUSS)',
+  title: 'article config (Next BRUSS)',
 };
 
 export default async function Layout({
@@ -16,12 +17,11 @@ export default async function Layout({
   params: { lang: Locale };
 }) {
   const dict = await getDictionary(lang);
-  const cDict = dict.articleConfig;
-  const infoDescription = (
+  const noAccess = (
     <>
-      {cDict.noAccess}{' '}
+      {dict.noAccess}{' '}
       <a
-        href={`mailto:support@bruss-group.com?subject=Next BRUSS: uprawnienia rework`}
+        href={`mailto:support@bruss-group.com?subject=Next BRUSS: ${dict.noAccessMailSubject}`}
         className='text-blue-600 hover:text-blue-800'
       >
         support@bruss-group.com
@@ -30,10 +30,13 @@ export default async function Layout({
     </>
   );
   const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
   if (!session?.user.roles?.includes('article-config')) {
     return (
       <main className='m-2 flex justify-center'>
-        <Info title='Brak uprawnień!' description={infoDescription} />
+        <Info title={dict.noAccessTitle} description={noAccess} />
       </main>
     );
   }

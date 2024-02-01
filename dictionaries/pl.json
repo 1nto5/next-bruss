@@ -27,12 +27,14 @@
       }
     }
   },
+  "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij by wysłać zgłoszenie w celu ich nadania:",
+  "noAccessTitle": "Brak uprawnień!",
+  "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
   "home": {
     "title": "Cześć!"
   },
   "exportData": {},
   "articleConfig": {
-    "noAccess": "Nie posiadasz uprawnień do funkcji rework. Kliknij by wysłać zgłoszenie w celu ich nadania:",
     "tabs": {
       "edit": "Edytuj",
       "add": "Dodaj"
@@ -73,6 +75,13 @@
       "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",
       "articleNoteFormLabel": "Notatka do artykułu",
       "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)"
+    }
+  },
+  "dmcheck": {
+    "articleSelection": {
+      "cardTitle": "Wybierz artykuł",
+      "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
+      "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: "
     }
   }
 }
