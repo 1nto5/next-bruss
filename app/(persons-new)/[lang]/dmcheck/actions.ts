@@ -8,12 +8,12 @@ import { z } from 'zod';
 export async function getArticlesConfigForWorkplace(workplace: string) {
   const collection = await dbc('articles_config');
   const res = await collection.find({ workplace }).toArray();
-  console.log('pobieranie');
+  // console.log('pobieranie');
   return res;
 }
 
 export async function revalidateTest() {
-  console.log('revalidate');
+  // console.log('revalidate');
   revalidatePath('/(persons-new)/[lang]/dmcheck/[worklace]', 'page');
 }
 
@@ -21,22 +21,24 @@ export async function pushArticleConfigId(prevState: any, formData: FormData) {
   redirect(`test`);
 }
 
-export async function redirectToArticle(
+export async function personLogin(
   prevState: {
     message: string;
   },
   formData: FormData,
 ) {
   const schema = z.object({
-    articleConfigId: z.string().min(10),
+    personalNumber: z.string().min(1).max(4),
   });
   const parse = schema.safeParse({
-    articleConfigId: formData.get('articleConfigId'),
+    personalNumber: formData.get('personalNumber'),
   });
   if (!parse.success) {
-    return { message: 'Failed to redirect' };
+    return { message: 'not valid' };
   }
   const data = parse.data;
 
-  redirect(data.articleConfigId);
+  return {
+    message: 'error',
+  };
 }

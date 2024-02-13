@@ -1,21 +1,12 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { getArticlesConfigForWorkplace, revalidateTest } from '../actions';
-// import { revalidatePath } from 'next/cache';
+import { getArticlesConfigForWorkplace } from '../actions';
 import { ArticleButton } from '../components/ArticleButton';
 import { Info } from '../components/Info';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// export const revalidate = 3600;
-
-export default async function Page({
+export default async function ArticleSelectionPage({
   params: { lang, workplaceName },
 }: {
   params: { lang: Locale; workplaceName: string };
@@ -26,7 +17,6 @@ export default async function Page({
   const articlesConfigForWorkplace =
     await getArticlesConfigForWorkplace(workplaceName);
 
-  // TODO: show proper error message
   if (articlesConfigForWorkplace.length === 0) {
     return (
       <Info

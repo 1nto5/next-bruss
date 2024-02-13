@@ -82,6 +82,13 @@
       "cardTitle": "Wybierz artykuł",
       "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
       "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: "
+    },
+    "personLogin": {
+      "cardTitle": "Logowanie",
+      "personalNumberInputPlaceholder": "Numer personalny",
+      "confirmButton": "Potwierdź",
+      "loginButton": "Zaloguj",
+      "loginError": "Błędny login lub hasło!"
     }
   }
 }

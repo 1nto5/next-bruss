@@ -8,7 +8,7 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 
 export const metadata: Metadata = {
-  title: 'Next BRUSS',
+  title: 'Next BRUSS: DMCheck',
   description: 'Company helper applications',
 };
 
@@ -33,7 +33,7 @@ export default async function RootLayout({
           {/* <QueryProvider> */}
           <Header dict={dictionary} workplaceName={workplaceName} />
           <main className='m-2 flex justify-center'>{children}</main>
-          <Toaster />
+          <Toaster richColors position='bottom-center' />
           {/* </QueryProvider> */}
         </ThemeProvider>
       </body>
