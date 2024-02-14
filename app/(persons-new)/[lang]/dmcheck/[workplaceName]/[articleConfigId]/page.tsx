@@ -1,22 +1,19 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { getArticlesConfigForWorkplace, revalidateTest } from '../../actions';
-// import { revalidatePath } from 'next/cache';
 import { PersonLogin } from '../../components/PersonLogin';
-import { Info } from '../../components/Info';
 
 import {
   Card,
   CardContent,
-  CardDescription,
+  // CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 
 export default async function PersonLoginPage({
-  params: { lang, workplaceName, articleConfigId },
+  params: { lang },
 }: {
-  params: { lang: Locale; workplaceName: string; articleConfigId: string };
+  params: { lang: Locale };
 }) {
   const dict = await getDictionary(lang);
   const cDict = dict.dmcheck.personLogin;
@@ -27,11 +24,7 @@ export default async function PersonLoginPage({
         <CardTitle>{cDict.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className='flex flex-wrap justify-center'>
-        <PersonLogin
-          cDict={dict.dmcheck.personLogin}
-          workplaceName={workplaceName}
-          articleConfigId={articleConfigId}
-        />
+        <PersonLogin cDict={dict.dmcheck.personLogin} />
       </CardContent>
     </Card>
   );

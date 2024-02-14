@@ -2,14 +2,12 @@
 
 import { useFormState } from 'react-dom';
 import { useFormStatus } from 'react-dom';
-import { useState } from 'react';
-import { useEffect } from 'react';
-
+import { useState, useEffect } from 'react';
 import { personLogin } from '../actions';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const initialState = {
   message: '',
@@ -17,34 +15,36 @@ const initialState = {
 
 type PersonLoginProps = {
   cDict: any;
-  workplaceName: string;
-  articleConfigId: string;
 };
 
-export function PersonLogin({
-  cDict,
-  workplaceName,
-  articleConfigId,
-}: PersonLoginProps) {
+export function PersonLogin({ cDict }: PersonLoginProps) {
   const [state, formAction] = useFormState(personLogin, initialState);
   const { pending } = useFormStatus();
+  const [personalNumber, setPersonalNumber] = useState('');
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (state.message === 'not valid') {
-      toast.error('not valid');
-    }
-    if (state.message === 'error') {
-      toast(state.message);
-    }
-  }, [state]);
-
-  const [personalNumber, setPersonalNumber] = useState('');
+  const pathname = usePathname();
 
   const handleNumberClick = (number: number) => {
     setPersonalNumber(personalNumber + number.toString());
   };
+
+  useEffect(() => {
+    if (state?.message === 'not valid') {
+      toast.error(cDict.loginNotValid);
+    }
+    if (state?.message === 'error') {
+      toast.error(cDict.loginNotValid);
+    }
+    if (state?.message === 'not exist') {
+      toast.error(cDict.loginNotExist);
+    }
+    if (state?.message === 'exist') {
+      // toast.success(cDict.loginSuccess);
+      router.push(pathname + `/${personalNumber}`);
+    }
+    setPersonalNumber('');
+  }, [state?.message]);
 
   return (
     <form action={formAction} className='grid grid-cols-3 gap-4'>
