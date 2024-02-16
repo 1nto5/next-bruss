@@ -1,23 +1,22 @@
 import type { NextRequest } from 'next/server';
 import { dbc } from '@/lib/mongo';
 
-type RequestBody = {
-  articleId: string;
-};
-
-export async function POST(req: NextRequest) {
-  if (req.method !== 'POST') {
+export async function GET(req: NextRequest) {
+  if (req.method !== 'GET') {
     return new Response(
-      JSON.stringify({ message: 'Only POST requests allowed' }),
+      JSON.stringify({ message: 'Only GET requests allowed' }),
       {
         status: 405,
         headers: { 'Content-Type': 'application/json' },
       },
     );
   }
+  console.log('fetch-in-box');
 
-  return new Response(JSON.stringify({ message: 'test messege' }), {
-    status: 501,
+  const currentTime = new Date().toISOString();
+
+  return new Response(JSON.stringify({ message: currentTime }), {
+    status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
 }

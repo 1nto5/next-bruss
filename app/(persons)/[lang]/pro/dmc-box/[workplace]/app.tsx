@@ -20,7 +20,7 @@ export default function App() {
   const articleContext = useContext(ArticleContext);
   const pathname = usePathname();
   const workplace = pathname.split('/').pop();
-  const workplaceType = pathname.split('/')[2];
+  const workplaceType = pathname.split('/')[3];
   const workplaceExists = config.some(
     (item) => item.workplace === workplace && item.type === workplaceType,
   );

@@ -98,7 +98,8 @@
         "article": "artykuł",
         "inBox": "w boxie",
         "onPallet": "na palecie"
-      }
+      },
+      "dmcScanInputPlaceholder": "Skanuj kod DMC"
     }
   }
 }

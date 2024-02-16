@@ -32,19 +32,16 @@ export function PersonLogin({ cDict }: PersonLoginProps) {
   useEffect(() => {
     if (state?.message === 'not valid') {
       toast.error(cDict.loginNotValid);
-    }
-    if (state?.message === 'error') {
+    } else if (state?.message === 'error') {
       toast.error(cDict.loginNotValid);
-    }
-    if (state?.message === 'not exist') {
+    } else if (state?.message === 'not exist') {
       toast.error(cDict.loginNotExist);
-    }
-    if (state?.message === 'exist') {
-      // toast.success(cDict.loginSuccess);
-      router.push(pathname + `/${personalNumber}`);
+    } else {
+      router.push(pathname + `/${state?.message}`);
     }
     setPersonalNumber('');
-  }, [state?.message]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   return (
     <form action={formAction} className='grid grid-cols-3 gap-4'>
