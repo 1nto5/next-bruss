@@ -5,17 +5,18 @@ import { ThemeModeToggle } from './ThemeModeToggle';
 import { LogoutAll } from './Logout';
 import { Relaod } from './Reload';
 import Logo from './Logo';
+import { Locale } from '@/i18n.config';
 
 type HeaderProps = {
   dict: any;
   workplaceName: string;
-  logoutAllHref: string;
+  workplaceHref: string;
 };
 
 export default function Header({
   dict,
   workplaceName,
-  logoutAllHref,
+  workplaceHref,
 }: HeaderProps) {
   return (
     <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
@@ -23,7 +24,7 @@ export default function Header({
         <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
           <div className='flex items-center'>
             <Link
-              href={logoutAllHref}
+              href={workplaceHref}
               className='ml-4 flex items-center lg:ml-0'
             >
               <h1 className='font-bold'>Next</h1>
@@ -35,8 +36,8 @@ export default function Header({
           </div>
 
           <div className='flex items-center gap-x-2 lg:gap-x-4'>
-            <LogoutAll logoutAllHref={logoutAllHref} />
-            <Relaod />
+            <LogoutAll logoutAllHref={workplaceHref} />
+            <Relaod reavalidateHref={workplaceHref} />
             <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>
         </div>

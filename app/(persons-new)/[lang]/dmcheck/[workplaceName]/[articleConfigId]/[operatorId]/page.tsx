@@ -4,14 +4,9 @@ import { StatusBar } from '../../../components/StatusBar';
 import { redirect } from 'next/navigation';
 import { ScanDmc } from '../../../components/ScanDmc';
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
-import {
-  getArticleConfigById,
-  getOperatorById,
-  getBoxStatus,
-  getPalletStatus,
-} from '../../../actions';
+import { getArticleConfigById, getOperatorById } from '../../../actions';
 
 export default async function ScanPage({
   params: { lang, workplaceName, articleConfigId, operatorId },
@@ -61,10 +56,46 @@ export default async function ScanPage({
     redirect(`/${lang}/dmcheck/${workplaceName}`);
   }
 
+  async function getBoxStatus(articleConfigId: string) {
+    try {
+      const boxStatusRes = await fetch(
+        `${process.env.API}/dmcheck/box-status?articleConfigId=${articleConfigId}`,
+        {
+          next: { tags: [`box${articleConfigId}`] },
+        },
+      );
+      const boxStatus = await boxStatusRes.json();
+      if (boxStatus.message === 'article not found') {
+        redirect(`/${lang}/dmcheck/${workplaceName}`);
+      }
+      return boxStatus;
+    } catch (error) {
+      throw new Error('Fetching box status error: ' + error);
+    }
+  }
+
+  async function getPalletStatusTest(articleConfigId: string) {
+    try {
+      const boxStatusRes = await fetch(
+        `${process.env.API}/dmcheck/pallet-status?articleConfigId=${articleConfigId}`,
+        {
+          next: { tags: [`pallet${articleConfigId}`] },
+        },
+      );
+      const boxStatus = await boxStatusRes.json();
+      if (boxStatus.message === 'article not found') {
+        redirect(`/${lang}/dmcheck/${workplaceName}`);
+      }
+      return boxStatus;
+    } catch (error) {
+      throw new Error('Fetching pallet status error: ' + error);
+    }
+  }
+
   if (searchParams.pallet === 'true') {
     const [boxStatusPromise, palletStatusPromise] = await Promise.all([
       getBoxStatus(articleConfigId),
-      getPalletStatus(articleConfigId),
+      getPalletStatusTest(articleConfigId),
     ]);
     if (!boxStatusPromise || !palletStatusPromise) {
       redirect(`/${lang}/dmcheck/${workplaceName}`);
@@ -78,12 +109,6 @@ export default async function ScanPage({
     }
     boxStatus = boxStatusPromise;
   }
-
-  // boxStatus = await getBoxStatus(
-  //   articleConfigId,
-  //   // workplaceName,
-  //   // searchParams.articleNumber.toString(),
-  // );
 
   return (
     <>
@@ -101,7 +126,11 @@ export default async function ScanPage({
         />
       </div>
       {!boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
-        <ScanDmc cDict={dict.dmcheck.scan} articleConfigId={articleConfigId} />
+        <ScanDmc
+          cDict={dict.dmcheck.scan}
+          articleConfigId={articleConfigId}
+          operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
+        />
       )}
     </>
   );

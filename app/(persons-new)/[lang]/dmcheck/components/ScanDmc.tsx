@@ -14,13 +14,20 @@ const initialState = {
 type PersonLoginProps = {
   cDict: any;
   articleConfigId: string;
+  operatorPersonalNumber: string;
 };
 
-export function ScanDmc({ cDict, articleConfigId }: PersonLoginProps) {
+export function ScanDmc({
+  cDict,
+  articleConfigId,
+  operatorPersonalNumber,
+}: PersonLoginProps) {
+  const [dmcInput, setDmcInput] = useState('');
   const [state, formAction] = useFormState(saveDmc, initialState);
   const { pending } = useFormStatus();
 
   useEffect(() => {
+    setDmcInput('');
     if (state?.message === 'wrong article config id') {
       toast.error('test');
     } else if (state?.message === 'not valid') {
@@ -34,22 +41,33 @@ export function ScanDmc({ cDict, articleConfigId }: PersonLoginProps) {
   }, [state]);
 
   return (
-    <form action={formAction}>
-      <input
-        hidden
-        type='text'
-        id='articleConfigId'
-        name='articleConfigId'
-        defaultValue={articleConfigId}
-      />
-      <Input
-        id='dmc'
-        name='dmc'
-        type='text'
-        placeholder={cDict.dmcScanInputPlaceholder}
-        className='text-center'
-      />
-      <input type='submit' hidden />
-    </form>
+    <>
+      <form action={formAction}>
+        <input
+          hidden
+          type='text'
+          id='articleConfigId'
+          name='articleConfigId'
+          defaultValue={articleConfigId}
+        />
+        <input
+          hidden
+          type='text'
+          id='operatorPersonalNumber'
+          name='operatorPersonalNumber'
+          defaultValue={operatorPersonalNumber}
+        />
+        <Input
+          id='dmc'
+          name='dmc'
+          type='text'
+          value={dmcInput}
+          onChange={(e) => setDmcInput(e.target.value)}
+          placeholder={cDict.dmcScanInputPlaceholder}
+          className='text-center'
+        />
+        <input type='submit' hidden />
+      </form>
+    </>
   );
 }

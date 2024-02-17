@@ -6,6 +6,58 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
+// FORD DATE VALIDATION
+function fordDateValidation(dmc: string) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const start = new Date(year, 0, 0);
+  const diff = today.getTime() - start.getTime();
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dotyGreg = Math.floor(diff / oneDay);
+  const dotyJul = dotyGreg > 13 ? dotyGreg - 13 : 365 - 13 + dotyGreg;
+  const dmcDotyJul = parseInt(dmc.substr(7, 3));
+  return (
+    dmcDotyJul === dotyJul ||
+    dmcDotyJul === dotyJul - 1 ||
+    dmcDotyJul === dotyJul - 2
+  );
+}
+
+// BMW DATE VALIDATION
+function bmwDateValidation(dmc: string) {
+  const todayDate = parseInt(
+    new Date().toISOString().slice(2, 10).split('-').join(''),
+  );
+  const tomorrowDate = parseInt(
+    new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(2, 10)
+      .split('-')
+      .join(''),
+  );
+  const yesterdayDate = parseInt(
+    new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(2, 10)
+      .split('-')
+      .join(''),
+  );
+  const dayBeforeYesterdayDate = parseInt(
+    new Date(new Date().getTime() - 48 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(2, 10)
+      .split('-')
+      .join(''),
+  );
+  const dmcDate = parseInt(dmc.slice(17, 23));
+  return (
+    dmcDate === todayDate ||
+    dmcDate === tomorrowDate ||
+    dmcDate === yesterdayDate ||
+    dmcDate === dayBeforeYesterdayDate
+  );
+}
+
 export async function personLogin(
   prevState: {
     message: string;
@@ -52,71 +104,10 @@ export async function getOperatorById(operatorId: string) {
   return await collection.findOne({ _id: new ObjectId(operatorId) });
 }
 
-export async function getBoxStatus(
-  articleConfigId: string,
-  // workplace: string,
-  // articleNumber: string,
-) {
-  const articlesConfigCollection = await dbc('articles_config');
-  const articleConfig = await articlesConfigCollection.findOne({
-    _id: new ObjectId(articleConfigId),
-  });
-  if (!articleConfig) {
-    return null;
-  }
-  const scansCollection = await dbc('scans');
-  const count = await scansCollection.countDocuments({
-    status: 'box',
-    workplace: articleConfig.workplace,
-    article: articleConfig.articleNumber,
-  });
-  // const count = await scansCollection.countDocuments({
-  //   status: 'box',
-  //   workplace: workplace,
-  //   article: articleNumber,
-  // });
-
-  // console.log('count' + count);
-  return { piecesInBox: count, boxIsFull: count >= articleConfig.piecesPerBox };
-}
-
-export async function getPalletStatus(articleConfigId: string) {
-  const articlesConfigCollection = await dbc('articles_config');
-  const articleConfig = await articlesConfigCollection.findOne({
-    _id: new ObjectId(articleConfigId),
-  });
-  if (!articleConfig) {
-    return null;
-  }
-  const scansCollection = await dbc('scans');
-  const count = await scansCollection.countDocuments({
-    status: 'pallet',
-    workplace: articleConfig.workplace,
-    article: articleConfig.articleNumber,
-  });
-
-  return {
-    boxesOnPallet: count / articleConfig.piecesPerBox,
-    palletIsFull:
-      count / articleConfig.piecesPerBox >= articleConfig.boxesPerPallet,
-  };
-}
-
-// export async function revalidateTest() {
-//   console.log('revalidate');
-//   // revalidateTag('test');
-//   revalidatePath('/pl/dmcheck/eol74/65ba50d4a7428022c001d0c5/1394');
-// }
-
-export async function saveDmc(
-  prevState: {
-    message: string;
-  },
-  formData: FormData,
-) {
+export async function saveDmc(prevState: any, formData: FormData) {
   const articleConfigId = formData.get('articleConfigId');
   const articlesConfigCollection = await dbc('articles_config');
-  if (articleConfigId?.toString().length !== 24) {
+  if (!articleConfigId || articleConfigId.toString().length !== 24) {
     return { message: 'wrong article config id' };
   }
   const articleConfig = await articlesConfigCollection.findOne({
@@ -125,8 +116,6 @@ export async function saveDmc(
   if (!articleConfig) {
     return { message: 'wrong article config id' };
   }
-
-  console.log(articleConfig);
   const schema = z.object({
     dmc: z
       .string()
@@ -145,5 +134,21 @@ export async function saveDmc(
     return { message: 'not valid' };
   }
   const data = parse.data;
-  return { message: 'saved' };
+
+  const scansCollection = await dbc('scans');
+
+  const insertResult = await scansCollection.insertOne({
+    status: 'box',
+    dmc: data.dmc,
+    workplace: articleConfig.workplace,
+    type: articleConfig.type,
+    article: articleConfig.articleNumber,
+    operator: formData.get('operatorPersonalNumber'),
+    time: new Date(),
+  });
+
+  if (insertResult) {
+    revalidateTag(`box${articleConfigId}`);
+    return { message: 'saved' };
+  }
 }

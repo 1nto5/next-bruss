@@ -34,7 +34,7 @@ export default async function RootLayout({
           <Header
             dict={dictionary}
             workplaceName={workplaceName}
-            logoutAllHref={`/${lang}/dmcheck/${workplaceName}`}
+            workplaceHref={`/${lang}/dmcheck/${workplaceName}`}
           />
           <main className='m-2 flex flex-col items-center space-y-8'>
             {children}
