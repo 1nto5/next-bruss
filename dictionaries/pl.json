@@ -87,8 +87,8 @@
       "cardTitle": "Wybierz artykuł",
       "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
       "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: ",
-      "piecesPerBox": "sztuki w boxie",
-      "boxesPerPallet": "boxów na palecie"
+      "piecesPerBox": "szt. / box",
+      "boxesPerPallet": "box / paleta"
     },
     "personLogin": {
       "cardTitle": "Logowanie",
