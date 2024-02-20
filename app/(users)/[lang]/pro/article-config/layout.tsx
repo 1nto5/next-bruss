@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import Info from '../../components/Info';
 
 export const metadata = {
-  title: 'article config (Next BRUSS)',
+  title: 'Article config (Next BRUSS)',
 };
 
 export default async function Layout({

@@ -34,6 +34,7 @@
     "title": "Cześć!"
   },
   "exportData": {},
+  "rework": {},
   "articleConfig": {
     "tabs": {
       "edit": "Edytuj",
@@ -74,14 +75,20 @@
       "hydraProcessSelectOption090": "090 - Q3",
       "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",
       "articleNoteFormLabel": "Notatka do artykułu",
-      "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)"
+      "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)",
+      "toasts": {
+        "articleSaved": "Artykuł dodany!",
+        "articleExists": "Artykuł istnieje!"
+      }
     }
   },
   "dmcheck": {
     "articleSelection": {
       "cardTitle": "Wybierz artykuł",
       "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
-      "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: "
+      "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: ",
+      "piecesPerBox": "sztuki w boxie",
+      "boxesPerPallet": "boxów na palecie"
     },
     "personLogin": {
       "cardTitle": "Logowanie",
@@ -96,10 +103,29 @@
       "statusBar": {
         "operator": "operator",
         "article": "artykuł",
-        "inBox": "w boxie",
-        "onPallet": "na palecie"
+        "inBox": "box",
+        "onPallet": "paleta"
       },
-      "dmcScanInputPlaceholder": "Skanuj kod DMC"
+      "dmcScanInputPlaceholder": "skanuj kod DMC...",
+      "scanInputSavingPlaceholder": "przetwarzam...",
+      "hydraScanInputPlaceholder": "skanuj kod QR z etykiety HYDRA...",
+      "toast": {
+        "dmcNotValid": "Nieprawidłowy kod DMC!",
+        "articleNotFound": "Niepoprawny artykuł!",
+        "dmcSaved": "DMC zapisany!",
+        "dmcExists": "DMC istnieje w bazie!",
+        "fordDateNotValid": "Nieprawidłowa data FORD!",
+        "bmwDateNotValid": "Nieprawidłowa data BMW!",
+        "unknownSavingError": "Nieznany błąd, skontaktuj się z IT!",
+        "qrNotValid": "Nieprawidłowy kod QR!",
+        "qrWrongArticle": "Etykieta z niepoprawnym numerem artykułu!",
+        "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
+        "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
+        "batchSaved": "Batch zapisany!",
+        "batchExists": "Batch istnieje w bazie!"
+      },
+      "palletScanInputPlaceholder": "skanuj kod QR z wydrukowanej etykiety na paletę...",
+      "printPalletButton": "Wydruk etykiety na paletę"
     }
   }
 }

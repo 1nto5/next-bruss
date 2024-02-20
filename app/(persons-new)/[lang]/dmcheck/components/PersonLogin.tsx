@@ -46,6 +46,7 @@ export function PersonLogin({ cDict }: PersonLoginProps) {
   return (
     <form action={formAction} className='grid grid-cols-3 gap-4'>
       <Input
+        autoFocus
         id='personalNumber'
         name='personalNumber'
         type='text'

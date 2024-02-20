@@ -35,7 +35,7 @@ export default async function RootLayout({
           {/* <QueryProvider> */}
           <Header session={session} dict={dictionary} />
           {children}
-          <Toaster />
+          <Toaster richColors position='top-right' />
           {/* </QueryProvider> */}
         </ThemeProvider>
       </body>

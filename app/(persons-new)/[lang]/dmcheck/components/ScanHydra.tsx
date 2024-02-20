@@ -2,7 +2,7 @@
 
 import { useFormState } from 'react-dom';
 import { useEffect } from 'react';
-import { saveDmc } from '../actions';
+import { saveHydra } from '../actions';
 import { toast } from 'sonner';
 import { ScanInput } from './ScanInput';
 
@@ -10,40 +10,43 @@ const initialState = {
   message: '',
 };
 
-type ScanDmcProps = {
+type ScanHydraProps = {
   cDict: any;
   articleConfigId: string;
   operatorPersonalNumber: string;
 };
 
-export function ScanDmc({
+export function ScanHydra({
   cDict,
   articleConfigId,
   operatorPersonalNumber,
-}: ScanDmcProps) {
-  const [state, formAction] = useFormState(saveDmc, initialState);
+}: ScanHydraProps) {
+  const [state, formAction] = useFormState(saveHydra, initialState);
 
   useEffect(() => {
     switch (state?.message) {
       case 'saved':
-        toast.success(cDict.toast.dmcSaved);
+        toast.success(cDict.toast.hydraSaved);
         break;
       case 'exists':
-        toast.error(cDict.toast.dmcExists);
+        toast.error(cDict.toast.hydraExists);
         break;
       case 'not valid':
-        toast.error(cDict.toast.dmcNotValid);
+        toast.error(cDict.toast.hydraNotValid);
         break;
       case 'article not found' || 'wrong article config id':
         toast.error(cDict.toast.articleNotFound);
         break;
-      case 'ford date not valid':
-        toast.error(cDict.toast.fordDateNotValid);
+      case 'wrong article':
+        toast.error(cDict.toast.hydraWrongArticle);
         break;
-      case 'bmw date not valid':
-        toast.error(cDict.toast.bmwDateNotValid);
+      case 'wrong quantity':
+        toast.error(cDict.toast.hydraWrongQuantity);
         break;
-      case 'saving dmc error':
+      case 'wrong process':
+        toast.error(cDict.toast.hydraWrongProcess);
+        break;
+      case 'saving hydra error':
         toast.error(cDict.toast.unknownSavingError);
         break;
       default:
@@ -70,8 +73,8 @@ export function ScanDmc({
           defaultValue={operatorPersonalNumber}
         />
         <ScanInput
-          name='dmc'
-          placeholder={cDict.dmcScanInputPlaceholder}
+          name='hydra'
+          placeholder={cDict.hydraScanInputPlaceholder}
           savingPlaceholder={cDict.scanInputSavingPlaceholder}
         />
       </form>

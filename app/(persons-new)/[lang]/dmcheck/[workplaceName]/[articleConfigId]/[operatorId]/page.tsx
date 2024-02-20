@@ -3,10 +3,18 @@ import { getDictionary } from '@/lib/dictionary';
 import { StatusBar } from '../../../components/StatusBar';
 import { redirect } from 'next/navigation';
 import { ScanDmc } from '../../../components/ScanDmc';
+import { ScanHydra } from '../../../components/ScanHydra';
+import { ScanPallet } from '../../../components/ScanPallet';
+import { Scan } from '../../../components/Scan';
 
-export const revalidate = 300;
+export const revalidate = 0;
 
-import { getArticleConfigById, getOperatorById } from '../../../actions';
+import {
+  getArticleConfigById,
+  getOperatorById,
+  getPalletQr,
+} from '../../../actions';
+import { PrintPalletLabel } from '../../../components/PrintPalletLabel';
 
 export default async function ScanPage({
   params: { lang, workplaceName, articleConfigId, operatorId },
@@ -61,7 +69,7 @@ export default async function ScanPage({
       const boxStatusRes = await fetch(
         `${process.env.API}/dmcheck/box-status?articleConfigId=${articleConfigId}`,
         {
-          next: { tags: [`box${articleConfigId}`] },
+          next: { tags: ['box'] },
         },
       );
       const boxStatus = await boxStatusRes.json();
@@ -74,19 +82,20 @@ export default async function ScanPage({
     }
   }
 
-  async function getPalletStatusTest(articleConfigId: string) {
+  async function getPalletStatus(articleConfigId: string) {
     try {
-      const boxStatusRes = await fetch(
+      const palletStatusRes = await fetch(
         `${process.env.API}/dmcheck/pallet-status?articleConfigId=${articleConfigId}`,
         {
-          next: { tags: [`pallet${articleConfigId}`] },
+          next: { tags: ['pallet'] },
         },
       );
-      const boxStatus = await boxStatusRes.json();
-      if (boxStatus.message === 'article not found') {
+
+      const palletStatus = await palletStatusRes.json();
+      if (palletStatus.message === 'article not found') {
         redirect(`/${lang}/dmcheck/${workplaceName}`);
       }
-      return boxStatus;
+      return palletStatus;
     } catch (error) {
       throw new Error('Fetching pallet status error: ' + error);
     }
@@ -95,7 +104,7 @@ export default async function ScanPage({
   if (searchParams.pallet === 'true') {
     const [boxStatusPromise, palletStatusPromise] = await Promise.all([
       getBoxStatus(articleConfigId),
-      getPalletStatusTest(articleConfigId),
+      getPalletStatus(articleConfigId),
     ]);
     if (!boxStatusPromise || !palletStatusPromise) {
       redirect(`/${lang}/dmcheck/${workplaceName}`);
@@ -110,28 +119,90 @@ export default async function ScanPage({
     boxStatus = boxStatusPromise;
   }
 
+  const operatorName = searchParams.operatorName.toString().split(' ');
+  const operatorInitials =
+    operatorName[0] + ' ' + operatorName[1].charAt(0) + '.';
+
+  let palletQr = '';
+  if (palletStatus?.palletIsFull) {
+    const palletQrValue = await getPalletQr(articleConfigId);
+    if (!palletQrValue) {
+      redirect(`/${lang}/dmcheck/${workplaceName}`);
+    }
+    palletQr = palletQrValue;
+  }
+
   return (
     <>
       <div className='w-full'>
         <StatusBar
           cDict={dict.dmcheck.scan.statusBar}
-          operator={`${searchParams.operatorName} (${searchParams.operatorPersonalNumber})`}
-          article={`${searchParams.articleNumber} (${searchParams.articleName})`}
+          operator={`${operatorInitials} (${searchParams.operatorPersonalNumber})`}
+          article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
           boxIsFull={boxStatus?.boxIsFull ? true : false}
-          // boxIsFull={true}
+          // boxIsFull={false}
           boxStatus={`${boxStatus?.piecesInBox.toString()} / ${searchParams.piecesPerBox}`}
           pallet={searchParams.pallet === 'true' ? true : false}
           palletIsFull={palletStatus?.palletIsFull}
           palletStatus={`${palletStatus?.boxesOnPallet.toString()} / ${searchParams.boxesPerPallet}`}
         />
       </div>
-      {!boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
-        <ScanDmc
+
+      <div className='w-1/2'>
+        {/* {!boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
+          <ScanDmc
+            cDict={dict.dmcheck.scan}
+            articleConfigId={articleConfigId}
+            operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
+          />
+        )}
+        {boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
+          <ScanHydra
+            cDict={dict.dmcheck.scan}
+            articleConfigId={articleConfigId}
+            operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
+          />
+        )}
+        {palletStatus?.palletIsFull && (
+          <>
+            <ScanPallet
+              cDict={dict.dmcheck.scan}
+              articleConfigId={articleConfigId}
+              operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
+            />
+            <PrintPalletLabel
+              cDict={dict.dmcheck.scan}
+              articleNumber={searchParams.articleNumber.toString()}
+              articleName={searchParams.articleName.toString()}
+              piecesPerPallet={
+                Number(searchParams.boxesPerPallet) *
+                Number(searchParams.piecesPerBox)
+              }
+              qrCode={palletQr}
+            />
+          </>
+        )} */}
+        {/* It has to be as one component, otherwise toasts are not shown in case of change of box or pallet status - old component with useEffect is not rendered */}
+        <Scan
           cDict={dict.dmcheck.scan}
+          boxIsFull={boxStatus?.boxIsFull}
+          palletIsFull={palletStatus?.palletIsFull}
           articleConfigId={articleConfigId}
           operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
         />
-      )}
+        {palletStatus?.palletIsFull && (
+          <PrintPalletLabel
+            cDict={dict.dmcheck.scan}
+            articleNumber={searchParams.articleNumber.toString()}
+            articleName={searchParams.articleName.toString()}
+            piecesPerPallet={
+              Number(searchParams.boxesPerPallet) *
+              Number(searchParams.piecesPerBox)
+            }
+            qrCode={palletQr}
+          />
+        )}
+      </div>
     </>
   );
 }

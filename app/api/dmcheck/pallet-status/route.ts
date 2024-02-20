@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 
-export async function getBoxStatus(articleConfigId: string) {
+async function getBoxStatus(articleConfigId: string) {
   const articlesConfigCollection = await dbc('articles_config');
   const articleConfig = await articlesConfigCollection.findOne({
     _id: new ObjectId(articleConfigId),

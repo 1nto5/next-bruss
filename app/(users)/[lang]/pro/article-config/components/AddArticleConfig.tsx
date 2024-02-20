@@ -1,10 +1,8 @@
 'use client';
-
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-// import { AuthError } from 'next-auth';
 
 import {
   Form,
@@ -27,9 +25,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -98,54 +94,41 @@ export default function AddArticleConfig({ dict }: any) {
       path: ['dmcSecondValidation'],
     });
 
-  // TODO: complete validation
-  // .refine(
-  //   (data) =>
-  //     data.secondValidation &&
-  //     ( data.dmcSecondValidation &&
-  //       data.dmcSecondValidation.length < 4 ||
-  //       data.dmc.includes(data.dmcSecondValidation)),
-  //   {
-  //     message: cDict.z.dmcSecondValidation,
-  //     path: ['dmcSecondValidation'],
-  //   },
-  // );
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    // defaultValues: {
-    //   workplace: '', // TODO: workplaces list with possiblity to add new workplace
-    //   articleNumber: '',
-    //   articleName: '',
-    //   articleNote: '',
-    //   piecesPerBox: '',
-    //   pallet: false,
-    //   boxesPerPallet: '',
-    //   dmc: '',
-    //   dmcFirstValidation: '',
-    //   secondValidation: false,
-    //   dmcSecondValidation: '',
-    //   hydraProcess: '',
-    //   ford: false,
-    //   bmw: false,
-    // },
-
     defaultValues: {
-      workplace: 'eol34',
-      articleNumber: '12345',
-      articleName: 'Test Article',
-      articleNote: 'This is a test note',
-      piecesPerBox: '10',
-      pallet: true,
-      boxesPerPallet: '20',
-      dmc: 'Test DM 123455',
-      dmcFirstValidation: 'Test',
+      workplace: '',
+      articleNumber: '',
+      articleName: '',
+      articleNote: '',
+      piecesPerBox: '',
+      pallet: false,
+      boxesPerPallet: '',
+      dmc: '',
+      dmcFirstValidation: '',
       secondValidation: false,
       dmcSecondValidation: '',
-      hydraProcess: '050',
+      hydraProcess: '',
       ford: false,
       bmw: false,
     },
+
+    // defaultValues: {
+    //   workplace: 'eol34',
+    //   articleNumber: '12345',
+    //   articleName: 'Test Article',
+    //   articleNote: 'This is a test note',
+    //   piecesPerBox: '10',
+    //   pallet: true,
+    //   boxesPerPallet: '20',
+    //   dmc: 'Test DM 123455',
+    //   dmcFirstValidation: 'Test',
+    //   secondValidation: false,
+    //   dmcSecondValidation: '',
+    //   hydraProcess: '050',
+    //   ford: false,
+    //   bmw: false,
+    // },
   });
 
   const isPalletChecked = form.watch('pallet');
@@ -154,15 +137,20 @@ export default function AddArticleConfig({ dict }: any) {
   const [isPending, setIsPending] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log('Submitting form', data);
     setIsPending(true);
-    const res = await saveArticleConfig(data);
+    const convertedData = {
+      ...data,
+      piecesPerBox: Number(data.piecesPerBox),
+      boxesPerPallet: Number(data.boxesPerPallet),
+    };
+
+    const res = await saveArticleConfig(convertedData);
     setIsPending(false);
     if (res?.success) {
-      toast.success('sukces');
+      toast.success(cDict.toasts.articleSaved);
       // form.reset();
     } else if (res?.error === 'exists') {
-      toast.error('exists');
+      toast.error(cDict.toasts.articleExists);
     }
   };
 

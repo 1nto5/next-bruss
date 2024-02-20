@@ -13,7 +13,7 @@ type StatusBarProps = {
   palletStatus?: string;
 };
 
-export function StatusBar({
+export async function StatusBar({
   cDict,
   operator,
   article,
@@ -26,31 +26,28 @@ export function StatusBar({
   const boxStatusBlinkClass = twMerge(
     boxIsFull ? 'animate-ping text-bruss' : '',
   );
-  const boxStatusClass = clsx('text-center text-2xl', boxStatusBlinkClass);
+  const boxStatusClass = clsx('text-center text-xl', boxStatusBlinkClass);
   const palletStatusBlinkClass = twMerge(
     palletIsFull ? 'animate-ping text-bruss' : '',
   );
-  const palletStatusClass = clsx(
-    'text-center text-2xl',
-    palletStatusBlinkClass,
-  );
+  const palletStatusClass = clsx('text-center text-xl', palletStatusBlinkClass);
   return (
     <div className='flex w-full justify-center space-x-2'>
-      <Card className='flex-grow'>
+      <Card className='w-3/12 flex-grow'>
         <CardHeader className='text-center font-extralight'>
           {cDict.operator}:
         </CardHeader>
-        <CardContent className='text-center text-2xl'>{operator}</CardContent>
+        <CardContent className='text-center text-xl'>{operator}</CardContent>
       </Card>
 
-      <Card className='flex-grow'>
+      <Card className='w-5/12 flex-grow'>
         <CardHeader className='text-center font-extralight'>
           {cDict.article}:
         </CardHeader>
-        <CardContent className='text-center text-2xl'>{article}</CardContent>
+        <CardContent className='text-center text-xl'>{article}</CardContent>
       </Card>
 
-      <Card className='flex-grow'>
+      <Card className='w-2/12 flex-grow'>
         <CardHeader className='text-center font-extralight'>
           {cDict.inBox}:
         </CardHeader>
@@ -58,7 +55,7 @@ export function StatusBar({
       </Card>
 
       {pallet && (
-        <Card className='flex-grow'>
+        <Card className='w-2/12 flex-grow'>
           <CardHeader className='text-center font-extralight'>
             {cDict.onPallet}:
           </CardHeader>
