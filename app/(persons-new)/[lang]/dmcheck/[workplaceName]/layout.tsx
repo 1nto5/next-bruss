@@ -8,16 +8,16 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 
 export const metadata: Metadata = {
-  title: 'Next BRUSS: DMCheck',
+  title: 'DMCheck (Next BRUSS)',
   description: 'Company helper applications',
 };
 
 export default async function RootLayout({
   children,
-  params: { lang, workplaceName, articleConfigId },
+  params: { lang, workplaceName },
 }: {
   children: React.ReactNode;
-  params: { lang: Locale; workplaceName: string; articleConfigId: string };
+  params: { lang: Locale; workplaceName: string };
 }) {
   const dictionary = await getDictionary(lang);
   return (

@@ -27,8 +27,6 @@ export default async function ArticleSelectionPage({
     );
   }
 
-  console.log('articlesConfigForWorkplace', articlesConfigForWorkplace);
-
   return (
     <Card className='w-max-7xl'>
       <CardHeader>
