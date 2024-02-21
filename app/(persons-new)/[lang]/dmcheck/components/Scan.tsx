@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { save } from '../actions';
 import { toast } from 'sonner';
 import { ScanInput } from './ScanInput';
+import useSound from 'use-sound';
 
 const initialState = {
   message: '',
@@ -26,13 +27,16 @@ export function Scan({
   operatorPersonalNumber,
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
+  const [play, { sound }] = useSound('/sound.mp3');
 
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':
+        play();
         toast.success(cDict.toast.dmcSaved);
         break;
       case 'batch saved':
+        play();
         toast.success(cDict.toast.batchSaved);
         break;
       case 'dmc exists':
@@ -43,6 +47,7 @@ export function Scan({
         break;
       case 'dmc not valid':
         toast.error(cDict.toast.dmcNotValid);
+
         break;
       case 'qr not valid':
         toast.error(cDict.toast.qrNotValid);

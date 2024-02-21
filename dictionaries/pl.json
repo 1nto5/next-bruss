@@ -93,7 +93,7 @@
     "personLogin": {
       "cardTitle": "Logowanie",
       "personalNumberInputPlaceholder": "Numer personalny",
-      "confirmButton": "Potwierdź",
+      "confirmButton": "Login",
       "loginButton": "Zaloguj",
       "loginNotValid": "Wprowadź poprawny numer personalny!",
       "loginNotExist": "Numer personalny nie istnieje w bazie!",
