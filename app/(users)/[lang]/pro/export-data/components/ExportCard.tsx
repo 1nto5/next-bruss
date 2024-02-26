@@ -38,7 +38,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
-export default function ExportCard() {
+export default function ExportCard({ cDict }: { cDict: any }) {
   const [openWorkplace, setOpenWorkplace] = useState(false);
   const [openArticle, setOpenArticle] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
@@ -86,7 +86,7 @@ export default function ExportCard() {
     const statusOption = statusOptions.find(
       (option) => option.value === status,
     );
-    return statusOption ? statusOption.label : 'Wybierz...';
+    return statusOption ? statusOption.label : cDict.chooseInputPlaceholder;
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,17 +145,14 @@ export default function ExportCard() {
   return (
     <Card className='w-[450px]'>
       <CardHeader>
-        <CardTitle>Eksport danych</CardTitle>
-        <CardDescription>
-          W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000
-          najnowszych rekordów.
-        </CardDescription>
+        <CardTitle>{cDict.cardTitle}</CardTitle>
+        <CardDescription>{cDict.cardDescription}</CardDescription>
       </CardHeader>
       <form onSubmit={generateExcel}>
         <CardContent>
           <div className='grid w-full items-center gap-4'>
             <div className='flex flex-col space-y-1.5'>
-              <Label htmlFor='workplace'>Stanowisko</Label>
+              <Label htmlFor='workplace'>{cDict.workplaceLabel}</Label>
               <Popover
                 open={openWorkplace}
                 onOpenChange={setOpenWorkplace}
@@ -170,14 +167,14 @@ export default function ExportCard() {
                   >
                     {selectedWorkplace
                       ? selectedWorkplace.toUpperCase()
-                      : 'Wybierz...'}
+                      : cDict.chooseInputPlaceholder}
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className=' w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
-                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    <CommandEmpty>{cDict.emptyCommand}</CommandEmpty>
                     <CommandGroup className='max-h-48 overflow-y-auto'>
                       {workplaces.map((workplace) => (
                         <CommandItem
@@ -201,7 +198,7 @@ export default function ExportCard() {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <Label htmlFor='article'>Artykuł</Label>
+              <Label htmlFor='article'>{cDict.articleLabel}</Label>
               <Popover
                 open={openArticle}
                 onOpenChange={setOpenArticle}
@@ -221,16 +218,16 @@ export default function ExportCard() {
                           );
                           return foundArticle
                             ? `${foundArticle.article} - ${foundArticle.name}`
-                            : 'Wybierz...';
+                            : cDict.chooseInputPlaceholder;
                         })()
-                      : 'Wybierz...'}
+                      : cDict.chooseInputPlaceholder}
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
-                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    <CommandEmpty>{cDict.emptyCommand}</CommandEmpty>
                     {/* Scroll working with: */}
                     <CommandGroup className='max-h-48 overflow-y-auto'>
                       {/* not with: */}
@@ -257,7 +254,7 @@ export default function ExportCard() {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <Label htmlFor='status'>Status</Label>
+              <Label htmlFor='status'>{cDict.statusLabel}</Label>
               <Popover open={openStatus} onOpenChange={setOpenStatus}>
                 <PopoverTrigger asChild>
                   <Button
@@ -268,14 +265,14 @@ export default function ExportCard() {
                   >
                     {selectedStatus
                       ? getLabelForStatus(selectedStatus)
-                      : 'Wybierz...'}
+                      : cDict.chooseInputPlaceholder}
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
-                    <CommandEmpty>Nie znaleziono</CommandEmpty>
+                    <CommandEmpty>{cDict.emptyCommand}</CommandEmpty>
                     <CommandGroup className='max-h-48 overflow-y-auto'>
                       {statusOptions.map((statusOption) => (
                         <CommandItem
@@ -291,7 +288,7 @@ export default function ExportCard() {
                   </Command>
                 </PopoverContent>
               </Popover>
-              <Label htmlFor='date'>Zakres czasu</Label>
+              <Label htmlFor='date'>{cDict.timeFrameLabel}</Label>
               {/* className in '' if needed */}
               <div className={cn('grid gap-2', '')}>
                 <Popover>
@@ -333,7 +330,7 @@ export default function ExportCard() {
                 <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
                 <Input
                   type='text'
-                  placeholder='Wpisz dowolny...'
+                  placeholder={cDict.anyInputPlaceholder}
                   value={searchTerm}
                   onChange={handleInputChange}
                 />
@@ -343,15 +340,15 @@ export default function ExportCard() {
         </CardContent>
         <CardFooter className='flex justify-between'>
           <Button variant='destructive' type='button' onClick={handleClear}>
-            Wyczyść
+            {cDict.clearButton}
           </Button>
           {isPending ? (
             <Button disabled>
               <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Generowanie
+              {cDict.downloadingButton}
             </Button>
           ) : (
-            <Button type='submit'>Pobierz plik</Button>
+            <Button type='submit'>{cDict.downloadButton}</Button>
           )}
         </CardFooter>
       </form>

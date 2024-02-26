@@ -30,7 +30,7 @@ type Position = {
   count: string;
 };
 
-export default function ReworkCard() {
+export default function ReworkCard({ cDict }: { cDict: any }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isPendingSearching, setIsPendingSearching] = useState(false);
   const [error, setError] = useState('');
@@ -43,7 +43,7 @@ export default function ReworkCard() {
     event.preventDefault(); // Prevent the default form submission behavior
     setUpdated(0);
     if (!searchTerm) {
-      setError('Brak wartości do wyszukania!');
+      setError(cDict.noSearchTerm);
       return;
     }
     try {
@@ -51,7 +51,7 @@ export default function ReworkCard() {
       const search = await searchPositions(searchTerm);
       console.log('search', search);
       if (search.length === 0) {
-        setError('Nie znaleziono żadnej pozycji!');
+        setError(cDict.noResults);
         return;
       }
       setError('');
@@ -66,15 +66,15 @@ export default function ReworkCard() {
   const markAsRework = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent the default form submission behavior
     if (!searchTerm) {
-      setError('Skontaktuj się z IT!');
+      setError(cDict.pleaseContactIt);
       return;
     }
     if (!reason) {
-      setError('Wprowadź powód!');
+      setError(cDict.noReason);
       return;
     }
     if (reason.length < 20) {
-      setError('Powód musi mieć co najmniej 20 znaków!');
+      setError(cDict.tooShortReason);
       return;
     }
     try {
@@ -115,8 +115,8 @@ export default function ReworkCard() {
         {!error ? (
           <CardDescription>
             {positions.length === 0
-              ? 'Wpisz kod DMC, batch hydra lub paleta by wyszukać i oznaczyć jako rework.'
-              : `Sprawdź poprawność wyszukanych pozycji oraz wprowadź powód by oznaczyć jako rework.`}
+              ? cDict.positionsLengthZero
+              : cDict.checkPositionsAndReason}
           </CardDescription>
         ) : (
           <CardDescription className='text-red-700'>{error}</CardDescription>
@@ -128,10 +128,10 @@ export default function ReworkCard() {
             {positions.length === 0 ? (
               <>
                 <div className='flex flex-col space-y-1.5'>
-                  <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
+                  <Label htmlFor='input'>{cDict.inputLabel}</Label>
                   <Input
                     type='text'
-                    placeholder='Wpisz dowolny...'
+                    placeholder={cDict.inputPlaceholder}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -143,18 +143,18 @@ export default function ReworkCard() {
                       Szukanie
                     </Button>
                   ) : (
-                    <Button type='submit'>Wyszukaj</Button>
+                    <Button type='submit'>{cDict.searchButton}</Button>
                   )}
                 </div>
               </>
             ) : (
               <>
-                <ReworkTable data={positions} />
+                <ReworkTable cDict={cDict} data={positions} />
                 <Separator />
                 <div className='grid w-full gap-1.5'>
-                  <Label htmlFor='message'>Powód</Label>
+                  <Label htmlFor='message'>{cDict.reasonInputLabel}</Label>
                   <Textarea
-                    placeholder='Wprowadź krótki opis reworku.'
+                    placeholder={cDict.reasonTextareaPlaceholder}
                     id='reason'
                     value={reason}
                     className={reason.length >= 20 ? 'border-bruss' : ''}
@@ -181,7 +181,7 @@ export default function ReworkCard() {
                       Zapisywanie
                     </Button>
                   ) : (
-                    <Button type='submit'>Oznacz jako rework</Button>
+                    <Button type='submit'>{cDict.markAsReworkButton}</Button>
                   )}
                 </div>
               </>
@@ -191,7 +191,7 @@ export default function ReworkCard() {
       </CardContent>
       {updated > 0 && (
         <CardFooter className='font-bold text-bruss'>
-          Zaktualizowano pozycji: {updated}!
+          {cDict.updatedPositions} {updated}!
         </CardFooter>
       )}
     </Card>

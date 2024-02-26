@@ -10,7 +10,7 @@ export default async function ExportData({
   const dict = await getDictionary(lang);
   return (
     <main className='m-2 flex justify-center'>
-      <ExportCard />
+      <ExportCard cDict={dict.exportData} />
     </main>
   );
 }

@@ -33,8 +33,46 @@
   "home": {
     "title": "Cześć!"
   },
-  "exportData": {},
-  "rework": {},
+  "exportData": {
+    "cardTitle": "Export danych",
+    "cardDescription": "W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000 najnowszych rekordów.",
+    "workplaceLabel": "Stanowisko",
+
+    "statusLabel": "Status",
+    "chooseInputPlaceholder": "wybierz...",
+    "anyInputPlaceholder": "wpisz dowolny...",
+    "emptyCommand": "nie znaleziono",
+    "downloadButton": "Pobierz plik",
+    "downloadingButton": "Generowanie",
+    "clearButton": "Wyczyść",
+    "timeFrameLabel": "Zakres czasu",
+    "dateFromLabel": "Data od",
+    "dateToLabel": "Data do",
+    "exportButton": "Export",
+    "toasts": {
+      "exportSuccess": "Dane wyeksportowane!",
+      "exportError": "Błąd podczas eksportu danych!"
+    }
+  },
+  "rework": {
+    "articleLabel": "Artykuł",
+    "noSearchTerm": "Brak wartości do wyszukania!",
+    "noResults": "Nie znaleziono żadnej pozycji!",
+    "pleaseContactIt": "Skontaktuj się z IT!",
+    "noReason": "Wprowadź powód!",
+    "tooShortReason": "Powód musi mieć co najmniej 20 znaków!",
+    "positionsLengthZero": "Wpisz kod DMC, batch hydra lub paleta by wyszukać i oznaczyć jako rework.",
+    "checkPositionsAndReason": "Sprawdź poprawność wyszukanych pozycji oraz wprowadź powód by oznaczyć jako rework.",
+    "inputLabel": "DMC / batch hydra / paleta",
+    "inputPlaceholder": "wpisz dowolny...",
+    "searchButton": "Wyszukaj",
+    "reasonInputLabel": "Powód",
+    "reasonTextareaPlaceholder": "Wprowadź krótki opis reworku.",
+    "markAsReworkButton": "Oznacz jako rework",
+    "updatedPositions": "Zaktualizowano pozycji:",
+    "statusTableHead": "Status",
+    "workplaceTableHead": "Stanowisko"
+  },
   "articleConfig": {
     "tabs": {
       "edit": "Edytuj",

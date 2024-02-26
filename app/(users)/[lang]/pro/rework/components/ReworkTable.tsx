@@ -17,10 +17,11 @@ type Position = {
 };
 
 type ReworkTableProp = {
+  cDict: any;
   data: Position[];
 };
 
-export default function ReworkTable({ data }: ReworkTableProp) {
+export default function ReworkTable({ cDict, data }: ReworkTableProp) {
   const polishStatus = {
     pallet: 'paleta',
     warehouse: 'magazyn',
@@ -40,8 +41,8 @@ export default function ReworkTable({ data }: ReworkTableProp) {
       <TableHeader>
         <TableRow>
           <TableHead className='w-[100px]'>Artykuł</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Stanowisko</TableHead>
+          <TableHead>{cDict.statusTableHead}</TableHead>
+          <TableHead>{cDict.workplaceTableHead}</TableHead>
           <TableHead className='text-right'>Ilość</TableHead>
         </TableRow>
       </TableHeader>
