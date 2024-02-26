@@ -1,4 +1,7 @@
 import { auth } from '@/auth';
+import { Locale } from '@/i18n.config';
+import { getDictionary } from '@/lib/dictionary';
+import { redirect } from 'next/navigation';
 import Info from '../../components/Info';
 
 export const metadata = {
@@ -7,15 +10,17 @@ export const metadata = {
 
 export default async function Layout({
   children,
+  params: { lang },
 }: {
   children: React.ReactNode;
+  params: { lang: Locale };
 }) {
-  const infoDescription = (
+  const dict = await getDictionary(lang);
+  const noAccess = (
     <>
-      Nie posiadasz uprawnień do funkcji oznaczania jako części rework. Kliknij
-      by wysłać zgłoszenie w celu ich nadania:{' '}
+      {dict.noAccess}{' '}
       <a
-        href={`mailto:support@bruss-group.com?subject=Next BRUSS: uprawnienia rework`}
+        href={`mailto:support@bruss-group.com?subject=Next BRUSS: ${dict.noAccessMailSubject}`}
         className='text-blue-600 hover:text-blue-800'
       >
         support@bruss-group.com
@@ -24,10 +29,13 @@ export default async function Layout({
     </>
   );
   const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
   if (!session?.user.roles?.includes('rework')) {
     return (
       <main className='m-2 flex justify-center'>
-        <Info title='Brak uprawnień!' description={infoDescription} />
+        <Info title={dict.noAccessTitle} description={noAccess} />
       </main>
     );
   }
