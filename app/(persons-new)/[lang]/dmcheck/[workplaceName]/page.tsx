@@ -40,14 +40,10 @@ export default async function ArticleSelectionPage({
               pathname: `${workplaceName}/${a._id.toString()}`,
             }}
           >
-            <Button
-              className='m-4 flex h-auto w-auto flex-col'
-              variant='outline'
-            >
-              <div className='text-l'>
+            <Button className='m-4 flex flex-col' variant='outline'>
+              <div className='mb-2 text-xl'>
                 {a.articleNumber} - {a.articleName}
               </div>
-              <div className='font-extralight'>{a.articleNote}</div>
               <div className='font-extralight'>
                 {a.piecesPerBox} {cDict.piecesPerBox}
               </div>
@@ -58,6 +54,10 @@ export default async function ArticleSelectionPage({
                   </div>
                 </>
               )}
+              <div className='mt-2'>
+                {a.articleNote} lorem ipsumrem ipsumlorem ipsumlorem ipsumlorem
+                ipsumlorem ipsumlorem ipsum
+              </div>
             </Button>
           </Link>
         ))}

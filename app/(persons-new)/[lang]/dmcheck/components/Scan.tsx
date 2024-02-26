@@ -27,7 +27,7 @@ export function Scan({
   operatorPersonalNumber,
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
-  const [play, { sound }] = useSound('/sound.mp3');
+  const [play, { sound }] = useSound('/sound.mp3'); // audio file must be in the public/[lang] folder otherwise it is not detected, is this a next js error?
 
   useEffect(() => {
     switch (state?.message) {
