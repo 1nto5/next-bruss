@@ -28,30 +28,30 @@ import { useRouter } from 'next/navigation';
 import { register } from '../actions';
 import { toast } from 'sonner';
 
-const formSchema = z
-  .object({
-    email: z
-      .string()
-      .regex(/@bruss-group\.com$/, {
-        message: 'Podany email nie należy do domeny bruss-group.com!',
-      })
-      .min(23, { message: 'Email jest za krótki!' }),
-    password: z
-      .string()
-      .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: 'Hasło musi zawierać przynajmniej jeden znak specjalny!',
-      }),
-    confirmPassword: z
-      .string()
-      .min(1, { message: 'Potiwerdzenie hasła jest wymagane!' }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Hasła nie są zgodne!',
-  });
+export default function RegisterForm({ cDict }: { cDict: any }) {
+  const formSchema = z
+    .object({
+      email: z
+        .string()
+        .regex(/@bruss-group\.com$/, {
+          message: cDict.zod.emailNotFromBruss,
+        })
+        .min(23, { message: cDict.zod.emailTooShort }),
+      password: z
+        .string()
+        .min(6, { message: cDict.zod.passwordTooShort })
+        .regex(/[^a-zA-Z0-9]/, {
+          message: cDict.zod.passwordNoSpecialCharachter,
+        }),
+      confirmPassword: z
+        .string()
+        .min(1, { message: cDict.zod.passwordNoConfirm }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ['confirmPassword'],
+      message: cDict.zod.passwordsNotMatch,
+    });
 
-export default function RegisterForm() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,21 +73,21 @@ export default function RegisterForm() {
       const result = await register(values.email, values.password);
 
       if (result?.status === 'registered') {
-        toast.success('Konto zostało utworzone!');
+        toast.success(cDict.toasts.registered);
         router.replace('/auth');
       }
       if (result?.status === 'exists') {
-        toast.error('Konto istnieje!');
+        toast.error(cDict.toasts.exists);
         return;
       }
       if (result?.error) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error(cDict.toasts.pleaseContactIt);
         console.log('User registration was unsuccessful.:', result?.error);
         return;
       }
     } catch (error) {
       console.error('User registration was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(cDict.toasts.pleaseContactIt);
       return;
     } finally {
       setIsPending(false);
@@ -109,7 +109,7 @@ export default function RegisterForm() {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{cDict.emailInputLabel}</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
@@ -125,7 +125,7 @@ export default function RegisterForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło</FormLabel>
+                  <FormLabel>{cDict.passwordInputLabel}</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -141,7 +141,7 @@ export default function RegisterForm() {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormLabel>{cDict.confirmPasswordInputLabel}</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -157,10 +157,10 @@ export default function RegisterForm() {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Rejestracja
+                {cDict.registeringButton}
               </Button>
             ) : (
-              <Button type='submit'>Zarejestruj</Button>
+              <Button type='submit'>{cDict.registerButton}</Button>
             )}
           </CardFooter>
         </form>

@@ -30,6 +30,37 @@
   "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij by wysłać zgłoszenie w celu ich nadania:",
   "noAccessTitle": "Brak uprawnień!",
   "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
+  "auth": {
+    "loginTab": "Logowanie",
+    "registerTab": "Rejestracja",
+    "emailInputLabel": "Email",
+    "passwordInputLabel": "Hasło",
+    "confirmPasswordInputLabel": "Potwierdź hasło",
+    "loginButton": "Zaloguj",
+    "loggingButton": "Logowanie",
+    "resetPasswordButton": "Reset hasła",
+    "emailSendingButton": "Wysyłanie email",
+    "registerButton": "Zarejestruj",
+    "registeringButton": "Rejestracja",
+    "zod": {
+      "emailTooShort": "Email jest za krótki!",
+      "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",
+      "passwordEmpty": "Hasło nie może być puste!",
+      "passwordTooShort": "Hasło musi zawierać co najmniej 6 znaków!",
+      "passwordNoSpecialCharachter": "Hasło musi zawierać przynajmniej jeden znak specjalny",
+      "passwordNoConfirm": "Potwierdzenie hasła jest wymagane!",
+      "passwordsNotMatch": "Hasła nie są takie same!"
+    },
+    "toasts": {
+      "pleaseContactIt": "Skontaktuj się z IT!",
+      "loginError": "Nieprawidłowe dane logowania!",
+      "resetPasswordEmailSent": "Wysłano link do resetowania hasła!",
+      "noUserWithThisEmail": "Brak użytkownika o podanym adresie email!",
+      "resetPasswordNoEmail": "Wprowadź email by zresetować hasło!",
+      "registered": "Konto zostało utworzone!",
+      "exists": "Konto już istnieje!"
+    }
+  },
   "home": {
     "title": "Cześć!"
   },

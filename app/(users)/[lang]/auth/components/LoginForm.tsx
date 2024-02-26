@@ -30,20 +30,20 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-const formSchema = z.object({
-  email: z
-    .string()
-    .min(23, { message: 'Email jest za krótki!' })
-    .regex(/@bruss-group\.com$/, {
-      message: 'Podany email nie należy do domeny bruss-group.com!',
-    }),
-  password: z.string().min(1, { message: 'Password cannot be empty' }),
-});
-
-export default function LoginForm() {
+export default function LoginForm({ cDict }: { cDict: any }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [isPendingSending, setIsPendingSending] = useState(false);
+
+  const formSchema = z.object({
+    email: z
+      .string()
+      .min(23, { message: cDict.zod.emailTooShort })
+      .regex(/@bruss-group\.com$/, {
+        message: cDict.zod.emailNotFromBruss,
+      }),
+    password: z.string().min(1, { message: cDict.zod.passwordEmpty }),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,7 +66,7 @@ export default function LoginForm() {
     } catch (error) {
       // console.error(error);
       // toast.error('Skontaktuj się z IT!');
-      toast.error('Nieprawidłowe dane logowania!');
+      toast.error(cDict.toasts.loginError);
       return;
     } finally {
       setIsPending(false);
@@ -77,34 +77,34 @@ export default function LoginForm() {
     const email = form.getValues('email');
     // console.log('email: ', email);
     if (!email) {
-      toast.error('Wprowadź email by zresetować hasło!');
+      toast.error(cDict.toasts.resetPasswordNoEmail);
       return;
     }
     try {
       setIsPendingSending(true);
       const result = await resetPassword(email);
       if (!result) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error(cDict.toasts.pleaseContactIt);
         return;
       }
 
       if (result.status === 'sent') {
-        toast.success('Wysłano link do resetowania hasła!');
+        toast.success(cDict.toasts.resetPasswordEmailSent);
         return;
       }
 
       if (result?.error) {
-        toast.error('Skontaktuj się z IT!');
+        toast.error(cDict.toasts.pleaseContactIt);
         console.error('User password reset was unsuccessful.:', result?.error);
       }
 
       if (result.status === 'not exists') {
-        toast.error('Brak użytkownika o podanym adresie email!');
+        toast.error(cDict.toasts.noUserWithThisEmail);
         return;
       }
     } catch (error) {
       console.error('User password reset was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(cDict.toasts.pleaseContactIt);
       return;
     } finally {
       setIsPendingSending(false);
@@ -126,7 +126,7 @@ export default function LoginForm() {
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{cDict.emailInputLabel}</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
@@ -142,7 +142,7 @@ export default function LoginForm() {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło</FormLabel>
+                  <FormLabel>{cDict.passwordInputLabel}</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -158,7 +158,7 @@ export default function LoginForm() {
             {isPendingSending ? (
               <Button type='button' variant='destructive' disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Wysyłanie email
+                {cDict.emailSendingButton}
               </Button>
             ) : (
               <Button
@@ -166,16 +166,16 @@ export default function LoginForm() {
                 type='button'
                 variant='destructive'
               >
-                Reset hasła
+                {cDict.resetPasswordButton}
               </Button>
             )}
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Logowanie
+                {cDict.loggingButton}
               </Button>
             ) : (
-              <Button type='submit'>Zaloguj</Button>
+              <Button type='submit'>{cDict.loginButton}</Button>
             )}
           </CardFooter>
         </form>

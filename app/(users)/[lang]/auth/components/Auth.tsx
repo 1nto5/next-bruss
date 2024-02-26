@@ -6,14 +6,14 @@ export default function Auth({ cDict }: { cDict: any }) {
   return (
     <Tabs defaultValue='login' className='w-[400px]'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='login'>Logowanie</TabsTrigger>
-        <TabsTrigger value='register'>Rejestracja</TabsTrigger>
+        <TabsTrigger value='login'>{cDict.loginTab}</TabsTrigger>
+        <TabsTrigger value='register'>{cDict.registerTab}</TabsTrigger>
       </TabsList>
       <TabsContent value='login'>
-        <LoginForm />
+        <LoginForm cDict={cDict} />
       </TabsContent>
       <TabsContent value='register'>
-        <RegisterForm />
+        <RegisterForm cDict={cDict} />
       </TabsContent>
     </Tabs>
   );
