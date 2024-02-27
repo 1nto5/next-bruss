@@ -61,7 +61,7 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
           {Array.from(Array(9).keys()).map((number) => (
             <Button
               type='button'
-              className='w-18 h-14'
+              className='w-18 h-12'
               variant='outline'
               key={number + 1}
               onClick={() => handleNumberClick(number + 1)}
@@ -73,19 +73,19 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
             type='button'
             variant='destructive'
             onClick={() => setPersonalNumber('')}
-            className='w-18 h-14'
+            className='w-18 h-12'
           >
             Reset
           </Button>
           <Button
             type='button'
-            className='w-18 h-14'
+            className='w-18 h-12'
             variant='outline'
             onClick={() => handleNumberClick(0)}
           >
             0
           </Button>
-          <Button type='submit' aria-disabled={pending} className='w-18 h-14'>
+          <Button type='submit' aria-disabled={pending} className='w-18 h-12'>
             {cDict.confirmButton}
           </Button>
         </>
