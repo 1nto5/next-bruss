@@ -33,6 +33,7 @@ export function ScanInput({
             type='text'
             placeholder={placeholder}
             className='text-center'
+            autoComplete='off'
           />
           <input type='submit' hidden />
         </>

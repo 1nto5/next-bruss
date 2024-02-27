@@ -55,6 +55,7 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
         value={personalNumber}
         onChange={(e) => setPersonalNumber(e.target.value)}
         className='col-span-3'
+        autoComplete='off'
       />
       {lang !== 'de' && (
         <>
