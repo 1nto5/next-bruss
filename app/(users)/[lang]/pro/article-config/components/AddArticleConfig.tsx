@@ -44,6 +44,7 @@ import { saveArticleConfig } from '../actions';
 export default function AddArticleConfig({ dict }: any) {
   const cDict = dict?.articleConfig?.add;
 
+  // TODO: jak pallet false to nie dziaa zapis
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z
     .object({
@@ -94,39 +95,39 @@ export default function AddArticleConfig({ dict }: any) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      workplace: '',
-      articleNumber: '',
-      articleName: '',
-      articleNote: '',
-      piecesPerBox: '',
-      pallet: false,
-      boxesPerPallet: '',
-      dmc: '',
-      dmcFirstValidation: '',
-      secondValidation: false,
-      dmcSecondValidation: '',
-      hydraProcess: '',
-      ford: false,
-      bmw: false,
-    },
-
     // defaultValues: {
-    //   workplace: 'eol34',
-    //   articleNumber: '12345',
-    //   articleName: 'Test Article',
-    //   articleNote: 'This is a test note',
-    //   piecesPerBox: '10',
-    //   pallet: true,
-    //   boxesPerPallet: '20',
-    //   dmc: 'Test DM 123455',
-    //   dmcFirstValidation: 'Test',
+    //   workplace: '',
+    //   articleNumber: '',
+    //   articleName: '',
+    //   articleNote: '',
+    //   piecesPerBox: '',
+    //   pallet: false,
+    //   boxesPerPallet: '',
+    //   dmc: '',
+    //   dmcFirstValidation: '',
     //   secondValidation: false,
     //   dmcSecondValidation: '',
-    //   hydraProcess: '050',
+    //   hydraProcess: '',
     //   ford: false,
     //   bmw: false,
     // },
+
+    defaultValues: {
+      workplace: 'eol34',
+      articleNumber: '12345',
+      articleName: 'Test Article',
+      articleNote: 'This is a test note',
+      piecesPerBox: '10',
+      pallet: true,
+      boxesPerPallet: '20',
+      dmc: 'Test DM 123455',
+      dmcFirstValidation: 'Test',
+      secondValidation: false,
+      dmcSecondValidation: '',
+      hydraProcess: '050',
+      ford: false,
+      bmw: false,
+    },
   });
 
   const isPalletChecked = form.watch('pallet');
@@ -136,6 +137,7 @@ export default function AddArticleConfig({ dict }: any) {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
+    console.log('data: ', data);
     const convertedData = {
       ...data,
       piecesPerBox: Number(data.piecesPerBox),

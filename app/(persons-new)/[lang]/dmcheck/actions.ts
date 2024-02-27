@@ -156,11 +156,11 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    // if (articleConfig.ford) {
-    //   if (!fordDateValidation(dmc)) {
-    //     return { message: 'ford date not valid' };
-    //   }
-    // }
+    if (articleConfig.ford) {
+      if (!fordDateValidation(dmc)) {
+        return { message: 'ford date not valid' };
+      }
+    }
 
     const scansCollection = await dbc('scans');
 
