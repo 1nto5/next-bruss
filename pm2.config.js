@@ -6,7 +6,7 @@ module.exports = {
       args: 'start',
       //   interpreter: 'bun',
       env: {
-        PORT: 81,
+        PORT: 80,
         NODE_ENV: 'production',
       },
     },
