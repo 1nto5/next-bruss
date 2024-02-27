@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "next-bruss",
+      "name": "next-bruss 3000",
       "script": "./node_modules/next/dist/bin/next",
       "args": "start",
       "env": {
