@@ -47,9 +47,7 @@ export default function AddArticleConfig({ dict }: any) {
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z
     .object({
-      workplace: z.string().regex(/^[a-z]{3}\d{2}$/, {
-        message: cDict.z.workplace,
-      }),
+      workplace: z.string().min(4, { message: cDict.z.workplace }),
       articleNumber: z
         .string()
         .length(5, { message: cDict.z.articleNumber })

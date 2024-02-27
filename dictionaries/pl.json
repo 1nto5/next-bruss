@@ -111,7 +111,7 @@
     },
     "add": {
       "z": {
-        "workplace": "Podaj 3 małe litery oraz 2 cyfry! (np. eol74)",
+        "workplace": "Podaj minimum 4 znaki zgodne z aktualnym nazewnictwem!",
         "articleNumber": "Podaj 5 cyfr!",
         "articleName": "Minimum 10 znaków!",
         "boxesPerPallet": "Wprowadź liczbę całkowitą!",
