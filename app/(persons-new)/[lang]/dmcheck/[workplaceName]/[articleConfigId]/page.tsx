@@ -18,7 +18,7 @@ export default async function PersonLoginPage({
         <CardTitle>{cDict.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className='flex flex-wrap justify-center'>
-        <PersonLogin cDict={dict.dmcheck.personLogin} />
+        <PersonLogin cDict={dict.dmcheck.personLogin} lang={lang} />
       </CardContent>
     </Card>
   );

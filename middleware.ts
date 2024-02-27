@@ -26,6 +26,8 @@ export function middleware(request: NextRequest) {
   if (
     [
       '/logo.png',
+      '/success.mp3',
+      '/error.mp3',
       // Your other files in `public`
     ].includes(pathname)
   )

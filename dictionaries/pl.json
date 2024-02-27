@@ -157,7 +157,10 @@
       "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
       "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: ",
       "piecesPerBox": "szt. / box",
-      "boxesPerPallet": "box / paleta"
+      "boxesPerPallet": "box / paleta",
+      "articleNumber": "numer",
+      "articleName": "nazwa",
+      "articleNote": "notatka"
     },
     "personLogin": {
       "cardTitle": "Logowanie",

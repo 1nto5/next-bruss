@@ -15,9 +15,10 @@ const initialState = {
 
 type PersonLoginProps = {
   cDict: any;
+  lang: string;
 };
 
-export function PersonLogin({ cDict }: PersonLoginProps) {
+export function PersonLogin({ cDict, lang }: PersonLoginProps) {
   const [state, formAction] = useFormState(personLogin, initialState);
   const { pending } = useFormStatus();
   const [personalNumber, setPersonalNumber] = useState('');
@@ -55,36 +56,40 @@ export function PersonLogin({ cDict }: PersonLoginProps) {
         onChange={(e) => setPersonalNumber(e.target.value)}
         className='col-span-3'
       />
-      {Array.from(Array(9).keys()).map((number) => (
-        <Button
-          type='button'
-          className='h-16 w-16'
-          variant='outline'
-          key={number + 1}
-          onClick={() => handleNumberClick(number + 1)}
-        >
-          {number + 1}
-        </Button>
-      ))}
-      <Button
-        type='button'
-        variant='destructive'
-        onClick={() => setPersonalNumber('')}
-        className='h-16 w-16'
-      >
-        Reset
-      </Button>
-      <Button
-        type='button'
-        className='h-16 w-16'
-        variant='outline'
-        onClick={() => handleNumberClick(0)}
-      >
-        0
-      </Button>
-      <Button type='submit' aria-disabled={pending} className='h-16 w-16'>
-        {cDict.confirmButton}
-      </Button>
+      {lang !== 'de' && (
+        <>
+          {Array.from(Array(9).keys()).map((number) => (
+            <Button
+              type='button'
+              className='w-18 h-14'
+              variant='outline'
+              key={number + 1}
+              onClick={() => handleNumberClick(number + 1)}
+            >
+              {number + 1}
+            </Button>
+          ))}
+          <Button
+            type='button'
+            variant='destructive'
+            onClick={() => setPersonalNumber('')}
+            className='w-18 h-14'
+          >
+            Reset
+          </Button>
+          <Button
+            type='button'
+            className='w-18 h-14'
+            variant='outline'
+            onClick={() => handleNumberClick(0)}
+          >
+            0
+          </Button>
+          <Button type='submit' aria-disabled={pending} className='w-18 h-14'>
+            {cDict.confirmButton}
+          </Button>
+        </>
+      )}
     </form>
   );
 }

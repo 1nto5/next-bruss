@@ -1,8 +1,203 @@
 {
-  "home": {
-    "title": "Hallo!"
-  },
   "header": {
-    "productionTitle": "Produkcja"
+    "production": {
+      "title": "Produkcja",
+      "exportData": {
+        "title": "Export danych",
+        "description": "Generowanie pliku excel z danymi systemu skanowania."
+      },
+      "rework": {
+        "title": "Rework",
+        "description": "Oznaczanie partii jako rework - ponowne skanowanie."
+      },
+      "articleConfig": {
+        "title": "Konfiguracja artykułów",
+        "description": "Dodawanie i edycja artykułów w systmie skanowania DMC."
+      }
+    },
+    "inventory": {
+      "title": "Inwentaryzacja",
+      "inventory": {
+        "title": "Inwentaryzacja",
+        "description": "Aplikacja wspierająca proces inwentaryzacji."
+      },
+      "inventoryApprove": {
+        "title": "Zatwierdzanie inwentaryzacji",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      }
+    }
+  },
+  "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij by wysłać zgłoszenie w celu ich nadania:",
+  "noAccessTitle": "Brak uprawnień!",
+  "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
+  "auth": {
+    "loginTab": "Logowanie",
+    "registerTab": "Rejestracja",
+    "emailInputLabel": "Email",
+    "passwordInputLabel": "Hasło",
+    "confirmPasswordInputLabel": "Potwierdź hasło",
+    "loginButton": "Zaloguj",
+    "loggingButton": "Logowanie",
+    "resetPasswordButton": "Reset hasła",
+    "emailSendingButton": "Wysyłanie email",
+    "registerButton": "Zarejestruj",
+    "registeringButton": "Rejestracja",
+    "zod": {
+      "emailTooShort": "Email jest za krótki!",
+      "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",
+      "passwordEmpty": "Hasło nie może być puste!",
+      "passwordTooShort": "Hasło musi zawierać co najmniej 6 znaków!",
+      "passwordNoSpecialCharachter": "Hasło musi zawierać przynajmniej jeden znak specjalny",
+      "passwordNoConfirm": "Potwierdzenie hasła jest wymagane!",
+      "passwordsNotMatch": "Hasła nie są takie same!"
+    },
+    "toasts": {
+      "pleaseContactIt": "Skontaktuj się z IT!",
+      "loginError": "Nieprawidłowe dane logowania!",
+      "resetPasswordEmailSent": "Wysłano link do resetowania hasła!",
+      "noUserWithThisEmail": "Brak użytkownika o podanym adresie email!",
+      "resetPasswordNoEmail": "Wprowadź email by zresetować hasło!",
+      "registered": "Konto zostało utworzone!",
+      "exists": "Konto już istnieje!"
+    }
+  },
+  "home": {
+    "title": "Cześć!"
+  },
+  "exportData": {
+    "cardTitle": "Export danych",
+    "cardDescription": "W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000 najnowszych rekordów.",
+    "workplaceLabel": "Stanowisko",
+
+    "statusLabel": "Status",
+    "chooseInputPlaceholder": "wybierz...",
+    "anyInputPlaceholder": "wpisz dowolny...",
+    "emptyCommand": "nie znaleziono",
+    "downloadButton": "Pobierz plik",
+    "downloadingButton": "Generowanie",
+    "clearButton": "Wyczyść",
+    "timeFrameLabel": "Zakres czasu",
+    "dateFromLabel": "Data od",
+    "dateToLabel": "Data do",
+    "exportButton": "Export",
+    "toasts": {
+      "exportSuccess": "Dane wyeksportowane!",
+      "exportError": "Błąd podczas eksportu danych!"
+    }
+  },
+  "rework": {
+    "articleLabel": "Artykuł",
+    "noSearchTerm": "Brak wartości do wyszukania!",
+    "noResults": "Nie znaleziono żadnej pozycji!",
+    "pleaseContactIt": "Skontaktuj się z IT!",
+    "noReason": "Wprowadź powód!",
+    "tooShortReason": "Powód musi mieć co najmniej 20 znaków!",
+    "positionsLengthZero": "Wpisz kod DMC, batch hydra lub paleta by wyszukać i oznaczyć jako rework.",
+    "checkPositionsAndReason": "Sprawdź poprawność wyszukanych pozycji oraz wprowadź powód by oznaczyć jako rework.",
+    "inputLabel": "DMC / batch hydra / paleta",
+    "inputPlaceholder": "wpisz dowolny...",
+    "searchButton": "Wyszukaj",
+    "reasonInputLabel": "Powód",
+    "reasonTextareaPlaceholder": "Wprowadź krótki opis reworku.",
+    "markAsReworkButton": "Oznacz jako rework",
+    "updatedPositions": "Zaktualizowano pozycji:",
+    "statusTableHead": "Status",
+    "workplaceTableHead": "Stanowisko"
+  },
+  "articleConfig": {
+    "tabs": {
+      "edit": "Edytuj",
+      "add": "Dodaj"
+    },
+    "add": {
+      "z": {
+        "workplace": "Podaj 3 małe litery oraz 2 cyfry! (np. eol74)",
+        "articleNumber": "Podaj 5 cyfr!",
+        "articleName": "Minimum 10 znaków!",
+        "boxesPerPallet": "Wprowadź liczbę całkowitą!",
+        "dmc": "Minimum 10 znaków!",
+        "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC!",
+        "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"!",
+        "piecesPerBox": "Wprowadź liczbę całkowitą!",
+        "hydraProcess": "Wybierz proces!"
+      },
+      "cardTitle": "Dodaj artykuł",
+      "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
+      "workplaceFormLabel": "Stanowisko",
+      "articleNumberFormLabel": "Numer artykułu",
+      "articleNameFormLabel": "Nazwa artykułu",
+      "piecesPerBoxFormLabel": "Ilość sztuk w boxie",
+      "palletFormLabel": "Etykiety zbiorcze na paletę",
+      "boxesPerPalletFormLabel": "Ilość boxów na palecie",
+      "dmcFormLabel": "DMC",
+      "dmcFormDescription": "Pełna zawartość skanowanego kodu DMC",
+      "dmcFirstValidationFormLabel": "Walidowana wartość DMC",
+      "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC",
+      "secondValidationCheckboxFormLabel": "Walidacja dwóch ciągów znaków",
+      "dmcSecondValidationFormLabel": "Druga walidowana wartość DMC",
+      "dmcSecondValidationFormDescription": "Używaj tylko w przyadku gdy DMC zawiera dwa stałe ciągi znaków (początek i koniec)!",
+      "fordCheckboxFormLabel": "Walidacja daty FORD",
+      "bmwCheckboxFormLabel": "Walidacja daty BMW",
+      "hydraProcessFormLabel": "Proces Hydra",
+      "hydraProcessFormDescription": "Proeces HYDRA z którego pochodzi artykuł.",
+      "hydraProcessSelectOption050": "050 - po kontroli ciśnieniowej EOL",
+      "hydraProcessSelectOption090": "090 - Q3",
+      "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",
+      "articleNoteFormLabel": "Notatka do artykułu",
+      "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)",
+      "toasts": {
+        "articleSaved": "Artykuł dodany!",
+        "articleExists": "Artykuł istnieje!"
+      }
+    }
+  },
+  "dmcheck": {
+    "articleSelection": {
+      "cardTitle": "article",
+      "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
+      "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: ",
+      "piecesPerBox": "szt. / box",
+      "boxesPerPallet": "box / paleta",
+      "articleNumber": "numer",
+      "articleName": "nazwa",
+      "articleNote": "notatka"
+    },
+    "personLogin": {
+      "cardTitle": "Logowanie",
+      "personalNumberInputPlaceholder": "eine person number",
+      "confirmButton": "Login",
+      "loginButton": "Zaloguj",
+      "loginNotValid": "Wprowadź poprawny numer personalny!",
+      "loginNotExist": "Numer personalny nie istnieje w bazie!",
+      "loginSuccess": "Zalogowano jako: "
+    },
+    "scan": {
+      "statusBar": {
+        "operator": "operator",
+        "article": "artykuł",
+        "inBox": "box",
+        "onPallet": "paleta"
+      },
+      "dmcScanInputPlaceholder": "skanuj kod DMC...",
+      "scanInputSavingPlaceholder": "przetwarzam...",
+      "hydraScanInputPlaceholder": "skanuj kod QR z etykiety HYDRA...",
+      "toast": {
+        "dmcNotValid": "Nieprawidłowy kod DMC!",
+        "articleNotFound": "Niepoprawny artykuł!",
+        "dmcSaved": "DMC zapisany!",
+        "dmcExists": "DMC istnieje w bazie!",
+        "fordDateNotValid": "Nieprawidłowa data FORD!",
+        "bmwDateNotValid": "Nieprawidłowa data BMW!",
+        "unknownSavingError": "Nieznany błąd, skontaktuj się z IT!",
+        "qrNotValid": "Nieprawidłowy kod QR!",
+        "qrWrongArticle": "Etykieta z niepoprawnym numerem artykułu!",
+        "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
+        "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
+        "batchSaved": "Batch zapisany!",
+        "batchExists": "Batch istnieje w bazie!"
+      },
+      "palletScanInputPlaceholder": "skanuj kod QR z wydrukowanej etykiety na paletę...",
+      "printPalletButton": "Wydruk etykiety na paletę"
+    }
   }
 }

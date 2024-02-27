@@ -27,50 +27,59 @@ export function Scan({
   operatorPersonalNumber,
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
-  const [play, { sound }] = useSound('/sound.mp3'); // audio file must be in the public/[lang] folder otherwise it is not detected, is this a next js error?
-
+  const [playSuccess, { sound: successSound }] = useSound('/success.mp3');
+  const [playError, { sound: errorSound }] = useSound('/error.mp3');
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':
-        play();
+        playSuccess();
         toast.success(cDict.toast.dmcSaved);
         break;
       case 'batch saved':
-        play();
+        playSuccess();
         toast.success(cDict.toast.batchSaved);
         break;
       case 'dmc exists':
         toast.error(cDict.toast.dmcExists);
         break;
       case 'batch exists':
+        playError();
         toast.error(cDict.toast.batchExists);
         break;
       case 'dmc not valid':
+        playError();
         toast.error(cDict.toast.dmcNotValid);
-
         break;
       case 'qr not valid':
+        playError();
         toast.error(cDict.toast.qrNotValid);
         break;
       case 'article not found' || 'wrong article config id':
+        playError();
         toast.error(cDict.toast.articleNotFound);
         break;
       case 'ford date not valid':
+        playError();
         toast.error(cDict.toast.fordDateNotValid);
         break;
       case 'bmw date not valid':
+        playError();
         toast.error(cDict.toast.bmwDateNotValid);
         break;
       case 'qr wrong article':
+        playError();
         toast.error(cDict.toast.qrWrongArticle);
         break;
       case 'qr wrong quantity':
+        playError();
         toast.error(cDict.toast.qrWrongQuantity);
         break;
       case 'qr wrong process':
+        playError();
         toast.error(cDict.toast.qrWrongProcess);
         break;
       case 'saving error':
+        playError();
         toast.error(cDict.toast.unknownSavingError);
         break;
       default:

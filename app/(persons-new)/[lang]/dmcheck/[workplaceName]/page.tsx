@@ -4,6 +4,15 @@ import { getArticlesConfigForWorkplace } from '../actions';
 import { Info } from '../components/Info';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -27,13 +36,16 @@ export default async function ArticleSelectionPage({
     );
   }
 
+  articlesConfigForWorkplace.sort((a, b) => a.articleNumber - b.articleNumber);
+  const showPalletColumn = articlesConfigForWorkplace.some((a) => a.pallet);
+
   return (
     <Card className='w-max-7xl'>
       <CardHeader>
         <CardTitle>{cDict.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className='flex flex-wrap justify-center'>
-        {articlesConfigForWorkplace.map((a, index) => (
+        {/* {articlesConfigForWorkplace.map((a, index) => (
           <Link
             key={index}
             href={{
@@ -60,7 +72,44 @@ export default async function ArticleSelectionPage({
               </div>
             </Button>
           </Link>
-        ))}
+        ))} */}
+        <Table>
+          {/* <TableCaption>A list of instruments.</TableCaption> */}
+          <TableHeader>
+            <TableRow>
+              <TableHead>{cDict.articleNumber}</TableHead>
+              <TableHead>{cDict.articleName}</TableHead>
+              <TableHead>{cDict.piecesPerBox}</TableHead>
+              {showPalletColumn && (
+                <TableHead>{cDict.boxesPerPallet}</TableHead>
+              )}
+              <TableHead>{cDict.articleNote}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {articlesConfigForWorkplace.map((a) => (
+              <Link
+                legacyBehavior
+                key={a.articleNumber}
+                href={{
+                  pathname: `${workplaceName}/${a._id.toString()}`,
+                }}
+              >
+                <TableRow>
+                  <TableCell className='font-bold'>{a.articleNumber}</TableCell>
+                  <TableCell>{a.articleName}</TableCell>
+                  <TableCell>{a.piecesPerBox}</TableCell>
+                  {showPalletColumn && (
+                    <TableCell>{a.pallet ? a.boxesPerPallet : '-'}</TableCell>
+                  )}
+                  <TableCell className='font-extralight'>
+                    {a.articleNote ? a.articleNote : '-'}
+                  </TableCell>
+                </TableRow>
+              </Link>
+            ))}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );
