@@ -36,7 +36,7 @@ export function PrintPalletLabel({
                                 align-items: center;
                             }
                             .print-window--image img {
-                                height: 50mm;
+                                height: 30mm;
                             }
                             .print-window--table {
                                 border-collapse: collapse;
