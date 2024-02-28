@@ -76,9 +76,20 @@ export default function AddArticleConfig({ dict }: any) {
       ford: z.boolean().default(false).optional(),
       bmw: z.boolean().default(false).optional(),
     })
+    // .refine(
+    //   (data) =>
+    //     data.pallet && data.boxesPerPallet && /^\d+$/.test(data.boxesPerPallet),
+    //   {
+    //     message: cDict.z.boxesPerPallet,
+    //     path: ['boxesPerPallet'],
+    //   },
+    // )
     .refine(
       (data) =>
-        data.pallet && data.boxesPerPallet && /^\d+$/.test(data.boxesPerPallet),
+        !data.pallet ||
+        (data.pallet &&
+          data.boxesPerPallet &&
+          /^\d+$/.test(data.boxesPerPallet)),
       {
         message: cDict.z.boxesPerPallet,
         path: ['boxesPerPallet'],
@@ -95,39 +106,39 @@ export default function AddArticleConfig({ dict }: any) {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    // defaultValues: {
-    //   workplace: '',
-    //   articleNumber: '',
-    //   articleName: '',
-    //   articleNote: '',
-    //   piecesPerBox: '',
-    //   pallet: false,
-    //   boxesPerPallet: '',
-    //   dmc: '',
-    //   dmcFirstValidation: '',
-    //   secondValidation: false,
-    //   dmcSecondValidation: '',
-    //   hydraProcess: '',
-    //   ford: false,
-    //   bmw: false,
-    // },
-
     defaultValues: {
-      workplace: 'eol34',
-      articleNumber: '12345',
-      articleName: 'Test Article',
-      articleNote: 'This is a test note',
-      piecesPerBox: '10',
-      pallet: true,
-      boxesPerPallet: '20',
-      dmc: 'Test DM 123455',
-      dmcFirstValidation: 'Test',
+      workplace: '',
+      articleNumber: '',
+      articleName: '',
+      articleNote: '',
+      piecesPerBox: '',
+      pallet: false,
+      boxesPerPallet: '',
+      dmc: '',
+      dmcFirstValidation: '',
       secondValidation: false,
       dmcSecondValidation: '',
-      hydraProcess: '050',
+      hydraProcess: '',
       ford: false,
       bmw: false,
     },
+
+    // defaultValues: {
+    //   workplace: 'eol34',
+    //   articleNumber: '12345',
+    //   articleName: 'Test Article',
+    //   articleNote: 'This is a test note',
+    //   piecesPerBox: '10',
+    //   pallet: true,
+    //   boxesPerPallet: '20',
+    //   dmc: 'Test DM 123455',
+    //   dmcFirstValidation: 'Test',
+    //   secondValidation: false,
+    //   dmcSecondValidation: '',
+    //   hydraProcess: '050',
+    //   ford: false,
+    //   bmw: false,
+    // },
   });
 
   const isPalletChecked = form.watch('pallet');
@@ -411,15 +422,15 @@ export default function AddArticleConfig({ dict }: any) {
               type='button'
               onClick={() => form.reset()}
             >
-              Wyczyść
+              {cDict.clearButton}
             </Button>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Dodawanie
+                {cDict.addingButton}
               </Button>
             ) : (
-              <Button type='submit'>Dodaj</Button>
+              <Button type='submit'>{cDict.addButton}</Button>
             )}
           </CardFooter>
         </form>

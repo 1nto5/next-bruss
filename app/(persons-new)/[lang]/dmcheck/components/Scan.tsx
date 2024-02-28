@@ -27,8 +27,8 @@ export function Scan({
   operatorPersonalNumber,
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
-  const [playSuccess, { sound: successSound }] = useSound('/success.mp3');
-  const [playError, { sound: errorSound }] = useSound('/error.mp3');
+  const [playSuccess, { sound: successSound }] = useSound('/success.wav');
+  const [playError, { sound: errorSound }] = useSound('/error.wav');
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':

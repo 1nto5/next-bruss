@@ -60,6 +60,11 @@ export default function Header({ session, dict }: HeaderProps) {
           title: `${dict?.header?.production?.articleConfig.title}`,
           description: `${dict?.header?.production?.articleConfig.description}`,
         },
+        {
+          href: '/pro/persons-config',
+          title: `${dict?.header?.production?.personsConfig.title}`,
+          description: `${dict?.header?.production?.personsConfig.description}`,
+        },
       ],
     },
     {

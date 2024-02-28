@@ -13,6 +13,10 @@
       "articleConfig": {
         "title": "Konfiguracja artykułów",
         "description": "Dodawanie i edycja artykułów w systmie skanowania DMC."
+      },
+      "personsConfig": {
+        "title": "Zarządzanie pracownikami",
+        "description": "Dodawanie i edycja pracowników w systmie skanowania DMC."
       }
     },
     "inventory": {
@@ -123,6 +127,9 @@
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
+      "addButton": "Dodaj",
+      "addingButton": "Dodawanie",
+      "clearButton": "Wyczyść",
       "workplaceFormLabel": "Stanowisko",
       "articleNumberFormLabel": "Numer artykułu",
       "articleNameFormLabel": "Nazwa artykułu",
@@ -149,6 +156,27 @@
         "articleSaved": "Artykuł dodany!",
         "articleExists": "Artykuł istnieje!"
       }
+    }
+  },
+  "personsConfig": {
+    "z": {
+      "firstName": "Imię musi zawierać 3 znaki!",
+      "lastName": "Nazwisko musi zawierać 3 znaki!",
+      "loginCode": "Numer personalny jest wymagany!",
+      "password": "Hasło musi zawierać 5 znaków!"
+    },
+    "firstNameFormLabel": "Imię",
+    "lastNameFormLabel": "Nazwisko",
+    "loginCodeFormLabel": "Numer personalny",
+    "loginCodeFormDescription": "Używany do logowania w aplikacji DMCheck.",
+    "passwordFormLabel": "Hasło",
+    "passwordFormDescription": "Używane w aplikacji wsparcia procesu inwentaryzacji. Pozostaw puste aby pominąć.",
+    "clearButton": "Wyczyść",
+    "addButton": "Dodaj",
+    "addingButton": "Dodawanie",
+    "toasts": {
+      "saved": "Pracownik został dodany!",
+      "exists": "Numer personalny jest już zdefiniowany w bazie danych!"
     }
   },
   "dmcheck": {
