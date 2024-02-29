@@ -32,8 +32,7 @@ export default async function Layout({
   if (!session) {
     redirect('/auth');
   }
-  if (!session?.user.roles?.includes('article-config')) {
-    // TODO: change to persons-config
+  if (!session?.user.roles?.includes('persons-config')) {
     return (
       <main className='m-2 flex justify-center'>
         <Info title={dict.noAccessTitle} description={noAccess} />
