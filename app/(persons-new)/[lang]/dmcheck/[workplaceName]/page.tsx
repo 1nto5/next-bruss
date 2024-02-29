@@ -96,6 +96,7 @@ export default async function ArticleSelectionPage({
                 }}
               >
                 <TableRow>
+                  {/* TODO: scrool area */}
                   <TableCell className='font-bold'>{a.articleNumber}</TableCell>
                   <TableCell>{a.articleName}</TableCell>
                   <TableCell>{a.piecesPerBox}</TableCell>
