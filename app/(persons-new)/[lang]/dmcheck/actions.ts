@@ -13,7 +13,7 @@ export async function personLogin(
   formData: FormData,
 ) {
   const schema = z.object({
-    personalNumber: z.string().min(1).max(4),
+    personalNumber: z.string().min(1),
   });
   const parse = schema.safeParse({
     personalNumber: formData.get('personalNumber'),
