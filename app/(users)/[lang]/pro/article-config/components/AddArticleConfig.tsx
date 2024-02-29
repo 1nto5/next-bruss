@@ -419,6 +419,7 @@ export default function AddArticleConfig({ dict }: any) {
             <Button
               variant='destructive'
               type='button'
+              // TODO: form.reset() is not working for hydra process
               onClick={() => form.reset()}
             >
               {cDict.clearButton}
