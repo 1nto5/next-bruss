@@ -44,7 +44,6 @@ import { saveArticleConfig } from '../actions';
 export default function AddArticleConfig({ dict }: any) {
   const cDict = dict?.articleConfig?.add;
 
-  // TODO: jak pallet false to nie dziaa zapis
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z
     .object({
