@@ -2,9 +2,6 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { StatusBar } from '../../../components/StatusBar';
 import { redirect } from 'next/navigation';
-import { ScanDmc } from '../../../components/ScanDmc';
-import { ScanHydra } from '../../../components/ScanHydra';
-import { ScanPallet } from '../../../components/ScanPallet';
 import { Scan } from '../../../components/Scan';
 
 export const revalidate = 0;
@@ -137,7 +134,11 @@ export default async function ScanPage({
       <div className='w-full'>
         <StatusBar
           cDict={dict.dmcheck.scan.statusBar}
-          operator={`${operatorInitials} (${searchParams.operatorPersonalNumber})`}
+          operator={
+            lang === 'pl'
+              ? `${operatorInitials} (${searchParams.operatorPersonalNumber})`
+              : `${operatorInitials}`
+          }
           article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
           boxIsFull={boxStatus?.boxIsFull ? true : false}
           // boxIsFull={false}
