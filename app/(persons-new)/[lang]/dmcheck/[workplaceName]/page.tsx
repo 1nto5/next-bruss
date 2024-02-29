@@ -2,7 +2,7 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { getArticlesConfigForWorkplace } from '../actions';
 import { Info } from '../components/Info';
-import { Button } from '@/components/ui/button';
+
 import Link from 'next/link';
 import {
   Table,
@@ -96,7 +96,7 @@ export default async function ArticleSelectionPage({
                 }}
               >
                 <TableRow>
-                  {/* TODO: scrool area */}
+                  {/* TODO: scrool area https://github.com/shadcn-ui/ui/issues/1151 */}
                   <TableCell className='font-bold'>{a.articleNumber}</TableCell>
                   <TableCell>{a.articleName}</TableCell>
                   <TableCell>{a.piecesPerBox}</TableCell>
