@@ -54,7 +54,7 @@ export default function AddArticleConfig({ dict }: any) {
         .regex(/^[0-9]{5}$/, {
           message: cDict.z.articleNumber,
         }),
-      articleName: z.string().min(10, { message: cDict.z.articleName }),
+      articleName: z.string().min(5, { message: cDict.z.articleName }),
       articleNote: z.string().optional(),
       piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
         message: cDict.z.piecesPerBox,

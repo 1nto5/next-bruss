@@ -117,7 +117,7 @@
       "z": {
         "workplace": "Podaj minimum 4 znaki zgodne z aktualnym nazewnictwem!",
         "articleNumber": "Podaj 5 cyfr!",
-        "articleName": "Minimum 10 znaków!",
+        "articleName": "Minimum 5 znaków!",
         "boxesPerPallet": "Wprowadź liczbę całkowitą!",
         "dmc": "Minimum 10 znaków!",
         "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC!",
