@@ -2,6 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AddPersonConfig from './AddPersonConfig';
 import NoAvailable from '@/app/(users)/[lang]/components/NoAvailable';
 
+//TODO: edit article config
+
 export default function TabsPersonsConfig({ dict }: any) {
   return (
     <Tabs defaultValue='add' className='w-[450px]'>

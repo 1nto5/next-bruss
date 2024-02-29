@@ -72,6 +72,8 @@ export async function resetPassword(email: string) {
     const resetUrl = `${process.env.URL}/auth/reset-password/${resetToken}`;
     console.log(resetUrl);
 
+    //TODO: chane to bruss exchange
+
     const transporter = nodemailer.createTransport({
       service: process.env.NODEMAILER_SERVICE,
       host: process.env.NODEMAILER_HOST,

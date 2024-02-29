@@ -155,7 +155,8 @@ export default function LoginForm({ cDict }: { cDict: any }) {
             />
           </CardContent>
           <CardFooter className='flex justify-between'>
-            {isPendingSending ? (
+            {/* TODO: uncomment after exchange implemetation */}
+            {/* {isPendingSending ? (
               <Button type='button' variant='destructive' disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 {cDict.emailSendingButton}
@@ -168,7 +169,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
               >
                 {cDict.resetPasswordButton}
               </Button>
-            )}
+            )} */}
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

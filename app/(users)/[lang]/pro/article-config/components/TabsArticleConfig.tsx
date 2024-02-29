@@ -2,6 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AddArticleConfig from './AddArticleConfig';
 import NoAvailable from '@/app/(users)/[lang]/components/NoAvailable';
 
+//TODO: edit article config
+
 export default function TabsArticleConfig({ dict }: any) {
   return (
     <Tabs defaultValue='add' className='w-[450px]'>
