@@ -33,6 +33,10 @@ export default function MuteButton() {
     );
   };
 
+  if (!volume) {
+    return null;
+  }
+
   return (
     <Popover>
       <PopoverTrigger asChild>
