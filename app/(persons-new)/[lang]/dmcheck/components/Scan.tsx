@@ -28,7 +28,6 @@ export function Scan({
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
   const [playSuccess, { sound: successSound }] = useSound('/success.wav');
-  const [playError, { sound: errorSound }] = useSound('/error.wav');
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':
@@ -43,43 +42,33 @@ export function Scan({
         toast.error(cDict.toast.dmcExists);
         break;
       case 'batch exists':
-        playError();
         toast.error(cDict.toast.batchExists);
         break;
       case 'dmc not valid':
-        playError();
         toast.error(cDict.toast.dmcNotValid);
         break;
       case 'qr not valid':
-        playError();
         toast.error(cDict.toast.qrNotValid);
         break;
       case 'article not found' || 'wrong article config id':
-        playError();
         toast.error(cDict.toast.articleNotFound);
         break;
       case 'ford date not valid':
-        playError();
         toast.error(cDict.toast.fordDateNotValid);
         break;
       case 'bmw date not valid':
-        playError();
         toast.error(cDict.toast.bmwDateNotValid);
         break;
       case 'qr wrong article':
-        playError();
         toast.error(cDict.toast.qrWrongArticle);
         break;
       case 'qr wrong quantity':
-        playError();
         toast.error(cDict.toast.qrWrongQuantity);
         break;
       case 'qr wrong process':
-        playError();
         toast.error(cDict.toast.qrWrongProcess);
         break;
       case 'saving error':
-        playError();
         toast.error(cDict.toast.unknownSavingError);
         break;
       default:

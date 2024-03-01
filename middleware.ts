@@ -27,7 +27,6 @@ export function middleware(request: NextRequest) {
     [
       '/logo.png',
       '/success.wav',
-      '/error.wav',
       // Your other files in `public`
     ].includes(pathname)
   )
