@@ -35,6 +35,7 @@ export default async function Header({
           </div>
 
           <div className='flex items-center gap-x-4'>
+            {/* TODO: hide buttons if not logged */}
             <LogoutAll logoutAllHref={workplaceHref} />
             <Relaod reavalidateHref={workplaceHref} />
             <MuteButton />
