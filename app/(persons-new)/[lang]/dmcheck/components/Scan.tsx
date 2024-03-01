@@ -55,8 +55,6 @@ export function Scan({
         toast.error(cDict.toast.batchExists);
         break;
       case 'dmc not valid':
-        playSuccess();
-
         toast.error(cDict.toast.dmcNotValid);
         break;
       case 'qr not valid':
