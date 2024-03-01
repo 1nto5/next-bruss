@@ -6,6 +6,7 @@ import { save } from '../actions';
 import { toast } from 'sonner';
 import { ScanInput } from './ScanInput';
 import useSound from 'use-sound';
+import { useSearchParams } from 'next/navigation';
 
 const initialState = {
   message: '',
@@ -27,7 +28,16 @@ export function Scan({
   operatorPersonalNumber,
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
-  const [playSuccess, { sound: successSound }] = useSound('/success.wav');
+  const searchParams = useSearchParams();
+  const volume = parseFloat(searchParams.get('volume') || '0.75');
+  if (isNaN(volume) || volume < 0 || volume > 1) {
+    throw new Error(
+      'Invalid volume value. Please provide a value between 0.0 and 1.0.',
+    );
+  }
+  const [playSuccess, { sound: successSound }] = useSound('/success.wav', {
+    volume: volume,
+  });
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':
@@ -45,6 +55,8 @@ export function Scan({
         toast.error(cDict.toast.batchExists);
         break;
       case 'dmc not valid':
+        playSuccess();
+
         toast.error(cDict.toast.dmcNotValid);
         break;
       case 'qr not valid':

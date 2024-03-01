@@ -46,11 +46,11 @@ export default async function ScanPage({
     }
     if (article?.pallet === true) {
       redirect(
-        `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}`,
+        `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`,
       );
     }
     redirect(
-      `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}`,
+      `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`,
     );
   }
 

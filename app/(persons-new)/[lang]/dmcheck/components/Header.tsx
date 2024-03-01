@@ -1,11 +1,10 @@
-import React from 'react';
 import Link from 'next/link';
 import Container from '@/components/ui/container';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import { LogoutAll } from './Logout';
 import { Relaod } from './Reload';
 import Logo from './Logo';
-import { Locale } from '@/i18n.config';
+import MuteButton from './MuteButton';
 
 type HeaderProps = {
   dict: any;
@@ -13,7 +12,7 @@ type HeaderProps = {
   workplaceHref: string;
 };
 
-export default function Header({
+export default async function Header({
   dict,
   workplaceName,
   workplaceHref,
@@ -38,6 +37,7 @@ export default function Header({
           <div className='flex items-center gap-x-4'>
             <LogoutAll logoutAllHref={workplaceHref} />
             <Relaod reavalidateHref={workplaceHref} />
+            <MuteButton />
             <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>
         </div>
