@@ -1,203 +1,232 @@
 {
   "header": {
     "production": {
-      "title": "Produkcja",
+      "title": "Produktion",
       "exportData": {
-        "title": "Export danych",
-        "description": "Generowanie pliku excel z danymi systemu skanowania."
+        "title": "Datenexport",
+        "description": "Erstellung einer Excel-Datei mit den Daten des DMC-Scansystems."
       },
       "rework": {
-        "title": "Rework",
-        "description": "Oznaczanie partii jako rework - ponowne skanowanie."
+        "title": "Nacharbeit",
+        "description": "Markieren von Chargen für die Nacharbeit - erneutes Scannen."
       },
       "articleConfig": {
-        "title": "Konfiguracja artykułów",
-        "description": "Dodawanie i edycja artykułów w systmie skanowania DMC."
+        "title": "Artikelkonfiguration",
+        "description": "Hinzufügen und Bearbeiten von Artikeln im DMC-Scansystem."
+      },
+      "personsConfig": {
+        "title": "Mitarbeiterverwaltung",
+        "description": "Hinzufügen und Bearbeiten von Mitarbeitern im DMC-Scansystem."
       }
     },
     "inventory": {
-      "title": "Inwentaryzacja",
+      "title": "Inventur",
       "inventory": {
-        "title": "Inwentaryzacja",
-        "description": "Aplikacja wspierająca proces inwentaryzacji."
+        "title": "Inventur",
+        "description": "Anwendung zur Unterstützung des Inventurprozesses."
       },
       "inventoryApprove": {
-        "title": "Zatwierdzanie inwentaryzacji",
-        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+        "title": "Inventur bestätigen",
+        "description": "Tool zur Bestätigung inventarisierter Positionen."
       }
     }
   },
-  "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij by wysłać zgłoszenie w celu ich nadania:",
-  "noAccessTitle": "Brak uprawnień!",
-  "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
+  "noAccess": "Sie haben keine Berechtigung für diese Funktion. Klicken Sie hier, um einen Berechtigungsantrag zu stellen:",
+  "noAccessTitle": "Keine Berechtigung!",
+  "noAccessMailSubject": "Berechtigung erteilen für: (Name der Funktion eintragen)",
   "auth": {
-    "loginTab": "Logowanie",
-    "registerTab": "Rejestracja",
-    "emailInputLabel": "Email",
-    "passwordInputLabel": "Hasło",
-    "confirmPasswordInputLabel": "Potwierdź hasło",
-    "loginButton": "Zaloguj",
-    "loggingButton": "Logowanie",
-    "resetPasswordButton": "Reset hasła",
-    "emailSendingButton": "Wysyłanie email",
-    "registerButton": "Zarejestruj",
-    "registeringButton": "Rejestracja",
+    "loginTab": "Anmeldung",
+    "registerTab": "Registrierung",
+    "emailInputLabel": "E-Mail",
+    "passwordInputLabel": "Passwort",
+    "confirmPasswordInputLabel": "Passwort bestätigen",
+    "loginButton": "Anmelden",
+    "loggingButton": "Anmeldung",
+    "resetPasswordButton": "Passwort zurücksetzen",
+    "emailSendingButton": "E-Mail senden",
+    "registerButton": "Registrieren",
+    "registeringButton": "Registrierung",
     "zod": {
-      "emailTooShort": "Email jest za krótki!",
-      "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",
-      "passwordEmpty": "Hasło nie może być puste!",
-      "passwordTooShort": "Hasło musi zawierać co najmniej 6 znaków!",
-      "passwordNoSpecialCharachter": "Hasło musi zawierać przynajmniej jeden znak specjalny",
-      "passwordNoConfirm": "Potwierdzenie hasła jest wymagane!",
-      "passwordsNotMatch": "Hasła nie są takie same!"
+      "emailTooShort": "Die E-Mail ist zu kurz!",
+      "emailNotFromBruss": "Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!",
+      "passwordEmpty": "Das Passwort darf nicht leer sein!",
+      "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein!",
+      "passwordNoSpecialCharachter": "Das Passwort muss mindestens ein Sonderzeichen enthalten",
+      "passwordNoConfirm": "Passwortbestätigung ist erforderlich!",
+      "passwordsNotMatch": "Die Passwörter stimmen nicht überein!"
     },
     "toasts": {
-      "pleaseContactIt": "Skontaktuj się z IT!",
-      "loginError": "Nieprawidłowe dane logowania!",
-      "resetPasswordEmailSent": "Wysłano link do resetowania hasła!",
-      "noUserWithThisEmail": "Brak użytkownika o podanym adresie email!",
-      "resetPasswordNoEmail": "Wprowadź email by zresetować hasło!",
-      "registered": "Konto zostało utworzone!",
-      "exists": "Konto już istnieje!"
+      "pleaseContactIt": "Bitte kontaktieren Sie die IT!",
+      "loginError": "Ungültige Anmeldedaten!",
+      "resetPasswordEmailSent": "Link zum Zurücksetzen des Passworts gesendet!",
+      "noUserWithThisEmail": "Kein Benutzer mit dieser E-Mail gefunden!",
+      "resetPasswordNoEmail": "Geben Sie eine E-Mail ein, um das Passwort zurückzusetzen!",
+      "registered": "Konto erstellt!",
+      "exists": "Konto existiert bereits!"
     }
   },
   "home": {
-    "title": "Cześć!"
+    "title": "Hallo!"
   },
   "exportData": {
-    "cardTitle": "Export danych",
-    "cardDescription": "W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000 najnowszych rekordów.",
-    "workplaceLabel": "Stanowisko",
+    "cardTitle": "Datenexport",
+    "cardDescription": "Bei einem breiten Kriterienbereich werden die neuesten 10.000 Datensätze heruntergeladen.",
+    "workplaceLabel": "Arbeitsplatz",
 
     "statusLabel": "Status",
-    "chooseInputPlaceholder": "wybierz...",
-    "anyInputPlaceholder": "wpisz dowolny...",
-    "emptyCommand": "nie znaleziono",
-    "downloadButton": "Pobierz plik",
-    "downloadingButton": "Generowanie",
-    "clearButton": "Wyczyść",
-    "timeFrameLabel": "Zakres czasu",
-    "dateFromLabel": "Data od",
-    "dateToLabel": "Data do",
+    "chooseInputPlaceholder": "wählen...",
+    "anyInputPlaceholder": "beliebig eingeben...",
+    "emptyCommand": "nicht gefunden",
+    "downloadButton": "Datei herunterladen",
+    "downloadingButton": "Generierung",
+    "clearButton": "Löschen",
+    "timeFrameLabel": "Zeitraum",
+    "dateFromLabel": "Datum von",
+    "dateToLabel": "Datum bis",
     "exportButton": "Export",
     "toasts": {
-      "exportSuccess": "Dane wyeksportowane!",
-      "exportError": "Błąd podczas eksportu danych!"
+      "exportSuccess": "Daten exportiert!",
+      "exportError": "Fehler beim Export der Daten!"
     }
   },
+
   "rework": {
-    "articleLabel": "Artykuł",
-    "noSearchTerm": "Brak wartości do wyszukania!",
-    "noResults": "Nie znaleziono żadnej pozycji!",
-    "pleaseContactIt": "Skontaktuj się z IT!",
-    "noReason": "Wprowadź powód!",
-    "tooShortReason": "Powód musi mieć co najmniej 20 znaków!",
-    "positionsLengthZero": "Wpisz kod DMC, batch hydra lub paleta by wyszukać i oznaczyć jako rework.",
-    "checkPositionsAndReason": "Sprawdź poprawność wyszukanych pozycji oraz wprowadź powód by oznaczyć jako rework.",
-    "inputLabel": "DMC / batch hydra / paleta",
-    "inputPlaceholder": "wpisz dowolny...",
-    "searchButton": "Wyszukaj",
-    "reasonInputLabel": "Powód",
-    "reasonTextareaPlaceholder": "Wprowadź krótki opis reworku.",
-    "markAsReworkButton": "Oznacz jako rework",
-    "updatedPositions": "Zaktualizowano pozycji:",
+    "articleLabel": "Artikel",
+    "noSearchTerm": "Keine Werte zum Suchen!",
+    "noResults": "Keine Positionen gefunden!",
+    "pleaseContactIt": "Bitte kontaktieren Sie die IT!",
+    "noReason": "Bitte Grund eingeben!",
+    "tooShortReason": "Der Grund muss mindestens 20 Zeichen lang sein!",
+    "positionsLengthZero": "Geben Sie den DMC-Code, Batch Hydra oder Palette ein, um nachzusuchen und als Nacharbeit zu markieren.",
+    "checkPositionsAndReason": "Überprüfen Sie die Richtigkeit der gefundenen Positionen und geben Sie einen Grund an, um als Nacharbeit zu markieren.",
+    "inputLabel": "DMC / Batch Hydra / Palette",
+    "inputPlaceholder": "beliebig eingeben...",
+    "searchButton": "Suchen",
+    "reasonInputLabel": "Grund",
+    "reasonTextareaPlaceholder": "Geben Sie eine kurze Beschreibung der Nacharbeit ein.",
+    "markAsReworkButton": "Als Nacharbeit markieren",
+    "updatedPositions": "Positionen aktualisiert:",
     "statusTableHead": "Status",
-    "workplaceTableHead": "Stanowisko"
+    "workplaceTableHead": "Arbeitsplatz"
   },
   "articleConfig": {
     "tabs": {
-      "edit": "Edytuj",
-      "add": "Dodaj"
+      "edit": "Bearbeiten",
+      "add": "Hinzufügen"
     },
     "add": {
       "z": {
-        "workplace": "Podaj 3 małe litery oraz 2 cyfry! (np. eol74)",
-        "articleNumber": "Podaj 5 cyfr!",
-        "articleName": "Minimum 10 znaków!",
-        "boxesPerPallet": "Wprowadź liczbę całkowitą!",
-        "dmc": "Minimum 10 znaków!",
-        "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC!",
-        "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"!",
-        "piecesPerBox": "Wprowadź liczbę całkowitą!",
-        "hydraProcess": "Wybierz proces!"
+        "workplace": "Geben Sie mindestens 4 Zeichen ein, die der aktuellen Benennung entsprechen!",
+        "articleNumber": "Geben Sie 5 Ziffern ein!",
+        "articleName": "Mindestens 5 Zeichen!",
+        "boxesPerPallet": "Geben Sie eine ganze Zahl ein!",
+        "dmc": "Mindestens 10 Zeichen!",
+        "dmcValidation": "Mindestens 4 Zeichen im DMC-Feld enthalten!",
+        "dmcSecondValidation": "Mindestens 4 Zeichen im DMC-Feld, anders als im Feld 'Validierter DMC-Wert'!",
+        "piecesPerBox": "Geben Sie eine ganze Zahl ein!",
+        "hydraProcess": "Wählen Sie den Prozess!"
       },
-      "cardTitle": "Dodaj artykuł",
-      "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
-      "workplaceFormLabel": "Stanowisko",
-      "articleNumberFormLabel": "Numer artykułu",
-      "articleNameFormLabel": "Nazwa artykułu",
-      "piecesPerBoxFormLabel": "Ilość sztuk w boxie",
-      "palletFormLabel": "Etykiety zbiorcze na paletę",
-      "boxesPerPalletFormLabel": "Ilość boxów na palecie",
+      "cardTitle": "Artikel hinzufügen",
+      "cardDescription": "Füllen Sie alle Daten aus, um einen neuen Artikel hinzuzufügen.",
+      "addButton": "Hinzufügen",
+      "addingButton": "Wird hinzugefügt",
+      "clearButton": "Löschen",
+      "workplaceFormLabel": "Arbeitsplatz",
+      "articleNumberFormLabel": "Artikelnummer",
+      "articleNameFormLabel": "Artikelname",
+      "piecesPerBoxFormLabel": "Anzahl der Stücke pro Box",
+      "palletFormLabel": "Sammellabels für Palette",
+      "boxesPerPalletFormLabel": "Anzahl der Boxen pro Palette",
       "dmcFormLabel": "DMC",
-      "dmcFormDescription": "Pełna zawartość skanowanego kodu DMC",
-      "dmcFirstValidationFormLabel": "Walidowana wartość DMC",
-      "dmcFirstValidationFormDescription": "Stała zawartość kodu (np. numer artykułu klienta) - ciąg znaków który musi zawierać skanowany kod DMC",
-      "secondValidationCheckboxFormLabel": "Walidacja dwóch ciągów znaków",
-      "dmcSecondValidationFormLabel": "Druga walidowana wartość DMC",
-      "dmcSecondValidationFormDescription": "Używaj tylko w przyadku gdy DMC zawiera dwa stałe ciągi znaków (początek i koniec)!",
-      "fordCheckboxFormLabel": "Walidacja daty FORD",
-      "bmwCheckboxFormLabel": "Walidacja daty BMW",
-      "hydraProcessFormLabel": "Proces Hydra",
-      "hydraProcessFormDescription": "Proeces HYDRA z którego pochodzi artykuł.",
-      "hydraProcessSelectOption050": "050 - po kontroli ciśnieniowej EOL",
+      "dmcFormDescription": "Vollständiger Inhalt des gescannten DMC-Codes",
+      "dmcFirstValidationFormLabel": "Validierter DMC-Wert",
+      "dmcFirstValidationFormDescription": "Fester Inhalt des Codes (z.B. Artikelnummer des Kunden) - Zeichenfolge, die der gescannte DMC-Code enthalten muss",
+      "secondValidationCheckboxFormLabel": "Validierung von zwei Zeichenfolgen",
+      "dmcSecondValidationFormLabel": "Zweiter validierter DMC-Wert",
+      "dmcSecondValidationFormDescription": "Nur verwenden, wenn der DMC zwei feste Zeichenfolgen enthält (Anfang und Ende)!",
+      "fordCheckboxFormLabel": "Validierung des FORD-Datums",
+      "bmwCheckboxFormLabel": "Validierung des BMW-Datums",
+      "hydraProcessFormLabel": "Hydra-Prozess",
+      "hydraProcessFormDescription": "Hydra-Prozess, aus dem der Artikel stammt.",
+      "hydraProcessSelectOption050": "050 - nach der Druckprüfung EOL",
       "hydraProcessSelectOption090": "090 - Q3",
-      "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",
-      "articleNoteFormLabel": "Notatka do artykułu",
-      "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)",
+      "hydraProcessSelectPlaceholder": "Wählen Sie den richtigen Prozess für den Artikel",
+      "articleNoteFormLabel": "Artikelnotiz",
+      "articleNoteFormDescription": "Zusätzliche Informationen über den Artikel (z.B. Verpackungsart, umgangssprachlicher Name usw.)",
       "toasts": {
-        "articleSaved": "Artykuł dodany!",
-        "articleExists": "Artykuł istnieje!"
+        "articleSaved": "Artikel hinzugefügt!",
+        "articleExists": "Artikel existiert bereits!"
       }
+    }
+  },
+  "personsConfig": {
+    "z": {
+      "firstName": "Der Vorname muss 3 Zeichen enthalten!",
+      "lastName": "Der Nachname muss 3 Zeichen enthalten!",
+      "loginCode": "Personalnummer ist erforderlich!",
+      "password": "Das Passwort muss 5 Zeichen enthalten!"
+    },
+    "firstNameFormLabel": "Vorname",
+    "lastNameFormLabel": "Nachname",
+    "loginCodeFormLabel": "Personalnummer",
+    "loginCodeFormDescription": "Wird zum Einloggen in die DMCheck-App verwendet.",
+    "passwordFormLabel": "Passwort",
+    "passwordFormDescription": "Wird in der Inventur-Unterstützungs-App verwendet. Leer lassen, um zu überspringen.",
+    "clearButton": "Löschen",
+    "addButton": "Hinzufügen",
+    "addingButton": "Wird hinzugefügt",
+    "toasts": {
+      "saved": "Mitarbeiter hinzugefügt!",
+      "exists": "Personalnummer ist bereits in der Datenbank definiert!"
     }
   },
   "dmcheck": {
     "articleSelection": {
-      "cardTitle": "article",
-      "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
-      "noArticleConfigForWorkplaceDescription": "Brak artykułów w konfiguracji dla stanowiska: ",
-      "piecesPerBox": "szt. / box",
-      "boxesPerPallet": "box / paleta",
-      "articleNumber": "numer",
-      "articleName": "nazwa",
-      "articleNote": "notatka"
+      "cardTitle": "Artikel wählen",
+      "noArticleConfigForWorkplaceTitle": "Keine Konfiguration!",
+      "noArticleConfigForWorkplaceDescription": "Keine Artikel in der Konfiguration für den Arbeitsplatz: ",
+      "piecesPerBox": "Stk. / Box",
+      "boxesPerPallet": "Box / Palette",
+      "articleNumber": "Nummer",
+      "articleName": "Name",
+      "articleNote": "Notiz"
     },
     "personLogin": {
-      "cardTitle": "Logowanie",
-      "personalNumberInputPlaceholder": "eine person number",
+      "cardTitle": "Anmeldung",
+      "personalNumberInputPlaceholder": "Personalnummer",
       "confirmButton": "Login",
-      "loginButton": "Zaloguj",
-      "loginNotValid": "Wprowadź poprawny numer personalny!",
-      "loginNotExist": "Numer personalny nie istnieje w bazie!",
-      "loginSuccess": "Zalogowano jako: "
+      "loginButton": "Anmelden",
+      "loginNotValid": "Geben Sie eine gültige Personalnummer ein!",
+      "loginNotExist": "Personalnummer existiert nicht in der Datenbank!",
+      "loginSuccess": "Eingeloggt als: "
     },
     "scan": {
       "statusBar": {
-        "operator": "operator",
-        "article": "artykuł",
-        "inBox": "box",
-        "onPallet": "paleta"
+        "operator": "Operator",
+        "article": "Artikel",
+        "inBox": "in Box",
+        "onPallet": "auf Palette"
       },
-      "dmcScanInputPlaceholder": "skanuj kod DMC...",
-      "scanInputSavingPlaceholder": "przetwarzam...",
-      "hydraScanInputPlaceholder": "skanuj kod QR z etykiety HYDRA...",
+      "dmcScanInputPlaceholder": "DMC-Code scannen...",
+      "scanInputSavingPlaceholder": "wird verarbeitet...",
+      "hydraScanInputPlaceholder": "QR-Code vom HYDRA-Label scannen...",
       "toast": {
-        "dmcNotValid": "Nieprawidłowy kod DMC!",
-        "articleNotFound": "Niepoprawny artykuł!",
-        "dmcSaved": "DMC zapisany!",
-        "dmcExists": "DMC istnieje w bazie!",
-        "fordDateNotValid": "Nieprawidłowa data FORD!",
-        "bmwDateNotValid": "Nieprawidłowa data BMW!",
-        "unknownSavingError": "Nieznany błąd, skontaktuj się z IT!",
-        "qrNotValid": "Nieprawidłowy kod QR!",
-        "qrWrongArticle": "Etykieta z niepoprawnym numerem artykułu!",
-        "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
-        "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
-        "batchSaved": "Batch zapisany!",
-        "batchExists": "Batch istnieje w bazie!"
+        "dmcNotValid": "Ungültiger DMC-Code!",
+        "articleNotFound": "Artikel nicht korrekt!",
+        "dmcSaved": "DMC gespeichert!",
+        "dmcExists": "DMC existiert bereits in der Datenbank!",
+        "fordDateNotValid": "Ungültiges FORD-Datum!",
+        "bmwDateNotValid": "Ungültiges BMW-Datum!",
+        "unknownSavingError": "Unbekannter Fehler, bitte kontaktieren Sie die IT!",
+        "qrNotValid": "Ungültiger QR-Code!",
+        "qrWrongArticle": "Label mit falscher Artikelnummer!",
+        "qrWrongQuantity": "Falsche Stückzahl auf dem Label!",
+        "qrWrongProcess": "Label mit falscher Prozessnummer!",
+        "batchSaved": "Batch gespeichert!",
+        "batchExists": "Batch existiert bereits in der Datenbank!"
       },
-      "palletScanInputPlaceholder": "skanuj kod QR z wydrukowanej etykiety na paletę...",
-      "printPalletButton": "Wydruk etykiety na paletę"
+      "palletScanInputPlaceholder": "QR-Code von gedrucktem Palette-Label scannen...",
+      "printPalletButton": "Palette-Label drucken"
     }
   }
 }
