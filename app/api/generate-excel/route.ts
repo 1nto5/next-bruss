@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection('scans');
 
     const timeQuery: TimeQuery = {};
     if (body.timeFrom) timeQuery['$gte'] = new Date(body.timeFrom);
@@ -54,25 +53,45 @@ export async function POST(req: NextRequest) {
       }),
     };
 
-    const data = await collection.find(query).limit(100000).toArray();
+    const collection = db.collection('scans');
+    // const data = await collection.find(query).limit(100000).toArray();
+
+    // Get the second collection
+    const archiveCollection = db.collection('scans_archive');
+
+    // Query the 'scans' collection
+    let data = await collection.find(query).limit(100000).toArray();
+
+    // If the number of returned documents is less than 100000, query the 'scans_archive' collection
+    if (data.length < 100000) {
+      const dataFromArchive = await archiveCollection
+        .find(query)
+        .limit(100000 - data.length)
+        .toArray();
+      data = [...data, ...dataFromArchive];
+    }
+
     const workbook = new Workbook();
     const sheet = workbook.addWorksheet('Scans');
 
     sheet.columns = [
       { header: 'ID', key: '_id', width: 10, hidden: true },
-      { header: 'Stanowisko', key: 'workplace', width: 10 },
+      { header: 'Workplace', key: 'workplace', width: 10 },
       { header: 'Typ', key: 'type', width: 10 },
-      { header: 'Artykuł', key: 'article', width: 10 },
+      { header: 'Article', key: 'article', width: 10 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'DMC', key: 'dmc', width: 30 },
       { header: 'Operator', key: 'operator', width: 12 },
-      { header: 'Data', key: 'time', width: 12 },
-      { header: 'Hydra Batch', key: 'hydra_batch', width: 15 },
-      { header: 'Hydra Data', key: 'hydra_time', width: 12 },
-      { header: 'Hydra Operator', key: 'hydra_operator', width: 12 },
-      { header: 'Paleta Batch', key: 'pallet_batch', width: 15 },
-      { header: 'Paleta Operator', key: 'pallet_operator', width: 12 },
-      { header: 'Paleta Data', key: 'pallet_time', width: 12 },
+      { header: 'Date', key: 'time', width: 12 },
+      { header: 'Hydra batch', key: 'hydra_batch', width: 15 },
+      { header: 'Hydra date', key: 'hydra_time', width: 12 },
+      { header: 'Hydra operator', key: 'hydra_operator', width: 12 },
+      { header: 'Paleta batch', key: 'pallet_batch', width: 15 },
+      { header: 'Paleta operator', key: 'pallet_operator', width: 12 },
+      { header: 'Paleta date', key: 'pallet_time', width: 12 },
+      { header: 'Rework date', key: 'rework_time', width: 12 },
+      { header: 'Rework reason', key: 'rework_reason', width: 30 },
+      { header: 'Rework user', key: 'rework_user', width: 12 },
     ];
 
     data.forEach((item) => {
@@ -93,6 +112,7 @@ export async function POST(req: NextRequest) {
           (item.status === 'box' && 'box') ||
           (item.status === 'pallet' && 'paleta') ||
           (item.status === 'warehouse' && 'magazyn') ||
+          (item.status === 'rework' && 'rework') ||
           'błąd',
         time: item.time
           ? convertToLocalTimeWithMoment(new Date(item.time))
@@ -102,6 +122,9 @@ export async function POST(req: NextRequest) {
           : '',
         pallet_time: item.pallet_time
           ? convertToLocalTimeWithMoment(new Date(item.pallet_time))
+          : '',
+        rework_time: item.rework_time
+          ? convertToLocalTimeWithMoment(new Date(item.rework_time))
           : '',
       };
 
