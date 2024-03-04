@@ -89,6 +89,7 @@ export async function searchPositions(
 export async function setReworkStatus(
   condition: string,
   reason: string,
+  userEmail: string,
 ): Promise<number> {
   try {
     const client = await clientPromise;
@@ -104,14 +105,16 @@ export async function setReworkStatus(
             { pallet_batch: condition },
           ],
         },
-        { status: { $ne: 'rework' } },
+        // { status: { $ne: 'rework' } },
       ],
     };
 
     const update = {
       $set: {
         status: 'rework',
+        rework_time: new Date(),
         rework_reason: reason,
+        rework_user: userEmail,
       },
     };
 

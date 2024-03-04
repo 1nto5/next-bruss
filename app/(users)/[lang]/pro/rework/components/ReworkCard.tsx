@@ -28,7 +28,13 @@ type Position = {
   count: string;
 };
 
-export default function ReworkCard({ cDict }: { cDict: any }) {
+export default function ReworkCard({
+  cDict,
+  userEmail,
+}: {
+  cDict: any;
+  userEmail: string;
+}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isPendingSearching, setIsPendingSearching] = useState(false);
   const [error, setError] = useState('');
@@ -77,7 +83,7 @@ export default function ReworkCard({ cDict }: { cDict: any }) {
     }
     try {
       setIsPendingSetting(true);
-      const updated = await setReworkStatus(searchTerm, reason);
+      const updated = await setReworkStatus(searchTerm, reason, userEmail);
       if (updated) {
         setPositions([]);
         setReason('');
