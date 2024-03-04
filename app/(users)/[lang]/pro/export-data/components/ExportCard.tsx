@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import config from '@/app/(persons)/[lang]/pro/config';
 
 import {
   Card,
@@ -36,7 +35,31 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
-export default function ExportCard({ cDict }: { cDict: any }) {
+type articlesConfigType = {
+  _id: string;
+  workplace: string;
+  articleNumber: string;
+  articleName: string;
+  articleNote: string;
+  piecesPerBox: number;
+  pallet: boolean;
+  boxesPerPallet: number;
+  dmc: string;
+  dmcFirstValidation: string;
+  secondValidation: boolean;
+  dmcSecondValidation: string;
+  hydraProcess: string;
+  ford: boolean;
+  bmw: boolean;
+};
+
+export default function ExportCard({
+  cDict,
+  articlesConfig,
+}: {
+  cDict: any;
+  articlesConfig: articlesConfigType[];
+}) {
   const [openWorkplace, setOpenWorkplace] = useState(false);
   const [openArticle, setOpenArticle] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
@@ -55,14 +78,17 @@ export default function ExportCard({ cDict }: { cDict: any }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isPending, setIsPending] = useState(false);
 
-  const workplaces = Array.from(new Set(config.map((item) => item.workplace)));
+  const workplaces = Array.from(
+    new Set(articlesConfig.map((item) => item.workplace)),
+  );
   const filteredArticles = selectedWorkplace
-    ? config.filter((item) => item.workplace === selectedWorkplace)
-    : config;
+    ? articlesConfig.filter((item) => item.workplace === selectedWorkplace)
+    : articlesConfig;
   const statusOptions = [
     { label: 'box', value: 'box' },
     { label: 'paleta', value: 'pallet' },
     { label: 'magazyn', value: 'warehouse' },
+    { label: 'rework', value: 'rework' },
   ];
 
   const handleSelectWorkplace = (workplace: string) => {
@@ -212,10 +238,10 @@ export default function ExportCard({ cDict }: { cDict: any }) {
                     {selectedArticle
                       ? (() => {
                           const foundArticle = filteredArticles.find(
-                            (item) => item.article === selectedArticle,
+                            (item) => item.articleNumber === selectedArticle,
                           );
                           return foundArticle
-                            ? `${foundArticle.article} - ${foundArticle.name}`
+                            ? `${foundArticle.articleNumber} - ${foundArticle.articleName}`
                             : cDict.chooseInputPlaceholder;
                         })()
                       : cDict.chooseInputPlaceholder}
@@ -230,21 +256,21 @@ export default function ExportCard({ cDict }: { cDict: any }) {
                     <CommandGroup className='max-h-48 overflow-y-auto'>
                       {/* not with: */}
                       {/* <ScrollArea /> */}
-                      {filteredArticles.map((article) => (
+                      {filteredArticles.map((a) => (
                         <CommandItem
-                          key={article.article}
-                          value={article.article}
-                          onSelect={() => handleSelectArticle(article.article)}
+                          key={a.articleNumber}
+                          value={a.articleNumber}
+                          onSelect={() => handleSelectArticle(a.articleNumber)}
                         >
                           <Check
                             className={cn(
                               'mr-2 h-4 w-4',
-                              selectedArticle === article.article
+                              selectedArticle === a.articleNumber
                                 ? 'opacity-100'
                                 : 'opacity-0',
                             )}
                           />
-                          {`${article.article} - ${article.name}`}
+                          {`${a.articleNumber} - ${a.articleName}`}
                         </CommandItem>
                       ))}
                       {/* <ScrollArea /> */}
