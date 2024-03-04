@@ -92,6 +92,7 @@ export async function POST(req: NextRequest) {
       { header: 'Rework date', key: 'rework_time', width: 12 },
       { header: 'Rework reason', key: 'rework_reason', width: 30 },
       { header: 'Rework user', key: 'rework_user', width: 12 },
+      { header: 'Archived', key: 'archive', width: 12 },
     ];
 
     data.forEach((item) => {
@@ -108,12 +109,6 @@ export async function POST(req: NextRequest) {
         _id: item._id.toString(),
         workplace: item.workplace.toUpperCase(),
         type: item.type ? item.type.toUpperCase() : '',
-        status:
-          (item.status === 'box' && 'box') ||
-          (item.status === 'pallet' && 'paleta') ||
-          (item.status === 'warehouse' && 'magazyn') ||
-          (item.status === 'rework' && 'rework') ||
-          'błąd',
         time: item.time
           ? convertToLocalTimeWithMoment(new Date(item.time))
           : '',
@@ -126,6 +121,7 @@ export async function POST(req: NextRequest) {
         rework_time: item.rework_time
           ? convertToLocalTimeWithMoment(new Date(item.rework_time))
           : '',
+        archive: item.archive ? 'x' : '',
       };
 
       sheet.addRow(row);
