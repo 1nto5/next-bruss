@@ -72,7 +72,7 @@
     "cardTitle": "Export danych",
     "cardDescription": "W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000 najnowszych rekordów.",
     "workplaceLabel": "Stanowisko",
-
+    "articleLabel": "Artykuł",
     "statusLabel": "Status",
     "chooseInputPlaceholder": "wybierz...",
     "anyInputPlaceholder": "wpisz dowolny...",
