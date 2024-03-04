@@ -96,7 +96,6 @@ export default async function ArticleSelectionPage({
                 }}
               >
                 <TableRow>
-                  {/* TODO: scrool area https://github.com/shadcn-ui/ui/issues/1151 */}
                   <TableCell className='font-bold'>{a.articleNumber}</TableCell>
                   <TableCell>{a.articleName}</TableCell>
                   <TableCell>{a.piecesPerBox}</TableCell>
