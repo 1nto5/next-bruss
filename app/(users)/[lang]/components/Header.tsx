@@ -35,9 +35,10 @@ import { useRouter } from 'next/navigation';
 type HeaderProps = {
   session: Session | null;
   dict: any;
+  lang: string;
 };
 
-export default function Header({ session, dict }: HeaderProps) {
+export default function Header({ session, dict, lang }: HeaderProps) {
   const router = useRouter();
 
   const routes = [
@@ -89,6 +90,37 @@ export default function Header({ session, dict }: HeaderProps) {
     // },
   ];
 
+  const routesDe = [
+    {
+      title: `${dict?.header?.production?.title}`,
+      href: '',
+      submenu: [
+        {
+          href: `/pro/export-data`,
+          title: `${dict?.header?.production?.exportData.title}`,
+          description: `${dict?.header?.production?.exportData.description}`,
+        },
+        {
+          href: '/pro/rework',
+          title: `${dict?.header?.production?.rework.title}`,
+          description: `${dict?.header?.production?.rework.description}`,
+        },
+        {
+          href: '/pro/article-config',
+          title: `${dict?.header?.production?.articleConfig.title}`,
+          description: `${dict?.header?.production?.articleConfig.description}`,
+        },
+        {
+          href: '/pro/persons-config',
+          title: `${dict?.header?.production?.personsConfig.title}`,
+          description: `${dict?.header?.production?.personsConfig.description}`,
+        },
+      ],
+    },
+  ];
+
+  const selectedRoutes = lang === 'de' ? routesDe : routes;
+
   return (
     <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
       <Container>
@@ -100,7 +132,7 @@ export default function Header({ session, dict }: HeaderProps) {
               </SheetTrigger>
               <SheetContent side='left' className='w-[300px] sm:w-[400px]'>
                 <nav className='flex flex-col gap-4'>
-                  {routes.map((route, i) =>
+                  {selectedRoutes.map((route, i) =>
                     route.submenu ? (
                       <div key={i}>
                         <span className='block px-2 py-1 text-sm'>
@@ -143,7 +175,7 @@ export default function Header({ session, dict }: HeaderProps) {
             {/* do i need flex className?  */}
             <NavigationMenu>
               <NavigationMenuList>
-                {routes.map((route) =>
+                {selectedRoutes.map((route) =>
                   route.submenu ? (
                     <NavigationMenuItem key={route.title}>
                       <NavigationMenuTrigger>

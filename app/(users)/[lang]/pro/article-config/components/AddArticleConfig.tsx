@@ -41,7 +41,13 @@ import NoAvailable from '../../../components/NoAvailable';
 import { saveArticleConfig } from '../actions';
 // import { useQuery } from '@tanstack/react-query';
 
-export default function AddArticleConfig({ dict }: any) {
+export default function AddArticleConfig({
+  dict,
+  lang,
+}: {
+  dict: any;
+  lang: string;
+}) {
   const cDict = dict?.articleConfig?.add;
 
   // it should be under function declaration -> no recreate on every render but how to add translations?
@@ -54,6 +60,7 @@ export default function AddArticleConfig({ dict }: any) {
         .regex(/^[0-9]{5}$/, {
           message: cDict.z.articleNumber,
         }),
+      // TODO: change to SAP format
       articleName: z.string().min(5, { message: cDict.z.articleName }),
       articleNote: z.string().optional(),
       piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
@@ -117,7 +124,7 @@ export default function AddArticleConfig({ dict }: any) {
       dmcFirstValidation: '',
       secondValidation: false,
       dmcSecondValidation: '',
-      hydraProcess: '',
+      hydraProcess: lang === 'pl' ? '' : '050',
       ford: false,
       bmw: false,
     },
@@ -243,38 +250,43 @@ export default function AddArticleConfig({ dict }: any) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='pallet'
-              render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className='space-y-1 leading-none'>
-                    <FormLabel>{cDict.palletFormLabel}</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-            {isPalletChecked && (
-              <FormField
-                control={form.control}
-                name='boxesPerPallet'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{cDict.boxesPerPalletFormLabel}</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+            {lang === 'pl' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name='pallet'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className='space-y-1 leading-none'>
+                        <FormLabel>{cDict.palletFormLabel}</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                {isPalletChecked && (
+                  <FormField
+                    control={form.control}
+                    name='boxesPerPallet'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{cDict.boxesPerPalletFormLabel}</FormLabel>
+                        <FormControl>
+                          <Input placeholder='' {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
+              </>
             )}
+
             <FormField
               control={form.control}
               name='dmc'
@@ -365,10 +377,12 @@ export default function AddArticleConfig({ dict }: any) {
                       <SelectItem value='050'>
                         {cDict.hydraProcessSelectOption050}
                       </SelectItem>
-                      <SelectItem value='090'>
-                        {' '}
-                        {cDict.hydraProcessSelectOption090}
-                      </SelectItem>
+                      {lang === 'pl' && (
+                        <SelectItem value='090'>
+                          {' '}
+                          {cDict.hydraProcessSelectOption090}
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   {/* <FormDescription>
@@ -378,42 +392,45 @@ export default function AddArticleConfig({ dict }: any) {
                 </FormItem>
               )}
             />
+            {lang === 'pl' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name='ford'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className='space-y-1 leading-none'>
+                        <FormLabel>{cDict.fordCheckboxFormLabel}</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name='ford'
-              render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className='space-y-1 leading-none'>
-                    <FormLabel>{cDict.fordCheckboxFormLabel}</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='bmw'
-              render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className='space-y-1 leading-none'>
-                    <FormLabel>{cDict.bmwCheckboxFormLabel}</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name='bmw'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className='space-y-1 leading-none'>
+                        <FormLabel>{cDict.bmwCheckboxFormLabel}</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
           </CardContent>
           <CardFooter className='flex justify-between'>
             <Button

@@ -72,7 +72,7 @@
     "cardTitle": "Datenexport",
     "cardDescription": "Bei einem breiten Kriterienbereich werden die neuesten 10.000 Datensätze heruntergeladen.",
     "workplaceLabel": "Arbeitsplatz",
-
+    "articleLabel": "Artikel",
     "statusLabel": "Status",
     "chooseInputPlaceholder": "wählen...",
     "anyInputPlaceholder": "beliebig eingeben...",
@@ -166,9 +166,11 @@
       "loginCode": "Personalnummer ist erforderlich!",
       "password": "Das Passwort muss 5 Zeichen enthalten!"
     },
+    "cardTitle": "Mitarbeiter hinzufügen",
+    "cardDescription": "Füllen Sie alle Daten aus, um einen neuen Mitarbeiter hinzuzufügen.",
     "firstNameFormLabel": "Vorname",
     "lastNameFormLabel": "Nachname",
-    "loginCodeFormLabel": "Personalnummer",
+    "loginCodeFormLabel": "Log-in Kartencode",
     "loginCodeFormDescription": "Wird zum Einloggen in die DMCheck-App verwendet.",
     "passwordFormLabel": "Passwort",
     "passwordFormDescription": "Wird in der Inventur-Unterstützungs-App verwendet. Leer lassen, um zu überspringen.",

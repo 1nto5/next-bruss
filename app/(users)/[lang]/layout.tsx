@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import '@/app/globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import QueryProvider from '@/lib/query-provider';
+// import QueryProvider from '@/lib/query-provider';
 import { Locale } from '@/i18n.config';
 import Header from './components/Header';
 import { Toaster } from '@/components/ui/sonner';
@@ -33,7 +33,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {/* <QueryProvider> */}
-          <Header session={session} dict={dictionary} />
+          <Header session={session} dict={dictionary} lang={lang} />
           {children}
           <Toaster richColors position='top-right' />
           {/* </QueryProvider> */}

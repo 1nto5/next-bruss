@@ -10,7 +10,7 @@ export default async function ArticleConfig({
   const dict = await getDictionary(lang);
   return (
     <main className='m-2 flex justify-center'>
-      <TabsArticleConfig dict={dict} />
+      <TabsArticleConfig dict={dict} lang={lang} />
     </main>
   );
 }

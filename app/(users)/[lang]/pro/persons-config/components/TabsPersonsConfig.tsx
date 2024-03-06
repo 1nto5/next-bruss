@@ -4,7 +4,13 @@ import NoAvailable from '@/app/(users)/[lang]/components/NoAvailable';
 
 //TODO: edit article config
 
-export default function TabsPersonsConfig({ dict }: any) {
+export default function TabsPersonsConfig({
+  dict,
+  lang,
+}: {
+  dict: any;
+  lang: string;
+}) {
   return (
     <Tabs defaultValue='add' className='w-[450px]'>
       <TabsList className='grid w-full grid-cols-2'>
@@ -17,7 +23,7 @@ export default function TabsPersonsConfig({ dict }: any) {
         <NoAvailable />
       </TabsContent>
       <TabsContent value='add'>
-        <AddPersonConfig cDict={dict?.personsConfig} />
+        <AddPersonConfig cDict={dict?.personsConfig} lang={lang} />
       </TabsContent>
     </Tabs>
   );

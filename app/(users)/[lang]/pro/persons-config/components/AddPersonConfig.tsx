@@ -31,7 +31,13 @@ import NoAvailable from '../../../components/NoAvailable';
 import { savePersonConfig } from '../actions';
 // import { useQuery } from '@tanstack/react-query';
 
-export default function AddPersonConfig({ cDict }: any) {
+export default function AddPersonConfig({
+  cDict,
+  lang,
+}: {
+  cDict: any;
+  lang: string;
+}) {
   // it could be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z.object({
     firstName: z.string().min(3, { message: cDict.z.firstName }),
@@ -117,22 +123,24 @@ export default function AddPersonConfig({ cDict }: any) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='password'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{cDict.passwordFormLabel}</FormLabel>
-                  <FormControl>
-                    <Input type='password' placeholder='' {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    {cDict.passwordFormDescription}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {lang === 'pl' && (
+              <FormField
+                control={form.control}
+                name='password'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{cDict.passwordFormLabel}</FormLabel>
+                    <FormControl>
+                      <Input type='password' placeholder='' {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      {cDict.passwordFormDescription}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
           <CardFooter className='flex justify-between'>
             <Button

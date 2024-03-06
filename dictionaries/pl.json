@@ -165,6 +165,8 @@
       "loginCode": "Numer personalny jest wymagany!",
       "password": "Hasło musi zawierać 5 znaków!"
     },
+    "cardTitle": "Dodaj pracownika",
+    "cardDescription": "Uzupełnij wszystkie dane by dodać nowego pracownika.",
     "firstNameFormLabel": "Imię",
     "lastNameFormLabel": "Nazwisko",
     "loginCodeFormLabel": "Numer personalny",
