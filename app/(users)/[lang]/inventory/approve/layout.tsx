@@ -28,7 +28,7 @@ export default async function Layout({
   const session = await auth();
   console.log('session: ', session);
   if (!session) {
-    redirect('/auth/login');
+    redirect('/auth');
   }
 
   if (!session?.user?.roles?.includes('inventory-approve')) {
