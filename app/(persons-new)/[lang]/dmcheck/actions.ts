@@ -105,6 +105,20 @@ function bmwDateValidation(dmc: string) {
   );
 }
 
+function convertDmcForBriApi(dmc: string) {
+  const formattedDmc = dmc
+    .replace(/#/g, '%23')
+    .replace(/\*/g, '%2A')
+    .replace(/=/g, '%3D')
+    .replace(/ /g, '%20');
+
+  const currentYear = new Date().getFullYear();
+  const yearCode = currentYear.toString().slice(2);
+  const formattedDmcWithYear = `%${yearCode}${formattedDmc}`;
+
+  return formattedDmcWithYear;
+}
+
 // save function for all types of scans - dmc, hydra, pallet - toasts are handled in the Scan component in the useEffect
 export async function save(prevState: any, formData: FormData) {
   if (formData.get('dmc')) {
@@ -145,6 +159,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
     const parse = schema.safeParse({
       dmc: formData?.get('dmc')?.toString(),
     });
+
     if (!parse.success) {
       return { message: 'dmc not valid' };
     }
@@ -162,11 +177,24 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
+    // TODO: BRI 40040 check in external API
+    // if (articleConfig.articleNumber === '40040') {
+    //   try {
+    //     const convertedDmc = convertDmcForBriApi(dmc);
+    //     console.log(convertedDmc);
+    //     const api = await fetch(
+    //       `http://10.24.10.102:2413/api/v2/teil/${convertedDmc}`,
+    //     );
+    //   } catch (error) {}
+    // }
+
     const scansCollection = await dbc('scans');
 
-    const existingDmc = await scansCollection.findOne({ dmc: dmc });
-    if (existingDmc) {
-      return { message: 'dmc exists' };
+    if (!articleConfig.articleNumber.includes('-200')) {
+      const existingDmc = await scansCollection.findOne({ dmc: dmc });
+      if (existingDmc) {
+        return { message: 'dmc exists' };
+      }
     }
 
     const insertResult = await scansCollection.insertOne({
