@@ -190,11 +190,12 @@ export async function saveDmc(prevState: any, formData: FormData) {
 
     const scansCollection = await dbc('scans');
 
-    if (!articleConfig.articleNumber.includes('-200')) {
-      const existingDmc = await scansCollection.findOne({ dmc: dmc });
-      if (existingDmc) {
-        return { message: 'dmc exists' };
-      }
+    const existingDmc = await scansCollection.findOne({
+      dmc: dmc,
+      workplace: articleConfig.workplace,
+    });
+    if (existingDmc) {
+      return { message: 'dmc exists' };
     }
 
     const insertResult = await scansCollection.insertOne({
