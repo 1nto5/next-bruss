@@ -84,6 +84,22 @@ export default function Header({ session, dict, lang }: HeaderProps) {
         },
       ],
     },
+    {
+      title: `New`,
+      href: '',
+      submenu: [
+        {
+          href: '/capa',
+          title: `capa`,
+          description: `${dict?.header?.inventory?.inventory.description}`,
+        },
+        {
+          href: '/inventory/approve',
+          title: `${dict?.header?.inventory?.inventoryApprove.title}`,
+          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
+        },
+      ],
+    },
     // {
     //   title: 'Nadgodziny',
     //   href: '/extra-hours',

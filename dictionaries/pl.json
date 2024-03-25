@@ -68,6 +68,13 @@
   "home": {
     "title": "Cześć!"
   },
+  "capa": {
+    "cardTitle": "CAPA",
+    "addCapaFormDialog": {
+      "addButton": "Dodaj",
+      "title": "Dodawanie nowego CAPA"
+    }
+  },
   "exportData": {
     "cardTitle": "Export danych",
     "cardDescription": "W przypadku szerokiego zakresu kryteriów, zostanie pobrane 10000 najnowszych rekordów.",
