@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
 export const metadata = {
-  title: 'Capa (Next BRUSS)',
+  title: 'CAPA (Next BRUSS)',
 };
 
 export default async function Layout({
