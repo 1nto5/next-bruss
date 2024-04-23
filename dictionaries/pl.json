@@ -31,7 +31,7 @@
       }
     }
   },
-  "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij by wysłać zgłoszenie w celu ich nadania:",
+  "noAccess": "Nie posiadasz uprawnień do tej funkcji. Kliknij aby wysłać zgłoszenie w celu ich nadania:",
   "noAccessTitle": "Brak uprawnień!",
   "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
   "auth": {

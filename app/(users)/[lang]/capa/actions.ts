@@ -1,0 +1,125 @@
+'use server';
+
+import { dbc } from '@/lib/mongo';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+
+type CapaType = {
+  client: string;
+  line: string;
+  articleNumber: string;
+  articleName: string;
+  clientPartNumber: string;
+  piff: string;
+  processDescription: string;
+  rep160t?: string;
+  rep260t?: string;
+  rep260t2k?: string;
+  rep300t?: string;
+  rep300t2k?: string;
+  rep400t?: string;
+  rep500t?: string;
+  b50?: string;
+  b85?: string;
+  engel?: string;
+  eol?: string;
+  cutter?: string;
+  other?: string;
+  soldCapa?: string;
+  flex?: string;
+  possibleMax?: string;
+  comment?: string;
+  sop?: string;
+  eop?: string;
+  service?: string;
+  editHistory?: { date: Date | string; email: string }[];
+  lastEdit?: { date: string; email: string };
+};
+
+export async function saveCapa(capa: CapaType) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('capa')) {
+      redirect('/auth');
+    }
+
+    const collection = await dbc('capa');
+
+    const exists = await collection.findOne({
+      articleNumber: capa.articleNumber,
+    });
+
+    if (exists) {
+      return { error: 'exists' };
+    }
+    const email = session.user.email;
+    if (!email) {
+      redirect('/auth');
+    }
+
+    capa = { ...capa, editHistory: [{ date: new Date(), email }] };
+
+    const res = await collection.insertOne(capa);
+    if (res) {
+      revalidatePath('/capa');
+      return { success: 'inserted' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the CAPA.');
+  }
+}
+
+export async function editCapa(capa: CapaType) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('capa')) {
+      redirect('/auth');
+    }
+
+    const collection = await dbc('capa');
+
+    const exists = await collection.findOne({
+      articleNumber: capa.articleNumber,
+    });
+
+    if (!exists) {
+      return { error: 'not found' };
+    }
+    const email = session.user.email;
+    if (!email) {
+      redirect('/auth');
+    }
+    capa = {
+      ...capa,
+      editHistory: [...(capa.editHistory ?? []), { date: new Date(), email }],
+    };
+
+    const res = await collection.updateOne(
+      { articleNumber: capa.articleNumber },
+      { $set: capa },
+    );
+    if (res) {
+      revalidatePath('/capa');
+      return { success: 'updated' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the CAPA.');
+  }
+}
+
+export async function getCapa(articleNumber: string): Promise<CapaType | null> {
+  try {
+    const collection = await dbc('capa');
+    const capa = (await collection.findOne(
+      { articleNumber },
+      { projection: { _id: 0 } },
+    )) as unknown as CapaType;
+    return capa;
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while retrieving the CAPA.');
+  }
+}

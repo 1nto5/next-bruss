@@ -18,16 +18,47 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  // CardDescription,
+  CardDescription,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { editCapa } from '../actions';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 
-import { saveCapa } from '../../actions';
+type CapaType = {
+  client: string;
+  line: string;
+  articleNumber: string;
+  articleName: string;
+  clientPartNumber: string;
+  piff: string;
+  processDescription: string;
+  rep160t?: string;
+  rep260t?: string;
+  rep260t2k?: string;
+  rep300t?: string;
+  rep300t2k?: string;
+  rep400t?: string;
+  rep500t?: string;
+  b50?: string;
+  b85?: string;
+  engel?: string;
+  eol?: string;
+  cutter?: string;
+  other?: string;
+  soldCapa?: string;
+  flex?: string;
+  possibleMax?: string;
+  comment?: string;
+  sop?: string;
+  eop?: string;
+  service?: string;
+  lastEdit?: { date: string; email: string };
+};
 
-export default function AddCapa() {
+export default function EditCapa({ data }: { data: CapaType }) {
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z.object({
     client: z.string().min(2, { message: 'Pole jest wymagane!' }),
@@ -64,40 +95,33 @@ export default function AddCapa() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      client: 'BMW ',
-      line: 'Las Vegas',
-      articleNumber: '12345',
-      articleName: 'Test article',
-      clientPartNumber: '123551231',
-      piff: '2134',
-      processDescription: 'test process description',
-      // client: '',
-      // line: '',
-      // articleNumber: '',
-      // articleName: '',
-      // clientPartNumber: '',
-      // piff: '',
-      // processDescription: '',
-      // rep160t: '',
-      // rep260t: '',
-      // rep260t2k: '',
-      // rep300t: '',
-      // rep300t2k: '',
-      // rep400t: '',
-      // rep500t: '',
-      // b50: '',
-      // b85: '',
-      // engel: '',
-      // eol: '',
-      // cutter: '',
-      // other: '',
-      // soldCapa: '',
-      // flex: '',
-      // possibleMax: '',
-      // comment: '',
-      // sop: '',
-      // eop: '',
-      // service: '',
+      client: data.client,
+      line: data.line,
+      articleNumber: data.articleNumber,
+      articleName: data.articleName,
+      clientPartNumber: data.clientPartNumber,
+      piff: data.piff,
+      processDescription: data.processDescription,
+      rep160t: data.rep160t,
+      rep260t: data.rep260t,
+      rep260t2k: data.rep260t2k,
+      rep300t: data.rep300t,
+      rep300t2k: data.rep300t2k,
+      rep400t: data.rep400t,
+      rep500t: data.rep500t,
+      b50: data.b50,
+      b85: data.b85,
+      engel: data.engel,
+      eol: data.eol,
+      cutter: data.cutter,
+      other: data.other,
+      soldCapa: data.soldCapa,
+      flex: data.flex,
+      possibleMax: data.possibleMax,
+      comment: data.comment,
+      sop: data.sop,
+      eop: data.eop,
+      service: data.service,
     },
   });
 
@@ -105,23 +129,30 @@ export default function AddCapa() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
-    console.log('data: ', data);
-    console.log('zapis');
-    const res = await saveCapa(data);
-    setIsPending(false);
-    if (res?.success) {
-      toast.success('CAPA zapisana!');
-      // form.reset();
-    } else if (res?.error === 'exists') {
-      toast.error('CAPA już istnieje, przejdź do edycji!');
+    try {
+      const res = await editCapa(data);
+      if (res?.success) {
+        toast.success('CAPA zapisana!');
+      } else if (res?.error) {
+        console.error('An error occurred:', res?.error);
+        toast.error('Skontaktuj się z IT!');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPending(false);
     }
   };
-
+  console.log(data);
   return (
     <Card className='w-[450px]'>
       <CardHeader>
-        <CardTitle>Dodaj CAPA</CardTitle>
-        {/* <CardDescription>{cDict.cardDescription}</CardDescription> */}
+        <CardTitle>Edytuj CAPA</CardTitle>
+        <CardDescription>
+          Ostatnia edycja: {data.lastEdit?.date ?? ''} przez{' '}
+          {extractNameFromEmail(data.lastEdit?.email ?? '')}
+        </CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -518,22 +549,14 @@ export default function AddCapa() {
               )}
             />
           </CardContent>
-          <CardFooter className='flex justify-between'>
-            <Button
-              variant='destructive'
-              type='button'
-              // TODO: form.reset() is not working for hydra process
-              onClick={() => form.reset()}
-            >
-              Wyczyść
-            </Button>
+          <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Dodawanie
+                Zapisywanie
               </Button>
             ) : (
-              <Button type='submit'>Dodaj</Button>
+              <Button type='submit'>Zapisz</Button>
             )}
           </CardFooter>
         </form>

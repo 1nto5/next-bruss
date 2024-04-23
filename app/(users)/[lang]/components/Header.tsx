@@ -85,18 +85,18 @@ export default function Header({ session, dict, lang }: HeaderProps) {
       ],
     },
     {
-      title: `New`,
+      title: `CAPA`,
       href: '',
       submenu: [
         {
           href: '/capa',
-          title: `capa`,
-          description: `${dict?.header?.inventory?.inventory.description}`,
+          title: `Tabela CAPA`,
+          description: `Wyświetlanie wszystkich pozycji.`,
         },
         {
-          href: '/inventory/approve',
-          title: `${dict?.header?.inventory?.inventoryApprove.title}`,
-          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
+          href: '/capa/add',
+          title: `Dodaj CAPA`,
+          description: `Dodawanie nowej pozycji.`,
         },
       ],
     },
