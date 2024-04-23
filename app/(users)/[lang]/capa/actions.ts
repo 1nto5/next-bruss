@@ -3,7 +3,7 @@
 import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 
 type CapaType = {
   client: string;
@@ -62,7 +62,7 @@ export async function saveCapa(capa: CapaType) {
 
     const res = await collection.insertOne(capa);
     if (res) {
-      revalidatePath('/capa');
+      revalidateTag('capa');
       return { success: 'inserted' };
     }
   } catch (error) {
@@ -85,7 +85,7 @@ export async function editCapa(capa: CapaType) {
     });
 
     if (!exists) {
-      return { error: 'not found' };
+      return { error: 'not exists' };
     }
     const email = session.user.email;
     if (!email) {
@@ -101,7 +101,7 @@ export async function editCapa(capa: CapaType) {
       { $set: capa },
     );
     if (res) {
-      revalidatePath('/capa');
+      revalidateTag('capa');
       return { success: 'updated' };
     }
   } catch (error) {
@@ -122,4 +122,34 @@ export async function getCapa(articleNumber: string): Promise<CapaType | null> {
     console.error(error);
     throw new Error('An error occurred while retrieving the CAPA.');
   }
+}
+
+export async function deleteCapa(articleNumber: string) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('capa')) {
+      redirect('/auth');
+    }
+
+    const collection = await dbc('capa');
+
+    const exists = await collection.findOne({ articleNumber });
+
+    if (!exists) {
+      return { error: 'not found' };
+    }
+
+    const res = await collection.deleteOne({ articleNumber });
+    if (res) {
+      revalidateTag('capa');
+      return { success: 'deleted' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while deleting the CAPA.');
+  }
+}
+
+export async function revalidateCapa() {
+  revalidateTag('capa');
 }

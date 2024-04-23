@@ -26,6 +26,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { editCapa } from '../../../actions';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import Link from 'next/link';
+import { Table } from 'lucide-react';
 
 type CapaType = {
   client: string;
@@ -70,26 +72,26 @@ export default function EditCapa({ data }: { data: CapaType }) {
     clientPartNumber: z.string().min(3, { message: 'Pole jest wymagane!' }),
     piff: z.string().min(3, { message: 'Pole jest wymagane!' }),
     processDescription: z.string().min(5, { message: 'Pole jest wymagane!' }),
-    rep160t: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep260t: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep260t2k: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep300t: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep300t2k: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep400t: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    rep500t: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    b50: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    b85: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    engel: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    eol: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    cutter: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    other: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    soldCapa: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    flex: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    possibleMax: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    comment: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    sop: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    eop: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
-    service: z.string().min(3, { message: 'Minimum 3 znaki!' }).optional(),
+    rep160t: z.string().optional(),
+    rep260t: z.string().optional(),
+    rep260t2k: z.string().optional(),
+    rep300t: z.string().optional(),
+    rep300t2k: z.string().optional(),
+    rep400t: z.string().optional(),
+    rep500t: z.string().optional(),
+    b50: z.string().optional(),
+    b85: z.string().optional(),
+    engel: z.string().optional(),
+    eol: z.string().optional(),
+    cutter: z.string().optional(),
+    other: z.string().optional(),
+    soldCapa: z.string().optional(),
+    flex: z.string().optional(),
+    possibleMax: z.string().optional(),
+    comment: z.string().optional(),
+    sop: z.string().optional(),
+    eop: z.string().optional(),
+    service: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -153,6 +155,13 @@ export default function EditCapa({ data }: { data: CapaType }) {
           Ostatnia edycja: {data.lastEdit?.date ?? ''} przez{' '}
           {extractNameFromEmail(data.lastEdit?.email ?? '')}
         </CardDescription>
+        <div className='flex items-center justify-between py-4'>
+          <Link href='/capa'>
+            <Button className='mr-2 justify-end' variant='outline'>
+              <Table />
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -164,7 +173,7 @@ export default function EditCapa({ data }: { data: CapaType }) {
                 <FormItem>
                   <FormLabel>Klient</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input autoFocus placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -190,7 +199,7 @@ export default function EditCapa({ data }: { data: CapaType }) {
                 <FormItem>
                   <FormLabel>Artykuł</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input disabled placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +210,7 @@ export default function EditCapa({ data }: { data: CapaType }) {
               name='articleName'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Numer</FormLabel>
+                  <FormLabel>Nazwa art.</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>

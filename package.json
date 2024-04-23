@@ -57,6 +57,7 @@
     "react-dom": "latest",
     "react-hook-form": "^7.49.2",
     "react-hot-toast": "^2.4.1",
+    "react-hotkeys-hook": "^4.5.0",
     "react-icons": "v5.0.1",
     "react-select": "^5.7.4",
     "sharp": "v0.33.2",

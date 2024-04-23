@@ -14,7 +14,6 @@ export default async function EditCapaPage({
   if (!capa || !capa.editHistory) {
     redirect('/capa');
   }
-  // Assuming capa is an object of CapaType
   if (capa.editHistory && capa.editHistory.length > 0) {
     const lastEdit = capa.editHistory[0];
     delete capa.editHistory;
