@@ -13,6 +13,11 @@ async function getData(lang: string): Promise<Capa[]> {
     let allCapa = await response.json();
     // Sort the data by articleNumber in ascending order
     allCapa = allCapa
+      .sort((a: Capa, b: Capa) => {
+        const dateA = a.edited?.date ? new Date(a.edited.date) : new Date(0); // Default to epoch if undefined
+        const dateB = b.edited?.date ? new Date(b.edited.date) : new Date(0); // Default to epoch if undefined
+        return dateB.getTime() - dateA.getTime();
+      })
       .map((capa: Capa) => {
         if (capa.edited) {
           const edited = {
@@ -23,11 +28,6 @@ async function getData(lang: string): Promise<Capa[]> {
           return { ...capa, edited };
         }
         return capa;
-      })
-      .sort((a: Capa, b: Capa) => {
-        const dateA = a.edited?.date ? new Date(a.edited.date) : new Date(0); // Default to epoch if undefined
-        const dateB = b.edited?.date ? new Date(b.edited.date) : new Date(0); // Default to epoch if undefined
-        return dateB.getTime() - dateA.getTime();
       });
 
     return allCapa;
