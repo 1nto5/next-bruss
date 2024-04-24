@@ -72,6 +72,7 @@ export function DataTable<TData, TValue>({
         <div className='flex items-center justify-between py-4'>
           <div className='flex'>
             <Input
+              autoFocus
               placeholder='Wyszukaj nr. artykułu...'
               value={
                 (table
