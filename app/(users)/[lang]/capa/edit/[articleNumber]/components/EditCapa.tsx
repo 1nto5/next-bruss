@@ -57,10 +57,14 @@ type CapaType = {
   sop?: string;
   eop?: string;
   service?: string;
-  lastEdit?: { date: string; email: string };
+  edited?: { date: string | Date; email: string };
 };
 
 export default function EditCapa({ data }: { data: CapaType }) {
+  const date =
+    typeof data.edited?.date === 'string'
+      ? data.edited?.date
+      : 'błąd formatowania daty';
   // it should be under function declaration -> no recreate on every render but how to add translations?
   const formSchema = z.object({
     client: z.string().min(2, { message: 'Pole jest wymagane!' }),
@@ -146,14 +150,14 @@ export default function EditCapa({ data }: { data: CapaType }) {
       setIsPending(false);
     }
   };
-  console.log(data);
+
   return (
-    <Card className='w-[450px]'>
+    <Card className='w-[550px]'>
       <CardHeader>
         <CardTitle>Edytuj CAPA</CardTitle>
         <CardDescription>
-          Ostatnia edycja: {data.lastEdit?.date ?? ''} przez{' '}
-          {extractNameFromEmail(data.lastEdit?.email ?? '')}
+          Ostatnia edycja: {date} przez{' '}
+          {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription>
         <div className='flex items-center justify-between py-4'>
           <Link href='/capa'>

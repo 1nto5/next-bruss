@@ -11,15 +11,14 @@ export default async function EditCapaPage({
 }) {
   // const dict = await getDictionary(lang);
   const capa = await getCapa(articleNumber);
-  if (!capa || !capa.editHistory) {
+  if (!capa || !capa.edited) {
     redirect('/capa');
   }
-  if (capa.editHistory && capa.editHistory.length > 0) {
-    const lastEdit = capa.editHistory[0];
-    delete capa.editHistory;
-    capa.lastEdit = {
-      ...lastEdit,
-      date: new Date(lastEdit.date).toLocaleString(lang),
+  if (capa.edited) {
+    const edited = capa.edited;
+    capa.edited = {
+      date: new Date(edited.date).toLocaleString(lang),
+      email: edited.email,
     };
   }
 

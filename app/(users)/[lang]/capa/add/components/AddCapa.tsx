@@ -25,7 +25,7 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-import { saveCapa } from '../../actions';
+import { addCapa } from '../../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
 
@@ -107,20 +107,26 @@ export default function AddCapa() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
-    console.log('data: ', data);
-    console.log('zapis');
-    const res = await saveCapa(data);
-    setIsPending(false);
-    if (res?.success) {
-      toast.success('CAPA zapisana!');
-      // form.reset();
-    } else if (res?.error === 'exists') {
-      toast.error('CAPA już istnieje, przejdź do edycji!');
+    try {
+      const res = await addCapa(data);
+      if (res?.success) {
+        toast.success('CAPA zapisana!');
+        // form.reset();
+      } else if (res?.error === 'exists') {
+        toast.error('CAPA już istnieje, przejdź do edycji!');
+      } else if (res?.error) {
+        toast.error('Skontaktuj się z IT!');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPending(false);
     }
   };
 
   return (
-    <Card className='w-[450px]'>
+    <Card className='w-[550px]'>
       <CardHeader>
         <CardTitle>Dodaj CAPA</CardTitle>
         {/* <CardDescription>{cDict.cardDescription}</CardDescription> */}
@@ -179,7 +185,7 @@ export default function AddCapa() {
               name='articleName'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Numer</FormLabel>
+                  <FormLabel>Nazwa art.</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>

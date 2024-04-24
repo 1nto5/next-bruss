@@ -33,11 +33,10 @@ type CapaType = {
   sop?: string;
   eop?: string;
   service?: string;
-  editHistory?: { date: Date | string; email: string }[];
-  lastEdit?: { date: string; email: string };
+  edited?: { date: Date | string; email: string };
 };
 
-export async function saveCapa(capa: CapaType) {
+export async function addCapa(capa: CapaType) {
   try {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('capa')) {
@@ -53,12 +52,13 @@ export async function saveCapa(capa: CapaType) {
     if (exists) {
       return { error: 'exists' };
     }
+
     const email = session.user.email;
     if (!email) {
       redirect('/auth');
     }
 
-    capa = { ...capa, editHistory: [{ date: new Date(), email }] };
+    capa = { ...capa, edited: { date: new Date(), email } };
 
     const res = await collection.insertOne(capa);
     if (res) {
@@ -79,6 +79,7 @@ export async function editCapa(capa: CapaType) {
     }
 
     const collection = await dbc('capa');
+    const historyCollection = await dbc('capa_history');
 
     const exists = await collection.findOne({
       articleNumber: capa.articleNumber,
@@ -87,13 +88,17 @@ export async function editCapa(capa: CapaType) {
     if (!exists) {
       return { error: 'not exists' };
     }
+
+    // Save the old document in the capa_history collection
+    await historyCollection.insertOne(exists);
+
     const email = session.user.email;
     if (!email) {
       redirect('/auth');
     }
     capa = {
       ...capa,
-      editHistory: [...(capa.editHistory ?? []), { date: new Date(), email }],
+      edited: { date: new Date(), email },
     };
 
     const res = await collection.updateOne(

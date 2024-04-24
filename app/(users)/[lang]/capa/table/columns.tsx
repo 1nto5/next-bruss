@@ -50,8 +50,7 @@ export type Capa = {
   sop?: string;
   eop?: string;
   service?: string;
-  editHistory?: { date: Date | string; email: string }[];
-  lastEdit?: { date: string; email: string };
+  edited?: { date: string; email: string };
 };
 
 export const columns: ColumnDef<Capa>[] = [
@@ -209,7 +208,11 @@ export const columns: ColumnDef<Capa>[] = [
     header: 'Czy serwisowy?',
   },
   {
-    accessorKey: 'lastEdit',
+    accessorKey: 'edited.date',
     header: 'Ostatnia edycja',
+  },
+  {
+    accessorKey: 'edited.name',
+    header: 'Edytowane przez',
   },
 ];
