@@ -25,20 +25,11 @@ async function getData(lang: string): Promise<Capa[]> {
         return capa;
       })
       .sort((a: Capa, b: Capa) => {
-        if (a.edited && b.edited) {
-          return (
-            new Date(b.edited.date).getTime() -
-            new Date(a.edited.date).getTime()
-          );
-        } else if (a.edited) {
-          return -1;
-        } else if (b.edited) {
-          return 1;
-        } else {
-          return 0;
-        }
-      })
-      .reverse();
+        const dateA = a.edited?.date ? new Date(a.edited.date) : new Date(0); // Default to epoch if undefined
+        const dateB = b.edited?.date ? new Date(b.edited.date) : new Date(0); // Default to epoch if undefined
+        return dateB.getTime() - dateA.getTime();
+      });
+
     return allCapa;
   } catch (error) {
     throw new Error('Fetching all capa error: ' + error);

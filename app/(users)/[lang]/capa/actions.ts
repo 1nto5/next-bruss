@@ -71,7 +71,7 @@ export async function addCapa(capa: CapaType) {
   }
 }
 
-export async function editCapa(capa: CapaType) {
+export async function saveCapa(capa: CapaType) {
   try {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('capa')) {
