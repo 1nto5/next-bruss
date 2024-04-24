@@ -40,11 +40,13 @@ import Link from 'next/link';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  fetched?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fetched,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -69,6 +71,7 @@ export function DataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <CardTitle>CAPA</CardTitle>
+        <CardDescription>Ostatnia synchronizacja: {fetched}</CardDescription>
         <div className='flex items-center justify-between py-4'>
           <div className='flex'>
             <Input
