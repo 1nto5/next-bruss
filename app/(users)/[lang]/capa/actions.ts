@@ -90,7 +90,8 @@ export async function saveCapa(capa: CapaType) {
     }
 
     // Save the old document in the capa_history collection
-    await historyCollection.insertOne(exists);
+    const { _id, ...documentWithoutId } = exists;
+    await historyCollection.insertOne(documentWithoutId);
 
     const email = session.user.email;
     if (!email) {
