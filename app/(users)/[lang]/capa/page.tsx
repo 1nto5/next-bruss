@@ -10,7 +10,7 @@ async function getData(lang: string): Promise<Capa[]> {
   // Fetch data from your API here.
   try {
     const response = await fetch(`${process.env.API}/capa/getAllCapa`, {
-      next: { revalidate: 1200, tags: ['capa'] },
+      next: { revalidate: 600 * 8, tags: ['capa'] },
     });
     console.log('response', response);
 
