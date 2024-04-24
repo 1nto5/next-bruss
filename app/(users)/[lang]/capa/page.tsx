@@ -37,7 +37,8 @@ async function getData(lang: string): Promise<Capa[]> {
         } else {
           return 0;
         }
-      });
+      })
+      .reverse();
     return allCapa;
   } catch (error) {
     throw new Error('Fetching all capa error: ' + error);
