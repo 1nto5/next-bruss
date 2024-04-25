@@ -17,7 +17,7 @@ import Link from 'next/link';
 import { Trash2, Pencil } from 'lucide-react';
 import { deleteCapa } from '.././actions';
 //TODO: implement or delete :)
-import { useHotkeys } from 'react-hotkeys-hook';
+// import { useHotkeys } from 'react-hotkeys-hook';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.

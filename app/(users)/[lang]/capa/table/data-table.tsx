@@ -40,14 +40,25 @@ import Link from 'next/link';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  fetched?: string;
+  fetchTime: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  fetched,
+  fetchTime,
 }: DataTableProps<TData, TValue>) {
+  //   React.useEffect(() => {
+  //     const intervalId = setInterval(
+  //       () => {
+  //         revalidateCapa();
+  //       },
+  //       1 * 60 * 1000,
+  //     ); // 5 minutes in milliseconds
+
+  //     // Clear interval on component unmount
+  //     return () => clearInterval(intervalId);
+  //   }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -71,7 +82,7 @@ export function DataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <CardTitle>CAPA</CardTitle>
-        <CardDescription>Ostatnia synchronizacja: {fetched}</CardDescription>
+        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between py-4'>
           <div className='flex'>
             <Input
