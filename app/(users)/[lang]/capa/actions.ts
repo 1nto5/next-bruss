@@ -3,7 +3,7 @@
 import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 type CapaType = {
   client: string;
