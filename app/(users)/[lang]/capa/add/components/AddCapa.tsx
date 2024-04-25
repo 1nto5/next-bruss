@@ -130,7 +130,7 @@ export default function AddCapa() {
       <CardHeader>
         <CardTitle>Dodaj CAPA</CardTitle>
         {/* <CardDescription>{cDict.cardDescription}</CardDescription> */}
-        <div className='flex items-center justify-between py-4'>
+        <div className='flex items-center justify-end py-4'>
           <Link href='/capa'>
             <Button className='mr-2 justify-end' variant='outline'>
               <Table />

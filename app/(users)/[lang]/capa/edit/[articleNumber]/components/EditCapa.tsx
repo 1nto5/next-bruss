@@ -154,7 +154,7 @@ export default function EditCapa({ data }: { data: CapaType }) {
   return (
     <Card className='w-[550px]'>
       <CardHeader>
-        <CardTitle>Edytuj CAPA</CardTitle>
+        <CardTitle>Edytuj CAPA {data.articleNumber}</CardTitle>
         <CardDescription>
           Poprzednio edytowany: {date} przez{' '}
           {extractNameFromEmail(data.edited?.email ?? '')}
