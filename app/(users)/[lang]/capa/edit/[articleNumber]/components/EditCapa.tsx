@@ -156,10 +156,10 @@ export default function EditCapa({ data }: { data: CapaType }) {
       <CardHeader>
         <CardTitle>Edytuj CAPA</CardTitle>
         <CardDescription>
-          Ostatnia edycja: {date} przez{' '}
+          Poprzednio edytowany: {date} przez{' '}
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription>
-        <div className='flex items-center justify-between py-4'>
+        <div className='flex items-center justify-end py-4'>
           <Link href='/capa'>
             <Button className='mr-2 justify-end' variant='outline'>
               <Table />

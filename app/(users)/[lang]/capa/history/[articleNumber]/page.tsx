@@ -6,11 +6,15 @@ import { extractNameFromEmail } from '@/lib//utils/nameFormat';
 
 async function getData(
   lang: string,
+  articleNumber: string,
 ): Promise<{ fetchTime: string; allCapa: Capa[] }> {
   try {
-    const response = await fetch(`${process.env.API}/capa/get-all-capa`, {
-      next: { revalidate: 60 * 15, tags: ['capa'] },
-    });
+    const response = await fetch(
+      `${process.env.API}/capa/get-capa-history?articleNumber=${articleNumber}`,
+      {
+        next: { revalidate: 60 * 15, tags: ['capa'] },
+      },
+    );
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
     const fetchTime = dateFromResponse.toLocaleString(lang);
@@ -41,17 +45,22 @@ async function getData(
 }
 
 export default async function CapaPage({
-  params: { lang },
+  params: { lang, articleNumber },
 }: {
-  params: { lang: Locale };
+  params: { lang: Locale; articleNumber: string };
 }) {
-  const { fetchTime, allCapa } = await getData(lang);
+  const { fetchTime, allCapa } = await getData(lang, articleNumber);
   return (
     // <main className='m-2 flex justify-center'>
     //   {' '}
     // container
     <div className='mx-auto px-12 py-4 lg:px-24'>
-      <DataTable columns={columns} data={allCapa} fetchTime={fetchTime} />
+      <DataTable
+        columns={columns}
+        data={allCapa}
+        fetchTime={fetchTime}
+        articleNumber={articleNumber}
+      />
     </div>
     // </main>
   );
