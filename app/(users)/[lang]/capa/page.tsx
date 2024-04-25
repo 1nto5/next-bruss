@@ -9,7 +9,7 @@ async function getData(
 ): Promise<{ fetchTime: string; allCapa: Capa[] }> {
   try {
     const response = await fetch(`${process.env.API}/capa/getAllCapa`, {
-      next: { revalidate: 3600 * 4, tags: ['capa'] },
+      next: { revalidate: 60 * 15, tags: ['capa'] },
     });
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
