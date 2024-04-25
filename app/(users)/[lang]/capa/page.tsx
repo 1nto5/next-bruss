@@ -12,7 +12,6 @@ async function getData(lang: string): Promise<Capa[]> {
     const response = await fetch(`${process.env.API}/capa/getAllCapa`, {
       next: { revalidate: 600 * 8, tags: ['capa'] },
     });
-    console.log('response', response);
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
     fetched = dateFromResponse.toLocaleString(lang);
