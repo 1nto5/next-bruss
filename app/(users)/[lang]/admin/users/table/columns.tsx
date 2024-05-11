@@ -1,0 +1,93 @@
+'use client';
+
+import { ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontal } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  // DropdownMenuLabel,
+  // DropdownMenuSeparator,
+  // DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { Trash2, Pencil } from 'lucide-react';
+import { deleteUser } from '.././actions';
+//TODO: implement or delete :)
+// import { useHotkeys } from 'react-hotkeys-hook';
+
+// This type is used to define the shape of our data.
+// You can use a Zod schema here if you want.
+
+//TODO: move types to a separate file
+export type User = {
+  id: string;
+  email: string;
+  roles?: string[];
+};
+
+export const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'admin',
+    header: 'Admin',
+  },
+  {
+    accessorKey: 'inventory-approve',
+    header: 'Inventory approve',
+  },
+  {
+    accessorKey: 'rework',
+    header: 'Rework',
+  },
+  {
+    accessorKey: 'article-config',
+    header: 'Article config',
+  },
+  {
+    accessorKey: 'persons-config',
+    header: 'Persons config',
+  },
+
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const user = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' className='h-8 w-8 p-0'>
+              <span className='sr-only'>Open menu</span>
+              <MoreHorizontal className='h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
+            {/* <DropdownMenuSeparator /> */}
+            <Link href={`/admin/users/edit/${user.id}`}>
+              <DropdownMenuItem>
+                <Pencil className='mr-2 h-4 w-4' />
+                <span>Edit</span>
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuItem
+              onClick={() => deleteUser(user.id)}
+              className=' focus:bg-red-400 dark:focus:bg-red-700'
+            >
+              <Trash2 className='mr-2 h-4 w-4' />
+              <span>Delete</span>
+              {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];
