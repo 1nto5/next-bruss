@@ -16,45 +16,22 @@ import {
 import Link from 'next/link';
 import { Trash2, Pencil } from 'lucide-react';
 import { deleteUser } from '.././actions';
+import { UserType } from '@/lib/types/user';
 //TODO: implement or delete :)
 // import { useHotkeys } from 'react-hotkeys-hook';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-//TODO: move types to a separate file
-export type User = {
-  id: string;
-  email: string;
-  roles?: string[];
-};
-
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<UserType>[] = [
   {
     accessorKey: 'email',
     header: 'Email',
   },
   {
-    accessorKey: 'admin',
-    header: 'Admin',
+    accessorKey: 'roles',
+    header: 'Roles',
   },
-  {
-    accessorKey: 'inventory-approve',
-    header: 'Inventory approve',
-  },
-  {
-    accessorKey: 'rework',
-    header: 'Rework',
-  },
-  {
-    accessorKey: 'article-config',
-    header: 'Article config',
-  },
-  {
-    accessorKey: 'persons-config',
-    header: 'Persons config',
-  },
-
   {
     id: 'actions',
     cell: ({ row }) => {
@@ -71,14 +48,14 @@ export const columns: ColumnDef<User>[] = [
           <DropdownMenuContent align='end'>
             {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
             {/* <DropdownMenuSeparator /> */}
-            <Link href={`/admin/users/edit/${user.id}`}>
+            <Link href={`/admin/users/edit/${user._id}`}>
               <DropdownMenuItem>
                 <Pencil className='mr-2 h-4 w-4' />
                 <span>Edit</span>
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem
-              onClick={() => deleteUser(user.id)}
+              onClick={() => deleteUser(user._id)}
               className=' focus:bg-red-400 dark:focus:bg-red-700'
             >
               <Trash2 className='mr-2 h-4 w-4' />

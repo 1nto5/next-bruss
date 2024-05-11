@@ -1,11 +1,13 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { User, columns } from './table/columns';
+import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
+import { UserType } from '@/lib/types/user';
+import { User } from 'next-auth';
 
 async function getData(
   lang: string,
-): Promise<{ fetchTime: string; allUsers: User[] }> {
+): Promise<{ fetchTime: string; allUsers: UserType[] }> {
   try {
     const response = await fetch(`${process.env.API}/admin/get-all-users`, {
       next: { revalidate: 60 * 15, tags: ['users'] },
@@ -16,26 +18,13 @@ async function getData(
 
     let allUsers = await response.json();
 
-    let allRoles: string[] = allUsers.reduce((roles: string[], user: User) => {
-      return [...roles, ...(user.roles ?? [])];
-    }, []);
-    // @ts-ignore
-    allRoles = [...new Set(allRoles)];
-
-    allUsers = allUsers.map((user: User) => {
-      let rolesObj: { [key: string]: string } = {};
-      allRoles.forEach((role: string) => {
-        rolesObj[role] = (user.roles ?? []).includes(role) ? 'X' : '';
-      });
-      return { ...user, ...rolesObj };
-    });
     return { fetchTime, allUsers };
   } catch (error) {
-    throw new Error('Fetching all capa error: ' + error);
+    throw new Error('Fetching all users error: ' + error);
   }
 }
 
-export default async function CapaPage({
+export default async function AdminUsersPage({
   params: { lang },
 }: {
   params: { lang: Locale };
