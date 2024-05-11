@@ -21,6 +21,7 @@ import {
   // CardDescription,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -138,7 +139,7 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
                 <FormItem>
                   <FormLabel>Roles</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Textarea autoFocus placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
