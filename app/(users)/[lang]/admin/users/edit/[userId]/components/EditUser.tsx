@@ -82,7 +82,7 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
       const user = {
         _id: userObject._id,
         email: data.email,
-        roles: data.roles.split(','),
+        roles: data.roles.split(',').filter((role) => role.trim() !== ''),
       };
       const res = await saveUser(user);
       if (res?.success) {
