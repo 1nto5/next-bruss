@@ -45,7 +45,6 @@
     "loggingButton": "Anmeldung",
     "resetPasswordButton": "Passwort zurücksetzen",
     "emailSendingButton": "E-Mail senden",
-    "passwordUpdated": "Passwort aktualisiert!",
     "registerButton": "Registrieren",
     "registeringButton": "Registrierung",
     "saveNewPasswordButton": "Passwort speichern",
@@ -66,7 +65,8 @@
       "noUserWithThisEmail": "Kein Benutzer mit dieser E-Mail gefunden!",
       "resetPasswordNoEmail": "Geben Sie eine E-Mail ein, um das Passwort zurückzusetzen!",
       "registered": "Konto erstellt!",
-      "exists": "Konto existiert bereits!"
+      "exists": "Konto existiert bereits!",
+      "passwordUpdated": "Passwort aktualisiert!"
     }
   },
   "home": {
