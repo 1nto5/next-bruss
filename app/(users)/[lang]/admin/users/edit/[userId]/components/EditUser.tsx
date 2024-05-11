@@ -25,9 +25,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { saveUser } from '../../../actions';
+import { saveUser, getResetPasswordLink } from '../../../actions';
 import Link from 'next/link';
-import { Table } from 'lucide-react';
+import { Table, SquareAsterisk } from 'lucide-react';
 import { UserType } from '@/lib/types/user';
 
 export default function EditUser({ userObject }: { userObject: UserType }) {
@@ -83,7 +83,14 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
       const user = {
         _id: userObject._id,
         email: data.email,
-        roles: data.roles.split(',').filter((role) => role.trim() !== ''),
+        roles: Array.from(
+          new Set(
+            data.roles
+              .split(',')
+              .map((role) => role.trim())
+              .filter((role) => role !== ''),
+          ),
+        ),
       };
       const res = await saveUser(user);
       if (res?.success) {
@@ -100,6 +107,46 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
     }
   };
 
+  const [isPendingPassword, setIsPendingPassword] = useState(false);
+
+  async function passwordReset() {
+    try {
+      setIsPendingPassword(true);
+      const res = await getResetPasswordLink(userObject._id);
+      if (!res) {
+        toast.error('Please contact IT!');
+        return;
+      }
+
+      if (res.status === 'success') {
+        const resetLink = res.resetUrl;
+        if (!resetLink) {
+          toast.error('Please contact IT!');
+          return;
+        }
+        navigator.clipboard.writeText(resetLink);
+        toast.success('The password reset link has been copied!');
+        return;
+      }
+
+      if (res?.error) {
+        toast.error('Please contact IT!');
+        console.error('User password reset was unsuccessful.:', res?.error);
+      }
+
+      if (res.status === 'not exists') {
+        toast.error('User does not exist!');
+        return;
+      }
+    } catch (error) {
+      console.error('User password reset was unsuccessful.:', error);
+      toast.error('Please contact IT!');
+      return;
+    } finally {
+      setIsPendingPassword(false);
+    }
+  }
+
   return (
     <Card className='w-[550px]'>
       <CardHeader>
@@ -109,8 +156,15 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
+          <Button
+            onClick={() => passwordReset()}
+            className='mr-2'
+            variant='outline'
+          >
+            <SquareAsterisk />
+          </Button>
           <Link href='/admin/users'>
-            <Button className='mr-2 justify-end' variant='outline'>
+            <Button className='mr-2' variant='outline'>
               <Table />
             </Button>
           </Link>
@@ -139,7 +193,7 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
                 <FormItem>
                   <FormLabel>Roles</FormLabel>
                   <FormControl>
-                    <Textarea autoFocus placeholder='' {...field} />
+                    <Textarea placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

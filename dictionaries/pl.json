@@ -37,6 +37,7 @@
   "auth": {
     "loginTab": "Logowanie",
     "registerTab": "Rejestracja",
+    "resetPassword": "Ustal nowe hasło",
     "emailInputLabel": "Email",
     "passwordInputLabel": "Hasło",
     "confirmPasswordInputLabel": "Potwierdź hasło",
@@ -44,8 +45,11 @@
     "loggingButton": "Logowanie",
     "resetPasswordButton": "Reset hasła",
     "emailSendingButton": "Wysyłanie email",
+    "passwordUpdated": "Hasło zaktualizowane!",
     "registerButton": "Zarejestruj",
     "registeringButton": "Rejestracja",
+    "saveNewPasswordButton": "Zapisz hasło",
+    "savingButton": "Zapisywanie",
     "zod": {
       "emailTooShort": "Email jest za krótki!",
       "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",

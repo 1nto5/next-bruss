@@ -28,24 +28,23 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-const formSchema = z
-  .object({
-    password: z
-      .string()
-      .min(6, { message: 'Hasło musi zawierać co najmniej 6 znaków!' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: 'Hasło musi zawierać przynajmniej jeden znak specjalny!',
-      }),
-    confirmPassword: z
-      .string()
-      .min(1, { message: 'Potiwerdzenie hasła jest wymagane!' }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Hasła nie są zgodne!',
-  });
-
-export default function Reset({ token }: { token: string }) {
+export default function Reset({ cDict, token }: { cDict: any; token: string }) {
+  const formSchema = z
+    .object({
+      password: z
+        .string()
+        .min(6, { message: cDict.zod.passwordTooShort })
+        .regex(/[^a-zA-Z0-9]/, {
+          message: cDict.zod.passwordNoSpecialCharachter,
+        }),
+      confirmPassword: z
+        .string()
+        .min(1, { message: cDict.zod.passwordNoConfirm }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ['confirmPassword'],
+      message: cDict.zod.passwordsNotMatch,
+    });
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
 
@@ -62,7 +61,7 @@ export default function Reset({ token }: { token: string }) {
       return response;
     } catch (error) {
       console.error('Finding token was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(cDict.toasts.pleaseContactIt);
       return null;
     }
   }
@@ -95,15 +94,15 @@ export default function Reset({ token }: { token: string }) {
 
       if (response.error || response.status !== 'password updated') {
         console.error(response.error || 'Password update was unsuccessful.');
-        toast.error('Skontaktuj się z IT!');
+        toast.error(cDict.toasts.pleaseContactIt);
         return;
       }
 
-      toast.success('Hasło zostało zaktualizowane!');
+      toast.success(cDict.toasts.passwordUpdated);
       router.replace('/auth');
     } catch (error) {
       console.error('User login was unsuccessful.:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(cDict.toasts.pleaseContactIt);
     } finally {
       setIsPending(false);
     }
@@ -112,7 +111,7 @@ export default function Reset({ token }: { token: string }) {
   return (
     <Card className='w-[400px]'>
       <CardHeader>
-        <CardTitle>Ustal nowe hasło</CardTitle>
+        <CardTitle>{cDict.resetPassword}</CardTitle>
         {/* <CardDescription>Wprowadź dane aby się zalogować:</CardDescription> */}
       </CardHeader>
 
@@ -124,7 +123,7 @@ export default function Reset({ token }: { token: string }) {
               name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nowe hasło</FormLabel>
+                  <FormLabel>{cDict.passwordInputLabel}</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -140,7 +139,7 @@ export default function Reset({ token }: { token: string }) {
               name='confirmPassword'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Powtórz hasło</FormLabel>
+                  <FormLabel>{cDict.confirmPasswordInputLabel}</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -156,10 +155,10 @@ export default function Reset({ token }: { token: string }) {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Zapisywanie
+                {cDict.savingNewPasswordButton}
               </Button>
             ) : (
-              <Button type='submit'>Zatwierdź</Button>
+              <Button type='submit'>{cDict.saveNewPasswordButton}</Button>
             )}
           </CardFooter>
         </form>

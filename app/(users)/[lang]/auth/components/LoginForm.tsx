@@ -88,7 +88,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
         return;
       }
 
-      if (result.status === 'sent') {
+      if (result.status === 'success') {
         toast.success(cDict.toasts.resetPasswordEmailSent);
         return;
       }

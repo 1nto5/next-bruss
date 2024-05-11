@@ -6,6 +6,8 @@ import { redirect } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import { ObjectId } from 'mongodb';
 import { UserType } from '@/lib/types/user';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 // export async function addUser(user: UserType) {
 //   try {
@@ -114,4 +116,38 @@ export async function deleteUser(userId: string) {
 
 export async function revalidateUsers() {
   revalidateTag('users');
+}
+
+export async function getResetPasswordLink(
+  _id: string,
+): Promise<{ status: string; resetUrl?: string; error?: any }> {
+  try {
+    const collection = await dbc('users');
+
+    const existingUser = await collection.findOne({ _id: new ObjectId(_id) });
+    if (!existingUser) {
+      return { status: 'not exists' };
+    }
+
+    const resetToken = await crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+    const tokenExpiry = Date.now() + 3600000 * 8;
+
+    await collection.updateOne(
+      { _id: new ObjectId(_id) },
+      {
+        $set: {
+          passwordResetToken: hashedToken,
+          passwordResetExpires: tokenExpiry,
+        },
+      },
+    );
+
+    const resetUrl = `${process.env.AUTH_URL}/auth/reset-password/${resetToken}`;
+
+    return { status: 'success', resetUrl };
+  } catch (error) {
+    console.error(error);
+    return { status: 'error', error };
+  }
 }

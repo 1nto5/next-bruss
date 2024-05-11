@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
 export const metadata = {
-  title: 'CAPA (Next BRUSS)',
+  title: 'Users management (Next BRUSS)',
 };
 
 export default async function Layout({
@@ -10,5 +10,12 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
+  if (!session?.user.roles?.includes('admin')) {
+    redirect('/');
+  }
   return <>{children}</>;
 }

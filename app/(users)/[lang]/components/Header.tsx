@@ -69,6 +69,17 @@ export default function Header({ session, dict, lang }: HeaderProps) {
       ],
     },
     {
+      title: `Wsparcie`,
+      href: '',
+      submenu: [
+        {
+          href: '/capa',
+          title: `CAPA`,
+          description: `Tabela CAPA dla artykułów.`,
+        },
+      ],
+    },
+    {
       title: `${dict?.header?.inventory?.title}`,
       href: '',
       submenu: [
@@ -84,22 +95,21 @@ export default function Header({ session, dict, lang }: HeaderProps) {
         },
       ],
     },
-    {
-      title: `CAPA`,
-      href: '',
-      submenu: [
-        {
-          href: '/capa',
-          title: `Tabela CAPA`,
-          description: `Wyświetlanie wszystkich pozycji.`,
-        },
-        {
-          href: '/capa/add',
-          title: `Dodaj CAPA`,
-          description: `Dodawanie nowej pozycji.`,
-        },
-      ],
-    },
+    ...(session?.user.roles?.includes('admin')
+      ? [
+          {
+            title: 'Admin',
+            href: '',
+            submenu: [
+              {
+                href: '/admin/users',
+                title: 'Users roles',
+                description: 'Manage users roles',
+              },
+            ],
+          },
+        ]
+      : []),
     // {
     //   title: 'Nadgodziny',
     //   href: '/extra-hours',
@@ -133,6 +143,21 @@ export default function Header({ session, dict, lang }: HeaderProps) {
         },
       ],
     },
+    ...(session?.user.roles?.includes('admin')
+      ? [
+          {
+            title: 'Admin',
+            href: '',
+            submenu: [
+              {
+                href: '/admin/users',
+                title: 'Users roles',
+                description: 'Manage users roles',
+              },
+            ],
+          },
+        ]
+      : []),
   ];
 
   const selectedRoutes = lang === 'de' ? routesDe : routes;
