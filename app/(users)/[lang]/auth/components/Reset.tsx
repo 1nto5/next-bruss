@@ -55,6 +55,7 @@ export default function Reset({ cDict, token }: { cDict: any; token: string }) {
       confirmPassword: '',
     },
   });
+
   async function find(token: string) {
     try {
       const response = await findToken(token);
@@ -66,6 +67,7 @@ export default function Reset({ cDict, token }: { cDict: any; token: string }) {
     }
   }
 
+  //TODO: change to server
   useEffect(() => {
     const fetchToken = async () => {
       try {
