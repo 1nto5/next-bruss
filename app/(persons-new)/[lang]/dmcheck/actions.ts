@@ -63,11 +63,7 @@ function fordDateValidation(dmc: string) {
   const dotyJul = dotyGreg > 13 ? dotyGreg - 13 : 365 - 13 + dotyGreg;
   const dmcDotyJul = parseInt(dmc.substr(7, 3));
   // console.log(dotyJul, dmcDotyJul);
-  return (
-    dmcDotyJul === dotyJul ||
-    dmcDotyJul === dotyJul - 1 ||
-    dmcDotyJul === dotyJul - 2
-  );
+  return dmcDotyJul >= dotyJul - 7;
 }
 
 // BMW DATE VALIDATION
