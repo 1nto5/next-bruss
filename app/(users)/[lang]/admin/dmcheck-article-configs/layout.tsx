@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 
 export const metadata = {
-  title: 'Users management (Next BRUSS)',
+  title: 'DMCheck article configs management (Next BRUSS)',
 };
 
 export default async function Layout({

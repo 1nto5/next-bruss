@@ -95,7 +95,7 @@ export async function deleteArticle(userId: string) {
       redirect('/');
     }
 
-    const collection = await dbc('users');
+    const collection = await dbc('articles_config');
 
     const exists = await collection.findOne({ _id: new ObjectId(userId) });
 

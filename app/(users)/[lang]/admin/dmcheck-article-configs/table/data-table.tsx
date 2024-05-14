@@ -35,7 +35,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
 import { revalidateUsers } from '../actions';
-import Link from 'next/link';
+// import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -81,7 +81,7 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Articles management</CardTitle>
+        <CardTitle>DMCheck article configs management</CardTitle>
         <CardDescription>Last synchronization: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between py-4'>
           <div className='flex'>
@@ -101,7 +101,6 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              autoFocus
               placeholder='Search article name...'
               value={
                 (table.getColumn('articleName')?.getFilterValue() as string) ??
@@ -115,7 +114,6 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              autoFocus
               placeholder='Search workplace...'
               value={
                 (table.getColumn('workplace')?.getFilterValue() as string) ?? ''

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Trash2, Pencil } from 'lucide-react';
-import { deleteArticle } from '.././actions';
+import { deleteArticle } from '../actions';
 import { ArticleConfigType } from '@/lib/types/articleConfig';
 //TODO: implement or delete :)
 // import { useHotkeys } from 'react-hotkeys-hook';
@@ -24,14 +24,6 @@ import { ArticleConfigType } from '@/lib/types/articleConfig';
 // You can use a Zod schema here if you want.
 
 export const columns: ColumnDef<ArticleConfigType>[] = [
-  {
-    accessorKey: 'articleNumber',
-    header: 'Article number',
-  },
-  {
-    accessorKey: 'articleName',
-    header: 'Article name',
-  },
   {
     accessorKey: 'workplace',
     header: 'Workplace',
@@ -42,21 +34,76 @@ export const columns: ColumnDef<ArticleConfigType>[] = [
     },
   },
   {
+    accessorKey: 'articleNumber',
+    header: 'Number',
+  },
+  {
+    accessorKey: 'articleName',
+    header: 'Name',
+  },
+  {
+    accessorKey: 'articleNote',
+    header: 'Note',
+  },
+  {
     accessorKey: 'piecesPerBox',
     header: 'Pieces per box',
   },
   {
-    accessorKey: 'amount',
-    header: () => <div className='text-right'>Amount</div>,
+    accessorKey: 'dmc',
+    header: 'DMC full content',
+  },
+  {
+    accessorKey: 'dmcFirstValidation',
+    header: 'Validation string',
+  },
+  {
+    accessorKey: 'secondValidation',
+    header: 'Second validation',
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
-
-      return <div className='text-right font-medium'>{formatted}</div>;
+      const value: boolean = row.getValue('secondValidation');
+      const text = value ? 'Yes' : 'No';
+      return <div>{text}</div>;
     },
+  },
+  {
+    accessorKey: 'dmcSecondValidation',
+    header: 'Second validation string',
+  },
+  {
+    accessorKey: 'hydraProcess',
+    header: 'HYDRA process',
+  },
+  {
+    accessorKey: 'ford',
+    header: 'FORD date validation',
+    cell: ({ row }) => {
+      const value: boolean = row.getValue('ford');
+      const text = value ? 'Yes' : 'No';
+      return <div>{text}</div>;
+    },
+  },
+  {
+    accessorKey: 'bmw',
+    header: 'BMW date validation',
+    cell: ({ row }) => {
+      const value: boolean = row.getValue('bmw');
+      const text = value ? 'Yes' : 'No';
+      return <div>{text}</div>;
+    },
+  },
+  {
+    accessorKey: 'pallet',
+    header: 'Pallet label',
+    cell: ({ row }) => {
+      const value: boolean = row.getValue('pallet');
+      const text = value ? 'Yes' : 'No';
+      return <div>{text}</div>;
+    },
+  },
+  {
+    accessorKey: 'boxesPerPallet',
+    header: 'Boxes per pallet',
   },
   {
     id: 'actions',
