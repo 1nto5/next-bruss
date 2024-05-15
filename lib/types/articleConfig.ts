@@ -1,5 +1,5 @@
 export type ArticleConfigType = {
-  _id: string;
+  _id?: string;
   workplace: string;
   articleNumber: string;
   articleName: string;

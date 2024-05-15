@@ -34,7 +34,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import { revalidateUsers } from '../actions';
+import { revalidateArticleConfigs } from '../actions';
+import Link from 'next/link';
 // import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
@@ -125,10 +126,15 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <div className='flex'>
+            <Link href='/admin/dmcheck-configs/add'>
+              <Button className='mr-2 justify-end' variant='outline'>
+                <CopyPlus />
+              </Button>
+            </Link>
             <Button
               className='justify-end'
               variant='outline'
-              onClick={() => revalidateUsers()}
+              onClick={() => revalidateArticleConfigs()}
             >
               <RefreshCcw />
             </Button>

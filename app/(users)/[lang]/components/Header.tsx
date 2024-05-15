@@ -104,7 +104,12 @@ export default function Header({ session, dict, lang }: HeaderProps) {
               {
                 href: '/admin/users',
                 title: 'Users roles',
-                description: 'Manage users roles',
+                description: 'Manage users roles.',
+              },
+              {
+                href: '/admin/dmcheck-articles',
+                title: 'DMCheck articles',
+                description: 'Manage articles in DMCheck app.',
               },
             ],
           },
@@ -152,7 +157,12 @@ export default function Header({ session, dict, lang }: HeaderProps) {
               {
                 href: '/admin/users',
                 title: 'Users roles',
-                description: 'Manage users roles',
+                description: 'Manage users roles.',
+              },
+              {
+                href: '/admin/dmcheck-articles',
+                title: 'DMCheck articles',
+                description: 'Manage articles in DMCheck app.',
               },
             ],
           },

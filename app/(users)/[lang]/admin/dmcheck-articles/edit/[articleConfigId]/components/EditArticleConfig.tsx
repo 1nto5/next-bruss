@@ -28,9 +28,13 @@ import { toast } from 'sonner';
 import { saveUser, getResetPasswordLink } from '../../../actions';
 import Link from 'next/link';
 import { Table, SquareAsterisk } from 'lucide-react';
-import { UserType } from '@/lib/types/user';
+import { ArticleConfigType } from '@/lib/types/articleConfig';
 
-export default function EditUser({ userObject }: { userObject: UserType }) {
+export default function EditArticleConfig({
+  articleConfigObject,
+}: {
+  articleConfigObject: ArticleConfigType;
+}) {
   // it should be under function declaration -> no recreate on every render but how to add translations?
   // const formSchema = z.object({
   //   email: z
@@ -107,62 +111,15 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
     }
   };
 
-  const [isPendingPassword, setIsPendingPassword] = useState(false);
-
-  async function passwordReset() {
-    try {
-      setIsPendingPassword(true);
-      const res = await getResetPasswordLink(userObject._id);
-      if (!res) {
-        toast.error('Please contact IT!');
-        return;
-      }
-
-      if (res.status === 'success') {
-        const resetLink = res.resetUrl;
-        if (!resetLink) {
-          toast.error('Please contact IT!');
-          return;
-        }
-        navigator.clipboard.writeText(resetLink);
-        toast.success('The password reset link has been copied!');
-        return;
-      }
-
-      if (res?.error) {
-        toast.error('Please contact IT!');
-        console.error('User password reset was unsuccessful.:', res?.error);
-      }
-
-      if (res.status === 'not exists') {
-        toast.error('User does not exist!');
-        return;
-      }
-    } catch (error) {
-      console.error('User password reset was unsuccessful.:', error);
-      toast.error('Please contact IT!');
-      return;
-    } finally {
-      setIsPendingPassword(false);
-    }
-  }
-
   return (
     <Card className='w-[550px]'>
       <CardHeader>
-        <CardTitle>Edit user</CardTitle>
+        <CardTitle>Edit article config</CardTitle>
         {/* <CardDescription>
           Poprzednio edytowany: {date} przez{' '}
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
-          <Button
-            onClick={() => passwordReset()}
-            className='mr-2'
-            variant='outline'
-          >
-            <SquareAsterisk />
-          </Button>
           <Link href='/admin/users'>
             <Button className='mr-2' variant='outline'>
               <Table />

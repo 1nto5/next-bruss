@@ -17,6 +17,8 @@ import Link from 'next/link';
 import { Trash2, Pencil } from 'lucide-react';
 import { deleteArticle } from '../actions';
 import { ArticleConfigType } from '@/lib/types/articleConfig';
+import { toast } from 'sonner';
+
 //TODO: implement or delete :)
 // import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -42,12 +44,54 @@ export const columns: ColumnDef<ArticleConfigType>[] = [
     header: 'Name',
   },
   {
+    id: 'actions',
+    header: 'Actions',
+
+    cell: ({ row }) => {
+      const articleConfig = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' className='h-8 w-8 p-0'>
+              <span className='sr-only'>Open menu</span>
+              <MoreHorizontal className='h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
+            {/* <DropdownMenuSeparator /> */}
+            <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
+              <DropdownMenuItem>
+                <Pencil className='mr-2 h-4 w-4' />
+                <span>Edit</span>
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuItem
+              onClick={() => {
+                if (articleConfig._id) {
+                  deleteArticle(articleConfig._id);
+                } else {
+                  toast.error(`Article _id is missing. Please contact IT.`);
+                }
+              }}
+              className=' focus:bg-red-400 dark:focus:bg-red-700'
+            >
+              <Trash2 className='mr-2 h-4 w-4' />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+  {
     accessorKey: 'articleNote',
     header: 'Note',
   },
   {
     accessorKey: 'piecesPerBox',
-    header: 'Pieces per box',
+    header: 'Pieces / box',
   },
   {
     accessorKey: 'dmc',
@@ -103,41 +147,6 @@ export const columns: ColumnDef<ArticleConfigType>[] = [
   },
   {
     accessorKey: 'boxesPerPallet',
-    header: 'Boxes per pallet',
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const articleConfig = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
-            {/* <DropdownMenuSeparator /> */}
-            <Link href={`/pro/article-config-table/edit/${articleConfig._id}`}>
-              <DropdownMenuItem>
-                <Pencil className='mr-2 h-4 w-4' />
-                <span>Edit</span>
-              </DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem
-              onClick={() => deleteArticle(articleConfig._id)}
-              className=' focus:bg-red-400 dark:focus:bg-red-700'
-            >
-              <Trash2 className='mr-2 h-4 w-4' />
-              <span>Delete</span>
-              {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    header: 'Boxes / pallet',
   },
 ];
