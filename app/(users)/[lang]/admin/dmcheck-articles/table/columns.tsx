@@ -18,6 +18,17 @@ import { Trash2, Pencil } from 'lucide-react';
 import { deleteArticle } from '../actions';
 import { ArticleConfigType } from '@/lib/types/articleConfig';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 //TODO: implement or delete :)
 // import { useHotkeys } from 'react-hotkeys-hook';
@@ -51,37 +62,58 @@ export const columns: ColumnDef<ArticleConfigType>[] = [
       const articleConfig = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
-            {/* <DropdownMenuSeparator /> */}
-            <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
-              <DropdownMenuItem>
-                <Pencil className='mr-2 h-4 w-4' />
-                <span>Edit</span>
+        <AlertDialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
+              {/* <DropdownMenuSeparator /> */}
+              <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
+                <DropdownMenuItem>
+                  <Pencil className='mr-2 h-4 w-4' />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem
+                // onClick={() => {
+                //   if (articleConfig._id) {
+                //     deleteArticle(articleConfig._id);
+                //   } else {
+                //     toast.error(`Article _id is missing. Please contact IT.`);
+                //   }
+                // }}
+                className=' focus:bg-red-400 dark:focus:bg-red-700'
+              >
+                <AlertDialogTrigger asChild>
+                  {/* <Button>
+                    <Trash2 className='mr-2 h-4 w-4' />
+                    <span>Delete</span>
+                  </Button> */}
+                  test
+                </AlertDialogTrigger>
               </DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem
-              onClick={() => {
-                if (articleConfig._id) {
-                  deleteArticle(articleConfig._id);
-                } else {
-                  toast.error(`Article _id is missing. Please contact IT.`);
-                }
-              }}
-              className=' focus:bg-red-400 dark:focus:bg-red-700'
-            >
-              <Trash2 className='mr-2 h-4 w-4' />
-              <span>Delete</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       );
     },
   },

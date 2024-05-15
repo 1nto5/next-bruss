@@ -19,11 +19,7 @@ export default async function EditArticleConfigPage({
 
   return (
     <main className='m-2 flex justify-center'>
-      {/* <EditArticleConfig
-        articleConfigObject={{
-          _id: articleConfig._id.toString(),
-        }}
-      /> */}
+      <EditArticleConfig lang={lang} articleConfigObject={articleConfig} />
     </main>
   );
 }

@@ -35,6 +35,38 @@ export async function insertArticleConfig(articleConfig: ArticleConfigType) {
   }
 }
 
+export async function updateArticleConfig(articleConfig: ArticleConfigType) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/');
+    }
+
+    const collection = await dbc('articles_config');
+
+    const exists = await collection.findOne({
+      _id: new ObjectId(articleConfig._id),
+    });
+
+    if (!exists) {
+      return { error: 'not found' };
+    }
+
+    const { _id, ...data } = articleConfig;
+    const res = await collection.updateOne(
+      { _id: new ObjectId(articleConfig._id) },
+      { $set: data },
+    );
+    if (res) {
+      revalidateTag('articleConfigs');
+      return { success: 'updated' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while updating the article config.');
+  }
+}
+
 export async function getArticleConfig(
   articleConfigId: ObjectId,
 ): Promise<ArticleConfigType | null> {

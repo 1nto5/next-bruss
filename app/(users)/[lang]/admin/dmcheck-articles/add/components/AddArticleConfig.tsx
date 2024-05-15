@@ -415,7 +415,7 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
               // TODO: form.reset() is not working for hydra process
               onClick={() => form.reset()}
             >
-              Clear
+              Reset
             </Button>
             {isPending ? (
               <Button disabled>
