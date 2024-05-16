@@ -7,7 +7,7 @@ import * as z from 'zod';
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,7 +19,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
+  // CardDescription,
 } from '@/components/ui/card';
 
 import {
@@ -59,21 +59,11 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
         .string()
         .min(5, { message: 'Article name must be at least 5 characters long' }),
       articleNote: z.string().optional(),
-      piecesPerBox: z
-        .number({
-          required_error: 'Pieces per box is required',
-          invalid_type_error: 'Pieces per box must be a number',
-        })
-        .refine((value) => !isNaN(value), {
-          message: 'Pieces per box must be a valid number',
-        }),
+      piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
+        message: 'Pieces per box must be a valid number',
+      }),
       pallet: z.boolean().optional(),
-      boxesPerPallet: z
-        .number()
-        .optional()
-        .refine((value) => value !== undefined, {
-          message: 'Boxes per pallet must be a valid number',
-        }),
+      boxesPerPallet: z.string().optional(),
       dmc: z
         .string()
         .min(10, { message: 'DMC code must be at least 10 characters long' }),
@@ -90,12 +80,13 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
       ford: z.boolean().optional(),
       bmw: z.boolean().optional(),
     })
+
     .refine(
       (data) =>
         !data.pallet ||
         (data.pallet &&
-          data.boxesPerPallet !== undefined &&
-          !isNaN(data.boxesPerPallet)),
+          data.boxesPerPallet &&
+          /^\d+$/.test(data.boxesPerPallet)),
       {
         message: 'If using a pallet, boxes per pallet must be a valid number',
         path: ['boxesPerPallet'],
@@ -111,22 +102,42 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
       path: ['dmcSecondValidation'],
     });
 
+  // const form = useForm<z.infer<typeof formSchema>>({
+  //   resolver: zodResolver(formSchema),
+  //   defaultValues: {
+  //     workplace: '',
+  //     articleNumber: '',
+  //     articleName: '',
+  //     articleNote: '',
+  //     piecesPerBox: '',
+  //     pallet: false,
+  //     boxesPerPallet: '',
+  //     dmc: '',
+  //     dmcFirstValidation: '',
+  //     secondValidation: false,
+  //     dmcSecondValidation: '',
+  //     hydraProcess: lang === 'pl' ? '' : '050',
+  //     ford: false,
+  //     bmw: false,
+  //   },
+  // });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      workplace: '',
-      articleNumber: '',
-      articleName: '',
-      articleNote: '',
-      piecesPerBox: undefined,
-      pallet: false,
-      boxesPerPallet: undefined,
-      dmc: '',
-      dmcFirstValidation: '',
-      secondValidation: false,
-      dmcSecondValidation: '',
-      hydraProcess: lang === 'pl' ? '' : '050',
-      ford: false,
+      workplace: 'Example Workplace',
+      articleNumber: '12345',
+      articleName: 'Example Article',
+      articleNote: 'Example Note',
+      piecesPerBox: '10',
+      pallet: true,
+      boxesPerPallet: '20',
+      dmc: 'Example DMC',
+      dmcFirstValidation: 'Example',
+      secondValidation: true,
+      dmcSecondValidation: 'DMC',
+      hydraProcess: '050',
+      ford: true,
       bmw: false,
     },
   });
@@ -138,13 +149,30 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
-    const res = await insertArticleConfig(data);
-    setIsPending(false);
-    if (res?.success) {
-      toast.success('Article saved successfully! Go celebrate!');
-      // form.reset(); // Uncomment to reset the form after a successful save.
-    } else if (res?.error === 'exists') {
-      toast.error('Whoops! This article already exists! Try a new one!');
+
+    try {
+      const res = await insertArticleConfig({
+        ...data,
+        piecesPerBox: parseInt(data.piecesPerBox),
+        boxesPerPallet: parseInt(data.boxesPerPallet ?? ''),
+      });
+
+      if (res?.success) {
+        toast.success('Article config saved successfully!');
+        // form.reset(); // Uncomment to reset the form after a successful save.
+      } else if (res?.error === 'exists') {
+        toast.error('Article already exists!');
+      } else if (res?.error) {
+        console.error('Error inserting article config:', res?.error);
+        toast.error('An error occurred! Check console for more info.');
+      }
+    } catch (error) {
+      console.error('Error inserting article config:', error);
+      toast.error(
+        'An error occurred while inserting the article. Please try again.',
+      );
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -157,7 +185,7 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
-          <Link href='/admin/dmcheck-configs'>
+          <Link href='/admin/dmcheck-articles'>
             <Button className='mr-2' variant='outline'>
               <Table />
             </Button>

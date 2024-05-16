@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
@@ -36,6 +37,85 @@ import {
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
+const onDeleteArticle = async (articleId: string) => {
+  try {
+    const res = await deleteArticle(articleId);
+    if (!res) {
+      toast.error('Failed to delete article!');
+    }
+    if (res && res.error === 'not found') {
+      toast.error('Article not found!');
+    }
+    if (res && res.success === 'deleted') {
+      toast.success('Article deleted successfully!');
+    }
+  } catch (error) {
+    toast.error('Failed to delete article!');
+  }
+};
+
+const ActionsCell = ({ row }: { row: any }) => {
+  const articleConfig = row.original;
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='ghost' className='h-8 w-8 p-0'>
+            <span className='sr-only'>Open menu</span>
+            <MoreHorizontal className='h-4 w-4' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end'>
+          <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
+            <DropdownMenuItem>
+              <Pencil className='mr-2 h-4 w-4' />
+              <span>Edit</span>
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuItem
+            className=' focus:bg-red-400 dark:focus:bg-red-700'
+            onClick={() => setIsOpen(true)}
+          >
+            <Trash2 className='mr-2 h-4 w-4' />
+            <span>Delete</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={isOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              article.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setIsOpen(false);
+                if (articleConfig._id) {
+                  onDeleteArticle(articleConfig._id);
+                } else {
+                  toast.error(`Article _id is missing. Please contact IT.`);
+                }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
+
 export const columns: ColumnDef<ArticleConfigType>[] = [
   {
     accessorKey: 'workplace',
@@ -57,65 +137,7 @@ export const columns: ColumnDef<ArticleConfigType>[] = [
   {
     id: 'actions',
     header: 'Actions',
-
-    cell: ({ row }) => {
-      const articleConfig = row.original;
-
-      return (
-        <AlertDialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
-              {/* <DropdownMenuSeparator /> */}
-              <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
-                <DropdownMenuItem>
-                  <Pencil className='mr-2 h-4 w-4' />
-                  <span>Edit</span>
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem
-                // onClick={() => {
-                //   if (articleConfig._id) {
-                //     deleteArticle(articleConfig._id);
-                //   } else {
-                //     toast.error(`Article _id is missing. Please contact IT.`);
-                //   }
-                // }}
-                className=' focus:bg-red-400 dark:focus:bg-red-700'
-              >
-                <AlertDialogTrigger asChild>
-                  {/* <Button>
-                    <Trash2 className='mr-2 h-4 w-4' />
-                    <span>Delete</span>
-                  </Button> */}
-                  test
-                </AlertDialogTrigger>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      );
-    },
+    cell: (props) => <ActionsCell {...props} />,
   },
   {
     accessorKey: 'articleNote',

@@ -12,14 +12,19 @@ export default async function EditArticleConfigPage({
 }) {
   // const dict = await getDictionary(lang);
   const articleConfig = await getArticleConfig(new ObjectId(articleConfigId));
-  console.log('articleConfig', articleConfig);
   if (!articleConfig || !articleConfig._id) {
     redirect('/admin/dmcheck-articles');
   }
 
   return (
     <main className='m-2 flex justify-center'>
-      <EditArticleConfig lang={lang} articleConfigObject={articleConfig} />
+      <EditArticleConfig
+        lang={lang}
+        articleConfigObject={{
+          ...articleConfig,
+          _id: articleConfig._id.toString(),
+        }}
+      />
     </main>
   );
 }

@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <div className='flex'>
-            <Link href='/admin/dmcheck-configs/add'>
+            <Link href='/admin/dmcheck-articles/add'>
               <Button className='mr-2 justify-end' variant='outline'>
                 <CopyPlus />
               </Button>

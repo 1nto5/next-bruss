@@ -62,21 +62,11 @@ export default function EditArticleConfig({
         .string()
         .min(5, { message: 'Article name must be at least 5 characters long' }),
       articleNote: z.string().optional(),
-      piecesPerBox: z
-        .number({
-          required_error: 'Pieces per box is required',
-          invalid_type_error: 'Pieces per box must be a number',
-        })
-        .refine((value) => !isNaN(value), {
-          message: 'Pieces per box must be a valid number',
-        }),
+      piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
+        message: 'Pieces per box must be a valid number',
+      }),
       pallet: z.boolean().optional(),
-      boxesPerPallet: z
-        .number()
-        .optional()
-        .refine((value) => value !== undefined, {
-          message: 'Boxes per pallet must be a valid number',
-        }),
+      boxesPerPallet: z.string().optional(),
       dmc: z
         .string()
         .min(10, { message: 'DMC code must be at least 10 characters long' }),
@@ -93,12 +83,13 @@ export default function EditArticleConfig({
       ford: z.boolean().optional(),
       bmw: z.boolean().optional(),
     })
+
     .refine(
       (data) =>
         !data.pallet ||
         (data.pallet &&
-          data.boxesPerPallet !== undefined &&
-          !isNaN(data.boxesPerPallet)),
+          data.boxesPerPallet &&
+          /^\d+$/.test(data.boxesPerPallet)),
       {
         message: 'If using a pallet, boxes per pallet must be a valid number',
         path: ['boxesPerPallet'],
@@ -121,9 +112,9 @@ export default function EditArticleConfig({
       articleNumber: articleConfigObject.articleNumber,
       articleName: articleConfigObject.articleName,
       articleNote: articleConfigObject.articleNote,
-      piecesPerBox: articleConfigObject.piecesPerBox,
+      piecesPerBox: articleConfigObject.piecesPerBox.toString(),
       pallet: articleConfigObject.pallet,
-      boxesPerPallet: articleConfigObject.boxesPerPallet,
+      boxesPerPallet: articleConfigObject.boxesPerPallet?.toString() ?? '',
       dmc: articleConfigObject.dmc,
       dmcFirstValidation: articleConfigObject.dmcFirstValidation,
       secondValidation: articleConfigObject.secondValidation,
@@ -142,20 +133,23 @@ export default function EditArticleConfig({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      const articleConfig = {
+      const res = await updateArticleConfig({
         _id: articleConfigObject._id,
         ...data,
-      };
-      const res = await updateArticleConfig(articleConfig);
+        piecesPerBox: parseInt(data.piecesPerBox),
+        boxesPerPallet: parseInt(data.boxesPerPallet ?? ''),
+      });
       if (res?.success) {
-        toast.success('Article config saved!');
+        toast.success('Article config updated!');
       } else if (res?.error) {
-        console.error('An error occurred:', res?.error);
+        console.error('Error updating article config:', res?.error);
         toast.error('An error occurred! Check console for more info.');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
-      toast.error('An error occurred! Check console for more info.');
+      console.error('Error updating article config:', error);
+      toast.error(
+        'An error occurred while updating the article. Please try again.',
+      );
     } finally {
       setIsPending(false);
     }
@@ -421,15 +415,7 @@ export default function EditArticleConfig({
               </>
             )}
           </CardContent>
-          <CardFooter className='flex justify-between'>
-            <Button
-              variant='destructive'
-              type='button'
-              // TODO: form.reset() is not working for hydra process
-              onClick={() => form.reset()}
-            >
-              Reset
-            </Button>
+          <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

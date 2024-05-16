@@ -14,7 +14,7 @@ export async function insertArticleConfig(articleConfig: ArticleConfigType) {
       redirect('/');
     }
 
-    const collection = await dbc('dmcheck_configs');
+    const collection = await dbc('articles_config');
 
     const exists = await collection.findOne({
       articleNumber: articleConfig.articleNumber,
