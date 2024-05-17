@@ -52,8 +52,9 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
       articleNumber: z
         .string()
         .length(5, { message: 'Article number must be exactly 5 digits' })
-        .regex(/^[0-9]{5}$/, {
-          message: 'Article number must consist of 5 digits',
+        .refine((value) => /^\d{5}$|^\d{2}\.\d{6}\.\d{2}$/.test(value), {
+          message:
+            'Article number must consist of 5 digits or be in the SAP format: 10.0XXXX.00',
         }),
       articleName: z
         .string()
