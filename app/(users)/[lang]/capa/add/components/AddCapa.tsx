@@ -537,7 +537,6 @@ export default function AddCapa() {
             <Button
               variant='destructive'
               type='button'
-              // TODO: form.reset() is not working for hydra process
               onClick={() => form.reset()}
             >
               Wyczyść

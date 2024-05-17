@@ -67,7 +67,6 @@ export default function Reset({ cDict, token }: { cDict: any; token: string }) {
     }
   }
 
-  //TODO: change to server
   useEffect(() => {
     const fetchToken = async () => {
       try {

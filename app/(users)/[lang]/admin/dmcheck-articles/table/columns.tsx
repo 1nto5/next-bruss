@@ -28,11 +28,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
+  // AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-
-//TODO: implement or delete :)
-// import { useHotkeys } from 'react-hotkeys-hook';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.

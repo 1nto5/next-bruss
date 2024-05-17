@@ -72,7 +72,7 @@ export async function resetPassword(email: string) {
     const resetUrl = `${process.env.URL}/auth/reset-password/${resetToken}`;
     console.log(resetUrl);
 
-    //TODO: chane to bruss exchange
+    //TODO: change to bruss exchange
 
     const transporter = nodemailer.createTransport({
       service: process.env.NODEMAILER_SERVICE,
@@ -208,8 +208,7 @@ export async function logout() {
   await signOut();
 }
 
-// TODO: 500 internal server error while wrong credientials, fallowing function helps but login doesn't work properly (first time gives error)
-
+// 500 internal server error while wrong credientials, fallowing function helps but login doesn't work properly (first time gives error)
 // export async function login(email: string, password: string) {
 //   try {
 //     const success = await signIn('credentials', { email, password });
