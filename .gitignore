@@ -36,6 +36,3 @@ next-env.d.ts
 
 # data folder
 /data
-
-# BUN
-*.lockb
