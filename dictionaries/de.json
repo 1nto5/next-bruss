@@ -12,11 +12,11 @@
       },
       "articleConfig": {
         "title": "Artikelkonfiguration",
-        "description": "Hinzufügen und Bearbeiten von Artikeln im DMC-Scansystem."
+        "description": "Hinzufügen von Artikeln im DMC-Scansystem."
       },
       "personsConfig": {
         "title": "Mitarbeiterverwaltung",
-        "description": "Hinzufügen und Bearbeiten von Mitarbeitern im DMC-Scansystem."
+        "description": "Hinzufügen von Mitarbeitern im DMC-Scansystem."
       }
     },
     "inventory": {
@@ -121,7 +121,7 @@
     "add": {
       "z": {
         "workplace": "Geben Sie mindestens 4 Zeichen ein, die der aktuellen Benennung entsprechen!",
-        "articleNumber": "Geben Sie 5 Ziffern ein!",
+        "articleNumber": "Die Artikelnummer muss das folgende Format haben: XXXXX oder 10.0XXXXX.00 (X - ganze Zahl)",
         "articleName": "Mindestens 5 Zeichen!",
         "boxesPerPallet": "Geben Sie eine ganze Zahl ein!",
         "dmc": "Mindestens 10 Zeichen!",
@@ -159,7 +159,8 @@
       "articleNoteFormDescription": "Zusätzliche Informationen über den Artikel (z.B. Verpackungsart, umgangssprachlicher Name usw.)",
       "toasts": {
         "articleSaved": "Artikel hinzugefügt!",
-        "articleExists": "Artikel existiert bereits!"
+        "articleExists": "Artikel existiert bereits!",
+        "pleaseContactIt": "Bitte kontaktieren Sie die IT!"
       }
     }
   },

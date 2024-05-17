@@ -7,16 +7,16 @@
         "description": "Generowanie pliku excel z danymi systemu skanowania."
       },
       "rework": {
-        "title": "Rework",
+        "title": "Oznacz rework",
         "description": "Oznaczanie partii jako rework - ponowne skanowanie."
       },
       "articleConfig": {
-        "title": "Konfiguracja artykułów",
-        "description": "Dodawanie i edycja artykułów w systmie skanowania DMC."
+        "title": "Dodaj artykuł",
+        "description": "Dodawanie artykułów w systmie skanowania DMC."
       },
       "personsConfig": {
-        "title": "Zarządzanie pracownikami",
-        "description": "Dodawanie i edycja pracowników w systmie skanowania DMC."
+        "title": "Dodaj pracownika",
+        "description": "Dodawanie pracowników w systmie skanowania DMC."
       }
     },
     "inventory": {
@@ -119,15 +119,15 @@
     },
     "add": {
       "z": {
-        "workplace": "Podaj minimum 4 znaki zgodne z aktualnym nazewnictwem!",
-        "articleNumber": "Podaj 5 cyfr!",
-        "articleName": "Minimum 5 znaków!",
-        "boxesPerPallet": "Wprowadź liczbę całkowitą!",
-        "dmc": "Minimum 10 znaków!",
-        "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC!",
-        "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"!",
-        "piecesPerBox": "Wprowadź liczbę całkowitą!",
-        "hydraProcess": "Wybierz proces!"
+        "workplace": "Podaj minimum 4 znaki zgodne z aktualnym nazewnictwem",
+        "articleNumber": "Numer artykułu musi być w formacie: XXXXX lub 10.0XXXXX.00 (X - liczba całkowita)",
+        "articleName": "Minimum 5 znaków",
+        "boxesPerPallet": "Wprowadź liczbę całkowitą",
+        "dmc": "Minimum 10 znaków",
+        "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC",
+        "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"",
+        "piecesPerBox": "Wprowadź liczbę całkowitą",
+        "hydraProcess": "Wybierz proces"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
@@ -158,7 +158,8 @@
       "articleNoteFormDescription": "Dodatkowe informacje o artykule (np. rodzaj pakowania, nazwa \"obiegowa\" itp.)",
       "toasts": {
         "articleSaved": "Artykuł dodany!",
-        "articleExists": "Artykuł istnieje!"
+        "articleExists": "Artykuł istnieje!",
+        "pleaseContactIt": "Skontaktuj się z IT!"
       }
     }
   },

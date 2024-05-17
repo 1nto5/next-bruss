@@ -57,12 +57,12 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `${dict?.header?.production?.rework.description}`,
         },
         {
-          href: '/pro/article-config',
+          href: '/pro/add-article-config',
           title: `${dict?.header?.production?.articleConfig.title}`,
           description: `${dict?.header?.production?.articleConfig.description}`,
         },
         {
-          href: '/pro/persons-config',
+          href: '/pro/add-person-config',
           title: `${dict?.header?.production?.personsConfig.title}`,
           description: `${dict?.header?.production?.personsConfig.description}`,
         },
@@ -103,7 +103,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             submenu: [
               {
                 href: '/admin/users',
-                title: 'Users roles',
+                title: 'Users management',
                 description: 'Manage users roles.',
               },
               {
@@ -137,12 +137,12 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `${dict?.header?.production?.rework.description}`,
         },
         {
-          href: '/pro/article-config',
+          href: '/pro/add-article-config',
           title: `${dict?.header?.production?.articleConfig.title}`,
           description: `${dict?.header?.production?.articleConfig.description}`,
         },
         {
-          href: '/pro/persons-config',
+          href: '/pro/add-person-config',
           title: `${dict?.header?.production?.personsConfig.title}`,
           description: `${dict?.header?.production?.personsConfig.description}`,
         },
@@ -156,7 +156,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             submenu: [
               {
                 href: '/admin/users',
-                title: 'Users roles',
+                title: 'User management',
                 description: 'Manage users roles.',
               },
               {
