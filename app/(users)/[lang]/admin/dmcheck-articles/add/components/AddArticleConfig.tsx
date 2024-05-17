@@ -53,7 +53,7 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
         .string()
         .refine((value) => /^\d{5}$|^\d{2}\.\d{6}\.\d{2}$/.test(value), {
           message:
-            'Article number must be in the format: XXXXX or 10.0XXXXX.00',
+            'Article number must be in the format: XXXXX or 10.0XXXXX.00 (X - integer)',
         }),
       articleName: z
         .string()
@@ -153,6 +153,7 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
     try {
       const res = await insertArticleConfig({
         ...data,
+        workplace: data.workplace.toLowerCase(),
         piecesPerBox: parseInt(data.piecesPerBox),
         boxesPerPallet: parseInt(data.boxesPerPallet ?? ''),
       });
