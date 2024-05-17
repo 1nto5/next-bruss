@@ -73,7 +73,7 @@ export default function AddPersonConfig({
   if (!cDict) return <NoAvailable />;
 
   return (
-    <Card>
+    <Card className='w-[550px]'>
       <CardHeader>
         <CardTitle>{cDict.cardTitle}</CardTitle>
         <CardDescription>{cDict.cardDescription}</CardDescription>

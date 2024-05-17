@@ -67,6 +67,7 @@ export default function Reset({ cDict, token }: { cDict: any; token: string }) {
     }
   }
 
+  // change to server
   useEffect(() => {
     const fetchToken = async () => {
       try {
@@ -82,6 +83,7 @@ export default function Reset({ cDict, token }: { cDict: any; token: string }) {
     };
 
     fetchToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, token]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
