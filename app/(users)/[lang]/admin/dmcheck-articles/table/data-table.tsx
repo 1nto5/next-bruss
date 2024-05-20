@@ -49,17 +49,6 @@ export function DataTable<TData, TValue>({
   data,
   fetchTime,
 }: DataTableProps<TData, TValue>) {
-  //   React.useEffect(() => {
-  //     const intervalId = setInterval(
-  //       () => {
-  //         revalidateCapa();
-  //       },
-  //       1 * 60 * 1000,
-  //     ); // 5 minutes in milliseconds
-
-  //     // Clear interval on component unmount
-  //     return () => clearInterval(intervalId);
-  //   }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
