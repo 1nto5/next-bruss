@@ -5,21 +5,51 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import { ObjectId } from 'mongodb';
-import { UserType } from '@/lib/types/user';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
+import { EmployeeType } from '@/lib/types/employee';
 
-export async function saveUser(user: UserType) {
+export async function insertEmployee(employee: EmployeeType) {
   try {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
-    const collection = await dbc('users');
+    const collection = await dbc('persons');
 
     const exists = await collection.findOne({
-      _id: new ObjectId(user._id),
+      personalNumber: employee.personalNumber,
+    });
+
+    if (exists) {
+      return { error: 'exists' };
+    }
+
+    const res = await collection.insertOne({
+      name: employee.name,
+      personalNumber: employee.personalNumber,
+      password: employee.password,
+    });
+    if (res) {
+      revalidateTag('employees');
+      return { success: 'inserted' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving the user.');
+  }
+}
+
+export async function updateEmployee(employee: EmployeeType) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/');
+    }
+
+    const collection = await dbc('persons');
+
+    const exists = await collection.findOne({
+      _id: new ObjectId(employee._id),
     });
 
     if (!exists) {
@@ -27,11 +57,17 @@ export async function saveUser(user: UserType) {
     }
 
     const res = await collection.updateOne(
-      { _id: new ObjectId(user._id) },
-      { $set: { email: user.email, roles: user.roles } },
+      { _id: new ObjectId(employee._id) },
+      {
+        $set: {
+          name: employee.name,
+          personalNumber: employee.personalNumber,
+          password: employee.password,
+        },
+      },
     );
     if (res) {
-      revalidateTag('users');
+      revalidateTag('employees');
       return { success: 'updated' };
     }
   } catch (error) {
@@ -40,13 +76,15 @@ export async function saveUser(user: UserType) {
   }
 }
 
-export async function getUser(userId: ObjectId): Promise<UserType | null> {
+export async function getEmployee(
+  userId: ObjectId,
+): Promise<EmployeeType | null> {
   try {
-    const collection = await dbc('users');
+    const collection = await dbc('persons');
     const user = await collection.findOne({
       _id: userId,
     });
-    return user as UserType | null;
+    return user as EmployeeType | null;
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while retrieving the user.');
@@ -81,38 +119,4 @@ export async function deleteUser(userId: string) {
 
 export async function revalidateUsers() {
   revalidateTag('employees');
-}
-
-export async function getResetPasswordLink(
-  _id: string,
-): Promise<{ status: string; resetUrl?: string; error?: any }> {
-  try {
-    const collection = await dbc('users');
-
-    const existingUser = await collection.findOne({ _id: new ObjectId(_id) });
-    if (!existingUser) {
-      return { status: 'not exists' };
-    }
-
-    const resetToken = await crypto.randomBytes(32).toString('hex');
-    const hashedToken = await bcrypt.hash(resetToken, 10);
-    const tokenExpiry = Date.now() + 3600000 * 8;
-
-    await collection.updateOne(
-      { _id: new ObjectId(_id) },
-      {
-        $set: {
-          passwordResetToken: hashedToken,
-          passwordResetExpires: tokenExpiry,
-        },
-      },
-    );
-
-    const resetUrl = `${process.env.AUTH_URL}/auth/reset-password/${resetToken}`;
-
-    return { status: 'success', resetUrl };
-  } catch (error) {
-    console.error(error);
-    return { status: 'error', error };
-  }
 }

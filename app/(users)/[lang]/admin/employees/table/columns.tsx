@@ -46,7 +46,7 @@ export const columns: ColumnDef<UserType>[] = [
           <DropdownMenuContent align='end'>
             {/* <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel> */}
             {/* <DropdownMenuSeparator /> */}
-            <Link href={`/admin/users/edit/${user._id}`}>
+            <Link href={`/admin/employees/edit/${user._id}`}>
               <DropdownMenuItem>
                 <Pencil className='mr-2 h-4 w-4' />
                 <span>Edit</span>

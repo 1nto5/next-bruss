@@ -78,15 +78,20 @@ export function DataTable<TData, TValue>({
               autoFocus
               placeholder='Search...'
               value={
-                (table.getColumn('email')?.getFilterValue() as string) ?? ''
+                (table.getColumn('name')?.getFilterValue() as string) ?? ''
               }
               onChange={(event) =>
-                table.getColumn('email')?.setFilterValue(event.target.value)
+                table.getColumn('name')?.setFilterValue(event.target.value)
               }
               className='mr-2 max-w-xs'
             />
           </div>
           <div className='flex'>
+            <Link href='/admin/employees/add'>
+              <Button className='mr-2 justify-end' variant='outline'>
+                <CopyPlus />
+              </Button>
+            </Link>
             <Button
               className='justify-end'
               variant='outline'
