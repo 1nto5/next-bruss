@@ -111,6 +111,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 title: 'DMCheck articles',
                 description: 'Manage articles in DMCheck app.',
               },
+              {
+                href: '/admin/employees',
+                title: 'Employees',
+                description: 'Manage employees in Next BRUSS apps.',
+              },
             ],
           },
         ]
