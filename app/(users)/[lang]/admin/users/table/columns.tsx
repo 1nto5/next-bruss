@@ -32,7 +32,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
-const onDeleteArticle = async (userId: string) => {
+const onDeleteUser = async (userId: string) => {
   try {
     const res = await deleteUser(userId);
     if (!res) {
@@ -50,7 +50,7 @@ const onDeleteArticle = async (userId: string) => {
 };
 
 const ActionsCell = ({ row }: { row: any }) => {
-  const articleConfig = row.original;
+  const user = row.original;
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -63,7 +63,7 @@ const ActionsCell = ({ row }: { row: any }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
+          <Link href={`/admin/dmcheck-articles/edit/${user._id}`}>
             <DropdownMenuItem>
               <Pencil className='mr-2 h-4 w-4' />
               <span>Edit</span>
@@ -94,8 +94,8 @@ const ActionsCell = ({ row }: { row: any }) => {
             <AlertDialogAction
               onClick={() => {
                 setIsOpen(false);
-                if (articleConfig._id) {
-                  onDeleteArticle(articleConfig._id);
+                if (user._id) {
+                  onDeleteUser(user._id);
                 } else {
                   toast.error(`Article _id is missing. Please contact IT.`);
                 }
