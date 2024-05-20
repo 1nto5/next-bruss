@@ -31,9 +31,6 @@ import {
   // AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-
 const onDeleteArticle = async (articleId: string) => {
   try {
     const res = await deleteArticle(articleId);
@@ -86,8 +83,7 @@ const ActionsCell = ({ row }: { row: any }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this
-              article.
+              This action will permanently delete this article.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

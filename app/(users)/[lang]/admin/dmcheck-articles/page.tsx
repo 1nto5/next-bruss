@@ -8,9 +8,12 @@ async function getData(
   lang: string,
 ): Promise<{ fetchTime: string; allConfigs: ArticleConfigType[] }> {
   try {
-    const response = await fetch(`${process.env.API}/pro/get-article-configs`, {
-      next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
-    });
+    const response = await fetch(
+      `${process.env.API}/admin/get-article-configs`,
+      {
+        next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
+      },
+    );
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
     const fetchTime = dateFromResponse.toLocaleString(lang);
