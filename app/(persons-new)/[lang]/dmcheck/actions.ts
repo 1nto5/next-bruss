@@ -195,7 +195,12 @@ export async function saveDmc(prevState: any, formData: FormData) {
         const result = await pgc.query(
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
         );
-        console.log(result.rows); // This will print the result of the query
+        const haubeIo = result.rows[0]?.haube_io;
+        if (haubeIo) {
+          console.log('OK');
+        } else {
+          console.log('NOK');
+        }
         return { message: 'test' };
       } catch (error) {
         console.error('Failed to execute query:', error);
