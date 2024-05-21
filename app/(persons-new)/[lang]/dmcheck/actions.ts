@@ -199,7 +199,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
           `SELECT haube_io FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
         );
         // console.log(result);
-        console.log(haube);
+        console.log(haube.rows[0].haube_io);
         return { message: 'test' };
       } catch (error) {
         console.error('Failed to execute query:', error);
