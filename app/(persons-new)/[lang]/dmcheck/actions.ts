@@ -198,7 +198,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
         const haube = await pgc.query(
           `SELECT id_haube FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 10`,
         );
-        console.log(haube.rows[0]);
+        console.log(haube.rows);
         // console.log(result.rows[0]);
         // console.log(result.rows[0].haube_io);
         return { message: 'test' };
