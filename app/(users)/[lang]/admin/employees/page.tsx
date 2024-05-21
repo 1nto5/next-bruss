@@ -2,12 +2,12 @@ import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
-import { UserType } from '@/lib/types/user';
+import { EmployeeType } from '@/lib/types/employee';
 import { User } from 'next-auth';
 
 async function getData(
   lang: string,
-): Promise<{ fetchTime: string; allUsers: UserType[] }> {
+): Promise<{ fetchTime: string; allUsers: EmployeeType[] }> {
   try {
     const response = await fetch(`${process.env.API}/admin/get-all-employees`, {
       next: { revalidate: 60 * 15, tags: ['employees'] },
@@ -24,7 +24,7 @@ async function getData(
   }
 }
 
-export default async function AdminUsersPage({
+export default async function AdminEmployeesPage({
   params: { lang },
 }: {
   params: { lang: Locale };
