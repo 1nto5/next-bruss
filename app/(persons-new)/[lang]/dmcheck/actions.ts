@@ -178,11 +178,12 @@ export async function saveDmc(prevState: any, formData: FormData) {
     if (articleConfig.articleNumber === '40040') {
       try {
         const pgc = await pgp.connect();
-        const result = await pgc.query(
-          `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
-        );
-        console.log(result.rows);
-        return { message: 'test pg' };
+        // const result = await pgc.query(
+        //   `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
+        // );
+        const result = await pgc.query(`SELECT NOW() as current_time`);
+        console.log(result.rows[0].current_time);
+        return { message: 'test' };
       } catch (error) {}
     }
 
