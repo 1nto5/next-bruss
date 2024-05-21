@@ -179,9 +179,10 @@ export async function saveDmc(prevState: any, formData: FormData) {
       try {
         const pgc = await pgp.connect();
         const result = await pgc.query(
-          `SELECT * FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
+          `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
         );
         console.log(result.rows);
+        return { message: 'test pg' };
       } catch (error) {}
     }
 

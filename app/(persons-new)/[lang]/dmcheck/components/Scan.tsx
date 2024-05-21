@@ -81,6 +81,9 @@ export function Scan({
       case 'saving error':
         toast.error(cDict.toast.unknownSavingError);
         break;
+      case 'test pg':
+        'test pg';
+        break;
       default:
         break;
     }
