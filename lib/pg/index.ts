@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 
-const pool = new Pool({
+const pgp = new Pool({
   user: 'postgres',
   host: '10.24.10.102',
   database: 'm413',
@@ -8,13 +8,13 @@ const pool = new Pool({
   port: 5432,
 });
 
-pool.on('connect', () => {
+pgp.on('connect', () => {
   console.log('Connected to the PostgreSQL database');
 });
 
-pool.on('error', (err, client) => {
+pgp.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1);
 });
 
-export default pool;
+export default pgp;

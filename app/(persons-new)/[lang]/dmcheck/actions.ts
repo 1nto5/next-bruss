@@ -1,6 +1,7 @@
 'use server';
 
 import { dbc } from '@/lib/mongo';
+import { pgp } from '@/lib/pg';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
@@ -173,16 +174,16 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    // TODO: BRI 40040 check in external API
-    // if (articleConfig.articleNumber === '40040') {
-    //   try {
-    //     const convertedDmc = convertDmcForBriApi(dmc);
-    //     console.log(convertedDmc);
-    //     const api = await fetch(
-    //       `http://10.24.10.102:2413/api/v2/teil/${convertedDmc}`,
-    //     );
-    //   } catch (error) {}
-    // }
+    // TODO: BRI 40040 check in external DB
+    if (articleConfig.articleNumber === '40040') {
+      try {
+        const pgc = await pgp.connect();
+        const result = await pgc.query(
+          `SELECT * FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
+        );
+        console.log(result.rows);
+      } catch (error) {}
+    }
 
     const scansCollection = await dbc('scans');
 
