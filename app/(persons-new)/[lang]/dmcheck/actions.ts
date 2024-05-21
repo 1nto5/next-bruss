@@ -182,7 +182,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
         );
         // console.log(res.rows[0].haube_io);
-        if (!res.rows[0].haube_io) {
+        if (res.rows.length === 0 || !res.rows[0].haube_io) {
           return { message: '40040 nok' };
         }
       } catch (error) {
