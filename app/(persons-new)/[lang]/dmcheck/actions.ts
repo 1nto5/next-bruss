@@ -196,7 +196,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
         //   `SELECT * FROM stationdichtheitspruefung WHERE id_haube LIKE '%DBB66KOPG22%'`,
         // );
         const haube = await pgc.query(
-          `SELECT id_haube FROM stationdichtheitspruefung ORDER BY id_haube ASC LIMIT 10`,
+          `SELECT * FROM stationdichtheitspruefung ORDER BY id_haube ASC LIMIT 10`,
         );
         console.log(haube.rows);
         // console.log(result.rows[0]);
