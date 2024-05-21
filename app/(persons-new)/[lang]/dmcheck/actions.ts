@@ -181,7 +181,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
         const res = await pgc.query(
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
         );
-        console.log(res.rows[0].haube_io);
+        // console.log(res.rows[0].haube_io);
         if (!res.rows[0].haube_io) {
           return { message: '40040 nok' };
         }
