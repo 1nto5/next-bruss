@@ -175,16 +175,32 @@ export async function saveDmc(prevState: any, formData: FormData) {
     }
 
     // TODO: BRI 40040 check in external DB
+    // if (articleConfig.articleNumber === '40040') {
+    //   try {
+    //     const pgc = await pgp.connect();
+    //     // const result = await pgc.query(
+    //     //   `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
+    //     // );
+    //     const result = await pgc.query(`SELECT NOW() as current_time`);
+    //     console.log(result.rows[0].current_time);
+    //     return { message: 'test' };
+    //   } catch (error) {}
+    // }
+
     if (articleConfig.articleNumber === '40040') {
       try {
         const pgc = await pgp.connect();
-        // const result = await pgc.query(
-        //   `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
-        // );
-        const result = await pgc.query(`SELECT NOW() as current_time`);
-        console.log(result.rows[0].current_time);
+        // Query to select the id_haube column from stationdichtheitspruefung
+        // You might want to specify more conditions or limit the rows if necessary
+        const result = await pgc.query(
+          `SELECT id_haube FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
+        );
+        console.log(result.rows); // This will print the result of the query
         return { message: 'test' };
-      } catch (error) {}
+      } catch (error) {
+        console.error('Failed to execute query:', error);
+        return { message: 'test' };
+      }
     }
 
     const scansCollection = await dbc('scans');
