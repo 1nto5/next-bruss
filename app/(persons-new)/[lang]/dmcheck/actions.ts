@@ -193,7 +193,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
         // Query to select the id_haube column from stationdichtheitspruefung
         // You might want to specify more conditions or limit the rows if necessary
         const result = await pgc.query(
-          `SELECT * FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D #＃#*1BE DBB66KOPG22*=`,
+          `SELECT * FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D #＃#*1BE DBB66KOPG22*='`,
         );
         console.log('Result:', result);
         const haubeIo = result.rows[0]?.haube_io;
