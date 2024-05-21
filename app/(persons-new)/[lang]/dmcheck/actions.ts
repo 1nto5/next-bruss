@@ -192,13 +192,13 @@ export async function saveDmc(prevState: any, formData: FormData) {
         const pgc = await pgp.connect();
         // Query to select the id_haube column from stationdichtheitspruefung
         // You might want to specify more conditions or limit the rows if necessary
-        const result = await pgc.query(
-          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D  ###*1BE DBB66J1BK2Z*='`,
-        );
+        // const result = await pgc.query(
+        //   `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D  ###*1BE DBB66J1BK2Z*='`,
+        // );
         const haube = await pgc.query(
-          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D  ###*1BE DBB66J1BK2Z*=' ORDER BY id_haube DESC LIMIT 1`,
+          `SELECT haube_io FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
         );
-        console.log(result);
+        // console.log(result);
         console.log(haube);
         return { message: 'test' };
       } catch (error) {
