@@ -174,37 +174,20 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    // TODO: BRI 40040 check in external DB
-    // if (articleConfig.articleNumber === '40040') {
-    //   try {
-    //     const pgc = await pgp.connect();
-    //     // const result = await pgc.query(
-    //     //   `SELECT * FROM stationdichtheitspruefung ORDER BY id DESC LIMIT 10`,
-    //     // );
-    //     const result = await pgc.query(`SELECT NOW() as current_time`);
-    //     console.log(result.rows[0].current_time);
-    //     return { message: 'test' };
-    //   } catch (error) {}
-    // }
-
+    // TODO: BRI 40040 check in external pg DB
     if (articleConfig.articleNumber === '40040') {
       try {
         const pgc = await pgp.connect();
-        // Query to select the id_haube column from stationdichtheitspruefung
-        // You might want to specify more conditions or limit the rows if necessary
-        const result = await pgc.query(
+        const res = await pgc.query(
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
         );
-        // const haube = await pgc.query(
-        //   `SELECT * FROM stationdichtheitspruefung ORDER BY id_haube ASC LIMIT 10`,
-        // );
-        // console.log(haube.rows);
-        console.log(result.rows[0]);
-        console.log(result.rows[0].haube_io);
-        return { message: 'test' };
+        console.log(res.rows[0].haube_io);
+        if (!res.rows[0].haube_io) {
+          return { message: '40040 nok' };
+        }
       } catch (error) {
-        console.error('Failed to execute query:', error);
-        return { message: 'test' };
+        console.error('Failed to execute BRI pg query:', error);
+        return { message: 'saving error' };
       }
     }
 

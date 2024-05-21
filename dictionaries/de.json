@@ -225,6 +225,7 @@
         "fordDateNotValid": "Ungültiges FORD-Datum!",
         "bmwDateNotValid": "Ungültiges BMW-Datum!",
         "unknownSavingError": "Unbekannter Fehler, bitte kontaktieren Sie die IT!",
+        "nok": "NOK!",
         "qrNotValid": "Ungültiger QR-Code!",
         "qrWrongArticle": "Label mit falscher Artikelnummer!",
         "qrWrongQuantity": "Falsche Stückzahl auf dem Label!",
