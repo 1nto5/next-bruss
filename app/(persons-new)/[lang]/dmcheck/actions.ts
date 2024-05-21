@@ -1,7 +1,7 @@
 'use server';
 
 import { dbc } from '@/lib/mongo';
-import { pgp } from '@/lib/pg';
+import pgp from '@/lib/pg';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
