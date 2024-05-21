@@ -195,9 +195,10 @@ export async function saveDmc(prevState: any, formData: FormData) {
         const result = await pgc.query(
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D  ###*1BE DBB66J1BK2Z*='`,
         );
-        // const haube = await pgc.query(
-        //   `SELECT haube_io FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
-        // );
+        const haube = await pgc.query(
+          `SELECT * FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
+        );
+        console.log(haube.rows[0]);
         console.log(result.rows[0].haube_io);
         return { message: 'test' };
       } catch (error) {
