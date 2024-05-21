@@ -193,12 +193,13 @@ export async function saveDmc(prevState: any, formData: FormData) {
         // Query to select the id_haube column from stationdichtheitspruefung
         // You might want to specify more conditions or limit the rows if necessary
         const result = await pgc.query(
-          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '#05L103469D  ###*1BE DBB66J1BK2Z*='`,
+          `SELECT * FROM stationdichtheitspruefung WHERE id_haube LIKE '%DBB66KOPG22%'`,
         );
-        const haube = await pgc.query(
-          `SELECT * FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
-        );
-        console.log(haube.rows[0]);
+        // const haube = await pgc.query(
+        //   `SELECT * FROM stationdichtheitspruefung ORDER BY id_haube DESC LIMIT 1`,
+        // );
+        // console.log(haube.rows[0]);
+        console.log(result.rows[0]);
         console.log(result.rows[0].haube_io);
         return { message: 'test' };
       } catch (error) {
