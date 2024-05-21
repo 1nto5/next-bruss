@@ -1,6 +1,6 @@
 export type EmployeeType = {
-  _id: string;
+  _id?: string;
   name: string;
-  personalNumber: string; // loginCode
+  loginCode: string;
   password?: string | undefined;
 };

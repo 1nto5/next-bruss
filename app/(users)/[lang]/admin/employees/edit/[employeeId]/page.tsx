@@ -12,11 +12,11 @@ export default async function EditUserPage({
   params: { lang: Locale; employeeId: string };
 }) {
   // const dict = await getDictionary(lang);
-  let employee = await getEmployee(new ObjectId(employeeId));
-  if (!employee) {
+  const employee = await getEmployee(new ObjectId(employeeId));
+  console.log(employee);
+  if (!employee || !employee._id) {
     redirect('/admin/employees');
   }
-
   return (
     <main className='m-2 flex justify-center'>
       <EditEmployee

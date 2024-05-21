@@ -7,6 +7,7 @@ import * as z from 'zod';
 import {
   Form,
   FormControl,
+  FormDescription,
   // FormDescription,
   FormField,
   FormItem,
@@ -42,133 +43,58 @@ import Link from 'next/link';
 // import { useQuery } from '@tanstack/react-query';
 
 export default function AddEmployee({ lang }: { lang: string }) {
-  // it should be under function declaration -> no recreate on every render but how to add translations?
-  const formSchema = z
-    .object({
-      _id: z.string().optional(),
-      workplace: z
-        .string()
-        .min(4, { message: 'Workplace must be at least 4 characters long' }),
-      articleNumber: z
-        .string()
-        .refine((value) => /^\d{5}$|^\d{2}\.\d{6}\.\d{2}$/.test(value), {
-          message:
-            'Article number must be in the format: XXXXX or 10.0XXXXX.00 (X - integer)',
-        }),
-      articleName: z
-        .string()
-        .min(5, { message: 'Article name must be at least 5 characters long' }),
-      articleNote: z.string().optional(),
-      piecesPerBox: z.string().refine((value) => !isNaN(parseInt(value)), {
-        message: 'Pieces per box must be a valid number',
-      }),
-      pallet: z.boolean().optional(),
-      boxesPerPallet: z.string().optional(),
-      dmc: z
-        .string()
-        .min(10, { message: 'DMC code must be at least 10 characters long' }),
-      dmcFirstValidation: z.string().min(4, {
-        message: 'DMC first validation must be at least 4 characters long',
-      }),
-      secondValidation: z.boolean().optional(),
-      dmcSecondValidation: z.string().optional(),
-      hydraProcess: z
-        .string()
-        .refine((value) => (value.match(/\d/g) || []).length >= 3, {
-          message: 'Hydra process code must contain at least 3 digits',
-        }),
-      ford: z.boolean().optional(),
-      bmw: z.boolean().optional(),
-    })
-
-    .refine(
-      (data) =>
-        !data.pallet ||
-        (data.pallet &&
-          data.boxesPerPallet &&
-          /^\d+$/.test(data.boxesPerPallet)),
-      {
-        message: 'If using a pallet, boxes per pallet must be a valid number',
-        path: ['boxesPerPallet'],
-      },
-    )
-    .refine((data) => data.dmc.includes(data.dmcFirstValidation), {
-      message: 'DMC first validation must be included in the full DMC code',
-      path: ['dmcFirstValidation'],
-    })
-    .refine((data) => !(data.secondValidation && !data.dmcSecondValidation), {
-      message:
-        'DMC second validation is required when second validation is true',
-      path: ['dmcSecondValidation'],
-    });
-
-  // const form = useForm<z.infer<typeof formSchema>>({
-  //   resolver: zodResolver(formSchema),
-  //   defaultValues: {
-  //     workplace: '',
-  //     articleNumber: '',
-  //     articleName: '',
-  //     articleNote: '',
-  //     piecesPerBox: '',
-  //     pallet: false,
-  //     boxesPerPallet: '',
-  //     dmc: '',
-  //     dmcFirstValidation: '',
-  //     secondValidation: false,
-  //     dmcSecondValidation: '',
-  //     hydraProcess: lang === 'pl' ? '' : '050',
-  //     ford: false,
-  //     bmw: false,
-  //   },
-  // });
+  const formSchema = z.object({
+    firstName: z
+      .string()
+      .min(3, { message: 'Minimum 3 characters!' })
+      .optional(),
+    lastName: z
+      .string()
+      .min(3, { message: 'Minimum 3 characters!' })
+      .optional(),
+    loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
+    password: z
+      .string()
+      .min(6, { message: 'Minimum 6 characters!' })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: 'Password must contain at least one special character!',
+      })
+      .optional(),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      workplace: 'Example Workplace',
-      articleNumber: '12345',
-      articleName: 'Example Article',
-      articleNote: 'Example Note',
-      piecesPerBox: '10',
-      pallet: true,
-      boxesPerPallet: '20',
-      dmc: 'Example DMC',
-      dmcFirstValidation: 'Example',
-      secondValidation: true,
-      dmcSecondValidation: 'DMC',
-      hydraProcess: '050',
-      ford: true,
-      bmw: false,
+      firstName: '',
+      lastName: '',
+      loginCode: '',
+      password: '',
     },
   });
-
-  const isPalletChecked = form.watch('pallet');
-  const isSecondValidationChecked = form.watch('secondValidation');
 
   const [isPending, setIsPending] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
-
+    const employee = {
+      name: `${data.firstName} ${data.lastName}`,
+      loginCode: data.loginCode,
+      password: data.password,
+    };
     try {
-      const res = await insertEmployee({
-        ...data,
-        workplace: data.workplace.toLowerCase(),
-        piecesPerBox: parseInt(data.piecesPerBox),
-        boxesPerPallet: parseInt(data.boxesPerPallet ?? ''),
-      });
+      const res = await insertEmployee(employee);
 
       if (res?.success) {
-        toast.success('Article config saved successfully!');
+        toast.success('Employee config saved successfully!');
         // form.reset(); // Uncomment to reset the form after a successful save.
       } else if (res?.error === 'exists') {
-        toast.error('Article already exists!');
+        toast.error('Employee already exists!');
       } else if (res?.error) {
-        console.error('Error inserting article config:', res?.error);
+        console.error('Error inserting employee:', res?.error);
         toast.error('An error occurred! Check console for more info.');
       }
     } catch (error) {
-      console.error('Error inserting article config:', error);
+      console.error('Error inserting employee config:', error);
       toast.error(
         'An error occurred while inserting the article. Please try again.',
       );
@@ -186,7 +112,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
-          <Link href='/admin/dmcheck-articles'>
+          <Link href='/admin/employees'>
             <Button className='mr-2' variant='outline'>
               <Table />
             </Button>
@@ -198,12 +124,12 @@ export default function AddEmployee({ lang }: { lang: string }) {
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
-              name='workplace'
+              name='firstName'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Workplace</FormLabel>
+                  <FormLabel>First name</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input autoFocus placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -211,12 +137,12 @@ export default function AddEmployee({ lang }: { lang: string }) {
             />
             <FormField
               control={form.control}
-              name='articleNumber'
+              name='lastName'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Number</FormLabel>
+                  <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input autoFocus placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -224,235 +150,47 @@ export default function AddEmployee({ lang }: { lang: string }) {
             />
             <FormField
               control={form.control}
-              name='articleName'
+              name='loginCode'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Login code</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input autoFocus placeholder='' {...field} />
                   </FormControl>
+                  <FormDescription>
+                    Personal number (MRG) or contents of the employee card code
+                    (BRI)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name='articleNote'
+              name='password'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Note</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder='' {...field} />
+                    <Input autoFocus placeholder='' {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                    
-                  </FormDescription> */}
+                  <FormDescription>
+                    For inventory support applications - not for DMCheck, leave
+                    blank if not in use
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='piecesPerBox'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pieces / box</FormLabel>
-                  <FormControl>
-                    <Input placeholder='' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {lang === 'pl' && (
-              <>
-                <FormField
-                  control={form.control}
-                  name='pallet'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className='space-y-1 leading-none'>
-                        <FormLabel>Pallet label</FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-                {isPalletChecked && (
-                  <FormField
-                    control={form.control}
-                    name='boxesPerPallet'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Boxes / pallet</FormLabel>
-                        <FormControl>
-                          <Input placeholder='' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
-              </>
-            )}
-
-            <FormField
-              control={form.control}
-              name='dmc'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>DMC full content</FormLabel>
-                  <FormControl>
-                    <Input placeholder='' {...field} />
-                  </FormControl>
-                  {/* <FormDescription>{cDict.dmcFormDescription}</FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='dmcFirstValidation'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Validation string</FormLabel>
-                  <FormControl>
-                    <Input placeholder='' {...field} />
-                  </FormControl>
-                  {/* <FormDescription>
-                    {cDict.dmcFirstValidationFormDescription}
-                  </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='secondValidation'
-              render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className='space-y-1 leading-none'>
-                    <FormLabel>Second validation</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-            {isSecondValidationChecked && (
-              <FormField
-                control={form.control}
-                name='dmcSecondValidation'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Second validation string</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>
-                      {cDict.dmcSecondValidationFormDescription}
-                    </FormDescription> */}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <FormField
-              control={form.control}
-              name='hydraProcess'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>HYDRA proces</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select process' />
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      <SelectItem value='050'>050 - EOL</SelectItem>
-                      {lang === 'pl' && (
-                        <SelectItem value='090'>090 - Q3</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {/* <FormDescription>
-                  You can manage email addresses in your{' '}
-                </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {lang === 'pl' && (
-              <>
-                <FormField
-                  control={form.control}
-                  name='ford'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className='space-y-1 leading-none'>
-                        <FormLabel>FORD date validation</FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='bmw'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className='space-y-1 leading-none'>
-                        <FormLabel>BMW date validation</FormLabel>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
           </CardContent>
-          <CardFooter className='flex justify-between'>
-            <Button
-              variant='destructive'
-              type='button'
-              // TODO: form.reset() is not working for hydra process
-              onClick={() => form.reset()}
-            >
-              Reset
-            </Button>
+          <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Adding
+                Saving
               </Button>
             ) : (
-              <Button type='submit'>Add</Button>
+              <Button type='submit'>Save</Button>
             )}
           </CardFooter>
         </form>

@@ -17,7 +17,7 @@ export async function insertEmployee(employee: EmployeeType) {
     const collection = await dbc('persons');
 
     const exists = await collection.findOne({
-      personalNumber: employee.personalNumber,
+      personalNumber: employee.loginCode,
     });
 
     if (exists) {
@@ -26,7 +26,7 @@ export async function insertEmployee(employee: EmployeeType) {
 
     const res = await collection.insertOne({
       name: employee.name,
-      personalNumber: employee.personalNumber,
+      personalNumber: employee.loginCode,
       password: employee.password,
     });
     if (res) {
@@ -61,7 +61,7 @@ export async function updateEmployee(employee: EmployeeType) {
       {
         $set: {
           name: employee.name,
-          personalNumber: employee.personalNumber,
+          personalNumber: employee.loginCode,
           password: employee.password,
         },
       },
@@ -84,21 +84,31 @@ export async function getEmployee(
     const user = await collection.findOne({
       _id: userId,
     });
-    return user as EmployeeType | null;
+
+    if (user) {
+      return {
+        _id: user._id.toString(),
+        name: user.name,
+        loginCode: user.personalNumber,
+        password: user.password ?? undefined,
+      };
+    }
+
+    return null;
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while retrieving the user.');
   }
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteEmployee(userId: string) {
   try {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
-    const collection = await dbc('users');
+    const collection = await dbc('persons');
 
     const exists = await collection.findOne({ _id: new ObjectId(userId) });
 

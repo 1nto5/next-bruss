@@ -45,10 +45,7 @@ export default function EditEmployee({
       .string()
       .min(3, { message: 'Minimum 3 characters!' })
       .optional(),
-    loginCode: z
-      .string()
-      .min(3, { message: 'Minimum 1 character!' })
-      .optional(),
+    loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
     password: z
       .string()
       .min(6, { message: 'Minimum 6 characters!' })
@@ -63,7 +60,8 @@ export default function EditEmployee({
     defaultValues: {
       firstName: employeeObject.name.split(' ')[0],
       lastName: employeeObject.name.split(' ')[1],
-      loginCode: employeeObject.personalNumber,
+      loginCode: employeeObject.loginCode,
+      password: employeeObject.password,
     },
   });
 
@@ -72,16 +70,10 @@ export default function EditEmployee({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      if (!data.firstName || !data.lastName || !data.loginCode) {
-        toast.error('Please fill in all fields!');
-        setIsPending(false);
-        return;
-      }
       const employee = {
         _id: employeeObject._id,
         name: `${data.firstName} ${data.lastName}`,
-        personalNumber: data.loginCode,
-        password: data.password || undefined,
+        loginCode: data.loginCode,
       };
       const res = await updateEmployee(employee);
       if (res?.success) {
@@ -124,7 +116,7 @@ export default function EditEmployee({
                 <FormItem>
                   <FormLabel>First name</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -137,7 +129,7 @@ export default function EditEmployee({
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -150,7 +142,7 @@ export default function EditEmployee({
                 <FormItem>
                   <FormLabel>Login code</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormDescription>
                     Personal number (MRG) or contents of the employee card code
@@ -167,7 +159,7 @@ export default function EditEmployee({
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormDescription>
                     For inventory support applications - not for DMCheck, leave
