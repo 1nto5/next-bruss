@@ -9,7 +9,7 @@ const pgp = new Pool({
 });
 
 pgp.on('connect', () => {
-  console.log('Connected to the PostgreSQL database');
+  // console.log('Connected to the PostgreSQL database');
 });
 
 pgp.on('error', (err, client) => {

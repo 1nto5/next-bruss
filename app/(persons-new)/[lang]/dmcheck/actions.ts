@@ -174,7 +174,17 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    // TODO: BRI 40040 check in external pg DB
+    const scansCollection = await dbc('scans');
+
+    const existingDmc = await scansCollection.findOne({
+      dmc: dmc,
+      workplace: articleConfig.workplace,
+    });
+    if (existingDmc) {
+      return { message: 'dmc exists' };
+    }
+
+    // BRI 40040 check in external pg DB
     if (articleConfig.articleNumber === '40040') {
       try {
         const pgc = await pgp.connect();
@@ -191,14 +201,31 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    const scansCollection = await dbc('scans');
-
-    const existingDmc = await scansCollection.findOne({
-      dmc: dmc,
-      workplace: articleConfig.workplace,
-    });
-    if (existingDmc) {
-      return { message: 'dmc exists' };
+    // EOL810 check in external API
+    if (articleConfig.workplace === 'eol810') {
+      const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok || response.status === 404) {
+          return { message: 'eol810 fetch error' };
+        }
+        const data = await response.text();
+        console.log(data);
+        switch (data) {
+          case 'NOT_FOUND':
+            return { message: 'eol810 not found' };
+          case 'UNKNOWN':
+            return { message: 'eol810 unknown' };
+          case 'NOK':
+            return { message: 'eol810 nok' };
+          case 'PATTERN':
+            return { message: 'eol810 pattern' };
+        }
+      } catch (error) {
+        throw new Error(
+          'An error occurred while fetching the part status from SMART.',
+        );
+      }
     }
 
     const insertResult = await scansCollection.insertOne({

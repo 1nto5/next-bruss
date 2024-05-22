@@ -84,6 +84,21 @@ export function Scan({
       case '40040 nok':
         toast.error(cDict.toast.nok);
         break;
+      case 'eol810 not found':
+        toast.error('Nie znaleziono w bazie SMART!');
+        break;
+      case 'eol810 unknown':
+        toast.error('SMART: Część nieprzeprocesowana na wszystkich stacjach!');
+        break;
+      case 'eol810 nok':
+        toast.error('SMART: Część otrzymała status NOK na jednej ze stacji!'); // can we determine which station in the future?
+        break;
+      case 'eol810 pattern':
+        toast.error('SMART: Część jest wzornikiem!');
+        break;
+      case 'eol810 fetch error':
+        toast.error('Problem połączenia z bazą SMART!');
+        break;
       default:
         break;
     }
