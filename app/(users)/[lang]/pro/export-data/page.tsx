@@ -11,7 +11,7 @@ export default async function ExportData({
   const articlesConfigJson = await fetch(
     `${process.env.API}/generate-excel/article-configs`,
     {
-      next: { tags: ['articles-config'], revalidate: 60 * 24 * 24 },
+      next: { tags: ['articles-config'], revalidate: 60 * 15 },
     },
   );
   const articlesConfig = await articlesConfigJson.json();
