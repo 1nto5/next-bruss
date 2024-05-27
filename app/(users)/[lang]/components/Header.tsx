@@ -57,6 +57,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `${dict?.header?.production?.rework.description}`,
         },
         {
+          href: '/pro/zero-quantity',
+          title: `${dict?.header?.production?.zero.title}`,
+          description: `${dict?.header?.production?.zero.description}`,
+        },
+        {
           href: '/pro/add-article-config',
           title: `${dict?.header?.production?.articleConfig.title}`,
           description: `${dict?.header?.production?.articleConfig.description}`,

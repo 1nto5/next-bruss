@@ -10,6 +10,10 @@
         "title": "Nacharbeit",
         "description": "Markieren von Chargen für die Nacharbeit - erneutes Scannen."
       },
+      "zero": {
+        "title": "Wyzeruj stan",
+        "description": "Zerowanie stanu ilości cześci, gdy użycie opcji rework jest niemożliwe."
+      },
       "articleConfig": {
         "title": "Artikelkonfiguration",
         "description": "Hinzufügen von Artikeln im DMC-Scansystem."

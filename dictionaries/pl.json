@@ -10,6 +10,10 @@
         "title": "Oznacz rework",
         "description": "Oznaczanie partii jako rework - ponowne skanowanie."
       },
+      "zero": {
+        "title": "Wyzeruj stan",
+        "description": "Zerowanie stanu ilości cześci, gdy użycie opcji rework jest niemożliwe."
+      },
       "articleConfig": {
         "title": "Dodaj artykuł",
         "description": "Dodawanie artykułów w systmie skanowania DMC."
