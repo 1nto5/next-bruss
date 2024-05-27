@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-export default function MuteButton() {
+export default function VolumeButton() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

@@ -4,7 +4,7 @@ import { ThemeModeToggle } from './ThemeModeToggle';
 import { LogoutAll } from './Logout';
 import { Relaod } from './Reload';
 import Logo from './Logo';
-import MuteButton from './MuteButton';
+import VolumeButton from './VolumeButton';
 
 type HeaderProps = {
   dict: any;
@@ -37,7 +37,7 @@ export default async function Header({
           <div className='flex items-center gap-x-4'>
             <LogoutAll logoutAllHref={workplaceHref} />
             <Relaod reavalidateHref={workplaceHref} />
-            <MuteButton />
+            <VolumeButton />
             <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>
         </div>
