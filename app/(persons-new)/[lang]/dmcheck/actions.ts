@@ -201,8 +201,11 @@ export async function saveDmc(prevState: any, formData: FormData) {
       }
     }
 
-    // EOL810 check in external API
-    if (articleConfig.workplace === 'eol810') {
+    // EOL810/EOL488 check in external SMART API
+    if (
+      articleConfig.workplace === 'eol810' ||
+      articleConfig.workplace === 'eol488'
+    ) {
       const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
       try {
         const response = await fetch(url);
