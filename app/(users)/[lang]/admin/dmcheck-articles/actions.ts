@@ -18,6 +18,7 @@ export async function insertArticleConfig(articleConfig: ArticleConfigType) {
 
     const exists = await collection.findOne({
       articleNumber: articleConfig.articleNumber,
+      workplace: articleConfig.workplace,
     });
     if (exists) {
       return { error: 'exists' };
