@@ -63,7 +63,7 @@ const ActionsCell = ({ row }: { row: any }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <Link href={`/admin/dmcheck-articles/edit/${user._id}`}>
+          <Link href={`/admin/users/edit/${user._id}`}>
             <DropdownMenuItem>
               <Pencil className='mr-2 h-4 w-4' />
               <span>Edit</span>
