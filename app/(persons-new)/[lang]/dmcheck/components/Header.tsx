@@ -3,7 +3,7 @@ import Container from '@/components/ui/container';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import { LogoutAll } from './Logout';
 import { Relaod } from './Reload';
-import Logo from './Logo';
+import Logo from '@/components/Logo';
 import VolumeButton from './VolumeButton';
 
 type HeaderProps = {

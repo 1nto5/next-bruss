@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import { LoginLogout } from './LoginLogout';
 
-import Logo from './Logo';
+import Logo from '@/components/Logo';
 import UserAvatar from './UserAvatar';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 import { logout, getSession } from '../auth/actions';
