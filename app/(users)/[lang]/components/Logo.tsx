@@ -17,6 +17,7 @@ export default function Logo({ logoStyles }: LogoProps) {
     // />
     <Image
       src={logo}
+      className={logoStyles ?? ''}
       // You don't need to specify
       //either height nor width but
       // you should if you wan't to

@@ -210,19 +210,19 @@ export async function saveDmc(prevState: any, formData: FormData) {
       try {
         const response = await fetch(url);
         if (!response.ok || response.status === 404) {
-          return { message: 'eol810 fetch error' };
+          return { message: 'smart fetch error' };
         }
         const data = await response.text();
         console.log(data);
         switch (data) {
           case 'NOT_FOUND':
-            return { message: 'eol810 not found' };
+            return { message: 'smart not found' };
           case 'UNKNOWN':
-            return { message: 'eol810 unknown' };
+            return { message: 'smart unknown' };
           case 'NOK':
-            return { message: 'eol810 nok' };
+            return { message: 'smart nok' };
           case 'PATTERN':
-            return { message: 'eol810 pattern' };
+            return { message: 'smart pattern' };
         }
       } catch (error) {
         throw new Error(
