@@ -68,52 +68,53 @@ function fordDateValidation(dmc: string) {
 }
 
 // BMW DATE VALIDATION
+// function bmwDateValidation(dmc: string) {
+//   const todayDate = parseInt(
+//     new Date().toISOString().slice(2, 10).split('-').join(''),
+//   );
+//   const tomorrowDate = parseInt(
+//     new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+//       .toISOString()
+//       .slice(2, 10)
+//       .split('-')
+//       .join(''),
+//   );
+//   const yesterdayDate = parseInt(
+//     new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+//       .toISOString()
+//       .slice(2, 10)
+//       .split('-')
+//       .join(''),
+//   );
+//   const dayBeforeYesterdayDate = parseInt(
+//     new Date(new Date().getTime() - 48 * 60 * 60 * 1000)
+//       .toISOString()
+//       .slice(2, 10)
+//       .split('-')
+//       .join(''),
+//   );
+//   const dmcDate = parseInt(dmc.slice(17, 23));
+//   return (
+//     dmcDate === todayDate ||
+//     dmcDate === tomorrowDate ||
+//     dmcDate === yesterdayDate ||
+//     dmcDate === dayBeforeYesterdayDate
+//   );
+// }
 function bmwDateValidation(dmc: string) {
-  const todayDate = parseInt(
-    new Date().toISOString().slice(2, 10).split('-').join(''),
-  );
-  const tomorrowDate = parseInt(
-    new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(2, 10)
-      .split('-')
-      .join(''),
-  );
-  const yesterdayDate = parseInt(
-    new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(2, 10)
-      .split('-')
-      .join(''),
-  );
-  const dayBeforeYesterdayDate = parseInt(
-    new Date(new Date().getTime() - 48 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(2, 10)
-      .split('-')
-      .join(''),
-  );
+  const today = new Date();
   const dmcDate = parseInt(dmc.slice(17, 23));
-  return (
-    dmcDate === todayDate ||
-    dmcDate === tomorrowDate ||
-    dmcDate === yesterdayDate ||
-    dmcDate === dayBeforeYesterdayDate
-  );
-}
 
-function convertDmcForBriApi(dmc: string) {
-  const formattedDmc = dmc
-    .replace(/#/g, '%23')
-    .replace(/\*/g, '%2A')
-    .replace(/=/g, '%3D')
-    .replace(/ /g, '%20');
-
-  const currentYear = new Date().getFullYear();
-  const yearCode = currentYear.toString().slice(2);
-  const formattedDmcWithYear = `%${yearCode}${formattedDmc}`;
-
-  return formattedDmcWithYear;
+  for (let i = 0; i <= 9; i++) {
+    const checkDate = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
+    const checkDateFormatted = parseInt(
+      checkDate.toISOString().slice(2, 10).split('-').join(''),
+    );
+    if (dmcDate === checkDateFormatted) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // save function for all types of scans - dmc, hydra, pallet - toasts are handled in the Scan component in the useEffect
