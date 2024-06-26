@@ -39,7 +39,7 @@ export function Scan({
     volume: volume,
   });
 
-  const [playNok, { sound: nokSound }] = useSound('/nok.wav', {
+  const [playNok, { sound: nokSound }] = useSound('/nok.mp3', {
     volume: volume,
   });
 
