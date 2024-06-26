@@ -105,7 +105,7 @@ function bmwDateValidation(dmc: string) {
   const today = new Date();
   const dmcDate = parseInt(dmc.slice(17, 23));
 
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= 30; i++) {
     const checkDate = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     const checkDateFormatted = parseInt(
       checkDate.toISOString().slice(2, 10).split('-').join(''),
