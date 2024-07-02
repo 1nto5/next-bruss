@@ -181,7 +181,8 @@ export async function saveDmc(prevState: any, formData: FormData) {
       dmc: dmc,
       workplace: articleConfig.workplace,
     });
-    if (existingDmc) {
+
+    if (existingDmc && existingDmc.status !== 'rework') {
       return { message: 'dmc exists' };
     }
 
