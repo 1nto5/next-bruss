@@ -177,10 +177,13 @@ export async function saveDmc(prevState: any, formData: FormData) {
 
     const scansCollection = await dbc('scans');
 
-    const existingDmc = await scansCollection.findOne({
-      dmc: dmc,
-      workplace: articleConfig.workplace,
-    });
+    const existingDmc = await scansCollection.findOne(
+      {
+        dmc: dmc,
+        workplace: articleConfig.workplace,
+      },
+      { sort: { time: -1 } },
+    );
 
     if (existingDmc && existingDmc.status !== 'rework') {
       return { message: 'dmc exists' };

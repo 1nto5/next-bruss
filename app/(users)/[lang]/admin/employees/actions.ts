@@ -39,6 +39,60 @@ export async function insertEmployee(employee: EmployeeType) {
   }
 }
 
+export async function insertManyEmployee(pastedEmployees: string) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/');
+      return; // Make sure to stop the execution after redirecting
+    }
+
+    const employees = pastedEmployees
+      .split('\n')
+      .map((line) => line.split('\t'))
+      .map(([name, loginCode]) => {
+        const [lastName, firstName] = name.split(', ').map((s) => s.trim());
+        return {
+          name: `${firstName} ${lastName}`,
+          loginCode,
+        };
+      });
+
+    const collection = await dbc('persons');
+
+    const existingEmployees = await collection
+      .find({
+        personalNumber: { $in: employees.map((e) => e.loginCode) },
+        name: { $ne: '' },
+        loginCode: { $ne: '' },
+      })
+      .toArray();
+
+    const existingLoginCodes = existingEmployees.map((e) => e.personalNumber);
+
+    const newEmployees = employees.filter(
+      (e) => !existingLoginCodes.includes(e.loginCode) && e.name && e.loginCode,
+    );
+
+    console.log('newEmployees', newEmployees);
+
+    const res = await collection.insertMany(
+      newEmployees.map((employee) => ({
+        name: employee.name,
+        personalNumber: employee.loginCode,
+      })),
+    );
+
+    if (res.insertedCount > 0) {
+      revalidateTag('employees');
+      return { success: res.insertedCount };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while saving employees.');
+  }
+}
+
 export async function updateEmployee(employee: EmployeeType) {
   try {
     const session = await auth();

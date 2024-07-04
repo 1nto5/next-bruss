@@ -106,7 +106,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
   return (
     <Card className='w-[550px]'>
       <CardHeader>
-        <CardTitle>Add article config</CardTitle>
+        <CardTitle>Add new employee</CardTitle>
         {/* <CardDescription>
           Poprzednio edytowany: {date} przez{' '}
           {extractNameFromEmail(data.edited?.email ?? '')}
