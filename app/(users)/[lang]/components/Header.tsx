@@ -121,6 +121,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 title: 'Employees',
                 description: 'Manage employees in Next BRUSS apps.',
               },
+              {
+                href: '/admin/employees/add-many',
+                title: 'Add many employees',
+                description: 'Add many employees from HYDRA export file.',
+              },
             ],
           },
         ]
@@ -166,13 +171,23 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             submenu: [
               {
                 href: '/admin/users',
-                title: 'User management',
+                title: 'Users management',
                 description: 'Manage users roles.',
               },
               {
                 href: '/admin/dmcheck-articles',
                 title: 'DMCheck articles',
                 description: 'Manage articles in DMCheck app.',
+              },
+              {
+                href: '/admin/employees',
+                title: 'Employees',
+                description: 'Manage employees in Next BRUSS apps.',
+              },
+              {
+                href: '/admin/employees/add-many',
+                title: 'Add many employees',
+                description: 'Add many employees from HYDRA export file.',
               },
             ],
           },

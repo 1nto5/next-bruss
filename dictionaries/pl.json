@@ -131,7 +131,7 @@
         "dmcValidation": "Ciąg minimum 4 znaków zawartych w polu DMC",
         "dmcSecondValidation": "Ciąg minimum 4 znaków zawartych w polu DMC, inny niż w polu \"Walidowana wartość DMC\"",
         "piecesPerBox": "Wprowadź liczbę całkowitą",
-        "hydraProcess": "Wybierz proces"
+        "hydraProcess": "Wpisz właściwy proces!"
       },
       "cardTitle": "Dodaj artykuł",
       "cardDescription": "Uzupełnij wszystkie dane by dodać nowy artykuł.",
@@ -154,7 +154,7 @@
       "fordCheckboxFormLabel": "Walidacja daty FORD",
       "bmwCheckboxFormLabel": "Walidacja daty BMW",
       "hydraProcessFormLabel": "Proces Hydra",
-      "hydraProcessFormDescription": "Proeces HYDRA z którego pochodzi artykuł.",
+      "hydraProcessFormDescription": "Proces HYDRA z którego pochodzi artykuł (np. 050 - po kontroli ciśnieniowej EOL)",
       "hydraProcessSelectOption050": "050 - po kontroli ciśnieniowej EOL",
       "hydraProcessSelectOption090": "090 - Q3",
       "hydraProcessSelectPlaceholder": "Wybierz proces właściwy dla danego artykułu",

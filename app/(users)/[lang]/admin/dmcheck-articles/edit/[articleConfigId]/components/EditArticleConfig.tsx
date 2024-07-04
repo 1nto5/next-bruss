@@ -76,9 +76,11 @@ export default function EditArticleConfig({
       secondValidation: z.boolean().optional(),
       dmcSecondValidation: z.string().optional(),
       hydraProcess: z
-        .string()
-        .refine((value) => (value.match(/\d/g) || []).length >= 3, {
-          message: 'Hydra process code must contain at least 3 digits',
+        .string({
+          required_error: 'Hydra process code must contain 3 digits',
+        })
+        .refine((value) => /^\d{3}$/.test(value), {
+          message: 'Hydra process code must contain 3 digits',
         }),
       ford: z.boolean().optional(),
       bmw: z.boolean().optional(),
@@ -351,30 +353,17 @@ export default function EditArticleConfig({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>HYDRA proces</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select process' />
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      <SelectItem value='050'>050 - EOL</SelectItem>
-                      {lang === 'pl' && (
-                        <SelectItem value='090'>090 - Q3</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
                   {/* <FormDescription>
-                  You can manage email addresses in your{' '}
-                </FormDescription> */}
+                    {cDict.hydraProcessFormDescription}
+                  </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             {lang === 'pl' && (
               <>
                 <FormField

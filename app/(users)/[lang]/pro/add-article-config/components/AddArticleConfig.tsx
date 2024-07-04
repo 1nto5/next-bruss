@@ -74,7 +74,7 @@ export default function AddArticleConfig({
       dmcSecondValidation: z.string().optional(),
       hydraProcess: z
         .string({ required_error: cDict.z.hydraProcess })
-        .refine((value) => (value.match(/\d/g) || []).length >= 3, {
+        .refine((value) => /^\d{3}$/.test(value), {
           message: cDict.z.hydraProcess,
         }),
       ford: z.boolean().default(false).optional(),
@@ -114,7 +114,7 @@ export default function AddArticleConfig({
       dmcFirstValidation: '',
       secondValidation: false,
       dmcSecondValidation: '',
-      hydraProcess: lang === 'pl' ? '' : '050',
+      hydraProcess: '',
       ford: false,
       bmw: false,
     },
@@ -339,37 +339,17 @@ export default function AddArticleConfig({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>HYDRA proces</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={cDict.hydraProcessSelectPlaceholder}
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-
-                    <SelectContent>
-                      <SelectItem value='050'>
-                        {cDict.hydraProcessSelectOption050}
-                      </SelectItem>
-                      {lang === 'pl' && (
-                        <SelectItem value='090'>
-                          {' '}
-                          {cDict.hydraProcessSelectOption090}
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {/* <FormDescription>
-                    You can manage email addresses in your{' '}
-                  </FormDescription> */}
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    {cDict.hydraProcessFormDescription}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             {lang === 'pl' && (
               <>
                 <FormField

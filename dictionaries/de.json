@@ -132,7 +132,7 @@
         "dmcValidation": "Mindestens 4 Zeichen im DMC-Feld enthalten!",
         "dmcSecondValidation": "Mindestens 4 Zeichen im DMC-Feld, anders als im Feld 'Validierter DMC-Wert'!",
         "piecesPerBox": "Geben Sie eine ganze Zahl ein!",
-        "hydraProcess": "Wählen Sie den Prozess!"
+        "hydraProcess": "Geben Sie den richtigen Prozess ein!"
       },
       "cardTitle": "Artikel hinzufügen",
       "cardDescription": "Füllen Sie alle Daten aus, um einen neuen Artikel hinzuzufügen.",
@@ -155,7 +155,7 @@
       "fordCheckboxFormLabel": "Validierung des FORD-Datums",
       "bmwCheckboxFormLabel": "Validierung des BMW-Datums",
       "hydraProcessFormLabel": "Hydra-Prozess",
-      "hydraProcessFormDescription": "Hydra-Prozess, aus dem der Artikel stammt.",
+      "hydraProcessFormDescription": "Hydra-Prozess, aus dem der Artikel stammt. (z.B. 050 - nach EOL-Kontrolle)",
       "hydraProcessSelectOption050": "050 - nach der Druckprüfung EOL",
       "hydraProcessSelectOption090": "090 - Q3",
       "hydraProcessSelectPlaceholder": "Wählen Sie den richtigen Prozess für den Artikel",
