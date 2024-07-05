@@ -59,6 +59,8 @@ export default function AddEmployee({ lang }: { lang: string }) {
           toast.success('Employee saved successfully!');
         } else if (res?.success > 1) {
           toast.success(`${res?.success} new employees saved successfully!`);
+        } else {
+          toast.error('The employees listed already exist!');
         }
         form.reset();
       } else {
