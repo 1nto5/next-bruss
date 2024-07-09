@@ -121,6 +121,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 title: 'Add many employees',
                 description: 'Add many employees from HYDRA export file.',
               },
+              {
+                href: '/admin/rework-many',
+                title: 'Rework many',
+                description: 'Rework many DMCs / batches at once.',
+              },
             ],
           },
         ]
@@ -183,6 +188,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 href: '/admin/employees/add-many',
                 title: 'Add many employees',
                 description: 'Add many employees from HYDRA export file.',
+              },
+              {
+                href: '/admin/rework-many',
+                title: 'Rework many',
+                description: 'Rework many DMCs / batches at once.',
               },
             ],
           },
