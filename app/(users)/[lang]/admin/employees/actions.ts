@@ -44,7 +44,7 @@ export async function insertManyEmployee(pastedEmployees: string) {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('admin')) {
       redirect('/');
-      return; // Make sure to stop the execution after redirecting
+      return;
     }
 
     const employees = pastedEmployees
