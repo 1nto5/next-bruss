@@ -95,7 +95,8 @@
     "toasts": {
       "exportSuccess": "Dane wyeksportowane!",
       "exportError": "Błąd podczas eksportu danych!"
-    }
+    },
+    "pleaseContactIt": "Skontaktuj się z IT!"
   },
   "rework": {
     "articleLabel": "Artykuł",

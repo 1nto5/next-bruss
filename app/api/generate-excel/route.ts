@@ -1,4 +1,4 @@
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Workbook } from 'exceljs';
 import clientPromise from '@/lib/mongo';
 import moment from 'moment';
@@ -20,7 +20,7 @@ type TimeQuery = {
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({ message: 'Only POST requests allowed' }),
       {
         status: 405,
@@ -54,15 +54,10 @@ export async function POST(req: NextRequest) {
     };
 
     const collection = db.collection('scans');
-    // const data = await collection.find(query).limit(100000).toArray();
-
-    // Get the second collection
     const archiveCollection = db.collection('scans_archive');
 
-    // Query the 'scans' collection
     let data = await collection.find(query).limit(100000).toArray();
 
-    // If the number of returned documents is less than 100000, query the 'scans_archive' collection
     if (data.length < 100000) {
       const dataFromArchive = await archiveCollection
         .find(query)
@@ -128,21 +123,15 @@ export async function POST(req: NextRequest) {
     });
     const buffer = await workbook.xlsx.writeBuffer();
 
-    return new Response(buffer, {
+    return new NextResponse(buffer, {
       status: 200,
-      headers: {
-        'Content-Type':
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': 'attachment; filename=data.xlsx',
-      },
     });
   } catch (error) {
     console.error('Error generating Excel file:', error);
-    return new Response(
+    return new NextResponse(
       JSON.stringify({ message: 'Error generating Excel file' }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
       },
     );
   }

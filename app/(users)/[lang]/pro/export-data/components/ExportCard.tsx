@@ -34,6 +34,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { addDays, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
+import { toast } from 'sonner';
 
 type articlesConfigType = {
   _id: string;
@@ -145,21 +146,24 @@ export default function ExportCard({
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      console.log(response.status);
+      if (response.status != 200) {
+        toast.error(cDict.pleaseContactIt);
+        return;
       }
 
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.setAttribute('download', `exported-data.xlsx`);
+      link.setAttribute('download', `DMCheck export (Next BRUSS).xlsx`);
       document.body.appendChild(link);
       link.click();
       if (link.parentNode) {
         link.parentNode.removeChild(link);
       }
     } catch (error) {
+      toast.error(cDict.pleaseContactIt);
       console.error('There was an error generating the Excel file:', error);
     } finally {
       setIsPending(false);
