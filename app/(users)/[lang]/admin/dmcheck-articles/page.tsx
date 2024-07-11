@@ -33,12 +33,8 @@ export default async function ArticleConfigsPage({
 }) {
   const { fetchTime, allConfigs } = await getData(lang);
   return (
-    // <main className='m-2 flex justify-center'>
-    //   {' '}
-    // container
-    <div className='mx-auto px-12 py-4 lg:px-24'>
+    <main className='mx-auto px-4 py-4 lg:px-8'>
       <DataTable columns={columns} data={allConfigs} fetchTime={fetchTime} />
-    </div>
-    // </main>
+    </main>
   );
 }
