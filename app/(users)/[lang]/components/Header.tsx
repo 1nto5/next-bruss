@@ -249,7 +249,9 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             </Sheet>
             <Link href='/' className='ml-4 flex items-center lg:ml-0'>
               <h1 className='font-bold'>Next</h1>
-              <Logo logoStyles='mr-2' />
+              <div className='w-24'>
+                <Logo />
+              </div>
             </Link>
           </div>
           <nav className='mx-6 hidden items-center space-x-4 md:block lg:space-x-6'>

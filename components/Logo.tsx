@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import logo from '@/public/logo.png';
 
-type LogoProps = {
-  logoStyles?: string;
-};
+// type LogoProps = {
+//   logoStyles?: string;
+// };
 
-export default function Logo({ logoStyles }: LogoProps) {
+export default function Logo() {
   return (
     // <Image
     //   className={logoStyles ?? ''}
@@ -17,16 +17,16 @@ export default function Logo({ logoStyles }: LogoProps) {
     // />
     <Image
       src={logo}
-      className={logoStyles ?? ''}
-      // You don't need to specify
-      //either height nor width but
-      // you should if you wan't to
-      // change the size
-      // height={100}
-      width={100}
-      // Optional blur-up
-      // while loading
-      // placeholder='blur'
+      // className={logoStyles ?? ''}
+      // // You don't need to specify
+      // //either height nor width but
+      // // you should if you wan't to
+      // // change the size
+      // // height={100}
+      // width={80}
+      // // Optional blur-up
+      // // while loading
+      // // placeholder='blur'
       alt='BRUSS'
     />
   );
