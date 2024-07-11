@@ -74,10 +74,10 @@ export function DataTable<TData, TValue>({
         <CardTitle>DMCheck article configs management</CardTitle>
         <CardDescription>Last synchronization: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between py-4'>
-          <div className='flex'>
+          <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0'>
             <Input
               autoFocus
-              placeholder='Search article number...'
+              placeholder='article number...'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              placeholder='Search article name...'
+              placeholder='article name...'
               value={
                 (table.getColumn('articleName')?.getFilterValue() as string) ??
                 ''
@@ -104,7 +104,7 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              placeholder='Search workplace...'
+              placeholder='workplace...'
               value={
                 (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
               }
