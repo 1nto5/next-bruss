@@ -129,7 +129,7 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <div className='flex'>
-            <Link href='/capa/add'>
+            <Link href='/deviation/add'>
               <Button className='mr-2 justify-end' variant='outline'>
                 <CopyPlus />
               </Button>
