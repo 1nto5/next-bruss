@@ -27,10 +27,9 @@ export default async function Header({
               className='ml-4 flex items-center lg:ml-0'
             >
               <h1 className='font-bold'>Next</h1>
-              <Logo logoStyles='mr-2' />
-              <h1 className='font-bold'>
-                DMCheck {workplaceName.toUpperCase()}
-              </h1>
+              <div className='w-24'>
+                <Logo />
+              </div>
             </Link>
           </div>
 
