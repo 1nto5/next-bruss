@@ -14,7 +14,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
       redirect('/auth');
     }
 
-    const collection = await dbc('deviation');
+    const collection = await dbc('deviations');
 
     const email = session.user.email;
     if (!email) {
@@ -23,7 +23,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
 
     const res = await collection.insertOne(deviation);
     if (res) {
-      revalidateTag('deviation');
+      revalidateTag('deviations');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
@@ -93,32 +93,33 @@ export async function insertDeviation(deviation: AddDeviationType) {
 //   }
 // }
 
-// export async function deleteCapa(articleNumber: string) {
-//   try {
-//     const session = await auth();
-//     if (!session || !(session.user.roles ?? []).includes('capa')) {
-//       redirect('/auth');
-//     }
+// TODO: change to deviation
+export async function deleteDeviation(articleNumber: string) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/auth');
+    }
 
-//     const collection = await dbc('capa');
+    const collection = await dbc('deviations');
 
-//     const exists = await collection.findOne({ articleNumber });
+    const exists = await collection.findOne({ articleNumber });
 
-//     if (!exists) {
-//       return { error: 'not found' };
-//     }
+    if (!exists) {
+      return { error: 'not found' };
+    }
 
-//     const res = await collection.deleteOne({ articleNumber });
-//     if (res) {
-//       revalidateTag('capa');
-//       return { success: 'deleted' };
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error('An error occurred while deleting the deviation.');
-//   }
-// }
+    const res = await collection.deleteOne({ articleNumber });
+    if (res) {
+      revalidateTag('capa');
+      return { success: 'deleted' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while deleting the deviation.');
+  }
+}
 
-// export async function revalidateCapa() {
-//   revalidateTag('capa');
-// }
+export async function revalidateDeviations() {
+  revalidateTag('deviations');
+}

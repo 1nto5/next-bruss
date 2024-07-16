@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Trash2, History, Pencil } from 'lucide-react';
-import { deleteCapa } from '.././actions';
+import { deleteDeviation } from '../actions';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -112,12 +112,12 @@ export const columns: ColumnDef<Capa>[] = [
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem
-              onClick={() => deleteCapa(capa.articleNumber)}
+              onClick={() => deleteDeviation(capa.articleNumber)}
               className=' focus:bg-red-400 dark:focus:bg-red-700'
             >
               <Trash2 className='mr-2 h-4 w-4' />
               <span>Usuń</span>
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+              {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

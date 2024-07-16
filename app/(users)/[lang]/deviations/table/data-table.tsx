@@ -34,7 +34,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import { revalidateCapa } from '../actions';
+import { revalidateDeviations } from '../actions';
 import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
@@ -70,13 +70,13 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Production deviations</CardTitle>
-        <CardDescription>Last synchronization: {fetchTime}</CardDescription>
+        <CardTitle>Odchylenia produkcji</CardTitle>
+        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between py-4'>
           <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0'>
             <Input
               autoFocus
-              placeholder='deviation id...'
+              placeholder='id odchylenia'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
             />
             <Input
               autoFocus
-              placeholder='article number...'
+              placeholder='numer artykułu'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -105,7 +105,7 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              placeholder='article name...'
+              placeholder='nazwa artykułu'
               value={
                 (table.getColumn('articleName')?.getFilterValue() as string) ??
                 ''
@@ -118,7 +118,7 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             />
             <Input
-              placeholder='workplace...'
+              placeholder='stanowisko'
               value={
                 (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
               }
@@ -129,7 +129,7 @@ export function DataTable<TData, TValue>({
             />
           </div>
           <div className='flex'>
-            <Link href='/deviation/add'>
+            <Link href='/deviations/add'>
               <Button className='mr-2 justify-end' variant='outline'>
                 <CopyPlus />
               </Button>
@@ -137,7 +137,7 @@ export function DataTable<TData, TValue>({
             <Button
               className='justify-end'
               variant='outline'
-              onClick={() => revalidateCapa()}
+              onClick={() => revalidateDeviations()}
             >
               <RefreshCcw />
             </Button>

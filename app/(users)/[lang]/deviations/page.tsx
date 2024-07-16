@@ -40,7 +40,7 @@ async function getData(
   }
 }
 
-export default async function CapaPage({
+export default async function DeviationsPage({
   params: { lang },
 }: {
   params: { lang: Locale };

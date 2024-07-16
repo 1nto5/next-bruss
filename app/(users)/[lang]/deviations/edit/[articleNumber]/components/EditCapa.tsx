@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { saveCapa } from '../../../actions';
+// import { saveCapa } from '../../../actions';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
@@ -133,23 +133,23 @@ export default function EditCapa({ data }: { data: CapaType }) {
 
   const [isPending, setIsPending] = useState(false);
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsPending(true);
-    try {
-      const res = await saveCapa(data);
-      if (res?.success) {
-        toast.success('CAPA zapisana!');
-      } else if (res?.error) {
-        console.error('An error occurred:', res?.error);
-        toast.error('Skontaktuj się z IT!');
-      }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPending(false);
-    }
-  };
+  // const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  //   setIsPending(true);
+  //   try {
+  //     const res = await saveCapa(data);
+  //     if (res?.success) {
+  //       toast.success('CAPA zapisana!');
+  //     } else if (res?.error) {
+  //       console.error('An error occurred:', res?.error);
+  //       toast.error('Skontaktuj się z IT!');
+  //     }
+  //   } catch (error) {
+  //     console.error('An error occurred:', error);
+  //     toast.error('Skontaktuj się z IT!');
+  //   } finally {
+  //     setIsPending(false);
+  //   }
+  // };
 
   return (
     <Card className='w-[550px]'>
