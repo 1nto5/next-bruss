@@ -13,6 +13,15 @@ export const addDeviationSchema = z.object({
     .optional(),
   periodFrom: z.date({ message: 'Wprowadź poprawną datę!' }),
   periodTo: z.date({ message: 'Wprowadź poprawną datę!' }),
+  drawingNumber: z
+    .string({ message: 'Wprowadź numer rysunku!' })
+    .min(5, { message: 'Wprowadź poprawny numer rysunku!' }),
+  quantity: z
+    .string({ message: 'Podaj ilość!' })
+    .min(1, { message: 'Podaj ilość!' })
+    .refine((value) => !isNaN(Number(value)), {
+      message: 'Podaj poprawną liczbę!',
+    }),
   reason: z.string().min(5, { message: 'Podaj powód!' }),
   description: z
     .string()

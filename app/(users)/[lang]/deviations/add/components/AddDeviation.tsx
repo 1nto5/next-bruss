@@ -25,6 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
@@ -38,8 +39,13 @@ import { insertDeviation } from '../../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
 import { addDeviationSchema } from '@/lib/z/addDeviation';
+import { DeviationReasonType } from '@/lib/types/deviation';
 
-export default function AddDeviation() {
+export default function AddDeviation({
+  reasons,
+}: {
+  reasons: DeviationReasonType[];
+}) {
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
     defaultValues: {
@@ -52,7 +58,6 @@ export default function AddDeviation() {
       description: '',
     },
   });
-
   const [isPending, setIsPending] = useState(false);
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
@@ -239,14 +244,81 @@ export default function AddDeviation() {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name='drawingNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Numer rysunku</FormLabel>
+                  <FormControl>
+                    <Input
+                      className='w-[350px]'
+                      placeholder='F-IWDR92,1L-ST'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='quantity'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ilość</FormLabel>
+                  <FormControl>
+                    <Input className='w-[120px]' placeholder='997' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='reason'
+              render={({ field }) => (
+                <FormItem className='space-y-3'>
+                  <FormLabel>Wybierz powód:</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className='flex flex-col space-y-1'
+                    >
+                      {reasons.map((reason) => (
+                        <FormItem
+                          key={reason._id.toString()}
+                          className='flex items-center space-x-3 space-y-0'
+                        >
+                          <FormControl>
+                            <RadioGroupItem value={reason.content} />
+                          </FormControl>
+                          <FormLabel className='font-normal'>
+                            {reason.content}
+                          </FormLabel>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name='description'
               render={({ field }) => (
                 <FormItem>
-                  {/* <FormLabel>First name</FormLabel> */}
+                  <FormLabel>Opis odchylenia</FormLabel>
                   <FormControl>
-                    <Textarea autoFocus placeholder={``} {...field} />
+                    <Textarea
+                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

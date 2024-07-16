@@ -8,8 +8,7 @@ export const dynamic = 'auto';
 // 'auto' | 'force-dynamic' | 'error' | 'force-static'
 
 export async function GET(req: NextRequest) {
-  // console.log('getAllCapa:', new Date().toLocaleString('pl'));
-  const capaCol = await dbc('capa');
-  const allCapa = await capaCol.find({}).toArray();
-  return new NextResponse(JSON.stringify(allCapa));
+  const coll = await dbc('deviation_reasons');
+  const reasons = await coll.find({}).toArray();
+  return new NextResponse(JSON.stringify(reasons));
 }

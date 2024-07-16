@@ -33,3 +33,10 @@ export type DeviationType = {
   productionManagerApproval: ApprovalType;
   // plantManagerApproval: ApprovalType;
 };
+
+export type DeviationReasonType = {
+  _id: ObjectId;
+  content: string;
+  created: { at: Date; by: string };
+  edited?: { at: Date; by: string };
+};
