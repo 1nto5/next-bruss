@@ -34,6 +34,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { insertDeviation } from '../../actions';
 import Link from 'next/link';
@@ -52,10 +53,17 @@ export default function AddDeviation({
       articleNumber: '',
       articleName: '',
       workplace: '',
+      drawingNumber: '',
+      quantity: '',
+      charge: '',
+      description: '',
+      reason: '',
       periodFrom: new Date(),
       periodTo: new Date(),
-      reason: '',
-      description: '',
+      area: '',
+      processSpecification: '',
+      customerNumber: '',
+      customerAuthorization: false,
     },
   });
   const [isPending, setIsPending] = useState(false);
@@ -84,7 +92,7 @@ export default function AddDeviation({
         <CardTitle>Dodaj nowe odchylenie</CardTitle>
         {/* <CardDescription>{cDict.cardDescription}</CardDescription> */}
         <div className='flex items-center justify-end py-4'>
-          <Link href='/deviation'>
+          <Link href='/deviations'>
             <Button className='mr-2 justify-end' variant='outline'>
               <Table />
             </Button>
@@ -129,6 +137,7 @@ export default function AddDeviation({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name='workplace'
@@ -141,6 +150,105 @@ export default function AddDeviation({
                       placeholder='EOL74'
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='drawingNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Numer rysunku</FormLabel>
+                  <FormControl>
+                    <Input
+                      className='w-[350px]'
+                      placeholder='24769.08T'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='quantity'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ilość</FormLabel>
+                  <FormControl>
+                    <Input className='w-[120px]' placeholder='997' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='charge'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Partia</FormLabel>
+                  <FormControl>
+                    <Input
+                      className='w-[350px]'
+                      placeholder='MATC188678/188352/188501/188679'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Opis odchylenia</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='reason'
+              render={({ field }) => (
+                <FormItem className='space-y-3'>
+                  <FormLabel>Wybierz powód:</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className='flex flex-col space-y-1'
+                    >
+                      {reasons.map((reason) => (
+                        <FormItem
+                          key={reason._id.toString()}
+                          className='flex items-center space-x-3 space-y-0'
+                        >
+                          <FormControl>
+                            <RadioGroupItem value={reason.content} />
+                          </FormControl>
+                          <FormLabel className='font-normal'>
+                            {reason.content}
+                          </FormLabel>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -247,14 +355,15 @@ export default function AddDeviation({
 
             <FormField
               control={form.control}
-              name='drawingNumber'
+              name='area'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Numer rysunku</FormLabel>
+                  <FormLabel>Obszar</FormLabel>
                   <FormControl>
                     <Input
-                      className='w-[350px]'
-                      placeholder='F-IWDR92,1L-ST'
+                      className='w-[120px]'
+                      autoFocus
+                      placeholder='Q4'
                       {...field}
                     />
                   </FormControl>
@@ -265,55 +374,10 @@ export default function AddDeviation({
 
             <FormField
               control={form.control}
-              name='quantity'
+              name='processSpecification'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ilość</FormLabel>
-                  <FormControl>
-                    <Input className='w-[120px]' placeholder='997' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='reason'
-              render={({ field }) => (
-                <FormItem className='space-y-3'>
-                  <FormLabel>Wybierz powód:</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className='flex flex-col space-y-1'
-                    >
-                      {reasons.map((reason) => (
-                        <FormItem
-                          key={reason._id.toString()}
-                          className='flex items-center space-x-3 space-y-0'
-                        >
-                          <FormControl>
-                            <RadioGroupItem value={reason.content} />
-                          </FormControl>
-                          <FormLabel className='font-normal'>
-                            {reason.content}
-                          </FormLabel>
-                        </FormItem>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Opis odchylenia</FormLabel>
+                  <FormLabel>Specyfikacja procesu</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
@@ -321,6 +385,48 @@ export default function AddDeviation({
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='customerNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Numer części klienta</FormLabel>
+                  <FormControl>
+                    <Input
+                      className='w-[240px]'
+                      autoFocus
+                      placeholder=''
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='customerAuthorization'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>Security emails</FormLabel>
+                    {/* <FormDescription>
+                    Receive emails about your account security.
+                  </FormDescription> */}
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      // disabled
+                      aria-readonly
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />
