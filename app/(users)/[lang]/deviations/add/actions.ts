@@ -3,10 +3,10 @@
 import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
 import { AddDeviationType } from '@/lib/z/addDeviation';
-import { de } from 'date-fns/locale';
+import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 
 export async function insertDeviation(deviation: AddDeviationType) {
   try {
@@ -21,8 +21,26 @@ export async function insertDeviation(deviation: AddDeviationType) {
     if (!email) {
       redirect('/auth');
     }
+
+    const initials = getInitialsFromEmail(email);
+
+    const latestDeviation = await collection
+      .find({ deviationId: { $regex: `^${initials}` } })
+      .sort({ deviationId: -1 })
+      .limit(1)
+      .toArray();
+
+    let newIdNumber = 1;
+    if (latestDeviation.length > 0) {
+      const latestId = latestDeviation[0].deviationId;
+      const latestNumber = parseInt(latestId.replace(initials, ''), 10);
+      newIdNumber = latestNumber + 1;
+    }
+
+    const id = `${initials}${newIdNumber}`;
+
     const deviationToInsert: DeviationType = {
-      deviationId: 'AA' + new Date().getTime(),
+      deviationId: id,
       status: 'approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
