@@ -21,17 +21,30 @@ export async function insertDeviation(deviation: AddDeviationType) {
     if (!email) {
       redirect('/auth');
     }
-
     const deviationToInsert: DeviationType = {
       deviationId: 'AA' + new Date().getTime(),
       status: 'approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
-      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+      ...(deviation.workplace && { workplace: deviation.workplace }),
+      ...(deviation.drawingNumber && {
+        drawingNumber: deviation.drawingNumber,
+      }),
+      ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
+      ...(deviation.charge && { charge: deviation.charge }),
       reason: deviation.reason,
+      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+      ...(deviation.area && { area: deviation.area }),
+      ...(deviation.description && { description: deviation.description }),
+      ...(deviation.processSpecification && {
+        processSpecification: deviation.processSpecification,
+      }),
+      createdAt: new Date(),
+      ...(deviation.customerNumber && {
+        customerNumber: deviation.customerNumber,
+      }),
       customerAuthorization: deviation.customerAuthorization,
       owner: email,
-      createdAt: new Date(),
     };
 
     const res = await collection.insertOne(deviationToInsert);
