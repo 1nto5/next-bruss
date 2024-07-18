@@ -5,34 +5,6 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
-import { AddDeviationType } from '@/lib/z/addDeviation';
-
-export async function insertDeviation(deviation: AddDeviationType) {
-  try {
-    const session = await auth();
-    if (!session) {
-      redirect('/auth');
-    }
-
-    const collection = await dbc('deviations');
-
-    const email = session.user.email;
-    if (!email) {
-      redirect('/auth');
-    }
-
-    const res = await collection.insertOne(deviation);
-    if (res) {
-      revalidateTag('deviations');
-      return { success: 'inserted' };
-    } else {
-      return { error: 'not inserted' };
-    }
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while saving the deviation.');
-  }
-}
 
 // export async function saveCapa(capa: CapaType) {
 //   try {

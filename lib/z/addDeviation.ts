@@ -5,8 +5,8 @@ export const addDeviationSchema = z.object({
     .string({ message: 'Wprowadź numer artykułu!' })
     .min(5, { message: 'Wprowadź poprawny numer artykułu!' }),
   articleName: z
-    .string()
-    .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' }),
+    .string({ message: 'Wprowadź nazwę artykułu!' })
+    .min(5, { message: 'Wprowadź poprawną nazwę artykułu!' }),
   workplace: z
     .string()
     .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
@@ -27,7 +27,7 @@ export const addDeviationSchema = z.object({
     .string()
     .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' })
     .optional(),
-  reason: z.string().min(5, { message: 'Wybierz powód!' }),
+  reason: z.string({ message: 'Wybierz powód!' }),
   periodFrom: z.date({ message: 'Wybierz datę!' }),
   periodTo: z.date({ message: 'Wybierz datę!' }),
   area: z

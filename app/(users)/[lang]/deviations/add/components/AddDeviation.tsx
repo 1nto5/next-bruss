@@ -1,3 +1,5 @@
+// TODO: save draft
+
 'use client';
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { insertDeviation } from '../../actions';
+import { insertDeviation } from '../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
 import { addDeviationSchema } from '@/lib/z/addDeviation';
@@ -50,19 +52,19 @@ export default function AddDeviation({
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
     defaultValues: {
-      articleNumber: '',
-      articleName: '',
-      workplace: '',
-      drawingNumber: '',
-      quantity: '',
-      charge: '',
-      description: '',
-      reason: '',
-      periodFrom: new Date(),
-      periodTo: new Date(),
-      area: '',
-      processSpecification: '',
-      customerNumber: '',
+      // articleNumber: '',
+      // articleName: '',
+      // workplace: '',
+      // drawingNumber: '',
+      // quantity: '',
+      // charge: '',
+      // description: '',
+      // reason: '',
+      periodFrom: new Date(new Date().setHours(0, 0, 0, 0)),
+      periodTo: new Date(new Date().setHours(0, 0, 0, 0)),
+      // area: '',
+      // processSpecification: '',
+      // customerNumber: '',
       customerAuthorization: false,
     },
   });
@@ -73,7 +75,7 @@ export default function AddDeviation({
     try {
       const res = await insertDeviation(data);
       if (res?.success) {
-        toast.success('CAPA zapisana!');
+        toast.success('Odchylenie dodane!');
         // form.reset()
       } else if (res?.error) {
         toast.error('Skontaktuj się z IT!');
@@ -89,11 +91,10 @@ export default function AddDeviation({
   return (
     <Card className='w-[550px]'>
       <CardHeader>
-        <CardTitle>Dodaj nowe odchylenie</CardTitle>
-        {/* <CardDescription>{cDict.cardDescription}</CardDescription> */}
-        <div className='flex items-center justify-end py-4'>
-          <Link href='/deviations'>
-            <Button className='mr-2 justify-end' variant='outline'>
+        <div className='flex justify-between'>
+          <CardTitle>Nowe odchylenie</CardTitle>
+          <Link className='ml-4' href='/deviations'>
+            <Button variant='outline'>
               <Table />
             </Button>
           </Link>
@@ -120,6 +121,7 @@ export default function AddDeviation({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name='articleName'
@@ -360,12 +362,7 @@ export default function AddDeviation({
                 <FormItem>
                   <FormLabel>Obszar</FormLabel>
                   <FormControl>
-                    <Input
-                      className='w-[120px]'
-                      autoFocus
-                      placeholder='Q4'
-                      {...field}
-                    />
+                    <Input className='w-[120px]' placeholder='Q4' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -380,7 +377,7 @@ export default function AddDeviation({
                   <FormLabel>Specyfikacja procesu</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      placeholder={`Wprowadź specyfikację procesu gdy dotyczy`}
                       {...field}
                     />
                   </FormControl>
@@ -396,12 +393,7 @@ export default function AddDeviation({
                 <FormItem>
                   <FormLabel>Numer części klienta</FormLabel>
                   <FormControl>
-                    <Input
-                      className='w-[240px]'
-                      autoFocus
-                      placeholder=''
-                      {...field}
-                    />
+                    <Input className='w-[240px]' placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -412,9 +404,9 @@ export default function AddDeviation({
               control={form.control}
               name='customerAuthorization'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                <FormItem>
                   <div className='space-y-0.5'>
-                    <FormLabel className='text-base'>Security emails</FormLabel>
+                    <FormLabel>Autoryzacja klienta</FormLabel>
                     {/* <FormDescription>
                     Receive emails about your account security.
                   </FormDescription> */}
@@ -424,7 +416,7 @@ export default function AddDeviation({
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       // disabled
-                      aria-readonly
+                      // aria-readonly
                     />
                   </FormControl>
                 </FormItem>
@@ -439,14 +431,26 @@ export default function AddDeviation({
             >
               Wyczyść
             </Button>
-            {isPending ? (
-              <Button disabled>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Dodawanie
-              </Button>
-            ) : (
-              <Button type='submit'>Dodaj</Button>
-            )}
+            <div className=' space-x-2'>
+              {isPending ? (
+                <Button variant='secondary' disabled>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Zapisuję
+                </Button>
+              ) : (
+                <Button variant='secondary' type='submit'>
+                  Zapisz szkic
+                </Button>
+              )}
+              {isPending ? (
+                <Button disabled>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Dodawanie
+                </Button>
+              ) : (
+                <Button type='submit'>Dodaj odchylenie</Button>
+              )}
+            </div>
           </CardFooter>
         </form>
       </Form>
