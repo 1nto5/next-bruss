@@ -6,11 +6,18 @@ import { DeviationReasonType } from '@/lib/types/deviation';
 async function getReasons(): Promise<DeviationReasonType[]> {
   try {
     const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
-      next: { revalidate: 60 * 60, tags: ['deviationReasons'] },
+      next: { revalidate: 0, tags: ['deviationReasons'] },
     });
-    return await res.json();
+
+    if (!res.ok) {
+      throw new Error('getting deviation reasons: ' + res.status);
+    }
+    const data = await res.json();
+    console.log('res', res.status);
+    return data;
   } catch (error) {
-    throw new Error('Fetching all capa error: ' + error);
+    console.error('getting deviation reasons:', error);
+    throw error;
   }
 }
 

@@ -8,9 +8,12 @@ async function getData(
   lang: string,
 ): Promise<{ fetchTime: string; allCapa: Capa[] }> {
   try {
-    const response = await fetch(`${process.env.API}/capa/get-all-capa`, {
-      next: { revalidate: 60 * 15, tags: ['capa'] },
-    });
+    const response = await fetch(
+      `${process.env.API}/api/deviations/get-deviations`,
+      {
+        next: { revalidate: 0, tags: ['deviations'] },
+      },
+    );
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
     const fetchTime = dateFromResponse.toLocaleString(lang);
@@ -36,7 +39,7 @@ async function getData(
 
     return { fetchTime, allCapa };
   } catch (error) {
-    throw new Error('Fetching all capa error: ' + error);
+    throw new Error('Fetching all deviations error: ' + error);
   }
 }
 

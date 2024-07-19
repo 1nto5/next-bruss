@@ -72,7 +72,7 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Odchylenia produkcji</CardTitle>
+        <CardTitle>Odchylenia</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between py-4'>
           <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0'>

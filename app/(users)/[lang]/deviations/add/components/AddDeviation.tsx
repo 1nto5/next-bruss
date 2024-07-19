@@ -1,4 +1,5 @@
-// TODO: save draft
+// TODO: save draft and go to edit page
+// TODO: get article name
 
 'use client';
 import { useState } from 'react';
