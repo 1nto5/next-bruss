@@ -5,7 +5,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
-import { AddDeviationType } from '@/lib/z/addDeviation';
+import { AddDeviationType, AddDeviationDraftType } from '@/lib/z/deviation';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 
 export async function insertDeviation(deviation: AddDeviationType) {
@@ -22,25 +22,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
       redirect('/auth');
     }
 
-    const initials = getInitialsFromEmail(email);
-
-    const latestDeviation = await collection
-      .find({ deviationId: { $regex: `^${initials}` } })
-      .sort({ deviationId: -1 })
-      .limit(1)
-      .toArray();
-
-    let newIdNumber = 1;
-    if (latestDeviation.length > 0) {
-      const latestId = latestDeviation[0].deviationId;
-      const latestNumber = parseInt(latestId.replace(initials, ''), 10);
-      newIdNumber = latestNumber + 1;
-    }
-
-    const id = `${initials}${newIdNumber}`;
-
     const deviationToInsert: DeviationType = {
-      deviationId: id,
       status: 'approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
@@ -78,49 +60,28 @@ export async function insertDeviation(deviation: AddDeviationType) {
   }
 }
 
-export async function insertDraftDeviation(deviation: AddDeviationType) {
+export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
   try {
     const session = await auth();
-    if (!session) {
+    if (!session || !session.user.email) {
       redirect('/auth');
     }
 
     const collection = await dbc('deviations');
 
-    const email = session.user.email;
-    if (!email) {
-      redirect('/auth');
-    }
-
-    const initials = getInitialsFromEmail(email);
-
-    const latestDeviation = await collection
-      .find({ deviationId: { $regex: `^${initials}` } })
-      .sort({ deviationId: -1 })
-      .limit(1)
-      .toArray();
-
-    let newIdNumber = 1;
-    if (latestDeviation.length > 0) {
-      const latestId = latestDeviation[0].deviationId;
-      const latestNumber = parseInt(latestId.replace(initials, ''), 10);
-      newIdNumber = latestNumber + 1;
-    }
-
-    const id = `${initials}${newIdNumber}`;
-
-    const deviationToInsert: DeviationType = {
-      deviationId: id,
+    const deviationDraftToInsert: DeviationType = {
       status: 'draft',
-      articleName: deviation.articleName,
-      articleNumber: deviation.articleNumber,
+      ...(deviation.articleName && { articleName: deviation.articleName }),
+      ...(deviation.articleNumber && {
+        articleNumber: deviation.articleNumber,
+      }),
       ...(deviation.workplace && { workplace: deviation.workplace }),
       ...(deviation.drawingNumber && {
         drawingNumber: deviation.drawingNumber,
       }),
       ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
       ...(deviation.charge && { charge: deviation.charge }),
-      reason: deviation.reason,
+      ...(deviation.reason && { reason: deviation.reason }),
       timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
       ...(deviation.area && { area: deviation.area }),
       ...(deviation.description && { description: deviation.description }),
@@ -132,10 +93,10 @@ export async function insertDraftDeviation(deviation: AddDeviationType) {
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: email,
+      owner: session.user.email,
     };
 
-    const res = await collection.insertOne(deviationToInsert);
+    const res = await collection.insertOne(deviationDraftToInsert);
     if (res) {
       revalidateTag('deviations');
       return { success: 'inserted' };
@@ -145,5 +106,20 @@ export async function insertDraftDeviation(deviation: AddDeviationType) {
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving the deviation.');
+  }
+}
+
+export async function findArticleName(articleNumber: string) {
+  try {
+    const collection = await dbc('inventory_articles');
+    const res = await collection.findOne({ number: articleNumber });
+    if (res) {
+      return { success: res.name };
+    } else {
+      return { error: 'not found' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while fetching the article name.');
   }
 }

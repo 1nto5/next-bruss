@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
+import { ObjectId } from 'mongodb';
 
 // export async function saveCapa(capa: CapaType) {
 //   try {
@@ -66,24 +67,24 @@ import { DeviationType } from '@/lib/types/deviation';
 // }
 
 // TODO: change to deviation
-export async function deleteDeviation(articleNumber: string) {
+export async function deleteDraftDeviation(_id: ObjectId) {
   try {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('admin')) {
       redirect('/auth');
     }
-
+    console.log('deleteDraftDeviation', _id);
     const collection = await dbc('deviations');
 
-    const exists = await collection.findOne({ articleNumber });
+    const exists = await collection.findOne({ _id: new ObjectId(_id) });
 
     if (!exists) {
       return { error: 'not found' };
     }
 
-    const res = await collection.deleteOne({ articleNumber });
+    const res = await collection.deleteOne({ _id: new ObjectId(_id) });
     if (res) {
-      revalidateTag('capa');
+      revalidateTag('deviations');
       return { success: 'deleted' };
     }
   } catch (error) {

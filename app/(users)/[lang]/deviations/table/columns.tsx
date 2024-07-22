@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { MoreHorizontal, ArrowUpDown, Copy } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,78 +15,56 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Trash2, History, Pencil } from 'lucide-react';
-import { deleteDeviation } from '../actions';
+import { deleteDraftDeviation } from '../actions';
+import { DeviationType } from '@/lib/types/deviation';
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+export const columns: ColumnDef<DeviationType>[] = [
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.original.status;
+      let statusLabel;
 
-export type Capa = {
-  deviationId: string;
-  client: string;
-  line: string;
-  articleNumber: string;
-  articleName: string;
-  clientPartNumber: string;
-  piff: string;
-  processDescription: string;
-  rep160t?: string;
-  rep260t?: string;
-  rep260t2k?: string;
-  rep300t?: string;
-  rep300t2k?: string;
-  rep400t?: string;
-  rep500t?: string;
-  b50?: string;
-  b85?: string;
-  engel?: string;
-  eol?: string;
-  cutter?: string;
-  other?: string;
-  soldCapa?: string;
-  flex?: string;
-  possibleMax?: string;
-  comment?: string;
-  sop?: string;
-  eop?: string;
-  service?: string;
-  edited?: { date: string; email: string };
-};
+      switch (status) {
+        case 'approval':
+          statusLabel = (
+            <span className='italic text-orange-500'>
+              W trakcie zatwierdzania
+            </span>
+          );
+          break;
+        case 'valid':
+          statusLabel = (
+            <span className='font-bold text-green-600'>Obowiązuje</span>
+          );
+          break;
+        case 'closed':
+          statusLabel = <span className=''>Zamknięte</span>;
+          break;
+        case 'rejected':
+          statusLabel = <span className='text-red-600'>Odrzucone</span>;
+          break;
+        case 'draft':
+          statusLabel = (
+            <span className='font-extralight italic tracking-widest text-gray-600'>
+              Szkic
+            </span>
+          );
+          break;
+        default:
+          statusLabel = <span className='text-gray-600'>Nieznany</span>;
+          break;
+      }
 
-export const columns: ColumnDef<Capa>[] = [
-  {
-    accessorKey: 'deviationId',
-    header: 'ID',
-  },
-  {
-    accessorKey: 'client',
-    header: 'Klient',
-  },
-  {
-    accessorKey: 'line',
-    header: 'Linia',
-  },
-  {
-    accessorKey: 'articleNumber',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Artykuł
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      );
+      return statusLabel;
     },
   },
   {
-    accessorKey: 'articleName',
-    header: 'Nazwa art.',
-  },
-  {
     id: 'actions',
+    header: 'Akcje',
     cell: ({ row }) => {
-      const capa = row.original;
+      const deviation = row.original;
 
       return (
         <DropdownMenu>
@@ -97,39 +75,96 @@ export const columns: ColumnDef<Capa>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>{capa.articleNumber}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <Link href={`/capa/edit/${capa.articleNumber}`}>
-              <DropdownMenuItem>
-                <Pencil className='mr-2 h-4 w-4' />
-                <span>Edytuj</span>
+            {/* <DropdownMenuLabel>
+              ...{deviation._id?.toString().slice(-5)}
+            </DropdownMenuLabel> */}
+            {/* <DropdownMenuSeparator /> */}
+            {deviation.status === 'draft' && (
+              <Link href={`/deviations/edit/${deviation.articleNumber}`}>
+                <DropdownMenuItem>
+                  <Pencil className='mr-2 h-4 w-4' />
+                  <span>Edytuj</span>
+                </DropdownMenuItem>
+              </Link>
+            )}
+            {deviation.status !== 'draft' && (
+              <Link href={`/deviations/history/${deviation.articleNumber}`}>
+                <DropdownMenuItem>
+                  <History className='mr-2 h-4 w-4' />
+                  <span>Historia</span>
+                </DropdownMenuItem>
+              </Link>
+            )}
+            {deviation.status !== 'draft' && (
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    deviation._id?.toString() ?? 'not available',
+                  );
+                }}
+                // className=' focus:bg-red-400 dark:focus:bg-red-700'
+              >
+                <Copy className='mr-2 h-4 w-4' />
+                <span>Kopiuj ID</span>
               </DropdownMenuItem>
-            </Link>
-            <Link href={`/capa/history/${capa.articleNumber}`}>
-              <DropdownMenuItem>
-                <History className='mr-2 h-4 w-4' />
-                <span>Historia</span>
+            )}
+            {deviation.status === 'draft' && (
+              <DropdownMenuItem
+                onClick={() =>
+                  deviation._id && deleteDraftDeviation(deviation._id)
+                }
+                className=' focus:bg-red-400 dark:focus:bg-red-700'
+              >
+                <Trash2 className='mr-2 h-4 w-4' />
+                <span>Usuń</span>
+                {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
               </DropdownMenuItem>
-            </Link>
-            <DropdownMenuItem
-              onClick={() => deleteDeviation(capa.articleNumber)}
-              className=' focus:bg-red-400 dark:focus:bg-red-700'
-            >
-              <Trash2 className='mr-2 h-4 w-4' />
-              <span>Usuń</span>
-              {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-            </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
   },
+
   {
-    accessorKey: 'edited.date',
-    header: 'Ostatnia edycja',
+    accessorKey: 'articleNumber',
+    header: 'Numer',
   },
   {
-    accessorKey: 'edited.name',
-    header: 'Edytowane przez',
+    accessorKey: 'articleName',
+    header: 'Nazwa',
+  },
+  {
+    accessorKey: 'drawingNumber',
+    header: 'Rysunek',
+  },
+  {
+    accessorKey: 'quantity',
+    header: 'Ilość',
+  },
+  {
+    accessorKey: 'charge',
+    header: 'Partia',
+  },
+  {
+    accessorKey: 'reason',
+    header: 'Powód',
+  },
+  {
+    accessorKey: 'timePeriod.from',
+    header: 'Od',
+  },
+  {
+    accessorKey: 'timePeriod.to',
+    header: 'Do',
+  },
+  {
+    accessorKey: '_id',
+    header: 'ID',
+    cell: ({ row }) => {
+      const id = row.original._id?.toString();
+
+      return id ? id.toUpperCase() : 'Brak';
+    },
   },
 ];

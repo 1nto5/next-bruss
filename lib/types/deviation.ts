@@ -8,16 +8,16 @@ type ApprovalType = {
 
 export type DeviationType = {
   _id?: ObjectId;
-  deviationId: string;
   status: string;
-  articleNumber: string;
-  articleName: string;
+  articleNumber?: string;
+  articleName?: string;
   workplace?: string;
   drawingNumber?: string;
   quantity?: number;
+  uni?: string;
   charge?: string;
-  reason: string;
-  timePeriod: { from: Date; to: Date };
+  reason?: string;
+  timePeriod: { from: Date | string; to: Date | string };
   area?: string;
   description?: string;
   processSpecification?: string;

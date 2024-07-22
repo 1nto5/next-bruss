@@ -9,8 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('api/deviations/get-deviations');
-    const coll = await dbc('deviations');
+    const coll = await dbc('deviation_reasons');
     const reasons = await coll.find({}).toArray();
     return new NextResponse(JSON.stringify(reasons));
   } catch (error) {

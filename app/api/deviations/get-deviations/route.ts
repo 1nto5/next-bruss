@@ -9,9 +9,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const coll = await dbc('deviation_reasons');
-    const reasons = await coll.find({}).toArray();
-    return new NextResponse(JSON.stringify(reasons));
+    const coll = await dbc('deviations');
+    const deviations = await coll.find({}).sort({ _id: -1 }).toArray();
+    return new NextResponse(JSON.stringify(deviations));
   } catch (error) {
     console.error('api/deviations/get-reasons: ' + error);
     return new NextResponse('get-reasons api error', { status: 503 });

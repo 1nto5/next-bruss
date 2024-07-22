@@ -39,10 +39,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { insertDeviation } from '../actions';
+import {
+  insertDeviation,
+  insertDraftDeviation,
+  findArticleName,
+} from '../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
-import { addDeviationSchema } from '@/lib/z/addDeviation';
+import { addDeviationSchema, addDeviationDraftSchema } from '@/lib/z/deviation';
 import { DeviationReasonType } from '@/lib/types/deviation';
 
 export default function AddDeviation({
@@ -50,8 +54,16 @@ export default function AddDeviation({
 }: {
   reasons: DeviationReasonType[];
 }) {
+  const [isDraft, setIsDraft] = useState(false);
+  const [isPendingInsert, setIsPendingInserting] = useState(false);
+  const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
+  const [isPendingFindArticleName, setIsPendingFindArticleName] =
+    useState(false);
+
   const form = useForm<z.infer<typeof addDeviationSchema>>({
-    resolver: zodResolver(addDeviationSchema),
+    resolver: zodResolver(
+      isDraft ? addDeviationDraftSchema : addDeviationSchema,
+    ),
     defaultValues: {
       // articleNumber: '',
       // articleName: '',
@@ -69,10 +81,32 @@ export default function AddDeviation({
       customerAuthorization: false,
     },
   });
-  const [isPending, setIsPending] = useState(false);
+
+  const handleFindArticleName = async () => {
+    setIsPendingFindArticleName(true);
+    try {
+      const articleNumber = form.getValues('articleNumber');
+      if (articleNumber.length === 5) {
+        const res = await findArticleName(articleNumber);
+        if (res.success) {
+          form.setValue('articleName', res.success);
+        } else if (res.error === 'not found') {
+          toast.error('Nie znaleziono artykułu');
+        }
+      } else {
+        toast.error('Wprowadź poprawny numer artykułu');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingFindArticleName(false);
+    }
+  };
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
-    setIsPending(true);
+    setIsDraft(false);
+    setIsPendingInserting(true);
     try {
       const res = await insertDeviation(data);
       if (res?.success) {
@@ -85,7 +119,28 @@ export default function AddDeviation({
       console.error('An error occurred:', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPending(false);
+      setIsPendingInserting(false);
+    }
+  };
+
+  const handleDraftInsert = async (
+    data: z.infer<typeof addDeviationDraftSchema>,
+  ) => {
+    setIsPendingInsertingDraft(true);
+    try {
+      const res = await insertDraftDeviation(data);
+      if (res?.success) {
+        toast.success('Szkic zapisany!');
+        // Możesz przekierować na stronę edycji szkicu tutaj, jeśli jest taka potrzeba
+        form.reset();
+      } else if (res?.error) {
+        toast.error('Skontaktuj się z IT!');
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingInsertingDraft(false);
     }
   };
 
@@ -102,7 +157,10 @@ export default function AddDeviation({
         </div>
       </CardHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}
+        <form
+          onSubmit={form.handleSubmit(isDraft ? handleDraftInsert : onSubmit)}
+        >
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
@@ -110,14 +168,30 @@ export default function AddDeviation({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Artykuł</FormLabel>
-                  <FormControl>
-                    <Input
-                      className='w-[120px]'
-                      autoFocus
-                      placeholder='12345'
-                      {...field}
-                    />
-                  </FormControl>
+                  <div className='flex items-center space-x-2'>
+                    <FormControl>
+                      <Input
+                        className='w-[120px]'
+                        autoFocus
+                        placeholder='12345'
+                        {...field}
+                      />
+                    </FormControl>
+                    {isPendingFindArticleName ? (
+                      <Button variant='secondary' type='button' disabled>
+                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        Pobieranie
+                      </Button>
+                    ) : (
+                      <Button
+                        variant='secondary'
+                        type='button'
+                        onClick={handleFindArticleName}
+                      >
+                        Pobierz nazwę
+                      </Button>
+                    )}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -432,18 +506,25 @@ export default function AddDeviation({
             >
               Wyczyść
             </Button>
-            <div className=' space-x-2'>
-              {isPending ? (
+            <div className='flex space-x-2'>
+              {isPendingInsertDraft ? (
                 <Button variant='secondary' disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Zapisuję
+                  Zapisywanie
                 </Button>
               ) : (
-                <Button variant='secondary' type='submit'>
+                <Button
+                  variant='secondary'
+                  type='button'
+                  onClick={() => {
+                    setIsDraft(true);
+                    form.handleSubmit(handleDraftInsert)();
+                  }}
+                >
                   Zapisz szkic
                 </Button>
               )}
-              {isPending ? (
+              {isPendingInsert ? (
                 <Button disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   Dodawanie

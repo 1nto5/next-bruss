@@ -79,15 +79,9 @@ export function DataTable<TData, TValue>({
             <Input
               autoFocus
               placeholder='id odchylenia'
-              value={
-                (table
-                  .getColumn('articleNumber')
-                  ?.getFilterValue() as string) ?? ''
-              }
+              value={(table.getColumn('_id')?.getFilterValue() as string) ?? ''}
               onChange={(event) =>
-                table
-                  .getColumn('articleNumber')
-                  ?.setFilterValue(event.target.value)
+                table.getColumn('_id')?.setFilterValue(event.target.value)
               }
               className='mr-2 max-w-xs'
             />
@@ -119,7 +113,7 @@ export function DataTable<TData, TValue>({
               }
               className='mr-2 max-w-xs'
             />
-            <Input
+            {/* <Input
               placeholder='stanowisko'
               value={
                 (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
@@ -128,7 +122,7 @@ export function DataTable<TData, TValue>({
                 table.getColumn('workplace')?.setFilterValue(event.target.value)
               }
               className='mr-2 max-w-xs'
-            />
+            /> */}
           </div>
           <div className='flex'>
             <Link href='/deviations/add'>
