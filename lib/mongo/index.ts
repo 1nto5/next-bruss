@@ -1,7 +1,9 @@
 import { MongoClient } from 'mongodb';
 
 const URI = process.env.MONGO_URI;
-const options = {};
+const options = {
+  serverSelectionTimeoutMS: 3000,
+};
 
 if (!URI) {
   throw new Error(

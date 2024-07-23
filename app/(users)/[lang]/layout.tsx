@@ -6,7 +6,6 @@ import Header from './components/Header';
 import { Toaster } from '@/components/ui/sonner';
 import { auth } from '@/auth';
 import { getDictionary } from '@/lib/dictionary';
-import Footer from './components/Footer';
 
 export const metadata: Metadata = {
   title: 'Next BRUSS',

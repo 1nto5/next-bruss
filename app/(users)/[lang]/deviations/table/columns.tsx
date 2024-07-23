@@ -146,16 +146,19 @@ export const columns: ColumnDef<DeviationType>[] = [
     header: 'Nazwa',
   },
   {
-    accessorKey: 'drawingNumber',
-    header: 'Rysunek',
-  },
-  {
-    accessorKey: 'quantity',
+    accessorKey: 'quantity.value',
     header: 'Ilość',
-  },
-  {
-    accessorKey: 'charge',
-    header: 'Partia',
+    cell: ({ row }) => {
+      const quantity = row.original.quantity;
+      const value = quantity?.value;
+      const unit = quantity?.unit;
+
+      return (
+        <span className='text-nowrap'>
+          {value} {unit && ` ${unit === 'pcs' ? 'szt.' : unit}`}
+        </span>
+      );
+    },
   },
   {
     accessorKey: 'reason',

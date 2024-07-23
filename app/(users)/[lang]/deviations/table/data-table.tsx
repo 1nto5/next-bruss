@@ -55,6 +55,10 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  if (data === undefined) {
+    throw new Error('data is undefined');
+  }
+
   const table = useReactTable({
     data,
     columns,

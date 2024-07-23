@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+// import { redirect } from 'next/navigation';
+// import { auth } from '@/auth';
 
 export const metadata = {
   title: 'Odchylenia (Next BRUSS)',

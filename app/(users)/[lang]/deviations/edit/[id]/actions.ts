@@ -35,7 +35,7 @@ export async function updateDeviation(deviation: DeviationType) {
     }
     deviation = {
       ...deviation,
-      edited: { date: new Date(), email },
+      edited: { at: new Date(), by: email },
     };
 
     const res = await collection.updateOne(

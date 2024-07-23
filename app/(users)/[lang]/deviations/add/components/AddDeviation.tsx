@@ -21,7 +21,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  // CardDescription,
+  CardDescription,
 } from '@/components/ui/card';
 import {
   Popover,
@@ -49,22 +49,21 @@ import Link from 'next/link';
 import { Table } from 'lucide-react';
 import { addDeviationSchema, addDeviationDraftSchema } from '@/lib/z/deviation';
 import { DeviationReasonType } from '@/lib/types/deviation';
+import { Separator } from '@/components/ui/separator';
 
 export default function AddDeviation({
   reasons,
 }: {
   reasons: DeviationReasonType[];
 }) {
-  const [isDraft, setIsDraft] = useState(true);
+  // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
   const [isPendingFindArticleName, setIsPendingFindArticleName] =
     useState(false);
 
   const form = useForm<z.infer<typeof addDeviationSchema>>({
-    resolver: zodResolver(
-      isDraft ? addDeviationDraftSchema : addDeviationSchema,
-    ),
+    resolver: zodResolver(addDeviationSchema),
     defaultValues: {
       // articleNumber: '',
       // articleName: '',
@@ -110,7 +109,7 @@ export default function AddDeviation({
   };
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
-    setIsDraft(false);
+    // setIsDraft(false);
     setIsPendingInserting(true);
     try {
       const res = await insertDeviation(data);
@@ -132,7 +131,6 @@ export default function AddDeviation({
   const handleDraftInsert = async (
     data: z.infer<typeof addDeviationDraftSchema>,
   ) => {
-    setIsDraft(true);
     setIsPendingInsertingDraft(true);
     try {
       const res = await insertDraftDeviation(data);
@@ -152,7 +150,7 @@ export default function AddDeviation({
   };
 
   return (
-    <Card className='w-[1024px]'>
+    <Card className='w-[768px]'>
       <CardHeader>
         <div className='flex justify-between'>
           <CardTitle>Nowe odchylenie</CardTitle>
@@ -163,6 +161,7 @@ export default function AddDeviation({
           </Link>
         </div>
       </CardHeader>
+      <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* <form
@@ -305,13 +304,13 @@ export default function AddDeviation({
                         className='flex flex-col'
                       >
                         <FormItem
-                          key={'szt'}
+                          key={'pcs'}
                           className='flex items-center space-x-3 space-y-0'
                         >
                           <FormControl>
-                            <RadioGroupItem value='szt' />
+                            <RadioGroupItem value='pcs' />
                           </FormControl>
-                          <FormLabel className='font-normal'>szt</FormLabel>
+                          <FormLabel className='font-normal'>szt.</FormLabel>
                         </FormItem>
                         <FormItem
                           key={'kg'}
@@ -551,6 +550,8 @@ export default function AddDeviation({
               )}
             />
           </CardContent>
+          <Separator className='mb-4' />
+
           <CardFooter className='flex justify-between'>
             <Button
               variant='destructive'
@@ -571,8 +572,9 @@ export default function AddDeviation({
                   variant='secondary'
                   type='button'
                   onClick={() => {
-                    setIsDraft(true);
-                    form.handleSubmit(handleDraftInsert)();
+                    // setIsDraft(true);
+                    // form.handleSubmit(handleDraftInsert)();
+                    handleDraftInsert(form.getValues());
                   }}
                 >
                   <Pencil className='mr-2 h-4 w-4' />

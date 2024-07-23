@@ -13,8 +13,7 @@ export type DeviationType = {
   articleName?: string;
   workplace?: string;
   drawingNumber?: string;
-  quantity?: number;
-  uni?: string;
+  quantity?: { value?: number; unit?: string };
   charge?: string;
   reason?: string;
   timePeriod: { from: Date | string; to: Date | string };

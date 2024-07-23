@@ -14,6 +14,6 @@ export async function GET(req: NextRequest) {
     return new NextResponse(JSON.stringify(deviations));
   } catch (error) {
     console.error('api/deviations/get-reasons: ' + error);
-    return new NextResponse('get-reasons api error', { status: 503 });
+    return new NextResponse('get-deviations api error', { status: 503 });
   }
 }
