@@ -22,11 +22,7 @@ export const LoginLogout: React.FC<LoginLogoutButtonProps> = ({
       variant='outline'
       size='icon'
     >
-      {isLoggedIn ? (
-        <LogOut className='h-[1.2rem] w-[1.2rem]' />
-      ) : (
-        <LogIn className='h-[1.2rem] w-[1.2rem]' />
-      )}
+      {isLoggedIn ? <LogOut /> : <LogIn />}
     </Button>
   );
 };

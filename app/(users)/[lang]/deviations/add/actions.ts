@@ -6,21 +6,14 @@ import { redirect } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
 import { AddDeviationType, AddDeviationDraftType } from '@/lib/z/deviation';
-import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 
 export async function insertDeviation(deviation: AddDeviationType) {
+  const session = await auth();
+  if (!session || !session.user.email) {
+    redirect('/auth');
+  }
   try {
-    const session = await auth();
-    if (!session) {
-      redirect('/auth');
-    }
-
     const collection = await dbc('deviations');
-
-    const email = session.user.email;
-    if (!email) {
-      redirect('/auth');
-    }
 
     const deviationToInsert: DeviationType = {
       status: 'approval',
@@ -31,6 +24,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
         drawingNumber: deviation.drawingNumber,
       }),
       ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
+      ...(deviation.unit && { unit: deviation.unit }),
       ...(deviation.charge && { charge: deviation.charge }),
       reason: deviation.reason,
       timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
@@ -44,7 +38,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: email,
+      owner: session.user.email,
     };
 
     const res = await collection.insertOne(deviationToInsert);
@@ -61,12 +55,11 @@ export async function insertDeviation(deviation: AddDeviationType) {
 }
 
 export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
+  const session = await auth();
+  if (!session || !session.user.email) {
+    redirect('/auth');
+  }
   try {
-    const session = await auth();
-    if (!session || !session.user.email) {
-      redirect('/auth');
-    }
-
     const collection = await dbc('deviations');
 
     const deviationDraftToInsert: DeviationType = {
@@ -80,6 +73,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
         drawingNumber: deviation.drawingNumber,
       }),
       ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
+      ...(deviation.unit && { unit: deviation.unit }),
       ...(deviation.charge && { charge: deviation.charge }),
       ...(deviation.reason && { reason: deviation.reason }),
       timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
@@ -98,6 +92,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
 
     const res = await collection.insertOne(deviationDraftToInsert);
     if (res) {
+      // redirect('/deviations');
       revalidateTag('deviations');
       return { success: 'inserted' };
     } else {
@@ -122,4 +117,8 @@ export async function findArticleName(articleNumber: string) {
     console.error(error);
     throw new Error('An error occurred while fetching the article name.');
   }
+}
+
+export async function redirectToAddDeviations() {
+  redirect('/deviations');
 }

@@ -73,16 +73,15 @@ export default function Header({ session, dict, lang }: HeaderProps) {
       href: '',
       submenu: [
         {
+          href: '/deviations',
+          title: `Odchylenia`,
+          description: `Zarządzanie odchyleniami produkcji.`,
+        },
+        {
           href: '/capa',
           title: `CAPA`,
           description: `Tabela CAPA dla artykułów.`,
         },
-      ],
-    },
-    {
-      title: `${dict?.header?.inventory?.title}`,
-      href: '',
-      submenu: [
         {
           href: '/inventory/main',
           title: `${dict?.header?.inventory?.inventory.title}`,
@@ -203,13 +202,13 @@ export default function Header({ session, dict, lang }: HeaderProps) {
   const selectedRoutes = lang === 'de' ? routesDe : routes;
 
   return (
-    <header className='border-b px-4 py-3 sm:flex sm:justify-between'>
+    <header className='px-6 py-4 sm:flex sm:justify-between'>
       <Container>
-        <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
+        <div className='relative flex h-6 w-full items-center justify-between '>
           <div className='flex items-center'>
             <Sheet>
               <SheetTrigger>
-                <Menu className='h-6 w-6 md:hidden' />
+                <Menu className='mr-2 h-6 w-6 md:hidden' />
               </SheetTrigger>
               <SheetContent side='left' className='w-[300px] sm:w-[400px]'>
                 <nav className='flex flex-col gap-4'>
@@ -247,7 +246,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 </nav>
               </SheetContent>
             </Sheet>
-            <Link href='/' className='ml-4 flex items-center lg:ml-0'>
+            <Link href='/' className='flex items-center'>
               <h1 className='font-bold'>Next</h1>
               <div className='w-24'>
                 <Logo />
@@ -255,7 +254,6 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             </Link>
           </div>
           <nav className='mx-6 hidden items-center space-x-4 md:block lg:space-x-6'>
-            {/* do i need flex className?  */}
             <NavigationMenu>
               <NavigationMenuList>
                 {selectedRoutes.map((route) =>
@@ -293,7 +291,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <div className='flex items-center gap-x-2 lg:gap-x-4'>
+          <div className='flex items-center space-x-2'>
             <UserAvatar
               userInitials={
                 session?.user.email
@@ -311,10 +309,9 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 logout();
                 // toast.success('Wylogowano!');
               }}
-              buttonStyle=''
             />
 
-            <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
+            <ThemeModeToggle />
           </div>
         </div>
       </Container>

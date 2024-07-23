@@ -17,6 +17,21 @@ import Link from 'next/link';
 import { Trash2, History, Pencil } from 'lucide-react';
 import { deleteDraftDeviation } from '../actions';
 import { DeviationType } from '@/lib/types/deviation';
+import { toast } from 'sonner';
+import { ObjectId } from 'mongodb';
+
+const handleCopyId = async (id: ObjectId | undefined) => {
+  if (id) {
+    try {
+      await navigator.clipboard.writeText(id.toString());
+      toast.success('ID skopiowane!');
+    } catch (error) {
+      toast.error('Nie udało się skopiować ID');
+    }
+  } else {
+    toast.error('Skontaktuj się z IT!');
+  }
+};
 
 export const columns: ColumnDef<DeviationType>[] = [
   {
@@ -97,11 +112,7 @@ export const columns: ColumnDef<DeviationType>[] = [
             )}
             {deviation.status !== 'draft' && (
               <DropdownMenuItem
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    deviation._id?.toString() ?? 'not available',
-                  );
-                }}
+                onClick={() => handleCopyId(deviation._id)}
                 // className=' focus:bg-red-400 dark:focus:bg-red-700'
               >
                 <Copy className='mr-2 h-4 w-4' />

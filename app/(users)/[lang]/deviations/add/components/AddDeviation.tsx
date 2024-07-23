@@ -31,7 +31,7 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { AArrowDown, CalendarIcon, Eraser, Pencil, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { Loader2 } from 'lucide-react';
@@ -43,6 +43,7 @@ import {
   insertDeviation,
   insertDraftDeviation,
   findArticleName,
+  redirectToAddDeviations,
 } from '../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
@@ -54,7 +55,7 @@ export default function AddDeviation({
 }: {
   reasons: DeviationReasonType[];
 }) {
-  const [isDraft, setIsDraft] = useState(false);
+  const [isDraft, setIsDraft] = useState(true);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
   const [isPendingFindArticleName, setIsPendingFindArticleName] =
@@ -86,6 +87,10 @@ export default function AddDeviation({
     setIsPendingFindArticleName(true);
     try {
       const articleNumber = form.getValues('articleNumber');
+      if (!articleNumber) {
+        toast.error('Wprowadź numer artykułu');
+        return;
+      }
       if (articleNumber.length === 5) {
         const res = await findArticleName(articleNumber);
         if (res.success) {
@@ -112,7 +117,8 @@ export default function AddDeviation({
       if (res?.success) {
         toast.success('Odchylenie dodane!');
         // form.reset()
-      } else if (res?.error) {
+        redirectToAddDeviations();
+      } else if (res?.error === 'not inserted') {
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
@@ -126,14 +132,15 @@ export default function AddDeviation({
   const handleDraftInsert = async (
     data: z.infer<typeof addDeviationDraftSchema>,
   ) => {
+    setIsDraft(true);
     setIsPendingInsertingDraft(true);
     try {
       const res = await insertDraftDeviation(data);
       if (res?.success) {
         toast.success('Szkic zapisany!');
-        // Możesz przekierować na stronę edycji szkicu tutaj, jeśli jest taka potrzeba
-        form.reset();
-      } else if (res?.error) {
+        // form.reset();
+        redirectToAddDeviations();
+      } else if (res?.error === 'not inserted') {
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
@@ -145,94 +152,112 @@ export default function AddDeviation({
   };
 
   return (
-    <Card className='w-[550px]'>
+    <Card className='w-[1024px]'>
       <CardHeader>
         <div className='flex justify-between'>
           <CardTitle>Nowe odchylenie</CardTitle>
-          <Link className='ml-4' href='/deviations'>
-            <Button variant='outline'>
+          <Link href='/deviations'>
+            <Button size='icon' variant='outline'>
               <Table />
             </Button>
           </Link>
         </div>
       </CardHeader>
       <Form {...form}>
-        {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}
-        <form
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          {/* <form
           onSubmit={form.handleSubmit(isDraft ? handleDraftInsert : onSubmit)}
-        >
+        > */}
           <CardContent className='grid w-full items-center gap-4'>
-            <FormField
-              control={form.control}
-              name='articleNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Artykuł</FormLabel>
-                  <div className='flex items-center space-x-2'>
+            <div className='flex space-x-2'>
+              <FormField
+                control={form.control}
+                name='articleNumber'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Artykuł</FormLabel>
                     <FormControl>
                       <Input
-                        className='w-[120px]'
+                        className='w-20'
                         autoFocus
                         placeholder='12345'
                         {...field}
                       />
                     </FormControl>
-                    {isPendingFindArticleName ? (
-                      <Button variant='secondary' type='button' disabled>
-                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                        Pobieranie
-                      </Button>
-                    ) : (
-                      <Button
-                        variant='secondary'
-                        type='button'
-                        onClick={handleFindArticleName}
-                      >
-                        Pobierz nazwę
-                      </Button>
-                    )}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name='articleName'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nazwa artykułu</FormLabel>
-                  <FormControl>
-                    <Input
-                      className='w-[350px]'
-                      placeholder='F-IWDR92,1L-ST'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='workplace'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stanowisko</FormLabel>
-                  <FormControl>
-                    <Input
-                      className='w-[240px]'
-                      placeholder='EOL74'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='articleName'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nazwa</FormLabel>
+                    <div className='flex items-center space-x-2'>
+                      <FormControl>
+                        <Input
+                          className='w-44'
+                          placeholder='F-IWDR92,1L-ST'
+                          {...field}
+                        />
+                      </FormControl>
+                      {isPendingFindArticleName ? (
+                        <Button
+                          size='icon'
+                          variant='outline'
+                          type='button'
+                          disabled
+                        >
+                          <Loader2 className='h-4 w-4 animate-spin' />
+                        </Button>
+                      ) : (
+                        <Button
+                          size='icon'
+                          variant='outline'
+                          type='button'
+                          onClick={handleFindArticleName}
+                        >
+                          <AArrowDown />
+                        </Button>
+                      )}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
+            <div className='flex space-x-2'>
+              <FormField
+                control={form.control}
+                name='workplace'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stanowisko</FormLabel>
+                    <FormControl>
+                      <Input className='w-36' placeholder='EOL74' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='area'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Obszar</FormLabel>
+                    <FormControl>
+                      <Input className='w-16' placeholder='Q4' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name='drawingNumber'
@@ -241,7 +266,7 @@ export default function AddDeviation({
                   <FormLabel>Numer rysunku</FormLabel>
                   <FormControl>
                     <Input
-                      className='w-[350px]'
+                      className='w-36'
                       placeholder='24769.08T'
                       {...field}
                     />
@@ -251,19 +276,59 @@ export default function AddDeviation({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name='quantity'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ilość</FormLabel>
-                  <FormControl>
-                    <Input className='w-[120px]' placeholder='997' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* TODO: add unit? */}
+            <div className='flex space-x-4'>
+              <FormField
+                control={form.control}
+                name='quantity'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ilość</FormLabel>
+                    <FormControl>
+                      <Input className='w-20' placeholder='997' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='unit'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Jednostka</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        // defaultValue={field.value}
+                        className='flex flex-col'
+                      >
+                        <FormItem
+                          key={'szt'}
+                          className='flex items-center space-x-3 space-y-0'
+                        >
+                          <FormControl>
+                            <RadioGroupItem value='szt' />
+                          </FormControl>
+                          <FormLabel className='font-normal'>szt</FormLabel>
+                        </FormItem>
+                        <FormItem
+                          key={'kg'}
+                          className='flex items-center space-x-3 space-y-0'
+                        >
+                          <FormControl>
+                            <RadioGroupItem value='kg' />
+                          </FormControl>
+                          <FormLabel className='font-normal'>kg</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -273,7 +338,7 @@ export default function AddDeviation({
                   <FormLabel>Partia</FormLabel>
                   <FormControl>
                     <Input
-                      className='w-[350px]'
+                      className='w-72'
                       placeholder='MATC188678/188352/188501/188679'
                       {...field}
                     />
@@ -332,117 +397,105 @@ export default function AddDeviation({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name='periodFrom'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Odchylenie od</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={'outline'}
-                          className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, 'PPP')
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
-                      <Calendar
-                        mode='single'
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => {
-                          const today = new Date();
-                          const minDate = new Date(today);
-                          minDate.setDate(today.getDate() - 7);
-                          const maxDate = new Date(today);
-                          maxDate.setDate(today.getDate() + 7);
-                          return date < minDate || date > maxDate;
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {/* <FormDescription>
+            <div className='flex space-x-2'>
+              <FormField
+                control={form.control}
+                name='periodFrom'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Odchylenie od</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-56 pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => {
+                            const today = new Date();
+                            const minDate = new Date(today);
+                            minDate.setDate(today.getDate() - 7);
+                            const maxDate = new Date(today);
+                            maxDate.setDate(today.getDate() + 7);
+                            return date < minDate || date > maxDate;
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {/* <FormDescription>
                 Your date of birth is used to calculate your age.
               </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='periodTo'
-              render={({ field }) => (
-                <FormItem className='flex flex-col'>
-                  <FormLabel>Odchylenie do</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={'outline'}
-                          className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, 'PPP')
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
-                      <Calendar
-                        mode='single'
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => {
-                          const today = new Date();
-                          const maxDate = new Date(today);
-                          maxDate.setDate(today.getDate() + 180);
-                          return date < today || date > maxDate;
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {/* <FormDescription>
+              <FormField
+                control={form.control}
+                name='periodTo'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Odchylenie do</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-56 pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'PPP')
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => {
+                            const today = new Date();
+                            const maxDate = new Date(today);
+                            maxDate.setDate(today.getDate() + 180);
+                            return date < today || date > maxDate;
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {/* <FormDescription>
                 Your date of birth is used to calculate your age.
               </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='area'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Obszar</FormLabel>
-                  <FormControl>
-                    <Input className='w-[120px]' placeholder='Q4' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -468,7 +521,7 @@ export default function AddDeviation({
                 <FormItem>
                   <FormLabel>Numer części klienta</FormLabel>
                   <FormControl>
-                    <Input className='w-[240px]' placeholder='' {...field} />
+                    <Input className='w-48' placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -504,6 +557,7 @@ export default function AddDeviation({
               type='button'
               onClick={() => form.reset()}
             >
+              <Eraser className='mr-2 h-4 w-4' />
               Wyczyść
             </Button>
             <div className='flex space-x-2'>
@@ -521,6 +575,7 @@ export default function AddDeviation({
                     form.handleSubmit(handleDraftInsert)();
                   }}
                 >
+                  <Pencil className='mr-2 h-4 w-4' />
                   Zapisz szkic
                 </Button>
               )}
@@ -530,7 +585,10 @@ export default function AddDeviation({
                   Dodawanie
                 </Button>
               ) : (
-                <Button type='submit'>Dodaj odchylenie</Button>
+                <Button type='submit'>
+                  <Plus className='mr-2 h-4 w-4' />
+                  Dodaj odchylenie
+                </Button>
               )}
             </div>
           </CardFooter>

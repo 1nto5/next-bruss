@@ -4,6 +4,7 @@ import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 import { extractNameFromEmail } from '@/lib//utils/nameFormat';
 import { DeviationType } from '@/lib/types/deviation';
+import Container from '@/components/ui/container';
 async function getDeviations(lang: string): Promise<{
   fetchTime: string;
   deviations: DeviationType[];
@@ -39,8 +40,11 @@ export default async function DeviationsPage({
 }) {
   const { fetchTime, deviations } = await getDeviations(lang);
   return (
-    <main className='mx-auto px-4 py-4 lg:px-8'>
-      <DataTable columns={columns} data={deviations} fetchTime={fetchTime} />
-    </main>
+    // <main className='mx-auto px-8 py-4 lg:px-4'>
+    <Container>
+      <main className='flex justify-center'>
+        <DataTable columns={columns} data={deviations} fetchTime={fetchTime} />
+      </main>
+    </Container>
   );
 }

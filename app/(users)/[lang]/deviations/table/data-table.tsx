@@ -38,6 +38,7 @@ import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
 import { revalidateDeviations } from '../actions';
 import Link from 'next/link';
+import Container from '@/components/ui/container';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -67,6 +68,11 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageSize: 14,
+      },
+    },
   });
 
   return (
@@ -74,20 +80,20 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Odchylenia</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between py-4'>
-          <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0'>
+        <div className='flex items-center justify-between'>
+          <div className='flex flex-row space-x-1'>
             <Input
               autoFocus
-              placeholder='id odchylenia'
+              placeholder='id'
               value={(table.getColumn('_id')?.getFilterValue() as string) ?? ''}
               onChange={(event) =>
                 table.getColumn('_id')?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-24'
             />
             <Input
               autoFocus
-              placeholder='numer artykułu'
+              placeholder='numer art.'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -98,10 +104,10 @@ export function DataTable<TData, TValue>({
                   .getColumn('articleNumber')
                   ?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-28'
             />
             <Input
-              placeholder='nazwa artykułu'
+              placeholder='nazwa art.'
               value={
                 (table.getColumn('articleName')?.getFilterValue() as string) ??
                 ''
@@ -111,7 +117,7 @@ export function DataTable<TData, TValue>({
                   .getColumn('articleName')
                   ?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-32'
             />
             {/* <Input
               placeholder='stanowisko'
@@ -124,16 +130,16 @@ export function DataTable<TData, TValue>({
               className='mr-2 max-w-xs'
             /> */}
           </div>
-          <div className='flex'>
+          <div className='flex items-center space-x-1'>
             <Link href='/deviations/add'>
-              <Button className='mr-2 justify-end' variant='outline'>
+              <Button variant='outline' size='icon'>
                 <CopyPlus />
               </Button>
             </Link>
             <Button
-              className='justify-end'
               variant='outline'
               onClick={() => revalidateDeviations()}
+              size='icon'
             >
               <RefreshCcw />
             </Button>
