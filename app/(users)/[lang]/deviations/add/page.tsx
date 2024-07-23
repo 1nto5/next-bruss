@@ -5,21 +5,15 @@ import { DeviationReasonType } from '@/lib/types/deviation';
 import Container from '@/components/ui/container';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
-  try {
-    const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
-      next: { revalidate: 0, tags: ['deviationReasons'] },
-    });
+  const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
+    next: { revalidate: 0, tags: ['deviationReasons'] },
+  });
 
-    if (!res.ok) {
-      throw new Error('getting deviation reasons: ' + res.status);
-    }
-    const data = await res.json();
-    console.log('res', res.status);
-    return data;
-  } catch (error) {
-    console.error('getting deviation reasons:', error);
-    throw error;
+  if (!res.ok) {
+    throw new Error('getting deviation reasons: ' + res.status);
   }
+  const data = await res.json();
+  return data;
 }
 
 export default async function AddDeviationPage({

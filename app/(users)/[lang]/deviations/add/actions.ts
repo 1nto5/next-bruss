@@ -23,8 +23,12 @@ export async function insertDeviation(deviation: AddDeviationType) {
       ...(deviation.drawingNumber && {
         drawingNumber: deviation.drawingNumber,
       }),
-      ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
-      ...(deviation.unit && { unit: deviation.unit }),
+      ...(deviation.quantity && {
+        quantity: {
+          value: Number(deviation.quantity),
+          unit: deviation.unit && deviation.unit,
+        },
+      }),
       ...(deviation.charge && { charge: deviation.charge }),
       reason: deviation.reason,
       timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
@@ -72,7 +76,12 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
       ...(deviation.drawingNumber && {
         drawingNumber: deviation.drawingNumber,
       }),
-      ...(deviation.quantity && { quantity: Number(deviation.quantity) }),
+      ...(deviation.quantity && {
+        quantity: {
+          value: Number(deviation.quantity),
+          unit: deviation.unit && deviation.unit,
+        },
+      }),
       ...(deviation.unit && { unit: deviation.unit }),
       ...(deviation.charge && { charge: deviation.charge }),
       ...(deviation.reason && { reason: deviation.reason }),
@@ -121,4 +130,8 @@ export async function findArticleName(articleNumber: string) {
 
 export async function redirectToAddDeviations() {
   redirect('/deviations');
+}
+
+export async function revalidateReasons() {
+  revalidateTag('deviationReasons');
 }
