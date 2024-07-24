@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Trash2, Pencil } from 'lucide-react';
-import { deleteUser } from '.././actions';
+import { deleteUser } from '../actions';
 import { UserType } from '@/lib/types/user';
 
 import { toast } from 'sonner';

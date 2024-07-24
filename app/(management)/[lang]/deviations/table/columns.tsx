@@ -44,32 +44,48 @@ export const columns: ColumnDef<DeviationType>[] = [
       switch (status) {
         case 'approval':
           statusLabel = (
-            <span className='italic text-orange-500'>
+            <span className='rounded-md bg-orange-100 px-2 py-1 italic dark:bg-orange-600'>
               W trakcie zatwierdzania
             </span>
           );
           break;
         case 'valid':
           statusLabel = (
-            <span className='font-bold text-green-600'>Obowiązuje</span>
+            <span className='rounded-md bg-green-100 px-2 py-1 font-bold dark:bg-green-600'>
+              Obowiązuje
+            </span>
           );
           break;
         case 'closed':
-          statusLabel = <span className=''>Zamknięte</span>;
+          statusLabel = (
+            <span className='rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-600'>
+              Zamknięte
+            </span>
+          );
           break;
         case 'rejected':
-          statusLabel = <span className='text-red-600'>Odrzucone</span>;
+          statusLabel = (
+            <span className='rounded-md bg-red-100 px-2 py-1 dark:bg-red-600'>
+              Odrzucone
+            </span>
+          );
+          break;
+        case 'to approve':
+          statusLabel = (
+            <span className='rounded-md bg-yellow-100 px-2 py-1 dark:bg-yellow-600'>
+              Do zatwierdzenia
+            </span>
+          );
           break;
         case 'draft':
           statusLabel = (
-            <span className='font-extralight italic tracking-widest text-gray-600'>
+            <span className='rounded-md bg-gray-100 px-2 py-1 font-extralight italic tracking-widest dark:bg-gray-600'>
               Szkic
             </span>
           );
           break;
         default:
-          statusLabel = <span className='text-gray-600'>Nieznany</span>;
-          break;
+          statusLabel = <span>{status}</span>;
       }
 
       return statusLabel;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getSession } from '@/app/(users)/[lang]/auth/actions';
+import { getSession } from '@/app/(management)/[lang]/auth/actions';
 import { Session } from 'next-auth';
 import { useContext } from 'react';
 import { InventoryContext } from '../lib/InventoryContext';

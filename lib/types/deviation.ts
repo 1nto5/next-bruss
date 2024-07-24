@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-type ApprovalType = {
+export type ApprovalType = {
   approved: boolean;
   by: string;
   at: Date;
@@ -8,7 +8,14 @@ type ApprovalType = {
 
 export type DeviationType = {
   _id?: ObjectId;
-  status: string;
+  status:
+    | 'rejected'
+    | 'approved'
+    | 'approval'
+    | 'valid'
+    | 'closed'
+    | 'draft'
+    | string;
   articleNumber?: string;
   articleName?: string;
   workplace?: string;
@@ -28,9 +35,9 @@ export type DeviationType = {
   approvedAt?: Date;
   closedAt?: Date;
   groupLeaderApproval?: ApprovalType;
-  qualityApproval?: ApprovalType;
-  engineeringAproval?: ApprovalType;
-  maintenanceApproval?: ApprovalType;
+  qualityManagerApproval?: ApprovalType;
+  engineeringManagerAproval?: ApprovalType;
+  maintenanceManagerApproval?: ApprovalType;
   productionManagerApproval?: ApprovalType;
   // plantManagerApproval: ApprovalType;
 };
