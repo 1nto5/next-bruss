@@ -104,7 +104,6 @@ function fordDateValidation(dmc: string) {
 function bmwDateValidation(dmc: string) {
   const today = new Date();
   const dmcDate = parseInt(dmc.slice(17, 23));
-
   for (let i = 0; i <= 30; i++) {
     const checkDate = new Date(today.getTime() - i * 24 * 60 * 60 * 1000);
     const checkDateFormatted = parseInt(
@@ -113,6 +112,14 @@ function bmwDateValidation(dmc: string) {
     if (dmcDate === checkDateFormatted) {
       return true;
     }
+  }
+  // preventing differences in time zones
+  const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowDate = parseInt(
+    tomorrow.toISOString().slice(2, 10).split('-').join(''),
+  );
+  if (dmcDate === tomorrowDate) {
+    return true;
   }
   return false;
 }
