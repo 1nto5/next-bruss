@@ -5,4 +5,5 @@ TODO: how much scans on shift for operator
 TODO: MS365 login
 TODO: copy article config to new article
 TODO: fix tables in admin sections (like deviations and capa)
+TODO: fix add / edit pages for capa and admin sections (like deviations)
 */
