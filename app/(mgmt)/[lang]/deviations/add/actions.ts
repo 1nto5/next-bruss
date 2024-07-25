@@ -63,6 +63,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
   if (!session || !session.user.email) {
     redirect('/auth');
   }
+
   try {
     const collection = await dbc('deviations');
 
@@ -101,7 +102,6 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
 
     const res = await collection.insertOne(deviationDraftToInsert);
     if (res) {
-      // redirect('/deviations');
       revalidateTag('deviations');
       return { success: 'inserted' };
     } else {
@@ -124,11 +124,11 @@ export async function findArticleName(articleNumber: string) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while fetching the article name.');
+    return { error: 'findArticleName server action error' };
   }
 }
 
-export async function redirectToAddDeviations() {
+export async function redirectToDeviations() {
   redirect('/deviations');
 }
 

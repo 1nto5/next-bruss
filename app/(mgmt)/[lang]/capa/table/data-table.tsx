@@ -83,11 +83,11 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>CAPA</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between py-4'>
-          <div className='flex'>
+        <div className='flex items-center justify-between'>
+          <div className='flex flex-row space-x-1'>
             <Input
               autoFocus
-              placeholder='Wyszukaj nr. artykułu...'
+              placeholder='nr. art.'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -98,27 +98,27 @@ export function DataTable<TData, TValue>({
                   .getColumn('articleNumber')
                   ?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-28'
             />
             <Input
-              placeholder='Wyszukaj klientów...'
+              placeholder='klient'
               value={
                 (table.getColumn('client')?.getFilterValue() as string) ?? ''
               }
               onChange={(event) =>
                 table.getColumn('client')?.setFilterValue(event.target.value)
               }
-              className='max-w-xs'
+              className='w-36'
             />
           </div>
-          <div className='flex'>
+          <div className='flex items-center space-x-1'>
             <Link href='/capa/add'>
-              <Button className='mr-2 justify-end' variant='outline'>
+              <Button size='icon' variant='outline'>
                 <CopyPlus />
               </Button>
             </Link>
             <Button
-              className='justify-end'
+              size='icon'
               variant='outline'
               onClick={() => revalidateCapa()}
             >

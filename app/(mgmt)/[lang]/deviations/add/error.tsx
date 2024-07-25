@@ -9,14 +9,13 @@ import { useTransition } from 'react';
 import { revalidateReasons as revalidate } from './actions';
 
 export default function Error({
-  error,
+  // error,
   reset,
 }: {
-  error: Error;
+  // error: Error;
   reset: () => void;
 }) {
   const router = useRouter();
-  // const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const reload = () => {

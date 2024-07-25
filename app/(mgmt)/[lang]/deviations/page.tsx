@@ -13,11 +13,11 @@ async function getAllDeviations(lang: string): Promise<{
   deviations: DeviationType[];
 }> {
   const res = await fetch(`${process.env.API}/deviations/get-deviations`, {
-    next: { revalidate: 0, tags: ['deviations'] },
+    next: { revalidate: 60 * 15, tags: ['deviations'] },
   });
 
   if (!res.ok) {
-    throw new Error('getting deviations: ' + res.status);
+    throw new Error('getAllDeviations fetch res: ' + res.status);
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
@@ -50,10 +50,10 @@ async function getUserDeviations(
   deviations: DeviationType[];
 }> {
   const res = await fetch(`${process.env.API}/deviations/get-deviations`, {
-    next: { revalidate: 0, tags: ['deviations'] },
+    next: { revalidate: 60 * 15, tags: ['deviations'] },
   });
   if (!res.ok) {
-    throw new Error('getting deviations: ' + res.status);
+    throw new Error('getUserDeviations res: ' + res.status);
   }
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);

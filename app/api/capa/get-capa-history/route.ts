@@ -9,16 +9,16 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   const articleNumber = req.nextUrl.searchParams.get('articleNumber') ?? '';
-  const capaHistoryCol = await dbc('capa_history');
-  const capaCol = await dbc('capa');
-
-  const capaHistory = await capaHistoryCol
-    .find({ articleNumber: articleNumber })
-    .toArray();
-
-  const capa = await capaCol.findOne({ articleNumber: articleNumber });
-
-  const combined = [...capaHistory, capa];
-
-  return new NextResponse(JSON.stringify(combined));
+  try {
+    const capaHistoryCol = await dbc('capa_history');
+    const capaCol = await dbc('capa');
+    const capaHistory = await capaHistoryCol
+      .find({ articleNumber: articleNumber })
+      .toArray();
+    const capa = await capaCol.findOne({ articleNumber: articleNumber });
+    const combined = [...capaHistory, capa];
+    return new NextResponse(JSON.stringify(combined));
+  } catch (error) {
+    return new NextResponse('get-capa-history api error', { status: 503 });
+  }
 }

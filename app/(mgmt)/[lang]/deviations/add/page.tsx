@@ -6,7 +6,7 @@ import Container from '@/components/ui/container';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
-    next: { revalidate: 0, tags: ['deviationReasons'] },
+    next: { revalidate: 60 * 60, tags: ['deviationReasons'] },
   });
 
   if (!res.ok) {

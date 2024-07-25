@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { revalidateDeviations as revalidate } from './actions';
+import { revalidateCapa as revalidate } from './actions';
 
 export default function Error({
   // error,

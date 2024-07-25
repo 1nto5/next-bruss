@@ -10,10 +10,14 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     const coll = await dbc('deviations');
-    const deviations = await coll.find({}).sort({ _id: -1 }).toArray();
+    const deviations = await coll
+      .find({})
+      .sort({ _id: -1 })
+      .limit(1000)
+      .toArray();
     return new NextResponse(JSON.stringify(deviations));
   } catch (error) {
-    console.error('api/deviations/get-reasons: ' + error);
+    console.error('api/deviations/get-deviations: ' + error);
     return new NextResponse('get-deviations api error', { status: 503 });
   }
 }

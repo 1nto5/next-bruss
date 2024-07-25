@@ -50,17 +50,6 @@ export function DataTable<TData, TValue>({
   fetchTime,
   articleNumber,
 }: DataTableProps<TData, TValue>) {
-  //   React.useEffect(() => {
-  //     const intervalId = setInterval(
-  //       () => {
-  //         revalidateCapa();
-  //       },
-  //       1 * 60 * 1000,
-  //     ); // 5 minutes in milliseconds
-
-  //     // Clear interval on component unmount
-  //     return () => clearInterval(intervalId);
-  //   }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -85,21 +74,19 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Historia CAPA {articleNumber}</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-end py-4'>
-          <div className='flex'>
-            <Link href='/capa'>
-              <Button className='mr-2 justify-end' variant='outline'>
-                <TableIcon />
-              </Button>
-            </Link>
-            <Button
-              className='justify-end'
-              variant='outline'
-              onClick={() => revalidateCapa()}
-            >
-              <RefreshCcw />
+        <div className='flex items-center justify-end space-x-1'>
+          <Link href='/capa'>
+            <Button size='icon' variant='outline'>
+              <TableIcon />
             </Button>
-          </div>
+          </Link>
+          <Button
+            size='icon'
+            variant='outline'
+            onClick={() => revalidateCapa()}
+          >
+            <RefreshCcw />
+          </Button>
         </div>
       </CardHeader>
       <CardContent>

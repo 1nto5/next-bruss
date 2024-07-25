@@ -8,8 +8,11 @@ export const dynamic = 'force-dynamic';
 // 'auto' | 'force-dynamic' | 'error' | 'force-static'
 
 export async function GET(req: NextRequest) {
-  // console.log('getAllCapa:', new Date().toLocaleString('pl'));
-  const capaCol = await dbc('capa');
-  const allCapa = await capaCol.find({}).toArray();
-  return new NextResponse(JSON.stringify(allCapa));
+  try {
+    const coll = await dbc('capa');
+    const allCapa = await coll.find({}).toArray();
+    return new NextResponse(JSON.stringify(allCapa));
+  } catch (error) {
+    return new NextResponse('get-all-capa api error', { status: 503 });
+  }
 }

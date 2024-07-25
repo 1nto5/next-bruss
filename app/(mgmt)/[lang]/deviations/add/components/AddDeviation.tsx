@@ -43,7 +43,7 @@ import {
   insertDeviation,
   insertDraftDeviation,
   findArticleName,
-  redirectToAddDeviations,
+  redirectToDeviations,
 } from '../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
@@ -116,7 +116,7 @@ export default function AddDeviation({
       if (res?.success) {
         toast.success('Odchylenie dodane!');
         // form.reset()
-        redirectToAddDeviations();
+        redirectToDeviations();
       } else if (res?.error === 'not inserted') {
         toast.error('Skontaktuj się z IT!');
       }
@@ -137,7 +137,7 @@ export default function AddDeviation({
       if (res?.success) {
         toast.success('Szkic zapisany!');
         // form.reset();
-        redirectToAddDeviations();
+        redirectToDeviations();
       } else if (res?.error === 'not inserted') {
         toast.error('Skontaktuj się z IT!');
       }
