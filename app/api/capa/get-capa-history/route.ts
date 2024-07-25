@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
     const combined = [...capaHistory, capa];
     return new NextResponse(JSON.stringify(combined));
   } catch (error) {
+    console.error(error);
     return new NextResponse('get-capa-history api error', { status: 503 });
   }
 }

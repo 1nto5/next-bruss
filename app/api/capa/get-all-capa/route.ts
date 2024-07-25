@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     const allCapa = await coll.find({}).toArray();
     return new NextResponse(JSON.stringify(allCapa));
   } catch (error) {
+    console.error(error);
     return new NextResponse('get-all-capa api error', { status: 503 });
   }
 }
