@@ -34,7 +34,7 @@ import {
 import { Button } from '@/components/ui/button';
 // import { Input } from '@/components/ui/input';
 import { ArrowRight, Table as TableIcon, RefreshCcw } from 'lucide-react';
-import { revalidateCapa } from '../../../actions';
+import { revalidateCapaHistory } from '../actions';
 import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
@@ -83,7 +83,7 @@ export function DataTable<TData, TValue>({
           <Button
             size='icon'
             variant='outline'
-            onClick={() => revalidateCapa()}
+            onClick={() => revalidateCapaHistory()}
           >
             <RefreshCcw />
           </Button>
