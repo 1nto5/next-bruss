@@ -17,3 +17,18 @@ export async function GET(req: NextRequest) {
     return new NextResponse('get-deviations api error', { status: 503 });
   }
 }
+
+// export async function GET(req: NextRequest) {
+//   try {
+//     const coll = await dbc('deviations');
+//     const deviations = await coll.find({}).sort({ _id: -1 }).toArray();
+//     return new Promise((resolve, reject) => {
+//       setTimeout(() => {
+//         resolve(new NextResponse(JSON.stringify(deviations)));
+//       }, 2500); // 5 seconds timeout
+//     });
+//   } catch (error) {
+//     console.error('api/deviations/get-reasons: ' + error);
+//     return new NextResponse('get-deviations api error', { status: 503 });
+//   }
+// }
