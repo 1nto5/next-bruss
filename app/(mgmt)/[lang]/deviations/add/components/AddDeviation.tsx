@@ -2,7 +2,7 @@
 // TODO: get article name
 
 'use client';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -59,8 +59,8 @@ export default function AddDeviation({
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
-  const [isPendingFindArticleName, setIsPendingFindArticleName] =
-    useState(false);
+  const [isPendingFindArticleName, startFindArticleNameTransition] =
+    useTransition();
 
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
@@ -83,29 +83,31 @@ export default function AddDeviation({
   });
 
   const handleFindArticleName = async () => {
-    setIsPendingFindArticleName(true);
-    try {
-      const articleNumber = form.getValues('articleNumber');
-      if (!articleNumber) {
-        toast.error('Wprowadź numer artykułu');
-        return;
-      }
-      if (articleNumber.length === 5) {
-        const res = await findArticleName(articleNumber);
-        if (res.success) {
-          form.setValue('articleName', res.success);
-        } else if (res.error === 'not found') {
-          toast.error('Nie znaleziono artykułu');
+    startFindArticleNameTransition(async () => {
+      try {
+        const articleNumber = form.getValues('articleNumber');
+        if (!articleNumber) {
+          toast.error('Wprowadź numer artykułu');
+          return;
         }
-      } else {
-        toast.error('Wprowadź poprawny numer artykułu');
+        if (articleNumber.length === 5) {
+          const res = await findArticleName(articleNumber);
+          if (res.success) {
+            form.setValue('articleName', res.success);
+          } else if (res.error === 'not found') {
+            toast.error('Nie znaleziono artykułu');
+          } else if (res.error) {
+            console.error(res.error);
+            toast.error('Skontaktuj się z IT!');
+          }
+        } else {
+          toast.error('Wprowadź poprawny numer artykułu');
+        }
+      } catch (error) {
+        console.error('handleFindArticleName', error);
+        toast.error('Skontaktuj się z IT!');
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPendingFindArticleName(false);
-    }
+    });
   };
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
