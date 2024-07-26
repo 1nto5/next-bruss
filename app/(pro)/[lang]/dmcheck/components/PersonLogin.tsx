@@ -33,8 +33,6 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
   useEffect(() => {
     if (state?.message === 'not valid') {
       toast.error(cDict.loginNotValid);
-    } else if (state?.message === 'error') {
-      toast.error(cDict.loginNotValid);
     } else if (state?.message === 'not exist') {
       toast.error(cDict.loginNotExist);
     } else {

@@ -34,23 +34,38 @@ export async function personLogin(
     return { message: person._id.toString() };
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred during the login process.');
+    throw new Error('personLogin server action error');
   }
 }
 
-export async function getArticlesConfigForWorkplace(workplace: string) {
-  const collection = await dbc('articles_config');
-  return await collection.find({ workplace }).toArray();
+export async function getArticlesForWorkplace(workplace: string) {
+  try {
+    const coll = await dbc('articles_config');
+    return await coll.find({ workplace }).toArray();
+  } catch (error) {
+    console.error(error);
+    throw new Error('getArticlesForWorkplace server action error');
+  }
 }
 
 export async function getArticleConfigById(articleConfigId: string) {
-  const collection = await dbc('articles_config');
-  return await collection.findOne({ _id: new ObjectId(articleConfigId) });
+  try {
+    const collection = await dbc('articles_config');
+    return await collection.findOne({ _id: new ObjectId(articleConfigId) });
+  } catch (error) {
+    console.error(error);
+    throw new Error('getArticleConfigById server action error');
+  }
 }
 
 export async function getOperatorById(operatorId: string) {
-  const collection = await dbc('persons');
-  return await collection.findOne({ _id: new ObjectId(operatorId) });
+  try {
+    const collection = await dbc('persons');
+    return await collection.findOne({ _id: new ObjectId(operatorId) });
+  } catch (error) {
+    console.error(error);
+    throw new Error('getOperatorById server action error');
+  }
 }
 
 // FORD DATE VALIDATION
@@ -219,27 +234,21 @@ export async function saveDmc(prevState: any, formData: FormData) {
       articleConfig.workplace === 'eol488'
     ) {
       const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok || response.status === 404) {
-          return { message: 'smart fetch error' };
-        }
-        const data = await response.text();
-        console.log(data);
-        switch (data) {
-          case 'NOT_FOUND':
-            return { message: 'smart not found' };
-          case 'UNKNOWN':
-            return { message: 'smart unknown' };
-          case 'NOK':
-            return { message: 'smart nok' };
-          case 'PATTERN':
-            return { message: 'smart pattern' };
-        }
-      } catch (error) {
-        throw new Error(
-          'An error occurred while fetching the part status from SMART.',
-        );
+
+      const response = await fetch(url);
+      if (!response.ok || response.status === 404) {
+        return { message: 'smart fetch error' };
+      }
+      const data = await response.text();
+      switch (data) {
+        case 'NOT_FOUND':
+          return { message: 'smart not found' };
+        case 'UNKNOWN':
+          return { message: 'smart unknown' };
+        case 'NOK':
+          return { message: 'smart nok' };
+        case 'PATTERN':
+          return { message: 'smart pattern' };
       }
     }
 
@@ -259,7 +268,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
     }
   } catch (error) {
     console.error(error);
-    return { message: 'saving error' };
+    throw new Error('saveDmc server action error');
   }
 }
 
@@ -340,7 +349,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
     }
   } catch (error) {
     console.error(error);
-    return { message: 'saving error' };
+    throw new Error('saveHydra server action error');
   }
 }
 
@@ -443,6 +452,6 @@ export async function savePallet(prevState: any, formData: FormData) {
     }
   } catch (error) {
     console.error(error);
-    return { message: 'saving error' };
+    throw new Error('savePallet server action error');
   }
 }

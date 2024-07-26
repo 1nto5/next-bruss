@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { getArticlesConfigForWorkplace } from '../actions';
+import { getArticlesForWorkplace } from '../actions';
 import { Info } from '../components/Info';
 
 import Link from 'next/link';
@@ -23,11 +23,9 @@ export default async function ArticleSelectionPage({
 }) {
   const dict = await getDictionary(lang);
   const cDict = dict.dmcheck.articleSelection;
+  const workplaceArticles = await getArticlesForWorkplace(workplaceName);
 
-  const articlesConfigForWorkplace =
-    await getArticlesConfigForWorkplace(workplaceName);
-
-  if (articlesConfigForWorkplace.length === 0) {
+  if (workplaceArticles.length === 0) {
     return (
       <Info
         title={cDict.noArticleConfigForWorkplaceTitle}
@@ -36,8 +34,8 @@ export default async function ArticleSelectionPage({
     );
   }
 
-  articlesConfigForWorkplace.sort((a, b) => a.articleNumber - b.articleNumber);
-  const showPalletColumn = articlesConfigForWorkplace.some((a) => a.pallet);
+  workplaceArticles.sort((a, b) => a.articleNumber - b.articleNumber);
+  const showPalletColumn = workplaceArticles.some((a) => a.pallet);
 
   return (
     <Card className='w-max-7xl'>
@@ -87,7 +85,7 @@ export default async function ArticleSelectionPage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {articlesConfigForWorkplace.map((a) => (
+            {workplaceArticles.map((a) => (
               <Link
                 legacyBehavior
                 key={a.articleNumber}

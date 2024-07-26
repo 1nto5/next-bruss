@@ -4,8 +4,6 @@ import { StatusBar } from '../../../components/StatusBar';
 import { redirect } from 'next/navigation';
 import { Scan } from '../../../components/Scan';
 
-export const revalidate = 0;
-
 import {
   getArticleConfigById,
   getOperatorById,
@@ -66,7 +64,7 @@ export default async function ScanPage({
       const boxStatusRes = await fetch(
         `${process.env.API}/dmcheck/box-status?articleConfigId=${articleConfigId}`,
         {
-          next: { tags: ['box'] },
+          next: { revalidate: 0, tags: ['box'] },
         },
       );
       const boxStatus = await boxStatusRes.json();
@@ -84,7 +82,7 @@ export default async function ScanPage({
       const palletStatusRes = await fetch(
         `${process.env.API}/dmcheck/pallet-status?articleConfigId=${articleConfigId}`,
         {
-          next: { tags: ['pallet'] },
+          next: { revalidate: 0, tags: ['pallet'] },
         },
       );
 

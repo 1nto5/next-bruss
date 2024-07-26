@@ -4,29 +4,47 @@ import { Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
+// import { revalidateDeviations as revalidate } from './actions';
 
-export default function GlobalError({
-  error,
+export default function Error({
+  // error,
   reset,
 }: {
-  error: Error & { digest?: string };
+  // error: Error;
   reset: () => void;
 }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const reload = () => {
+    startTransition(() => {
+      // revalidate();
+      router.refresh();
+      reset();
+    });
+  };
+
   return (
-    <html>
-      <body>
-        <main className='flex h-screen items-center justify-center'>
-          <Alert className='w-[450px]'>
-            <Terminal className='h-4 w-4' />
-            <AlertTitle>Something went wrong!</AlertTitle>
-            <AlertDescription className='flex justify-end'>
-              <Button className='ml-auto' onClick={() => reset()}>
-                <RefreshCcw className='mr-2 h-4 w-4' /> Try again
-              </Button>
-            </AlertDescription>
-          </Alert>
-        </main>
-      </body>
-    </html>
+    <Alert className='w-[450px]'>
+      <Terminal className='h-4 w-4' />
+      <AlertTitle>Something went wrong!</AlertTitle>
+      <AlertDescription className='mt-8 flex justify-end'>
+        <Button onClick={reload} disabled={isPending}>
+          {isPending ? (
+            <span className='flex items-center'>
+              <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+              Loading
+            </span>
+          ) : (
+            <span className='flex items-center'>
+              <RefreshCcw className='mr-2 h-4 w-4' />
+              Try again
+            </span>
+          )}
+        </Button>
+      </AlertDescription>
+    </Alert>
   );
 }

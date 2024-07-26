@@ -93,10 +93,10 @@ export function Scan({
         playNok();
         toast.error(cDict.toast.qrWrongProcess);
         break;
-      case 'saving error':
-        playNok();
-        toast.error(cDict.toast.unknownSavingError);
-        break;
+      // case 'saving error':
+      //   playNok();
+      //   toast.error(cDict.toast.unknownSavingError);
+      //   break;
       case '40040 nok':
         playNok();
         toast.error(cDict.toast.nok);
