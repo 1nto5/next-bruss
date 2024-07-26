@@ -54,7 +54,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the deviation.');
+    return { error: 'insertDeviation server action error' };
   }
 }
 
@@ -109,7 +109,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the deviation.');
+    return { error: 'insertDraftDeviation server action error' };
   }
 }
 

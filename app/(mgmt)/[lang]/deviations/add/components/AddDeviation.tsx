@@ -115,15 +115,16 @@ export default function AddDeviation({
     setIsPendingInserting(true);
     try {
       const res = await insertDeviation(data);
-      if (res?.success) {
+      if (res.success) {
         toast.success('Odchylenie dodane!');
         // form.reset()
         redirectToDeviations();
-      } else if (res?.error === 'not inserted') {
+      } else if (res.error) {
+        console.error(res.error);
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPendingInserting(false);
@@ -136,15 +137,16 @@ export default function AddDeviation({
     setIsPendingInsertingDraft(true);
     try {
       const res = await insertDraftDeviation(data);
-      if (res?.success) {
+      if (res.success) {
         toast.success('Szkic zapisany!');
         // form.reset();
         redirectToDeviations();
-      } else if (res?.error === 'not inserted') {
+      } else if (res.error) {
+        console.error(res.error);
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error('handleDraftInsert', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPendingInsertingDraft(false);
