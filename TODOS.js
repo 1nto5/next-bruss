@@ -7,4 +7,5 @@ TODO: copy article config to new article
 TODO: fix tables in admin sections (like deviations and capa)
 TODO: fix add / edit pages for capa and admin sections (like deviations)
 TODO: fix errors from server actions (like findArticleName add deviation)
+TODO: period from cant be older than period to
 */
