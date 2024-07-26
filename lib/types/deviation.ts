@@ -8,6 +8,7 @@ export type ApprovalType = {
 
 export type DeviationType = {
   _id?: ObjectId;
+  id?: string;
   status:
     | 'rejected'
     | 'approved'
