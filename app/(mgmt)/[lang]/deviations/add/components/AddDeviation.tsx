@@ -73,8 +73,8 @@ export default function AddDeviation({
       // charge: '',
       // description: '',
       // reason: '',
-      periodFrom: new Date(new Date().setHours(0, 0, 0, 0)),
-      periodTo: new Date(new Date().setHours(0, 0, 0, 0)),
+      periodFrom: new Date(new Date().setHours(12, 0, 0, 0)),
+      periodTo: new Date(new Date().setHours(12, 0, 0, 0)),
       // area: '',
       // processSpecification: '',
       // customerNumber: '',
@@ -430,7 +430,12 @@ export default function AddDeviation({
                         <Calendar
                           mode='single'
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            if (date) {
+                              date.setHours(12, 0, 0, 0);
+                              field.onChange(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
                             const minDate = new Date(today);
@@ -480,7 +485,12 @@ export default function AddDeviation({
                         <Calendar
                           mode='single'
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            if (date) {
+                              date.setHours(12, 0, 0, 0);
+                              field.onChange(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
                             const maxDate = new Date(today);
