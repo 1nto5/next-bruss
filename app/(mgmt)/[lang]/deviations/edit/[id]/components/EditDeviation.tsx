@@ -1,8 +1,6 @@
-// TODO: save draft and go to edit page
-// TODO: get article name
-
 'use client';
-import { useState } from 'react';
+
+import { useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -40,112 +38,132 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
-  insertDeviation,
-  insertDraftDeviation,
+  insertDeviationFromDraft,
+  updateDraftDeviation,
   findArticleName,
-  redirectToAddDeviations,
+  redirectToDeviations,
 } from '../actions';
 import Link from 'next/link';
 import { Table } from 'lucide-react';
 import { addDeviationSchema, addDeviationDraftSchema } from '@/lib/z/deviation';
-import { DeviationReasonType } from '@/lib/types/deviation';
+import { DeviationReasonType, DeviationType } from '@/lib/types/deviation';
 import { Separator } from '@/components/ui/separator';
 
-export default function AddDeviation({
+export default function EditDeviation({
   reasons,
+  deviation,
 }: {
   reasons: DeviationReasonType[];
+  deviation: DeviationType | null;
 }) {
-  // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
-  const [isPendingFindArticleName, setIsPendingFindArticleName] =
-    useState(false);
+  const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
+  const [isPendingFindArticleName, startFindArticleNameTransition] =
+    useTransition();
 
+  console.log('deviation', deviation);
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
     defaultValues: {
-      // articleNumber: '',
-      // articleName: '',
-      // workplace: '',
-      // drawingNumber: '',
-      // quantity: '',
-      // charge: '',
-      // description: '',
-      // reason: '',
-      periodFrom: new Date(new Date().setHours(0, 0, 0, 0)),
-      periodTo: new Date(new Date().setHours(0, 0, 0, 0)),
-      // area: '',
-      // processSpecification: '',
-      // customerNumber: '',
-      customerAuthorization: false,
+      articleNumber: deviation?.articleNumber || undefined,
+      articleName: deviation?.articleName || undefined,
+      workplace: deviation?.workplace || undefined,
+      area: deviation?.area || undefined,
+      drawingNumber: deviation?.drawingNumber || undefined,
+      quantity: deviation?.quantity?.value?.toString() || undefined,
+      unit: deviation?.quantity?.unit || undefined,
+      charge: deviation?.charge || undefined,
+      description: deviation?.description || undefined,
+      reason: deviation?.reason || undefined,
+      periodFrom: deviation?.timePeriod.from
+        ? new Date(deviation.timePeriod.from)
+        : new Date(new Date().setHours(12, 0, 0, 0)),
+      periodTo: deviation?.timePeriod.to
+        ? new Date(deviation.timePeriod.to)
+        : new Date(new Date().setHours(12, 0, 0, 0)),
+      processSpecification: deviation?.processSpecification || undefined,
+      customerNumber: deviation?.customerNumber || undefined,
+      customerAuthorization: deviation?.customerAuthorization || false,
     },
   });
 
   const handleFindArticleName = async () => {
-    setIsPendingFindArticleName(true);
-    try {
-      const articleNumber = form.getValues('articleNumber');
-      if (!articleNumber) {
-        toast.error('Wprowadź numer artykułu');
-        return;
-      }
-      if (articleNumber.length === 5) {
-        const res = await findArticleName(articleNumber);
-        if (res.success) {
-          form.setValue('articleName', res.success);
-        } else if (res.error === 'not found') {
-          toast.error('Nie znaleziono artykułu');
+    startFindArticleNameTransition(async () => {
+      try {
+        const articleNumber = form.getValues('articleNumber');
+        if (!articleNumber) {
+          toast.error('Wprowadź numer artykułu');
+          return;
         }
-      } else {
-        toast.error('Wprowadź poprawny numer artykułu');
+        if (articleNumber.length === 5) {
+          const res = await findArticleName(articleNumber);
+          if (res.success) {
+            form.setValue('articleName', res.success);
+          } else if (res.error === 'not found') {
+            toast.error('Nie znaleziono artykułu');
+          } else if (res.error) {
+            console.error(res.error);
+            toast.error('Skontaktuj się z IT!');
+          }
+        } else {
+          toast.error('Wprowadź poprawny numer artykułu');
+        }
+      } catch (error) {
+        console.error('handleFindArticleName', error);
+        toast.error('Skontaktuj się z IT!');
       }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPendingFindArticleName(false);
-    }
+    });
   };
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
-    // setIsDraft(false);
     setIsPendingInserting(true);
+    if (!deviation?.id) {
+      console.error('onSubmit', 'deviation.id is missing');
+      toast.error('Skontaktuj się z IT!');
+      return;
+    }
     try {
-      const res = await insertDeviation(data);
-      if (res?.success) {
+      const res = await insertDeviationFromDraft(deviation.id, data);
+      if (res.success) {
         toast.success('Odchylenie dodane!');
         // form.reset()
-        redirectToAddDeviations();
-      } else if (res?.error === 'not inserted') {
+        redirectToDeviations();
+      } else if (res.error) {
+        console.error('onSubmit', res.error);
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPendingInserting(false);
     }
   };
 
-  const handleDraftInsert = async (
+  const handleDraftUpdate = async (
     data: z.infer<typeof addDeviationDraftSchema>,
   ) => {
-    setIsPendingInsertingDraft(true);
+    setIsPendingUpdatingDraft(true);
+    if (!deviation?.id) {
+      console.error('onSubmit', 'deviation.id is missing');
+      toast.error('Skontaktuj się z IT!');
+      return;
+    }
     try {
-      const res = await insertDraftDeviation(data);
-      if (res?.success) {
+      const res = await updateDraftDeviation(deviation?.id, data);
+      if (res.success) {
         toast.success('Szkic zapisany!');
         // form.reset();
-        redirectToAddDeviations();
-      } else if (res?.error === 'not inserted') {
+        redirectToDeviations();
+      } else if (res.error) {
+        console.error('handleDraftUpdate', res.error);
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error('handleDraftUpdate', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPendingInsertingDraft(false);
+      setIsPendingUpdatingDraft(false);
     }
   };
 
@@ -153,19 +171,20 @@ export default function AddDeviation({
     <Card className='w-[768px]'>
       <CardHeader>
         <div className='flex justify-between'>
-          <CardTitle>Nowe odchylenie</CardTitle>
+          <CardTitle>Edytowanie szkicu odchylenia</CardTitle>
           <Link href='/deviations'>
             <Button size='icon' variant='outline'>
               <Table />
             </Button>
           </Link>
         </div>
+        <CardDescription>ID: {deviation?.id}</CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* <form
-          onSubmit={form.handleSubmit(isDraft ? handleDraftInsert : onSubmit)}
+          onSubmit={form.handleSubmit(isDraft ? handleDraftUpdate : onSubmit)}
         > */}
           <CardContent className='grid w-full items-center gap-4'>
             <div className='flex space-x-2'>
@@ -300,7 +319,7 @@ export default function AddDeviation({
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
-                        // defaultValue={field.value}
+                        defaultValue={field.value}
                         className='flex flex-col'
                       >
                         <FormItem
@@ -426,7 +445,12 @@ export default function AddDeviation({
                         <Calendar
                           mode='single'
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            if (date) {
+                              date.setHours(12, 0, 0, 0);
+                              field.onChange(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
                             const minDate = new Date(today);
@@ -476,7 +500,12 @@ export default function AddDeviation({
                         <Calendar
                           mode='single'
                           selected={field.value}
-                          onSelect={field.onChange}
+                          onSelect={(date) => {
+                            if (date) {
+                              date.setHours(12, 0, 0, 0);
+                              field.onChange(date);
+                            }
+                          }}
                           disabled={(date) => {
                             const today = new Date();
                             const maxDate = new Date(today);
@@ -562,7 +591,7 @@ export default function AddDeviation({
               Wyczyść
             </Button>
             <div className='flex space-x-2'>
-              {isPendingInsertDraft ? (
+              {isPendingUpdateDraft ? (
                 <Button variant='secondary' disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   Zapisywanie
@@ -573,8 +602,8 @@ export default function AddDeviation({
                   type='button'
                   onClick={() => {
                     // setIsDraft(true);
-                    // form.handleSubmit(handleDraftInsert)();
-                    handleDraftInsert(form.getValues());
+                    // form.handleSubmit(handleDraftUpdate)();
+                    handleDraftUpdate(form.getValues());
                   }}
                 >
                   <Pencil className='mr-2 h-4 w-4' />

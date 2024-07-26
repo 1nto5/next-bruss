@@ -1,12 +1,13 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import AddDeviation from './components/AddDeviation';
+import EditDeviation from './components/EditDeviation';
 import { DeviationReasonType } from '@/lib/types/deviation';
 import Container from '@/components/ui/container';
+import { findDeviation, redirectToDeviations } from './actions';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
-    next: { revalidate: 0, tags: ['deviationReasons'] },
+    next: { revalidate: 60 * 60 * 8, tags: ['deviationReasons'] },
   });
 
   if (!res.ok) {
@@ -16,17 +17,19 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   return data;
 }
 
-export default async function AddDeviationPage({
-  params: { lang },
+export default async function EditDeviationPage({
+  params: { lang, id },
 }: {
-  params: { lang: Locale };
+  params: { lang: Locale; id: string };
 }) {
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();
+  const deviation = await findDeviation(id);
+
   return (
     <Container>
       <main className='flex justify-center'>
-        <AddDeviation reasons={deviationReasons} />
+        <EditDeviation reasons={deviationReasons} deviation={deviation} />
       </main>
     </Container>
   );

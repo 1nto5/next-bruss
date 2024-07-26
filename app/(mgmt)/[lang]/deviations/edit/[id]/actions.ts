@@ -6,8 +6,58 @@ import { redirect } from 'next/navigation';
 import { revalidateTag } from 'next/cache';
 import { DeviationType } from '@/lib/types/deviation';
 import { AddDeviationType, AddDeviationDraftType } from '@/lib/z/deviation';
+import { ObjectId } from 'mongodb';
 
-export async function insertDeviation(deviation: AddDeviationType) {
+export async function findDeviation(id: string): Promise<DeviationType | null> {
+  const session = await auth();
+  if (!session || !session.user.email) {
+    redirect('/auth');
+  }
+  try {
+    const collection = await dbc('deviations');
+    const res = await collection.findOne({
+      _id: new ObjectId(id),
+    });
+    if (res && res.owner === session.user.email) {
+      const { _id, ...deviation } = res;
+      return { id: _id.toString(), ...deviation } as DeviationType;
+    }
+
+    return null;
+  } catch (error) {
+    console.error(error);
+    throw new Error('findDeviation server action error');
+  }
+}
+
+async function deleteDraftDeviation(id: string) {
+  const session = await auth();
+  if (!session || !session.user.email) {
+    redirect('/auth');
+  }
+  try {
+    const collection = await dbc('deviations');
+    const res = await collection.deleteOne({
+      _id: new ObjectId(id),
+      owner: session.user.email,
+      status: 'draft',
+    });
+    if (res) {
+      revalidateTag('deviations');
+      return { success: 'deleted' };
+    } else {
+      return { error: 'not deleted' };
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteDraftDeviation server action error' };
+  }
+}
+
+export async function insertDeviationFromDraft(
+  id: string,
+  deviation: AddDeviationType,
+) {
   const session = await auth();
   if (!session || !session.user.email) {
     redirect('/auth');
@@ -48,25 +98,33 @@ export async function insertDeviation(deviation: AddDeviationType) {
     const res = await collection.insertOne(deviationToInsert);
     if (res) {
       revalidateTag('deviations');
+      const deleteRes = await deleteDraftDeviation(id);
+      if (deleteRes.error) {
+        return { error: deleteRes.error };
+      }
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the deviation.');
+    return { error: 'insertDeviationFromDraft server action error' };
   }
 }
 
-export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
+export async function updateDraftDeviation(
+  id: string,
+  deviation: AddDeviationDraftType,
+) {
   const session = await auth();
   if (!session || !session.user.email) {
     redirect('/auth');
   }
+
   try {
     const collection = await dbc('deviations');
 
-    const deviationDraftToInsert: DeviationType = {
+    const deviationDraftToUpdate: DeviationType = {
       status: 'draft',
       ...(deviation.articleName && { articleName: deviation.articleName }),
       ...(deviation.articleNumber && {
@@ -98,18 +156,19 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user.email,
     };
-
-    const res = await collection.insertOne(deviationDraftToInsert);
-    if (res) {
-      // redirect('/deviations');
+    const res = await collection.updateOne(
+      { _id: new ObjectId(id), status: 'draft', owner: session.user.email },
+      { $set: deviationDraftToUpdate },
+    );
+    if (res.modifiedCount > 0) {
       revalidateTag('deviations');
-      return { success: 'inserted' };
+      return { success: 'updated' };
     } else {
-      return { error: 'not inserted' };
+      return { error: 'not updated' };
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the deviation.');
+    return { error: 'updateDraftDeviation server action error' };
   }
 }
 
@@ -124,11 +183,11 @@ export async function findArticleName(articleNumber: string) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while fetching the article name.');
+    return { error: 'findArticleName server action error' };
   }
 }
 
-export async function redirectToAddDeviations() {
+export async function redirectToDeviations() {
   redirect('/deviations');
 }
 

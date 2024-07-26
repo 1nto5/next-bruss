@@ -5,26 +5,24 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useState } from 'react';
-import { revalidateReasons } from './actions';
+import { useTransition } from 'react';
+import { revalidateReasons as revalidate } from './actions';
 
 export default function Error({
-  error,
+  // error,
   reset,
 }: {
-  error: Error;
+  // error: Error;
   reset: () => void;
 }) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const reload = () => {
-    setIsLoading(true);
     startTransition(() => {
-      revalidateReasons();
+      revalidate();
       router.refresh();
       reset();
-      setIsLoading(false);
     });
   };
 
@@ -34,8 +32,8 @@ export default function Error({
         <Terminal className='h-4 w-4' />
         <AlertTitle>Something went wrong!</AlertTitle>
         <AlertDescription className='mt-8 flex justify-end'>
-          <Button onClick={reload} disabled={isLoading}>
-            {isLoading ? (
+          <Button onClick={reload} disabled={isPending}>
+            {isPending ? (
               <span className='flex items-center'>
                 <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
                 Loading
