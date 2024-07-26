@@ -67,7 +67,7 @@ export async function addCapa(capa: CapaType) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the CAPA.');
+    throw new Error('addCapa server action error');
   }
 }
 
@@ -112,7 +112,7 @@ export async function saveCapa(capa: CapaType) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the CAPA.');
+    throw new Error('addCapa server action error');
   }
 }
 
@@ -126,7 +126,7 @@ export async function getCapa(articleNumber: string): Promise<CapaType | null> {
     return capa;
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while retrieving the CAPA.');
+    throw new Error('getCapa server action error');
   }
 }
 
@@ -152,7 +152,7 @@ export async function deleteCapa(articleNumber: string) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while deleting the CAPA.');
+    throw new Error('deleteCapa server action error');
   }
 }
 
