@@ -38,7 +38,6 @@ import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
 import { revalidateDeviations } from '../actions';
 import Link from 'next/link';
-import Container from '@/components/ui/container';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
