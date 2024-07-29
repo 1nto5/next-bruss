@@ -1,11 +1,10 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
-import { DeviationType } from '@/lib/types/deviation';
+import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function deleteDraftDeviation(_id: ObjectId) {
   try {

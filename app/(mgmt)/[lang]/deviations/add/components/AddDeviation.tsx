@@ -2,54 +2,58 @@
 // TODO: get article name
 
 'use client';
-import { useState, useTransition } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import {
-  Form,
-  FormControl,
-  // FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Input } from '@/components/ui/input';
-import { format } from 'date-fns';
-import { AArrowDown, CalendarIcon, Eraser, Pencil, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Calendar } from '@/components/ui/calendar';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import { DeviationReasonType } from '@/lib/types/deviation';
+import { cn } from '@/lib/utils';
+import { addDeviationDraftSchema, addDeviationSchema } from '@/lib/z/deviation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { format } from 'date-fns';
 import {
+  AArrowDown,
+  CalendarIcon,
+  Eraser,
+  Loader2,
+  Pencil,
+  Plus,
+  Table,
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState, useTransition } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+import {
+  findArticleName,
   insertDeviation,
   insertDraftDeviation,
-  findArticleName,
   redirectToDeviations,
 } from '../actions';
-import Link from 'next/link';
-import { Table } from 'lucide-react';
-import { addDeviationSchema, addDeviationDraftSchema } from '@/lib/z/deviation';
-import { DeviationReasonType } from '@/lib/types/deviation';
-import { Separator } from '@/components/ui/separator';
 
 export default function AddDeviation({
   reasons,
