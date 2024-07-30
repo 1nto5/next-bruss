@@ -52,6 +52,7 @@ import {
   findArticleName,
   insertDeviationFromDraft,
   redirectToDeviations,
+  revalidateReasons,
   updateDraftDeviation,
 } from '../actions';
 
@@ -387,7 +388,9 @@ export default function EditDeviation({
                 </FormItem>
               )}
             />
-
+            <button type='button' onClick={() => revalidateReasons()}>
+              odśnież
+            </button>
             <FormField
               control={form.control}
               name='reason'
