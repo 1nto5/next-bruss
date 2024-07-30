@@ -37,7 +37,7 @@ export type DeviationType = {
   closedAt?: Date;
   groupLeaderApproval?: ApprovalType;
   qualityManagerApproval?: ApprovalType;
-  engineeringManagerAproval?: ApprovalType;
+  engineeringManagerApproval?: ApprovalType;
   maintenanceManagerApproval?: ApprovalType;
   productionManagerApproval?: ApprovalType;
   // plantManagerApproval: ApprovalType;

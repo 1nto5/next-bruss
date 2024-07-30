@@ -3,9 +3,9 @@ import { Locale } from '@/i18n.config';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 // import { extractNameFromEmail } from '@/lib//utils/nameFormat';
-import { DeviationType, ApprovalType } from '@/lib/types/deviation';
-import Container from '@/components/ui/container';
 import { auth } from '@/auth';
+import Container from '@/components/ui/container';
+import { ApprovalType, DeviationType } from '@/lib/types/deviation';
 import { Session } from 'next-auth';
 
 async function getAllDeviations(lang: string): Promise<{
@@ -62,7 +62,7 @@ async function getUserDeviations(
   const approvalMapping: { [key: string]: keyof DeviationType } = {
     'group-leader': 'groupLeaderApproval',
     'quality-manager': 'qualityManagerApproval',
-    'engineering-manager': 'engineeringManagerAproval',
+    'engineering-manager': 'engineeringManagerApproval',
     'maintenance-manager': 'maintenanceManagerApproval',
     'production-manager': 'productionManagerApproval',
   };
@@ -78,7 +78,7 @@ async function getUserDeviations(
             const approval = deviation[approvalField] as
               | ApprovalType
               | undefined;
-            return !approval?.approved;
+            return deviation.status !== 'draft' && !approval?.approved;
           })
           .map((deviation: DeviationType) => ({
             ...deviation,
@@ -101,10 +101,13 @@ async function getUserDeviations(
     (deviation: DeviationType) =>
       deviation.status === 'draft' && deviation.owner === session.user.email,
   );
+
   const otherDeviations = deviations.filter(
     (deviation: DeviationType) =>
-      deviation.status !== 'draft' ||
-      (deviation.status === 'draft' && deviation.owner !== session.user.email),
+      deviation.status !== 'draft' &&
+      !uniqueDeviationsToApprove.find(
+        (d) => d._id?.toString() === deviation._id?.toString(),
+      ),
   );
 
   // Format the deviations
