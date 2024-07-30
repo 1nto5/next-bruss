@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 // import Info from '../../components/Info';
 
 export const metadata = {
-  title: 'Nowe odchylenie (Next BRUSS)',
+  title: 'Odchylenie (Next BRUSS)',
 };
 
 export default async function Layout({
@@ -25,7 +25,7 @@ export default async function Layout({
 
   return (
     <Container>
-      <main className='flex justify-center'>
+      <main>
         <>{children}</>
       </main>
     </Container>

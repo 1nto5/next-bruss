@@ -4,7 +4,6 @@ import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 // import { extractNameFromEmail } from '@/lib//utils/nameFormat';
 import { auth } from '@/auth';
-import Container from '@/components/ui/container';
 import { ApprovalType, DeviationType } from '@/lib/types/deviation';
 import { Session } from 'next-auth';
 
@@ -34,7 +33,7 @@ async function getAllDeviations(lang: string): Promise<{
       from: new Date(deviation.timePeriod.from).toLocaleDateString(lang),
       to: new Date(deviation.timePeriod.to).toLocaleDateString(lang),
     };
-    return { ...deviation, timePeriod: formattedTimePeriod };
+    return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
   };
 
   const deviationsFormatted = deviationsFiltered.map(formatDeviation);
@@ -110,13 +109,12 @@ async function getUserDeviations(
       ),
   );
 
-  // Format the deviations
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: new Date(deviation.timePeriod.from).toLocaleDateString(lang),
       to: new Date(deviation.timePeriod.to).toLocaleDateString(lang),
     };
-    return { ...deviation, timePeriod: formattedTimePeriod };
+    return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
   };
 
   const deviationsFormatted = [
@@ -125,7 +123,10 @@ async function getUserDeviations(
     ...otherDeviations,
   ].map(formatDeviation);
 
-  return { fetchTime, deviations: deviationsFormatted };
+  return {
+    fetchTime,
+    deviations: deviationsFormatted,
+  };
 }
 
 export default async function DeviationsPage({
@@ -143,11 +144,11 @@ export default async function DeviationsPage({
   }
 
   return (
-    // <main className='mx-auto px-8 py-4 lg:px-4'>
-    <Container>
-      <main>
-        <DataTable columns={columns} data={deviations} fetchTime={fetchTime} />
-      </main>
-    </Container>
+    <DataTable
+      columns={columns}
+      data={deviations}
+      fetchTime={fetchTime}
+      lang={lang}
+    />
   );
 }

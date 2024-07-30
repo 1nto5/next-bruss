@@ -24,7 +24,8 @@ export type DeviationType = {
   quantity?: { value?: number; unit?: string };
   charge?: string;
   reason?: string;
-  timePeriod: { from: Date | string; to: Date | string };
+  timePeriod: { from: Date; to: Date };
+  timePeriodLocalDateString?: { from: string; to: string };
   area?: string;
   description?: string;
   processSpecification?: string;

@@ -1,24 +1,21 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, ArrowUpDown, Copy } from 'lucide-react';
+import { Copy, MoreHorizontal } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
-import { Trash2, History, Pencil } from 'lucide-react';
-import { deleteDraftDeviation } from '../actions';
 import { DeviationType } from '@/lib/types/deviation';
-import { toast } from 'sonner';
+import { Pencil, Trash2 } from 'lucide-react';
 import { ObjectId } from 'mongodb';
+import Link from 'next/link';
+import { toast } from 'sonner';
+import { deleteDraftDeviation } from '../actions';
 
 const handleCopyId = async (id: ObjectId | undefined) => {
   if (id) {
@@ -127,13 +124,21 @@ export const columns: ColumnDef<DeviationType>[] = [
               </Link>
             )} */}
             {deviation.status !== 'draft' && (
-              <DropdownMenuItem
-                onClick={() => handleCopyId(deviation._id)}
-                // className=' focus:bg-red-400 dark:focus:bg-red-700'
-              >
-                <Copy className='mr-2 h-4 w-4' />
-                <span>Kopiuj ID</span>
-              </DropdownMenuItem>
+              <>
+                <Link href={`/deviations/${deviation._id}`}>
+                  <DropdownMenuItem>
+                    <Pencil className='mr-2 h-4 w-4' />
+                    <span>Otwórz</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
+                  onClick={() => handleCopyId(deviation._id)}
+                  // className=' focus:bg-red-400 dark:focus:bg-red-700'
+                >
+                  <Copy className='mr-2 h-4 w-4' />
+                  <span>Kopiuj ID</span>
+                </DropdownMenuItem>
+              </>
             )}
             {deviation.status === 'draft' && (
               <DropdownMenuItem
@@ -181,11 +186,11 @@ export const columns: ColumnDef<DeviationType>[] = [
     header: 'Powód',
   },
   {
-    accessorKey: 'timePeriod.from',
+    accessorKey: 'timePeriodLocalDateString.from',
     header: 'Od',
   },
   {
-    accessorKey: 'timePeriod.to',
+    accessorKey: 'timePeriodLocalDateString.to',
     header: 'Do',
   },
   {

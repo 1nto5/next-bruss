@@ -1,6 +1,5 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import Container from '@/components/ui/container';
 import { DeviationReasonType } from '@/lib/types/deviation';
 import AddDeviation from './components/AddDeviation';
 
@@ -23,11 +22,5 @@ export default async function AddDeviationPage({
 }) {
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();
-  return (
-    <Container>
-      <main className='flex justify-center'>
-        <AddDeviation reasons={deviationReasons} />
-      </main>
-    </Container>
-  );
+  return <AddDeviation reasons={deviationReasons} />;
 }

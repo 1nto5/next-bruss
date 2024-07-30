@@ -1,12 +1,12 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
+import { dbc } from '@/lib/mongo';
 import { DeviationType } from '@/lib/types/deviation';
-import { AddDeviationType, AddDeviationDraftType } from '@/lib/z/deviation';
+import { AddDeviationDraftType, AddDeviationType } from '@/lib/z/deviation';
 import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function findDeviation(id: string): Promise<DeviationType | null> {
   const session = await auth();
@@ -18,7 +18,8 @@ export async function findDeviation(id: string): Promise<DeviationType | null> {
     const res = await collection.findOne({
       _id: new ObjectId(id),
     });
-    if (res && res.owner === session.user.email) {
+    console.log('res', res);
+    if (res && res.status === 'draft' && res.owner === session.user.email) {
       const { _id, ...deviation } = res;
       return { id: _id.toString(), ...deviation } as DeviationType;
     }
