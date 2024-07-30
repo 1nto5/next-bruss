@@ -1,8 +1,5 @@
-// TODO: synchro does not work
-
 'use client';
 
-import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import * as React from 'react';
 
 import {
   Table,
@@ -27,17 +25,17 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
-  CardDescription,
 } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import { revalidateDeviations } from '../actions';
 import Link from 'next/link';
+import { revalidateDeviations } from '../actions';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
