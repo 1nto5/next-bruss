@@ -1,12 +1,12 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import AddDeviation from './components/AddDeviation';
-import { DeviationReasonType } from '@/lib/types/deviation';
 import Container from '@/components/ui/container';
+import { DeviationReasonType } from '@/lib/types/deviation';
+import AddDeviation from './components/AddDeviation';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
-    next: { revalidate: 60 * 60, tags: ['deviationReasons'] },
+    next: { revalidate: 0, tags: ['deviationReasons'] }, // TODO: add revalidate time
   });
 
   if (!res.ok) {
