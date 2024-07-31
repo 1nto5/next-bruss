@@ -81,7 +81,7 @@ async function getUserDeviations(
           })
           .map((deviation: DeviationType) => ({
             ...deviation,
-            status: 'to approve',
+            status: 'to approve' as 'to approve',
           }));
         deviationsToApprove = [...deviationsToApprove, ...roleDeviations];
       }

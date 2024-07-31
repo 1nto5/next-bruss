@@ -19,53 +19,79 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DeviationReasonType, DeviationType } from '@/lib/types/deviation';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { addDeviationSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Table as TableIcon } from 'lucide-react';
+import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 export default function Deviation({
   reasons,
   deviation,
   lang,
+  session,
 }: {
   reasons: DeviationReasonType[];
   deviation: DeviationType | null;
   lang: string;
+  session: Session | null;
 }) {
-  const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
-  const [isPendingFindArticleName, startFindArticleNameTransition] =
-    useTransition();
+  // const [isPendingInsert, setIsPendingInserting] = useState(false);
+  // const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
+  const [isPendingApproval, startApprovalTransition] = useTransition();
 
   console.log('deviation', deviation);
-  const form = useForm<z.infer<typeof addDeviationSchema>>({
-    resolver: zodResolver(addDeviationSchema),
-    defaultValues: {
-      articleNumber: deviation?.articleNumber || undefined,
-      articleName: deviation?.articleName || undefined,
-      workplace: deviation?.workplace || undefined,
-      area: deviation?.area || undefined,
-      drawingNumber: deviation?.drawingNumber || undefined,
-      quantity: deviation?.quantity?.value?.toString() || undefined,
-      unit: deviation?.quantity?.unit || undefined,
-      charge: deviation?.charge || undefined,
-      description: deviation?.description || undefined,
-      reason: deviation?.reason || undefined,
-      periodFrom: deviation?.timePeriod.from
-        ? new Date(deviation.timePeriod.from)
-        : new Date(new Date().setHours(12, 0, 0, 0)),
-      periodTo: deviation?.timePeriod.to
-        ? new Date(deviation.timePeriod.to)
-        : new Date(new Date().setHours(12, 0, 0, 0)),
-      processSpecification: deviation?.processSpecification || undefined,
-      customerNumber: deviation?.customerNumber || undefined,
-      customerAuthorization: deviation?.customerAuthorization || false,
-    },
-  });
+
+  // 'group-leader': 'groupLeaderApproval',
+  // 'quality-manager': 'qualityManagerApproval',
+  // 'engineering-manager': 'engineeringManagerApproval',
+  // 'maintenance-manager': 'maintenanceManagerApproval',
+  // 'production-manager': 'productionManagerApproval',
+
+  // const allUserRoles = session.user.roles;
+  // const deviationUserRole = allUserRoles?.find((role) => {
+  //   return [
+  //     'group-leader',
+  //     'quality-manager',
+  //     'engineering-manager',
+  //     'maintenance-manager',
+  //     'production-manager',
+  //   ].includes(role);
+  // });
+
+  // console.log('deviationUserRole', deviationUserRole);
+
+  const handleApproval = async (role: string) => {
+    startApprovalTransition(async () => {
+      try {
+        if (deviation && !deviation.id) {
+          throw new Error('handleApproval: deviation.id is missing');
+        }
+
+        // if (articleNumber.length === 5) {
+        //   const res = await findArticleName(articleNumber);
+        //   if (res.success) {
+        //     form.setValue('articleName', res.success);
+        //   } else if (res.error === 'not found') {
+        //     toast.error('Nie znaleziono artykułu');
+        //   } else if (res.error) {
+        //     console.error(res.error);
+        //     toast.error('Skontaktuj się z IT!');
+        //   }
+        // } else {
+        //   toast.error('Wprowadź poprawny numer artykułu');
+        // }
+      } catch (error) {
+        console.error('handleFindArticleName', error);
+        toast.error('Skontaktuj się z IT!');
+      }
+    });
+  };
 
   // const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
   //   setIsPendingInserting(true);
@@ -130,7 +156,7 @@ export default function Deviation({
             </Button>
           </Link>
         </div>
-        <CardDescription>ID: {deviation?.id}</CardDescription>
+        <CardDescription>ID: {deviation?._id?.toString()}</CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
       <CardContent>
@@ -184,8 +210,10 @@ export default function Deviation({
                     <TableRow>
                       <TableCell className='font-medium'>Obowiązuje:</TableCell>
                       <TableCell>
-                        {`${deviation?.timePeriod.from.toLocaleDateString(lang)} - ${deviation?.timePeriod.to.toLocaleDateString(lang)}` ||
-                          '-'}
+                        {deviation?.timePeriod?.from &&
+                        deviation?.timePeriod?.to
+                          ? `${new Date(deviation?.timePeriod?.from).toLocaleDateString(lang)} - ${new Date(deviation?.timePeriod?.to).toLocaleDateString(lang)}`
+                          : '-'}
                       </TableCell>
                     </TableRow>
 
@@ -247,10 +275,17 @@ export default function Deviation({
                         <TableCell className='font-medium'>
                           Testowa akcja korygująca
                         </TableCell>
-                        <TableCell>{deviation?.owner || '-'}</TableCell>
                         <TableCell>
-                          {deviation?.createdAt?.toLocaleDateString(lang) ||
-                            '-'}
+                          {deviation?.owner
+                            ? extractNameFromEmail(deviation.owner)
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {deviation?.createdAt
+                            ? new Date(deviation?.createdAt).toLocaleDateString(
+                                lang,
+                              )
+                            : '-'}
                         </TableCell>
                         <TableCell>Nie jest dobrze</TableCell>
                       </TableRow>
@@ -258,10 +293,17 @@ export default function Deviation({
                         <TableCell className='font-medium'>
                           Testowa akcja korygująca
                         </TableCell>
-                        <TableCell>{deviation?.owner || '-'}</TableCell>
                         <TableCell>
-                          {deviation?.createdAt?.toLocaleDateString(lang) ||
-                            '-'}
+                          {deviation?.owner
+                            ? extractNameFromEmail(deviation.owner)
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          {deviation?.createdAt
+                            ? new Date(deviation?.createdAt).toLocaleDateString(
+                                lang,
+                              )
+                            : '-'}
                         </TableCell>
                         <TableCell>Nie jest dobrze</TableCell>
                       </TableRow>
@@ -289,75 +331,136 @@ export default function Deviation({
                         <TableCell className='font-medium'>
                           Group Leader
                         </TableCell>
-                        <TableCell className='font-medium'>
-                          <Button variant='outline'>zatwierdź</Button>
+                        <TableCell>
+                          {session?.user.roles?.includes('group-leader') && (
+                            <Button
+                              type='button'
+                              onClick={() => console.log('test')}
+                              variant='outline'
+                            >
+                              zatwierdź
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           {deviation?.groupLeaderApproval?.by || '-'}
                         </TableCell>
                         <TableCell>
-                          {deviation?.groupLeaderApproval?.at.toLocaleDateString() ||
-                            '-'}
+                          {deviation?.groupLeaderApproval?.at
+                            ? new Date(
+                                deviation?.groupLeaderApproval?.at,
+                              ).toLocaleDateString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Group Leader
+                          Kierownik zapewnienia jakości
                         </TableCell>
                         <TableCell className='font-medium'>
-                          <Button variant='outline'>zatwierdź</Button>
+                          {session?.user.roles?.includes('quality-manager') && (
+                            <Button
+                              type='button'
+                              onClick={() => console.log('test')}
+                              variant='outline'
+                            >
+                              zatwierdź
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           {deviation?.groupLeaderApproval?.by || '-'}
                         </TableCell>
                         <TableCell>
-                          {deviation?.groupLeaderApproval?.at.toLocaleDateString() ||
-                            '-'}
+                          {deviation?.groupLeaderApproval?.at
+                            ? new Date(
+                                deviation?.groupLeaderApproval?.at,
+                              ).toLocaleDateString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Group Leader
+                          Kierownik Działu Inżynieryjnego
                         </TableCell>
                         <TableCell className='font-medium'>
-                          <Button variant='outline'>zatwierdź</Button>
+                          {session?.user.roles?.includes(
+                            'engineering-manager',
+                          ) && (
+                            <Button
+                              type='button'
+                              onClick={() => console.log('test')}
+                              variant='outline'
+                            >
+                              zatwierdź
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           {deviation?.groupLeaderApproval?.by || '-'}
                         </TableCell>
                         <TableCell>
-                          {deviation?.groupLeaderApproval?.at.toLocaleDateString() ||
-                            '-'}
+                          {deviation?.groupLeaderApproval?.at
+                            ? new Date(
+                                deviation?.groupLeaderApproval?.at,
+                              ).toLocaleDateString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Group Leader
+                          Kierownik Działu Utrzymania Ruchu
                         </TableCell>
                         <TableCell className='font-medium'>
-                          <Button variant='outline'>zatwierdź</Button>
+                          {session?.user.roles?.includes(
+                            'maintenance-manager',
+                          ) && (
+                            <Button
+                              type='button'
+                              onClick={() => console.log('test')}
+                              variant='outline'
+                            >
+                              zatwierdź
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           {deviation?.groupLeaderApproval?.by || '-'}
                         </TableCell>
                         <TableCell>
-                          {deviation?.groupLeaderApproval?.at.toLocaleDateString() ||
-                            '-'}
+                          {deviation?.groupLeaderApproval?.at
+                            ? new Date(
+                                deviation?.groupLeaderApproval?.at,
+                              ).toLocaleDateString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Group Leader
+                          Kierownik Produkcji
                         </TableCell>
                         <TableCell className='font-medium'>
-                          <Button variant='outline'>zatwierdź</Button>
+                          {session?.user.roles?.includes(
+                            'production-manager',
+                          ) && (
+                            <Button
+                              type='button'
+                              onClick={() => console.log('test')}
+                              variant='outline'
+                            >
+                              zatwierdź
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           {deviation?.groupLeaderApproval?.by || '-'}
                         </TableCell>
                         <TableCell>
-                          {deviation?.groupLeaderApproval?.at.toLocaleDateString() ||
-                            '-'}
+                          {deviation?.groupLeaderApproval?.at
+                            ? new Date(
+                                deviation?.groupLeaderApproval?.at,
+                              ).toLocaleDateString()
+                            : '-'}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -382,17 +485,17 @@ export default function Deviation({
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell>Analiza ryzyska</TableCell>
+                      <TableCell>Analiza ryzyka</TableCell>
                       <TableCell>Jan Kowalski</TableCell>
                       <TableCell>Utworzono</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Analiza ryzyska</TableCell>
+                      <TableCell>Analiza ryzyka</TableCell>
                       <TableCell>Jan Kowalski</TableCell>
                       <TableCell>Utworzono</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Analiza ryzyska</TableCell>
+                      <TableCell>Analiza ryzyka</TableCell>
                       <TableCell>Jan Kowalski</TableCell>
                       <TableCell>Utworzono</TableCell>
                     </TableRow>
@@ -404,7 +507,7 @@ export default function Deviation({
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Historia zmian</CardTitle>
+                <CardTitle>Historia</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>

@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 export type ApprovalType = {
   approved: boolean;
   by: string;
-  at: Date;
+  at: Date | string;
 };
 
 export type DeviationType = {
@@ -16,7 +16,7 @@ export type DeviationType = {
     | 'valid'
     | 'closed'
     | 'draft'
-    | string;
+    | 'to approve';
   articleNumber?: string;
   articleName?: string;
   workplace?: string;
@@ -24,7 +24,7 @@ export type DeviationType = {
   quantity?: { value?: number; unit?: string };
   charge?: string;
   reason?: string;
-  timePeriod: { from: Date; to: Date };
+  timePeriod: { from: Date | string; to: Date | string };
   timePeriodLocalDateString?: { from: string; to: string };
   area?: string;
   description?: string;
@@ -32,10 +32,10 @@ export type DeviationType = {
   customerNumber?: string;
   customerAuthorization: boolean;
   owner: string;
-  createdAt: Date;
-  edited?: { at: Date; by: string };
-  approvedAt?: Date;
-  closedAt?: Date;
+  createdAt: Date | string;
+  edited?: { at: Date | string; by: string };
+  approvedAt?: Date | string;
+  closedAt?: Date | string;
   groupLeaderApproval?: ApprovalType;
   qualityManagerApproval?: ApprovalType;
   engineeringManagerApproval?: ApprovalType;
@@ -47,6 +47,6 @@ export type DeviationType = {
 export type DeviationReasonType = {
   _id: ObjectId;
   content: string;
-  created: { at: Date; by: string };
-  edited?: { at: Date; by: string };
+  created: { at: Date | string; by: string };
+  edited?: { at: Date | string; by: string };
 };

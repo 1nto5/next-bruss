@@ -8,10 +8,10 @@ import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function findDeviation(id: string): Promise<DeviationType | null> {
-  const session = await auth();
-  if (!session || !session.user.email) {
-    redirect('/auth');
-  }
+  // const session = await auth();
+  // if (!session || !session.user.email) {
+  //   redirect('/auth');
+  // }
   try {
     const collection = await dbc('deviations');
     const res = await collection.findOne({
