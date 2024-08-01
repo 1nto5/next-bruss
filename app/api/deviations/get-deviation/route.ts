@@ -12,18 +12,20 @@ export async function GET(req: NextRequest) {
   try {
     const id = req.nextUrl.searchParams.get('id');
     if (!id) {
-      return new NextResponse('get-deviation api error: missing id', {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: 'get-deviation api: missing id' },
+        { status: 400 },
+      );
     }
     const coll = await dbc('deviations');
     const deviation = await coll.findOne({
       _id: new ObjectId(id),
     });
-    return new NextResponse(JSON.stringify(deviation));
+    // return new NextResponse(JSON.stringify(deviation));
+    return NextResponse.json(deviation);
   } catch (error) {
     console.error('api/deviations/get-deviation: ' + error);
-    return new NextResponse('get-deviation api error', { status: 503 });
+    return NextResponse.json({ error: 'get-deviation api' }, { status: 503 });
   }
 }
 

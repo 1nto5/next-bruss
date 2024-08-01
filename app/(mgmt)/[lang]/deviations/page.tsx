@@ -16,7 +16,10 @@ async function getAllDeviations(lang: string): Promise<{
   });
 
   if (!res.ok) {
-    throw new Error('getAllDeviations fetch res: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getAllDeviations error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
@@ -52,8 +55,12 @@ async function getUserDeviations(
     next: { revalidate: 60 * 15, tags: ['deviations'] },
   });
   if (!res.ok) {
-    throw new Error('getUserDeviations res: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getUserDeviations error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
+
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
   const deviations: DeviationType[] = await res.json();

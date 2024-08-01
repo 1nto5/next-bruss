@@ -9,10 +9,13 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
     next: { revalidate: 0, tags: ['deviationReasons'] }, // TODO: add revalidate time
   });
-
   if (!res.ok) {
-    throw new Error('getting deviation reasons: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getReasons error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
+
   const data = await res.json();
   return data;
 }

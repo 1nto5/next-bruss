@@ -9,7 +9,10 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   });
 
   if (!res.ok) {
-    throw new Error('getting deviation reasons: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getReasons error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
   const data = await res.json();
   return data;

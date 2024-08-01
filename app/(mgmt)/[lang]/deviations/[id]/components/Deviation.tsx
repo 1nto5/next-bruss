@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -18,25 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { DeviationReasonType, DeviationType } from '@/lib/types/deviation';
+import { DeviationType } from '@/lib/types/deviation';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
-import { addDeviationSchema } from '@/lib/z/deviation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Table as TableIcon } from 'lucide-react';
+import { CopyPlus, Plus, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
-import { useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useTransition } from 'react';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import { approveDeviation } from '../actions';
+import TableCellsApprove from './TableCellApproveRole';
 
 export default function Deviation({
-  reasons,
   deviation,
   lang,
   session,
 }: {
-  reasons: DeviationReasonType[];
   deviation: DeviationType | null;
   lang: string;
   session: Session | null;
@@ -45,32 +40,51 @@ export default function Deviation({
   // const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
   const [isPendingApproval, startApprovalTransition] = useTransition();
 
-  console.log('deviation', deviation);
-
   // 'group-leader': 'groupLeaderApproval',
   // 'quality-manager': 'qualityManagerApproval',
   // 'engineering-manager': 'engineeringManagerApproval',
   // 'maintenance-manager': 'maintenanceManagerApproval',
   // 'production-manager': 'productionManagerApproval',
 
-  // const allUserRoles = session.user.roles;
-  // const deviationUserRole = allUserRoles?.find((role) => {
-  //   return [
-  //     'group-leader',
-  //     'quality-manager',
-  //     'engineering-manager',
-  //     'maintenance-manager',
-  //     'production-manager',
-  //   ].includes(role);
-  // });
+  const deviationUserRole = session?.user.roles?.find((role) => {
+    return [
+      'group-leader',
+      'quality-manager',
+      'engineering-manager',
+      'maintenance-manager',
+      'production-manager',
+    ].includes(role);
+  });
 
-  // console.log('deviationUserRole', deviationUserRole);
-
-  const handleApproval = async (role: string) => {
+  const handleApproval = async () => {
     startApprovalTransition(async () => {
       try {
-        if (deviation && !deviation.id) {
-          throw new Error('handleApproval: deviation.id is missing');
+        if (!deviation?._id) {
+          console.error('handleApproval', 'deviation.id is missing');
+          toast.error('Skontaktuj się z IT!');
+          return;
+        }
+
+        console.log(
+          'handleApproval',
+          'deviation.id',
+          deviation._id,
+          'deviationUserRole',
+          deviationUserRole,
+        );
+
+        if (deviation._id && deviationUserRole) {
+          console.log('tu');
+          const res = await approveDeviation(
+            deviation._id.toString(),
+            deviationUserRole,
+          );
+          if (res.success) {
+            toast.success('Zatwierdzono!');
+          } else if (res.error) {
+            console.error('handleApproval', res.error);
+            toast.error('Skontaktuj się z IT!');
+          }
         }
 
         // if (articleNumber.length === 5) {
@@ -149,6 +163,7 @@ export default function Deviation({
     <Card>
       <CardHeader>
         <div className='flex justify-between'>
+          {/* TODO: change to deviation status */}
           <CardTitle>Podgląd odchylenia</CardTitle>
           <Link href='/deviations'>
             <Button size='icon' variant='outline'>
@@ -258,8 +273,17 @@ export default function Deviation({
             <div className='flex-col space-y-4 lg:w-3/5'>
               <Card>
                 <CardHeader>
-                  <CardTitle>Akcje korygujące</CardTitle>
+                  <div className='flex justify-between'>
+                    <CardTitle>Akcje korygujące</CardTitle>
+
+                    <Link href={`/deviations/${deviation?._id}/add-corrective`}>
+                      <Button size='icon' variant='outline'>
+                        <CopyPlus />
+                      </Button>
+                    </Link>
+                  </div>
                 </CardHeader>
+
                 <CardContent>
                   <Table>
                     <TableHeader>
@@ -323,145 +347,75 @@ export default function Deviation({
                         <TableHead></TableHead>
 
                         <TableHead>Osoba</TableHead>
-                        <TableHead>Data</TableHead>
+                        <TableHead>Czas</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow>
-                        <TableCell className='font-medium'>
-                          Group Leader
-                        </TableCell>
-                        <TableCell>
-                          {session?.user.roles?.includes('group-leader') && (
-                            <Button
-                              type='button'
-                              onClick={() => console.log('test')}
-                              variant='outline'
-                            >
-                              zatwierdź
-                            </Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.by || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.at
-                            ? new Date(
-                                deviation?.groupLeaderApproval?.at,
-                              ).toLocaleDateString()
-                            : '-'}
-                        </TableCell>
+                        <TableCellsApprove
+                          roleText='Group Leader'
+                          deviationUserRole={deviationUserRole}
+                          role='group-leader'
+                          approved={deviation?.groupLeaderApproval?.approved}
+                          handleApproval={handleApproval}
+                          by={deviation?.groupLeaderApproval?.by}
+                          at={deviation?.groupLeaderApproval?.at.toString()}
+                          lang={lang}
+                        />
                       </TableRow>
                       <TableRow>
-                        <TableCell className='font-medium'>
-                          Kierownik zapewnienia jakości
-                        </TableCell>
-                        <TableCell className='font-medium'>
-                          {session?.user.roles?.includes('quality-manager') && (
-                            <Button
-                              type='button'
-                              onClick={() => console.log('test')}
-                              variant='outline'
-                            >
-                              zatwierdź
-                            </Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.by || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.at
-                            ? new Date(
-                                deviation?.groupLeaderApproval?.at,
-                              ).toLocaleDateString()
-                            : '-'}
-                        </TableCell>
+                        <TableCellsApprove
+                          roleText='Kierownik Zapewnienia Jakości'
+                          deviationUserRole={deviationUserRole}
+                          role='quality-manager'
+                          approved={deviation?.qualityManagerApproval?.approved}
+                          handleApproval={handleApproval}
+                          by={deviation?.qualityManagerApproval?.by}
+                          at={deviation?.qualityManagerApproval?.at.toString()}
+                          lang={lang}
+                        />
                       </TableRow>
                       <TableRow>
-                        <TableCell className='font-medium'>
-                          Kierownik Działu Inżynieryjnego
-                        </TableCell>
-                        <TableCell className='font-medium'>
-                          {session?.user.roles?.includes(
-                            'engineering-manager',
-                          ) && (
-                            <Button
-                              type='button'
-                              onClick={() => console.log('test')}
-                              variant='outline'
-                            >
-                              zatwierdź
-                            </Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.by || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.at
-                            ? new Date(
-                                deviation?.groupLeaderApproval?.at,
-                              ).toLocaleDateString()
-                            : '-'}
-                        </TableCell>
+                        <TableCellsApprove
+                          roleText='Kierownik Działu Inżynieryjnego'
+                          deviationUserRole={deviationUserRole}
+                          role='engineering-manager'
+                          approved={
+                            deviation?.engineeringManagerApproval?.approved
+                          }
+                          handleApproval={handleApproval}
+                          by={deviation?.engineeringManagerApproval?.by}
+                          at={deviation?.engineeringManagerApproval?.at.toString()}
+                          lang={lang}
+                        />
                       </TableRow>
                       <TableRow>
-                        <TableCell className='font-medium'>
-                          Kierownik Działu Utrzymania Ruchu
-                        </TableCell>
-                        <TableCell className='font-medium'>
-                          {session?.user.roles?.includes(
-                            'maintenance-manager',
-                          ) && (
-                            <Button
-                              type='button'
-                              onClick={() => console.log('test')}
-                              variant='outline'
-                            >
-                              zatwierdź
-                            </Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.by || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.at
-                            ? new Date(
-                                deviation?.groupLeaderApproval?.at,
-                              ).toLocaleDateString()
-                            : '-'}
-                        </TableCell>
+                        <TableCellsApprove
+                          roleText='Kierownik Działu Utrzymania Ruchu'
+                          deviationUserRole={deviationUserRole}
+                          role='maintenance-manager'
+                          approved={
+                            deviation?.maintenanceManagerApproval?.approved
+                          }
+                          handleApproval={handleApproval}
+                          by={deviation?.maintenanceManagerApproval?.by}
+                          at={deviation?.maintenanceManagerApproval?.at.toString()}
+                          lang={lang}
+                        />
                       </TableRow>
                       <TableRow>
-                        <TableCell className='font-medium'>
-                          Kierownik Produkcji
-                        </TableCell>
-                        <TableCell className='font-medium'>
-                          {session?.user.roles?.includes(
-                            'production-manager',
-                          ) && (
-                            <Button
-                              type='button'
-                              onClick={() => console.log('test')}
-                              variant='outline'
-                            >
-                              zatwierdź
-                            </Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.by || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.groupLeaderApproval?.at
-                            ? new Date(
-                                deviation?.groupLeaderApproval?.at,
-                              ).toLocaleDateString()
-                            : '-'}
-                        </TableCell>
+                        <TableCellsApprove
+                          roleText='Kierownik Produkcji'
+                          deviationUserRole={deviationUserRole}
+                          role='production-manager'
+                          approved={
+                            deviation?.productionManagerApproval?.approved
+                          }
+                          handleApproval={handleApproval}
+                          by={deviation?.productionManagerApproval?.by}
+                          at={deviation?.productionManagerApproval?.at.toString()}
+                          lang={lang}
+                        />
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -513,7 +467,7 @@ export default function Deviation({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Data</TableHead>
+                      <TableHead>Czas</TableHead>
                       <TableHead>Osoba</TableHead>
                       <TableHead>Akcja</TableHead>
                     </TableRow>
