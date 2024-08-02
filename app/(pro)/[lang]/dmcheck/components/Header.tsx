@@ -1,9 +1,9 @@
-import Link from 'next/link';
+import Logo from '@/components/Logo';
 import Container from '@/components/ui/container';
-import { ThemeModeToggle } from './ThemeModeToggle';
+import Link from 'next/link';
 import { LogoutAll } from './Logout';
 import { Relaod } from './Reload';
-import Logo from '@/components/Logo';
+import { ThemeModeToggle } from './ThemeModeToggle';
 import VolumeButton from './VolumeButton';
 
 type HeaderProps = {
@@ -31,6 +31,9 @@ export default async function Header({
                 <Logo />
               </div>
             </Link>
+            <span className='font-mono font-semibold'>
+              {workplaceName.toLocaleUpperCase()}
+            </span>
           </div>
 
           <div className='flex items-center gap-x-4'>
