@@ -3,7 +3,6 @@ import { Locale } from '@/i18n.config';
 import { auth } from '@/auth';
 import { DeviationReasonType, DeviationType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
-import { findDeviation } from './actions';
 import Deviation from './components/Deviation';
 
 async function getDeviation(id: string): Promise<DeviationType> {
