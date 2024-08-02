@@ -2,7 +2,7 @@ import Logo from '@/components/Logo';
 import Container from '@/components/ui/container';
 import Link from 'next/link';
 import { LogoutAll } from './Logout';
-import { Relaod } from './Reload';
+import { Reload } from './Reload';
 import { ThemeModeToggle } from './ThemeModeToggle';
 import VolumeButton from './VolumeButton';
 
@@ -38,7 +38,7 @@ export default async function Header({
 
           <div className='flex items-center gap-x-4'>
             <LogoutAll logoutAllHref={workplaceHref} />
-            <Relaod reavalidateHref={workplaceHref} />
+            <Reload revalidateHref={workplaceHref} />
             <VolumeButton />
             <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
           </div>

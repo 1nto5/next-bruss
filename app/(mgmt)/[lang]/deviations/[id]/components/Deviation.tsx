@@ -159,12 +159,26 @@ export default function Deviation({
   //   }
   // };
 
+  const statusCardTitle = () => {
+    switch (deviation?.status) {
+      case 'approved':
+        return 'Odchylenie zatwierdzone';
+      case 'rejected':
+        return 'Odchylenie odrzucone';
+      case 'approval':
+        return 'Odchylenie w trakcie zatwierdzania';
+      case 'valid':
+        return 'Odchylenie obowiazuje';
+      case 'closed':
+        return 'Odchylenie zamknięte';
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <div className='flex justify-between'>
-          {/* TODO: change to deviation status */}
-          <CardTitle>Podgląd odchylenia</CardTitle>
+          <CardTitle>{statusCardTitle()}</CardTitle>
           <Link href='/deviations'>
             <Button size='icon' variant='outline'>
               <TableIcon />
@@ -276,7 +290,7 @@ export default function Deviation({
                   <div className='flex justify-between'>
                     <CardTitle>Akcje korygujące</CardTitle>
 
-                    <Link href={`/deviations/${deviation?._id}/add-corrective`}>
+                    <Link href={`/deviations/${deviation?._id}/corrective/add`}>
                       <Button size='icon' variant='outline'>
                         <CopyPlus />
                       </Button>

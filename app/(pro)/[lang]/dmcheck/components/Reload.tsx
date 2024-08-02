@@ -1,12 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
-import Link from 'next/link';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-export async function Relaod({ reavalidateHref }: { reavalidateHref: string }) {
+export async function Reload({
+  revalidateHref: revalidateHref,
+}: {
+  revalidateHref: string;
+}) {
   const revalidate = async () => {
     'use server';
-    revalidatePath(reavalidateHref);
+    revalidatePath(revalidateHref);
   };
 
   return (

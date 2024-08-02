@@ -6,6 +6,13 @@ export type ApprovalType = {
   at: Date | string;
 };
 
+type correctiveActionType = {
+  description: string;
+  responsible: string;
+  deadline: Date | string;
+  added: { at: Date | string; by: string };
+};
+
 export type DeviationType = {
   _id?: ObjectId;
   id?: string;
@@ -42,6 +49,7 @@ export type DeviationType = {
   maintenanceManagerApproval?: ApprovalType;
   productionManagerApproval?: ApprovalType;
   // plantManagerApproval: ApprovalType;
+  correctiveActions?: correctiveActionType[];
 };
 
 export type DeviationReasonType = {

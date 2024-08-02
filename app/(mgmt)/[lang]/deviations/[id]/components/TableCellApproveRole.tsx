@@ -9,9 +9,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { TableCell, TableRow } from '@/components/ui/table';
+import { TableCell } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog';
+import { ClipboardPen } from 'lucide-react';
 
 type TableCellApproveRoleProps = {
   roleText: string;
@@ -42,8 +43,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         {deviationUserRole === role && !approved && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button type='button' variant='outline'>
-                Zatwierdź
+              <Button size='icon' type='button' variant='outline'>
+                <ClipboardPen />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
