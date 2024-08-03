@@ -12,6 +12,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
   Form,
   FormControl,
   FormField,
@@ -30,6 +38,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { DeviationReasonType } from '@/lib/types/deviation';
+import { UsersListType } from '@/lib/types/user';
 import { cn } from '@/lib/utils';
 import { addCorrectiveActionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,6 +46,8 @@ import { format } from 'date-fns';
 import {
   AArrowDown,
   CalendarIcon,
+  Check,
+  ChevronsUpDown,
   Eraser,
   Loader2,
   Pencil,
@@ -49,36 +60,50 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
-  insertCorrectiveAction,
   // findArticleName,
   // insertDeviation,
   // insertDraftDeviation,
   redirectToDeviation,
+  updateCorrectiveAction,
 } from '../actions';
 
-export default function AddCorrectiveAction({ id }: { id: string }) {
+type AddCorrectiveActionPropsType = {
+  id: string;
+  users: UsersListType;
+};
+
+export default function AddCorrectiveAction({
+  id,
+  users,
+}: AddCorrectiveActionPropsType) {
   // const [isDraft, setIsDraft] = useState<boolean>();
-  const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
-  const [isPendingFindArticleName, startFindArticleNameTransition] =
-    useTransition();
+  const [isPendingUpdate, setIsPendingUpdating] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof addCorrectiveActionSchema>>({
     resolver: zodResolver(addCorrectiveActionSchema),
     defaultValues: {
-      deadline: new Date(new Date().setHours(12, 0, 0, 0) + 86400000),
+      description: undefined,
+      responsible: undefined,
+      // deadline: new Date(new Date().setHours(12, 0, 0, 0) + 86400000),
+      deadline: undefined,
     },
   });
 
   const onSubmit = async (data: z.infer<typeof addCorrectiveActionSchema>) => {
-    // setIsDraft(false);
-    setIsPendingInserting(true);
+    console.log('onSubmit', data);
+    setIsPendingUpdating(true);
     try {
-      const res = await insertCorrectiveAction(data);
+      const res = await updateCorrectiveAction(id, data);
       if (res.success) {
-        toast.success('Odchylenie dodane!');
+        toast.success('Akcja korygująca dodana!');
         // form.reset()
         redirectToDeviation(id);
+      } else if (res.error === 'not found') {
+        toast.error('Nie znaleziono odchylenia!');
+      } else if (res.error === 'not authorized') {
+        toast.error(
+          'Tylko właściciel odchylenia może dodawać akcje korygujące!',
+        );
       } else if (res.error) {
         console.error(res.error);
         toast.error('Skontaktuj się z IT!');
@@ -87,7 +112,7 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
       console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPendingInserting(false);
+      setIsPendingUpdating(false);
     }
   };
 
@@ -116,7 +141,7 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
                 name='deadline'
                 render={({ field }) => (
                   <FormItem className='flex flex-col'>
-                    <FormLabel>Deadline</FormLabel>
+                    <FormLabel>Termin wykonania</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -130,7 +155,7 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
                             {field.value ? (
                               format(field.value, 'PPP')
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Wybierz datę</span>
                             )}
                             <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                           </Button>
@@ -165,7 +190,84 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name='responsible'
+                render={({ field }) => (
+                  <FormItem className='flex flex-col'>
+                    <FormLabel>Osoba odpowiedzialna</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant='outline'
+                            role='combobox'
+                            className={cn(
+                              'w-[200px] justify-between',
+                              !field.value && 'text-muted-foreground',
+                            )}
+                          >
+                            {field.value
+                              ? users.find(
+                                  (language) => language.email === field.value,
+                                )?.name
+                              : 'Wybierz'}
+                            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-[200px] p-0'>
+                        <Command>
+                          <CommandInput placeholder='Szukaj...' />
+                          <CommandList>
+                            <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                            {/* height of the selection window */}
+                            <CommandGroup className='max-h-48 overflow-y-auto'>
+                              {users.map((user) => (
+                                <CommandItem
+                                  value={user.name}
+                                  key={user.email}
+                                  onSelect={() => {
+                                    form.setValue('responsible', user.email);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4',
+                                      user.email === field.value
+                                        ? 'opacity-100'
+                                        : 'opacity-0',
+                                    )}
+                                  />
+                                  {user.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Opis akcji</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={`Wprowadź dowolny tekst opisujący akcję do podjęcia`}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <Separator className='mb-4' />
 
@@ -179,7 +281,7 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
               Wyczyść
             </Button>
             <div className='flex space-x-2'>
-              {isPendingInsert ? (
+              {isPendingUpdate ? (
                 <Button disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                   Dodawanie
@@ -187,7 +289,7 @@ export default function AddCorrectiveAction({ id }: { id: string }) {
               ) : (
                 <Button type='submit'>
                   <Plus className='mr-2 h-4 w-4' />
-                  Dodaj odchylenie
+                  Dodaj akcję korygującą
                 </Button>
               )}
             </div>

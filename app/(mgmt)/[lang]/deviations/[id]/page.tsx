@@ -6,12 +6,9 @@ import { redirect } from 'next/navigation';
 import Deviation from './components/Deviation';
 
 async function getDeviation(id: string): Promise<DeviationType> {
-  const res = await fetch(
-    `${process.env.API}/deviations/get-deviation?id=${id}`,
-    {
-      next: { revalidate: 0, tags: ['deviation'] },
-    },
-  );
+  const res = await fetch(`${process.env.API}/deviations/deviation?id=${id}`, {
+    next: { revalidate: 0, tags: ['deviation'] },
+  });
 
   if (!res.ok) {
     const json = await res.json();

@@ -302,49 +302,27 @@ export default function Deviation({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Akcja</TableHead>
-                        <TableHead>Wykonawca</TableHead>
-                        <TableHead>Termin</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className='min-w-[250px]'>Akcja</TableHead>
+                        <TableHead>Osoba odpowiedzialna</TableHead>
+                        <TableHead>Termin wykonania</TableHead>
+                        <TableHead>Wykonano</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell className='font-medium'>
-                          Testowa akcja korygująca
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.owner
-                            ? extractNameFromEmail(deviation.owner)
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.createdAt
-                            ? new Date(deviation?.createdAt).toLocaleDateString(
-                                lang,
-                              )
-                            : '-'}
-                        </TableCell>
-                        <TableCell>Nie jest dobrze</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className='font-medium'>
-                          Testowa akcja korygująca
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.owner
-                            ? extractNameFromEmail(deviation.owner)
-                            : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {deviation?.createdAt
-                            ? new Date(deviation?.createdAt).toLocaleDateString(
-                                lang,
-                              )
-                            : '-'}
-                        </TableCell>
-                        <TableCell>Nie jest dobrze</TableCell>
-                      </TableRow>
+                      {deviation?.correctiveActions?.map((action, index) => (
+                        <TableRow key={index}>
+                          <TableCell className='font-medium'>
+                            {action.description}
+                          </TableCell>
+                          <TableCell>
+                            {extractNameFromEmail(action.responsible)}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(action.deadline).toLocaleDateString(lang)}
+                          </TableCell>
+                          <TableCell>{action.done ? 'tak' : 'nie'}</TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </CardContent>

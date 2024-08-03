@@ -11,6 +11,7 @@ type correctiveActionType = {
   responsible: string;
   deadline: Date | string;
   added: { at: Date | string; by: string };
+  done: boolean;
 };
 
 export type DeviationType = {

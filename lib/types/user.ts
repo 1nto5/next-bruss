@@ -3,3 +3,8 @@ export type UserType = {
   email: string;
   roles?: string[];
 };
+
+export type UsersListType = {
+  email: string;
+  name: string;
+}[];

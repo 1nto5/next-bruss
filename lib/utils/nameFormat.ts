@@ -24,6 +24,19 @@ export function extractNameFromEmail(email: string): string {
   );
 }
 
+export function extractFullNameFromEmail(email: string): string {
+  let nameParts = email.split('@')[0].split('.');
+  let firstName = nameParts[0];
+  let lastName = nameParts.length > 1 ? nameParts[1] : '';
+  return (
+    firstName.charAt(0).toUpperCase() +
+    firstName.slice(1) +
+    ' ' +
+    lastName.charAt(0).toUpperCase() +
+    lastName.slice(1)
+  );
+}
+
 export function getInitialsFromEmail(email: string): string {
   let emailNamePart = email.split('@')[0];
   let nameParts = emailNamePart.split('.');

@@ -82,9 +82,9 @@ export type AddDeviationDraftType = z.infer<typeof addDeviationDraftSchema>;
 
 export const addCorrectiveActionSchema = z.object({
   description: z
-    .string()
+    .string({ message: 'Wprowadź opis!' })
     .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' }),
-  responsible: z.string(),
+  responsible: z.string({ message: 'Wybierz osobę odpowiedzialną!' }),
   deadline: z.date({ message: 'Wybierz datę!' }),
 });
 
