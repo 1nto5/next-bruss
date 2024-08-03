@@ -9,4 +9,5 @@ TODO: fix add / edit pages for capa and admin sections (like deviations)
 TODO: fix errors from server actions and APIs (like deviations)
 TODO: period from cant be older than period to
 TODO: https (Nginx + Certbot)
+TODO: add users name to users objects? (polish letters)
 */
