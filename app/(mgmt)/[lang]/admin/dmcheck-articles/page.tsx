@@ -1,19 +1,16 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
+import { ArticleConfigType } from '@/lib/types/articleConfig';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
-import { ArticleConfigType } from '@/lib/types/articleConfig';
 
 async function getData(
   lang: string,
 ): Promise<{ fetchTime: string; allConfigs: ArticleConfigType[] }> {
   try {
-    const response = await fetch(
-      `${process.env.API}/admin/get-article-configs`,
-      {
-        next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
-      },
-    );
+    const response = await fetch(`${process.env.API}/admin/article-configs`, {
+      next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
+    });
 
     const dateFromResponse = new Date(response.headers.get('date') || '');
     const fetchTime = dateFromResponse.toLocaleString(lang);

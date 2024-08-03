@@ -1,15 +1,15 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { columns } from './table/columns';
-import { DataTable } from './table/data-table';
 import { UserType } from '@/lib/types/user';
 import { User } from 'next-auth';
+import { columns } from './table/columns';
+import { DataTable } from './table/data-table';
 
 async function getData(
   lang: string,
 ): Promise<{ fetchTime: string; allUsers: UserType[] }> {
   try {
-    const response = await fetch(`${process.env.API}/admin/get-all-users`, {
+    const response = await fetch(`${process.env.API}/admin/all-users`, {
       next: { revalidate: 60 * 15, tags: ['users'] },
     });
 

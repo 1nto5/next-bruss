@@ -1,16 +1,16 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
+import Container from '@/components/ui/container';
+import { extractNameFromEmail } from '@/lib//utils/nameFormat';
 import { Capa, columns } from './table/columns';
 import { DataTable } from './table/data-table';
-import { extractNameFromEmail } from '@/lib//utils/nameFormat';
-import Container from '@/components/ui/container';
 
 async function getCapaHistory(
   lang: string,
   articleNumber: string,
 ): Promise<{ fetchTime: string; allCapa: Capa[] }> {
   const res = await fetch(
-    `${process.env.API}/capa/get-capa-history?articleNumber=${articleNumber}`,
+    `${process.env.API}/capa/capa-history?articleNumber=${articleNumber}`,
     {
       next: { revalidate: 60 * 15, tags: ['capaHistory'] },
     },
