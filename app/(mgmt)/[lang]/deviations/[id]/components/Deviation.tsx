@@ -26,6 +26,7 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { approveDeviation } from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
+import TableCellCorrectiveAction from './TableCellCorrectiveAction';
 
 export default function Deviation({
   deviation,
@@ -303,6 +304,7 @@ export default function Deviation({
                     <TableHeader>
                       <TableRow>
                         <TableHead className='min-w-[250px]'>Akcja</TableHead>
+                        <TableHead></TableHead>
                         <TableHead>Osoba odpowiedzialna</TableHead>
                         <TableHead>Termin wykonania</TableHead>
                         <TableHead>Wykonano</TableHead>
@@ -311,16 +313,13 @@ export default function Deviation({
                     <TableBody>
                       {deviation?.correctiveActions?.map((action, index) => (
                         <TableRow key={index}>
-                          <TableCell className='font-medium'>
-                            {action.description}
-                          </TableCell>
-                          <TableCell>
-                            {extractNameFromEmail(action.responsible)}
-                          </TableCell>
-                          <TableCell>
-                            {new Date(action.deadline).toLocaleDateString(lang)}
-                          </TableCell>
-                          <TableCell>{action.done ? 'tak' : 'nie'}</TableCell>
+                          <TableCellCorrectiveAction
+                            description={action.description}
+                            responsible={action.responsible}
+                            deadline={action.deadline}
+                            done={action.done}
+                            handleApproval={handleApproval}
+                          />
                         </TableRow>
                       ))}
                     </TableBody>

@@ -13,15 +13,12 @@ export function getLastNameFirstLetter(fullName: string): string {
 
 export function extractNameFromEmail(email: string): string {
   let nameParts = email.split('@')[0].split('.');
-  let firstName = nameParts[0];
-  let lastNameInitial =
-    nameParts.length > 1 ? nameParts[1].charAt(0) + '.' : '';
-  return (
-    firstName.charAt(0).toUpperCase() +
-    firstName.slice(1) +
-    ' ' +
-    lastNameInitial.toUpperCase()
-  );
+  const lastName =
+    nameParts.length > 1
+      ? nameParts[1].charAt(0).toUpperCase() + nameParts[1].slice(1)
+      : '';
+  let firstNameInitial = nameParts[0].charAt(0).toUpperCase() + '.';
+  return firstNameInitial + ' ' + lastName;
 }
 
 export function extractFullNameFromEmail(email: string): string {
