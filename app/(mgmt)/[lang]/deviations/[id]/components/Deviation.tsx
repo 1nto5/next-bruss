@@ -146,8 +146,17 @@ export default function Deviation({
                 <Table>
                   <TableBody>
                     <TableRow>
+                      <TableCell className='font-medium'>Utworzono:</TableCell>
+                      <TableCell>
+                        {deviation?.createdAt
+                          ? new Date(deviation.createdAt).toLocaleString(lang)
+                          : '-'}
+                      </TableCell>
+                    </TableRow>
+
+                    <TableRow>
                       <TableCell className='font-medium'>Numer:</TableCell>
-                      <TableCell>{deviation?.articleNumber || '-'}</TableCell>
+                      <TableCell>{deviation?.articleNumber || '-'}</TableCell>Ū
                     </TableRow>
 
                     <TableRow>
@@ -158,6 +167,13 @@ export default function Deviation({
                     <TableRow>
                       <TableCell className='font-medium'>
                         Numer części klienta:
+                      </TableCell>
+                      <TableCell>{deviation?.customerNumber || '-'}</TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                      <TableCell className='font-medium'>
+                        Nazwa części klienta:
                       </TableCell>
                       <TableCell>{deviation?.customerNumber || '-'}</TableCell>
                     </TableRow>
