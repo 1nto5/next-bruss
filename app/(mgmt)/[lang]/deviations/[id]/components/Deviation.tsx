@@ -24,7 +24,7 @@ import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { approveDeviation } from '../actions';
+import { approveDeviation, confirmCorrectiveActionExecution } from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
 import TableCellCorrectiveAction from './TableCellCorrectiveAction';
 
@@ -37,15 +37,9 @@ export default function Deviation({
   lang: string;
   session: Session | null;
 }) {
-  // const [isPendingInsert, setIsPendingInserting] = useState(false);
-  // const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
   const [isPendingApproval, startApprovalTransition] = useTransition();
-
-  // 'group-leader': 'groupLeaderApproval',
-  // 'quality-manager': 'qualityManagerApproval',
-  // 'engineering-manager': 'engineeringManagerApproval',
-  // 'maintenance-manager': 'maintenanceManagerApproval',
-  // 'production-manager': 'productionManagerApproval',
+  const [isPendingConfirmExecution, startConfirmExecutionTransition] =
+    useTransition();
 
   const deviationUserRole = session?.user.roles?.find((role) => {
     return [
@@ -66,14 +60,6 @@ export default function Deviation({
           return;
         }
 
-        console.log(
-          'handleApproval',
-          'deviation.id',
-          deviation._id,
-          'deviationUserRole',
-          deviationUserRole,
-        );
-
         if (deviation._id && deviationUserRole) {
           console.log('tu');
           const res = await approveDeviation(
@@ -87,20 +73,6 @@ export default function Deviation({
             toast.error('Skontaktuj się z IT!');
           }
         }
-
-        // if (articleNumber.length === 5) {
-        //   const res = await findArticleName(articleNumber);
-        //   if (res.success) {
-        //     form.setValue('articleName', res.success);
-        //   } else if (res.error === 'not found') {
-        //     toast.error('Nie znaleziono artykułu');
-        //   } else if (res.error) {
-        //     console.error(res.error);
-        //     toast.error('Skontaktuj się z IT!');
-        //   }
-        // } else {
-        //   toast.error('Wprowadź poprawny numer artykułu');
-        // }
       } catch (error) {
         console.error('handleFindArticleName', error);
         toast.error('Skontaktuj się z IT!');
@@ -108,57 +80,31 @@ export default function Deviation({
     });
   };
 
-  // const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
-  //   setIsPendingInserting(true);
-  //   if (!deviation?.id) {
-  //     console.error('onSubmit', 'deviation.id is missing');
-  //     toast.error('Skontaktuj się z IT!');
-  //     return;
-  //   }
-  //   try {
-  //     const res = await insertDeviationFromDraft(deviation.id, data);
-  //     if (res.success) {
-  //       toast.success('Odchylenie dodane!');
-  //       // form.reset()
-  //       redirectToDeviations();
-  //     } else if (res.error) {
-  //       console.error('onSubmit', res.error);
-  //       toast.error('Skontaktuj się z IT!');
-  //     }
-  //   } catch (error) {
-  //     console.error('onSubmit', error);
-  //     toast.error('Skontaktuj się z IT!');
-  //   } finally {
-  //     setIsPendingInserting(false);
-  //   }
-  // };
-
-  // const handleDraftUpdate = async (
-  //   data: z.infer<typeof addDeviationDraftSchema>,
-  // ) => {
-  //   setIsPendingUpdatingDraft(true);
-  //   if (!deviation?.id) {
-  //     console.error('onSubmit', 'deviation.id is missing');
-  //     toast.error('Skontaktuj się z IT!');
-  //     return;
-  //   }
-  //   try {
-  //     const res = await updateDraftDeviation(deviation?.id, data);
-  //     if (res.success) {
-  //       toast.success('Szkic zapisany!');
-  //       // form.reset();
-  //       redirectToDeviations();
-  //     } else if (res.error) {
-  //       console.error('handleDraftUpdate', res.error);
-  //       toast.error('Skontaktuj się z IT!');
-  //     }
-  //   } catch (error) {
-  //     console.error('handleDraftUpdate', error);
-  //     toast.error('Skontaktuj się z IT!');
-  //   } finally {
-  //     setIsPendingUpdatingDraft(false);
-  //   }
-  // };
+  const handleConfirmExecution = (correctiveActionIndex: number) => {
+    console.log('handleConfirmExecution');
+    startConfirmExecutionTransition(async () => {
+      try {
+        if (!deviation?._id) {
+          console.error('handleApproval', 'deviation.id is missing');
+          toast.error('Skontaktuj się z IT!');
+          return;
+        }
+        const res = await confirmCorrectiveActionExecution(
+          deviation._id.toString(),
+          correctiveActionIndex,
+        );
+        if (res.success) {
+          toast.success('Akcja korygująca została zakończona!');
+        } else if (res.error) {
+          console.error('handleConfirmExecution', res.error);
+          toast.error('Skontaktuj się z IT!');
+        }
+      } catch (error) {
+        console.error('handleConfirmExecution', error);
+        toast.error('Skontaktuj się z IT!');
+      }
+    });
+  };
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
@@ -210,6 +156,13 @@ export default function Deviation({
                     </TableRow>
 
                     <TableRow>
+                      <TableCell className='font-medium'>
+                        Numer części klienta:
+                      </TableCell>
+                      <TableCell>{deviation?.customerNumber || '-'}</TableCell>
+                    </TableRow>
+
+                    <TableRow>
                       <TableCell className='font-medium'>Stanowisko:</TableCell>
                       <TableCell>{deviation?.workplace || '-'}</TableCell>
                     </TableRow>
@@ -222,8 +175,7 @@ export default function Deviation({
                     <TableRow>
                       <TableCell className='font-medium'>Ilość:</TableCell>
                       <TableCell>
-                        {`${deviation?.quantity?.value} ${deviation?.quantity?.unit === 'pcs' ? 'szt.' : deviation?.quantity?.unit || ''}` ||
-                          '-'}
+                        {`${deviation?.quantity?.value || '-'} ${deviation?.quantity?.unit === 'pcs' ? 'szt.' : deviation?.quantity?.unit || ''}`}
                       </TableCell>
                     </TableRow>
 
@@ -268,13 +220,6 @@ export default function Deviation({
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Numer części klienta:
-                      </TableCell>
-                      <TableCell>{deviation?.customerNumber || '-'}</TableCell>
-                    </TableRow>
-
-                    <TableRow>
-                      <TableCell className='font-medium'>
                         Autoryzacja klienta:
                       </TableCell>
                       <TableCell>
@@ -290,7 +235,7 @@ export default function Deviation({
                 <CardHeader>
                   <div className='flex justify-between'>
                     <CardTitle>Akcje korygujące</CardTitle>
-
+                    {/* TODO: who should have access to add corrective actions? */}
                     <Link href={`/deviations/${deviation?._id}/corrective/add`}>
                       <Button size='icon' variant='outline'>
                         <CopyPlus />
@@ -307,7 +252,7 @@ export default function Deviation({
                         <TableHead></TableHead>
                         <TableHead>Osoba odpowiedzialna</TableHead>
                         <TableHead>Termin wykonania</TableHead>
-                        <TableHead>Wykonano</TableHead>
+                        <TableHead>Zakończono</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -317,8 +262,10 @@ export default function Deviation({
                             description={action.description}
                             responsible={action.responsible}
                             deadline={action.deadline}
-                            done={action.done}
-                            handleApproval={handleApproval}
+                            executedAt={action.executedAt}
+                            handle={() => handleConfirmExecution(index)}
+                            lang={lang}
+                            user={session?.user.email || undefined}
                           />
                         </TableRow>
                       ))}

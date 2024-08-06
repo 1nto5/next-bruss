@@ -11,7 +11,7 @@ type correctiveActionType = {
   responsible: string;
   deadline: Date | string;
   added: { at: Date | string; by: string };
-  done: boolean;
+  executedAt?: Date | string;
 };
 
 export type DeviationType = {
@@ -28,6 +28,8 @@ export type DeviationType = {
   articleNumber?: string;
   articleName?: string;
   workplace?: string;
+  customerNumber?: string;
+  customerName?: string;
   drawingNumber?: string;
   quantity?: { value?: number; unit?: string };
   charge?: string;
@@ -37,7 +39,6 @@ export type DeviationType = {
   area?: string;
   description?: string;
   processSpecification?: string;
-  customerNumber?: string;
   customerAuthorization: boolean;
   owner: string;
   createdAt: Date | string;

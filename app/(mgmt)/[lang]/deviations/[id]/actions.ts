@@ -10,7 +10,6 @@ import { redirect } from 'next/navigation';
 
 export async function approveDeviation(id: string, userRole: string) {
   const session = await auth();
-  console.log('tu');
   if (
     !session ||
     !session.user.email ||
@@ -40,9 +39,6 @@ export async function approveDeviation(id: string, userRole: string) {
     } as ApprovalType,
   };
 
-  console.log('updateField', updateField);
-  console.log('id', id);
-
   try {
     const coll = await dbc('deviations');
     const update = await coll.updateOne(
@@ -53,13 +49,64 @@ export async function approveDeviation(id: string, userRole: string) {
     );
 
     if (update.matchedCount === 0) {
-      return { error: 'deviation not found' };
+      return { error: 'not found' };
     }
     revalidateDeviationsAndDeviation();
-    return { success: 'deviation approved', update };
+    return { success: 'approved' };
   } catch (error) {
     console.error(error);
     return { error: 'approveDeviation server action error' };
+  }
+}
+
+export async function confirmCorrectiveActionExecution(
+  id: string,
+  correctiveActionIndex: number,
+) {
+  const session = await auth();
+  if (!session || !session.user.email) {
+    return { error: 'unauthorized' };
+  }
+  try {
+    const coll = await dbc('deviations');
+    const deviation = await coll.findOne({ _id: new ObjectId(id) });
+    if (!deviation) {
+      return { error: 'not found' };
+    }
+    if (deviation.owner !== session.user.email) {
+      return { error: 'unauthorized' };
+    }
+
+    const correctiveActions = deviation.correctiveActions || [];
+    if (
+      correctiveActionIndex < 0 ||
+      correctiveActionIndex >= correctiveActions.length
+    ) {
+      return { error: 'invalid index' };
+    }
+
+    correctiveActions[correctiveActionIndex].executedAt = new Date();
+
+    const updateField: Partial<DeviationType> = {
+      correctiveActions,
+    };
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: updateField,
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateDeviationsAndDeviation();
+    return { success: 'updated' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'confirmCorrectiveActionExecution server action error' };
   }
 }
 

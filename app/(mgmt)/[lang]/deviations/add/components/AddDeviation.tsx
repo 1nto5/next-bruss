@@ -237,6 +237,34 @@ export default function AddDeviation({
               />
             </div>
 
+            <FormField
+              control={form.control}
+              name='customerNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Numer części klienta</FormLabel>
+                  <FormControl>
+                    <Input className='w-48' placeholder='' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='customerName'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nazwa części klienta</FormLabel>
+                  <FormControl>
+                    <Input className='w-48' placeholder='' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className='flex space-x-2'>
               <FormField
                 control={form.control}
@@ -524,20 +552,6 @@ export default function AddDeviation({
                       placeholder={`Wprowadź specyfikację procesu gdy dotyczy`}
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='customerNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numer części klienta</FormLabel>
-                  <FormControl>
-                    <Input className='w-48' placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

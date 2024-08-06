@@ -12,48 +12,50 @@ import { Button } from '@/components/ui/button';
 import { TableCell } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog';
-import { ClipboardPen } from 'lucide-react';
+import { ClipboardCheck } from 'lucide-react';
 
 type TableCellCorrectiveActionProps = {
   description: string;
   responsible: string;
   deadline: string | Date;
-  done: boolean | undefined;
-  handleApproval: () => void;
+  executedAt?: string | Date;
+  handle: () => void;
   lang: string;
+  user?: string;
 };
 
 const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   description,
   responsible,
   deadline,
-  done,
-  handleApproval,
+  executedAt,
+  handle,
   lang,
+  user,
 }) => {
   return (
     <>
       <TableCell>{description}</TableCell>
 
       <TableCell>
-        {!done && (
+        {!executedAt && responsible === user && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size='icon' type='button' variant='outline'>
-                <ClipboardPen />
+                <ClipboardCheck />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Jesteś pewien?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Czy na pewno chcesz zatwierdzić to odchylenie?
+                  Czy wybrana akcja korygująca została wykonana?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Anuluj</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleApproval()}>
-                  Zatwierdzam
+                <AlertDialogAction onClick={() => handle()}>
+                  Potwierdź
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -62,7 +64,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       </TableCell>
       <TableCell>{extractNameFromEmail(responsible)}</TableCell>
       <TableCell>{new Date(deadline).toLocaleDateString(lang)}</TableCell>
-      <TableCell>{done ? 'tak' : 'nie'}</TableCell>
+      <TableCell>
+        {executedAt ? new Date(executedAt).toLocaleString(lang) : '-'}
+      </TableCell>
     </>
   );
 };

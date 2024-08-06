@@ -40,7 +40,6 @@ export async function updateCorrectiveAction(
                 at: new Date(),
                 by: session.user.email,
               },
-              done: false,
             },
           ],
         },

@@ -7,6 +7,8 @@ export const addDeviationSchema = z.object({
   articleName: z
     .string({ message: 'Wprowadź nazwę artykułu!' })
     .min(5, { message: 'Wprowadź poprawną nazwę artykułu!' }),
+  customerNumber: z.string().optional(),
+  customerName: z.string().optional(),
   workplace: z
     .string()
     .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
@@ -36,7 +38,6 @@ export const addDeviationSchema = z.object({
     .min(2, { message: 'Wprowadź poprawną nazwę obszaru!' })
     .optional(),
   processSpecification: z.string().optional(),
-  customerNumber: z.string().optional(),
   customerAuthorization: z.boolean(),
 });
 
@@ -45,6 +46,8 @@ export type AddDeviationType = z.infer<typeof addDeviationSchema>;
 export const addDeviationDraftSchema = z.object({
   articleNumber: z.string().optional(),
   articleName: z.string().optional(),
+  customerNumber: z.string().optional(),
+  customerName: z.string().optional(),
   workplace: z
     .string()
     .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
@@ -74,7 +77,6 @@ export const addDeviationDraftSchema = z.object({
     .min(2, { message: 'Wprowadź poprawną nazwę obszaru!' })
     .optional(),
   processSpecification: z.string().optional(),
-  customerNumber: z.string().optional(),
   customerAuthorization: z.boolean(),
 });
 

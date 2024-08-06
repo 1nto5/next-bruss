@@ -27,30 +27,24 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { DeviationReasonType } from '@/lib/types/deviation';
 import { UsersListType } from '@/lib/types/user';
 import { cn } from '@/lib/utils';
 import { addCorrectiveActionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import {
-  AArrowDown,
   CalendarIcon,
   Check,
   ChevronsUpDown,
   Eraser,
   Loader2,
-  Pencil,
   Plus,
   Table,
 } from 'lucide-react';
@@ -59,13 +53,7 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import {
-  // findArticleName,
-  // insertDeviation,
-  // insertDraftDeviation,
-  redirectToDeviation,
-  updateCorrectiveAction,
-} from '../actions';
+import { redirectToDeviation, updateCorrectiveAction } from '../actions';
 
 type AddCorrectiveActionPropsType = {
   id: string;
