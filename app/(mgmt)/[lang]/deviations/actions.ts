@@ -32,7 +32,7 @@ export async function deleteDraftDeviation(_id: ObjectId) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while deleting the deviation.');
+    throw new Error('deleteDraftDeviation server action error');
   }
 }
 
