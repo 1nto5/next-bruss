@@ -18,13 +18,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DeviationType } from '@/lib/types/deviation';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+// import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { CopyPlus, Plus, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { approveDeviation, confirmCorrectiveActionExecution } from '../actions';
+import {
+  approveDeviation,
+  confirmCorrectiveActionExecution,
+  sendReminderEmail,
+} from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
 import TableCellCorrectiveAction from './TableCellCorrectiveAction';
 
@@ -132,6 +136,11 @@ export default function Deviation({
             </Button>
           </Link>
         </div>
+        <button
+          onClick={() => sendReminderEmail(deviation?._id?.toString() || '')}
+        >
+          test
+        </button>
         <CardDescription>ID: {deviation?._id?.toString()}</CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
@@ -156,7 +165,7 @@ export default function Deviation({
 
                     <TableRow>
                       <TableCell className='font-medium'>Numer:</TableCell>
-                      <TableCell>{deviation?.articleNumber || '-'}</TableCell>Ū
+                      <TableCell>{deviation?.articleNumber || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
