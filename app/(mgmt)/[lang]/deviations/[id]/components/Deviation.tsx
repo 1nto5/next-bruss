@@ -24,11 +24,7 @@ import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import {
-  approveDeviation,
-  confirmCorrectiveActionExecution,
-  sendReminderEmail,
-} from '../actions';
+import { approveDeviation, sendReminderEmail } from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
 import TableCellCorrectiveAction from './TableCellCorrectiveAction';
 
@@ -42,8 +38,6 @@ export default function Deviation({
   session: Session | null;
 }) {
   const [isPendingApproval, startApprovalTransition] = useTransition();
-  const [isPendingConfirmExecution, startConfirmExecutionTransition] =
-    useTransition();
 
   const deviationUserRole = session?.user.roles?.find((role) => {
     return [
@@ -84,30 +78,24 @@ export default function Deviation({
     });
   };
 
-  const handleConfirmExecution = (correctiveActionIndex: number) => {
-    console.log('handleConfirmExecution');
-    startConfirmExecutionTransition(async () => {
-      try {
-        if (!deviation?._id) {
-          console.error('handleApproval', 'deviation.id is missing');
-          toast.error('Skontaktuj się z IT!');
-          return;
-        }
-        const res = await confirmCorrectiveActionExecution(
-          deviation._id.toString(),
-          correctiveActionIndex,
-        );
-        if (res.success) {
-          toast.success('Akcja korygująca została zakończona!');
-        } else if (res.error) {
-          console.error('handleConfirmExecution', res.error);
-          toast.error('Skontaktuj się z IT!');
-        }
-      } catch (error) {
-        console.error('handleConfirmExecution', error);
+  const handleSendReminderEmail = async () => {
+    try {
+      if (!deviation?._id) {
+        console.error('handleSendReminderEmail', 'deviation.id is missing');
+        toast.error('Skontaktuj się z IT!');
+        return;
+      }
+      const res = await sendReminderEmail(deviation._id.toString());
+      if (res.success) {
+        toast.success('Wysłano przypomnienie!');
+      } else if (res.error) {
+        console.error('handleSendReminderEmail', res.error);
         toast.error('Skontaktuj się z IT!');
       }
-    });
+    } catch (error) {
+      console.error('handleSendReminderEmail', error);
+      toast.error('Skontaktuj się z IT!');
+    }
   };
 
   const statusCardTitle = () => {
@@ -136,11 +124,7 @@ export default function Deviation({
             </Button>
           </Link>
         </div>
-        <button
-          onClick={() => sendReminderEmail(deviation?._id?.toString() || '')}
-        >
-          test
-        </button>
+        <button onClick={() => handleSendReminderEmail()}>test</button>
         <CardDescription>ID: {deviation?._id?.toString()}</CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
@@ -288,9 +272,11 @@ export default function Deviation({
                             responsible={action.responsible}
                             deadline={action.deadline}
                             executedAt={action.executedAt}
-                            handle={() => handleConfirmExecution(index)}
+                            // handle={() => handleConfirmExecution(index)}
                             lang={lang}
                             user={session?.user.email || undefined}
+                            correctiveActionIndex={index}
+                            id={deviation?._id?.toString() || ''}
                           />
                         </TableRow>
                       ))}

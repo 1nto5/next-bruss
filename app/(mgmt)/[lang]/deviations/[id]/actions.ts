@@ -149,16 +149,14 @@ export async function sendReminderEmail(id: string) {
     // Define email options
     const mailOptions = {
       from: `"Odchylenia (Next BRUSS)" <${process.env.NODEMAILER_MAIL}>`,
-      to: deviation.owner,
+      to: deviation.owner, //TODO: change to the proper emails - managers who should take action - group leader, quality manager, engineering manager, maintenance manager, production manager (if they haven’t approved yet)
       subject: 'Prośba o działanie',
-      text: '',
-      html: `${extractFullNameFromEmail(session.user.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="http://localhost:3000/pl/deviations/${id}">kliknij aby otworzyć</a>.`,
+      html: `${extractFullNameFromEmail(session.user.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
     };
 
     // Send the email
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
-    return { success: 'email sent' };
+    return { success: 'sent' };
   } catch (error) {
     console.error(error);
     return { error: 'sendReminderEmail server action error' };

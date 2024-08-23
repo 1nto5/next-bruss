@@ -70,7 +70,7 @@ export default function AddCorrectiveAction({
   const form = useForm<z.infer<typeof addCorrectiveActionSchema>>({
     resolver: zodResolver(addCorrectiveActionSchema),
     defaultValues: {
-      description: undefined,
+      description: '',
       responsible: undefined,
       // deadline: new Date(new Date().setHours(12, 0, 0, 0) + 86400000),
       deadline: undefined,
