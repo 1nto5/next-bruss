@@ -277,6 +277,7 @@ export default function Deviation({
                             user={session?.user.email || undefined}
                             correctiveActionIndex={index}
                             id={deviation?._id?.toString() || ''}
+                            deviationCreatedAt={new Date(deviation.createdAt)}
                           />
                         </TableRow>
                       ))}

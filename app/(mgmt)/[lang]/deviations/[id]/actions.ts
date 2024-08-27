@@ -64,6 +64,8 @@ export async function approveDeviation(id: string, userRole: string) {
 export async function confirmCorrectiveActionExecution(
   id: string,
   correctiveActionIndex: number,
+  executionTime: Date,
+  additionalInfo?: string,
 ) {
   const session = await auth();
   if (!session || !session.user.email) {
