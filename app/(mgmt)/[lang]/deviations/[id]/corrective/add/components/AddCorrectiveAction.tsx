@@ -78,7 +78,7 @@ export default function AddCorrectiveAction({
   });
 
   const onSubmit = async (data: z.infer<typeof addCorrectiveActionSchema>) => {
-    console.log('onSubmit', data);
+    // console.log('onSubmit', data);
     setIsPendingUpdating(true);
     try {
       const res = await updateCorrectiveAction(id, data);
@@ -196,9 +196,8 @@ export default function AddCorrectiveAction({
                             )}
                           >
                             {field.value
-                              ? users.find(
-                                  (language) => language.email === field.value,
-                                )?.name
+                              ? users.find((user) => user.email === field.value)
+                                  ?.name
                               : 'Wybierz'}
                             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                           </Button>

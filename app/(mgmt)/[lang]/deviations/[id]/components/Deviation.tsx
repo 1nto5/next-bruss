@@ -259,28 +259,26 @@ export default function Deviation({
                       <TableRow>
                         <TableHead className='min-w-[250px]'>Akcja</TableHead>
                         <TableHead></TableHead>
-                        <TableHead>Osoba odpowiedzialna</TableHead>
-                        <TableHead>Termin wykonania</TableHead>
-                        <TableHead>Zakończono</TableHead>
+                        <TableHead>Wykonawca</TableHead>
+                        <TableHead>Deadline</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Aktualizacja</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {deviation?.correctiveActions?.map((action, index) => (
-                        <TableRow key={index}>
-                          <TableCellCorrectiveAction
-                            description={action.description}
-                            responsible={action.responsible}
-                            deadline={action.deadline}
-                            executedAt={action.executedAt}
-                            // handle={() => handleConfirmExecution(index)}
-                            lang={lang}
-                            user={session?.user.email || undefined}
-                            correctiveActionIndex={index}
-                            id={deviation?._id?.toString() || ''}
-                            deviationCreatedAt={new Date(deviation.createdAt)}
-                          />
-                        </TableRow>
-                      ))}
+                      {deviation?.correctiveActions?.map(
+                        (correctiveAction, index) => (
+                          <TableRow key={index}>
+                            <TableCellCorrectiveAction
+                              correctiveAction={correctiveAction}
+                              correctiveActionIndex={index}
+                              deviationId={deviation?._id?.toString() || ''}
+                              lang={lang}
+                              user={session?.user.email || ''}
+                            />
+                          </TableRow>
+                        ),
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>

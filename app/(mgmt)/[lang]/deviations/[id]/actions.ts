@@ -64,7 +64,7 @@ export async function approveDeviation(id: string, userRole: string) {
 export async function confirmCorrectiveActionExecution(
   id: string,
   correctiveActionIndex: number,
-  executionTime: Date,
+  executedAt: Date,
   additionalInfo?: string,
 ) {
   const session = await auth();
@@ -89,7 +89,8 @@ export async function confirmCorrectiveActionExecution(
       return { error: 'invalid index' };
     }
 
-    correctiveActions[correctiveActionIndex].executedAt = new Date();
+    correctiveActions[correctiveActionIndex].executedAt = executedAt;
+    correctiveActions[correctiveActionIndex].additionalInfo = additionalInfo;
 
     const updateField: Partial<DeviationType> = {
       correctiveActions,

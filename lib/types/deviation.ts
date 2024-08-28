@@ -6,12 +6,13 @@ export type ApprovalType = {
   at: Date | string;
 };
 
-type correctiveActionType = {
+export type correctiveActionType = {
   description: string;
   responsible: string;
   deadline: Date | string;
   added: { at: Date | string; by: string };
-  executedAt?: Date | string;
+  status: 'open' | 'closed' | 'overdue' | 'in progress' | 'rejected';
+  updated?: { at: Date | string; by: string };
 };
 
 export type DeviationType = {
