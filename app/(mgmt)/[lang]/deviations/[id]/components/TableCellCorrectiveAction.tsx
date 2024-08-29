@@ -35,7 +35,10 @@ import {
 import { TableCell } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
-import { correctiveActionType } from '@/lib/types/deviation';
+import {
+  correctiveActionStatusType,
+  correctiveActionType,
+} from '@/lib/types/deviation';
 import { cn } from '@/lib/utils';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
@@ -51,7 +54,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { confirmCorrectiveActionExecution } from '../actions';
+import { changeCorrectiveActionStatus } from '../actions';
 
 type TableCellCorrectiveActionProps = {
   correctiveAction: correctiveActionType;
@@ -71,9 +74,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   const form = useForm<z.infer<typeof confirmActionExecutionSchema>>({
     resolver: zodResolver(confirmActionExecutionSchema),
     defaultValues: {
-      additionalInfo: '',
+      executedAt: new Date(new Date().setHours(12, 0, 0, 0)),
       status: '',
-      updatedAt: new Date(new Date().setHours(12, 0, 0, 0)),
+      comment: '',
     },
   });
 
@@ -84,11 +87,19 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   ) => {
     setIsPending(true);
     try {
-      const res = await confirmCorrectiveActionExecution(
+      const status = {
+        value: data.status as correctiveActionType['status']['value'],
+        comment: data.comment,
+        executedAt: new Date(data.executedAt),
+        changed: {
+          at: new Date(),
+          by: user,
+        },
+      };
+      const res = await changeCorrectiveActionStatus(
         deviationId,
         correctiveActionIndex,
-        data.updatedAt,
-        data.additionalInfo,
+        status,
       );
       if (res.success) {
         toast.success('Akcja korygująca została zakończona!');
@@ -108,7 +119,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       <TableCell>{correctiveAction.description}</TableCell>
 
       <TableCell>
-        {correctiveAction.added.by === user && (
+        {correctiveAction.created.by === user && (
           <Dialog>
             <DialogTrigger asChild>
               <Button size='icon' type='button' variant='outline'>
@@ -128,7 +139,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                   <div className='grid gap-4'>
                     <FormField
                       control={form.control}
-                      name='updatedAt'
+                      name='executedAt'
                       render={({ field }) => (
                         <FormItem className='flex flex-col'>
                           <FormLabel>Data zmiany statusu</FormLabel>
@@ -166,7 +177,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                                 }}
                                 disabled={(date) => {
                                   const today = new Date();
-                                  const minDate = correctiveAction.added.at;
+                                  const minDate = correctiveAction.created.at;
                                   const maxDate = new Date(today);
                                   maxDate.setDate(today.getDate() + 0);
                                   return date < minDate || date > maxDate;
@@ -218,16 +229,20 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                                   <CommandGroup className='max-h-48 overflow-y-auto'>
                                     {statusOptions.map((status) => (
                                       <CommandItem
-                                        value={status.value}
-                                        key={status.value}
+                                        value={status.value.toString()}
+                                        key={status.value.toString()}
                                         onSelect={() => {
-                                          form.setValue('status', status.value);
+                                          form.setValue(
+                                            'status',
+                                            status.value.toString(),
+                                          );
                                         }}
                                       >
                                         <Check
                                           className={cn(
                                             'mr-2 h-4 w-4',
-                                            status.value === field.value
+                                            status.value ===
+                                              (field.value as correctiveActionStatusType['value'])
                                               ? 'opacity-100'
                                               : 'opacity-0',
                                           )}
@@ -246,7 +261,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     />
                     <FormField
                       control={form.control}
-                      name='additionalInfo'
+                      name='comment'
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Dodatkowe informacje</FormLabel>
@@ -276,10 +291,10 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       <TableCell>
         {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
       </TableCell>
-      <TableCell>{correctiveAction.status}</TableCell>
+      <TableCell>{correctiveAction.status.value}</TableCell>
       <TableCell>
-        {correctiveAction.updated?.at
-          ? new Date(correctiveAction.updated.at).toLocaleString(lang)
+        {correctiveAction.created?.at
+          ? new Date(correctiveAction.created.at).toLocaleString(lang)
           : '-'}
       </TableCell>
     </>

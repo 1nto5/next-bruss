@@ -1,7 +1,7 @@
-import { correctiveActionType } from '../types/deviation';
+import { correctiveActionStatusType } from '../types/deviation';
 
 export const correctiveActionStatusOptions: {
-  value: correctiveActionType['status'];
+  value: correctiveActionStatusType['value'];
   label: string;
 }[] = [
   { value: 'open', label: 'Otwarta' },

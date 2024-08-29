@@ -93,9 +93,9 @@ export const addCorrectiveActionSchema = z.object({
 export type AddCorrectiveActionType = z.infer<typeof addCorrectiveActionSchema>;
 
 export const confirmActionExecutionSchema = z.object({
-  additionalInfo: z.string().optional(),
+  comment: z.string().optional(),
   status: z.string({ message: 'Wybierz status!' }),
-  updatedAt: z.date({ message: 'Wybierz datę!' }),
+  executedAt: z.date({ message: 'Wybierz datę!' }),
 });
 
 export type confirmActionExecutionType = z.infer<

@@ -28,6 +28,15 @@ export async function updateCorrectiveAction(
       return { error: 'not authorized' };
     }
 
+    const status = {
+      value: 'open',
+      executedAt: new Date(),
+      changed: {
+        at: new Date(),
+        by: session.user.email,
+      },
+    };
+
     const res = await collection.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -36,10 +45,11 @@ export async function updateCorrectiveAction(
             ...(deviationToUpdate.correctiveActions || []),
             {
               ...correctiveAction,
-              added: {
+              created: {
                 at: new Date(),
                 by: session.user.email,
               },
+              status,
             },
           ],
         },

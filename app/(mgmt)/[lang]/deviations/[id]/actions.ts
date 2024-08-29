@@ -2,7 +2,11 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { ApprovalType, DeviationType } from '@/lib/types/deviation';
+import {
+  ApprovalType,
+  correctiveActionType,
+  DeviationType,
+} from '@/lib/types/deviation';
 import { extractFullNameFromEmail } from '@/lib/utils/nameFormat';
 import { AddDeviationType } from '@/lib/z/deviation';
 import { ObjectId } from 'mongodb';
@@ -61,11 +65,10 @@ export async function approveDeviation(id: string, userRole: string) {
   }
 }
 
-export async function confirmCorrectiveActionExecution(
+export async function changeCorrectiveActionStatus(
   id: string,
-  correctiveActionIndex: number,
-  executedAt: Date,
-  additionalInfo?: string,
+  index: number,
+  status: correctiveActionType['status'][0],
 ) {
   const session = await auth();
   if (!session || !session.user.email) {
@@ -89,7 +92,7 @@ export async function confirmCorrectiveActionExecution(
       return { error: 'invalid index' };
     }
 
-    correctiveActions[correctiveActionIndex].executedAt = executedAt;
+    correctiveActions[correctiveActionIndex].executtionTime = executtionTime;
     correctiveActions[correctiveActionIndex].additionalInfo = additionalInfo;
 
     const updateField: Partial<DeviationType> = {

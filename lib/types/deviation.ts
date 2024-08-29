@@ -9,10 +9,17 @@ export type ApprovalType = {
 export type correctiveActionType = {
   description: string;
   responsible: string;
-  deadline: Date | string;
-  added: { at: Date | string; by: string };
-  status: 'open' | 'closed' | 'overdue' | 'in progress' | 'rejected';
-  updated?: { at: Date | string; by: string };
+  deadline: Date;
+  created: { at: Date; by: string };
+  status: correctiveActionStatusType;
+  statusHistory: correctiveActionStatusType[];
+};
+
+export type correctiveActionStatusType = {
+  value: 'open' | 'closed' | 'overdue' | 'in progress' | 'rejected';
+  comment?: string;
+  executedAt: Date;
+  changed: { at: Date; by: string };
 };
 
 export type DeviationType = {
