@@ -13,7 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  // DialogDescription,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -158,10 +158,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
             <DialogContent className='sm:max-w-[425px]'>
               <DialogHeader>
                 <DialogTitle>Zmiana statusu akcji korygującej</DialogTitle>
-                {/* <DialogDescription>
-                  Wybierz datę wykonania akcji korygującej oraz dodaj dodatkowe
-                  informacje gdy jest to konieczne.
-                </DialogDescription> */}
+                <DialogDescription>
+                  {correctiveAction.description}
+                </DialogDescription>
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -327,11 +326,12 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           </DialogTrigger>
           <DialogContent className='sm:max-w-[600px]'>
             <DialogHeader>
-              <DialogTitle>Historia akcji korygującej</DialogTitle>
-              {/* <DialogDescription>
-                  Wybierz datę wykonania akcji korygującej oraz dodaj dodatkowe
-                  informacje gdy jest to konieczne.
-                </DialogDescription> */}
+              <DialogTitle>
+                Historia zmian statusu akcji korygującej
+              </DialogTitle>
+              <DialogDescription>
+                {correctiveAction.description}
+              </DialogDescription>
             </DialogHeader>
             <Table>
               {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
@@ -339,29 +339,48 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                 <TableRow>
                   <TableHead className='w-[100px]'>Status</TableHead>
                   <TableHead>Data wykonania</TableHead>
-                  <TableHead>Osoba</TableHead>
+                  <TableHead>Zmiana przez</TableHead>
                   <TableHead className='text-right'>Czas edycji</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {correctiveAction.history.map((historyItem, index) => (
-                  <TableRow key={index}>
-                    <TableCell className='font-medium'>
-                      {getStatusLabel(historyItem.value)}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(historyItem.executedAt).toLocaleDateString(
-                        lang,
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {extractNameFromEmail(historyItem.changed.by)}
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      {new Date(historyItem.changed.at).toLocaleString(lang)}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                <TableRow>
+                  <TableCell className='font-medium'>
+                    {getStatusLabel(correctiveAction.status.value)}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(
+                      correctiveAction.status.executedAt,
+                    ).toLocaleDateString(lang)}
+                  </TableCell>
+                  <TableCell>
+                    {extractNameFromEmail(correctiveAction.created.by)}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    {new Date(
+                      correctiveAction.status.changed.at,
+                    ).toLocaleString(lang)}
+                  </TableCell>
+                </TableRow>
+                {correctiveAction.history &&
+                  correctiveAction.history.map((historyItem, index) => (
+                    <TableRow key={index}>
+                      <TableCell className='font-medium'>
+                        {getStatusLabel(historyItem.value)}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(historyItem.executedAt).toLocaleDateString(
+                          lang,
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {extractNameFromEmail(historyItem.changed.by)}
+                      </TableCell>
+                      <TableCell className='text-right'>
+                        {new Date(historyItem.changed.at).toLocaleString(lang)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
 
