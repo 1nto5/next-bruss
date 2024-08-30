@@ -18,6 +18,7 @@ export async function updateCorrectiveAction(
   }
   try {
     const collection = await dbc('deviations');
+    console.log(id);
     const deviationToUpdate = await collection.findOne({
       _id: new ObjectId(id),
     });

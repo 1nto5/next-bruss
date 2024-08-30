@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table';
 import { DeviationType } from '@/lib/types/deviation';
 // import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { CopyPlus, Plus, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
@@ -148,6 +149,13 @@ export default function Deviation({
                     </TableRow>
 
                     <TableRow>
+                      <TableCell className='font-medium'>Właściciel:</TableCell>
+                      <TableCell>
+                        {extractNameFromEmail(deviation?.owner || '') || '-'}
+                      </TableCell>
+                    </TableRow>
+
+                    <TableRow>
                       <TableCell className='font-medium'>Numer:</TableCell>
                       <TableCell>{deviation?.articleNumber || '-'}</TableCell>
                     </TableRow>
@@ -258,11 +266,12 @@ export default function Deviation({
                     <TableHeader>
                       <TableRow>
                         <TableHead className='min-w-[250px]'>Akcja</TableHead>
-                        <TableHead></TableHead>
                         <TableHead>Wykonawca</TableHead>
                         <TableHead>Deadline</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Zmiana statusu</TableHead>
                         <TableHead>Aktualizacja</TableHead>
+                        <TableHead>Historia</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -274,7 +283,8 @@ export default function Deviation({
                               correctiveActionIndex={index}
                               deviationId={deviation?._id?.toString() || ''}
                               lang={lang}
-                              user={session?.user.email || ''}
+                              user={session?.user.email}
+                              deviationOwner={deviation?.owner}
                             />
                           </TableRow>
                         ),

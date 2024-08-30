@@ -13,7 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  // DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -32,7 +32,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { TableCell } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
 import {
@@ -40,7 +48,10 @@ import {
   correctiveActionType,
 } from '@/lib/types/deviation';
 import { cn } from '@/lib/utils';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import {
+  extractFullNameFromEmail,
+  extractNameFromEmail,
+} from '@/lib/utils/nameFormat';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
@@ -49,6 +60,7 @@ import {
   Check,
   ChevronsUpDown,
   ClipboardCheck,
+  History,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -61,7 +73,8 @@ type TableCellCorrectiveActionProps = {
   correctiveActionIndex: number;
   deviationId: string;
   lang: string;
-  user: string;
+  user: string | null | undefined;
+  deviationOwner: string;
 };
 
 const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
@@ -70,6 +83,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   deviationId,
   lang,
   user,
+  deviationOwner,
 }) => {
   const form = useForm<z.infer<typeof confirmActionExecutionSchema>>({
     resolver: zodResolver(confirmActionExecutionSchema),
@@ -82,11 +96,20 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
 
   const [isPending, setIsPending] = useState(false);
 
+  const getStatusLabel = (statusValue: string) => {
+    const status = statusOptions.find((option) => option.value === statusValue);
+    return status?.label || '';
+  };
+
   const onSubmit = async (
     data: z.infer<typeof confirmActionExecutionSchema>,
   ) => {
     setIsPending(true);
     try {
+      if (!user) {
+        console.error('onSubmit', 'no user');
+        return;
+      }
       const status = {
         value: data.status as correctiveActionType['status']['value'],
         comment: data.comment,
@@ -102,13 +125,13 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
         status,
       );
       if (res.success) {
-        toast.success('Akcja korygująca została zakończona!');
+        toast.success('Status został zaktualizowany!');
       } else if (res.error) {
-        console.error('handleConfirmExecution', res.error);
+        console.error('onSubmit', res.error);
         toast.error('Skontaktuj się z IT!');
       }
     } catch (error) {
-      console.error('handleConfirmExecution', error);
+      console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPending(false);
@@ -117,9 +140,15 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   return (
     <>
       <TableCell>{correctiveAction.description}</TableCell>
-
       <TableCell>
-        {correctiveAction.created.by === user && (
+        {extractNameFromEmail(correctiveAction.responsible)}
+      </TableCell>
+      <TableCell>
+        {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
+      </TableCell>
+      <TableCell>{getStatusLabel(correctiveAction.status.value)}</TableCell>
+      <TableCell>
+        {(correctiveAction.created.by === user || user === deviationOwner) && (
           <Dialog>
             <DialogTrigger asChild>
               <Button size='icon' type='button' variant='outline'>
@@ -177,7 +206,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                                 }}
                                 disabled={(date) => {
                                   const today = new Date();
-                                  const minDate = correctiveAction.created.at;
+                                  const minDate = new Date(
+                                    correctiveAction.status.executedAt,
+                                  );
                                   const maxDate = new Date(today);
                                   maxDate.setDate(today.getDate() + 0);
                                   return date < minDate || date > maxDate;
@@ -210,12 +241,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                                     !field.value && 'text-muted-foreground',
                                   )}
                                 >
-                                  {field.value
-                                    ? statusOptions.find(
-                                        (option) =>
-                                          option.value === field.value,
-                                      )?.label
-                                    : 'Wybierz'}
+                                  {getStatusLabel(field.value) || 'Wybierz'}
                                   <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                 </Button>
                               </FormControl>
@@ -285,17 +311,66 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           </Dialog>
         )}
       </TableCell>
-      <TableCell>
-        {extractNameFromEmail(correctiveAction.responsible)}
-      </TableCell>
-      <TableCell>
-        {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
-      </TableCell>
-      <TableCell>{correctiveAction.status.value}</TableCell>
+
       <TableCell>
         {correctiveAction.created?.at
           ? new Date(correctiveAction.created.at).toLocaleString(lang)
           : '-'}
+      </TableCell>
+
+      <TableCell>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button size='icon' type='button' variant='outline'>
+              <History />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className='sm:max-w-[600px]'>
+            <DialogHeader>
+              <DialogTitle>Historia akcji korygującej</DialogTitle>
+              {/* <DialogDescription>
+                  Wybierz datę wykonania akcji korygującej oraz dodaj dodatkowe
+                  informacje gdy jest to konieczne.
+                </DialogDescription> */}
+            </DialogHeader>
+            <Table>
+              {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
+              <TableHeader>
+                <TableRow>
+                  <TableHead className='w-[100px]'>Status</TableHead>
+                  <TableHead>Data wykonania</TableHead>
+                  <TableHead>Osoba</TableHead>
+                  <TableHead className='text-right'>Czas edycji</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {correctiveAction.history.map((historyItem, index) => (
+                  <TableRow key={index}>
+                    <TableCell className='font-medium'>
+                      {getStatusLabel(historyItem.value)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(historyItem.executedAt).toLocaleDateString(
+                        lang,
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {extractNameFromEmail(historyItem.changed.by)}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      {new Date(historyItem.changed.at).toLocaleString(lang)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* 
+              <DialogFooter className='pt-4'>
+                <Button type='submit'>Potwierdź</Button>
+              </DialogFooter> */}
+          </DialogContent>
+        </Dialog>
       </TableCell>
     </>
   );

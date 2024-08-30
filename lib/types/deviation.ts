@@ -12,7 +12,7 @@ export type correctiveActionType = {
   deadline: Date;
   created: { at: Date; by: string };
   status: correctiveActionStatusType;
-  statusHistory: correctiveActionStatusType[];
+  history: correctiveActionStatusType[];
 };
 
 export type correctiveActionStatusType = {
@@ -59,7 +59,7 @@ export type DeviationType = {
   maintenanceManagerApproval?: ApprovalType;
   productionManagerApproval?: ApprovalType;
   // plantManagerApproval: ApprovalType;
-  correctiveActions?: correctiveActionType[];
+  correctiveActions: correctiveActionType[];
 };
 
 export type DeviationReasonType = {

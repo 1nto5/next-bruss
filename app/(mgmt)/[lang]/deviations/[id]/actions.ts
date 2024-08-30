@@ -68,7 +68,7 @@ export async function approveDeviation(id: string, userRole: string) {
 export async function changeCorrectiveActionStatus(
   id: string,
   index: number,
-  status: correctiveActionType['status'][0],
+  status: correctiveActionType['status'],
 ) {
   const session = await auth();
   if (!session || !session.user.email) {
@@ -85,29 +85,26 @@ export async function changeCorrectiveActionStatus(
     }
 
     const correctiveActions = deviation.correctiveActions || [];
-    if (
-      correctiveActionIndex < 0 ||
-      correctiveActionIndex >= correctiveActions.length
-    ) {
+    if (index < 0 || index >= correctiveActions.length) {
       return { error: 'invalid index' };
     }
+    const currentStatus = correctiveActions[index].status;
+    const history = correctiveActions[index].history || [];
 
-    correctiveActions[correctiveActionIndex].executtionTime = executtionTime;
-    correctiveActions[correctiveActionIndex].additionalInfo = additionalInfo;
-
-    const updateField: Partial<DeviationType> = {
-      correctiveActions,
-    };
+    history.unshift(currentStatus);
 
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
-        $set: updateField,
+        $set: {
+          [`correctiveActions.${index}.status`]: status,
+          [`correctiveActions.${index}.history`]: history,
+        },
       },
     );
 
     if (update.matchedCount === 0) {
-      return { error: 'not found' };
+      return { error: 'not updated' };
     }
 
     revalidateDeviationsAndDeviation();

@@ -1,11 +1,11 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
+import { dbc } from '@/lib/mongo';
 import { DeviationType } from '@/lib/types/deviation';
-import { AddDeviationType, AddDeviationDraftType } from '@/lib/z/deviation';
+import { AddDeviationDraftType, AddDeviationType } from '@/lib/z/deviation';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function insertDeviation(deviation: AddDeviationType) {
   const session = await auth();
@@ -43,6 +43,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
       }),
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user.email,
+      correctiveActions: [],
     };
 
     const res = await collection.insertOne(deviationToInsert);
@@ -98,6 +99,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
       }),
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user.email,
+      correctiveActions: [],
     };
 
     const res = await collection.insertOne(deviationDraftToInsert);

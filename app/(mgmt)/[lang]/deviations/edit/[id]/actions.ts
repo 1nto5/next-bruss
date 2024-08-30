@@ -94,6 +94,7 @@ export async function insertDeviationFromDraft(
       }),
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user.email,
+      correctiveActions: [],
     };
 
     const res = await collection.insertOne(deviationToInsert);
@@ -156,6 +157,7 @@ export async function updateDraftDeviation(
       }),
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user.email,
+      correctiveActions: [],
     };
     const res = await collection.updateOne(
       { _id: new ObjectId(id), status: 'draft', owner: session.user.email },
