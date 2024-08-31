@@ -33,6 +33,13 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
   TableCaption,
@@ -54,13 +61,14 @@ import {
 } from '@/lib/utils/nameFormat';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import {
   CalendarIcon,
   Check,
   ChevronsUpDown,
   ClipboardCheck,
   History,
+  Loader2,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -74,6 +82,7 @@ type TableCellCorrectiveActionProps = {
   deviationId: string;
   lang: string;
   user: string | null | undefined;
+  userRoles: string[] | null | undefined;
   deviationOwner: string;
 };
 
@@ -83,6 +92,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   deviationId,
   lang,
   user,
+  userRoles,
   deviationOwner,
 }) => {
   const form = useForm<z.infer<typeof confirmActionExecutionSchema>>({
@@ -95,6 +105,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   });
 
   const [isPending, setIsPending] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const getStatusLabel = (statusValue: string) => {
     const status = statusOptions.find((option) => option.value === statusValue);
@@ -126,6 +137,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       );
       if (res.success) {
         toast.success('Status został zaktualizowany!');
+        setOpen(false);
       } else if (res.error) {
         console.error('onSubmit', res.error);
         toast.error('Skontaktuj się z IT!');
@@ -137,6 +149,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       setIsPending(false);
     }
   };
+
   return (
     <>
       <TableCell>{correctiveAction.description}</TableCell>
@@ -148,167 +161,164 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       </TableCell>
       <TableCell>{getStatusLabel(correctiveAction.status.value)}</TableCell>
       <TableCell>
-        {(correctiveAction.created.by === user || user === deviationOwner) && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button size='icon' type='button' variant='outline'>
-                <ClipboardCheck />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button size='icon' type='button' variant='outline'>
+              <ClipboardCheck />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className='sm:max-w-[425px]'>
+            {correctiveAction.status.value === 'closed' ? (
               <DialogHeader>
-                <DialogTitle>Zmiana statusu akcji korygującej</DialogTitle>
+                <DialogTitle>Akcja korygująca zakończona</DialogTitle>
                 <DialogDescription>
-                  {correctiveAction.description}
+                  Nie można zmienić statusu zakończonej akcji korygującej.
                 </DialogDescription>
               </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
-                  <div className='grid gap-4'>
-                    <FormField
-                      control={form.control}
-                      name='executedAt'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                          <FormLabel>Data zmiany statusu</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={'outline'}
-                                  className={cn(
-                                    'w-56 pl-3 text-left font-normal',
-                                    !field.value && 'text-muted-foreground',
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, 'PPP')
-                                  ) : (
-                                    <span>Wybierz datę</span>
-                                  )}
-                                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className='w-auto p-0'
-                              align='start'
+            ) : correctiveAction.created.by === user ||
+              user === deviationOwner ||
+              userRoles?.includes(
+                'group-leader' ||
+                  'quality-manager' ||
+                  'engineering-manager' ||
+                  'maintenance-manager' ||
+                  'production-manager',
+              ) ? (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Zmiana statusu akcji korygującej</DialogTitle>
+                  <DialogDescription>
+                    {correctiveAction.description}
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <div className='grid gap-4'>
+                      <FormField
+                        control={form.control}
+                        name='executedAt'
+                        render={({ field }) => (
+                          <FormItem className='flex flex-col'>
+                            <FormLabel>Data zmiany statusu</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={'outline'}
+                                    className={cn(
+                                      'pl-3 text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, 'PPP')
+                                    ) : (
+                                      <span>Wybierz datę</span>
+                                    )}
+                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className='w-auto p-0'
+                                align='start'
+                              >
+                                <Calendar
+                                  mode='single'
+                                  selected={field.value}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      date.setHours(12, 0, 0, 0);
+                                      field.onChange(date);
+                                    }
+                                  }}
+                                  disabled={(date) => {
+                                    const today = new Date();
+                                    const minDate = new Date(
+                                      correctiveAction.status.executedAt,
+                                    );
+                                    const maxDate = new Date(today);
+                                    maxDate.setDate(today.getDate() + 0);
+                                    return date < minDate || date > maxDate;
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='status'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Status</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
                             >
-                              <Calendar
-                                mode='single'
-                                selected={field.value}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    date.setHours(12, 0, 0, 0);
-                                    field.onChange(date);
-                                  }
-                                }}
-                                disabled={(date) => {
-                                  const today = new Date();
-                                  const minDate = new Date(
-                                    correctiveAction.status.executedAt,
-                                  );
-                                  const maxDate = new Date(today);
-                                  maxDate.setDate(today.getDate() + 0);
-                                  return date < minDate || date > maxDate;
-                                }}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name='status'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                          <FormLabel>Status</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
                               <FormControl>
-                                <Button
-                                  variant='outline'
-                                  role='combobox'
-                                  className={cn(
-                                    'w-[200px] justify-between',
-                                    !field.value && 'text-muted-foreground',
-                                  )}
-                                >
-                                  {getStatusLabel(field.value) || 'Wybierz'}
-                                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                                </Button>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Wybierz' />
+                                </SelectTrigger>
                               </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-[200px] p-0'>
-                              <Command>
-                                <CommandInput placeholder='Szukaj...' />
-                                <CommandList>
-                                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                                  {/* height of the selection window */}
-                                  <CommandGroup className='max-h-48 overflow-y-auto'>
-                                    {statusOptions.map((status) => (
-                                      <CommandItem
-                                        value={status.value.toString()}
-                                        key={status.value.toString()}
-                                        onSelect={() => {
-                                          form.setValue(
-                                            'status',
-                                            status.value.toString(),
-                                          );
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            status.value ===
-                                              (field.value as correctiveActionStatusType['value'])
-                                              ? 'opacity-100'
-                                              : 'opacity-0',
-                                          )}
-                                        />
-                                        {status.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
+                              <SelectContent>
+                                {statusOptions.map((status) => (
+                                  <SelectItem
+                                    key={status.value}
+                                    value={status.value.toString()}
+                                  >
+                                    {status.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='comment'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dodatkowe informacje</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder={`Dowolny tekst dotyczący wykonania akcji korygującej`}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <DialogFooter className='pt-4'>
+                      {isPending ? (
+                        <Button disabled>
+                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                          Potwierdzanie
+                        </Button>
+                      ) : (
+                        <Button type='submit'>Potwierdź</Button>
                       )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name='comment'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Dodatkowe informacje</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder={`Dowolny tekst dotyczący wykonania akcji korygującej`}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <DialogFooter className='pt-4'>
-                    <Button type='submit'>Potwierdź</Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        )}
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </>
+            ) : (
+              <DialogHeader>
+                <DialogTitle>Brak uprawnień</DialogTitle>
+                <DialogDescription>
+                  Nie masz uprawnień do zmiany statusu akcji korygującej.
+                </DialogDescription>
+              </DialogHeader>
+            )}
+          </DialogContent>
+        </Dialog>
       </TableCell>
 
       <TableCell>
@@ -324,7 +334,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
               <History />
             </Button>
           </DialogTrigger>
-          <DialogContent className='sm:max-w-[600px]'>
+          <DialogContent className='sm:max-w-[768px]'>
             <DialogHeader>
               <DialogTitle>
                 Historia zmian statusu akcji korygującej
@@ -339,6 +349,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                 <TableRow>
                   <TableHead className='w-[100px]'>Status</TableHead>
                   <TableHead>Data wykonania</TableHead>
+                  <TableHead>Komentarz</TableHead>
                   <TableHead>Zmiana przez</TableHead>
                   <TableHead className='text-right'>Czas edycji</TableHead>
                 </TableRow>
@@ -353,6 +364,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                       correctiveAction.status.executedAt,
                     ).toLocaleDateString(lang)}
                   </TableCell>
+                  <TableCell>{correctiveAction.status.comment}</TableCell>
                   <TableCell>
                     {extractNameFromEmail(correctiveAction.created.by)}
                   </TableCell>
@@ -373,6 +385,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                           lang,
                         )}
                       </TableCell>
+                      <TableCell>{historyItem.comment}</TableCell>
                       <TableCell>
                         {extractNameFromEmail(historyItem.changed.by)}
                       </TableCell>

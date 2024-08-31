@@ -526,7 +526,9 @@ export default function AddDeviation({
                             const today = new Date();
                             const maxDate = new Date(today);
                             maxDate.setDate(today.getDate() + 180);
-                            return date < today || date > maxDate;
+                            const periodFrom = form.getValues('periodFrom');
+                            if (!periodFrom) return true;
+                            return date <= periodFrom || date > maxDate;
                           }}
                           initialFocus
                         />

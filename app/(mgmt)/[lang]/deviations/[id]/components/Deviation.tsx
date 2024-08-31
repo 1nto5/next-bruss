@@ -284,6 +284,7 @@ export default function Deviation({
                               deviationId={deviation?._id?.toString() || ''}
                               lang={lang}
                               user={session?.user.email}
+                              userRoles={session?.user.roles}
                               deviationOwner={deviation?.owner}
                             />
                           </TableRow>
@@ -302,8 +303,7 @@ export default function Deviation({
                     <TableHeader>
                       <TableRow>
                         <TableHead>Stanowisko</TableHead>
-                        <TableHead></TableHead>
-
+                        <TableHead>Zatwierdź</TableHead>
                         <TableHead>Osoba</TableHead>
                         <TableHead>Czas</TableHead>
                       </TableRow>
@@ -416,7 +416,7 @@ export default function Deviation({
               </CardContent>
             </Card>
           </div>
-          <div>
+          {/* <div>
             <Card>
               <CardHeader>
                 <CardTitle>Historia</CardTitle>
@@ -460,7 +460,7 @@ export default function Deviation({
                 </Table>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>
