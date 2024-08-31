@@ -1,9 +1,8 @@
 'use client';
 
-import { Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 // import { revalidateDeviations as revalidate } from './actions';
@@ -27,24 +26,26 @@ export default function Error({
   };
 
   return (
-    <Alert className='w-[450px]'>
-      <Terminal className='h-4 w-4' />
-      <AlertTitle>Something went wrong!</AlertTitle>
-      <AlertDescription className='mt-8 flex justify-end'>
-        <Button onClick={reload} disabled={isPending}>
-          {isPending ? (
-            <span className='flex items-center'>
-              <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-              Loading
-            </span>
-          ) : (
-            <span className='flex items-center'>
-              <RefreshCcw className='mr-2 h-4 w-4' />
-              Try again
-            </span>
-          )}
-        </Button>
-      </AlertDescription>
-    </Alert>
+    <main className='mt-24 flex justify-center'>
+      <Alert className='w-[450px]'>
+        <Terminal className='h-4 w-4' />
+        <AlertTitle>Something went wrong!</AlertTitle>
+        <AlertDescription className='mt-8 flex justify-end'>
+          <Button onClick={reload} disabled={isPending}>
+            {isPending ? (
+              <span className='flex items-center'>
+                <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+                Loading
+              </span>
+            ) : (
+              <span className='flex items-center'>
+                <RefreshCcw className='mr-2 h-4 w-4' />
+                Try again
+              </span>
+            )}
+          </Button>
+        </AlertDescription>
+      </Alert>
+    </main>
   );
 }

@@ -18,9 +18,9 @@ export default async function Header({
   workplaceHref,
 }: HeaderProps) {
   return (
-    <header className='border-b px-4 py-2 sm:flex sm:justify-between'>
+    <header className='px-6 py-4 sm:flex sm:justify-between'>
       <Container>
-        <div className='relative flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8'>
+        <div className='relative flex h-6 w-full items-center justify-between '>
           <div className='flex items-center'>
             <Link
               href={workplaceHref}
@@ -36,11 +36,11 @@ export default async function Header({
             </span>
           </div>
 
-          <div className='flex items-center gap-x-4'>
+          <div className='flex items-center space-x-2'>
             <LogoutAll logoutAllHref={workplaceHref} />
             <Reload revalidateHref={workplaceHref} />
             <VolumeButton />
-            <ThemeModeToggle buttonStyle='mr-2 lg:mr-0' />
+            <ThemeModeToggle />
           </div>
         </div>
       </Container>

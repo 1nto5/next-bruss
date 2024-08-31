@@ -1,15 +1,20 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { StatusBar } from '../../../components/StatusBar';
 import { redirect } from 'next/navigation';
 import { Scan } from '../../../components/Scan';
+import { StatusBar } from '../../../components/StatusBar';
 
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   getArticleConfigById,
   getOperatorById,
   getPalletQr,
 } from '../../../actions';
+
+import { columns } from './table/columns';
+
 import { PrintPalletLabel } from '../../../components/PrintPalletLabel';
+import { LastScansDataTable } from './table/data-table';
 
 export default async function ScanPage({
   params: { lang, workplaceName, articleConfigId, operatorId },
@@ -129,46 +134,32 @@ export default async function ScanPage({
 
   return (
     <>
-      <div className='w-full'>
-        <StatusBar
-          cDict={dict.dmcheck.scan.statusBar}
-          operator={
-            lang === 'pl'
-              ? `${operatorInitials} (${searchParams.operatorPersonalNumber})`
-              : `${operatorInitials}`
-          }
-          article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
-          boxIsFull={boxStatus?.boxIsFull ? true : false}
-          // boxIsFull={false}
-          boxStatus={`${boxStatus?.piecesInBox.toString()} / ${searchParams.piecesPerBox}`}
-          pallet={searchParams.pallet === 'true' ? true : false}
-          palletIsFull={palletStatus?.palletIsFull}
-          palletStatus={`${palletStatus?.boxesOnPallet.toString()} / ${searchParams.boxesPerPallet}`}
-        />
-      </div>
+      <StatusBar
+        cDict={dict.dmcheck.scan.statusBar}
+        operator={
+          lang === 'pl'
+            ? `${operatorInitials} (${searchParams.operatorPersonalNumber})`
+            : `${operatorInitials}`
+        }
+        article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
+        boxIsFull={boxStatus?.boxIsFull ? true : false}
+        // boxIsFull={false}
+        boxStatus={`${boxStatus?.piecesInBox.toString()} / ${searchParams.piecesPerBox}`}
+        pallet={searchParams.pallet === 'true' ? true : false}
+        palletIsFull={palletStatus?.palletIsFull}
+        palletStatus={`${palletStatus?.boxesOnPallet.toString()} / ${searchParams.boxesPerPallet}`}
+      />
 
-      <div className='w-1/2'>
-        {/* {!boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
-          <ScanDmc
+      <Card className='mt-2'>
+        <CardHeader>
+          <Scan
             cDict={dict.dmcheck.scan}
+            boxIsFull={boxStatus?.boxIsFull}
+            palletIsFull={palletStatus?.palletIsFull}
             articleConfigId={articleConfigId}
             operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
           />
-        )}
-        {boxStatus?.boxIsFull && !palletStatus?.palletIsFull && (
-          <ScanHydra
-            cDict={dict.dmcheck.scan}
-            articleConfigId={articleConfigId}
-            operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
-          />
-        )}
-        {palletStatus?.palletIsFull && (
-          <>
-            <ScanPallet
-              cDict={dict.dmcheck.scan}
-              articleConfigId={articleConfigId}
-              operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
-            />
+          {palletStatus?.palletIsFull && (
             <PrintPalletLabel
               cDict={dict.dmcheck.scan}
               articleNumber={searchParams.articleNumber.toString()}
@@ -179,29 +170,16 @@ export default async function ScanPage({
               }
               qrCode={palletQr}
             />
-          </>
-        )} */}
-        {/* It has to be as one component, otherwise toasts are not shown in case of change of box or pallet status - old component with useEffect is not rendered */}
-        <Scan
-          cDict={dict.dmcheck.scan}
-          boxIsFull={boxStatus?.boxIsFull}
-          palletIsFull={palletStatus?.palletIsFull}
-          articleConfigId={articleConfigId}
-          operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
-        />
-        {palletStatus?.palletIsFull && (
-          <PrintPalletLabel
-            cDict={dict.dmcheck.scan}
-            articleNumber={searchParams.articleNumber.toString()}
-            articleName={searchParams.articleName.toString()}
-            piecesPerPallet={
-              Number(searchParams.boxesPerPallet) *
-              Number(searchParams.piecesPerBox)
-            }
-            qrCode={palletQr}
+          )}
+        </CardHeader>
+        <CardContent>
+          <LastScansDataTable
+            columns={columns}
+            lang={lang}
+            data={[{ dmc: '123456789', time: '2021-09-01T12:00:00Z' }]}
           />
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </>
   );
 }
