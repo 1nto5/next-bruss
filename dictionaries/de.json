@@ -193,6 +193,11 @@
     }
   },
   "dmcheck": {
+    "lastFiveTable": {
+      "tableCaption": "zuletzt erfasste Elemente",
+      "timeTableHead": "Stunde",
+      "dateTableHead": "Daten"
+    },
     "articleSelection": {
       "cardTitle": "Artikel wählen",
       "noArticleConfigForWorkplaceTitle": "Keine Konfiguration!",

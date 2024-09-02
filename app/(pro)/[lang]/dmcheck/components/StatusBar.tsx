@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { twMerge } from 'tailwind-merge';
 import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { BoxDialog } from './BoxDialog';
 
 type StatusBarProps = {
   cDict: any;
@@ -26,7 +27,7 @@ export async function StatusBar({
   const boxStatusBlinkClass = twMerge(
     boxIsFull ? 'animate-ping text-bruss' : '',
   );
-  const boxStatusClass = clsx('text-center text-xl', boxStatusBlinkClass);
+  const boxStatusClass = clsx('text-center text-xl ', boxStatusBlinkClass);
   const palletStatusBlinkClass = twMerge(
     palletIsFull ? 'animate-ping text-bruss' : '',
   );
@@ -51,7 +52,14 @@ export async function StatusBar({
         <CardHeader className='text-center font-extralight'>
           {cDict.inBox}:
         </CardHeader>
-        <CardContent className={boxStatusClass}>{boxStatus}</CardContent>
+        <CardContent className={boxStatusClass}>
+          {boxStatus}
+          <BoxDialog
+            cDict={cDict.boxDialog}
+            lang='pl' // TODO: get proper lang
+            articleConfigId='66d594831dcd4d10ef694c1f' // TODO: get proper articleConfigId
+          />
+        </CardContent>
       </Card>
 
       {pallet && (

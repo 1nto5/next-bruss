@@ -4,8 +4,15 @@ import { dbc } from '@/lib/mongo';
 import pgp from '@/lib/pg';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { z } from 'zod';
+import { redirect } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
+
+// type FormStateType = {
+//   message: string;
+//   dmc?: string;
+//   time?: string;
+// };
 
 export async function personLogin(
   prevState: {
@@ -140,7 +147,10 @@ function bmwDateValidation(dmc: string) {
 }
 
 // save function for all types of scans - dmc, hydra, pallet - toasts are handled in the Scan component in the useEffect
-export async function save(prevState: any, formData: FormData) {
+export async function save(
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
   if (formData.get('dmc')) {
     return await saveDmc(prevState, formData);
   }
@@ -152,8 +162,12 @@ export async function save(prevState: any, formData: FormData) {
   }
 }
 
-export async function saveDmc(prevState: any, formData: FormData) {
+export async function saveDmc(
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
   try {
+    console.log(formData);
     const articleConfigId = formData.get('articleConfigId');
     const articlesConfigCollection = await dbc('articles_config');
     if (!articleConfigId || articleConfigId.toString().length !== 24) {
@@ -264,7 +278,7 @@ export async function saveDmc(prevState: any, formData: FormData) {
 
     if (insertResult) {
       revalidateTag('box');
-      return { message: 'dmc saved' };
+      return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
   } catch (error) {
     console.error(error);
@@ -453,5 +467,31 @@ export async function savePallet(prevState: any, formData: FormData) {
   } catch (error) {
     console.error(error);
     throw new Error('savePallet server action error');
+  }
+}
+
+export async function getInBoxTableData(articleConfigId: string) {
+  try {
+    console.log('executing getInBoxTableData');
+    const scansCollection = await dbc('scans');
+    console.log(articleConfigId);
+    const articleConfig = await getArticleConfigById(articleConfigId);
+    if (!articleConfig) {
+      throw new Error('getInBoxTableData server action error');
+    }
+
+    const scans = await scansCollection
+      .find({
+        article: articleConfig.articleNumber,
+        status: 'box',
+      })
+      .sort({ time: -1 })
+      .project({ dmc: 1, time: 1, _id: 0 })
+      .toArray();
+
+    return scans as { dmc: string; time: string }[];
+  } catch (error) {
+    console.error(error);
+    throw new Error('getInBoxTableData server action error');
   }
 }

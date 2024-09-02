@@ -1,13 +1,12 @@
 'use client';
 
-import { useFormState } from 'react-dom';
-import { useFormStatus } from 'react-dom';
-import { useState, useEffect } from 'react';
-import { personLogin } from '../actions';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { toast } from 'sonner';
+import { personLogin } from '../actions';
 
 const initialState = {
   message: '',
@@ -60,7 +59,7 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
           {Array.from(Array(9).keys()).map((number) => (
             <Button
               type='button'
-              className='w-18 h-12'
+              className='h-14 w-28'
               variant='outline'
               key={number + 1}
               onClick={() => handleNumberClick(number + 1)}
@@ -72,13 +71,13 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
             type='button'
             variant='destructive'
             onClick={() => setPersonalNumber('')}
-            className='w-18 h-12'
+            className='h-14 w-28'
           >
             Reset
           </Button>
           <Button
             type='button'
-            className='w-18 h-12'
+            className='h-14 w-28'
             variant='outline'
             onClick={() => handleNumberClick(0)}
           >

@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { DeviationType } from '@/lib/types/deviation';
+// import { DeviationType } from '@/lib/types/deviation';
 import { AddCorrectiveActionType } from '@/lib/z/deviation';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';

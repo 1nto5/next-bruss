@@ -1,6 +1,7 @@
 import Logo from '@/components/Logo';
 import Container from '@/components/ui/container';
 import Link from 'next/link';
+import { BoxDialog } from './BoxDialog';
 import { LogoutAll } from './Logout';
 import { Reload } from './Reload';
 import { ThemeModeToggle } from './ThemeModeToggle';
@@ -20,7 +21,7 @@ export default async function Header({
   return (
     <header className='px-6 py-4 sm:flex sm:justify-between'>
       <Container>
-        <div className='relative flex h-6 w-full items-center justify-between '>
+        <div className='relative flex h-10 w-full items-center justify-between '>
           <div className='flex items-center'>
             <Link
               href={workplaceHref}
@@ -36,8 +37,9 @@ export default async function Header({
             </span>
           </div>
 
-          <div className='flex items-center space-x-2'>
+          <div className='flex items-center space-x-4'>
             <LogoutAll logoutAllHref={workplaceHref} />
+            {/* <BoxDialog cDict={dict} lang='pl' /> */}
             <Reload revalidateHref={workplaceHref} />
             <VolumeButton />
             <ThemeModeToggle />

@@ -1,7 +1,8 @@
 /*
 TODO: EOL136153 migration to new version
 TODO: BRI: scans history page - 3 sifts
-TODO: BRI: last 5 scans on scan page
+TODO: BRI: in box list table - dialog after click on box
+TODO: BRI: last 5 scans on scan page - query params
 TODO: BRI: empty workplace article on alle workplaces
 TODO: MS365 login
 TODO: copy article config to new article

@@ -1,15 +1,18 @@
 'use client';
 
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import { useEffect } from 'react';
-import { save } from '../actions';
 import { toast } from 'sonner';
-import { ScanInput } from './ScanInput';
 import useSound from 'use-sound';
-import { useSearchParams } from 'next/navigation';
+import { save } from '../actions';
+import { LastFiveTable } from './LastFiveTable';
+import { ScanInput } from './ScanInput';
 
-const initialState = {
+const initialState: { message: string; dmc?: string; time?: string } = {
   message: '',
+  dmc: '',
+  time: '',
 };
 
 type ScanProps = {
@@ -29,6 +32,8 @@ export function Scan({
 }: ScanProps) {
   const [state, formAction] = useFormState(save, initialState);
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const volume = parseFloat(searchParams.get('volume') || '0.75');
   if (isNaN(volume) || volume < 0 || volume > 1) {
     throw new Error(
@@ -43,11 +48,39 @@ export function Scan({
     volume: volume,
   });
 
+  const createQueryString = useCallback(
+    (dmc: string, time: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      const prevLastFive = params.get('lastFive') || '';
+      let lastFiveArray = prevLastFive ? prevLastFive.split(',') : [];
+
+      // Dodaj nową parę na początek tablicy
+      lastFiveArray.unshift(dmc, time);
+
+      // Jeśli liczba elementów przekracza 10, usuń najstarsze elementy z końca tablicy
+      if (lastFiveArray.length > 10) {
+        lastFiveArray = lastFiveArray.slice(0, 10);
+      }
+
+      // Ustaw parametr lastFive z nową wartością
+      params.set('lastFive', lastFiveArray.join(','));
+      return params.toString();
+    },
+    [searchParams],
+  );
+
   useEffect(() => {
     switch (state?.message) {
       case 'dmc saved':
         playOk();
         toast.success(cDict.toast.dmcSaved);
+        console.log(state.dmc, state.time);
+        state.dmc &&
+          state.time &&
+          router.push(
+            pathname + '?' + createQueryString(state.dmc, state.time),
+          );
         break;
       case 'batch saved':
         playOk();

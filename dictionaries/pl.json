@@ -192,6 +192,11 @@
     }
   },
   "dmcheck": {
+    "lastFiveTable": {
+      "tableCaption": "ostatnie pozycje",
+      "timeTableHead": "Godzina",
+      "dateTableHead": "Data"
+    },
     "articleSelection": {
       "cardTitle": "Wybierz artykuł",
       "noArticleConfigForWorkplaceTitle": "Brak konfiguracji!",
@@ -216,7 +221,13 @@
         "operator": "operator",
         "article": "artykuł",
         "inBox": "box",
-        "onPallet": "paleta"
+        "onPallet": "paleta",
+        "boxDialog": {
+          "timeTableHead": "Godzina",
+          "dateTableHead": "Data",
+          "dialogTitle": "Części w boxie",
+          "noDataTableCell": "Box jest pusty!"
+        }
       },
       "dmcScanInputPlaceholder": "skanuj kod DMC...",
       "scanInputSavingPlaceholder": "przetwarzam...",

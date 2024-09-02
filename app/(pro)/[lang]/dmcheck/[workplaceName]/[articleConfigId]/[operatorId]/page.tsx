@@ -5,16 +5,14 @@ import { Scan } from '../../../components/Scan';
 import { StatusBar } from '../../../components/StatusBar';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import {
   getArticleConfigById,
   getOperatorById,
   getPalletQr,
 } from '../../../actions';
-
-import { columns } from './table/columns';
-
+import { LastFiveTable } from '../../../components/LastFiveTable';
 import { PrintPalletLabel } from '../../../components/PrintPalletLabel';
-import { LastScansDataTable } from './table/data-table';
 
 export default async function ScanPage({
   params: { lang, workplaceName, articleConfigId, operatorId },
@@ -132,6 +130,17 @@ export default async function ScanPage({
     palletQr = palletQrValue;
   }
 
+  const lastFivePlainArray = Array.isArray(searchParams.lastFive)
+    ? searchParams.lastFive
+    : (searchParams.lastFive?.split(',') ?? []);
+  const lastFiveArray = [];
+  for (let i = 0; i < lastFivePlainArray.length; i += 2) {
+    lastFiveArray.push({
+      dmc: lastFivePlainArray[i],
+      time: lastFivePlainArray[i + 1],
+    });
+  }
+
   return (
     <>
       <StatusBar
@@ -172,11 +181,12 @@ export default async function ScanPage({
             />
           )}
         </CardHeader>
-        <CardContent>
-          <LastScansDataTable
-            columns={columns}
+        <Separator className='mb-2' />
+        <CardContent className='flex justify-center'>
+          <LastFiveTable
             lang={lang}
-            data={[{ dmc: '123456789', time: '2021-09-01T12:00:00Z' }]}
+            lastFive={lastFiveArray}
+            cDict={dict.dmcheck.lastFiveTable}
           />
         </CardContent>
       </Card>
