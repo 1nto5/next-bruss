@@ -3,7 +3,6 @@ import { getDictionary } from '@/lib/dictionary';
 import { getArticlesForWorkplace } from '../actions';
 import { Info } from '../components/Info';
 
-import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import Link from 'next/link';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -27,10 +27,12 @@ export default async function ArticleSelectionPage({
 
   if (workplaceArticles.length === 0) {
     return (
-      <Info
-        title={cDict.noArticleConfigForWorkplaceTitle}
-        description={`${cDict.noArticleConfigForWorkplaceDescription} ${workplaceName.toUpperCase()}`}
-      />
+      <main className='mt-24 flex justify-center'>
+        <Info
+          title={cDict.noArticleConfigForWorkplaceTitle}
+          description={`${cDict.noArticleConfigForWorkplaceDescription} ${workplaceName.toUpperCase()}`}
+        />
+      </main>
     );
   }
 
