@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Locale } from '@/i18n.config';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { BoxDialog } from './BoxDialog';
+import { BoxCardDialog } from './BoxCardDialog';
+import { PalletCardDialog } from './PalletCardDialog';
 
 type StatusBarProps = {
   cDict: any;
@@ -12,6 +14,8 @@ type StatusBarProps = {
   pallet: boolean;
   palletIsFull?: boolean;
   palletStatus?: string;
+  lang: Locale;
+  articleConfigId: string;
 };
 
 export async function StatusBar({
@@ -23,6 +27,8 @@ export async function StatusBar({
   pallet,
   palletIsFull,
   palletStatus,
+  lang,
+  articleConfigId,
 }: StatusBarProps) {
   const boxStatusBlinkClass = twMerge(
     boxIsFull ? 'animate-ping text-bruss' : '',
@@ -48,29 +54,31 @@ export async function StatusBar({
         <CardContent className='text-center text-xl'>{article}</CardContent>
       </Card>
 
-      <Card className='w-2/12 flex-grow'>
-        <CardHeader className='text-center font-extralight'>
-          {cDict.inBox}:
-        </CardHeader>
-        <CardContent className={boxStatusClass}>
-          {boxStatus}
-          <BoxDialog
-            cDict={cDict.boxDialog}
-            lang='pl' // TODO: get proper lang
-            articleConfigId='66d594831dcd4d10ef694c1f' // TODO: get proper articleConfigId
-          />
-        </CardContent>
-      </Card>
+      <BoxCardDialog
+        boxStatus={boxStatus}
+        cardContentClass={boxStatusClass}
+        cDict={cDict.boxCardDialog}
+        lang={lang}
+        articleConfigId={articleConfigId}
+      />
 
-      {pallet && (
-        <Card className='w-2/12 flex-grow'>
-          <CardHeader className='text-center font-extralight'>
-            {cDict.onPallet}:
-          </CardHeader>
-          <CardContent className={palletStatusClass}>
-            {palletStatus}
-          </CardContent>
-        </Card>
+      {pallet && palletStatus && (
+        <PalletCardDialog
+          palletStatus={palletStatus}
+          cardContentClass={palletStatusClass}
+          cDict={cDict.palletCardDialog}
+          lang={lang}
+          articleConfigId={articleConfigId}
+        />
+
+        // <Card className='w-2/12 flex-grow'>
+        //   <CardHeader className='text-center font-extralight'>
+        //     {cDict.onPallet}:
+        //   </CardHeader>
+        //   <CardContent className={palletStatusClass}>
+        //     {palletStatus}
+        //   </CardContent>
+        // </Card>
       )}
     </div>
   );

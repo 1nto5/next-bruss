@@ -1,7 +1,7 @@
 import Logo from '@/components/Logo';
 import Container from '@/components/ui/container';
 import Link from 'next/link';
-import { BoxDialog } from './BoxDialog';
+import { BoxDialog } from './BoxCardDialog';
 import { LogoutAll } from './Logout';
 import { Reload } from './Reload';
 import { ThemeModeToggle } from './ThemeModeToggle';

@@ -157,6 +157,8 @@ export default async function ScanPage({
         pallet={searchParams.pallet === 'true' ? true : false}
         palletIsFull={palletStatus?.palletIsFull}
         palletStatus={`${palletStatus?.boxesOnPallet.toString()} / ${searchParams.boxesPerPallet}`}
+        lang={lang}
+        articleConfigId={articleConfigId}
       />
 
       <Card className='mt-2'>

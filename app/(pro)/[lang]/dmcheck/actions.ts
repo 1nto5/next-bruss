@@ -495,3 +495,95 @@ export async function getInBoxTableData(articleConfigId: string) {
     throw new Error('getInBoxTableData server action error');
   }
 }
+
+export async function deleteDmcFromBox(dmc: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const result = await scansCollection.updateOne(
+      { dmc, status: 'box' },
+      {
+        $set: {
+          status: 'rework',
+          rework_time: new Date(),
+          reworkReason: 'deleted from box by operator',
+        },
+      },
+    );
+    if (result.modifiedCount === 1) {
+      revalidateTag('box');
+      return { message: 'deleted' };
+    }
+    return { message: 'not found' };
+  } catch (error) {
+    console.error(error);
+    throw new Error('deleteDmcFromBox server action error');
+  }
+}
+
+export async function getBoxesOnPalletTableData(articleConfigId: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const articleConfig = await getArticleConfigById(articleConfigId);
+    if (!articleConfig) {
+      throw new Error('getBoxesOnPalletTableData server action error');
+    }
+
+    const boxes = await scansCollection
+      .aggregate([
+        {
+          $match: {
+            article: articleConfig.articleNumber,
+            status: 'pallet',
+          },
+        },
+        {
+          $group: {
+            _id: '$hydra_batch',
+            hydra_time: { $first: '$hydra_time' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            hydra_batch: '$_id',
+            hydra_time: 1,
+          },
+        },
+        {
+          $sort: {
+            hydra_time: -1,
+          },
+        },
+      ])
+      .toArray();
+
+    return boxes as { hydra_batch: string; hydra_time: string }[];
+  } catch (error) {
+    console.error(error);
+    throw new Error('getBoxesOnPalletTableData server action error');
+  }
+}
+
+export async function deleteBoxFromPallet(hydra_batch: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const result = await scansCollection.updateMany(
+      { hydra_batch, status: 'pallet' },
+      {
+        $set: {
+          status: 'rework',
+          rework_time: new Date(),
+          reworkReason: 'deleted from pallet by operator',
+        },
+      },
+    );
+    if (result.modifiedCount > 0) {
+      revalidateTag('pallet');
+      return { message: 'deleted' };
+    }
+    return { message: 'not found' };
+  } catch (error) {
+    console.error(error);
+    throw new Error('deleteBoxFromPallet server action error');
+  }
+}

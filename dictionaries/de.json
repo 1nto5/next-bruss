@@ -221,8 +221,39 @@
       "statusBar": {
         "operator": "Operator",
         "article": "Artikel",
-        "inBox": "in Box",
-        "onPallet": "auf Palette"
+        "onPallet": "auf Palette",
+        "boxCardDialog": {
+          "cardHeader": "box",
+          "cardHeaderPending": "laden",
+          "timeTableHead": "Stunde",
+          "dateTableHead": "Datum",
+          "dialogTitle": "Teile in box",
+          "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
+          "dmcSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
+          "deleteTableHead": "Löschen",
+          "dmcDeletedToast": "Teil entfernt!",
+          "dmcNotFoundToast": "Keine Teile gefunden!",
+          "alertDialogTitle": "Sind Sie sicher?",
+          "alertDialogDescription": "Sind Sie sicher, dass Sie diesen Teil aus der aktuellen Box entfernen möchten?",
+          "alertDialogCancel": "Ankündigung",
+          "alertDialogAction": "Löschen"
+        },
+        "palletCardDialog": {
+          "cardHeader": "pallet",
+          "cardHeaderPending": "laden",
+          "timeTableHead": "Stunde",
+          "dateTableHead": "Datum",
+          "dialogTitle": "Teile in box",
+          "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
+          "hydraBatchSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
+          "deleteTableHead": "Löschen",
+          "hydraBatchDeletedToast": "Teil entfernt!",
+          "hydraBatchNotFoundToast": "Keine Teile gefunden!",
+          "alertDialogTitle": "Sind Sie sicher?",
+          "alertDialogDescription": "Sind Sie sicher, dass Sie diesen Teil aus der aktuellen Box entfernen möchten?",
+          "alertDialogCancel": "Ankündigung",
+          "alertDialogAction": "Löschen"
+        }
       },
       "dmcScanInputPlaceholder": "DMC-Code scannen...",
       "scanInputSavingPlaceholder": "wird verarbeitet...",

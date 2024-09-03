@@ -12,15 +12,15 @@
       },
       "zero": {
         "title": "Wyzeruj stan",
-        "description": "Zerowanie stanu ilości cześci, gdy użycie opcji rework jest niemożliwe."
+        "description": "Zerowanie stanu ilości części, gdy użycie opcji rework jest niemożliwe."
       },
       "articleConfig": {
         "title": "Dodaj artykuł",
-        "description": "Dodawanie artykułów w systmie skanowania DMC."
+        "description": "Dodawanie artykułów w systemie skanowania DMC."
       },
       "personsConfig": {
         "title": "Dodaj pracownika",
-        "description": "Dodawanie pracowników w systmie skanowania DMC."
+        "description": "Dodawanie pracowników w systemie skanowania DMC."
       }
     },
     "inventory": {
@@ -194,8 +194,8 @@
   "dmcheck": {
     "lastFiveTable": {
       "tableCaption": "ostatnie pozycje",
-      "timeTableHead": "Godzina",
-      "dateTableHead": "Data"
+      "timeTableHead": "godzina",
+      "dateTableHead": "data"
     },
     "articleSelection": {
       "cardTitle": "Wybierz artykuł",
@@ -220,13 +220,38 @@
       "statusBar": {
         "operator": "operator",
         "article": "artykuł",
-        "inBox": "box",
         "onPallet": "paleta",
-        "boxDialog": {
-          "timeTableHead": "Godzina",
-          "dateTableHead": "Data",
+        "boxCardDialog": {
+          "cardHeader": "box",
+          "cardHeaderPending": "ładowanie",
+          "timeTableHead": "godzina",
+          "dateTableHead": "data",
           "dialogTitle": "Części w boxie",
-          "noDataTableCell": "Box jest pusty!"
+          "noDataDialogDescription": "Box jest pusty, rozpocznij skanowanie części.",
+          "dmcSearchInputPlaceholder": "zeskanuj kod DMC aby wyszukać...",
+          "deleteTableHead": "usuń",
+          "dmcDeletedToast": "Część została usunięta!",
+          "dmcNotFoundToast": "Nie znaleziono części!",
+          "alertDialogTitle": "Jesteś pewny?",
+          "alertDialogDescription": "Czy na pewno chcesz usunąć tę część z aktualnego boxa?",
+          "alertDialogCancel": "Anuluj",
+          "alertDialogAction": "Usuń"
+        },
+        "palletCardDialog": {
+          "cardHeader": "paleta",
+          "cardHeaderPending": "ładowanie",
+          "timeTableHead": "godzina",
+          "dateTableHead": "data",
+          "dialogTitle": "Boxy na palecie",
+          "noDataDialogDescription": "Na palecie nie ma jeszcze pełnego boxa.",
+          "hydraBatchSearchInputPlaceholder": "zeskanuj hydra batch aby wyszukać...",
+          "deleteTableHead": "usuń",
+          "hydraBatchDeletedToast": "Box został usunięty!",
+          "hydraBatchNotFoundToast": "Nie znaleziono boxa!",
+          "alertDialogTitle": "Jesteś pewny?",
+          "alertDialogDescription": "Wszystkie części z boxa zostaną usunięte! Czy na pewno chcesz usunąć ten box z aktualnej palety?",
+          "alertDialogCancel": "Anuluj",
+          "alertDialogAction": "Usuń"
         }
       },
       "dmcScanInputPlaceholder": "skanuj kod DMC...",

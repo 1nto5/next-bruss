@@ -18,6 +18,10 @@ export function LastFiveTable({
   lang: Locale;
   lastFive?: { dmc: string; time: string }[];
 }) {
+  if (lastFive?.length === 0 || !lastFive) {
+    return null;
+  }
+
   return (
     <div className='flex w-3/4 justify-center'>
       <Table>
@@ -30,23 +34,22 @@ export function LastFiveTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {lastFive &&
-            lastFive.map((dmc) => (
-              <TableRow key={dmc.dmc}>
-                <TableCell>
-                  {new Date(dmc.time).toLocaleTimeString(lang)}
-                </TableCell>
-                <TableCell>
-                  {new Date(dmc.time).toLocaleDateString(lang)}
-                </TableCell>
-                <TableCell>{dmc.dmc}</TableCell>
-                {/* <TableCell>
+          {lastFive.map((dmc) => (
+            <TableRow key={dmc.dmc}>
+              <TableCell>
+                {new Date(dmc.time).toLocaleTimeString(lang)}
+              </TableCell>
+              <TableCell>
+                {new Date(dmc.time).toLocaleDateString(lang)}
+              </TableCell>
+              <TableCell>{dmc.dmc}</TableCell>
+              {/* <TableCell>
                 <Button size='icon' type='button' variant='outline'>
                   <Trash2 />
                 </Button>
               </TableCell> */}
-              </TableRow>
-            ))}
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

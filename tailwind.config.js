@@ -66,15 +66,20 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
+        'fade-out': {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-out': 'fade-out 0.3s forwards',
       },
     },
   },
   plugins: [
     require('tailwindcss-animate'),
-    // require('prettier-plugin-tailwindcss'), old version? 
+    // require('prettier-plugin-tailwindcss'), old version?
   ],
 };
