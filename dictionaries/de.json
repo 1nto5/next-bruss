@@ -219,14 +219,11 @@
     },
     "scan": {
       "statusBar": {
-        "operator": "Operator",
-        "article": "Artikel",
-        "onPallet": "auf Palette",
+        "operator": "operator",
         "boxCardDialog": {
           "cardHeader": "box",
-          "cardHeaderPending": "laden",
-          "timeTableHead": "Stunde",
-          "dateTableHead": "Datum",
+          "timeTableHead": "stunde",
+          "dateTableHead": "datum",
           "dialogTitle": "Teile in box",
           "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
           "dmcSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
@@ -240,9 +237,8 @@
         },
         "palletCardDialog": {
           "cardHeader": "pallet",
-          "cardHeaderPending": "laden",
-          "timeTableHead": "Stunde",
-          "dateTableHead": "Datum",
+          "timeTableHead": "stunde",
+          "dateTableHead": "datum",
           "dialogTitle": "Teile in box",
           "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
           "hydraBatchSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
@@ -253,6 +249,23 @@
           "alertDialogDescription": "Sind Sie sicher, dass Sie diesen Teil aus der aktuellen Box entfernen möchten?",
           "alertDialogCancel": "Ankündigung",
           "alertDialogAction": "Löschen"
+        },
+        "articleCardDialog": {
+          "cardHeader": "artikel",
+          "dialogTitle": "Statistiken über verarbeitete Teile",
+          "currentShiftTableCell": "aktuell",
+          "shiftTableHead": "arbeitsplatzwechsel",
+          "amountTableHead": "menge"
+        },
+        "operatorCardDialog": {
+          "cardHeader": "operator",
+          "dialogTitle": "Statistiken über verarbeitete Teile",
+          "allTableCell": "alle",
+          "monthTableCell": "monat",
+          "weekTableCell": "woche",
+          "dayTableCell": "tag",
+          "yearTableCell": "jahr",
+          "amountTableHead": "menge"
         }
       },
       "dmcScanInputPlaceholder": "DMC-Code scannen...",

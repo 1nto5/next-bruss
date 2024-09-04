@@ -2,12 +2,15 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { ArticleCardDialog } from './ArticleCardDialog';
 import { BoxCardDialog } from './BoxCardDialog';
+import { OperatorCardDialog } from './OperatorCardDialog';
 import { PalletCardDialog } from './PalletCardDialog';
 
 type StatusBarProps = {
   cDict: any;
   operator: string;
+  operatorPersonalNumber: string;
   article: string;
   boxIsFull: boolean;
   boxStatus: string;
@@ -21,6 +24,7 @@ type StatusBarProps = {
 export async function StatusBar({
   cDict,
   operator,
+  operatorPersonalNumber,
   article,
   boxIsFull,
   boxStatus,
@@ -40,45 +44,44 @@ export async function StatusBar({
   const palletStatusClass = clsx('text-center text-xl', palletStatusBlinkClass);
   return (
     <div className='flex w-full justify-center space-x-2'>
-      <Card className='w-3/12 flex-grow'>
-        <CardHeader className='text-center font-extralight'>
-          {cDict.operator}:
-        </CardHeader>
-        <CardContent className='text-center text-xl'>{operator}</CardContent>
-      </Card>
+      <div className='w-3/12 flex-grow'>
+        <OperatorCardDialog
+          cDict={cDict.operatorCardDialog}
+          lang={lang}
+          operator={operator}
+          operatorPersonalNumber={operatorPersonalNumber}
+        />
+      </div>
 
-      <Card className='w-5/12 flex-grow'>
-        <CardHeader className='text-center font-extralight'>
-          {cDict.article}:
-        </CardHeader>
-        <CardContent className='text-center text-xl'>{article}</CardContent>
-      </Card>
-
-      <BoxCardDialog
-        boxStatus={boxStatus}
-        cardContentClass={boxStatusClass}
-        cDict={cDict.boxCardDialog}
-        lang={lang}
-        articleConfigId={articleConfigId}
-      />
-
-      {pallet && palletStatus && (
-        <PalletCardDialog
-          palletStatus={palletStatus}
-          cardContentClass={palletStatusClass}
-          cDict={cDict.palletCardDialog}
+      <div className='w-5/12 flex-grow'>
+        <ArticleCardDialog
+          article={article}
+          cDict={cDict.articleCardDialog}
           lang={lang}
           articleConfigId={articleConfigId}
         />
+      </div>
 
-        // <Card className='w-2/12 flex-grow'>
-        //   <CardHeader className='text-center font-extralight'>
-        //     {cDict.onPallet}:
-        //   </CardHeader>
-        //   <CardContent className={palletStatusClass}>
-        //     {palletStatus}
-        //   </CardContent>
-        // </Card>
+      <div className='w-2/12 flex-grow'>
+        <BoxCardDialog
+          boxStatus={boxStatus}
+          cardContentClass={boxStatusClass}
+          cDict={cDict.boxCardDialog}
+          lang={lang}
+          articleConfigId={articleConfigId}
+        />
+      </div>
+
+      {pallet && palletStatus && (
+        <div className='w-2/12 flex-grow'>
+          <PalletCardDialog
+            palletStatus={palletStatus}
+            cardContentClass={palletStatusClass}
+            cDict={cDict.palletCardDialog}
+            lang={lang}
+            articleConfigId={articleConfigId}
+          />
+        </div>
       )}
     </div>
   );

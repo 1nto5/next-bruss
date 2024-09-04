@@ -1,7 +1,24 @@
 'use server';
 
+import { Locale } from '@/i18n.config';
 import { dbc } from '@/lib/mongo';
 import pgp from '@/lib/pg';
+import {
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  endOfYear,
+  isAfter,
+  isBefore,
+  setHours,
+  setMinutes,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  startOfYear,
+  subDays,
+} from 'date-fns';
+import { fromZonedTime } from 'date-fns-tz';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -587,3 +604,157 @@ export async function deleteBoxFromPallet(hydra_batch: string) {
     throw new Error('deleteBoxFromPallet server action error');
   }
 }
+
+export async function getArticleStatistics(
+  articleConfigId: string,
+  lang: Locale,
+) {
+  try {
+    const scansCollection = await dbc('scans');
+    const articleConfig = await getArticleConfigById(articleConfigId);
+    if (!articleConfig) {
+      throw new Error('getStatistics server action error');
+    }
+
+    const timeZones: Record<Locale, string> = {
+      pl: 'Europe/Warsaw',
+      de: 'Europe/Berlin',
+    };
+
+    const timeZone = timeZones[lang] || 'UTC';
+
+    const now = new Date();
+
+    const todayStart = startOfDay(now);
+    const prevDayStart = subDays(todayStart, 1);
+
+    const shift1Start = setHours(setMinutes(todayStart, 0), 6);
+    const shift2Start = setHours(setMinutes(prevDayStart, 0), 22);
+    const shift3Start = setHours(setMinutes(todayStart, 0), 14);
+
+    let currentShiftStart, currentShiftEnd;
+    let previousShiftStart1, previousShiftEnd1;
+    let previousShiftStart2, previousShiftEnd2;
+
+    if (isAfter(now, shift1Start) && isBefore(now, setHours(todayStart, 14))) {
+      currentShiftStart = shift1Start;
+      currentShiftEnd = now;
+
+      previousShiftStart1 = shift2Start;
+      previousShiftEnd1 = setHours(todayStart, 6);
+
+      previousShiftStart2 = setHours(setMinutes(prevDayStart, 0), 14);
+      previousShiftEnd2 = setHours(setMinutes(prevDayStart, 0), 22);
+    } else if (
+      isAfter(now, shift3Start) &&
+      isBefore(now, setHours(todayStart, 22))
+    ) {
+      currentShiftStart = shift3Start;
+      currentShiftEnd = now;
+
+      previousShiftStart1 = shift1Start;
+      previousShiftEnd1 = setHours(todayStart, 14);
+
+      previousShiftStart2 = shift2Start;
+      previousShiftEnd2 = setHours(todayStart, 6);
+    } else {
+      currentShiftStart = shift2Start;
+      currentShiftEnd = setHours(todayStart, 6);
+
+      previousShiftStart1 = setHours(setMinutes(prevDayStart, 0), 14);
+      previousShiftEnd1 = setHours(setMinutes(prevDayStart, 0), 22);
+
+      previousShiftStart2 = setHours(setMinutes(prevDayStart, 0), 6);
+      previousShiftEnd2 = setHours(setMinutes(prevDayStart, 0), 14);
+    }
+
+    const currentShiftStartUtc = fromZonedTime(currentShiftStart, timeZone);
+    const currentShiftEndUtc = fromZonedTime(currentShiftEnd, timeZone);
+
+    const previousShiftStart1Utc = fromZonedTime(previousShiftStart1, timeZone);
+    const previousShiftEnd1Utc = fromZonedTime(previousShiftEnd1, timeZone);
+
+    const previousShiftStart2Utc = fromZonedTime(previousShiftStart2, timeZone);
+    const previousShiftEnd2Utc = fromZonedTime(previousShiftEnd2, timeZone);
+
+    const currentShift = await scansCollection.countDocuments({
+      article: articleConfig.articleNumber,
+      status: { $ne: 'rework' },
+      time: { $gte: currentShiftStartUtc, $lt: currentShiftEndUtc },
+    });
+
+    const minus1Shift = await scansCollection.countDocuments({
+      article: articleConfig.articleNumber,
+      status: { $ne: 'rework' },
+      time: { $gte: previousShiftStart1Utc, $lt: previousShiftEnd1Utc },
+    });
+
+    const minus2Shift = await scansCollection.countDocuments({
+      article: articleConfig.articleNumber,
+      status: { $ne: 'rework' },
+      time: { $gte: previousShiftStart2Utc, $lt: previousShiftEnd2Utc },
+    });
+
+    return { currentShift, minus1Shift, minus2Shift };
+  } catch (error) {
+    console.error(error);
+    throw new Error('getStatistics server action error');
+  }
+}
+
+export const getOperatorStatistics = async (operatorPersonalNumber: string) => {
+  try {
+    const scansCollection = await dbc('scans'); // Kolekcja, w której trzymasz dane
+
+    // Bieżąca data
+    const now = new Date();
+
+    // Początek i koniec bieżącego miesiąca w UTC
+    const startOfCurrentMonthUtc = startOfMonth(now);
+    const endOfCurrentMonthUtc = endOfMonth(now);
+
+    // Początek i koniec bieżącego roku w UTC
+    const startOfCurrentYearUtc = startOfYear(now);
+    const endOfCurrentYearUtc = endOfYear(now);
+
+    // Liczba wszystkich operacji dla danego operatora
+    const all = await scansCollection.countDocuments({
+      operator: operatorPersonalNumber,
+      status: { $ne: 'rework' },
+    });
+
+    // Liczba operacji w bieżącym tygodniu
+    const week = await scansCollection.countDocuments({
+      operator: operatorPersonalNumber,
+      time: { $gte: startOfWeek(now), $lt: endOfWeek(now) },
+      status: { $ne: 'rework' },
+    });
+
+    // Liczba operacji w bieżącym miesiącu
+    const month = await scansCollection.countDocuments({
+      operator: operatorPersonalNumber,
+      time: { $gte: startOfMonth(now), $lt: endOfMonth(now) },
+      status: { $ne: 'rework' },
+    });
+
+    // Liczba operacji w bieżącym roku
+    const year = await scansCollection.countDocuments({
+      operator: operatorPersonalNumber,
+      time: { $gte: startOfYear(now), $lt: endOfYear(now) },
+      status: { $ne: 'rework' },
+    });
+
+    // Liczba operacji w bieżącym dniu
+    const day = await scansCollection.countDocuments({
+      operator: operatorPersonalNumber,
+      time: { $gte: startOfDay(now), $lt: endOfDay(now) },
+      status: { $ne: 'rework' },
+    });
+
+    // Zwracamy dane w odpowiednim formacie
+    return { all, week, month, year, day };
+  } catch (error) {
+    console.error('Error fetching operator statistics:', error);
+    throw new Error('Failed to fetch operator statistics');
+  }
+};

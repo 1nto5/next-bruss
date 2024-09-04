@@ -12,7 +12,12 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -98,17 +103,21 @@ export function BoxCardDialog({
 
   if (isPending) {
     return (
-      <Card className='w-2/12 flex-grow'>
-        <CardHeader className='animate-pulse text-center font-extralight'>
-          {cDict.cardHeaderPending}
+      <Card className='relative'>
+        <CardHeader className='flex items-center justify-between'>
+          <div className='font-extralight'>{cDict.cardHeader}:</div>
         </CardHeader>
-        <CardContent className={clsx('', cardContentClass)}>
-          {boxStatus}
-        </CardContent>
+        <CardContent className={cardContentClass}>{boxStatus}</CardContent>
+        <Button
+          size={'icon'}
+          variant={'secondary'}
+          className='absolute right-2 top-2'
+        >
+          <Box className='animate-spin' />
+        </Button>
       </Card>
     );
   }
-
   const filteredData = data.filter((dmc) =>
     dmc.dmc.toLowerCase().includes(searchText.toLowerCase()),
   );
@@ -138,95 +147,107 @@ export function BoxCardDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Card className='w-2/12 flex-grow'>
-          <CardHeader className='text-center font-extralight'>
-            {cDict.cardHeader}:
-          </CardHeader>
-          <CardContent className={cardContentClass}>{boxStatus}</CardContent>
-        </Card>
-      </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px]'>
-        <DialogHeader>
-          <DialogTitle>{cDict.dialogTitle}</DialogTitle>
-          {data.length === 0 && (
-            <DialogDescription>
-              {cDict.noDataDialogDescription}
-            </DialogDescription>
-          )}
-        </DialogHeader>
+    <>
+      <Card className='relative'>
+        <CardHeader className='text-center'>
+          <div className='font-extralight'>{cDict.cardHeader}:</div>
+        </CardHeader>
 
-        {data.length !== 0 && (
-          <Input
-            autoFocus
-            type='text'
-            placeholder={cDict.dmcSearchInputPlaceholder}
-            className='text-center'
-            autoComplete='off'
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-        )}
+        <CardContent className={cardContentClass}>
+          {boxStatus}
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button
+                size={'icon'}
+                variant={'outline'}
+                className='absolute right-2 top-2'
+              >
+                <Box />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className='sm:max-w-[600px]'>
+              <DialogHeader>
+                <DialogTitle>{cDict.dialogTitle}</DialogTitle>
+                {data.length === 0 && (
+                  <DialogDescription>
+                    {cDict.noDataDialogDescription}
+                  </DialogDescription>
+                )}
+              </DialogHeader>
 
-        {filteredData.length > 0 && (
-          <ScrollArea className='max-h-[400px]'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{cDict.timeTableHead}</TableHead>
-                  <TableHead>{cDict.dateTableHead}</TableHead>
-                  <TableHead>DMC</TableHead>
-                  <TableHead className='text-right'>
-                    {cDict.deleteTableHead}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredData.map((dmc) => (
-                  <TableRow key={dmc.dmc} id={`row-${dmc.dmc}`}>
-                    <TableCell>
-                      {new Date(dmc.time).toLocaleTimeString(lang)}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(dmc.time).toLocaleDateString(lang)}
-                    </TableCell>
-                    <TableCell>{dmc.dmc}</TableCell>
-                    <TableCell className='text-right'>
-                      <AlertDialog>
-                        <AlertDialogTrigger>
-                          <Button size='icon' variant='outline'>
-                            <Trash2 />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              {cDict.alertDialogTitle}
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              {cDict.alertDialogDescription}
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>
-                              {cDict.alertDialogCancel}
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteDmc(dmc.dmc)}
-                            >
-                              {cDict.alertDialogAction}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        )}
-      </DialogContent>
-    </Dialog>
+              {data.length !== 0 && (
+                <Input
+                  autoFocus
+                  type='text'
+                  placeholder={cDict.dmcSearchInputPlaceholder}
+                  className='text-center'
+                  autoComplete='off'
+                  onChange={(e) => setSearchText(e.target.value)}
+                />
+              )}
+
+              {filteredData.length > 0 && (
+                <ScrollArea className='max-h-[400px]'>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{cDict.timeTableHead}</TableHead>
+                        <TableHead>{cDict.dateTableHead}</TableHead>
+                        <TableHead>DMC</TableHead>
+                        <TableHead className='text-right'>
+                          {cDict.deleteTableHead}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredData.map((dmc) => (
+                        <TableRow key={dmc.dmc} id={`row-${dmc.dmc}`}>
+                          <TableCell>
+                            {new Date(dmc.time).toLocaleTimeString(lang)}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(dmc.time).toLocaleDateString(lang)}
+                          </TableCell>
+                          <TableCell>{dmc.dmc}</TableCell>
+                          <TableCell className='text-right'>
+                            <AlertDialog>
+                              <AlertDialogTrigger>
+                                <Button size='icon' variant='outline'>
+                                  <Trash2 />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    {cDict.alertDialogTitle}
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    {cDict.alertDialogDescription}
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    {cDict.alertDialogCancel}
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteDmc(dmc.dmc)}
+                                  >
+                                    {cDict.alertDialogAction}
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </ScrollArea>
+              )}
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
+    </>
   );
 }

@@ -150,6 +150,7 @@ export default async function ScanPage({
             ? `${operatorInitials} (${searchParams.operatorPersonalNumber})`
             : `${operatorInitials}`
         }
+        operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
         article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
         boxIsFull={boxStatus?.boxIsFull ? true : false}
         // boxIsFull={false}

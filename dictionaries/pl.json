@@ -223,7 +223,6 @@
         "onPallet": "paleta",
         "boxCardDialog": {
           "cardHeader": "box",
-          "cardHeaderPending": "ładowanie",
           "timeTableHead": "godzina",
           "dateTableHead": "data",
           "dialogTitle": "Części w boxie",
@@ -239,7 +238,6 @@
         },
         "palletCardDialog": {
           "cardHeader": "paleta",
-          "cardHeaderPending": "ładowanie",
           "timeTableHead": "godzina",
           "dateTableHead": "data",
           "dialogTitle": "Boxy na palecie",
@@ -252,6 +250,23 @@
           "alertDialogDescription": "Wszystkie części z boxa zostaną usunięte! Czy na pewno chcesz usunąć ten box z aktualnej palety?",
           "alertDialogCancel": "Anuluj",
           "alertDialogAction": "Usuń"
+        },
+        "articleCardDialog": {
+          "cardHeader": "artykuł",
+          "dialogTitle": "Statystyki przetworzonych części dla artykułu",
+          "currentShiftTableCell": "bieżąca",
+          "shiftTableHead": "zmiana",
+          "amountTableHead": "ilość"
+        },
+        "operatorCardDialog": {
+          "cardHeader": "operator",
+          "dialogTitle": "Statystyki przetworzonych części dla operatora",
+          "allTableCell": "wszystkie",
+          "monthTableCell": "miesiąc",
+          "weekTableCell": "tydzień",
+          "dayTableCell": "dzień",
+          "yearTableCell": "rok",
+          "amountTableHead": "ilość"
         }
       },
       "dmcScanInputPlaceholder": "skanuj kod DMC...",
