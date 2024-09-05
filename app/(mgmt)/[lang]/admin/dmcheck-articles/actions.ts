@@ -1,11 +1,11 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
-import { ObjectId } from 'mongodb';
+import { dbc } from '@/lib/mongo';
 import { ArticleConfigType } from '@/lib/types/articleConfig';
+import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function insertArticleConfig(articleConfig: ArticleConfigType) {
   try {
@@ -109,6 +109,45 @@ export async function deleteArticle(userId: string) {
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while deleting the user');
+  }
+}
+
+export async function copyArticle(articleId: string, workplaces: string) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/');
+    }
+
+    const collection = await dbc('articles_config');
+
+    const exists = await collection.findOne({ _id: new ObjectId(articleId) });
+
+    if (!exists) {
+      return { error: 'not found' };
+    }
+
+    const workplaceArray = workplaces
+      .split(',')
+      .map((workplace) => workplace.trim());
+
+    const res = await Promise.all(
+      workplaceArray.map((workplace) => {
+        const { _id, ...rest } = exists; // Usuwamy _id
+        return collection.insertOne({
+          ...rest, // Kopiujemy resztę dokumentu
+          workplace: workplace, // Zmieniamy miejsce pracy
+        });
+      }),
+    );
+
+    if (res) {
+      revalidateTag('articleConfigs');
+      return { success: 'copied' };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('An error occurred while copying the article');
   }
 }
 

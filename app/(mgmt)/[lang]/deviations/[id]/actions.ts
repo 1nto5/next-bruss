@@ -8,7 +8,7 @@ import {
   DeviationType,
 } from '@/lib/types/deviation';
 import { extractFullNameFromEmail } from '@/lib/utils/nameFormat';
-import { AddDeviationType } from '@/lib/z/deviation';
+// import { AddDeviationType } from '@/lib/z/deviation';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';

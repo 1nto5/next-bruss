@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { Copy, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,43 +14,17 @@ import {
   // DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
-import { Trash2, Pencil } from 'lucide-react';
-import { deleteArticle } from '../actions';
 import { ArticleConfigType } from '@/lib/types/articleConfig';
-import { toast } from 'sonner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  // AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 
-const onDeleteArticle = async (articleId: string) => {
-  try {
-    const res = await deleteArticle(articleId);
-    if (!res) {
-      toast.error('Failed to delete article!');
-    }
-    if (res && res.error === 'not found') {
-      toast.error('Article not found!');
-    }
-    if (res && res.success === 'deleted') {
-      toast.success('Article deleted successfully!');
-    }
-  } catch (error) {
-    toast.error('Failed to delete article!');
-  }
-};
+import { CopyDialog } from '../components/CopyDialog';
+import { DeleteDialog } from '../components/DeleteDialog';
 
 const ActionsCell = ({ row }: { row: any }) => {
   const articleConfig = row.original;
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
+  const [isOpenCopyDialog, setIsOpenCopyDialog] = useState(false);
 
   return (
     <>
@@ -68,43 +42,29 @@ const ActionsCell = ({ row }: { row: any }) => {
               <span>Edit</span>
             </DropdownMenuItem>
           </Link>
+          <DropdownMenuItem onClick={() => setIsOpenCopyDialog(true)}>
+            <Copy className='mr-2 h-4 w-4' />
+            <span>Copy</span>
+          </DropdownMenuItem>
           <DropdownMenuItem
             className=' focus:bg-red-400 dark:focus:bg-red-700'
-            onClick={() => setIsOpen(true)}
+            onClick={() => setIsOpenDeleteDialog(true)}
           >
             <Trash2 className='mr-2 h-4 w-4' />
             <span>Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <AlertDialog open={isOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will permanently delete this article.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsOpen(false)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setIsOpen(false);
-                if (articleConfig._id) {
-                  onDeleteArticle(articleConfig._id);
-                } else {
-                  toast.error(`Article _id is missing. Please contact IT.`);
-                }
-              }}
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CopyDialog
+        isOpen={isOpenCopyDialog}
+        setIsOpen={setIsOpenCopyDialog}
+        articleId={articleConfig._id}
+      />
+      <DeleteDialog
+        isOpen={isOpenDeleteDialog}
+        setIsOpen={setIsOpenDeleteDialog}
+        articleId={articleConfig._id}
+      />
     </>
   );
 };
