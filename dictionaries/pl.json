@@ -74,7 +74,8 @@
     }
   },
   "home": {
-    "title": "Cześć!"
+    "title": "Cześć!",
+    "description": "Cały czas pracuję nad rozwiązaniami, które tu znajdziesz. Jeśli masz jakieś sugestie lub uwagi, daj mi znać na: "
   },
   "exportData": {
     "cardTitle": "Export danych",

@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
-import Info from './components/Info';
 import { getDictionary } from '@/lib/dictionary';
+import Info from './components/Info';
 
 export default async function Home({
   params: { lang },
@@ -10,13 +10,12 @@ export default async function Home({
   const dict = await getDictionary(lang);
   const infoDescription = (
     <>
-      Strona oraz aplikacje są w trakcie budowy. Proszę o zgłaszanie napotkanych
-      błędów na{' '}
+      {dict.home.description}
       <a
         href={`mailto:support@bruss-group.com?subject=Next BRUSS: zgłoszenie błędu`}
         className='text-blue-600 hover:text-blue-800'
       >
-        support@bruss-group.com
+        adrian.antosiak@bruss-group.com
       </a>
       .
     </>
