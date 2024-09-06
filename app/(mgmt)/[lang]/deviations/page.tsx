@@ -11,7 +11,7 @@ async function getAllDeviations(lang: string): Promise<{
   fetchTime: string;
   deviations: DeviationType[];
 }> {
-  const res = await fetch(`${process.env.API}/deviations/get-deviations`, {
+  const res = await fetch(`${process.env.API}/deviations/deviations`, {
     next: { revalidate: 60 * 15, tags: ['deviations'] },
   });
 
@@ -54,6 +54,7 @@ async function getUserDeviations(
   const res = await fetch(`${process.env.API}/deviations/deviations`, {
     next: { revalidate: 60 * 15, tags: ['deviations'] },
   });
+
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
