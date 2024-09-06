@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import * as React from 'react';
 
 import {
   Table,
@@ -25,17 +25,17 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
-  CardDescription,
 } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import { revalidateUsers } from '../actions';
 import Link from 'next/link';
+import { revalidateUsers } from '../actions';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -72,28 +72,28 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Employees management</CardTitle>
         <CardDescription>Last synchronization: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between py-4'>
-          <div className='flex'>
+        <div className='flex items-center justify-between'>
+          <div className='flex flex-row space-x-1'>
             <Input
               autoFocus
-              placeholder='Search...'
+              placeholder='name'
               value={
                 (table.getColumn('name')?.getFilterValue() as string) ?? ''
               }
               onChange={(event) =>
                 table.getColumn('name')?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-48'
             />
           </div>
-          <div className='flex'>
+          <div className='flex items-center space-x-1'>
             <Link href='/admin/employees/add'>
-              <Button className='mr-2 justify-end' variant='outline'>
+              <Button size={'icon'} variant='outline'>
                 <CopyPlus />
               </Button>
             </Link>
             <Button
-              className='justify-end'
+              size={'icon'}
               variant='outline'
               onClick={() => revalidateUsers()}
             >

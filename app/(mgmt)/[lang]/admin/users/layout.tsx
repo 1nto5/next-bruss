@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import Container from '@/components/ui/container';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Users management (Next BRUSS)',
@@ -17,5 +18,9 @@ export default async function Layout({
   if (!session?.user.roles?.includes('admin')) {
     redirect('/');
   }
-  return <>{children}</>;
+  return (
+    <Container>
+      <main>{children}</main>
+    </Container>
+  );
 }

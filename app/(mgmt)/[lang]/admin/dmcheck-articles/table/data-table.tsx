@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import * as React from 'react';
 
 import {
   Table,
@@ -25,17 +25,17 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
-  CardDescription,
 } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import { revalidateArticleConfigs } from '../actions';
 import Link from 'next/link';
+import { revalidateArticleConfigs } from '../actions';
 // import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
@@ -73,11 +73,11 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>DMCheck article configs management</CardTitle>
         <CardDescription>Last synchronization: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between py-4'>
-          <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0'>
+        <div className='flex items-center justify-between'>
+          <div className='flex flex-row space-x-1'>
             <Input
               autoFocus
-              placeholder='article number...'
+              placeholder='art. number'
               value={
                 (table
                   .getColumn('articleNumber')
@@ -88,10 +88,10 @@ export function DataTable<TData, TValue>({
                   .getColumn('articleNumber')
                   ?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-24'
             />
             <Input
-              placeholder='article name...'
+              placeholder='art. name...'
               value={
                 (table.getColumn('articleName')?.getFilterValue() as string) ??
                 ''
@@ -101,27 +101,27 @@ export function DataTable<TData, TValue>({
                   .getColumn('articleName')
                   ?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-24'
             />
             <Input
-              placeholder='workplace...'
+              placeholder='workplace'
               value={
                 (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
               }
               onChange={(event) =>
                 table.getColumn('workplace')?.setFilterValue(event.target.value)
               }
-              className='mr-2 max-w-xs'
+              className='w-24'
             />
           </div>
-          <div className='flex'>
+          <div className='flex items-center space-x-1'>
             <Link href='/admin/dmcheck-articles/add'>
-              <Button className='mr-2 justify-end' variant='outline'>
+              <Button size={'icon'} variant='outline'>
                 <CopyPlus />
               </Button>
             </Link>
             <Button
-              className='justify-end'
+              size={'icon'}
               variant='outline'
               onClick={() => revalidateArticleConfigs()}
             >

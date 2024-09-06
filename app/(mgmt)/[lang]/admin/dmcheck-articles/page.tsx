@@ -4,23 +4,26 @@ import { ArticleConfigType } from '@/lib/types/articleConfig';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
-async function getData(
+async function getArticleConfigs(
   lang: string,
 ): Promise<{ fetchTime: string; allConfigs: ArticleConfigType[] }> {
-  try {
-    const response = await fetch(`${process.env.API}/admin/article-configs`, {
-      next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
-    });
+  const res = await fetch(`${process.env.API}/admin/article-configs`, {
+    next: { revalidate: 60 * 15, tags: ['articleConfigs'] },
+  });
 
-    const dateFromResponse = new Date(response.headers.get('date') || '');
-    const fetchTime = dateFromResponse.toLocaleString(lang);
-
-    let allConfigs = await response.json();
-
-    return { fetchTime, allConfigs };
-  } catch (error) {
-    throw new Error('Fetching article configs error: ' + error);
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(
+      `getArticleConfigs error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
+
+  const dateFromResponse = new Date(res.headers.get('date') || '');
+  const fetchTime = dateFromResponse.toLocaleString(lang);
+
+  let allConfigs = await res.json();
+
+  return { fetchTime, allConfigs };
 }
 
 export default async function ArticleConfigsPage({
@@ -28,10 +31,8 @@ export default async function ArticleConfigsPage({
 }: {
   params: { lang: Locale };
 }) {
-  const { fetchTime, allConfigs } = await getData(lang);
+  const { fetchTime, allConfigs } = await getArticleConfigs(lang);
   return (
-    <main className='mx-auto px-4 py-4 lg:px-8'>
-      <DataTable columns={columns} data={allConfigs} fetchTime={fetchTime} />
-    </main>
+    <DataTable columns={columns} data={allConfigs} fetchTime={fetchTime} />
   );
 }

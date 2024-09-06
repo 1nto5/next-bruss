@@ -1,5 +1,5 @@
-import { NextResponse, type NextRequest } from 'next/server';
 import { dbc } from '@/lib/mongo';
+import { NextResponse, type NextRequest } from 'next/server';
 
 // https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 // https://nextjs.org/docs/app/building-your-application/caching#on-demand-revalidation
@@ -20,6 +20,6 @@ export async function GET(req: NextRequest) {
     return new NextResponse(JSON.stringify(combined));
   } catch (error) {
     console.error(error);
-    return new NextResponse('get-capa-history api error', { status: 503 });
+    return new NextResponse('capa-history api error', { status: 503 });
   }
 }

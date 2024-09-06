@@ -143,10 +143,10 @@ export async function sendReminderEmail(id: string) {
     const transporter = nodemailer.createTransport({
       host: process.env.NODEMAILER_HOST,
       service: process.env.NODEMAILER_SERVICE,
-      auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS,
-      },
+      // auth: {
+      //   user: process.env.NODEMAILER_USER,
+      //   pass: process.env.NODEMAILER_PASS,
+      // },
     });
 
     // Define email options

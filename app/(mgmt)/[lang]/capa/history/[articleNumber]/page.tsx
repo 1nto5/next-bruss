@@ -17,7 +17,10 @@ async function getCapaHistory(
   );
 
   if (!res.ok) {
-    throw new Error('getCapaHistory fetch res: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getCapaHistory error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');

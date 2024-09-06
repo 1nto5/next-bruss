@@ -5,23 +5,26 @@ import { User } from 'next-auth';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
-async function getData(
+async function getPersons(
   lang: string,
 ): Promise<{ fetchTime: string; allUsers: EmployeeType[] }> {
-  try {
-    const response = await fetch(`${process.env.API}/admin/all-employees`, {
-      next: { revalidate: 60 * 15, tags: ['employees'] },
-    });
+  const res = await fetch(`${process.env.API}/admin/all-persons`, {
+    next: { revalidate: 60 * 15, tags: ['employees'] },
+  });
 
-    const dateFromResponse = new Date(response.headers.get('date') || '');
-    const fetchTime = dateFromResponse.toLocaleString(lang);
-
-    let allUsers = await response.json();
-
-    return { fetchTime, allUsers };
-  } catch (error) {
-    throw new Error('Fetching all employees error: ' + error);
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(
+      `getPersons error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
+
+  const dateFromResponse = new Date(res.headers.get('date') || '');
+  const fetchTime = dateFromResponse.toLocaleString(lang);
+
+  let allUsers = await res.json();
+
+  return { fetchTime, allUsers };
 }
 
 export default async function AdminEmployeesPage({
@@ -29,14 +32,6 @@ export default async function AdminEmployeesPage({
 }: {
   params: { lang: Locale };
 }) {
-  const { fetchTime, allUsers } = await getData(lang);
-  return (
-    // <main className='m-2 flex justify-center'>
-    //   {' '}
-    // container
-    <div className='mx-auto px-12 py-4 lg:px-24'>
-      <DataTable columns={columns} data={allUsers} fetchTime={fetchTime} />
-    </div>
-    // </main>
-  );
+  const { fetchTime, allUsers } = await getPersons(lang);
+  return <DataTable columns={columns} data={allUsers} fetchTime={fetchTime} />;
 }

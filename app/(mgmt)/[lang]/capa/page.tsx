@@ -13,7 +13,10 @@ async function getAllCapa(
   });
 
   if (!res.ok) {
-    throw new Error('getAllCapa fetch res: ' + res.status);
+    const json = await res.json();
+    throw new Error(
+      `getAllCapa error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
