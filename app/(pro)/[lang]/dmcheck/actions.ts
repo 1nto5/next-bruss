@@ -488,9 +488,8 @@ export async function savePallet(prevState: any, formData: FormData) {
 
 export async function getInBoxTableData(articleConfigId: string) {
   try {
-    console.log('executing getInBoxTableData');
     const scansCollection = await dbc('scans');
-    console.log(articleConfigId);
+
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
       throw new Error('getInBoxTableData server action error');
