@@ -12,7 +12,7 @@ export default async function Home({
     <>
       {dict.home.description}
       <a
-        href={`mailto:support@bruss-group.com?subject=Next BRUSS: zgłoszenie błędu`}
+        href={`mailto:adrian.antosiakt@bruss-group.com?subject=Next BRUSS: `}
         className='text-blue-600 hover:text-blue-800'
       >
         adrian.antosiak@bruss-group.com
