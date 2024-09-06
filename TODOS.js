@@ -1,6 +1,8 @@
 /*
 TODO: EOL136153 migration to new version
 TODO: MS365 login
-TODO: fix add / edit pages for capa and admin sections (like deviations) -> change to dialogs
+TODO: add / edit pages -> change to dialogs
 TODO: https (Nginx + Certbot)
+TODO: change deviations reason to object id and get for lang
+FIXME: deviations id copy to clipboard
 */

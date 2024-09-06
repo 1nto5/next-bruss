@@ -142,7 +142,7 @@ export async function sendReminderEmail(id: string) {
     // Create a transporter
     const transporter = nodemailer.createTransport({
       host: process.env.NODEMAILER_HOST,
-      service: process.env.NODEMAILER_SERVICE,
+      // service: process.env.NODEMAILER_SERVICE,
       // auth: {
       //   user: process.env.NODEMAILER_USER,
       //   pass: process.env.NODEMAILER_PASS,
@@ -151,7 +151,8 @@ export async function sendReminderEmail(id: string) {
 
     // Define email options
     const mailOptions = {
-      from: `"Odchylenia (Next BRUSS)" <${process.env.NODEMAILER_MAIL}>`,
+      // from: `"Odchylenia (Next BRUSS)" <${process.env.NODEMAILER_MAIL}>`,
+      from: process.env.NODEMAILER_MAIL,
       to: deviation.owner, //TODO: change to the proper emails - managers who should take action - group leader, quality manager, engineering manager, maintenance manager, production manager (if they haven’t approved yet)
       subject: 'Prośba o działanie',
       html: `${extractFullNameFromEmail(session.user.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
