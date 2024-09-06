@@ -46,13 +46,13 @@ import { deleteDmcFromBox, getInBoxTableData } from '../actions';
 
 export function BoxCardDialog({
   boxStatus,
-  cardContentClass,
+  statusDivClass,
   cDict,
   lang,
   articleConfigId,
 }: {
   boxStatus: string;
-  cardContentClass: string;
+  statusDivClass: string;
   cDict: any;
   lang: Locale;
   articleConfigId: string;
@@ -107,7 +107,9 @@ export function BoxCardDialog({
         <CardHeader className='flex items-center justify-between'>
           <div className='font-extralight'>{cDict.cardHeader}:</div>
         </CardHeader>
-        <CardContent className={cardContentClass}>{boxStatus}</CardContent>
+        <CardContent>
+          <div className={statusDivClass}>{boxStatus} </div>
+        </CardContent>
         <Button
           size={'icon'}
           variant={'secondary'}
@@ -153,8 +155,8 @@ export function BoxCardDialog({
           <div className='font-extralight'>{cDict.cardHeader}:</div>
         </CardHeader>
 
-        <CardContent className={cardContentClass}>
-          {boxStatus}
+        <CardContent>
+          <div className={statusDivClass}>{boxStatus}</div>
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
               <Button

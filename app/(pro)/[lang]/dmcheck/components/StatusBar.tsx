@@ -37,7 +37,7 @@ export async function StatusBar({
   const boxStatusBlinkClass = twMerge(
     boxIsFull ? 'animate-ping text-bruss' : '',
   );
-  const boxStatusClass = clsx('text-center text-xl ', boxStatusBlinkClass);
+  const boxStatusClass = clsx('text-center text-xl', boxStatusBlinkClass);
   const palletStatusBlinkClass = twMerge(
     palletIsFull ? 'animate-ping text-bruss' : '',
   );
@@ -65,7 +65,7 @@ export async function StatusBar({
       <div className='w-2/12 flex-grow'>
         <BoxCardDialog
           boxStatus={boxStatus}
-          cardContentClass={boxStatusClass}
+          statusDivClass={boxStatusClass}
           cDict={cDict.boxCardDialog}
           lang={lang}
           articleConfigId={articleConfigId}
@@ -76,7 +76,7 @@ export async function StatusBar({
         <div className='w-2/12 flex-grow'>
           <PalletCardDialog
             palletStatus={palletStatus}
-            cardContentClass={palletStatusClass}
+            statusDivClass={palletStatusClass}
             cDict={cDict.palletCardDialog}
             lang={lang}
             articleConfigId={articleConfigId}

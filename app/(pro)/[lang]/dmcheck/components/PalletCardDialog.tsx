@@ -41,13 +41,13 @@ import { deleteBoxFromPallet, getBoxesOnPalletTableData } from '../actions';
 
 export function PalletCardDialog({
   palletStatus,
-  cardContentClass,
+  statusDivClass,
   cDict,
   lang,
   articleConfigId,
 }: {
   palletStatus: string;
-  cardContentClass: string;
+  statusDivClass: string;
   cDict: any;
   lang: Locale;
   articleConfigId: string;
@@ -85,7 +85,9 @@ export function PalletCardDialog({
         <CardHeader className='flex items-center justify-between'>
           <div className='font-extralight'>{cDict.cardHeader}:</div>
         </CardHeader>
-        <CardContent className={cardContentClass}>{palletStatus}</CardContent>
+        <CardContent>
+          <div className={statusDivClass}>{palletStatus} </div>
+        </CardContent>
         <Button
           size={'icon'}
           variant={'secondary'}
@@ -130,7 +132,7 @@ export function PalletCardDialog({
       <CardHeader className='items-center'>
         <div className='font-extralight'>{cDict.cardHeader}:</div>
       </CardHeader>
-      <CardContent className={cardContentClass}>
+      <CardContent className={statusDivClass}>
         {palletStatus}
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>

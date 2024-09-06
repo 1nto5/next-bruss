@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { auth } from '@/auth';
-import { DeviationReasonType, DeviationType } from '@/lib/types/deviation';
+import { DeviationType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
 import Deviation from './components/Deviation';
 

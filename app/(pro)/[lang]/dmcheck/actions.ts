@@ -184,7 +184,6 @@ export async function saveDmc(
   formData: FormData,
 ): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
   try {
-    console.log(formData);
     const articleConfigId = formData.get('articleConfigId');
     const articlesConfigCollection = await dbc('articles_config');
     if (!articleConfigId || articleConfigId.toString().length !== 24) {
