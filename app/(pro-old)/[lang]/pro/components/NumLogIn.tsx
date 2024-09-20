@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, FormEvent, useContext } from 'react';
-import { PersonContext } from '../lib/PersonContext';
+import { FormEvent, useContext, useState } from 'react';
 import { loginPerson } from '../actions';
+import { PersonContext } from '../lib/PersonContext';
 
+import { login } from '@/app/(pro-old)/[lang]/inw-1/spis/actions';
 import toast from 'react-hot-toast';
-import { login } from '@/app/(pro-old)/[lang]/inventory/main/actions';
 
 type NumberButtonProps = {
   onClick: () => void;
