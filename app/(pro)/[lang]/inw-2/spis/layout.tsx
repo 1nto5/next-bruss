@@ -32,11 +32,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {/* <QueryProvider> */}
-          <Header
-            dict={dictionary}
-            workplaceName={workplaceName}
-            workplaceHref={`/${lang}/dmcheck/${workplaceName}`}
-          />
+          <Header emp='emp' />
           <Container>
             <main className='flex justify-center'>
               <>{children}</>
@@ -45,7 +41,7 @@ export default async function RootLayout({
           {/* <main className='m-2 flex flex-col items-center space-y-8'>
             {children}
           </main> */}
-          <Toaster richColors position='bottom-center' />
+          <Toaster richColors />
           {/* </QueryProvider> */}
         </ThemeProvider>
       </body>

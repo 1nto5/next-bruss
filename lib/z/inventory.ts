@@ -10,8 +10,6 @@ export const inventoryLoginSchema = z.object({
 export type loginInventoryType = z.infer<typeof inventoryLoginSchema>;
 
 export const newCardSchema = z.object({
-  personalNumber1: z.string().min(1, { message: 'Wprowadź numer personalny!' }),
-  password1: z.string().min(1, { message: 'Wprowadź hasło!' }),
-  personalNumber2: z.string().min(1, { message: 'Wprowadź numer personalny!' }),
-  password2: z.string().min(1, { message: 'Wprowadź hasło!' }),
+  warehouse: z.string().min(1, { message: 'Wybierz magazyn!' }),
+  sector: z.string().min(1, { message: 'Wybierz sektor' }),
 });

@@ -1,9 +1,5 @@
 import { Locale } from '@/i18n.config';
-import { getDictionary } from '@/lib/dictionary';
-
-import Link from 'next/link';
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// import { getDictionary } from '@/lib/dictionary';
 import Login from './components/Login';
 
 export default async function ArticleSelectionPage({

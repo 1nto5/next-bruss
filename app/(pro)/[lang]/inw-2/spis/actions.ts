@@ -4,6 +4,7 @@
 import { dbc } from '@/lib/mongo';
 
 import { loginInventoryType } from '@/lib/z/inventory';
+import { ObjectId } from 'mongodb';
 import { getLastNameFirstLetter } from '../../../../../lib/utils/nameFormat';
 
 type PersonsType = {
@@ -56,14 +57,75 @@ export async function login(data: loginInventoryType) {
       return { error: 'wrong password 2' };
     }
 
-    const encodedIds = Buffer.from(
-      `${person1._id.toString()}:${person2._id.toString()}`,
-    ).toString('base64');
-
-    return { success: true, token: encodedIds };
+    return {
+      success: true,
+      emp: `${person1.personalNumber}-${person2.personalNumber}`,
+    };
   } catch (error) {
     console.error(error);
     return { error: 'login server action error' };
+  }
+}
+
+export async function createNewCard(
+  emp: string,
+  warehouse: string,
+  sector: string,
+) {
+  try {
+    const coll = await dbc('inventory_cards');
+    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
+
+    // Pobierz wszystkie istniejące numery kart
+    const existingCards = await coll
+      .find({}, { projection: { number: 1 } })
+      .sort({ number: 1 })
+      .toArray();
+    const existingNumbers = existingCards.map((card) => card.number);
+
+    // Znajdź najniższy wolny numer
+    let newCardNumber = 1;
+    for (let i = 0; i < existingNumbers.length; i++) {
+      if (existingNumbers[i] !== newCardNumber) {
+        break; // Znaleziono wolny numer
+      }
+      newCardNumber++;
+    }
+
+    // Tworzenie nowej karty z najniższym wolnym numerem
+    const result = await coll.insertOne({
+      number: newCardNumber,
+      creators: [person1PersonalNumber, person2PersonalNumber],
+      warehouse: warehouse,
+      sector: sector,
+    });
+
+    if (result.insertedId) {
+      return { success: true, cardId: result.insertedId };
+    }
+    return { error: 'not created' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'createNewCard server action error' };
+  }
+}
+
+export async function getEmpCards(emp: string) {
+  try {
+    const coll = await dbc('inventory_cards');
+    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
+    console.log('person1PersonalNumber', person1PersonalNumber);
+    console.log('person2PersonalNumber', person2PersonalNumber);
+    return await coll
+      .find({
+        creators: {
+          $all: [person1PersonalNumber.trim(), person2PersonalNumber.trim()],
+        },
+      })
+      .toArray();
+  } catch (error) {
+    console.error(error);
+    throw new Error('getEmpCards server action error');
   }
 }
 

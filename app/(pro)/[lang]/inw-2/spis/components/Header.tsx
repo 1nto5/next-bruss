@@ -1,18 +1,10 @@
-import Logo from '@/components/Logo';
+import { Button } from '@/components/ui/button';
 import Container from '@/components/ui/container';
+import { StickyNote, UserPen } from 'lucide-react';
 import Link from 'next/link';
-import { LogoutAll } from './Logout';
-import { Reload } from './Reload';
 import { ThemeModeToggle } from './ThemeModeToggle';
-import VolumeButton from './VolumeButton';
 
-type HeaderProps = {
-  dict: any;
-  workplaceName: string;
-  workplaceHref: string;
-};
-
-export default async function Header({ workplaceHref }: HeaderProps) {
+export default async function Header({ emp }: { emp: string }) {
   return (
     <header className='px-6 py-4 sm:flex sm:justify-between'>
       <Container>
@@ -31,7 +23,16 @@ export default async function Header({ workplaceHref }: HeaderProps) {
           </div>
 
           <div className='flex items-center space-x-2'>
-            <LogoutAll logoutAllHref={workplaceHref} />
+            <Link href={`/inw-2/spis/${emp}`}>
+              <Button type='submit' variant='outline' size='icon'>
+                <StickyNote className='h-[1.2rem] w-[1.2rem]' />
+              </Button>
+            </Link>
+            <Link href={'/inw-2/spis'}>
+              <Button type='submit' variant='outline' size='icon'>
+                <UserPen className='h-[1.2rem] w-[1.2rem]' />
+              </Button>
+            </Link>
             {/* <BoxDialog cDict={dict} lang='pl' /> */}
             {/* <Reload revalidateHref={workplaceHref} />
             <VolumeButton /> */}

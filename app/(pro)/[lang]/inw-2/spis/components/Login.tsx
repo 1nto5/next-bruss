@@ -66,9 +66,9 @@ export default function Login() {
           default:
             toast.error('Skontaktuj się z IT!');
         }
-      } else if (res.success && res.token) {
+      } else if (res.success && res.emp) {
         toast.success('Zalogowano pomyślnie!');
-        router.push(pathname + `/${res.token}`);
+        router.push(pathname + `/${res.emp}`);
       }
     } catch (error) {
       console.error('onSubmit', error);
