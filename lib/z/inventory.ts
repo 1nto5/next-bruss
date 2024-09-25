@@ -13,3 +13,9 @@ export const newCardSchema = z.object({
   warehouse: z.string().min(1, { message: 'Wybierz magazyn!' }),
   sector: z.string().min(1, { message: 'Wybierz sektor' }),
 });
+
+export const savePositionSchema = z.object({
+  article: z.string().min(1, { message: 'Wybierz artykułu!' }),
+  quantity: z.string().min(1, { message: 'Wprowadź ilość!' }),
+  wip: z.boolean(),
+});

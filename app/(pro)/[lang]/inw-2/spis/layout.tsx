@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  params: { lang, workplaceName },
+  params: { lang },
 }: {
   children: React.ReactNode;
-  params: { lang: Locale; workplaceName: string };
+  params: { lang: Locale };
 }) {
   const dictionary = await getDictionary(lang);
   return (
@@ -32,12 +32,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {/* <QueryProvider> */}
-          <Header emp='emp' />
-          <Container>
-            <main className='flex justify-center'>
-              <>{children}</>
-            </main>
-          </Container>
+
+          <>{children}</>
+
           {/* <main className='m-2 flex flex-col items-center space-y-8'>
             {children}
           </main> */}

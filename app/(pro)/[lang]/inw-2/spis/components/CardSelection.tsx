@@ -39,7 +39,7 @@ import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createNewCard } from '../../actions';
+import { createNewCard } from '../actions';
 
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Produkcja + Magazyn' },
@@ -113,9 +113,9 @@ export default function CardSelection({
             console.error('onSubmitNewCard', res.error);
             toast.error('Skontaktuj się z IT!');
         }
-      } else if (res.success && res.cardId) {
-        toast.success('Karta utworzona!');
-        router.push(pathname + `/${res.cardId}`);
+      } else if (res.success && res.cardNumber) {
+        toast.success(`Karta: ${res.cardNumber} utworzona!`);
+        router.push(pathname + `/${res.cardNumber}`);
       }
     } catch (error) {
       console.error('onSubmit', error);
@@ -158,7 +158,7 @@ export default function CardSelection({
                               className='flex items-center space-x-3 space-y-0'
                             >
                               <FormControl>
-                                <RadioGroupItem value={warehouse.label} />
+                                <RadioGroupItem value={warehouse.value} />
                               </FormControl>
                               <FormLabel className='font-normal'>
                                 {warehouse.label}
@@ -189,7 +189,7 @@ export default function CardSelection({
                               className='flex items-center space-x-3 space-y-0'
                             >
                               <FormControl>
-                                <RadioGroupItem value={sector.label} />
+                                <RadioGroupItem value={sector.value} />
                               </FormControl>
                               <FormLabel className='font-normal'>
                                 {sector.label}
@@ -239,7 +239,7 @@ export default function CardSelection({
                     legacyBehavior
                     key={card.number}
                     href={{
-                      pathname: `${pathname}/${card._id.toString()}`,
+                      pathname: `${pathname}/${card.number.toString()}`,
                     }}
                   >
                     <TableRow>

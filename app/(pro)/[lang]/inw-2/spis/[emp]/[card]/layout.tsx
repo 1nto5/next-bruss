@@ -1,9 +1,8 @@
 import Container from '@/components/ui/container';
 import { redirect } from 'next/navigation';
-import Header from '../components/Header';
 
 export const metadata = {
-  title: 'Wybór karty (Next BRUSS)',
+  title: 'Wybór pozycji (Next BRUSS)',
 };
 
 export default async function Layout({

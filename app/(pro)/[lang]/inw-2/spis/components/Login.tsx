@@ -79,7 +79,7 @@ export default function Login() {
   };
 
   return (
-    <Card className='w-[768px]'>
+    <Card className='w-[400px]'>
       <CardHeader>
         <CardTitle>Logowanie pary inwentaryzującej</CardTitle>
       </CardHeader>
@@ -113,7 +113,7 @@ export default function Login() {
               name='password1'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło 1</FormLabel>
+                  <FormLabel>PIN 1</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>
@@ -151,7 +151,7 @@ export default function Login() {
               name='password2'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hasło 2</FormLabel>
+                  <FormLabel>PIN 2</FormLabel>
                   <FormControl>
                     <Input type='password' placeholder='' {...field} />
                   </FormControl>

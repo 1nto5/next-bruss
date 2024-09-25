@@ -5,6 +5,7 @@ import { dbc } from '@/lib/mongo';
 
 import { loginInventoryType } from '@/lib/z/inventory';
 import { ObjectId } from 'mongodb';
+import { number } from 'zod';
 import { getLastNameFirstLetter } from '../../../../../lib/utils/nameFormat';
 
 type PersonsType = {
@@ -98,10 +99,11 @@ export async function createNewCard(
       creators: [person1PersonalNumber, person2PersonalNumber],
       warehouse: warehouse,
       sector: sector,
+      time: new Date(),
     });
 
     if (result.insertedId) {
-      return { success: true, cardId: result.insertedId };
+      return { success: true, cardNumber: newCardNumber };
     }
     return { error: 'not created' };
   } catch (error) {
@@ -114,8 +116,6 @@ export async function getEmpCards(emp: string) {
   try {
     const coll = await dbc('inventory_cards');
     const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
-    console.log('person1PersonalNumber', person1PersonalNumber);
-    console.log('person2PersonalNumber', person2PersonalNumber);
     return await coll
       .find({
         creators: {
@@ -126,6 +126,73 @@ export async function getEmpCards(emp: string) {
   } catch (error) {
     console.error(error);
     throw new Error('getEmpCards server action error');
+  }
+}
+
+export async function getCardPositions(cardNumber: string, emp: string) {
+  try {
+    const coll = await dbc('inventory_cards');
+    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
+    const card = await coll.findOne({
+      number: Number(cardNumber),
+      creators: {
+        $all: [person1PersonalNumber.trim(), person2PersonalNumber.trim()],
+      },
+    });
+    if (!card) {
+      return { error: 'no card' };
+    }
+    return card.positions || [];
+  } catch (error) {
+    console.error(error);
+    return { error: 'getCardPositions server action error' };
+  }
+}
+
+export async function getPosition(cardNumber: string, position: string) {
+  try {
+    const coll = await dbc('inventory_cards');
+    const existingCard = await coll.findOne({
+      number: Number(cardNumber),
+    });
+
+    if (!existingCard) {
+      return { error: 'no card' };
+    }
+
+    if (Number(position) < 1 || Number(position) > 25) {
+      return { error: 'wrong position' };
+    }
+
+    if (!existingCard.positions) {
+      return null;
+    }
+    const positionOnCard = existingCard.positions.find(
+      (pos: { position: number }) => pos.position === Number(position),
+    );
+    return positionOnCard;
+  } catch (error) {
+    console.error(error);
+    throw new Error('getPosition server action error');
+  }
+}
+
+export async function getCardInfo(cardNumber: string) {
+  try {
+    const coll = await dbc('inventory_cards');
+    const res = await coll.findOne({ number: Number(cardNumber) });
+    if (!res) {
+      return { error: 'no card' };
+    }
+    return {
+      number: res.number,
+      warehouse: res.warehouse,
+      sector: res.sector,
+      creators: res.creators,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error('getCardInfo server action error');
   }
 }
 

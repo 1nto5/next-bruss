@@ -1,10 +1,16 @@
 import { Button } from '@/components/ui/button';
 import Container from '@/components/ui/container';
-import { StickyNote, UserPen } from 'lucide-react';
+import { SquarePen, StickyNote, UserPen } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeModeToggle } from './ThemeModeToggle';
 
-export default async function Header({ emp }: { emp: string }) {
+export default async function Header({
+  emp,
+  card,
+}: {
+  emp?: string;
+  card?: string;
+}) {
   return (
     <header className='px-6 py-4 sm:flex sm:justify-between'>
       <Container>
@@ -23,11 +29,20 @@ export default async function Header({ emp }: { emp: string }) {
           </div>
 
           <div className='flex items-center space-x-2'>
-            <Link href={`/inw-2/spis/${emp}`}>
-              <Button type='submit' variant='outline' size='icon'>
-                <StickyNote className='h-[1.2rem] w-[1.2rem]' />
-              </Button>
-            </Link>
+            {card && (
+              <Link href={`/inw-2/spis/${emp}/${card}`}>
+                <Button type='submit' variant='outline' size='icon'>
+                  <SquarePen className='h-[1.2rem] w-[1.2rem]' />
+                </Button>
+              </Link>
+            )}
+            {emp && (
+              <Link href={`/inw-2/spis/${emp}`}>
+                <Button type='submit' variant='outline' size='icon'>
+                  <StickyNote className='h-[1.2rem] w-[1.2rem]' />
+                </Button>
+              </Link>
+            )}
             <Link href={'/inw-2/spis'}>
               <Button type='submit' variant='outline' size='icon'>
                 <UserPen className='h-[1.2rem] w-[1.2rem]' />
