@@ -1,8 +1,12 @@
 'use client';
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -13,23 +17,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { updateEmployee } from '../../../actions';
-import Link from 'next/link';
-import { Table, SquareAsterisk } from 'lucide-react';
 import { EmployeeType } from '@/lib/types/employee';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, SquareAsterisk, Table } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+import { updateEmployee } from '../../../actions';
 
 export default function EditEmployee({
   employeeObject,
@@ -48,10 +46,7 @@ export default function EditEmployee({
     loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
     password: z
       .string()
-      .min(6, { message: 'Minimum 6 characters!' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: 'Password must contain at least one special character!',
-      })
+      .min(4, { message: 'Minimum 4 characters!' })
       .optional(),
   });
 
