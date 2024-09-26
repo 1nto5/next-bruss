@@ -1,9 +1,16 @@
 'use client';
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -14,14 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 
 import {
   Select,
@@ -33,13 +32,13 @@ import {
 
 import { Checkbox } from '@/components/ui/checkbox';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Table } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { insertEmployee } from '../../actions';
-import Link from 'next/link';
 // import { useQuery } from '@tanstack/react-query';
 
 export default function AddEmployee({ lang }: { lang: string }) {
@@ -55,7 +54,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
     loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
     password: z
       .string()
-      .min(6, { message: 'Minimum 6 characters!' })
+      .min(4, { message: 'Minimum 4 characters!' })
       .regex(/[^a-zA-Z0-9]/, {
         message: 'Password must contain at least one special character!',
       })
