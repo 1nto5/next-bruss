@@ -55,9 +55,6 @@ export default function AddEmployee({ lang }: { lang: string }) {
     password: z
       .string()
       .min(4, { message: 'Minimum 4 characters!' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: 'Password must contain at least one special character!',
-      })
       .optional(),
   });
 
