@@ -1,14 +1,6 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
 import Container from '@/components/ui/container';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from '@/components/ui/sheet';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -18,18 +10,26 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import Link from 'next/link';
+import React from 'react';
 // import { Skeleton } from '@/components/ui/skeleton';
-import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ThemeModeToggle } from './ThemeModeToggle';
+import { Menu } from 'lucide-react';
 import { LoginLogout } from './LoginLogout';
+import { ThemeModeToggle } from './ThemeModeToggle';
 
 import Logo from '@/components/Logo';
-import UserAvatar from './UserAvatar';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
-import { logout, getSession } from '../auth/actions';
 import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
+import { getSession, logout } from '../auth/actions';
+import UserAvatar from './UserAvatar';
 // import { toast } from 'sonner';
 
 type HeaderProps = {
@@ -83,12 +83,12 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `Tabela CAPA dla artykułów.`,
         },
         {
-          href: '/inventory/main',
+          href: '/inw/spis',
           title: `${dict?.header?.inventory?.inventory.title}`,
           description: `${dict?.header?.inventory?.inventory.description}`,
         },
         {
-          href: '/inventory/approve',
+          href: '/inw/zatwierdz',
           title: `${dict?.header?.inventory?.inventoryApprove.title}`,
           description: `${dict?.header?.inventory?.inventoryApprove.description}`,
         },

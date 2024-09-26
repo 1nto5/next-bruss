@@ -4,7 +4,7 @@ import { FormEvent, useContext, useState } from 'react';
 import { loginPerson } from '../actions';
 import { PersonContext } from '../lib/PersonContext';
 
-import { login } from '@/app/(pro-old)/[lang]/inw-1/spis/actions';
+import { login } from '@/app/(pro-old)/[lang]/inw/spis/actions';
 import toast from 'react-hot-toast';
 
 type NumberButtonProps = {

@@ -14,8 +14,9 @@ export const newCardSchema = z.object({
   sector: z.string().min(1, { message: 'Wybierz sektor' }),
 });
 
-export const savePositionSchema = z.object({
+export const positionEditSchema = z.object({
+  findArticle: z.string().optional(),
   article: z.string().min(1, { message: 'Wybierz artykułu!' }),
-  quantity: z.string().min(1, { message: 'Wprowadź ilość!' }),
+  quantity: z.number().min(1, { message: 'Wprowadź ilość!' }),
   wip: z.boolean(),
 });
