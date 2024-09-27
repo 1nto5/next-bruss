@@ -1,11 +1,11 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
-import { ObjectId } from 'mongodb';
+import { dbc } from '@/lib/mongo';
 import { EmployeeType } from '@/lib/types/employee';
+import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function insertEmployee(employee: EmployeeType) {
   try {
@@ -44,7 +44,6 @@ export async function insertManyEmployee(pastedEmployees: string) {
     const session = await auth();
     if (!session || !(session.user.roles ?? []).includes('admin')) {
       redirect('/');
-      return;
     }
 
     const employees = pastedEmployees
@@ -90,6 +89,63 @@ export async function insertManyEmployee(pastedEmployees: string) {
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred while saving employees.');
+  }
+}
+
+export async function insertManyEmployeesInventory(pastedEmployees: string) {
+  try {
+    const session = await auth();
+    if (!session || !(session.user.roles ?? []).includes('admin')) {
+      redirect('/');
+    }
+
+    // Przetwarzanie wklejonych danych
+    const employees = pastedEmployees
+      .split('\n')
+      .map((line) => line.split('\t'))
+      .map(([fullName, personalNumber, password]) => {
+        return {
+          name: fullName, // Bez zamiany kolejności imię -> nazwisko
+          personalNumber,
+          password,
+        };
+      });
+
+    const collection = await dbc('persons');
+
+    for (const employee of employees) {
+      // Sprawdzenie, czy pracownik o danym personalNumber już istnieje
+      const existingEmployee = await collection.findOne({
+        personalNumber: employee.personalNumber,
+      });
+
+      if (existingEmployee) {
+        // Jeśli istnieje, zaktualizuj dane
+        await collection.updateOne(
+          { personalNumber: employee.personalNumber },
+          {
+            $set: {
+              name: employee.name,
+              password: employee.password, // Aktualizujemy hasło (możesz zmienić to według potrzeb)
+            },
+          },
+        );
+      } else {
+        // Jeśli nie istnieje, wstaw nowego pracownika
+        await collection.insertOne({
+          name: employee.name,
+          personalNumber: employee.personalNumber,
+          password: employee.password,
+        });
+      }
+    }
+
+    // Rewalidacja po zapisaniu nowych danych
+    revalidateTag('employees');
+    return { success: 'added' };
+  } catch (error) {
+    console.error(error);
+    throw new Error('insertManyEmployeesInventory server action error');
   }
 }
 
