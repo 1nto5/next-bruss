@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useContext, use } from 'react';
-import clsx from 'clsx';
-import { PersonsContext } from '../lib/PersonsContext';
-import { InventoryContext } from '../lib/InventoryContext';
-import useSWR from 'swr';
-import { getPosition, savePosition, getArticlesOptions } from '../actions';
-import Select from './Select';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import clsx from 'clsx';
+import { use, useContext, useEffect, useState } from 'react';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import useSWR from 'swr';
+import { getArticlesOptions, getPosition, savePosition } from '../actions';
+import { InventoryContext } from '../lib/InventoryContext';
+import { PersonsContext } from '../lib/PersonsContext';
+import Select from './Select';
 
 type Article = {
   value: string;
@@ -100,6 +100,7 @@ export default function Edit() {
             }
             if (positionData.status == 'new') {
               setBlockNextPosition(true);
+              setWip(false);
             }
           }
           console.log('positionData:', positionData);
@@ -351,7 +352,9 @@ export default function Edit() {
               <input
                 type='checkbox'
                 checked={wip}
-                disabled={approved}
+                disabled={
+                  approved || inventoryContext?.inventory?.sector === 'S900'
+                }
                 onChange={(e) => setWip(e.target.checked)}
               />
               <span>WIP</span>

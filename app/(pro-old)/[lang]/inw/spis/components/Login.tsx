@@ -1,9 +1,9 @@
 'use client';
 
-import { useContext, useState, useRef } from 'react';
+import clsx from 'clsx';
+import { useContext, useRef, useState } from 'react';
 import { login } from '../actions';
 import { PersonsContext } from '../lib/PersonsContext';
-import clsx from 'clsx';
 
 type LoginFormState = {
   personalNumber: string;
@@ -125,9 +125,9 @@ export default function LoginForm() {
             />
             <input
               className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
-              type='password'
+              type='string'
               name='password'
-              placeholder='hasło'
+              placeholder='kod pin'
               value={formState.password}
               onChange={handleInputChange}
             />
