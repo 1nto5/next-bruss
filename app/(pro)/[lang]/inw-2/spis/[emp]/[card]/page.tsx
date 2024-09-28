@@ -2,8 +2,8 @@ import Container from '@/components/ui/container';
 import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
 import { getCardPositions } from '../../actions';
-import Header from '../../components/Header';
-import PositionSelection from '../../components/PositionSelection';
+import Header from '../../components/header';
+import PositionSelection from '../../components/position-selection';
 // import { getEmpCards } from '../actions';
 
 export default async function ArticleSelectionPage({

@@ -2,8 +2,8 @@ import Container from '@/components/ui/container';
 import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
 import { getCardInfo, getPosition } from '../../../actions';
-import Header from '../../../components/Header';
-import PositionEdit from '../../../components/PositionEdit';
+import Header from '../../../components/header';
+import PositionEdit from '../../../components/position-edit';
 // import { getEmpCards } from '../actions';
 
 export default async function ArticleSelectionPage({

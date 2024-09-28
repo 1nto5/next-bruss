@@ -23,7 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Table,
@@ -40,6 +39,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createNewCard } from '../actions';
+import { useGetCards } from '../data/get-cards';
+import { usePersonalNumberStore } from '../lib/stores';
 
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Produkcja + Magazyn' },
@@ -74,16 +75,18 @@ const sectorsSelectOptions = [
   { value: 'GTM - Kolejowa', label: 'GTM - Kolejowa' },
 ];
 
-export default function CardSelection({
-  emp,
-  cards,
-}: {
-  emp: string;
-  cards: any[];
-}) {
+export default function CardSelection() {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
+  const { personalNumber1, personalNumber2, personalNumber3 } =
+    usePersonalNumberStore();
+  const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
+    (person) => person,
+  );
+  const { data: cards, error: cardsError, fetchStatus } = useGetCards(persons);
+
+  console.log('fetchStatus', fetchStatus);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,6 +95,8 @@ export default function CardSelection({
       sector: undefined,
     },
   });
+
+  const emp = '1342';
 
   const onSubmitNewCard = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
@@ -128,7 +133,7 @@ export default function CardSelection({
   return (
     <Tabs defaultValue='new' className='w-[500px]'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='new'>Utwórz nową kartę</TabsTrigger>
+        <TabsTrigger value='new'>Utwórz nową kartę {fetchStatus}</TabsTrigger>
         <TabsTrigger value='exists'>Wybierz istniejącą kartę</TabsTrigger>
       </TabsList>
       <TabsContent value='new'>
@@ -234,7 +239,7 @@ export default function CardSelection({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {cards.map((card) => (
+                {cards?.map((card) => (
                   <Link
                     legacyBehavior
                     key={card.number}

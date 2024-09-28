@@ -1,22 +1,15 @@
+'use client';
 import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
-import Container from '@/components/ui/container';
-import Header from './components/Header';
-import Login from './components/Login';
+import { usePathname, useRouter } from 'next/navigation';
+import { login } from './actions';
+import { usePersonalNumberStore } from './lib/stores';
 
-export default async function ArticleSelectionPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
-  return (
-    <>
-      <Header />
-      <Container>
-        <main className='flex justify-center'>
-          <Login />
-        </main>
-      </Container>
-    </>
-  );
+// import { getDictionary } from '@/lib/dictionary';
+
+export default function ArticleSelectionPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { personalNumber1 } = usePersonalNumberStore();
+  !personalNumber1 && router.push(`${pathname}/login`);
+  personalNumber1 && router.push(`${pathname}/card`);
 }

@@ -10,31 +10,41 @@ export async function login(data: loginInventoryType) {
   try {
     const collection = await dbc('persons');
 
-    // Znalezienie pierwszej osoby
     const person1 = await collection.findOne({
       personalNumber: data.personalNumber1,
     });
     if (!person1) {
-      return { error: 'no person 1' };
+      return { error: 'wrong number 1' };
     }
-    if (data.password1 !== person1.password) {
-      return { error: 'wrong password 1' };
-    }
-
-    // Znalezienie drugiej osoby
-    const person2 = await collection.findOne({
-      personalNumber: data.personalNumber2,
-    });
-    if (!person2) {
-      return { error: 'no person 2' };
-    }
-    if (data.password2 !== person2.password) {
-      return { error: 'wrong password 2' };
+    if (data.pin1 !== person1.password) {
+      return { error: 'wrong pin 1' };
     }
 
+    if (data.personalNumber2) {
+      const person2 = await collection.findOne({
+        personalNumber: data.personalNumber2,
+      });
+      if (!person2) {
+        return { error: 'wrong number 2' };
+      }
+      if (data.pin2 !== person2.password) {
+        return { error: 'wrong pin 2' };
+      }
+    }
+
+    if (data.personalNumber3) {
+      const person3 = await collection.findOne({
+        personalNumber: data.personalNumber3,
+      });
+      if (!person3) {
+        return { error: 'wrong number 3' };
+      }
+      if (data.pin3 !== person3.password) {
+        return { error: 'wrong pin 3' };
+      }
+    }
     return {
       success: true,
-      emp: `${person1.personalNumber}-${person2.personalNumber}`,
     };
   } catch (error) {
     console.error(error);
@@ -86,17 +96,19 @@ export async function createNewCard(
   }
 }
 
-export async function getEmpCards(emp: string) {
+export async function fetchCards(persons: string[]) {
   try {
     const coll = await dbc('inventory_cards');
-    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
-    return await coll
+    const cards = await coll
       .find({
         creators: {
-          $all: [person1PersonalNumber.trim(), person2PersonalNumber.trim()],
+          $all: persons,
         },
       })
       .toArray();
+
+    const sanitizedCards = cards.map(({ _id, ...rest }) => rest);
+    return sanitizedCards;
   } catch (error) {
     console.error(error);
     throw new Error('getEmpCards server action error');
