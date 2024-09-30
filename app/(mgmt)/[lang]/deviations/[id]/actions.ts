@@ -124,6 +124,10 @@ export async function revalidateDeviationsAndDeviation() {
   revalidateTag('deviations');
 }
 
+export async function revalidateDeviation() {
+  revalidateTag('deviation');
+}
+
 export async function sendReminderEmail(id: string) {
   const session = await auth();
   if (!session || !session.user.email) {

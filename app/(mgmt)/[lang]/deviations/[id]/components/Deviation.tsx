@@ -29,7 +29,7 @@ import { useTransition } from 'react';
 import { toast } from 'sonner';
 import {
   approveDeviation,
-  revalidateDeviationsAndDeviation,
+  revalidateDeviation,
   sendReminderEmail,
 } from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
@@ -48,7 +48,7 @@ export default function Deviation({
 }) {
   useEffect(() => {
     const interval = setInterval(() => {
-      revalidateDeviationsAndDeviation();
+      revalidateDeviation();
     }, 1000 * 15); // 60 seconds
     return () => clearInterval(interval);
   }, []);
