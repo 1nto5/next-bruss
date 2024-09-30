@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
+
 import {
   Card,
   CardContent,
@@ -25,7 +27,11 @@ import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { approveDeviation, sendReminderEmail } from '../actions';
+import {
+  approveDeviation,
+  revalidateDeviationsAndDeviation,
+  sendReminderEmail,
+} from '../actions';
 import TableCellsApprove from './TableCellApproveRole';
 import TableCellCorrectiveAction from './TableCellCorrectiveAction';
 
@@ -33,11 +39,20 @@ export default function Deviation({
   deviation,
   lang,
   session,
+  fetchTime,
 }: {
   deviation: DeviationType | null;
   lang: string;
   session: Session | null;
+  fetchTime: string;
 }) {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      revalidateDeviationsAndDeviation();
+    }, 1000 * 15); // 60 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const [isPendingApproval, startApprovalTransition] = useTransition();
 
   const deviationUserRole = session?.user.roles?.find((role) => {
@@ -125,8 +140,9 @@ export default function Deviation({
             </Button>
           </Link>
         </div>
-        <button onClick={() => handleSendReminderEmail()}>test</button>
-        <CardDescription>ID: {deviation?._id?.toString()}</CardDescription>
+        <CardDescription>
+          ID: {deviation?._id?.toString()}, ostatnia synchronizacja: {fetchTime}
+        </CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
       <CardContent>

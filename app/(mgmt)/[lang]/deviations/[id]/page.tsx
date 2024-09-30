@@ -5,9 +5,15 @@ import { DeviationType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
 import Deviation from './components/Deviation';
 
-async function getDeviation(id: string): Promise<DeviationType> {
+async function getDeviation(
+  id: string,
+  lang: string,
+): Promise<{
+  fetchTime: string;
+  deviation: DeviationType;
+}> {
   const res = await fetch(`${process.env.API}/deviations/deviation?id=${id}`, {
-    next: { revalidate: 0, tags: ['deviation'] },
+    next: { revalidate: 15, tags: ['deviation'] },
   });
 
   if (!res.ok) {
@@ -17,8 +23,11 @@ async function getDeviation(id: string): Promise<DeviationType> {
     );
   }
 
+  const dateFromResponse = new Date(res.headers.get('date') || '');
+  const fetchTime = dateFromResponse.toLocaleString(lang);
+
   const data = await res.json();
-  return data;
+  return { fetchTime, deviation: data };
 }
 
 export default async function EditDeviationPage({
@@ -27,11 +36,18 @@ export default async function EditDeviationPage({
   params: { lang: Locale; id: string };
 }) {
   // const dict = await getDictionary(lang);
-  const deviation = await getDeviation(id);
+  const { fetchTime, deviation } = await getDeviation(id, lang);
   if (deviation === null) {
     redirect('/deviations');
   }
   const session = await auth();
 
-  return <Deviation deviation={deviation} lang={lang} session={session} />;
+  return (
+    <Deviation
+      deviation={deviation}
+      lang={lang}
+      session={session}
+      fetchTime={fetchTime}
+    />
+  );
 }
