@@ -300,9 +300,10 @@ export async function saveDmc(
         articleConfig.workplace === 'eol488'
       ) {
         const variant = articleConfig.workplace === 'eol488' ? '10' : '20';
-        await fetch(
+        const res = await fetch(
           `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
         );
+        console.log('Lamp response:', res);
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
