@@ -299,7 +299,7 @@ export async function saveDmc(
         articleConfig.workplace === 'eol810' ||
         articleConfig.workplace === 'eol488'
       ) {
-        const variant = articleConfig.workplace === 'eol810' ? '10' : '20';
+        const variant = articleConfig.workplace === 'eol488' ? '10' : '20';
         await fetch(
           `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
         );
