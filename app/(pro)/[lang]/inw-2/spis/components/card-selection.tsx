@@ -34,13 +34,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { set } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createNewCard } from '../actions';
 import { useGetCards } from '../data/get-cards';
-import { usePersonalNumberStore } from '../lib/stores';
+import { useCardStore, usePersonalNumberStore } from '../lib/stores';
 
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Produkcja + Magazyn' },
@@ -81,12 +82,11 @@ export default function CardSelection() {
   const [isPending, setIsPending] = useState(false);
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
+  const { setCard } = useCardStore();
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
   const { data: cards, error: cardsError, fetchStatus } = useGetCards(persons);
-
-  console.log('fetchStatus', fetchStatus);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -96,12 +96,10 @@ export default function CardSelection() {
     },
   });
 
-  const emp = '1342';
-
   const onSubmitNewCard = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      const res = await createNewCard(emp, data.warehouse, data.sector);
+      const res = await createNewCard(persons, data.warehouse, data.sector);
       if ('error' in res) {
         switch (res.error) {
           case 'persons not found':
@@ -120,7 +118,7 @@ export default function CardSelection() {
         }
       } else if (res.success && res.cardNumber) {
         toast.success(`Karta: ${res.cardNumber} utworzona!`);
-        router.push(pathname + `/${res.cardNumber}`);
+        setCard(res.cardNumber);
       }
     } catch (error) {
       console.error('onSubmit', error);
@@ -133,7 +131,7 @@ export default function CardSelection() {
   return (
     <Tabs defaultValue='new' className='w-[500px]'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='new'>Utwórz nową kartę {fetchStatus}</TabsTrigger>
+        <TabsTrigger value='new'>Utwórz nową kartę</TabsTrigger>
         <TabsTrigger value='exists'>Wybierz istniejącą kartę</TabsTrigger>
       </TabsList>
       <TabsContent value='new'>
@@ -240,22 +238,20 @@ export default function CardSelection() {
               </TableHeader>
               <TableBody>
                 {cards?.map((card) => (
-                  <Link
-                    legacyBehavior
+                  <TableRow
                     key={card.number}
-                    href={{
-                      pathname: `${pathname}/${card.number.toString()}`,
+                    onClick={() => {
+                      setCard(card.number);
+                      toast.success(`Karta: ${card.number} wybrana!`);
                     }}
                   >
-                    <TableRow>
-                      <TableCell>{card.number}</TableCell>
-                      <TableCell>
-                        {card.positions ? card.positions.length : '0'}
-                      </TableCell>
-                      <TableCell>{card.warehouse}</TableCell>
-                      <TableCell>{card.sector}</TableCell>
-                    </TableRow>
-                  </Link>
+                    <TableCell>{card.number}</TableCell>
+                    <TableCell>
+                      {card.positions ? card.positions.length : '0'}
+                    </TableCell>
+                    <TableCell>{card.warehouse}</TableCell>
+                    <TableCell>{card.sector}</TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>

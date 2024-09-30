@@ -53,13 +53,12 @@ export async function login(data: loginInventoryType) {
 }
 
 export async function createNewCard(
-  emp: string,
+  persons: string[],
   warehouse: string,
   sector: string,
 ) {
   try {
     const coll = await dbc('inventory_cards');
-    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
 
     // Pobierz wszystkie istniejące numery kart
     const existingCards = await coll
@@ -80,7 +79,7 @@ export async function createNewCard(
     // Tworzenie nowej karty z najniższym wolnym numerem
     const result = await coll.insertOne({
       number: newCardNumber,
-      creators: [person1PersonalNumber, person2PersonalNumber],
+      creators: persons,
       warehouse: warehouse,
       sector: sector,
       time: new Date(),

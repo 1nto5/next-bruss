@@ -26,3 +26,23 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
     { name: 'personal-numbers' },
   ),
 );
+
+type CardStateType = {
+  card: number;
+  setCard: (card: number) => void;
+};
+
+export const useCardStore = create<CardStateType>((set) => ({
+  card: 0,
+  setCard: (card: number) => set({ card }),
+}));
+
+type PositionStateType = {
+  position: number;
+  setPosition: (position: number) => void;
+};
+
+export const usePositionStore = create<PositionStateType>((set) => ({
+  position: 0,
+  setPosition: (position: number) => set({ position }),
+}));

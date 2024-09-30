@@ -136,7 +136,8 @@ export default function Login() {
       <CardHeader>
         <CardTitle>Logowanie</CardTitle>
         <CardDescription>
-          Wpisz dane jednej, dwóch lub trzech osób spisujących w grupie.
+          Wpisz dane jednej, dwóch lub trzech osób spisujących w Twojej grupie.
+          Jedna osoba loguje całą grupę na jednym urządzeniu.
         </CardDescription>
       </CardHeader>
 

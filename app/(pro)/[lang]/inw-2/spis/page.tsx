@@ -1,15 +1,20 @@
 'use client';
-import { Locale } from '@/i18n.config';
-import { usePathname, useRouter } from 'next/navigation';
-import { login } from './actions';
-import { usePersonalNumberStore } from './lib/stores';
+import CardSelection from './components/card-selection';
+import Login from './components/login';
+import { useCardStore, usePersonalNumberStore } from './lib/stores';
 
 // import { getDictionary } from '@/lib/dictionary';
 
-export default function ArticleSelectionPage() {
-  const router = useRouter();
-  const pathname = usePathname();
+export default function App() {
   const { personalNumber1 } = usePersonalNumberStore();
-  !personalNumber1 && router.push(`${pathname}/login`);
-  personalNumber1 && router.push(`${pathname}/card`);
+  const { card } = useCardStore();
+  if (!personalNumber1) {
+    return <Login />;
+  } else {
+    if (card == 0) {
+      return <CardSelection />;
+    } else {
+      return <div>Card: {card}</div>;
+    }
+  }
 }
