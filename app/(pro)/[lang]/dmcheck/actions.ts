@@ -294,6 +294,16 @@ export async function saveDmc(
 
     if (insertResult) {
       revalidateTag('box');
+      // EOL810/EOL488 lighting the lamp
+      if (
+        articleConfig.workplace === 'eol810' ||
+        articleConfig.workplace === 'eol488'
+      ) {
+        const variant = articleConfig.workplace === 'eol810' ? '10' : '20';
+        await fetch(
+          `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
+        );
+      }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
   } catch (error) {
