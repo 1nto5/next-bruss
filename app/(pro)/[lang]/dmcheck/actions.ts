@@ -265,11 +265,11 @@ export async function saveDmc(
     ) {
       const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
 
-      const response = await fetch(url);
-      if (!response.ok || response.status === 404) {
+      const res = await fetch(url);
+      if (!res.ok || res.status === 404) {
         return { message: 'smart fetch error' };
       }
-      const data = await response.text();
+      const data = await res.text();
       switch (data) {
         case 'NOT_FOUND':
           return { message: 'smart not found' };
@@ -300,10 +300,17 @@ export async function saveDmc(
         articleConfig.workplace === 'eol488'
       ) {
         const variant = articleConfig.workplace === 'eol488' ? '10' : '20';
+        console.log(
+          `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant} at ${new Date().toISOString()}`,
+        );
         const res = await fetch(
           `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
         );
-        console.log('Lamp response:', res);
+        const resText = await res.text();
+        console.log(
+          `Lamp response status at ${new Date().toISOString}:`,
+          resText,
+        );
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
