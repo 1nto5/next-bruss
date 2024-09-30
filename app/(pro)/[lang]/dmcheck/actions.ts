@@ -306,7 +306,7 @@ export async function saveDmc(
         const res = await fetch(
           `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
         );
-        console.log(`Lamp response status: ${res}`);
+        console.log(`Lamp response status: ${res.text()}`);
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
