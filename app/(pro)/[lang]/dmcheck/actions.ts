@@ -301,15 +301,12 @@ export async function saveDmc(
       ) {
         const variant = articleConfig.workplace === 'eol488' ? '10' : '20';
         console.log(
-          `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant}, at: ${new Date().toISOString()}`,
+          `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant}`,
         );
         const res = await fetch(
           `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
         );
-        const resText = await res.text();
-        console.log(
-          `Lamp response status at: ${new Date().toISOString}, res: ${resText}`,
-        );
+        console.log(`Lamp response status: ${res}`);
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
