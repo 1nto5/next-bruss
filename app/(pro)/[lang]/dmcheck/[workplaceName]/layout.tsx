@@ -1,12 +1,12 @@
 import '@/app/globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 // import QueryProvider from '@/lib/query-provider';
 import Container from '@/components/ui/container';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import Header from '../components/Header';
+import Header from '../components/header';
 
 export const metadata: Metadata = {
   title: 'DMCheck (Next BRUSS)',

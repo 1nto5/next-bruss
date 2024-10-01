@@ -28,6 +28,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createNewCard } from '../actions';
+import { usePersonalNumberStore } from '../lib/stores';
 
 export default function PositionSelection({
   emp,
@@ -38,6 +39,11 @@ export default function PositionSelection({
   positions: any[];
   card: string;
 }) {
+  const { personalNumber1, personalNumber2, personalNumber3 } =
+    usePersonalNumberStore();
+  const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
+    (person) => person,
+  );
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
@@ -53,7 +59,7 @@ export default function PositionSelection({
   const onSubmitNewCard = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      const res = await createNewCard(emp, data.warehouse, data.sector);
+      const res = await createNewCard(persons, data.warehouse, data.sector);
       if ('error' in res) {
         switch (res.error) {
           case 'persons not found':

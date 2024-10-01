@@ -3,10 +3,10 @@ import { Locale } from '@/i18n.config';
 import { DeviationReasonType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
 import { findDeviation } from './actions';
-import EditDeviation from './components/EditDeviation';
+import EditDraftDeviation from './components/edit-draft-deviation';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
-  const res = await fetch(`${process.env.API}/deviations/get-reasons`, {
+  const res = await fetch(`${process.env.API}/deviations/reasons`, {
     next: { revalidate: 0, tags: ['deviationReasons'] }, // TODO: add revalidate time
   });
   if (!res.ok) {
@@ -32,5 +32,7 @@ export default async function EditDeviationPage({
     redirect('/deviations');
   }
 
-  return <EditDeviation reasons={deviationReasons} deviation={deviation} />;
+  return (
+    <EditDraftDeviation reasons={deviationReasons} deviation={deviation} />
+  );
 }

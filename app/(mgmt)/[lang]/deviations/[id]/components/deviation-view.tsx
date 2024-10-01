@@ -32,8 +32,8 @@ import {
   revalidateDeviation,
   sendReminderEmail,
 } from '../actions';
-import TableCellsApprove from './TableCellApproveRole';
-import TableCellCorrectiveAction from './TableCellCorrectiveAction';
+import TableCellsApprove from './table-cell-approve-role';
+import TableCellCorrectiveAction from './table-cell-corrective-action';
 
 export default function Deviation({
   deviation,

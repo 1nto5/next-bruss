@@ -1,5 +1,5 @@
 import { Locale } from '@/i18n.config';
-import AddEmployee from './components/AddManyEmployees';
+import AddEmployee from './components/add-many-employees-inventory';
 
 export default async function EditUserPage({
   params: { lang },

@@ -1,6 +1,6 @@
-import ExportCard from './components/ExportCard';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import ExportCard from './components/export-card';
 
 export default async function ExportData({
   params: { lang },
@@ -16,9 +16,5 @@ export default async function ExportData({
   );
   const articlesConfig = await articlesConfigJson.json();
 
-  return (
-    <main className='m-2 flex justify-center'>
-      <ExportCard cDict={dict.exportData} articlesConfig={articlesConfig} />
-    </main>
-  );
+  return <ExportCard cDict={dict.exportData} articlesConfig={articlesConfig} />;
 }

@@ -1,8 +1,8 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import EditCapa from './components/EditCapa';
-import { getCapa } from '../../actions';
 import { redirect } from 'next/navigation';
+import { getCapa } from '../../actions';
+import EditCapa from './components/edit-capa';
 
 export default async function EditCapaPage({
   params: { lang, articleNumber },
@@ -22,9 +22,5 @@ export default async function EditCapaPage({
     };
   }
 
-  return (
-    <main className='m-2 flex justify-center'>
-      <EditCapa data={capa} />
-    </main>
-  );
+  return <EditCapa data={capa} />;
 }

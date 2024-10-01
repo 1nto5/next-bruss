@@ -1,6 +1,6 @@
 import '@/app/globals.css';
+import { ThemeProvider } from '@/lib/theme-provider';
 import Footer from './components/Footer';
-import { ThemeProvider } from '@/components/theme-provider';
 
 export default function RootLayout({
   children,

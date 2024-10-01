@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import FormContainer from '@/components/ui/form-container';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { redirect } from 'next/navigation';
@@ -34,10 +35,10 @@ export default async function Layout({
   }
   if (!session?.user.roles?.includes('rework')) {
     return (
-      <main className='m-2 flex justify-center'>
+      <FormContainer>
         <Info title={dict.noAccessTitle} description={noAccess} />
-      </main>
+      </FormContainer>
     );
   }
-  return <>{children}</>;
+  return <FormContainer>{children}</FormContainer>;
 }

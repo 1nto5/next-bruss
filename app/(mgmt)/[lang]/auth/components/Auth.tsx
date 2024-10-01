@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
+import LoginForm from './login-form';
+import RegisterForm from './register-form';
 
 export default function Auth({ cDict }: { cDict: any }) {
   return (

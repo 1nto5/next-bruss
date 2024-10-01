@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { UsersListType } from '@/lib/types/user';
-import AddCorrectiveAction from './components/AddCorrectiveAction';
+import AddCorrectiveAction from './components/add-corrective-action';
 
 async function getUsers(): Promise<UsersListType> {
   const res = await fetch(`${process.env.API}/users`, {

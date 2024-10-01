@@ -1,10 +1,10 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 
-import { getEmployee } from '../../actions';
-import { redirect } from 'next/navigation';
 import { ObjectId } from 'mongodb';
-import EditEmployee from './components/EditEmployee';
+import { redirect } from 'next/navigation';
+import { getEmployee } from '../../actions';
+import EditEmployee from './components/edit-employee';
 
 export default async function EditUserPage({
   params: { lang, employeeId },

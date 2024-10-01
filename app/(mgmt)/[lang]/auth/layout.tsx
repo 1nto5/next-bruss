@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import FormContainer from '@/components/ui/form-container';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Logowanie / rejestracja (Next BRUSS)',
@@ -16,5 +17,5 @@ export default async function Layout({
     redirect('/');
   }
 
-  return <>{children}</>;
+  return <FormContainer>{children}</FormContainer>;
 }

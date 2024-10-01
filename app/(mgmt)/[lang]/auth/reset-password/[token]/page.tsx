@@ -1,8 +1,8 @@
 'use server';
 
-import { getDictionary } from '@/lib/dictionary';
 import { Locale } from '@/i18n.config';
-import Reset from '../../components/Reset';
+import { getDictionary } from '@/lib/dictionary';
+import Reset from '../../components/reset-password';
 
 export default async function Page({
   params: { lang, token },

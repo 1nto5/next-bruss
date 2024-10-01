@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { PersonLogin } from '../../components/PersonLogin';
+import { PersonLogin } from '../../components/person-login';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 

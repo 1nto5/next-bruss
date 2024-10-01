@@ -1,9 +1,9 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import EditUser from './components/EditUser';
-import { getUser } from '../../actions';
-import { redirect } from 'next/navigation';
 import { ObjectId } from 'mongodb';
+import { redirect } from 'next/navigation';
+import { getUser } from '../../actions';
+import EditUser from './components/EditUser';
 
 export default async function EditUserPage({
   params: { lang, userId },
@@ -17,14 +17,12 @@ export default async function EditUserPage({
   }
 
   return (
-    <main className='m-2 flex justify-center'>
-      <EditUser
-        userObject={{
-          _id: user._id.toString(),
-          email: user.email,
-          roles: user.roles,
-        }}
-      />
-    </main>
+    <EditUser
+      userObject={{
+        _id: user._id.toString(),
+        email: user.email,
+        roles: user.roles,
+      }}
+    />
   );
 }

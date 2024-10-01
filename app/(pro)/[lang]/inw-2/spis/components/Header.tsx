@@ -16,8 +16,8 @@ export default function Header() {
   const { position, setPosition } = usePositionStore();
 
   return (
-    <header className='px-6 py-4 sm:flex sm:justify-between'>
-      <Container>
+    <Container>
+      <header className='px-6 py-4 sm:flex sm:justify-between'>
         <div className='relative flex h-10 w-full items-center justify-between '>
           <div className='flex items-center'>
             <span className='font-mono font-semibold'>inw-2 spis</span>
@@ -46,7 +46,7 @@ export default function Header() {
             <ThemeModeToggle />
           </div>
         </div>
-      </Container>
-    </header>
+      </header>
+    </Container>
   );
 }

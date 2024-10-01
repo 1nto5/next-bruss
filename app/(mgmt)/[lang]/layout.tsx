@@ -1,9 +1,10 @@
 import '@/app/globals.css';
 import { auth } from '@/auth';
-import { ThemeProvider } from '@/components/theme-provider';
+import Container from '@/components/ui/container';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Footer from './components/footer';
 import Header from './components/header';
@@ -33,13 +34,13 @@ export default async function RootLayout({
           enableSystem
           // disableTransitionOnChange
         >
-          <div className='flex min-h-screen flex-col'>
-            <Header session={session} dict={dictionary} lang={lang} />
-            <main className='flex-1'>{children}</main>
-            <Footer />
-          </div>
-
-          {/* <Footer /> */}
+          <Container>
+            <div className='flex min-h-screen flex-col'>
+              <Header session={session} dict={dictionary} lang={lang} />
+              <main className='flex-1'>{children}</main>
+              <Footer />
+            </div>
+          </Container>
         </ThemeProvider>
       </body>
     </html>

@@ -1,4 +1,5 @@
 // import { auth } from '@/auth';
+import FormContainer from '@/components/ui/form-container';
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 // import { redirect } from 'next/navigation';
@@ -16,5 +17,5 @@ export default async function Layout({
   // params: { lang: Locale };
 }) {
   // const dict = await getDictionary(lang);
-  return <>{children}</>;
+  return <FormContainer>{children}</FormContainer>;
 }

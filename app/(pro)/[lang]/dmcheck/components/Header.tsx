@@ -1,10 +1,10 @@
-import Logo from '@/components/Logo';
 import Container from '@/components/ui/container';
+import Logo from '@/components/ui/logo';
 import Link from 'next/link';
-import { LogoutAll } from './Logout';
-import { Reload } from './Reload';
-import { ThemeModeToggle } from './ThemeModeToggle';
-import VolumeButton from './VolumeButton';
+import { LogoutAll } from './logout';
+import { Reload } from './reload';
+import { ThemeModeToggle } from './theme-mode-toggle';
+import VolumeButton from './volume-button';
 
 type HeaderProps = {
   dict: any;

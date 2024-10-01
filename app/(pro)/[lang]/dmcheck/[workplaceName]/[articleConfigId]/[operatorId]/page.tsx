@@ -1,8 +1,8 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { redirect } from 'next/navigation';
-import { Scan } from '../../../components/Scan';
-import { StatusBar } from '../../../components/StatusBar';
+import { Scan } from '../../../components/scan';
+import { StatusBar } from '../../../components/status-bar';
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -11,8 +11,8 @@ import {
   getOperatorById,
   getPalletQr,
 } from '../../../actions';
-import { LastFiveTable } from '../../../components/LastFiveTable';
-import { PrintPalletLabel } from '../../../components/PrintPalletLabel';
+import { LastFiveTable } from '../../../components/last-five-table';
+import { PrintPalletLabel } from '../../../components/print-pallet-label';
 
 export default async function ScanPage({
   params: { lang, workplaceName, articleConfigId, operatorId },

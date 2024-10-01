@@ -6,8 +6,8 @@ import { useFormState } from 'react-dom';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import { save } from '../actions';
-import { LastFiveTable } from './LastFiveTable';
-import { ScanInput } from './ScanInput';
+import { LastFiveTable } from './last-five-table';
+import { ScanInput } from './scan-input';
 
 const initialState: { message: string; dmc?: string; time?: string } = {
   message: '',

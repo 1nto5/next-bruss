@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { getArticlesForWorkplace } from '../actions';
-import { Info } from '../components/Info';
+import { Info } from '../components/info';
 
 import {
   Table,

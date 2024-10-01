@@ -55,7 +55,7 @@ import {
   updateDraftDeviation,
 } from '../actions';
 
-export default function EditDeviation({
+export default function EditDraftDeviation({
   reasons,
   deviation,
 }: {

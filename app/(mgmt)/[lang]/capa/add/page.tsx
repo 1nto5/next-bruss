@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import AddCapa from './components/AddCapa';
 import Container from '@/components/ui/container';
+import AddCapa from './components/add-capa';
 
 export default async function AddCapaPage(
   {
@@ -11,11 +11,5 @@ export default async function AddCapaPage(
   },
 ) {
   // const dict = await getDictionary(lang);
-  return (
-    <Container>
-      <main className='flex justify-center'>
-        <AddCapa />
-      </main>
-    </Container>
-  );
+  return <AddCapa />;
 }

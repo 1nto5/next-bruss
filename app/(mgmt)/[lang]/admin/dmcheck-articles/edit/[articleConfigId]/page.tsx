@@ -1,9 +1,9 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import EditArticleConfig from './components/EditArticleConfig';
-import { getArticleConfig } from '../../actions';
-import { redirect } from 'next/navigation';
 import { ObjectId } from 'mongodb';
+import { redirect } from 'next/navigation';
+import { getArticleConfig } from '../../actions';
+import EditArticleConfig from './components/EditArticleConfig';
 
 export default async function EditArticleConfigPage({
   params: { lang, articleConfigId },
@@ -17,14 +17,12 @@ export default async function EditArticleConfigPage({
   }
 
   return (
-    <main className='m-2 flex justify-center'>
-      <EditArticleConfig
-        lang={lang}
-        articleConfigObject={{
-          ...articleConfig,
-          _id: articleConfig._id.toString(),
-        }}
-      />
-    </main>
+    <EditArticleConfig
+      lang={lang}
+      articleConfigObject={{
+        ...articleConfig,
+        _id: articleConfig._id.toString(),
+      }}
+    />
   );
 }

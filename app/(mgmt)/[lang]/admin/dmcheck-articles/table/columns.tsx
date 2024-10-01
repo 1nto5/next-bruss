@@ -18,8 +18,8 @@ import { ArticleConfigType } from '@/lib/types/articleConfig';
 import { Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
-import { CopyDialog } from '../components/CopyDialog';
-import { DeleteDialog } from '../components/DeleteDialog';
+import { CopyDialog } from '../components/copy-dialog';
+import { DeleteDialog } from '../components/delete-dialog';
 
 const ActionsCell = ({ row }: { row: any }) => {
   const articleConfig = row.original;

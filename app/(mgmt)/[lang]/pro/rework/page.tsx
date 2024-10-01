@@ -1,8 +1,8 @@
-import ReworkCard from './components/ReworkCard';
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import ReworkCard from './components/rework-card';
 
 export default async function Rework({
   params: { lang },
@@ -16,9 +16,5 @@ export default async function Rework({
     redirect('/auth');
   }
 
-  return (
-    <main className='m-2 flex justify-center'>
-      <ReworkCard cDict={dict.rework} userEmail={session?.user.email} />
-    </main>
-  );
+  return <ReworkCard cDict={dict.rework} userEmail={session?.user.email} />;
 }

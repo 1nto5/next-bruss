@@ -20,9 +20,5 @@ export default async function Home({
       .
     </>
   );
-  return (
-    <main className='m-2 flex justify-center'>
-      <Info title={dict?.home?.title} description={infoDescription} />
-    </main>
-  );
+  return <Info title={dict?.home?.title} description={infoDescription} />;
 }

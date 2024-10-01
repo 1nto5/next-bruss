@@ -1,5 +1,5 @@
 import { auth } from '@/auth';
-import Container from '@/components/ui/container';
+import FormContainer from '@/components/ui/form-container';
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { redirect } from 'next/navigation';
@@ -23,11 +23,5 @@ export default async function Layout({
     redirect('/auth');
   }
 
-  return (
-    <Container>
-      <main className='flex justify-center'>
-        <>{children}</>
-      </main>
-    </Container>
-  );
+  return <FormContainer>{children}</FormContainer>;
 }

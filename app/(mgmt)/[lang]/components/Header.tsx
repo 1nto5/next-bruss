@@ -24,7 +24,7 @@ import { Menu } from 'lucide-react';
 import { LoginLogout } from './login-logout';
 import { ThemeModeToggle } from './theme-mode-toggle';
 
-import Logo from '@/components/Logo';
+import Logo from '@/components/ui/logo';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';

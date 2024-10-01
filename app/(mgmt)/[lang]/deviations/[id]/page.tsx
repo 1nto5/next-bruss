@@ -3,7 +3,7 @@ import { Locale } from '@/i18n.config';
 import { auth } from '@/auth';
 import { DeviationType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
-import Deviation from './components/Deviation';
+import Deviation from './components/deviation-view';
 
 async function getDeviation(
   id: string,

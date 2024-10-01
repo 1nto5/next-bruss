@@ -2,10 +2,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { ArticleCardDialog } from './ArticleCardDialog';
-import { BoxCardDialog } from './BoxCardDialog';
-import { OperatorCardDialog } from './OperatorCardDialog';
-import { PalletCardDialog } from './PalletCardDialog';
+import { ArticleCardDialog } from './article-card-dialog';
+import { BoxCardDialog } from './box-card-dialog';
+import { OperatorCardDialog } from './operator-card-dialog';
+import { PalletCardDialog } from './pallet-card-dialog';
 
 type StatusBarProps = {
   cDict: any;

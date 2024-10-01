@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import AddArticleConfig from './components/AddArticleConfig';
+import AddArticleConfig from './components/add-article-config';
 
 export default async function ArticleConfig({
   params: { lang },
@@ -8,9 +8,5 @@ export default async function ArticleConfig({
   params: { lang: Locale };
 }) {
   const dict = await getDictionary(lang);
-  return (
-    <main className='m-2 flex justify-center'>
-      <AddArticleConfig dict={dict} lang={lang} />
-    </main>
-  );
+  return <AddArticleConfig dict={dict} lang={lang} />;
 }

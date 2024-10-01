@@ -1,9 +1,10 @@
 import '@/app/globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
 import Container from '@/components/ui/container';
+import Footer from '@/components/ui/footer';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Header from './components/header';
 import QueryProvider from './lib/query-provider';
@@ -32,11 +33,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Header />
             <Container>
-              <main className='flex justify-center'>
-                <>{children}</>
-              </main>
+              <div className='flex min-h-screen flex-col'>
+                <Header />
+                <main className='flex flex-1 justify-center'>{children}</main>
+
+                <Footer />
+              </div>
             </Container>
           </QueryProvider>
           <Toaster richColors />

@@ -55,15 +55,11 @@ export default async function CapaPage({
 }) {
   const { fetchTime, allCapa } = await getCapaHistory(lang, articleNumber);
   return (
-    <Container>
-      <main>
-        <DataTable
-          columns={columns}
-          data={allCapa}
-          fetchTime={fetchTime}
-          articleNumber={articleNumber}
-        />
-      </main>
-    </Container>
+    <DataTable
+      columns={columns}
+      data={allCapa}
+      fetchTime={fetchTime}
+      articleNumber={articleNumber}
+    />
   );
 }
