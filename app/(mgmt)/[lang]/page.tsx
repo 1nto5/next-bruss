@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import Info from './components/Info';
+import Info from './components/info';
 
 export default async function Home({
   params: { lang },

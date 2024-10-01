@@ -1,11 +1,12 @@
-import { Metadata } from 'next';
 import '@/app/globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Locale } from '@/i18n.config';
-import Header from './components/Header';
-import { Toaster } from '@/components/ui/sonner';
 import { auth } from '@/auth';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
+import { Metadata } from 'next';
+import Footer from './components/footer';
+import Header from './components/header';
 
 export const metadata: Metadata = {
   title: 'Next BRUSS',
@@ -32,9 +33,11 @@ export default async function RootLayout({
           enableSystem
           // disableTransitionOnChange
         >
-          <Header session={session} dict={dictionary} lang={lang} />
-          {children}
-          <Toaster richColors position='top-right' />
+          <div className='flex min-h-screen flex-col'>
+            <Header session={session} dict={dictionary} lang={lang} />
+            <main className='flex-1'>{children}</main>
+            <Footer />
+          </div>
 
           {/* <Footer /> */}
         </ThemeProvider>

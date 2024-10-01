@@ -21,15 +21,15 @@ import React from 'react';
 // import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
-import { LoginLogout } from './LoginLogout';
-import { ThemeModeToggle } from './ThemeModeToggle';
+import { LoginLogout } from './login-logout';
+import { ThemeModeToggle } from './theme-mode-toggle';
 
 import Logo from '@/components/Logo';
 import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
 import { getSession, logout } from '../auth/actions';
-import UserAvatar from './UserAvatar';
+import UserAvatar from './user-avatar';
 // import { toast } from 'sonner';
 
 type HeaderProps = {
@@ -39,6 +39,16 @@ type HeaderProps = {
 };
 
 export default function Header({ session, dict, lang }: HeaderProps) {
+  const [isScrolled, setIsScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 0);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const router = useRouter();
 
   const routes = [
@@ -119,6 +129,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 href: '/admin/employees/add-many',
                 title: 'Add many employees',
                 description: 'Add many employees from HYDRA export file.',
+              },
+              {
+                href: '/admin/employees/add-many',
+                title: 'Add many employees for inventory',
+                description: 'Add many employees from excel file.',
               },
               {
                 href: '/admin/rework-many',
@@ -202,7 +217,10 @@ export default function Header({ session, dict, lang }: HeaderProps) {
   const selectedRoutes = lang === 'de' ? routesDe : routes;
 
   return (
-    <header className='px-6 py-4 sm:flex sm:justify-between'>
+    // <header className='px-6 py-4 sm:flex sm:justify-between'>
+    <header
+      className={`sticky top-0 z-50 px-6 py-4 transition-colors duration-200 sm:flex sm:justify-between ${isScrolled ? 'border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60' : 'bg-background'}`}
+    >
       <Container>
         <div className='relative flex h-6 w-full items-center justify-between '>
           <div className='flex items-center'>
@@ -262,7 +280,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                       <NavigationMenuTrigger>
                         {route.title}
                       </NavigationMenuTrigger>
-                      <NavigationMenuContent>
+                      <NavigationMenuContent className=''>
                         <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
                           {route.submenu.map((subItem) => (
                             <ListItem

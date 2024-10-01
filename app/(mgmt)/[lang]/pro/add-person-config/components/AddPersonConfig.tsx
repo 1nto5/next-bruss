@@ -1,9 +1,17 @@
 'use client';
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -13,21 +21,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import NoAvailable from '../../../components/NoAvailable';
+import NoAvailable from '../../../components/not-available';
 import { savePersonConfig } from '../actions';
 // import { useQuery } from '@tanstack/react-query';
 
