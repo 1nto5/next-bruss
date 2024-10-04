@@ -1,12 +1,12 @@
 'use client';
 
-import { inventoryLoginSchema as formSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { login } from '../actions';
 import { usePersonalNumberStore } from '../lib/stores';
+import { inventoryLoginSchema as formSchema } from '../lib/zod';
 
 import { Button } from '@/components/ui/button';
 import {

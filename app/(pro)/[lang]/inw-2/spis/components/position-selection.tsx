@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,12 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { newCardSchema as formSchema } from '@/lib/z/inventory';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-
 import {
   Table,
   TableBody,
@@ -22,128 +17,103 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import clsx from 'clsx';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { createNewCard } from '../actions';
-import { usePersonalNumberStore } from '../lib/stores';
+import { useGetCardPositions } from '../data/get-positions';
+import {
+  useCardStore,
+  usePersonalNumberStore,
+  usePositionStore,
+} from '../lib/stores';
+import { PositionType } from '../lib/types';
 
-export default function PositionSelection({
-  emp,
-  positions,
-  card,
-}: {
-  emp: string;
-  positions: any[];
-  card: string;
-}) {
+export default function PositionSelection() {
+  // const [isPending, setIsPending] = useState(false);
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
+  const { card } = useCardStore();
+  const { setPosition } = usePositionStore();
+
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isPending, setIsPending] = useState(false);
+  const { data, error, fetchStatus, isSuccess } = useGetCardPositions(
+    persons,
+    card,
+  );
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      warehouse: undefined,
-      sector: undefined,
-    },
-  });
-
-  const onSubmitNewCard = async (data: z.infer<typeof formSchema>) => {
-    setIsPending(true);
-    try {
-      const res = await createNewCard(persons, data.warehouse, data.sector);
-      if ('error' in res) {
-        switch (res.error) {
-          case 'persons not found':
-            toast.error(
-              'Problem z zalogowanymi osobami, zaloguj się ponownie!!',
-            );
-            break;
-          case 'not created':
-            toast.error(
-              'Nie udało się utworzyć karty! Spróbuj ponownie lub skontaktuj się z IT!',
-            );
-            break;
-          default:
-            console.error('onSubmitNewCard', res.error);
-            toast.error('Skontaktuj się z IT!');
-        }
-      } else if (res.success && res.cardNumber) {
-        toast.success(`Karta: ${res.cardNumber} utworzona!`);
-        router.push(pathname + `/${res.cardNumber}`);
-      }
-    } catch (error) {
-      console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPending(false);
+  useEffect(() => {
+    if (isSuccess && data.message === 'no positions') {
+      setPosition(1);
     }
-  };
+  }, [data?.message, isSuccess, setPosition]);
+
+  // useEffect(() => {
+  //   if (data?.error || error) {
+  //     console.error('useGetCards error:', data?.error || error);
+  //     toast.error('Problem z pobraniem kart! Skontaktuj się z IT!');
+  //   }
+  // }, [data, error]);
+
+  if (data?.error || error) {
+    throw new Error(`useGetCardPositions error: ${data?.error || error}`);
+  }
 
   return (
-    <>
-      <Card className='w-[500px]'>
-        <CardHeader>
-          <CardTitle>Wybór pozycji</CardTitle>
-          <CardDescription>Numer karty: {card}</CardDescription>
-        </CardHeader>
-        <CardContent className='grid w-full items-center gap-4 '>
-          {
-            <Table>
-              {/* <TableCaption>A list of instruments.</TableCaption> */}
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Numer</TableHead>
-                  <TableHead>Identyfikator</TableHead>
-                  <TableHead>Numer art.</TableHead>
-                  <TableHead>Nazwa</TableHead>
-                  <TableHead>Ilość</TableHead>
-
-                  <TableHead>WIP</TableHead>
+    <Card className='w-[700px]'>
+      <CardHeader>
+        <CardTitle
+          className={clsx('', fetchStatus === 'fetching' && 'animate-pulse')}
+        >
+          Wybór pozycji
+        </CardTitle>
+        <CardDescription>Numer karty: {card}</CardDescription>
+      </CardHeader>
+      <CardContent className='grid w-full items-center gap-4 '>
+        {
+          <Table>
+            {/* <TableCaption>A list of instruments.</TableCaption> */}
+            <TableHeader>
+              <TableRow>
+                <TableHead>Numer</TableHead>
+                <TableHead>Identyfikator</TableHead>
+                <TableHead>Numer art.</TableHead>
+                <TableHead>Nazwa</TableHead>
+                <TableHead>Ilość</TableHead>
+                <TableHead>WIP</TableHead>
+                {/* TODO: uruchomić jak dodasz nowe pozycje z creators */}
+                {/* <TableHead>Utworzył</TableHead> */}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data?.success.map((position: PositionType) => (
+                <TableRow
+                  key={position.position}
+                  onClick={() => {
+                    setPosition(position.position);
+                    toast.success(`Pozycja: ${position.position} wybrana!`);
+                  }}
+                >
+                  <TableCell>{position.position}</TableCell>
+                  <TableCell>{position.identifier}</TableCell>
+                  <TableCell>{position.articleNumber}</TableCell>
+                  <TableCell>{position.articleName}</TableCell>
+                  <TableCell>{`${position.quantity} ${position.unit}`}</TableCell>
+                  <TableCell>{position.wip ? 'Tak' : 'Nie'}</TableCell>
+                  {/* <TableCell>{position.creators.join(', ')}</TableCell> */}
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {positions.map((position) => (
-                  <Link
-                    legacyBehavior
-                    key={position.number}
-                    href={{
-                      pathname: `${pathname}/${position.position.toString()}`,
-                    }}
-                  >
-                    <TableRow>
-                      <TableCell>{position.position}</TableCell>
-                      <TableCell>{position.identifier}</TableCell>
-                      <TableCell>{position.articleNumber}</TableCell>
-                      <TableCell>{position.articleName}</TableCell>
-                      <TableCell>{`${position.quantity} ${position.unit}`}</TableCell>
-
-                      <TableCell>{position.wip ? 'Tak' : 'Nie'}</TableCell>
-                    </TableRow>
-                  </Link>
-                ))}
-              </TableBody>
-            </Table>
-          }
-        </CardContent>
+              ))}
+            </TableBody>
+          </Table>
+        }
+      </CardContent>
+      {data?.success.length < 25 && (
         <CardFooter className='flex justify-end'>
-          <Link
-            href={{
-              pathname: `${pathname}/${positions.length + 1}`,
-            }}
-          >
-            <Button type='submit'>Nowa pozycja</Button>
-          </Link>
+          {/* TODO: onClick new position */}
+          <Button>Nowa pozycja</Button>
         </CardFooter>
-      </Card>
-    </>
+      )}
+    </Card>
   );
 }

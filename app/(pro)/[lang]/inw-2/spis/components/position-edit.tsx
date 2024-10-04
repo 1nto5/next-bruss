@@ -1,10 +1,10 @@
 'use client';
 
-import { positionEditSchema as formSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { positionEditSchema as formSchema } from '../lib/zod';
 // import { login } from '../actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,24 +28,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { set } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { findArticles, savePosition } from '../actions';
 
-export default function PositionEdit({
-  cardInfo,
-  positionData,
-  positionNumber,
-}: {
-  cardInfo: any;
-  positionData: any;
-  positionNumber: string;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
+export default function PositionEdit() {
   const [isPending, setIsPending] = useState(false);
   const [isPendingFindArticle, setIsPendingFindArticle] = useState(false);
   const [foundArticles, setFoundArticles] = useState<{ [key: string]: any }[]>(

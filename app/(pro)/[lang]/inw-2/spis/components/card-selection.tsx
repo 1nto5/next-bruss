@@ -1,15 +1,16 @@
 'use client';
 
-import { newCardSchema as formSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { newCardSchema as formSchema } from '../lib/zod';
 // import { login } from '../actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -27,21 +28,19 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { set } from 'date-fns';
+import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createNewCard } from '../actions';
 import { useGetCards } from '../data/get-cards';
 import { useCardStore, usePersonalNumberStore } from '../lib/stores';
+import { CardType } from '../lib/types';
 
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Produkcja + Magazyn' },
@@ -77,8 +76,7 @@ const sectorsSelectOptions = [
 ];
 
 export default function CardSelection() {
-  const router = useRouter();
-  const pathname = usePathname();
+  // TODO: obsługa błędów z react query
   const [isPending, setIsPending] = useState(false);
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
@@ -86,7 +84,18 @@ export default function CardSelection() {
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
-  const { data: cards, error: cardsError, fetchStatus } = useGetCards(persons);
+  const { data, error, fetchStatus } = useGetCards(persons);
+
+  // useEffect(() => {
+  //   if (data?.error || error) {
+  //     console.error('useGetCards error:', data?.error || error);
+  //     toast.error('Problem z pobraniem kart! Skontaktuj się z IT!');
+  //   }
+  // }, [data, error]);
+
+  if (data?.error || error) {
+    throw new Error(`useGetCards error: ${data?.error || error}`);
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -132,7 +141,12 @@ export default function CardSelection() {
     <Tabs defaultValue='new' className='w-[500px]'>
       <TabsList className='grid w-full grid-cols-2'>
         <TabsTrigger value='new'>Utwórz nową kartę</TabsTrigger>
-        <TabsTrigger value='exists'>Wybierz istniejącą kartę</TabsTrigger>
+        <TabsTrigger
+          className={clsx('', fetchStatus === 'fetching' && 'animate-pulse')}
+          value='exists'
+        >
+          Wybierz istniejącą kartę
+        </TabsTrigger>
       </TabsList>
       <TabsContent value='new'>
         <Card>
@@ -221,42 +235,67 @@ export default function CardSelection() {
         </Card>
       </TabsContent>
       <TabsContent value='exists'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Wybór wcześniej utworzonej karty</CardTitle>
-          </CardHeader>
-          <CardContent className='grid w-full items-center gap-4 '>
-            <Table>
-              {/* <TableCaption>A list of instruments.</TableCaption> */}
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Numer</TableHead>
-                  <TableHead>Liczba pozycji</TableHead>
-                  <TableHead>Magazyn</TableHead>
-                  <TableHead>Sektor</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {cards?.map((card) => (
-                  <TableRow
-                    key={card.number}
-                    onClick={() => {
-                      setCard(card.number);
-                      toast.success(`Karta: ${card.number} wybrana!`);
-                    }}
-                  >
-                    <TableCell>{card.number}</TableCell>
-                    <TableCell>
-                      {card.positions ? card.positions.length : '0'}
-                    </TableCell>
-                    <TableCell>{card.warehouse}</TableCell>
-                    <TableCell>{card.sector}</TableCell>
+        {data?.success ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Wybór wcześniej utworzonej karty</CardTitle>
+              <CardDescription>
+                Tylko karty gdzie autorem jest jedna z zalogowanych osób.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid w-full items-center gap-4 '>
+              <Table>
+                {/* <TableCaption>A list of instruments.</TableCaption> */}
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Numer</TableHead>
+                    <TableHead>Liczba pozycji</TableHead>
+                    <TableHead>Magazyn</TableHead>
+                    <TableHead>Sektor</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHeader>
+                <TableBody>
+                  {(data.success as CardType[]).map((card: CardType) => (
+                    <TableRow
+                      key={card.number}
+                      onClick={() => {
+                        setCard(card.number);
+                        toast.success(`Karta: ${card.number} wybrana!`);
+                      }}
+                    >
+                      <TableCell>{card.number}</TableCell>
+                      <TableCell>
+                        {card.positions ? card.positions.length : '0'}
+                      </TableCell>
+                      <TableCell>{card.warehouse}</TableCell>
+                      <TableCell>{card.sector}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ) : data?.message === 'no cards' ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Nie znaleziono istniejących kart</CardTitle>
+              <CardDescription>
+                Utwórz nową kartę, aby rozpocząć!
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        ) : (
+          data?.error && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Wystąpił błąd pobierania kart</CardTitle>
+                <CardDescription>
+                  Skontaktuj się z IT w celu rozwiązania problemu!
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )
+        )}
       </TabsContent>
     </Tabs>
   );

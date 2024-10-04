@@ -1,9 +1,10 @@
 import '@/app/globals.css';
 import Container from '@/components/ui/container';
 import Footer from '@/components/ui/footer';
+import FormContainer from '@/components/ui/form-container';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
-import { getDictionary } from '@/lib/dictionary';
+// import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Header from './components/header';
@@ -21,7 +22,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { lang: Locale };
 }) {
-  const dictionary = await getDictionary(lang);
+  // const dictionary = await getDictionary(lang);
   return (
     <html lang={lang} suppressHydrationWarning>
       <head />
@@ -30,14 +31,15 @@ export default async function RootLayout({
           attribute='class'
           defaultTheme='system'
           enableSystem
-          disableTransitionOnChange
+          // disableTransitionOnChange
         >
           <QueryProvider>
             <Container>
               <div className='flex min-h-screen flex-col'>
                 <Header />
-                <main className='flex flex-1 justify-center'>{children}</main>
-
+                <main className='flex-1'>
+                  <FormContainer>{children}</FormContainer>
+                </main>
                 <Footer />
               </div>
             </Container>

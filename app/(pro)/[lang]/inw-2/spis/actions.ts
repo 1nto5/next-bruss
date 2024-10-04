@@ -4,7 +4,7 @@
 import { dbc } from '@/lib/mongo';
 import { getLastNameFirstLetter } from '@/lib/utils/nameFormat';
 
-import { loginInventoryType } from '@/lib/z/inventory';
+import { loginInventoryType } from './lib/zod';
 
 export async function login(data: loginInventoryType) {
   try {
@@ -97,6 +97,9 @@ export async function createNewCard(
 
 export async function fetchCards(persons: string[]) {
   try {
+    // const timeout = (ms: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, ms));
+    // await timeout(2000);
     const coll = await dbc('inventory_cards');
     const cards = await coll
       .find({
@@ -105,36 +108,49 @@ export async function fetchCards(persons: string[]) {
         },
       })
       .toArray();
-
+    if (cards.length === 0) {
+      return { message: 'no cards' };
+    }
     const sanitizedCards = cards.map(({ _id, ...rest }) => rest);
-    return sanitizedCards;
+    return { success: sanitizedCards };
   } catch (error) {
     console.error(error);
-    throw new Error('getEmpCards server action error');
+    return { error: 'fetchCards server action error' };
   }
 }
 
-export async function getCardPositions(cardNumber: string, emp: string) {
+export async function fetchCardPositions(
+  persons: string[],
+  cardNumber: number,
+) {
   try {
+    // const timeout = (ms: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, ms));
+    // await timeout(5000);
     const coll = await dbc('inventory_cards');
-    const [person1PersonalNumber, person2PersonalNumber] = emp.split('-');
     const card = await coll.findOne({
       number: Number(cardNumber),
-      creators: {
-        $all: [person1PersonalNumber.trim(), person2PersonalNumber.trim()],
-      },
     });
     if (!card) {
       return { error: 'no card' };
     }
-    return card.positions || [];
+    if (
+      !card.creators ||
+      !card.creators.some((c: string) => persons.includes(c))
+    ) {
+      return { error: 'not authorized' };
+    }
+    if (card.positions.length === 0) {
+      return { message: 'no positions' };
+    }
+    return { success: card.positions };
   } catch (error) {
     console.error(error);
-    return { error: 'getCardPositions server action error' };
+    return { error: 'fetchCardPositions server action error' };
   }
 }
 
-export async function getPosition(cardNumber: string, position: string) {
+export async function fetchPosition(cardNumber: string, position: string) {
   try {
     const coll = await dbc('inventory_cards');
     const existingCard = await coll.findOne({
@@ -158,7 +174,7 @@ export async function getPosition(cardNumber: string, position: string) {
     return positionOnCard;
   } catch (error) {
     console.error(error);
-    throw new Error('getPosition server action error');
+    throw new Error('fetchPosition server action error');
   }
 }
 
