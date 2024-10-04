@@ -1,49 +1,34 @@
-'use client';
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw, Terminal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
-import { revalidateCapa as revalidate } from './actions';
 
-export default function Error({
-  // error,
-  reset,
-}: {
-  // error: Error;
-  reset: () => void;
-}) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+interface ErrorAlertProps {
+  refetch: () => void;
+  isFetching: boolean;
+}
 
-  const reload = () => {
-    startTransition(() => {
-      revalidate();
-      router.refresh();
-      reset();
-    });
-  };
-
+const ErrorAlert: React.FC<ErrorAlertProps> = ({ refetch, isFetching }) => {
   return (
     <Alert className='w-[450px]'>
       <Terminal className='h-4 w-4' />
-      <AlertTitle>Something went wrong!</AlertTitle>
+      <AlertTitle>Coś poszło nie tak!</AlertTitle>
       <AlertDescription className='mt-8 flex justify-end'>
-        <Button onClick={reload} disabled={isPending}>
-          {isPending ? (
+        <Button onClick={refetch} disabled={isFetching}>
+          {isFetching ? (
             <span className='flex items-center'>
               <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-              Loading
+              Ładowanie danych
             </span>
           ) : (
             <span className='flex items-center'>
               <RefreshCcw className='mr-2 h-4 w-4' />
-              Try again
+              Spróbuj ponownie
             </span>
           )}
         </Button>
       </AlertDescription>
     </Alert>
   );
-}
+};
+
+export default ErrorAlert;

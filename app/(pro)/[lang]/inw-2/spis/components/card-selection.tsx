@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -41,6 +42,7 @@ import { createNewCard } from '../actions';
 import { useGetCards } from '../data/get-cards';
 import { useCardStore, usePersonalNumberStore } from '../lib/stores';
 import { CardType } from '../lib/types';
+import ErrorAlert from './error-alert';
 
 const warehouseSelectOptions = [
   { value: '000', label: '000 - Produkcja + Magazyn' },
@@ -76,7 +78,6 @@ const sectorsSelectOptions = [
 ];
 
 export default function CardSelection() {
-  // TODO: obsługa błędów z react query
   const [isPending, setIsPending] = useState(false);
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
@@ -84,18 +85,7 @@ export default function CardSelection() {
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
-  const { data, error, fetchStatus } = useGetCards(persons);
-
-  // useEffect(() => {
-  //   if (data?.error || error) {
-  //     console.error('useGetCards error:', data?.error || error);
-  //     toast.error('Problem z pobraniem kart! Skontaktuj się z IT!');
-  //   }
-  // }, [data, error]);
-
-  if (data?.error || error) {
-    throw new Error(`useGetCards error: ${data?.error || error}`);
-  }
+  const { data, error, refetch, isFetching } = useGetCards(persons);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -137,16 +127,15 @@ export default function CardSelection() {
     }
   };
 
+  if (data?.error || error) {
+    return <ErrorAlert refetch={refetch} isFetching={isFetching} />;
+  }
+
   return (
     <Tabs defaultValue='new' className='w-[500px]'>
       <TabsList className='grid w-full grid-cols-2'>
         <TabsTrigger value='new'>Utwórz nową kartę</TabsTrigger>
-        <TabsTrigger
-          className={clsx('', fetchStatus === 'fetching' && 'animate-pulse')}
-          value='exists'
-        >
-          Wybierz istniejącą kartę
-        </TabsTrigger>
+        <TabsTrigger value='exists'>Wybierz istniejącą kartę</TabsTrigger>
       </TabsList>
       <TabsContent value='new'>
         <Card>
@@ -238,7 +227,9 @@ export default function CardSelection() {
         {data?.success ? (
           <Card>
             <CardHeader>
-              <CardTitle>Wybór wcześniej utworzonej karty</CardTitle>
+              <CardTitle className={clsx('', isFetching && 'animate-pulse')}>
+                Wybór wcześniej utworzonej karty
+              </CardTitle>
               <CardDescription>
                 Tylko karty gdzie autorem jest jedna z zalogowanych osób.
               </CardDescription>
@@ -275,26 +266,52 @@ export default function CardSelection() {
               </Table>
             </CardContent>
           </Card>
-        ) : data?.message === 'no cards' ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Nie znaleziono istniejących kart</CardTitle>
-              <CardDescription>
-                Utwórz nową kartę, aby rozpocząć!
-              </CardDescription>
-            </CardHeader>
-          </Card>
         ) : (
-          data?.error && (
+          data?.message === 'no cards' && (
             <Card>
               <CardHeader>
-                <CardTitle>Wystąpił błąd pobierania kart</CardTitle>
+                <CardTitle>Nie znaleziono istniejących kart</CardTitle>
                 <CardDescription>
-                  Skontaktuj się z IT w celu rozwiązania problemu!
+                  Utwórz nową kartę, aby rozpocząć!
                 </CardDescription>
               </CardHeader>
             </Card>
           )
+        )}
+        {isFetching && !data?.success && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Wybór wcześniej utworzonej karty</CardTitle>
+              <CardDescription>
+                Tylko karty gdzie autorem jest jedna z zalogowanych osób.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid w-full items-center gap-4 '>
+              <Skeleton>
+                <Table>
+                  {/* <TableCaption>A list of instruments.</TableCaption> */}
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Numer</TableHead>
+                      <TableHead>Liczba pozycji</TableHead>
+                      <TableHead>Magazyn</TableHead>
+                      <TableHead>Sektor</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index}>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Skeleton>
+            </CardContent>
+          </Card>
         )}
       </TabsContent>
     </Tabs>

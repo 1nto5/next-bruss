@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import clsx from 'clsx';
+import { RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { useGetCardPositions } from '../data/get-positions';
@@ -27,6 +29,7 @@ import {
   usePositionStore,
 } from '../lib/stores';
 import { PositionType } from '../lib/types';
+import ErrorAlert from './error-alert';
 
 export default function PositionSelection() {
   // const [isPending, setIsPending] = useState(false);
@@ -38,7 +41,7 @@ export default function PositionSelection() {
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
-  const { data, error, fetchStatus, isSuccess } = useGetCardPositions(
+  const { data, error, isSuccess, refetch, isFetching } = useGetCardPositions(
     persons,
     card,
   );
@@ -49,29 +52,20 @@ export default function PositionSelection() {
     }
   }, [data?.message, isSuccess, setPosition]);
 
-  // useEffect(() => {
-  //   if (data?.error || error) {
-  //     console.error('useGetCards error:', data?.error || error);
-  //     toast.error('Problem z pobraniem kart! Skontaktuj się z IT!');
-  //   }
-  // }, [data, error]);
-
   if (data?.error || error) {
-    throw new Error(`useGetCardPositions error: ${data?.error || error}`);
+    return <ErrorAlert refetch={refetch} isFetching={isFetching} />;
   }
 
   return (
     <Card className='w-[700px]'>
       <CardHeader>
-        <CardTitle
-          className={clsx('', fetchStatus === 'fetching' && 'animate-pulse')}
-        >
+        <CardTitle className={clsx('', isFetching && 'animate-pulse')}>
           Wybór pozycji
         </CardTitle>
         <CardDescription>Numer karty: {card}</CardDescription>
       </CardHeader>
       <CardContent className='grid w-full items-center gap-4 '>
-        {
+        {data?.success && (
           <Table>
             {/* <TableCaption>A list of instruments.</TableCaption> */}
             <TableHeader>
@@ -87,7 +81,7 @@ export default function PositionSelection() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.success.map((position: PositionType) => (
+              {data.success.map((position: PositionType) => (
                 <TableRow
                   key={position.position}
                   onClick={() => {
@@ -106,7 +100,39 @@ export default function PositionSelection() {
               ))}
             </TableBody>
           </Table>
-        }
+        )}
+        {isFetching && !data?.success && (
+          <Skeleton>
+            <Table>
+              {/* <TableCaption>A list of instruments.</TableCaption> */}
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Numer</TableHead>
+                  <TableHead>Identyfikator</TableHead>
+                  <TableHead>Numer art.</TableHead>
+                  <TableHead>Nazwa</TableHead>
+                  <TableHead>Ilość</TableHead>
+                  <TableHead>WIP</TableHead>
+                  {/* TODO: uruchomić jak dodasz nowe pozycje z creators */}
+                  {/* <TableHead>Utworzył</TableHead> */}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    {/* <TableCell>{position.creators.join(', ')}</TableCell> */}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Skeleton>
+        )}
       </CardContent>
       {data?.success.length < 25 && (
         <CardFooter className='flex justify-end'>

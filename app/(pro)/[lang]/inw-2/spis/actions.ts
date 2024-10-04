@@ -126,7 +126,7 @@ export async function fetchCardPositions(
   try {
     // const timeout = (ms: number) =>
     //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(5000);
+    // await timeout(2000);
     const coll = await dbc('inventory_cards');
     const card = await coll.findOne({
       number: Number(cardNumber),
