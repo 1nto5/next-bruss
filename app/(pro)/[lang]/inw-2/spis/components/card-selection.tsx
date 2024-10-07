@@ -117,7 +117,7 @@ export default function CardSelection() {
         }
       } else if (res.success && res.cardNumber) {
         toast.success(`Karta: ${res.cardNumber} utworzona!`);
-        setCard(res.cardNumber);
+        setCard(res.cardNumber, data.warehouse, data.sector);
       }
     } catch (error) {
       console.error('onSubmit', error);
@@ -250,7 +250,7 @@ export default function CardSelection() {
                     <TableRow
                       key={card.number}
                       onClick={() => {
-                        setCard(card.number);
+                        setCard(card.number, card.warehouse, card.sector);
                         toast.success(`Karta: ${card.number} wybrana!`);
                       }}
                     >

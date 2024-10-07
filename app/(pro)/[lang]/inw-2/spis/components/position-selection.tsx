@@ -19,10 +19,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import clsx from 'clsx';
-import { RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { useGetCardPositions } from '../data/get-positions';
+import { useGetCardPositions } from '../data/get-card-positions';
 import {
   useCardStore,
   usePersonalNumberStore,

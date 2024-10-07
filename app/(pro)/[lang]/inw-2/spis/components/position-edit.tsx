@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { positionEditSchema as formSchema } from '../lib/zod';
@@ -28,12 +28,49 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
+import { set } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { findArticles, savePosition } from '../actions';
+import { useGetPosition } from '../data/get-position';
+import {
+  useCardStore,
+  usePersonalNumberStore,
+  usePositionStore,
+} from '../lib/stores';
 
 export default function PositionEdit() {
+  const { personalNumber1, personalNumber2, personalNumber3 } =
+    usePersonalNumberStore();
+  const { card, warehouse, sector } = useCardStore();
+  const { setPosition, position } = usePositionStore();
+
+  const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
+    (person) => person,
+  );
+  const { data, error, isSuccess, refetch, isFetching } = useGetPosition(
+    persons,
+    card,
+    position,
+  );
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      if (isSuccess && data.success) {
+        const res = await findArticles(data.success.articleNumber);
+        setFoundArticles(res.success);
+        setSelectedArticle(data?.success.articleNumber);
+        setSelectedUnit(data?.success.unit);
+        form.setValue('article', data?.success.articleNumber);
+        form.setValue('quantity', data?.success.quantity);
+        setIdentifier(data?.success.identifier);
+      }
+    };
+
+    fetchArticles();
+  }, [isSuccess, data]);
+
   const [isPending, setIsPending] = useState(false);
   const [isPendingFindArticle, setIsPendingFindArticle] = useState(false);
   const [foundArticles, setFoundArticles] = useState<{ [key: string]: any }[]>(
@@ -48,9 +85,9 @@ export default function PositionEdit() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       findArticle: undefined,
-      article: positionData?.articleNumber || undefined,
-      quantity: positionData?.quantity || undefined,
-      wip: positionData?.wip || false,
+      article: data?.success.articleNumber || undefined,
+      quantity: data?.success.quantity || undefined,
+      wip: data?.success.wip || false,
     },
   });
 
@@ -91,16 +128,17 @@ export default function PositionEdit() {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      console.log(cardInfo.creators);
       const res = await savePosition(
-        cardInfo.number,
-        Number(positionNumber),
+        card,
+        position,
         selectedArticle.number,
         selectedArticle.name,
-        Number(data.quantity),
+        selectedArticle.converter && selectedUnit === 'kg'
+          ? Math.floor(Number(data.quantity) / selectedArticle.converter)
+          : Number(data.quantity),
         selectedUnit || selectedArticle.unit,
         data.wip,
-        cardInfo.creators,
+        persons,
       );
       if ('error' in res) {
         console.error('onSubmit', res.error);
@@ -119,15 +157,15 @@ export default function PositionEdit() {
       form.reset();
     }
   };
+
   return (
     <>
       <Card className='w-[500px]'>
         <CardHeader>
-          <CardTitle>Edycja pozycji nr: {positionNumber}</CardTitle>
+          <CardTitle>Pozycja nr: {position}</CardTitle>
           <CardDescription>
-            Numer karty: {cardInfo.number}, magazyn: {cardInfo.warehouse},
-            sektor: {cardInfo.sector}, inwentaryzujący: {cardInfo.creators[0]} i{' '}
-            {cardInfo.creators[1]}
+            karta nr: {card}, magazyn: {warehouse}, sektor: {sector},
+            zalogowani: {persons.join(', ')}
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -136,7 +174,7 @@ export default function PositionEdit() {
               {identifier && (
                 <FormItem className='rounded-lg border p-4'>
                   <FormLabel>Identyfikator</FormLabel>
-                  <FormMessage>{identifier}</FormMessage>
+                  <FormMessage className='text-2xl'>{identifier}</FormMessage>
                 </FormItem>
               )}
               <FormField
@@ -253,8 +291,10 @@ export default function PositionEdit() {
                         form.getValues('quantity') && (
                           <FormMessage>
                             ={' '}
-                            {Number(form.getValues('quantity')) /
-                              selectedArticle.converter}{' '}
+                            {Math.floor(
+                              Number(form.getValues('quantity')) /
+                                selectedArticle.converter,
+                            )}{' '}
                             st
                           </FormMessage>
                         )}
@@ -264,7 +304,7 @@ export default function PositionEdit() {
                 />
               )}
 
-              {selectedArticle && cardInfo.sector !== 'S900' && (
+              {selectedArticle && sector != 'S900' && (
                 <FormField
                   control={form.control}
                   name='wip'
@@ -285,17 +325,8 @@ export default function PositionEdit() {
               )}
             </CardContent>
             <CardFooter className='flex justify-between'>
-              {Number(positionNumber) !== 1 ? (
-                <Link
-                  href={{
-                    pathname: pathname.replace(
-                      /\/[^\/]+$/,
-                      `/${Number(positionNumber) - 1}`,
-                    ),
-                  }}
-                >
-                  <Button variant={'outline'}>- 1</Button>
-                </Link>
+              {position !== 1 ? (
+                <Button variant={'outline'}>- 1</Button>
               ) : (
                 <Button disabled variant={'outline'}>
                   - 1
@@ -304,17 +335,8 @@ export default function PositionEdit() {
               <Button disabled={!selectedArticle} type='submit'>
                 Zapisz
               </Button>
-              {Number(positionNumber) !== 25 && positionData ? (
-                <Link
-                  href={{
-                    pathname: pathname.replace(
-                      /\/[^\/]+$/,
-                      `/${Number(positionNumber) + 1}`,
-                    ),
-                  }}
-                >
-                  <Button variant={'outline'}>+ 1</Button>
-                </Link>
+              {position !== 25 && data ? (
+                <Button variant={'outline'}>+ 1</Button>
               ) : (
                 <Button disabled variant={'outline'}>
                   + 1

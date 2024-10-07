@@ -71,6 +71,6 @@ export const newCardSchema = z.object({
 export const positionEditSchema = z.object({
   findArticle: z.string().optional(),
   article: z.string().min(1, { message: 'Wybierz artykułu!' }),
-  quantity: z.number().min(1, { message: 'Wprowadź ilość!' }),
+  quantity: z.string().min(1, { message: 'Wprowadź ilość!' }),
   wip: z.boolean(),
 });

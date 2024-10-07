@@ -1,3 +1,4 @@
+import { R } from '@tanstack/react-query-devtools/build/legacy/devtools-PtxSnd7z';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -29,12 +30,17 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
 
 type CardStateType = {
   card: number;
-  setCard: (card: number) => void;
+  warehouse: string;
+  sector: string;
+  setCard: (card: number, warehouse: string, sector: string) => void;
 };
 
 export const useCardStore = create<CardStateType>((set) => ({
   card: 0,
-  setCard: (card: number) => set({ card }),
+  warehouse: '',
+  sector: '',
+  setCard: (card: number, warehouse: string, sector: string) =>
+    set({ card, warehouse, sector }),
 }));
 
 type PositionStateType = {

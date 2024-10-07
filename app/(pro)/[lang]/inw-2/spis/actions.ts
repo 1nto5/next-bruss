@@ -150,31 +150,42 @@ export async function fetchCardPositions(
   }
 }
 
-export async function fetchPosition(cardNumber: string, position: string) {
+export async function fetchPosition(
+  persons: string[],
+  cardNumber: number,
+  position: number,
+) {
   try {
     const coll = await dbc('inventory_cards');
     const existingCard = await coll.findOne({
-      number: Number(cardNumber),
+      number: cardNumber,
     });
-
     if (!existingCard) {
       return { error: 'no card' };
     }
-
-    if (Number(position) < 1 || Number(position) > 25) {
+    if (position < 1 || position > 25) {
       return { error: 'wrong position' };
     }
-
+    if (
+      !existingCard.creators ||
+      !existingCard.creators.some((c: string) => persons.includes(c))
+    ) {
+      return { error: 'not authorized' };
+    }
     if (!existingCard.positions) {
-      return null;
+      return { message: 'no positions' };
     }
     const positionOnCard = existingCard.positions.find(
-      (pos: { position: number }) => pos.position === Number(position),
+      (pos: { position: number }) => pos.position === position,
     );
-    return positionOnCard;
+
+    if (!positionOnCard) {
+      return { message: 'no position' };
+    }
+    return { success: positionOnCard };
   } catch (error) {
     console.error(error);
-    throw new Error('fetchPosition server action error');
+    return { error: 'fetchPosition server action error' };
   }
 }
 
