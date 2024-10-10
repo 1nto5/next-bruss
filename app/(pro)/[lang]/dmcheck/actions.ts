@@ -300,13 +300,13 @@ export async function saveDmc(
         articleConfig.workplace === 'eol488'
       ) {
         const variant = articleConfig.workplace === 'eol810' ? '10' : '20';
-        console.log(
-          `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant}`,
+        // console.log(
+        //   `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant}`,
+        // );
+        await fetch(
+          `http://10.27.90.4:8090/api/turn-on-ok-indicator/${variant}`,
         );
-        const res = await fetch(
-          `http://10.27.90.4:8025//api/turn-on-ok-indicator/${variant}`,
-        );
-        console.log(`Lamp response status: ${res.status}`);
+        // console.log(`Lamp response status: ${res.status}`);
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
