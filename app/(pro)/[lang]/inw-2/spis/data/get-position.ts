@@ -9,7 +9,7 @@ export function useGetPosition(
 ) {
   return useQuery({
     queryFn: async () => fetchPosition(persons, card, position),
-    queryKey: ['positions'],
+    queryKey: ['position'],
     refetchInterval: false,
   });
 }

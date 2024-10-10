@@ -128,6 +128,7 @@ export default function CardSelection() {
   };
 
   if (data?.error || error) {
+    console.error(data?.error || error);
     return <ErrorAlert refetch={refetch} isFetching={isFetching} />;
   }
 

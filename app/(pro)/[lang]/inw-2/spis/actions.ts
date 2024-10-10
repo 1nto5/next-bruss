@@ -140,7 +140,7 @@ export async function fetchCardPositions(
     ) {
       return { error: 'not authorized' };
     }
-    if (card.positions.length === 0) {
+    if (!card.positions) {
       return { message: 'no positions' };
     }
     return { success: card.positions };

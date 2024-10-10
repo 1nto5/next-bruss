@@ -52,6 +52,7 @@ export default function PositionSelection() {
   }, [data?.message, isSuccess, setPosition]);
 
   if (data?.error || error) {
+    console.error(data?.error || error);
     return <ErrorAlert refetch={refetch} isFetching={isFetching} />;
   }
 
@@ -133,7 +134,7 @@ export default function PositionSelection() {
           </Skeleton>
         )}
       </CardContent>
-      {data?.success.length < 25 && (
+      {data?.success && (
         <CardFooter className='flex justify-end'>
           {/* TODO: onClick new position */}
           <Button>Nowa pozycja</Button>

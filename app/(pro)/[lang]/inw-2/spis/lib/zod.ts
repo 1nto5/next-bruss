@@ -73,4 +73,5 @@ export const positionEditSchema = z.object({
   article: z.string().min(1, { message: 'Wybierz artykułu!' }),
   quantity: z.string().min(1, { message: 'Wprowadź ilość!' }),
   wip: z.boolean(),
+  unit: z.string().min(1, { message: 'Wybierz jednostkę!' }).optional(),
 });

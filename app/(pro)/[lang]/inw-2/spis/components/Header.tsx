@@ -25,8 +25,12 @@ export default function Header() {
 
           <div className='flex items-center space-x-2'>
             {card !== 0 && (
-              <Button onClick={() => setCard(0)} variant='outline' size='icon'>
-                <SquarePen className='h-[1.2rem] w-[1.2rem]' />
+              <Button
+                onClick={() => setCard(0, '', '')}
+                variant='outline'
+                size='icon'
+              >
+                <StickyNote className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
             {position !== 0 && (
@@ -35,7 +39,7 @@ export default function Header() {
                 variant='outline'
                 size='icon'
               >
-                <StickyNote className='h-[1.2rem] w-[1.2rem]' />
+                <SquarePen className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
             {personalNumber1 && (

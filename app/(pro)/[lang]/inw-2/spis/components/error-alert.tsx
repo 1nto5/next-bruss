@@ -17,7 +17,7 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ refetch, isFetching }) => {
           {isFetching ? (
             <span className='flex items-center'>
               <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-              Ładowanie danych
+              Ładowanie
             </span>
           ) : (
             <span className='flex items-center'>

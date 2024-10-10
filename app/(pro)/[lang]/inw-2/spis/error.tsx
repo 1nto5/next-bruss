@@ -27,18 +27,18 @@ export default function Error({
   return (
     <Alert className='w-[450px]'>
       <Terminal className='h-4 w-4' />
-      <AlertTitle>Something went wrong!</AlertTitle>
+      <AlertTitle>Coś poszło nie tak!</AlertTitle>
       <AlertDescription className='mt-8 flex justify-end'>
         <Button onClick={reload} disabled={isPending}>
           {isPending ? (
             <span className='flex items-center'>
               <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-              Loading
+              Ładowanie
             </span>
           ) : (
             <span className='flex items-center'>
               <RefreshCcw className='mr-2 h-4 w-4' />
-              Try again
+              Spróbuj ponownie
             </span>
           )}
         </Button>
