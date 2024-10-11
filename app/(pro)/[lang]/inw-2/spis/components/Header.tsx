@@ -26,7 +26,10 @@ export default function Header() {
           <div className='flex items-center space-x-2'>
             {card !== 0 && (
               <Button
-                onClick={() => setCard(0, '', '')}
+                onClick={() => {
+                  setCard(0, '', '');
+                  setPosition(0);
+                }}
                 variant='outline'
                 size='icon'
               >

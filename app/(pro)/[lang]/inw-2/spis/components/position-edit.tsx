@@ -27,10 +27,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
-import { set } from 'date-fns';
-import { Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2, RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { findArticles, savePosition } from '../actions';
 import { useGetPosition } from '../data/get-position';
@@ -78,7 +77,6 @@ export default function PositionEdit() {
 
   useEffect(() => {
     const fetchArticles = async () => {
-      console.log('isSuccess', isSuccess);
       if (isSuccess && data.success) {
         const res = await findArticles(data.success.articleNumber);
         if (res.success) {
@@ -88,7 +86,7 @@ export default function PositionEdit() {
           form.setValue('quantity', data?.success.quantity.toString());
           form.setValue('wip', data?.success.wip);
           form.setValue('article', res.success[0].number);
-          console.log('unit', data?.success.unit);
+
           form.setValue('unit', data?.success.unit);
         }
       }
@@ -191,24 +189,25 @@ export default function PositionEdit() {
           {persons.join(', ')}
         </CardDescription>
       </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-          <CardContent className='grid w-full items-center gap-4 '>
-            {identifier && (
-              <FormItem className='rounded-lg border p-4'>
-                <FormLabel>Identyfikator</FormLabel>
-                <FormMessage className='text-2xl'>{identifier}</FormMessage>
-              </FormItem>
-            )}
-            <FormField
-              control={form.control}
-              name='findArticle'
-              render={({ field }) => (
+      {!isFetching && (
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <CardContent className='grid w-full items-center gap-4'>
+              {identifier && (
                 <FormItem className='rounded-lg border p-4'>
-                  <FormLabel>Artykuł</FormLabel>
-                  <div className='flex items-center space-x-2'>
-                    <FormControl>
-                      {/* <Input
+                  <FormLabel>Identyfikator</FormLabel>
+                  <FormMessage className='text-2xl'>{identifier}</FormMessage>
+                </FormItem>
+              )}
+              <FormField
+                control={form.control}
+                name='findArticle'
+                render={({ field }) => (
+                  <FormItem className='rounded-lg border p-4'>
+                    <FormLabel>Artykuł</FormLabel>
+                    <div className='flex items-center space-x-2'>
+                      <FormControl>
+                        {/* <Input
                         className=''
                         placeholder={'wpisz numer lub nazwę aby wyszukać...'}
                         {...field}
@@ -216,181 +215,233 @@ export default function PositionEdit() {
                           handleFindArticle(e);
                         }}
                       /> */}
-                      <Input
-                        {...field}
-                        value={field.value ?? ''}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          handleFindArticle(e);
-                        }}
-                        placeholder={'wpisz numer lub nazwę aby wyszukać...'}
-                      />
-                    </FormControl>
-                  </div>
-                  {isPendingFindArticle && (
-                    <FormMessage>Wyszukiwanie...</FormMessage>
-                  )}
-                  {findMessage !== 'success' && !isPendingFindArticle && (
-                    <FormMessage>{findMessage}</FormMessage>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {foundArticles[0] && !isPendingFindArticle && (
-              <FormField
-                control={form.control}
-                name='article'
-                render={({ field }) => (
-                  <FormItem className='space-y-3 rounded-lg border p-4'>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                          const selectedArticle = foundArticles.find(
-                            (article) => article.number === value,
-                          );
-                          setSelectedArticle(selectedArticle);
-                        }}
-                        // defaultValue={field.value}
-                        value={field.value}
-                        className='flex flex-col space-y-1'
-                      >
-                        {foundArticles.map((article) => (
-                          <FormItem
-                            key={article.number}
-                            className='flex items-center space-x-3 space-y-0'
-                          >
-                            <FormControl>
-                              <RadioGroupItem value={article.number} />
-                            </FormControl>
-                            <FormLabel className='font-normal'>
-                              {article.number} - {article.name}
-                            </FormLabel>
-                          </FormItem>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {selectedArticle?.converter && (
-              <FormField
-                control={form.control}
-                name='unit'
-                render={({ field }) => (
-                  <FormItem className='rounded-lg border p-4'>
-                    <FormLabel>Wybierz jednostkę</FormLabel>
-
-                    <RadioGroup
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        if (value === 'kg') {
-                          form.setValue(
-                            'quantity',
-                            (
-                              Number(form.getValues('quantity')) *
-                              selectedArticle.converter
-                            ).toString(),
-                          );
-                        } else if (value === 'st') {
-                          form.setValue(
-                            'quantity',
-                            (
-                              Number(form.getValues('quantity')) /
-                              selectedArticle.converter
-                            ).toString(),
-                          );
-                        }
-                      }}
-                    >
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem value='kg' id='r2' />
-                        <Label htmlFor='kg'>kg</Label>
-                      </div>
-                      <div className='flex items-center space-x-2'>
-                        <RadioGroupItem value='st' id='r3' />
-                        <Label htmlFor='st'>st</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {selectedArticle && (
-              <FormField
-                control={form.control}
-                name='quantity'
-                render={({ field }) => (
-                  <FormItem className='rounded-lg border p-4'>
-                    <FormLabel>
-                      Ilość wyrażona w{' '}
-                      {selectedArticle.converter
-                        ? form.getValues('unit')
-                        : selectedArticle.unit}
-                    </FormLabel>
-                    {selectedArticle.converter &&
-                      form.getValues('unit') === 'kg' && (
-                        <FormDescription>
-                          {`10 st = ${selectedArticle.converter} kg`}
-                        </FormDescription>
-                      )}
-                    <div className='flex items-center space-x-2'>
-                      <FormControl>
                         <Input
-                          className=''
-                          placeholder={`podaj ilość w ${form.getValues('unit') || selectedArticle.unit}`}
                           {...field}
+                          value={field.value ?? ''}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleFindArticle(e);
+                          }}
+                          placeholder={'wpisz numer lub nazwę aby wyszukać...'}
                         />
                       </FormControl>
                     </div>
                     {isPendingFindArticle && (
-                      <Loader2 className='h-4 w-4 animate-spin' />
+                      <FormMessage>Wyszukiwanie...</FormMessage>
                     )}
-                    {selectedArticle.converter &&
-                      form.getValues('unit') === 'kg' &&
-                      form.getValues('quantity') && (
-                        <FormMessage>
-                          ={' '}
-                          {Math.floor(
-                            Number(form.getValues('quantity')) /
-                              selectedArticle.converter,
-                          )}{' '}
-                          st
-                        </FormMessage>
-                      )}
+                    {findMessage !== 'success' && !isPendingFindArticle && (
+                      <FormMessage>{findMessage}</FormMessage>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
+              {foundArticles[0] && !isPendingFindArticle && (
+                <FormField
+                  control={form.control}
+                  name='article'
+                  render={({ field }) => (
+                    <FormItem className='space-y-3 rounded-lg border p-4'>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            const selectedArticle = foundArticles.find(
+                              (article) => article.number === value,
+                            );
+                            setSelectedArticle(selectedArticle);
+                          }}
+                          // defaultValue={field.value}
+                          value={field.value}
+                          className='flex flex-col space-y-1'
+                        >
+                          {foundArticles.map((article) => (
+                            <FormItem
+                              key={article.number}
+                              className='flex items-center space-x-3 space-y-0'
+                            >
+                              <FormControl>
+                                <RadioGroupItem value={article.number} />
+                              </FormControl>
+                              <FormLabel className='font-normal'>
+                                {article.number} - {article.name}
+                              </FormLabel>
+                            </FormItem>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
-            {selectedArticle && sector != 'S900' && (
-              <FormField
-                control={form.control}
-                name='wip'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-                    <div className='space-y-0.5'>
-                      <FormLabel className='text-base'>WIP</FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+              {selectedArticle?.converter && (
+                <FormField
+                  control={form.control}
+                  name='unit'
+                  render={({ field }) => (
+                    <FormItem className='rounded-lg border p-4'>
+                      <FormLabel>Wybierz jednostkę</FormLabel>
+
+                      <RadioGroup
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          if (value === 'kg') {
+                            form.setValue(
+                              'quantity',
+                              (
+                                Number(form.getValues('quantity')) *
+                                selectedArticle.converter
+                              ).toString(),
+                            );
+                          } else if (value === 'st') {
+                            form.setValue(
+                              'quantity',
+                              (
+                                Number(form.getValues('quantity')) /
+                                selectedArticle.converter
+                              ).toString(),
+                            );
+                          }
+                        }}
+                      >
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem value='kg' id='r2' />
+                          <Label htmlFor='kg'>kg</Label>
+                        </div>
+                        <div className='flex items-center space-x-2'>
+                          <RadioGroupItem value='st' id='r3' />
+                          <Label htmlFor='st'>st</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {selectedArticle && (
+                <FormField
+                  control={form.control}
+                  name='quantity'
+                  render={({ field }) => (
+                    <FormItem className='rounded-lg border p-4'>
+                      <FormLabel>
+                        Ilość wyrażona w{' '}
+                        {selectedArticle.converter
+                          ? form.getValues('unit')
+                          : selectedArticle.unit}
+                      </FormLabel>
+                      {selectedArticle.converter &&
+                        form.getValues('unit') === 'kg' && (
+                          <FormDescription>
+                            {`10 st = ${selectedArticle.converter} kg`}
+                          </FormDescription>
+                        )}
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            className=''
+                            placeholder={`podaj ilość w ${form.getValues('unit') || selectedArticle.unit}`}
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      {isPendingFindArticle && (
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                      )}
+                      {selectedArticle.converter &&
+                        form.getValues('unit') === 'kg' &&
+                        form.getValues('quantity') && (
+                          <FormMessage>
+                            ={' '}
+                            {Math.floor(
+                              Number(form.getValues('quantity')) /
+                                selectedArticle.converter,
+                            )}{' '}
+                            st
+                          </FormMessage>
+                        )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {selectedArticle && sector != 'S900' && (
+                <FormField
+                  control={form.control}
+                  name='wip'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                      <div className='space-y-0.5'>
+                        <FormLabel className='text-base'>WIP</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
+            </CardContent>
+
+            {/* TODO: stała pozycja dla CardFooter */}
+            <CardFooter className='flex justify-between'>
+              {position !== 1 ? (
+                <Button
+                  onClick={() => setPosition(position - 1)}
+                  type={'button'}
+                  variant={'outline'}
+                >
+                  - 1
+                </Button>
+              ) : (
+                <Button type={'button'} disabled variant={'outline'}>
+                  - 1
+                </Button>
+              )}
+              {isPending ? (
+                <Button disabled type={'button'}>
+                  <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+                  Zapisywanie
+                </Button>
+              ) : (
+                <Button disabled={!selectedArticle || isPending} type='submit'>
+                  Zapisz
+                </Button>
+              )}
+              {position !== 25 && data?.success ? (
+                <Button
+                  onClick={() => setPosition(position + 1)}
+                  type={'button'}
+                  variant={'outline'}
+                >
+                  + 1
+                </Button>
+              ) : (
+                <Button type={'button'} disabled variant={'outline'}>
+                  + 1
+                </Button>
+              )}
+            </CardFooter>
+          </form>
+        </Form>
+      )}
+      {isFetching && (
+        <>
+          <CardContent className='g-full grid w-full items-center gap-4'>
+            <Skeleton className='h-24'></Skeleton>
+            <Skeleton className='h-24'></Skeleton>
+            <Skeleton className='h-12'></Skeleton>
+            <Skeleton className='h-16'></Skeleton>
           </CardContent>
-          <CardFooter className='flex justify-between'>
+
+          <CardFooter className=' flex justify-between'>
             {position !== 1 ? (
               <Button
                 onClick={() => setPosition(position - 1)}
@@ -404,9 +455,16 @@ export default function PositionEdit() {
                 - 1
               </Button>
             )}
-            <Button disabled={!selectedArticle} type='submit'>
-              Zapisz
-            </Button>
+            {isPending ? (
+              <Button disabled type={'button'}>
+                <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+                Zapisywanie
+              </Button>
+            ) : (
+              <Button disabled={!selectedArticle || isPending} type='submit'>
+                Zapisz
+              </Button>
+            )}
             {position !== 25 && data?.success ? (
               <Button
                 onClick={() => setPosition(position + 1)}
@@ -421,8 +479,8 @@ export default function PositionEdit() {
               </Button>
             )}
           </CardFooter>
-        </form>
-      </Form>
+        </>
+      )}
     </Card>
   );
 }

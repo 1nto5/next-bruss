@@ -156,6 +156,10 @@ export async function fetchPosition(
   position: number,
 ) {
   try {
+    const timeout = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+    await timeout(1000);
+
     const coll = await dbc('inventory_cards');
     const existingCard = await coll.findOne({
       number: cardNumber,
@@ -266,6 +270,10 @@ export async function savePosition(
   creators: string[],
 ) {
   try {
+    // const timeout = (ms: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, ms));
+    // await timeout(2000);
+
     const collection = await dbc('inventory_cards');
 
     const identifier = await generateIdentifier(card, position, creators);

@@ -121,7 +121,6 @@ export default function Login() {
         setPersonalNumber2(data.personalNumber2 || '');
         setPersonalNumber3(data.personalNumber3 || '');
         toast.success('Zalogowano pomyślnie!');
-        router.push(pathname.replace('/login', '/card'));
       }
     } catch (error) {
       console.error('onSubmit', error);

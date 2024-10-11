@@ -1,3 +1,4 @@
+import FormContainer from '@/components/ui/form-container';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import Info from './components/info';
@@ -20,5 +21,9 @@ export default async function Home({
       .
     </>
   );
-  return <Info title={dict?.home?.title} description={infoDescription} />;
+  return (
+    <FormContainer>
+      <Info title={dict?.home?.title} description={infoDescription} />
+    </FormContainer>
+  );
 }
