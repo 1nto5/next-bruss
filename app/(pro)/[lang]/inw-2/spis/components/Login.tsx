@@ -38,8 +38,6 @@ export default function Login() {
     usePersonalNumberStore();
   const [personalNumber2Form, setPersonalNumber2Form] = useState(false);
   const [personalNumber3Form, setPersonalNumber3Form] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({

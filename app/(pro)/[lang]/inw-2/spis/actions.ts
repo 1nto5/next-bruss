@@ -156,9 +156,9 @@ export async function fetchPosition(
   position: number,
 ) {
   try {
-    const timeout = (ms: number) =>
-      new Promise((resolve) => setTimeout(resolve, ms));
-    await timeout(1000);
+    // const timeout = (ms: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, ms));
+    // await timeout(1000);
 
     const coll = await dbc('inventory_cards');
     const existingCard = await coll.findOne({

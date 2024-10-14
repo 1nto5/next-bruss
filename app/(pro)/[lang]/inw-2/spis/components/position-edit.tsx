@@ -86,7 +86,6 @@ export default function PositionEdit() {
           form.setValue('quantity', data?.success.quantity.toString());
           form.setValue('wip', data?.success.wip);
           form.setValue('article', res.success[0].number);
-
           form.setValue('unit', data?.success.unit);
         }
       }
@@ -284,7 +283,7 @@ export default function PositionEdit() {
                     <FormItem className='rounded-lg border p-4'>
                       <FormLabel>Wybierz jednostkę</FormLabel>
 
-                      <RadioGroup
+                      {/* <RadioGroup
                         value={field.value}
                         onValueChange={(value) => {
                           field.onChange(value);
@@ -304,6 +303,32 @@ export default function PositionEdit() {
                                 selectedArticle.converter
                               ).toString(),
                             );
+                          }
+                        }}
+                      > */}
+                      <RadioGroup
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+
+                          const currentQuantity = form.getValues('quantity');
+                          if (currentQuantity) {
+                            const numericQuantity = Number(currentQuantity);
+                            if (value === 'kg') {
+                              form.setValue(
+                                'quantity',
+                                (
+                                  numericQuantity * selectedArticle.converter
+                                ).toString(),
+                              );
+                            } else if (value === 'st') {
+                              form.setValue(
+                                'quantity',
+                                (
+                                  numericQuantity / selectedArticle.converter
+                                ).toString(),
+                              );
+                            }
                           }
                         }}
                       >
@@ -435,13 +460,14 @@ export default function PositionEdit() {
       {isFetching && (
         <>
           <CardContent className='g-full grid w-full items-center gap-4'>
-            <Skeleton className='h-24'></Skeleton>
-            <Skeleton className='h-24'></Skeleton>
+            <Skeleton className='h-28'></Skeleton>
+            <Skeleton className='h-28'></Skeleton>
             <Skeleton className='h-12'></Skeleton>
-            <Skeleton className='h-16'></Skeleton>
+            <Skeleton className='h-20'></Skeleton>
+            <Skeleton className='h-12'></Skeleton>
           </CardContent>
 
-          <CardFooter className=' flex justify-between'>
+          {/* <CardFooter className=' flex justify-between'>
             {position !== 1 ? (
               <Button
                 onClick={() => setPosition(position - 1)}
@@ -478,7 +504,7 @@ export default function PositionEdit() {
                 + 1
               </Button>
             )}
-          </CardFooter>
+          </CardFooter> */}
         </>
       )}
     </Card>
