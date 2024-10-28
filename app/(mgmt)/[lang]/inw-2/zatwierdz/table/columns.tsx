@@ -1,21 +1,13 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { ClipboardCheck, Copy, MoreHorizontal, Table } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DeviationType } from '@/lib/types/deviation';
-import { Pencil, Trash2 } from 'lucide-react';
+import { CardType } from '@/lib/types/inventory';
+import { ColumnDef } from '@tanstack/react-table';
+import { Table } from 'lucide-react';
 import { ObjectId } from 'mongodb';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { deleteDraftDeviation } from '../actions';
 
 const handleCopyId = async (id: ObjectId | undefined) => {
   if (id) {
@@ -30,7 +22,7 @@ const handleCopyId = async (id: ObjectId | undefined) => {
   }
 };
 
-export const columns: ColumnDef<DeviationType>[] = [
+export const columns: ColumnDef<CardType>[] = [
   // {
   //   accessorKey: 'status',
   //   header: 'Status',
@@ -97,9 +89,9 @@ export const columns: ColumnDef<DeviationType>[] = [
     id: 'actions',
     header: 'Pozycja na karcie',
     cell: ({ row }) => {
-      const cardId = row.original._id;
+      const cardNumber = row.original.number;
       return (
-        <Link href={`inw-2/zatwierdz/${cardId}`}>
+        <Link href={`/inw-2/zatwierdz/${cardNumber}`}>
           <Button size='icon' type='button' variant='outline'>
             <Table />
           </Button>
@@ -108,37 +100,38 @@ export const columns: ColumnDef<DeviationType>[] = [
     },
   },
   {
-    accessorKey: 'articleName',
-    header: 'Nazwa',
-  },
-  {
     accessorKey: 'creators',
     header: 'Spisujący',
     cell: ({ row }) => {
-      const creators = row.original;
-
-      return <span className='text-nowrap'></span>;
+      const creators = row.original.creators;
+      return <span className='text-nowrap'>{creators.join(', ')}</span>;
     },
   },
   {
-    accessorKey: 'reason',
-    header: 'Powód',
-  },
-  {
-    accessorKey: 'timePeriodLocalDateString.from',
-    header: 'Od',
-  },
-  {
-    accessorKey: 'timePeriodLocalDateString.to',
-    header: 'Do',
-  },
-  {
-    accessorKey: '_id',
-    header: 'ID',
+    accessorKey: 'positions',
+    header: 'Pozycje',
     cell: ({ row }) => {
-      const id = row.original._id?.toString();
-
-      return id ? id.toUpperCase() : 'Brak';
+      const positions = row.original.positions;
+      return <span>{(positions && positions.length) || 0}</span>;
     },
+  },
+  {
+    accessorKey: 'positions',
+    header: 'Pozycje zatwierdzone',
+    cell: ({ row }) => {
+      const positions = row.original.positions;
+      const approvedCount = positions
+        ? positions.filter((pos) => pos.approver).length
+        : 0;
+      return <span>{approvedCount}</span>;
+    },
+  },
+  {
+    accessorKey: 'warehouse',
+    header: 'Magazyn',
+  },
+  {
+    accessorKey: 'sector',
+    header: 'Sektor',
   },
 ];

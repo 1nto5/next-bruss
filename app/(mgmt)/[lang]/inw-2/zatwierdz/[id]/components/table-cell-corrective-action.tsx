@@ -177,12 +177,14 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
               </DialogHeader>
             ) : correctiveAction.created.by === user ||
               user === deviationOwner ||
-              userRoles?.includes(
-                'group-leader' ||
-                  'quality-manager' ||
-                  'engineering-manager' ||
-                  'maintenance-manager' ||
+              userRoles?.some((role) =>
+                [
+                  'group-leader',
+                  'quality-manager',
+                  'engineering-manager',
+                  'maintenance-manager',
                   'production-manager',
+                ].includes(role),
               ) ? (
               <>
                 <DialogHeader>

@@ -102,7 +102,8 @@ export function Scan({
         playNok();
         toast.error(cDict.toast.qrNotValid);
         break;
-      case 'article not found' || 'wrong article config id':
+      case 'article not found':
+      case 'wrong article config id':
         playNok();
         toast.error(cDict.toast.articleNotFound);
         break;

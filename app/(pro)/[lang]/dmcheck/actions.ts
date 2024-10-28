@@ -341,27 +341,47 @@ export async function saveHydra(prevState: any, formData: FormData) {
     }
     const hydra = parse.data.hydra;
 
-    const splitHydraQr = hydra.split('|');
+    let qrBatch;
 
-    const qrArticle = splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
-
-    if (qrArticle !== articleConfig.articleNumber) {
-      return { message: 'qr wrong article' };
+    // SAP article format includes '/'
+    if (hydra.includes('/')) {
+      const qrArticle = hydra.split(':')[1].split('/')[0].slice(1);
+      if (qrArticle !== articleConfig.articleNumber) {
+        return { message: 'qr wrong article' };
+      }
+      const quantityPart = hydra
+        .split('|')
+        .find((part) => part.startsWith('Q:'));
+      const qrQuantity = quantityPart
+        ? parseInt(quantityPart.split(':')[1], 10)
+        : 0;
+      if (qrQuantity !== articleConfig.piecesPerBox) {
+        return { message: 'qr wrong quantity' };
+      }
+      const qrProcess = hydra.split(':')[1].split('/')[1];
+      if (!articleConfig.hydraProcess.includes(qrProcess)) {
+        return { message: 'qr wrong process' };
+      }
+      const batchPart = hydra.split('|').find((part) => part.startsWith('B:'));
+      if (!batchPart) return { message: 'qr not valid' };
+      qrBatch = batchPart ? batchPart.split(':')[1] : '';
+    } else {
+      const splitHydraQr = hydra.split('|');
+      const qrArticle =
+        splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
+      if (qrArticle !== articleConfig.articleNumber) {
+        return { message: 'qr wrong article' };
+      }
+      const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
+      if (qrQuantity !== articleConfig.piecesPerBox) {
+        return { message: 'qr wrong quantity' };
+      }
+      const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
+      if (!articleConfig.hydraProcess.includes(qrProcess)) {
+        return { message: 'qr wrong process' };
+      }
+      qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
     }
-
-    const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
-    if (qrQuantity !== articleConfig.piecesPerBox) {
-      return { message: 'qr wrong quantity' };
-    }
-
-    const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
-
-    if (!articleConfig.hydraProcess.includes(qrProcess)) {
-      return { message: 'qr wrong process' };
-    }
-
-    const qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
-
     const scansCollection = await dbc('scans');
     const existingBatch = await scansCollection.findOne({
       hydra_batch: qrBatch,

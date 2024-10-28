@@ -1,4 +1,3 @@
-import { R } from '@tanstack/react-query-devtools/build/legacy/devtools-PtxSnd7z';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

@@ -1,5 +1,5 @@
 import { Locale } from '@/i18n.config';
-import { DeviationType } from '@/lib/types/deviation';
+import { CardType } from '@/lib/types/inventory';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -8,9 +8,10 @@ async function getCards(
   test: string,
 ): Promise<{
   fetchTime: string;
-  deviations: DeviationType[];
+  cards: CardType[];
 }> {
   const res = await fetch(`${process.env.API}/inventory/cards`, {
+    // TODO: search params
     next: { revalidate: 30, tags: ['deviations'] },
   });
 
@@ -24,25 +25,9 @@ async function getCards(
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  const deviations: DeviationType[] = await res.json();
+  const cards: CardType[] = await res.json();
 
-  const deviationsFiltered = test
-    ? deviations.filter(
-        (deviation: DeviationType) => deviation.articleNumber === test,
-      )
-    : deviations;
-
-  const formatDeviation = (deviation: DeviationType) => {
-    const formattedTimePeriod = {
-      from: new Date(deviation.timePeriod.from).toLocaleDateString(lang),
-      to: new Date(deviation.timePeriod.to).toLocaleDateString(lang),
-    };
-    return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
-  };
-
-  const deviationsFormatted = deviationsFiltered.map(formatDeviation);
-
-  return { fetchTime, deviations: deviationsFormatted };
+  return { fetchTime, cards };
 }
 
 export default async function DeviationsPage({
@@ -53,14 +38,14 @@ export default async function DeviationsPage({
   // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  let fetchTime, deviations;
+  let fetchTime, cards;
   const { test = '' } = await searchParams;
-  ({ fetchTime, deviations } = await getCards(lang, test));
+  ({ fetchTime, cards } = await getCards(lang, test));
 
   return (
     <DataTable
       columns={columns}
-      data={deviations}
+      data={cards}
       fetchTime={fetchTime}
       lang={lang}
     />
