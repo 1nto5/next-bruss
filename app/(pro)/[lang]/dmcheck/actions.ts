@@ -346,6 +346,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
     // SAP article format includes '/'
     if (hydra.includes('/')) {
       const qrArticle = hydra.split(':')[1].split('/')[0].slice(1);
+      console.log(qrArticle);
       if (qrArticle !== articleConfig.articleNumber) {
         return { message: 'qr wrong article' };
       }
