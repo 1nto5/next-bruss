@@ -8,6 +8,8 @@ export type PositionType = {
   unit: string;
   wip: boolean;
   creators: string[];
+  approver: string;
+  approvedAt: string;
 };
 
 export type CardType = {
