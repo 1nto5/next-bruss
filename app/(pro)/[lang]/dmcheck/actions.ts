@@ -346,7 +346,6 @@ export async function saveHydra(prevState: any, formData: FormData) {
     // SAP article format includes '/'
     if (hydra.includes('/')) {
       const qrArticle = hydra.match(/:\d+\.\d+\.\d+/)?.[0].slice(1) || '';
-      console.log(qrArticle);
       if (qrArticle !== articleConfig.articleNumber) {
         return { message: 'qr wrong article' };
       }
@@ -359,7 +358,8 @@ export async function saveHydra(prevState: any, formData: FormData) {
       if (qrQuantity !== articleConfig.piecesPerBox) {
         return { message: 'qr wrong quantity' };
       }
-      const qrProcess = hydra.split(':')[1].split('/')[1];
+      const matchResult = hydra.match(/\/(\d{3})/);
+      const qrProcess = matchResult ? matchResult[1] : '';
       if (!articleConfig.hydraProcess.includes(qrProcess)) {
         return { message: 'qr wrong process' };
       }
