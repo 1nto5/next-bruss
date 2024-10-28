@@ -3,14 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -42,7 +34,7 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
+  // TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -50,26 +42,13 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
-import {
-  correctiveActionStatusType,
-  correctiveActionType,
-} from '@/lib/types/deviation';
+import { correctiveActionType } from '@/lib/types/deviation';
 import { cn } from '@/lib/utils';
-import {
-  extractFullNameFromEmail,
-  extractNameFromEmail,
-} from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format, set } from 'date-fns';
-import {
-  CalendarIcon,
-  Check,
-  ChevronsUpDown,
-  ClipboardCheck,
-  History,
-  Loader2,
-} from 'lucide-react';
+import { format } from 'date-fns';
+import { CalendarIcon, ClipboardCheck, History, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';

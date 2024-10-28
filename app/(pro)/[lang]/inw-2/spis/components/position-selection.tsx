@@ -21,13 +21,13 @@ import {
 import clsx from 'clsx';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { PositionType } from '../../../../../../lib/types/inventory';
 import { useGetCardPositions } from '../data/get-card-positions';
 import {
   useCardStore,
   usePersonalNumberStore,
   usePositionStore,
 } from '../lib/stores';
-import { PositionType } from '../lib/types';
 import ErrorAlert from './error-alert';
 
 export default function PositionSelection() {

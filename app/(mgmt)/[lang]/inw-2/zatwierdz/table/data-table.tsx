@@ -31,12 +31,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect } from 'react';
+import { ArrowRight, RefreshCcw } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
 import { revalidateDeviations } from '../actions';
 
 interface DataTableProps<TData, TValue> {
@@ -64,6 +64,21 @@ export function DataTable<TData, TValue>({
     [],
   );
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  // Get a new searchParams string by merging the current
+  // searchParams with a provided key/value pair
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -79,7 +94,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 14,
+        pageSize: 20,
       },
     },
   });
@@ -98,7 +113,7 @@ export function DataTable<TData, TValue>({
               Ostatnia synchronizacja: {fetchTime}
             </CardDescription>
             <div className='flex items-center justify-between'>
-              <div className='flex flex-row space-x-1'>
+              <div className='flex flex-col space-y-1 sm:flex-row sm:space-x-1 sm:space-y-0'>
                 <Input
                   placeholder='id'
                   value={
@@ -108,6 +123,18 @@ export function DataTable<TData, TValue>({
                     table.getColumn('_id')?.setFilterValue(event.target.value)
                   }
                   className='w-24'
+                />
+                <Input
+                  placeholder='test'
+                  className='w-24'
+                  onChange={(e) => {
+                    // <pathname>?sort=asc
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('test', e.target.value),
+                    );
+                  }}
                 />
                 <Input
                   placeholder='numer art.'
@@ -138,22 +165,17 @@ export function DataTable<TData, TValue>({
                   className='w-32'
                 />
                 {/* <Input
-              placeholder='stanowisko'
-              value={
-                (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table.getColumn('workplace')?.setFilterValue(event.target.value)
-              }
-              className='mr-2 max-w-xs'
-            /> */}
+      placeholder='stanowisko'
+      value={
+        (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
+      }
+      onChange={(event) =>
+        table.getColumn('workplace')?.setFilterValue(event.target.value)
+      }
+      className='mr-2 max-w-xs'
+    /> */}
               </div>
               <div className='flex items-center space-x-1'>
-                <Link href='/deviations/add'>
-                  <Button variant='outline' size='icon'>
-                    <CopyPlus />
-                  </Button>
-                </Link>
                 <Button
                   variant='outline'
                   onClick={() => revalidateDeviations()}
@@ -240,9 +262,7 @@ export function DataTable<TData, TValue>({
         <Card>
           <CardHeader>
             <CardTitle>Password</CardTitle>
-            <CardDescription>
-              Change your password here. After saving, youll be logged out.
-            </CardDescription>
+            <CardDescription>test</CardDescription>
           </CardHeader>
           <CardContent className='space-y-2'>test</CardContent>
           <CardFooter>

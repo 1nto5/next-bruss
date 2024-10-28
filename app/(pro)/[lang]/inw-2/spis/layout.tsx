@@ -11,7 +11,7 @@ import Header from './components/header';
 import QueryProvider from './lib/query-provider';
 
 export const metadata: Metadata = {
-  title: 'Logowanie (Next BRUSS)',
+  title: 'Inwentaryzacja - spis (Next BRUSS)',
   // description: 'Company helper applications',
 };
 
