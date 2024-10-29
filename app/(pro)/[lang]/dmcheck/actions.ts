@@ -21,7 +21,7 @@ import {
 import { fromZonedTime } from 'date-fns-tz';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { redirect } from 'next/navigation';
+// import { redirect } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
@@ -242,7 +242,7 @@ export async function saveDmc(
     }
 
     // BRI 40040 check in external pg DB
-    if (articleConfig.articleNumber === '40040') {
+    if (articleConfig.articleNumber.includes('40040')) {
       try {
         const pgc = await pgp.connect();
         const res = await pgc.query(
