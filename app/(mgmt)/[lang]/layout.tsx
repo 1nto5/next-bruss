@@ -23,9 +23,6 @@ export default async function RootLayout({
   params: { lang: Locale };
 }) {
   const session = await auth();
-  if (!session) {
-    redirect('/auth');
-  }
   const dictionary = await getDictionary(lang);
   return (
     <html lang={lang} suppressHydrationWarning>
