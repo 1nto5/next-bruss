@@ -7,4 +7,5 @@ FIXME: deviations id copy to clipboard
 FIXME: no toast when login failed
 FIXME: console errors when login failed
 PLAN: migrate to lucia auth
+PLAN: tempering process BRI (article login, get batch, show degrees and timer)
 */
