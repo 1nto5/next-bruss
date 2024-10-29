@@ -135,6 +135,10 @@ export function Scan({
         playNok();
         toast.error(cDict.toast.nok);
         break;
+      case 'bri pg saving error':
+        playNok();
+        toast.error(cDict.toast.briPgSavingError);
+        break;
       case 'smart not found':
         playNok();
         toast.error('Nie znaleziono w bazie SMART!');

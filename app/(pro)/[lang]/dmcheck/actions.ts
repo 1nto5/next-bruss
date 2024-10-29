@@ -254,7 +254,7 @@ export async function saveDmc(
         }
       } catch (error) {
         console.error('Failed to execute BRI pg query:', error);
-        return { message: 'saving error' };
+        return { message: 'bri pg saving error' };
       }
     }
 
