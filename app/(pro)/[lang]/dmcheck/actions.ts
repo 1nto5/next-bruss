@@ -244,15 +244,16 @@ export async function saveDmc(
     // BRI 40040 check in external pg DB
     if (articleConfig.articleNumber.includes('40040')) {
       try {
-        console.log('BRI 40040 check' + ' date: ' + new Date().toISOString());
+        // console.log('BRI 40040 check' + ' date: ' + new Date().toISOString());
         const pgc = await pgp.connect();
+        await pgc.query('SET statement_timeout TO 3000');
         const res = await pgc.query(
           `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
         );
-
-        console.log(
-          res.rows[0].haube_io + ' date: ' + new Date().toISOString(),
-        );
+        // console.log(
+        //   res.rows[0].haube_io + ' date: ' + new Date().toISOString(),
+        // );
+        pgc.release();
         if (res.rows.length === 0 || !res.rows[0].haube_io) {
           return { message: '40040 nok' };
         }
