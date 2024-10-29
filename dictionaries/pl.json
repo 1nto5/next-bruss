@@ -286,6 +286,7 @@
         "qrWrongArticle": "Etykieta z niepoprawnym numerem artykułu!",
         "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
         "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
+        "briPgSavingError": "Kontaktfehler mit externer Datenbank",
         "batchSaved": "Batch zapisany!",
         "batchExists": "Batch istnieje w bazie!"
       },

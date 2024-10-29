@@ -285,6 +285,7 @@
         "qrWrongArticle": "Label mit falscher Artikelnummer!",
         "qrWrongQuantity": "Falsche Stückzahl auf dem Label!",
         "qrWrongProcess": "Label mit falscher Prozessnummer!",
+        "briPgSavingError": "Kontaktfehler mit externer Datenbank",
         "batchSaved": "Batch gespeichert!",
         "batchExists": "Batch existiert bereits in der Datenbank!"
       },
