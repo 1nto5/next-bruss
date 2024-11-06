@@ -35,11 +35,11 @@ export async function StatusBar({
   articleConfigId,
 }: StatusBarProps) {
   const boxStatusBlinkClass = twMerge(
-    boxIsFull ? 'animate-ping text-bruss' : '',
+    boxIsFull ? 'animate-pulse text-bruss' : '',
   );
   const boxStatusClass = clsx('text-center text-xl', boxStatusBlinkClass);
   const palletStatusBlinkClass = twMerge(
-    palletIsFull ? 'animate-ping text-bruss' : '',
+    palletIsFull ? 'animate-pulse text-bruss' : '',
   );
   const palletStatusClass = clsx('text-center text-xl', palletStatusBlinkClass);
   return (
