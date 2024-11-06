@@ -3,8 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { personLogin } from '../actions';
 
@@ -18,8 +17,12 @@ type PersonLoginProps = {
 };
 
 export function PersonLogin({ cDict, lang }: PersonLoginProps) {
-  const [state, formAction] = useFormState(personLogin, initialState);
-  const { pending } = useFormStatus();
+  // const [state, formAction] = useFormState(personLogin, initialState);
+  // const { pending } = useFormStatus();
+  const [state, formAction, pending] = useActionState(
+    personLogin,
+    initialState,
+  );
   const [personalNumber, setPersonalNumber] = useState('');
 
   const router = useRouter();

@@ -1,12 +1,11 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
-import { useFormState } from 'react-dom';
+import { useActionState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import { save } from '../actions';
-import { LastFiveTable } from './last-five-table';
+// import { LastFiveTable } from './last-five-table';
 import { ScanInput } from './scan-input';
 
 const initialState: { message: string; dmc?: string; time?: string } = {
@@ -30,7 +29,8 @@ export function Scan({
   articleConfigId,
   operatorPersonalNumber,
 }: ScanProps) {
-  const [state, formAction] = useFormState(save, initialState);
+  // const [state, formAction] = useActionState(save, initialState);
+  const [state, formAction, pending] = useActionState(save, initialState);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
