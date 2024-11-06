@@ -35,15 +35,15 @@
     "@tanstack/react-query-devtools": "^5.59.19",
     "@tanstack/react-table": "^8.20.5",
     "@types/nodemailer": "^6.4.16",
-    "@types/react": "v18.2.48",
-    "@types/react-dom": "v18.2.18",
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^0.2.1",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
-    "eslint": "v8.56.0",
+    "eslint": "^9.14.0",
     "eslint-config-next": "^15.0.2",
     "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
@@ -79,6 +79,10 @@
     "uuid": "^9.0.1",
     "zod": "^3.23.8",
     "zustand": "^5.0.1"
+  },
+  "overrides": {
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.59.7",

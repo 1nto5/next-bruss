@@ -16,13 +16,13 @@
     "incremental": true,
     "plugins": [
       {
-        "name": "next",
-      },
+        "name": "next"
+      }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./*"]
     },
-    "typeRoots": ["./types"],
+    "typeRoots": ["./types"]
   },
   "include": [
     "next-env.d.ts",
@@ -31,7 +31,7 @@
     ".next/types/**/*.ts",
     "middleware.js",
     "app/[lang]/dictionaries.js",
-    "lib/mongo/connect.js",
+    "lib/mongo/connect.js"
   ],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", ".next"]
 }
