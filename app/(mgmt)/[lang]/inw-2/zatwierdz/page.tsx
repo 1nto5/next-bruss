@@ -30,14 +30,19 @@ async function getCards(
   return { fetchTime, cards };
 }
 
-export default async function DeviationsPage({
-  params: { lang },
-  searchParams,
-}: {
-  params: { lang: Locale };
-  // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
+export default async function DeviationsPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+    // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+    searchParams: Promise<{ [key: string]: string | undefined }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   let fetchTime, cards;
   const { test = '' } = await searchParams;
   ({ fetchTime, cards } = await getCards(lang, test));

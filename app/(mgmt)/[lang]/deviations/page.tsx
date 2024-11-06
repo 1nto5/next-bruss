@@ -137,11 +137,17 @@ async function getUserDeviations(
   };
 }
 
-export default async function DeviationsPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function DeviationsPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   let fetchTime, deviations;
   const session = await auth();
 

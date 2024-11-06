@@ -6,11 +6,18 @@ import { redirect } from 'next/navigation';
 import { getEmployee } from '../../actions';
 import EditEmployee from './components/edit-employee';
 
-export default async function EditUserPage({
-  params: { lang, employeeId },
-}: {
-  params: { lang: Locale; employeeId: string };
-}) {
+export default async function EditUserPage(
+  props: {
+    params: Promise<{ lang: Locale; employeeId: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    employeeId
+  } = params;
+
   // const dict = await getDictionary(lang);
   const employee = await getEmployee(new ObjectId(employeeId));
   console.log(employee);

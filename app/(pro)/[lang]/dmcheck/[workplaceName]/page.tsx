@@ -16,11 +16,18 @@ import Link from 'next/link';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default async function ArticleSelectionPage({
-  params: { lang, workplaceName },
-}: {
-  params: { lang: Locale; workplaceName: string };
-}) {
+export default async function ArticleSelectionPage(
+  props: {
+    params: Promise<{ lang: Locale; workplaceName: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    workplaceName
+  } = params;
+
   const dict = await getDictionary(lang);
   const cDict = dict.dmcheck.articleSelection;
   const workplaceArticles = await getArticlesForWorkplace(workplaceName);

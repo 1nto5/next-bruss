@@ -27,11 +27,17 @@ async function getPersons(
   return { fetchTime, allUsers };
 }
 
-export default async function AdminEmployeesPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function AdminEmployeesPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const { fetchTime, allUsers } = await getPersons(lang);
   return <DataTable columns={columns} data={allUsers} fetchTime={fetchTime} />;
 }

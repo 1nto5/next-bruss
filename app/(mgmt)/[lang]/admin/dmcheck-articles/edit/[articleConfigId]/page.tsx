@@ -5,11 +5,18 @@ import { redirect } from 'next/navigation';
 import { getArticleConfig } from '../../actions';
 import EditArticleConfig from './components/EditArticleConfig';
 
-export default async function EditArticleConfigPage({
-  params: { lang, articleConfigId },
-}: {
-  params: { lang: Locale; articleConfigId: string };
-}) {
+export default async function EditArticleConfigPage(
+  props: {
+    params: Promise<{ lang: Locale; articleConfigId: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    articleConfigId
+  } = params;
+
   // const dict = await getDictionary(lang);
   const articleConfig = await getArticleConfig(new ObjectId(articleConfigId));
   if (!articleConfig || !articleConfig._id) {

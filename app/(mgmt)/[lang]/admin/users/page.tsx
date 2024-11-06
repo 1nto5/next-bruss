@@ -25,11 +25,17 @@ async function getAllUsers(
   return { fetchTime, allUsers };
 }
 
-export default async function AdminUsersPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function AdminUsersPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const { fetchTime, allUsers } = await getAllUsers(lang);
   return <DataTable columns={columns} data={allUsers} fetchTime={fetchTime} />;
 }

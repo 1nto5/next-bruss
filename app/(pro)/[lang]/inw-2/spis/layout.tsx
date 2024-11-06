@@ -15,13 +15,22 @@ export const metadata: Metadata = {
   // description: 'Company helper applications',
 };
 
-export default async function RootLayout({
-  children,
-  params: { lang },
-}: {
-  children: React.ReactNode;
-  params: { lang: Locale };
-}) {
+export default async function RootLayout(
+  props: {
+    children: React.ReactNode;
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
+  const {
+    children
+  } = props;
+
   // const dictionary = await getDictionary(lang);
   return (
     <html lang={lang} suppressHydrationWarning>

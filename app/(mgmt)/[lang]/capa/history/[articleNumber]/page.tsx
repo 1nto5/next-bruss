@@ -48,11 +48,18 @@ async function getCapaHistory(
   return { fetchTime, allCapa };
 }
 
-export default async function CapaPage({
-  params: { lang, articleNumber },
-}: {
-  params: { lang: Locale; articleNumber: string };
-}) {
+export default async function CapaPage(
+  props: {
+    params: Promise<{ lang: Locale; articleNumber: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    articleNumber
+  } = params;
+
   const { fetchTime, allCapa } = await getCapaHistory(lang, articleNumber);
   return (
     <DataTable

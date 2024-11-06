@@ -14,18 +14,27 @@ import {
 import { LastFiveTable } from '../../../components/last-five-table';
 import { PrintPalletLabel } from '../../../components/print-pallet-label';
 
-export default async function ScanPage({
-  params: { lang, workplaceName, articleConfigId, operatorId },
-  searchParams,
-}: {
-  params: {
-    lang: Locale;
-    workplaceName: string;
-    articleConfigId: string;
-    operatorId: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function ScanPage(
+  props: {
+    params: Promise<{
+      lang: Locale;
+      workplaceName: string;
+      articleConfigId: string;
+      operatorId: string;
+    }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const {
+    lang,
+    workplaceName,
+    articleConfigId,
+    operatorId
+  } = params;
+
   const dict = await getDictionary(lang);
   if (
     !searchParams.operatorName ||

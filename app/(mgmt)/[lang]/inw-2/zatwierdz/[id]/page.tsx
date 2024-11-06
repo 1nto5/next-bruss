@@ -30,11 +30,18 @@ async function getDeviation(
   return { fetchTime, deviation: data };
 }
 
-export default async function EditDeviationPage({
-  params: { lang, id },
-}: {
-  params: { lang: Locale; id: string };
-}) {
+export default async function EditDeviationPage(
+  props: {
+    params: Promise<{ lang: Locale; id: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    id
+  } = params;
+
   // const dict = await getDictionary(lang);
   const { fetchTime, deviation } = await getDeviation(id, lang);
   if (deviation === null) {

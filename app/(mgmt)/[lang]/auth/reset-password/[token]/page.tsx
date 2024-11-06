@@ -4,11 +4,18 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import Reset from '../../components/reset-password';
 
-export default async function Page({
-  params: { lang, token },
-}: {
-  params: { lang: Locale; token: string };
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ lang: Locale; token: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    token
+  } = params;
+
   const dict = await getDictionary(lang);
   return (
     <main className='m-2 flex justify-center'>

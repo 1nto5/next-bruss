@@ -18,11 +18,17 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   return data;
 }
 
-export default async function AddDeviationPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function AddDeviationPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();
   return <AddDeviation reasons={deviationReasons} />;

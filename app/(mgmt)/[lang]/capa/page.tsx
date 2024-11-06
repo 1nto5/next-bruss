@@ -44,11 +44,17 @@ async function getAllCapa(
   return { fetchTime, allCapa };
 }
 
-export default async function CapaPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function CapaPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const { fetchTime, allCapa } = await getAllCapa(lang);
   return <DataTable columns={columns} data={allCapa} fetchTime={fetchTime} />;
 }

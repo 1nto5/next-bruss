@@ -26,11 +26,17 @@ async function getArticleConfigs(
   return { fetchTime, allConfigs };
 }
 
-export default async function ArticleConfigsPage({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function ArticleConfigsPage(
+  props: {
+    params: Promise<{ lang: Locale }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const { fetchTime, allConfigs } = await getArticleConfigs(lang);
   return (
     <DataTable columns={columns} data={allConfigs} fetchTime={fetchTime} />

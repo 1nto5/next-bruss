@@ -18,11 +18,18 @@ async function getUsers(): Promise<UsersListType> {
   return data;
 }
 
-export default async function AddDeviationPage({
-  params: { lang, id },
-}: {
-  params: { lang: Locale; id: string };
-}) {
+export default async function AddDeviationPage(
+  props: {
+    params: Promise<{ lang: Locale; id: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    id
+  } = params;
+
   // const dict = await getDictionary(lang);
   const users = await getUsers();
   return <AddCorrectiveAction id={id} users={users} />;

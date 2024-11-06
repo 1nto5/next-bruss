@@ -5,11 +5,18 @@ import { redirect } from 'next/navigation';
 import { getUser } from '../../actions';
 import EditUser from './components/EditUser';
 
-export default async function EditUserPage({
-  params: { lang, userId },
-}: {
-  params: { lang: Locale; userId: string };
-}) {
+export default async function EditUserPage(
+  props: {
+    params: Promise<{ lang: Locale; userId: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    userId
+  } = params;
+
   // const dict = await getDictionary(lang);
   let user = await getUser(new ObjectId(userId));
   if (!user) {

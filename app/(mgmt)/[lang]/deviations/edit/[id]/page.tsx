@@ -20,11 +20,18 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   return data;
 }
 
-export default async function EditDeviationPage({
-  params: { lang, id },
-}: {
-  params: { lang: Locale; id: string };
-}) {
+export default async function EditDeviationPage(
+  props: {
+    params: Promise<{ lang: Locale; id: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    lang,
+    id
+  } = params;
+
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();
   const deviation = await findDeviation(id);
