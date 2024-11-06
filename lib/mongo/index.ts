@@ -27,7 +27,7 @@ clientPromise = globalWithMongo._mongoClientPromise;
 
 export default clientPromise;
 
-// slow migration to:
+// migration to:
 
 export async function dbc(collectionName: string) {
   const client = await clientPromise;
