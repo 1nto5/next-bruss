@@ -116,6 +116,7 @@ export const columns: ColumnDef<CardType>[] = [
     },
   },
   {
+    id: 'approvedPositions',
     accessorKey: 'positions',
     header: 'Pozycje zatwierdzone',
     cell: ({ row }) => {

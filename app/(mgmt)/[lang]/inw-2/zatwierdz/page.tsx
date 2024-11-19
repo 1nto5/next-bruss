@@ -5,7 +5,7 @@ import { DataTable } from './table/data-table';
 
 async function getCards(
   lang: string,
-  test: string,
+  searchParams: { [key: string]: string | undefined },
 ): Promise<{
   fetchTime: string;
   cards: CardType[];
@@ -25,27 +25,36 @@ async function getCards(
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  const cards: CardType[] = await res.json();
+  let cards: CardType[] = await res.json();
+
+  const { number, creator, warehouse } = searchParams;
+  console.log('searchParams:', searchParams);
+  if (number) {
+    cards = cards.filter((card) => card.number === Number(number));
+  }
+  if (creator) {
+    cards = cards.filter((card) => card.creators.includes(creator));
+  }
+  if (warehouse) {
+    cards = cards.filter((card) => card.warehouse === warehouse);
+  }
 
   return { fetchTime, cards };
 }
 
-export default async function DeviationsPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-    // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-    searchParams: Promise<{ [key: string]: string | undefined }>;
-  }
-) {
+export default async function DeviationsPage(props: {
+  params: Promise<{ lang: Locale }>;
+  // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
   let fetchTime, cards;
-  const { test = '' } = await searchParams;
-  ({ fetchTime, cards } = await getCards(lang, test));
+  // const { number = '' } = searchParams;
+  ({ fetchTime, cards } = await getCards(lang, searchParams));
 
   return (
     <DataTable

@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -31,11 +32,30 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
-import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
-import { ArrowRight, RefreshCcw } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { warehouseSelectOptions } from '@/lib/options/warehouse';
+import { cn } from '@/lib/utils';
+import {
+  ArrowRight,
+  Check,
+  ChevronsUpDown,
+  CircleX,
+  RefreshCcw,
+} from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { revalidateDeviations } from '../actions';
 
@@ -63,6 +83,8 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  const [openWarehouse, setOpenWarehouse] = React.useState(false);
+  // const [warehouseValue, setWarehouseValue] = React.useState('');
 
   const router = useRouter();
   const pathname = usePathname();
@@ -108,13 +130,13 @@ export function DataTable<TData, TValue>({
       <TabsContent value='cards'>
         <Card>
           <CardHeader>
-            <CardTitle>Karty inwentaryzacja</CardTitle>
+            <CardTitle>Karty</CardTitle>
             <CardDescription>
               Ostatnia synchronizacja: {fetchTime}
             </CardDescription>
             <div className='flex items-center justify-between'>
               <div className='flex flex-col space-y-1 sm:flex-row sm:space-x-1 sm:space-y-0'>
-                <Input
+                {/* <Input
                   placeholder='id'
                   value={
                     (table.getColumn('_id')?.getFilterValue() as string) ?? ''
@@ -123,59 +145,146 @@ export function DataTable<TData, TValue>({
                     table.getColumn('_id')?.setFilterValue(event.target.value)
                   }
                   className='w-24'
-                />
+                /> */}
                 <Input
-                  placeholder='test'
+                  placeholder='nr karty'
                   className='w-24'
+                  value={searchParams.get('number') ?? ''}
                   onChange={(e) => {
-                    // <pathname>?sort=asc
                     router.push(
                       pathname +
                         '?' +
-                        createQueryString('test', e.target.value),
+                        createQueryString('number', e.target.value),
                     );
                   }}
                 />
                 <Input
-                  placeholder='numer art.'
-                  value={
-                    (table
-                      .getColumn('articleNumber')
-                      ?.getFilterValue() as string) ?? ''
-                  }
-                  onChange={(event) =>
-                    table
-                      .getColumn('articleNumber')
-                      ?.setFilterValue(event.target.value)
-                  }
-                  className='w-28'
+                  placeholder='spisujący'
+                  className='w-24'
+                  value={searchParams.get('creator') ?? ''}
+                  onChange={(e) => {
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('creator', e.target.value),
+                    );
+                  }}
                 />
                 <Input
-                  placeholder='nazwa art.'
-                  value={
-                    (table
-                      .getColumn('articleName')
-                      ?.getFilterValue() as string) ?? ''
-                  }
-                  onChange={(event) =>
-                    table
-                      .getColumn('articleName')
-                      ?.setFilterValue(event.target.value)
-                  }
-                  className='w-32'
+                  placeholder='spisujący'
+                  className='w-24'
+                  value={searchParams.get('creator') ?? ''}
+                  onChange={(e) => {
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('creator', e.target.value),
+                    );
+                  }}
                 />
                 {/* <Input
-      placeholder='stanowisko'
-      value={
-        (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
-      }
-      onChange={(event) =>
-        table.getColumn('workplace')?.setFilterValue(event.target.value)
-      }
-      className='mr-2 max-w-xs'
-    /> */}
+                  placeholder='magazyn'
+                  className='w-24'
+                  value={searchParams.get('warehouse') ?? ''}
+                  onChange={(e) => {
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('warehouse', e.target.value),
+                    );
+                  }}
+                /> */}
+                <Popover open={openWarehouse} onOpenChange={setOpenWarehouse}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      // aria-expanded={open}
+                      className={cn(
+                        'justify-between',
+                        !searchParams.get('warehouse') && 'opacity-50',
+                      )}
+                    >
+                      {searchParams.get('warehouse')
+                        ? warehouseSelectOptions.find(
+                            (warehouse) =>
+                              warehouse.value === searchParams.get('warehouse'),
+                          )?.value
+                        : 'magazyn'}
+                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-[300px] p-0'>
+                    <Command>
+                      <CommandInput placeholder='wyszukaj...' />
+                      <CommandList>
+                        <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            key='reset'
+                            onSelect={() => {
+                              // setWarehouseValue('');
+                              router.push(pathname);
+                              setOpenWarehouse(false);
+                            }}
+                          >
+                            <Check className='mr-2 h-4 w-4 opacity-0' />
+                            nie wybrano
+                          </CommandItem>
+                          {warehouseSelectOptions.map((warehouse) => (
+                            <CommandItem
+                              key={warehouse.value}
+                              value={warehouse.value}
+                              onSelect={(currentValue) => {
+                                // setWarehouseValue(
+                                //   currentValue === warehouseValue
+                                //     ? ''
+                                //     : currentValue,
+                                // );
+                                router.push(
+                                  pathname +
+                                    '?' +
+                                    createQueryString(
+                                      'warehouse',
+                                      currentValue ===
+                                        searchParams.get('warehouse')
+                                        ? ''
+                                        : currentValue,
+                                    ),
+                                );
+                                setOpenWarehouse(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  searchParams.get('warehouse') ===
+                                    warehouse.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0',
+                                )}
+                              />
+                              {warehouse.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
+
               <div className='flex items-center space-x-1'>
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    // setWarehouseValue('');
+                    router.push(pathname);
+                  }}
+                  size='icon'
+                >
+                  <CircleX />
+                </Button>
                 <Button
                   variant='outline'
                   onClick={() => revalidateDeviations()}
@@ -261,13 +370,11 @@ export function DataTable<TData, TValue>({
       <TabsContent value='positions'>
         <Card>
           <CardHeader>
-            <CardTitle>Password</CardTitle>
+            <CardTitle>Pozycje</CardTitle>
             <CardDescription>test</CardDescription>
           </CardHeader>
           <CardContent className='space-y-2'>test</CardContent>
-          <CardFooter>
-            <Button>Save password</Button>
-          </CardFooter>
+          <CardFooter>{/* <Button>Save password</Button> */}</CardFooter>
         </Card>
       </TabsContent>
     </Tabs>
