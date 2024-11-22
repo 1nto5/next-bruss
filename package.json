@@ -47,6 +47,8 @@
     "eslint-config-next": "^15.0.2",
     "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
+    "ldapjs": "^3.0.7",
+    "ldapjs-client": "^0.1.2",
     "lucide-react": "^0.438.0",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",

@@ -1,9 +1,9 @@
 // TODO: [auth][error] while wrong credentials in server console?
 
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
 import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 
 const collectionName = 'users';
 
@@ -47,6 +47,7 @@ export const {
             // console.log(user);
             return user;
           }
+
           // console.log('Invalid credentials');
           return null;
         } catch (error) {
