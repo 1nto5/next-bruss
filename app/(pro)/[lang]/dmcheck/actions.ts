@@ -233,6 +233,7 @@ export async function saveDmc(
       {
         dmc: dmc,
         workplace: articleConfig.workplace,
+        articleNumber: articleConfig.articleNumber,
       },
       { sort: { time: -1 } },
     );
