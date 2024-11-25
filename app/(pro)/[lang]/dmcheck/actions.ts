@@ -171,6 +171,9 @@ export async function save(
   if (formData.get('dmc')) {
     return await saveDmc(prevState, formData);
   }
+  if (formData.get('dmc-rework')) {
+    return await saveDmcRework(prevState, formData);
+  }
   if (formData.get('hydra')) {
     return await saveHydra(prevState, formData);
   }
@@ -314,6 +317,170 @@ export async function saveDmc(
         // console.log(`Lamp response status: ${res.status}`);
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('saveDmc server action error');
+  }
+}
+
+export async function saveDmcRework(
+  prevState: any,
+  formData: FormData,
+): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
+  try {
+    const articleConfigId = formData.get('articleConfigId');
+    const articlesConfigCollection = await dbc('articles_config');
+    if (!articleConfigId || articleConfigId.toString().length !== 24) {
+      return { message: 'wrong article config id' };
+    }
+    const articleConfig = await articlesConfigCollection.findOne({
+      _id: new ObjectId(articleConfigId.toString()),
+    });
+    if (!articleConfig) {
+      return { message: 'article not found' };
+    }
+    const schema = z.object({
+      dmc: z
+        .string()
+        .length(articleConfig.dmc.length)
+        .includes(articleConfig.dmcFirstValidation)
+        .refine(
+          (dmc) =>
+            !articleConfig.secondValidation ||
+            dmc.includes(articleConfig.dmcSecondValidation),
+        ),
+    });
+    const parse = schema.safeParse({
+      dmc: formData?.get('dmc-rework')?.toString(),
+    });
+
+    if (!parse.success) {
+      return { message: 'dmc not valid' };
+    }
+    const dmc = parse.data.dmc;
+
+    if (articleConfig.bmw) {
+      if (!bmwDateValidation(dmc)) {
+        return { message: 'bmw date not valid' };
+      }
+    }
+
+    if (articleConfig.ford) {
+      if (!fordDateValidation(dmc)) {
+        return { message: 'ford date not valid' };
+      }
+    }
+
+    const scansCollection = await dbc('scans');
+
+    const existingDmc = await scansCollection.findOne(
+      {
+        dmc: dmc,
+        workplace: articleConfig.workplace,
+      },
+      { sort: { time: -1 } },
+    );
+
+    if (
+      !existingDmc ||
+      existingDmc.status === 'rework' ||
+      existingDmc.status === 'box'
+    ) {
+      return { message: 'rework not possible' };
+    }
+
+    if (existingDmc && existingDmc.status !== 'rework') {
+      await scansCollection.updateOne(
+        { _id: existingDmc._id },
+        {
+          $set: {
+            status: 'rework',
+            rework_time: new Date(),
+            rework_reason: `workplace rework: ${articleConfig.workplace.toUpperCase()}`,
+            rework_user: `personal number: ${formData.get('operatorPersonalNumber')}`,
+          },
+        },
+      );
+    }
+
+    // BRI 40040 check in external pg DB
+    if (articleConfig.articleNumber.includes('40040')) {
+      try {
+        // console.log('BRI 40040 check' + ' date: ' + new Date().toISOString());
+        const pgc = await pgp.connect();
+        await pgc.query('SET statement_timeout TO 3000');
+        const res = await pgc.query(
+          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
+        );
+        // console.log(
+        //   res.rows[0].haube_io + ' date: ' + new Date().toISOString(),
+        // );
+        pgc.release();
+        if (res.rows.length === 0 || !res.rows[0].haube_io) {
+          return { message: '40040 nok' };
+        }
+      } catch (error) {
+        console.error('Failed to execute BRI pg query:', error);
+        return { message: 'bri pg saving error' };
+      }
+    }
+
+    // EOL810/EOL488 check in external SMART API
+    if (
+      articleConfig.workplace === 'eol810' ||
+      articleConfig.workplace === 'eol488'
+    ) {
+      const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
+
+      const res = await fetch(url);
+      if (!res.ok || res.status === 404) {
+        return { message: 'smart fetch error' };
+      }
+      const data = await res.text();
+      switch (data) {
+        case 'NOT_FOUND':
+          return { message: 'smart not found' };
+        case 'UNKNOWN':
+          return { message: 'smart unknown' };
+        case 'NOK':
+          return { message: 'smart nok' };
+        case 'PATTERN':
+          return { message: 'smart pattern' };
+      }
+    }
+
+    const insertResult = await scansCollection.insertOne({
+      status: 'box',
+      dmc: dmc,
+      workplace: articleConfig.workplace,
+      type: articleConfig.type,
+      article: articleConfig.articleNumber,
+      operator: formData.get('operatorPersonalNumber'),
+      time: new Date(),
+    });
+
+    if (insertResult) {
+      revalidateTag('box');
+      // EOL810/EOL488 lighting the lamp
+      if (
+        articleConfig.workplace === 'eol810' ||
+        articleConfig.workplace === 'eol488'
+      ) {
+        const variant = articleConfig.workplace === 'eol810' ? '10' : '20';
+        // console.log(
+        //   `Smart lighting the lamp for: ${articleConfig.workplace}, smart: ${variant}`,
+        // );
+        await fetch(
+          `http://10.27.90.4:8090/api/turn-on-ok-indicator/${variant}`,
+        );
+        // console.log(`Lamp response status: ${res.status}`);
+      }
+      return {
+        message: 'rework dmc saved',
+        dmc: dmc,
+        time: new Date().toISOString(),
+      };
     }
   } catch (error) {
     console.error(error);

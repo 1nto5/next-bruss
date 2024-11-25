@@ -271,6 +271,7 @@
         }
       },
       "dmcScanInputPlaceholder": "skanuj kod DMC...",
+      "dmcReworkInputPlaceholder": "UWAGA: DMC rework aktywny!",
       "scanInputSavingPlaceholder": "przetwarzam...",
       "hydraScanInputPlaceholder": "skanuj kod QR z etykiety HYDRA...",
       "toast": {
@@ -287,6 +288,8 @@
         "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
         "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
         "briPgSavingError": "Kontaktfehler mit externer Datenbank",
+        "reworkNotPossible": "Rework niemożliwy! Cześć w aktualnym boxie lub brak części.",
+        "reworkDmcSaved": "Rework DMC zapisany!",
         "batchSaved": "Batch zapisany!",
         "batchExists": "Batch istnieje w bazie!"
       },

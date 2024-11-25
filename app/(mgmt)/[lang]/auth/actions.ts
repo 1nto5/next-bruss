@@ -1,10 +1,10 @@
 'use server';
 
+import { auth, signIn, signOut } from '@/auth';
 import clientPromise from '@/lib/mongo';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import { signOut, signIn, auth } from '@/auth';
 // import { AuthError } from 'next-auth';
 
 const collectionName = 'users';
@@ -236,6 +236,7 @@ export async function login(email: string, password: string) {
     password,
     // redirect: false,
   });
+  console.log('res: ', res);
 }
 
 export async function getSession() {

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { resetPassword, login } from '../actions';
+import { login, resetPassword } from '../actions';
 // import { AuthError } from 'next-auth';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -16,17 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  // CardHeader,
-  // CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -112,7 +105,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
   }
 
   return (
-    <Card>
+    <Card className='w-[400px]'>
       {/* <CardHeader>
         <CardTitle>Wprowadź dane logowania</CardTitle>
         <CardDescription>Wprowadź dane aby się zalogować:</CardDescription>

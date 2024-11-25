@@ -270,6 +270,7 @@
         }
       },
       "dmcScanInputPlaceholder": "DMC-Code scannen...",
+      "dmcReworkInputPlaceholder": "ANMERKUNG: DMC rework aktiv!",
       "scanInputSavingPlaceholder": "wird verarbeitet...",
       "hydraScanInputPlaceholder": "QR-Code vom HYDRA-Label scannen...",
       "toast": {
@@ -286,6 +287,8 @@
         "qrWrongQuantity": "Falsche Stückzahl auf dem Label!",
         "qrWrongProcess": "Label mit falscher Prozessnummer!",
         "briPgSavingError": "Kontaktfehler mit externer Datenbank",
+        "reworkNotPossible": "Keine Teile im System - Nacharbeit unmöglich!",
+        "reworkDmcSaved": "Rework DMC gespeichert!",
         "batchSaved": "Batch gespeichert!",
         "batchExists": "Batch existiert bereits in der Datenbank!"
       },

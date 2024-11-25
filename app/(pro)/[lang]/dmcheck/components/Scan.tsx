@@ -1,11 +1,13 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useActionState, useCallback, useEffect } from 'react';
+import { useActionState, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import { save } from '../actions';
 // import { LastFiveTable } from './last-five-table';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { ScanInput } from './scan-input';
 
 const initialState: { message: string; dmc?: string; time?: string } = {
@@ -31,6 +33,8 @@ export function Scan({
 }: ScanProps) {
   // const [state, formAction] = useActionState(save, initialState);
   const [state, formAction, pending] = useActionState(save, initialState);
+  const [rework, setRework] = useState(false);
+  // console.log('state', rework);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -75,7 +79,7 @@ export function Scan({
       case 'dmc saved':
         playOk();
         toast.success(cDict.toast.dmcSaved);
-        console.log(state.dmc, state.time);
+        // console.log(state.dmc, state.time);
         state.dmc &&
           state.time &&
           router.push(
@@ -159,6 +163,20 @@ export function Scan({
         playNok();
         toast.error('Problem połączenia z bazą SMART!');
         break;
+      case 'rework not possible':
+        playNok();
+        toast.error(cDict.toast.reworkNotPossible);
+        break;
+      case 'rework dmc saved':
+        playOk();
+        toast.success(cDict.toast.reworkDmcSaved);
+        // console.log(state.dmc, state.time);
+        state.dmc &&
+          state.time &&
+          router.push(
+            pathname + '?' + createQueryString(state.dmc, state.time),
+          );
+        break;
       default:
         break;
     }
@@ -183,11 +201,20 @@ export function Scan({
           defaultValue={operatorPersonalNumber}
         />
         {!boxIsFull && !palletIsFull && (
-          <ScanInput
-            name='dmc'
-            placeholder={cDict.dmcScanInputPlaceholder}
-            savingPlaceholder={cDict.scanInputSavingPlaceholder}
-          />
+          <div className='flex items-center space-x-2'>
+            <ScanInput
+              name={rework ? 'dmc-rework' : 'dmc'}
+              placeholder={
+                rework
+                  ? cDict.dmcReworkInputPlaceholder
+                  : cDict.dmcScanInputPlaceholder
+              }
+              savingPlaceholder={cDict.scanInputSavingPlaceholder}
+            />
+
+            <Switch onCheckedChange={() => setRework(!rework)} id='rework' />
+            <Label htmlFor='rework'>rework</Label>
+          </div>
         )}
         {boxIsFull && !palletIsFull && (
           <ScanInput
