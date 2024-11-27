@@ -1,33 +1,18 @@
 import { dbc } from '@/lib/mongo';
-import NextAuth from 'next-auth';
+import { th } from 'date-fns/locale';
+import NextAuth, { User, type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 const LdapClient = require('ldapjs-client');
 
-type CredentialsType = {
-  email: string;
-  password: string;
-};
-
-export const {
-  auth,
-  signIn,
-  signOut,
-  handlers: { GET, POST },
-} = NextAuth({
-  pages: {
-    signIn: '/auth',
-  },
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
-      name: 'LDAP',
       credentials: {
-        email: { label: 'Email', type: 'text', placeholder: '' },
-        password: { label: 'Password', type: 'password' },
+        email: {},
+        password: {},
       },
-      // @ts-ignore
-      async authorize(credentials: CredentialsType) {
+      authorize: async (credentials) => {
         const { email, password } = credentials;
-
         const ldapClient = new LdapClient({
           url: process.env.LDAP,
         });
@@ -35,8 +20,9 @@ export const {
         try {
           await ldapClient.bind(process.env.LDAP_DN, process.env.LDAP_PASS);
         } catch (error) {
-          console.log('LDAP admin bind failed');
+          return null;
         }
+
         try {
           const options = {
             filter: `(mail=${email})`,
@@ -63,18 +49,16 @@ export const {
                 email,
                 roles: ['user'],
                 firstLogin: new Date(),
-                lastLogin: new Date(),
               });
+              return {
+                email,
+                roles: ['user'],
+              } as User;
             } else {
-              await usersCollection.updateOne(
-                { email },
-                { $set: { lastLogin: new Date() } },
-              );
               return {
                 email,
                 roles: user.roles,
-                lastUpdate: new Date().getTime(),
-              };
+              } as User;
             }
           }
         } catch (error) {
@@ -83,36 +67,4 @@ export const {
       },
     }),
   ],
-  callbacks: {
-    jwt: async ({ token, user }) => {
-      const now = new Date().getTime();
-      if (user) {
-        token.userId = user.id;
-        token.roles = user.roles;
-        token.lastUpdate = now;
-      } else {
-        const msDifference = now - Number(token.lastUpdate);
-        const minDifference = Math.ceil(msDifference / 1000 / 60);
-        if (minDifference >= 5 || minDifference < 0) {
-          const usersCollection = await dbc('users');
-          const freshUser = await usersCollection.findOne({
-            email: token.email,
-          });
-          token.roles = freshUser?.roles || 'banned';
-          token.lastUpdateAt = now;
-        }
-      }
-      return token;
-      // if (user) {
-      //   token.roles = user.roles;
-      // }
-      // return token;
-    },
-    session: async ({ session, token }) => {
-      if (session?.user) {
-        session.user.roles = token.roles as string[];
-      }
-      return session;
-    },
-  },
 });
