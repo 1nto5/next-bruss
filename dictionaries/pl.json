@@ -64,13 +64,8 @@
     },
     "toasts": {
       "pleaseContactIt": "Skontaktuj się z IT!",
-      "loginError": "Nieprawidłowe dane logowania!",
-      "resetPasswordEmailSent": "Wysłano link do resetowania hasła!",
-      "noUserWithThisEmail": "Brak użytkownika o podanym adresie email!",
-      "resetPasswordNoEmail": "Wprowadź email by zresetować hasło!",
-      "registered": "Konto zostało utworzone!",
-      "exists": "Konto już istnieje!",
-      "passwordUpdated": "Hasło zaktualizowane!"
+      "credentialsError": "Nieprawidłowe dane logowania!",
+      "loginSuccess": "Zalogowano!"
     }
   },
   "home": {

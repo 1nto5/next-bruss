@@ -1,6 +1,7 @@
 'use client';
 
 import Container from '@/components/ui/container';
+import Logo from '@/components/ui/logo';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,21 +17,18 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import Link from 'next/link';
-import React from 'react';
-// import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
 import { Menu } from 'lucide-react';
+import { Session } from 'next-auth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React from 'react';
+import { logout } from '../auth/actions';
+import { LoginDialog } from './login-dialog';
 import { LoginLogout } from './login-logout';
 import { ThemeModeToggle } from './theme-mode-toggle';
-
-import Logo from '@/components/ui/logo';
-import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
-import { Session } from 'next-auth';
-import { useRouter } from 'next/navigation';
-import { getSession, logout } from '../auth/actions';
 import UserAvatar from './user-avatar';
-// import { toast } from 'sonner';
 
 type HeaderProps = {
   session: Session | null;
@@ -104,7 +102,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
         },
       ],
     },
-    ...(session?.user.roles?.includes('admin')
+    ...(session?.user?.roles?.includes('admin')
       ? [
           {
             title: 'Admin',
@@ -177,7 +175,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
         },
       ],
     },
-    ...(session?.user.roles?.includes('admin')
+    ...(session?.user?.roles?.includes('admin')
       ? [
           {
             title: 'Admin',
@@ -312,11 +310,13 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           <div className='flex items-center space-x-2'>
             <UserAvatar
               userInitials={
-                session?.user.email
-                  ? getInitialsFromEmail(session?.user.email)
+                session?.user?.email
+                  ? getInitialsFromEmail(session?.user?.email)
                   : 'NU'
               }
             />
+
+            <LoginDialog />
 
             <LoginLogout
               isLoggedIn={!!session}

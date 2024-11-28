@@ -6,7 +6,6 @@ import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import Footer from './components/footer';
 import Header from './components/header';
 
@@ -15,21 +14,15 @@ export const metadata: Metadata = {
   description: 'Company helper applications',
 };
 
-export default async function RootLayout(
-  props: {
-    children: React.ReactNode;
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function RootLayout(props: {
+  children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   const session = await auth();
   const dictionary = await getDictionary(lang);
@@ -51,6 +44,7 @@ export default async function RootLayout(
               <Footer />
             </div>
           </Container>
+          <Toaster position='top-center' />
         </ThemeProvider>
       </body>
     </html>

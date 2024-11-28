@@ -4,8 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { login, resetPassword } from '../actions';
-// import { AuthError } from 'next-auth';
+import { login } from '../actions';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -20,13 +19,10 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function LoginForm({ cDict }: { cDict: any }) {
-  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
-  const [isPendingSending, setIsPendingSending] = useState(false);
 
   const formSchema = z.object({
     email: z
@@ -50,7 +46,17 @@ export default function LoginForm({ cDict }: { cDict: any }) {
     // console.log(values.email, values.password);
     try {
       setIsPending(true);
-      await login(values.email, values.password);
+      const res = await login(values.email, values.password);
+      console.log('res: ', res);
+      if (!res || res.error === 'default error') {
+        toast.error(cDict.toasts.pleaseContactIt);
+        return;
+      }
+      if (res.error === 'invalid credentials') {
+        toast.error(cDict.toasts.credentialsError);
+        return;
+      }
+      toast.success(cDict.toasts.loginSuccess);
       // if (!res) {
       //   toast.error('Nieprawidłowe dane logowania!');
       //   return;
@@ -63,44 +69,6 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       return;
     } finally {
       setIsPending(false);
-    }
-  }
-
-  async function onResetPassword() {
-    const email = form.getValues('email');
-    // console.log('email: ', email);
-    if (!email) {
-      toast.error(cDict.toasts.resetPasswordNoEmail);
-      return;
-    }
-    try {
-      setIsPendingSending(true);
-      const result = await resetPassword(email);
-      if (!result) {
-        toast.error(cDict.toasts.pleaseContactIt);
-        return;
-      }
-
-      if (result.status === 'success') {
-        toast.success(cDict.toasts.resetPasswordEmailSent);
-        return;
-      }
-
-      if (result?.error) {
-        toast.error(cDict.toasts.pleaseContactIt);
-        console.error('User password reset was unsuccessful.:', result?.error);
-      }
-
-      if (result.status === 'not exists') {
-        toast.error(cDict.toasts.noUserWithThisEmail);
-        return;
-      }
-    } catch (error) {
-      console.error('User password reset was unsuccessful.:', error);
-      toast.error(cDict.toasts.pleaseContactIt);
-      return;
-    } finally {
-      setIsPendingSending(false);
     }
   }
 
@@ -148,21 +116,6 @@ export default function LoginForm({ cDict }: { cDict: any }) {
             />
           </CardContent>
           <CardFooter className='flex justify-between'>
-            {/* uncommnet after exchange implementation */}
-            {/* {isPendingSending ? (
-              <Button type='button' variant='destructive' disabled>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                {cDict.emailSendingButton}
-              </Button>
-            ) : (
-              <Button
-                onClick={onResetPassword}
-                type='button'
-                variant='destructive'
-              >
-                {cDict.resetPasswordButton}
-              </Button>
-            )} */}
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

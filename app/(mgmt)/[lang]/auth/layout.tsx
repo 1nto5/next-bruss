@@ -13,9 +13,9 @@ export default async function Layout({
 }) {
   const session = await auth();
 
-  if (session) {
-    redirect('/');
-  }
+  // if (session) {
+  //   redirect('/');
+  // }
 
   return <FormContainer>{children}</FormContainer>;
 }
