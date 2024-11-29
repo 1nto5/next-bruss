@@ -17,8 +17,8 @@ import { signIn } from 'next-auth/react';
 export function LoginDialog() {
   const credentialsAction = (formData: FormData) => {
     signIn('credentials', {
-      email: 'adrian.antosiak@bruss-group.com',
-      password: '@dria^5',
+      email: 'test.test@bruss-group.com',
+      password: 'test',
     });
   };
   return (
