@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
 
 export async function insertDeviation(deviation: AddDeviationType) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
   try {
@@ -42,7 +42,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: session.user.email,
+      owner: session.user?.email,
       correctiveActions: [],
     };
 
@@ -61,7 +61,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
 
 export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
 
@@ -98,7 +98,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: session.user.email,
+      owner: session.user?.email,
       correctiveActions: [],
     };
 

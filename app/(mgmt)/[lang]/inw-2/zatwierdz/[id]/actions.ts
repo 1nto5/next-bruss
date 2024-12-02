@@ -18,8 +18,8 @@ export async function approveDeviation(id: string, userRole: string) {
   const session = await auth();
   if (
     !session ||
-    !session.user.email ||
-    !(session.user.roles ?? []).includes(userRole)
+    !session.user?.email ||
+    !(session.user?.roles ?? []).includes(userRole)
   ) {
     return { error: 'unauthorized' };
   }
@@ -40,7 +40,7 @@ export async function approveDeviation(id: string, userRole: string) {
   const updateField: Partial<DeviationType> = {
     [approvalField]: {
       approved: true,
-      by: session.user.email,
+      by: session.user?.email,
       at: new Date(),
     } as ApprovalType,
   };
@@ -71,7 +71,7 @@ export async function changeCorrectiveActionStatus(
   status: correctiveActionType['status'],
 ) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     return { error: 'unauthorized' };
   }
   try {
@@ -80,7 +80,7 @@ export async function changeCorrectiveActionStatus(
     if (!deviation) {
       return { error: 'not found' };
     }
-    if (deviation.owner !== session.user.email) {
+    if (deviation.owner !== session.user?.email) {
       return { error: 'unauthorized' };
     }
 
@@ -130,7 +130,7 @@ export async function revalidateDeviation() {
 
 export async function sendReminderEmail(id: string) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     return { error: 'unauthorized' };
   }
   try {
@@ -139,7 +139,7 @@ export async function sendReminderEmail(id: string) {
     if (!deviation) {
       return { error: 'not found' };
     }
-    if (deviation.owner !== session.user.email) {
+    if (deviation.owner !== session.user?.email) {
       return { error: 'unauthorized' };
     }
 
@@ -167,7 +167,7 @@ export async function sendReminderEmail(id: string) {
       from: process.env.NODEMAILER_MAIL,
       to: deviation.owner, //TODO: change to the proper emails - managers who should take action - group leader, quality manager, engineering manager, maintenance manager, production manager (if they haven’t approved yet)
       subject: 'Prośba o działanie',
-      // html: `${extractFullNameFromEmail(session.user.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
+      // html: `${extractFullNameFromEmail(session.user?.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
     };
 
     // Send the email

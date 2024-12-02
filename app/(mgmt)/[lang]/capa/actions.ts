@@ -1,9 +1,9 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
+import { dbc } from '@/lib/mongo';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 type CapaType = {
   client: string;
@@ -39,7 +39,7 @@ type CapaType = {
 export async function addCapa(capa: CapaType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('capa')) {
+    if (!session || !(session.user?.roles ?? []).includes('capa')) {
       redirect('/auth');
     }
 
@@ -53,7 +53,7 @@ export async function addCapa(capa: CapaType) {
       return { error: 'exists' };
     }
 
-    const email = session.user.email;
+    const email = session.user?.email;
     if (!email) {
       redirect('/auth');
     }
@@ -74,7 +74,7 @@ export async function addCapa(capa: CapaType) {
 export async function saveCapa(capa: CapaType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('capa')) {
+    if (!session || !(session.user?.roles ?? []).includes('capa')) {
       redirect('/auth');
     }
 
@@ -93,7 +93,7 @@ export async function saveCapa(capa: CapaType) {
     const { _id, ...documentWithoutId } = exists;
     await historyCollection.insertOne(documentWithoutId);
 
-    const email = session.user.email;
+    const email = session.user?.email;
     if (!email) {
       redirect('/auth');
     }
@@ -133,7 +133,7 @@ export async function getCapa(articleNumber: string): Promise<CapaType | null> {
 export async function deleteCapa(articleNumber: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('capa')) {
+    if (!session || !(session.user?.roles ?? []).includes('capa')) {
       redirect('/auth');
     }
 

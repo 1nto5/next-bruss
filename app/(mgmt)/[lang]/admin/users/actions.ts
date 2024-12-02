@@ -1,18 +1,18 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
-import { revalidateTag } from 'next/cache';
-import { ObjectId } from 'mongodb';
+import { dbc } from '@/lib/mongo';
 import { UserType } from '@/lib/types/user';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 // export async function addUser(user: UserType) {
 //   try {
 //     const session = await auth();
-//     if (!session || !(session.user.roles ?? []).includes('admin')) {
+//     if (!session || !(session.user?.roles ?? []).includes('admin')) {
 //       redirect('/');
 //     }
 
@@ -26,7 +26,7 @@ import crypto from 'crypto';
 //       return { error: 'exists' };
 //     }
 
-//     const email = session.user.email;
+//     const email = session.user?.email;
 //     if (!email) {
 //       redirect('/auth');
 //     }
@@ -47,7 +47,7 @@ import crypto from 'crypto';
 export async function saveUser(user: UserType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -91,7 +91,7 @@ export async function getUser(userId: ObjectId): Promise<UserType | null> {
 export async function deleteUser(userId: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 

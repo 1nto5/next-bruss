@@ -76,8 +76,8 @@ async function getUserDeviations(
 
   let deviationsToApprove: DeviationType[] = [];
 
-  if (session.user.roles) {
-    session.user.roles.forEach((role) => {
+  if (session.user?.roles) {
+    session.user?.roles.forEach((role) => {
       const approvalField = approvalMapping[role];
       if (approvalField) {
         const roleDeviations = deviations
@@ -106,7 +106,7 @@ async function getUserDeviations(
   // Separate deviations into drafts owned by the user and other deviations
   const userDrafts = deviations.filter(
     (deviation: DeviationType) =>
-      deviation.status === 'draft' && deviation.owner === session.user.email,
+      deviation.status === 'draft' && deviation.owner === session.user?.email,
   );
 
   const otherDeviations = deviations.filter(
@@ -137,16 +137,12 @@ async function getUserDeviations(
   };
 }
 
-export default async function DeviationsPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function DeviationsPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
   let fetchTime, deviations;
   const session = await auth();

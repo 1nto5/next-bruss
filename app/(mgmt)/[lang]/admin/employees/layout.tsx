@@ -14,7 +14,7 @@ export default async function Layout({
   if (!session) {
     redirect('/auth');
   }
-  if (!session?.user.roles?.includes('admin')) {
+  if (!session?.user?.roles?.includes('admin')) {
     redirect('/');
   }
   return <>{children}</>;

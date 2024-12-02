@@ -24,12 +24,11 @@ import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { toast } from 'sonner';
 import { logout } from '../auth/actions';
-import { LoginDialog } from './login-dialog';
 import { LoginLogout } from './login-logout';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import UserAvatar from './user-avatar';
-
 type HeaderProps = {
   session: Session | null;
   dict: any;
@@ -308,24 +307,21 @@ export default function Header({ session, dict, lang }: HeaderProps) {
             </NavigationMenu>
           </nav>
           <div className='flex items-center space-x-2'>
-            <UserAvatar
-              userInitials={
-                session?.user?.email
-                  ? getInitialsFromEmail(session?.user?.email)
-                  : 'NU'
-              }
-            />
-
-            <LoginDialog />
+            {session?.user?.email && (
+              <UserAvatar
+                userInitials={getInitialsFromEmail(session.user.email)}
+              />
+            )}
 
             <LoginLogout
               isLoggedIn={!!session}
               onLogin={() => {
-                router.push('/auth');
+                router.push(`/auth`);
               }}
               onLogout={() => {
                 logout();
-                // toast.success('Wylogowano!');
+                toast.success('Wylogowano!');
+                router.refresh();
               }}
             />
 

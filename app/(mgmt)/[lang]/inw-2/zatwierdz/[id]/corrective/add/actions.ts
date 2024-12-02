@@ -13,7 +13,7 @@ export async function updateCorrectiveAction(
   correctiveAction: AddCorrectiveActionType,
 ) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
   try {
@@ -25,7 +25,7 @@ export async function updateCorrectiveAction(
     if (!deviationToUpdate) {
       return { error: 'not found' };
     }
-    if (session.user.email !== deviationToUpdate.owner) {
+    if (session.user?.email !== deviationToUpdate.owner) {
       return { error: 'not authorized' };
     }
 
@@ -34,7 +34,7 @@ export async function updateCorrectiveAction(
       executedAt: new Date(),
       changed: {
         at: new Date(),
-        by: session.user.email,
+        by: session.user?.email,
       },
     };
 
@@ -48,7 +48,7 @@ export async function updateCorrectiveAction(
               ...correctiveAction,
               created: {
                 at: new Date(),
-                by: session.user.email,
+                by: session.user?.email,
               },
               status,
             },

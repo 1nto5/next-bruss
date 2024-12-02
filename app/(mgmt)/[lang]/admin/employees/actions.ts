@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 export async function insertEmployee(employee: EmployeeType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -42,7 +42,7 @@ export async function insertEmployee(employee: EmployeeType) {
 export async function insertManyEmployee(pastedEmployees: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -95,7 +95,7 @@ export async function insertManyEmployee(pastedEmployees: string) {
 export async function insertManyEmployeesInventory(pastedEmployees: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -152,7 +152,7 @@ export async function insertManyEmployeesInventory(pastedEmployees: string) {
 export async function updateEmployee(employee: EmployeeType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -214,7 +214,7 @@ export async function getEmployee(
 export async function deleteEmployee(userId: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 

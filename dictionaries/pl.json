@@ -39,32 +39,21 @@
   "noAccessTitle": "Brak uprawnień!",
   "noAccessMailSubject": "Nadanie uprawnień do: (wpisz nazwę funkcji)",
   "auth": {
-    "loginTab": "Logowanie",
-    "registerTab": "Rejestracja",
-    "resetPassword": "Ustal nowe hasło",
+    "cardTitle": "Logowanie",
+    "cardDescription": "Wprowadź służbowy email i hasło, którego używasz by zalogować się do komputera.",
     "emailInputLabel": "Email",
     "passwordInputLabel": "Hasło",
-    "confirmPasswordInputLabel": "Potwierdź hasło",
     "loginButton": "Zaloguj",
     "loggingButton": "Logowanie",
-    "resetPasswordButton": "Reset hasła",
-    "emailSendingButton": "Wysyłanie email",
-    "registerButton": "Zarejestruj",
-    "registeringButton": "Rejestracja",
-    "saveNewPasswordButton": "Zapisz hasło",
     "savingButton": "Zapisywanie",
     "zod": {
       "emailTooShort": "Email jest za krótki!",
       "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",
-      "passwordEmpty": "Hasło nie może być puste!",
-      "passwordTooShort": "Hasło musi zawierać co najmniej 6 znaków!",
-      "passwordNoSpecialCharachter": "Hasło musi zawierać przynajmniej jeden znak specjalny",
-      "passwordNoConfirm": "Potwierdzenie hasła jest wymagane!",
-      "passwordsNotMatch": "Hasła nie są takie same!"
+      "passwordTooShort": "Hasło musi zawierać co najmniej 5 znaków!",
+      "credentialsError": "Nieprawidłowe dane logowania!"
     },
     "toasts": {
       "pleaseContactIt": "Skontaktuj się z IT!",
-      "credentialsError": "Nieprawidłowe dane logowania!",
       "loginSuccess": "Zalogowano!"
     }
   },

@@ -7,7 +7,14 @@ import * as z from 'zod';
 import { login } from '../actions';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -19,9 +26,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function LoginForm({ cDict }: { cDict: any }) {
+  const router = useRouter();
+
   const [isPending, setIsPending] = useState(false);
 
   const formSchema = z.object({
@@ -31,7 +41,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       .regex(/@bruss-group\.com$/, {
         message: cDict.zod.emailNotFromBruss,
       }),
-    password: z.string().min(1, { message: cDict.zod.passwordEmpty }),
+    password: z.string().min(5, { message: cDict.zod.passwordTooShort }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,25 +57,28 @@ export default function LoginForm({ cDict }: { cDict: any }) {
     try {
       setIsPending(true);
       const res = await login(values.email, values.password);
-      console.log('res: ', res);
       if (!res || res.error === 'default error') {
         toast.error(cDict.toasts.pleaseContactIt);
         return;
       }
       if (res.error === 'invalid credentials') {
-        toast.error(cDict.toasts.credentialsError);
+        form.setError('email', {
+          type: 'manual',
+          message: cDict.zod.credentialsError,
+        });
+        form.setError('password', {
+          type: 'manual',
+          message: cDict.zod.credentialsError,
+        });
         return;
       }
-      toast.success(cDict.toasts.loginSuccess);
-      // if (!res) {
-      //   toast.error('Nieprawidłowe dane logowania!');
-      //   return;
-      // }
-      // console.log('res: ', res);
+      if (res.success) {
+        toast.success(cDict.toasts.loginSuccess);
+        // router.back();
+        router.push('/');
+      }
     } catch (error) {
-      // console.error(error);
-      // toast.error('Skontaktuj się z IT!');
-      toast.error(cDict.toasts.loginError);
+      toast.error(cDict.toasts.pleaseContactIt);
       return;
     } finally {
       setIsPending(false);
@@ -74,14 +87,14 @@ export default function LoginForm({ cDict }: { cDict: any }) {
 
   return (
     <Card className='w-[400px]'>
-      {/* <CardHeader>
-        <CardTitle>Wprowadź dane logowania</CardTitle>
-        <CardDescription>Wprowadź dane aby się zalogować:</CardDescription>
-      </CardHeader> */}
+      <CardHeader>
+        <CardTitle>{cDict.cardTitle}</CardTitle>
+        <CardDescription>{cDict.cardDescription}</CardDescription>
+      </CardHeader>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className='mt-4 grid w-full items-center gap-4'>
+          <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
               name='email'
@@ -115,7 +128,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
               )}
             />
           </CardContent>
-          <CardFooter className='flex justify-between'>
+          <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />

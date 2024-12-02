@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
 import { getSession } from '@/app/(mgmt)/[lang]/auth/actions';
-import { Session } from 'next-auth';
+import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import clsx from 'clsx';
-import { InventoryContext } from '../lib/InventoryContext';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
+import { useContext, useEffect, useState } from 'react';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import useSWR from 'swr';
 import {
-  getPosition,
-  getArticlesOptions,
-  savePosition,
   approvePosition,
+  getArticlesOptions,
+  getPosition,
+  savePosition,
 } from '../actions';
+import { InventoryContext } from '../lib/InventoryContext';
 import Select from './Select';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { useSession } from 'next-auth/react';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 
 type Article = {
   value: string;
@@ -35,7 +35,7 @@ export default function Edit() {
     const fetchSession = async () => {
       try {
         const sessionData = await getSession();
-        // console.log('session: ', sessionData?.user);
+        // console.log('session: ', sessionData?.user?);
         setSession(sessionData);
       } catch (error) {
         console.log('Session fetching error: ', error);
@@ -213,7 +213,7 @@ export default function Edit() {
           finalQuantity = quantity;
         }
 
-        if (selectedArticle && session?.user.email) {
+        if (selectedArticle && session?.user?.email) {
           setIsPendingSaving(true);
           const res = await savePosition(
             inventoryContext.inventory.card,
@@ -223,7 +223,7 @@ export default function Edit() {
             finalQuantity,
             selectedArticle.unit,
             wip,
-            session?.user.email,
+            session?.user?.email,
           );
           if (res?.status === 'added') {
             res?.identifier && setIdentifier(res?.identifier);
@@ -260,12 +260,12 @@ export default function Edit() {
         if (
           inventoryContext?.inventory?.card &&
           inventoryContext?.inventory.position &&
-          session?.user.email
+          session?.user?.email
         ) {
           const res = await approvePosition(
             inventoryContext?.inventory.card,
             inventoryContext?.inventory.position,
-            session?.user.email,
+            session?.user?.email,
           );
           if (res.status === 'approved') {
             setApproved(true);

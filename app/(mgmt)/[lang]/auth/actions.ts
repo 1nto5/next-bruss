@@ -20,10 +20,11 @@ export async function login(email: string, password: string) {
         case 'CredentialsSignin':
           return { error: 'invalid credentials' };
         default:
+          console.error(error);
           return { error: 'default error' };
       }
     }
-    throw error;
+    return { success: true };
   }
 }
 

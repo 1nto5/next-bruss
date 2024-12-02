@@ -55,7 +55,7 @@ export default function Deviation({
 
   const [isPendingApproval, startApprovalTransition] = useTransition();
 
-  const deviationUserRole = session?.user.roles?.find((role) => {
+  const deviationUserRole = session?.user?.roles?.find((role) => {
     return [
       'group-leader',
       'quality-manager',
@@ -299,8 +299,8 @@ export default function Deviation({
                               correctiveActionIndex={index}
                               deviationId={deviation?._id?.toString() || ''}
                               lang={lang}
-                              user={session?.user.email}
-                              userRoles={session?.user.roles}
+                              user={session?.user?.email}
+                              userRoles={session?.user?.roles}
                               deviationOwner={deviation?.owner}
                             />
                           </TableRow>

@@ -43,8 +43,9 @@ export default async function RootLayout(props: {
               <main className='flex-1'>{children}</main>
               <Footer />
             </div>
+
+            <Toaster className='mt-6' position='top-center' richColors />
           </Container>
-          <Toaster position='top-center' />
         </ThemeProvider>
       </body>
     </html>

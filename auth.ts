@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           await ldapClient.bind(process.env.LDAP_DN, process.env.LDAP_PASS);
         } catch (error) {
-          return null;
+          throw new Error('authorize ldap admin error');
         }
 
         try {
@@ -40,30 +40,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             try {
               await ldapClient.bind(userDn, password);
             } catch (error) {
+              await ldapClient.unbind();
               return null;
             }
-            const usersCollection = await dbc('users');
-            const user = await usersCollection.findOne({ email });
-            if (!user) {
-              await usersCollection.insertOne({
-                email,
-                roles: ['user'],
-                firstLogin: new Date(),
-              });
-              return {
-                email,
-                roles: ['user'],
-              } as User;
-            } else {
-              // console.log(user);
-              return {
-                email,
-                roles: user.roles,
-              } as User;
+
+            try {
+              const usersCollection = await dbc('users');
+              let user;
+
+              try {
+                user = await usersCollection.findOne({ email });
+              } catch (error) {
+                await ldapClient.unbind();
+                throw new Error('authorize database error: findOne failed');
+              }
+
+              if (!user) {
+                try {
+                  await usersCollection.insertOne({
+                    email,
+                    roles: ['user'],
+                    firstLogin: new Date(),
+                  });
+                } catch (error) {
+                  await ldapClient.unbind();
+                  throw new Error('authorize database error: insertOne failed');
+                }
+                return {
+                  email,
+                  roles: ['user'],
+                } as User;
+              } else {
+                return {
+                  email,
+                  roles: user.roles,
+                } as User;
+              }
+            } catch (error) {
+              await ldapClient.unbind();
+              throw new Error('authorize database error');
             }
           }
         } catch (error) {
-          return null;
+          await ldapClient.unbind();
+          throw new Error('authorize ldap error');
         }
       },
     }),

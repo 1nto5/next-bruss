@@ -39,38 +39,23 @@
   "noAccessTitle": "Keine Berechtigung!",
   "noAccessMailSubject": "Berechtigung erteilen für: (Name der Funktion eintragen)",
   "auth": {
-    "loginTab": "Anmeldung",
-    "registerTab": "Registrierung",
-    "resetPassword": "Ein neues Passwort festlegen",
+    "cardTitle": "Anmeldung",
+    "cardDescription": "Geben Sie die geschäftliche E-Mail-Adresse und das Passwort ein, mit denen Sie sich am Computer anmelden.",
     "emailInputLabel": "E-Mail",
     "passwordInputLabel": "Passwort",
-    "confirmPasswordInputLabel": "Passwort bestätigen",
     "loginButton": "Anmelden",
     "loggingButton": "Anmeldung",
-    "resetPasswordButton": "Passwort zurücksetzen",
-    "emailSendingButton": "E-Mail senden",
-    "registerButton": "Registrieren",
-    "registeringButton": "Registrierung",
     "saveNewPasswordButton": "Passwort speichern",
     "savingButton": "Aufnahme",
     "zod": {
       "emailTooShort": "Die E-Mail ist zu kurz!",
       "emailNotFromBruss": "Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!",
-      "passwordEmpty": "Das Passwort darf nicht leer sein!",
-      "passwordTooShort": "Das Passwort muss mindestens 6 Zeichen lang sein!",
-      "passwordNoSpecialCharachter": "Das Passwort muss mindestens ein Sonderzeichen enthalten",
-      "passwordNoConfirm": "Passwortbestätigung ist erforderlich!",
-      "passwordsNotMatch": "Die Passwörter stimmen nicht überein!"
+      "passwordTooShort": "Das Passwort muss mindestens 5 Zeichen lang sein!",
+      "credentialsError": "Ungültige Anmeldedaten!"
     },
     "toasts": {
       "pleaseContactIt": "Bitte kontaktieren Sie die IT!",
-      "loginError": "Ungültige Anmeldedaten!",
-      "resetPasswordEmailSent": "Link zum Zurücksetzen des Passworts gesendet!",
-      "noUserWithThisEmail": "Kein Benutzer mit dieser E-Mail gefunden!",
-      "resetPasswordNoEmail": "Geben Sie eine E-Mail ein, um das Passwort zurückzusetzen!",
-      "registered": "Konto erstellt!",
-      "exists": "Konto existiert bereits!",
-      "passwordUpdated": "Passwort aktualisiert!"
+      "loginSuccess": "Rebloggt!"
     }
   },
   "home": {

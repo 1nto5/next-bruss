@@ -1,19 +1,18 @@
 'use server';
 
-import { dbc } from '@/lib/mongo';
 import { auth } from '@/auth';
+import { dbc } from '@/lib/mongo';
 import { redirect } from 'next/navigation';
 
 export async function markAsRework(positions: string, reason: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session.user?.roles ?? []).includes('admin')) {
       redirect('/');
-      return;
     }
     const collection = await dbc('scans');
     const positionsArray = positions.split('\n').map((line) => line.trim());
-    const userEmail = session.user.email;
+    const userEmail = session.user?.email;
 
     const query = {
       $or: [

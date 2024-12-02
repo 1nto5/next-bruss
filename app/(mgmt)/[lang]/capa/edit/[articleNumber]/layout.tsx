@@ -9,21 +9,15 @@ export const metadata = {
   title: 'Edit CAPA (Next BRUSS)',
 };
 
-export default async function Layout(
-  props: {
-    children: React.ReactNode;
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function Layout(props: {
+  children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   const dict = await getDictionary(lang);
   const noAccess = (
@@ -42,7 +36,7 @@ export default async function Layout(
   if (!session) {
     redirect('/auth');
   }
-  if (!session?.user.roles?.includes('capa')) {
+  if (!session?.user?.roles?.includes('capa')) {
     return (
       <FormContainer>
         <Info title={dict.noAccessTitle} description={noAccess} />

@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 
 export async function findDeviation(id: string): Promise<DeviationType | null> {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
   try {
@@ -19,7 +19,7 @@ export async function findDeviation(id: string): Promise<DeviationType | null> {
       _id: new ObjectId(id),
     });
     console.log('res', res);
-    if (res && res.status === 'draft' && res.owner === session.user.email) {
+    if (res && res.status === 'draft' && res.owner === session.user?.email) {
       const { _id, ...deviation } = res;
       return { id: _id.toString(), ...deviation } as DeviationType;
     }
@@ -33,14 +33,14 @@ export async function findDeviation(id: string): Promise<DeviationType | null> {
 
 async function deleteDraftDeviation(id: string) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
   try {
     const collection = await dbc('deviations');
     const res = await collection.deleteOne({
       _id: new ObjectId(id),
-      owner: session.user.email,
+      owner: session.user?.email,
       status: 'draft',
     });
     if (res) {
@@ -60,7 +60,7 @@ export async function insertDeviationFromDraft(
   deviation: AddDeviationType,
 ) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
   try {
@@ -93,7 +93,7 @@ export async function insertDeviationFromDraft(
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: session.user.email,
+      owner: session.user?.email,
       correctiveActions: [],
     };
 
@@ -119,7 +119,7 @@ export async function updateDraftDeviation(
   deviation: AddDeviationDraftType,
 ) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth');
   }
 
@@ -156,11 +156,11 @@ export async function updateDraftDeviation(
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
-      owner: session.user.email,
+      owner: session.user?.email,
       correctiveActions: [],
     };
     const res = await collection.updateOne(
-      { _id: new ObjectId(id), status: 'draft', owner: session.user.email },
+      { _id: new ObjectId(id), status: 'draft', owner: session.user?.email },
       { $set: deviationDraftToUpdate },
     );
     if (res.modifiedCount > 0) {

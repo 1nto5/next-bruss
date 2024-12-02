@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 export async function insertArticleConfig(articleConfig: ArticleConfigType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -39,7 +39,7 @@ export async function insertArticleConfig(articleConfig: ArticleConfigType) {
 export async function updateArticleConfig(articleConfig: ArticleConfigType) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -89,7 +89,7 @@ export async function getArticleConfig(
 export async function deleteArticle(userId: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
@@ -115,7 +115,7 @@ export async function deleteArticle(userId: string) {
 export async function copyArticle(articleId: string, workplaces: string) {
   try {
     const session = await auth();
-    if (!session || !(session.user.roles ?? []).includes('admin')) {
+    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 

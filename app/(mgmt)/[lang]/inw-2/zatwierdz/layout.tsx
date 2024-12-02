@@ -1,7 +1,7 @@
 // import { redirect } from 'next/navigation';
 // import { auth } from '@/auth';
 
-import Container from '@/components/ui/container';
+// import Container from '@/components/ui/container';
 
 export const metadata = {
   title: 'Odchylenia (Next BRUSS)',

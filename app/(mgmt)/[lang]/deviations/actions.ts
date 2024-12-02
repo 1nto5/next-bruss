@@ -8,7 +8,7 @@ import { revalidateTag } from 'next/cache';
 
 export async function deleteDraftDeviation(_id: ObjectId) {
   const session = await auth();
-  if (!session || !session.user.email) {
+  if (!session || !session.user?.email) {
     return { error: 'unauthorized' };
   }
   try {
@@ -24,7 +24,7 @@ export async function deleteDraftDeviation(_id: ObjectId) {
       return { error: 'not draft' };
     }
 
-    if (deviation.owner !== session.user.email) {
+    if (deviation.owner !== session.user?.email) {
       return { error: 'unauthorized' };
     }
 
