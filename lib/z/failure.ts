@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-export const addLv2FailureSchema = z.object({
+export const Lv2FailureSchema = z.object({
   station: z.string(),
   failure: z.string(),
   from: z.date(),
@@ -10,4 +10,9 @@ export const addLv2FailureSchema = z.object({
   solution: z.string().min(1),
 });
 
-export type AddFailureType = z.infer<typeof addLv2FailureSchema>;
+export type FailureType = z.infer<typeof Lv2FailureSchema>;
+
+export type FailureTableDataType = Omit<FailureType, 'from' | 'to'> & {
+  from: string;
+  to: string;
+};

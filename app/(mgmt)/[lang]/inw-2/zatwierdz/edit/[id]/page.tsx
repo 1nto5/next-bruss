@@ -7,7 +7,7 @@ import EditDraftDeviation from './components/edit-draft-deviation';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/reasons`, {
-    next: { revalidate: 0, tags: ['deviationReasons'] }, // TODO: add revalidate time
+    next: { revalidate: 60, tags: ['deviationReasons'] },
   });
   if (!res.ok) {
     const json = await res.json();
@@ -20,17 +20,12 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   return data;
 }
 
-export default async function EditDeviationPage(
-  props: {
-    params: Promise<{ lang: Locale; id: string }>;
-  }
-) {
+export default async function EditDeviationPage(props: {
+  params: Promise<{ lang: Locale; id: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang,
-    id
-  } = params;
+  const { lang, id } = params;
 
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();

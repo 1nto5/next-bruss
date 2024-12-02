@@ -1,9 +1,16 @@
 'use client';
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -13,14 +20,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 
 import {
   Select,
@@ -32,13 +31,13 @@ import {
 
 import { Checkbox } from '@/components/ui/checkbox';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Table } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { insertArticleConfig } from '../../actions';
-import Link from 'next/link';
 // import { useQuery } from '@tanstack/react-query';
 
 export default function AddArticleConfig({ lang }: { lang: string }) {
@@ -410,7 +409,6 @@ export default function AddArticleConfig({ lang }: { lang: string }) {
             <Button
               variant='destructive'
               type='button'
-              // TODO: form.reset() is not working for hydra process
               onClick={() => form.reset()}
             >
               Reset

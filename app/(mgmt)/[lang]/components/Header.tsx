@@ -99,6 +99,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           title: `${dict?.header?.inventory?.inventoryApprove.title}`,
           description: `${dict?.header?.inventory?.inventoryApprove.description}`,
         },
+        {
+          href: '/failures/lv2',
+          title: `Awarie LV2`,
+          description: `Raport awarii LV2.`,
+        },
       ],
     },
     ...(session?.user?.roles?.includes('admin')

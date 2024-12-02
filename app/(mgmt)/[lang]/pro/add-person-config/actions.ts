@@ -19,7 +19,7 @@ export async function savePersonConfig({
     const collection = await dbc('persons');
     let exists;
     exists = await collection.findOne({
-      personalNumber: loginCode, // TODO change to loginCode in db
+      personalNumber: loginCode,
     });
     if (exists) {
       return { error: 'exists' };

@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { AddFailureType } from '@/lib/z/failures';
+import { FailureType } from '@/lib/z/failure';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 // import { redirect } from 'next/navigation';
@@ -31,7 +31,7 @@ export async function deleteDraftDeviation(_id: ObjectId) {
 
     const res = await collection.deleteOne({ _id: new ObjectId(_id) });
     if (res) {
-      revalidateDeviations();
+      revalidateFailures();
       return { success: 'deleted' };
     }
   } catch (error) {
@@ -40,11 +40,11 @@ export async function deleteDraftDeviation(_id: ObjectId) {
   }
 }
 
-export async function revalidateDeviations() {
-  revalidateTag('deviations');
+export async function revalidateFailures() {
+  revalidateTag('failures-lv2');
 }
 
-export async function insertFailure(failure: AddFailureType) {
+export async function insertFailure(failure: FailureType) {
   // const session = await auth();
   // if (!session || !session.user?.email) {
   //   redirect('/auth');

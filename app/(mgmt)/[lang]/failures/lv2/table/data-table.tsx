@@ -1,6 +1,5 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -46,7 +45,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { warehouseSelectOptions } from '@/lib/options/warehouse';
+import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -57,7 +56,7 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
-import { revalidateDeviations } from '../actions';
+import { revalidateFailures } from '../actions';
 import AddFailureDialog from '../components/add-failure-dialog';
 
 interface DataTableProps<TData, TValue> {
@@ -73,19 +72,22 @@ export function DataTable<TData, TValue>({
   fetchTime,
   lang,
 }: DataTableProps<TData, TValue>) {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      revalidateDeviations();
-    }, 1000 * 30); // 30 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(
+  //     () => {
+  //       revalidateFailures();
+  //     },
+  //     1000 * 60 * 10, // 10 minutes
+  //   );
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [openWarehouse, setOpenWarehouse] = React.useState(false);
-  // const [warehouseValue, setWarehouseValue] = React.useState('');
+  const [openStation, setOpenStation] = React.useState(false);
+  const [openFailure, setOpenFailure] = React.useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -101,6 +103,11 @@ export function DataTable<TData, TValue>({
     },
     [searchParams],
   );
+
+  const filteredFailures =
+    failuresOptions.find(
+      (option) => option.station === searchParams.get('station'),
+    )?.options || [];
 
   const table = useReactTable({
     data,
@@ -127,153 +134,199 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Awarie LV2</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between'>
-          <div className='flex flex-col space-y-1 sm:flex-row sm:space-x-1 sm:space-y-0'>
-            {/* <Input
-                  placeholder='id'
-                  value={
-                    (table.getColumn('_id')?.getFilterValue() as string) ?? ''
-                  }
-                  onChange={(event) =>
-                    table.getColumn('_id')?.setFilterValue(event.target.value)
-                  }
-                  className='w-24'
-                /> */}
-            <Input
-              placeholder='nr karty'
-              className='w-24'
-              value={searchParams.get('number') ?? ''}
-              onChange={(e) => {
-                router.push(
-                  pathname + '?' + createQueryString('number', e.target.value),
-                );
-              }}
-            />
-            <Input
-              placeholder='spisujący'
-              className='w-24'
-              value={searchParams.get('creator') ?? ''}
-              onChange={(e) => {
-                router.push(
-                  pathname + '?' + createQueryString('creator', e.target.value),
-                );
-              }}
-            />
-            <Input
-              placeholder='spisujący'
-              className='w-24'
-              value={searchParams.get('creator') ?? ''}
-              onChange={(e) => {
-                router.push(
-                  pathname + '?' + createQueryString('creator', e.target.value),
-                );
-              }}
-            />
-            {/* <Input
-                  placeholder='magazyn'
-                  className='w-24'
-                  value={searchParams.get('warehouse') ?? ''}
-                  onChange={(e) => {
-                    router.push(
-                      pathname +
-                        '?' +
-                        createQueryString('warehouse', e.target.value),
-                    );
-                  }}
-                /> */}
-            <Popover open={openWarehouse} onOpenChange={setOpenWarehouse}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant='outline'
-                  role='combobox'
-                  // aria-expanded={open}
-                  className={cn(
-                    'justify-between',
-                    !searchParams.get('warehouse') && 'opacity-50',
-                  )}
-                >
-                  {searchParams.get('warehouse')
-                    ? warehouseSelectOptions.find(
-                        (warehouse) =>
-                          warehouse.value === searchParams.get('warehouse'),
-                      )?.value
-                    : 'magazyn'}
-                  <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className='w-[300px] p-0'>
-                <Command>
-                  <CommandInput placeholder='wyszukaj...' />
-                  <CommandList>
-                    <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                    <CommandGroup>
+
+        <div className='flex flex-wrap gap-1'>
+          <Popover open={openStation} onOpenChange={setOpenStation}>
+            <PopoverTrigger asChild>
+              <Button
+                variant='outline'
+                role='combobox'
+                // aria-expanded={open}
+                className={cn(
+                  'justify-between',
+                  !searchParams.get('station') && 'opacity-50',
+                )}
+              >
+                {searchParams.get('station')
+                  ? stationsOptions.find(
+                      (station) => station === searchParams.get('station'),
+                    )
+                  : 'stacja'}
+                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className='w-[300px] p-0'>
+              <Command>
+                <CommandInput placeholder='wyszukaj...' />
+                <CommandList>
+                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      key='reset'
+                      onSelect={() => {
+                        // setWarehouseValue('');
+                        router.push(pathname);
+                        setOpenStation(false);
+                      }}
+                    >
+                      <Check className='mr-2 h-4 w-4 opacity-0' />
+                      nie wybrano
+                    </CommandItem>
+                    {stationsOptions.map((station) => (
                       <CommandItem
-                        key='reset'
-                        onSelect={() => {
-                          // setWarehouseValue('');
-                          router.push(pathname);
-                          setOpenWarehouse(false);
+                        key={station}
+                        value={station}
+                        onSelect={(currentValue) => {
+                          // setWarehouseValue(
+                          //   currentValue === warehouseValue
+                          //     ? ''
+                          //     : currentValue,
+                          // );
+                          router.push(
+                            pathname +
+                              '?' +
+                              createQueryString(
+                                'station',
+                                currentValue === searchParams.get('station')
+                                  ? ''
+                                  : currentValue,
+                              ),
+                          );
+                          setOpenStation(false);
                         }}
                       >
-                        <Check className='mr-2 h-4 w-4 opacity-0' />
-                        nie wybrano
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            searchParams.get('station') === station
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                          )}
+                        />
+                        {station}
                       </CommandItem>
-                      {warehouseSelectOptions.map((warehouse) => (
-                        <CommandItem
-                          key={warehouse.value}
-                          value={warehouse.value}
-                          onSelect={(currentValue) => {
-                            // setWarehouseValue(
-                            //   currentValue === warehouseValue
-                            //     ? ''
-                            //     : currentValue,
-                            // );
-                            router.push(
-                              pathname +
-                                '?' +
-                                createQueryString(
-                                  'warehouse',
-                                  currentValue === searchParams.get('warehouse')
-                                    ? ''
-                                    : currentValue,
-                                ),
-                            );
-                            setOpenWarehouse(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              'mr-2 h-4 w-4',
-                              searchParams.get('warehouse') === warehouse.value
-                                ? 'opacity-100'
-                                : 'opacity-0',
-                            )}
-                          />
-                          {warehouse.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className='flex items-center space-x-1'>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <Popover open={openFailure} onOpenChange={setOpenFailure}>
+            <PopoverTrigger asChild>
+              <Button
+                variant='outline'
+                role='combobox'
+                disabled={!searchParams.get('station')}
+                // aria-expanded={open}
+                className={cn(
+                  'justify-between',
+                  !searchParams.get('failure') && 'opacity-50',
+                )}
+              >
+                {searchParams.get('failure')
+                  ? filteredFailures.find(
+                      (failure) => failure === searchParams.get('failure'),
+                    )
+                  : 'awaria'}
+                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className='w-[300px] p-0'>
+              <Command>
+                <CommandInput placeholder='wyszukaj...' />
+                <CommandList>
+                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      key='reset'
+                      onSelect={() => {
+                        // setWarehouseValue('');
+                        router.push(pathname);
+                        setOpenFailure(false);
+                      }}
+                    >
+                      <Check className='mr-2 h-4 w-4 opacity-0' />
+                      nie wybrano
+                    </CommandItem>
+                    {filteredFailures.map((failure) => (
+                      <CommandItem
+                        key={failure}
+                        value={failure}
+                        onSelect={(currentValue) => {
+                          // setWarehouseValue(
+                          //   currentValue === warehouseValue
+                          //     ? ''
+                          //     : currentValue,
+                          // );
+                          router.push(
+                            pathname +
+                              '?' +
+                              createQueryString(
+                                'failure',
+                                currentValue === searchParams.get('failure')
+                                  ? ''
+                                  : currentValue,
+                              ),
+                          );
+                          setOpenFailure(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            searchParams.get('failure') === failure
+                              ? 'opacity-100'
+                              : 'opacity-0',
+                          )}
+                        />
+                        {failure}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <Input
+            placeholder='nadzorujący'
+            className='w-auto'
+            value={searchParams.get('supervisor') ?? ''}
+            onChange={(e) => {
+              router.push(
+                pathname +
+                  '?' +
+                  createQueryString('supervisor', e.target.value),
+              );
+            }}
+          />
+          <Input
+            placeholder='odpowiedzialny'
+            className='w-36'
+            value={searchParams.get('responsible') ?? ''}
+            onChange={(e) => {
+              router.push(
+                pathname +
+                  '?' +
+                  createQueryString('responsible', e.target.value),
+              );
+            }}
+          />
+          <Button
+            variant='outline'
+            onClick={() => {
+              router.push(pathname);
+            }}
+            size='icon'
+            title='wyczyść filtry'
+          >
+            <CircleX />
+          </Button>
+          <div className='ml-auto flex gap-1'>
             <Button
               variant='outline'
-              onClick={() => {
-                // setWarehouseValue('');
-                router.push(pathname);
-              }}
+              onClick={() => revalidateFailures()}
               size='icon'
-            >
-              <CircleX />
-            </Button>
-            <Button
-              variant='outline'
-              onClick={() => revalidateDeviations()}
-              size='icon'
+              title='odśwież'
             >
               <RefreshCcw />
             </Button>
@@ -325,7 +378,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    No results.
+                    Brak wyników.
                   </TableCell>
                 </TableRow>
               )}

@@ -1,44 +1,58 @@
 import { Locale } from '@/i18n.config';
-import { CardType } from '@/lib/types/inventory';
+import { FailureTableDataType, FailureType } from '@/lib/z/failure';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
-async function getCards(
+async function getFailures(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
   fetchTime: string;
-  cards: CardType[];
+  formattedFailures: FailureTableDataType[];
 }> {
-  const res = await fetch(`${process.env.API}/inventory/cards`, {
+  const res = await fetch(`${process.env.API}/failures-lv2`, {
     next: { revalidate: 600, tags: ['failures-lv2'] },
   });
 
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
-      `getCards error:  ${res.status}  ${res.statusText} ${json.error}`,
+      `getFailures error: ${res.status} ${res.statusText} ${json.error}`,
     );
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  let cards: CardType[] = await res.json();
+  let failures: FailureType[] = await res.json();
 
-  const { number, creator, warehouse } = searchParams;
-  console.log('searchParams:', searchParams);
-  if (number) {
-    cards = cards.filter((card) => card.number === Number(number));
+  const { station, failure, supervisor, responsible } = searchParams;
+  if (station) {
+    failures = failures.filter((failure) => failure.station === station);
   }
-  if (creator) {
-    cards = cards.filter((card) => card.creators.includes(creator));
+  if (failure) {
+    failures = failures.filter((failure_) => failure_.failure === failure);
   }
-  if (warehouse) {
-    cards = cards.filter((card) => card.warehouse === warehouse);
+  if (supervisor) {
+    failures = failures.filter((failure) =>
+      failure.supervisor.toLowerCase().includes(supervisor.toLowerCase()),
+    );
+  }
+  if (responsible) {
+    failures = failures.filter((failure) =>
+      failure.responsible.toLowerCase().includes(responsible.toLowerCase()),
+    );
   }
 
-  return { fetchTime, cards };
+  const formatTime = (failure: FailureType) => ({
+    ...failure,
+    from: new Date(failure.from).toLocaleString(lang),
+    to: new Date(failure.to).toLocaleString(lang),
+  });
+
+  const formattedFailures: FailureTableDataType[] = failures.map(formatTime);
+
+  return { fetchTime, formattedFailures };
 }
 
 export default async function DeviationsPage(props: {
@@ -50,14 +64,14 @@ export default async function DeviationsPage(props: {
 
   const { lang } = params;
 
-  let fetchTime, cards;
+  let fetchTime, formattedFailures;
   // const { number = '' } = searchParams;
-  ({ fetchTime, cards } = await getCards(lang, searchParams));
+  ({ fetchTime, formattedFailures } = await getFailures(lang, searchParams));
 
   return (
     <DataTable
       columns={columns}
-      data={cards}
+      data={formattedFailures}
       fetchTime={fetchTime}
       lang={lang}
     />
