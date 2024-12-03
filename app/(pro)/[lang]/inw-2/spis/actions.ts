@@ -2,7 +2,7 @@
 
 // import clientPromise from '@/lib/mongo';
 import { dbc } from '@/lib/mongo';
-import { getLastNameFirstLetter } from '@/lib/utils/nameFormat';
+import { getLastNameFirstLetter } from '@/lib/utils/name-format';
 
 import { loginInventoryType } from './lib/zod';
 

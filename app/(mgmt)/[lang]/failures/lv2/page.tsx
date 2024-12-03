@@ -1,5 +1,6 @@
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
-import { FailureTableDataType, FailureType } from '@/lib/z/failure';
+import { FailureType } from '@/lib/z/failure';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -8,11 +9,22 @@ async function getFailures(
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
   fetchTime: string;
-  formattedFailures: FailureTableDataType[];
+  formattedFailures: FailureType[];
 }> {
-  const res = await fetch(`${process.env.API}/failures-lv2`, {
-    next: { revalidate: 600, tags: ['failures-lv2'] },
-  });
+  let fromQuery = searchParams.from ? `?from=${searchParams.from}` : '';
+  let toQuery = searchParams.to ? `&to=${searchParams.to}` : '';
+  if (fromQuery === '?from=') {
+    fromQuery = '';
+  }
+  if (toQuery === '&to=') {
+    toQuery = '';
+  }
+  const res = await fetch(
+    `${process.env.API}/failures-lv2${fromQuery}${toQuery}`,
+    {
+      next: { revalidate: 300, tags: ['failures-lv2'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
@@ -48,17 +60,19 @@ async function getFailures(
     ...failure,
     from: new Date(failure.from).toLocaleString(lang),
     to: new Date(failure.to).toLocaleString(lang),
+    createdAt: new Date(failure.createdAt).toLocaleString(lang),
   });
 
-  const formattedFailures: FailureTableDataType[] = failures.map(formatTime);
+  const formattedFailures: FailureType[] = failures.map(formatTime);
 
   return { fetchTime, formattedFailures };
 }
 
-export default async function DeviationsPage(props: {
+export default async function FailuresPage(props: {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
+  const session = await auth();
   const params = await props.params;
   const searchParams = await props.searchParams;
 
@@ -73,7 +87,8 @@ export default async function DeviationsPage(props: {
       columns={columns}
       data={formattedFailures}
       fetchTime={fetchTime}
-      lang={lang}
+      // lang={lang}
+      // session={session}
     />
   );
 }

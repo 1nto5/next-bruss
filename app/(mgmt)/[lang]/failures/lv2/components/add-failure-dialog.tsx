@@ -42,7 +42,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { Lv2FailureSchema } from '@/lib/z/failure';
+import { AddFailureSchema } from '@/lib/z/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format, set } from 'date-fns';
 import {
@@ -85,8 +85,8 @@ export default function AddFailureDialog({}: {}) {
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
 
-  const form = useForm<z.infer<typeof Lv2FailureSchema>>({
-    resolver: zodResolver(Lv2FailureSchema),
+  const form = useForm<z.infer<typeof AddFailureSchema>>({
+    resolver: zodResolver(AddFailureSchema),
     defaultValues: {
       supervisor: '',
       responsible: '',
@@ -99,7 +99,7 @@ export default function AddFailureDialog({}: {}) {
   const selectedStation = form.watch('station');
   const selectedFailure = form.watch('failure');
 
-  const onSubmit = async (data: z.infer<typeof Lv2FailureSchema>) => {
+  const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
     // setIsDraft(false);
     setIsPendingInserting(true);
     try {

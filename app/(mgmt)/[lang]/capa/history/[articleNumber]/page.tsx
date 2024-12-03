@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import Container from '@/components/ui/container';
-import { extractNameFromEmail } from '@/lib//utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Capa, columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -48,17 +48,12 @@ async function getCapaHistory(
   return { fetchTime, allCapa };
 }
 
-export default async function CapaPage(
-  props: {
-    params: Promise<{ lang: Locale; articleNumber: string }>;
-  }
-) {
+export default async function CapaPage(props: {
+  params: Promise<{ lang: Locale; articleNumber: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang,
-    articleNumber
-  } = params;
+  const { lang, articleNumber } = params;
 
   const { fetchTime, allCapa } = await getCapaHistory(lang, articleNumber);
   return (

@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import Container from '@/components/ui/container';
-import { extractNameFromEmail } from '@/lib//utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Capa, columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -44,16 +44,12 @@ async function getAllCapa(
   return { fetchTime, allCapa };
 }
 
-export default async function CapaPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function CapaPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
   const { fetchTime, allCapa } = await getAllCapa(lang);
   return <DataTable columns={columns} data={allCapa} fetchTime={fetchTime} />;

@@ -1,7 +1,7 @@
 'use client';
 
 import { getSession } from '@/app/(mgmt)/[lang]/auth/actions';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import clsx from 'clsx';
 import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';

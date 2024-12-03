@@ -2,9 +2,10 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { FailureType } from '@/lib/z/failure';
+import { AddFailureType, FailureType } from '@/lib/z/failure';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 // import { redirect } from 'next/navigation';
 
 export async function deleteDraftDeviation(_id: ObjectId) {
@@ -44,14 +45,22 @@ export async function revalidateFailures() {
   revalidateTag('failures-lv2');
 }
 
-export async function insertFailure(failure: FailureType) {
-  // const session = await auth();
-  // if (!session || !session.user?.email) {
+export async function insertFailure(failure: AddFailureType) {
+  const session = await auth();
+  // if (
+  //   !session ||
+  //   !session.user?.email ||
+  //   !session.user?.roles.includes('failures-lv2')
+  // ) {
   //   redirect('/auth');
   // }
   try {
     const collection = await dbc('failures_lv2');
-    const res = await collection.insertOne(failure);
+    const failureWithDate: FailureType = {
+      ...failure,
+      createdAt: new Date(),
+    };
+    const res = await collection.insertOne(failureWithDate);
     if (res) {
       revalidateTag('failures-lv2');
       return { success: 'inserted' };

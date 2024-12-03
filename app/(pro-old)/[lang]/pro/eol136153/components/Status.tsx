@@ -1,9 +1,9 @@
 'use client';
 
-import { useContext } from 'react';
 import StatusBox from '@/app/(pro-old)/[lang]/components/StatusBox';
+import { shortenLastName } from '@/lib/utils/name-format';
+import { useContext } from 'react';
 import { PersonContext } from '../../lib/PersonContext';
-import { shortenLastName } from '@/lib/utils/nameFormat';
 
 type StatusProps = {
   onPallet153: number;

@@ -9,8 +9,26 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    console.log('api/failures-lv2/get');
+    // from to
+    const from = req.nextUrl.searchParams.get('from');
+    const to = req.nextUrl.searchParams.get('to');
     const coll = await dbc('failures_lv2');
-    const failures = await coll.find({}).sort({ _id: -1 }).limit(100).toArray();
+
+    let query: any = {};
+
+    if (from) query.from = { $gte: new Date(from) };
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setDate(toDate.getDate() + 1);
+      query.to = { $lte: toDate };
+    }
+
+    const failures = await coll
+      .find(query)
+      .sort({ _id: -1 })
+      .limit(1000)
+      .toArray();
     return new NextResponse(JSON.stringify(failures));
   } catch (error) {
     console.error('api/deviations/get-deviations: ' + error);

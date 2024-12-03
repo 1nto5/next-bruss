@@ -44,7 +44,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
 import { correctiveActionType } from '@/lib/types/deviation';
 import { cn } from '@/lib/utils';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';

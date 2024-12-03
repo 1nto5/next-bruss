@@ -18,7 +18,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { getInitialsFromEmail } from '@/lib/utils/nameFormat';
+import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { Menu } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';

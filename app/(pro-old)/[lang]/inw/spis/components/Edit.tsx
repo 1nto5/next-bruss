@@ -1,6 +1,6 @@
 'use client';
 
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import clsx from 'clsx';
 import { use, useContext, useEffect, useState } from 'react';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';

@@ -1,9 +1,9 @@
 'use client';
 
-import { FailureTableDataType } from '@/lib/z/failure';
+import { FailureType } from '@/lib/z/failure';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const columns: ColumnDef<FailureTableDataType>[] = [
+export const columns: ColumnDef<FailureType>[] = [
   {
     accessorKey: 'station',
     header: 'Stacja',
@@ -43,6 +43,14 @@ export const columns: ColumnDef<FailureTableDataType>[] = [
     cell: ({ row }) => {
       const solution = row.getValue('solution');
       return <div className='w-[300px]'>{solution as React.ReactNode}</div>;
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Utworzono',
+    cell: ({ row }) => {
+      const createdAt = row.getValue('createdAt');
+      return <div className='w-[150px]'>{createdAt as React.ReactNode}</div>;
     },
   },
 ];

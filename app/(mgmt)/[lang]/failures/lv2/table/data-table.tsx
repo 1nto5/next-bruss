@@ -40,6 +40,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
@@ -47,6 +48,7 @@ import {
 } from '@/components/ui/popover';
 import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
+import { se } from 'date-fns/locale';
 import {
   ArrowRight,
   Check,
@@ -54,8 +56,9 @@ import {
   CircleX,
   RefreshCcw,
 } from 'lucide-react';
+import { Session } from 'next-auth';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { revalidateFailures } from '../actions';
 import AddFailureDialog from '../components/add-failure-dialog';
 
@@ -63,14 +66,16 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTime: string;
-  lang: string;
+  // lang: string;
+  // session: Session | null;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   fetchTime,
-  lang,
+  // lang,
+  // session,
 }: DataTableProps<TData, TValue>) {
   // useEffect(() => {
   //   const interval = setInterval(
@@ -311,6 +316,35 @@ export function DataTable<TData, TValue>({
               );
             }}
           />
+
+          <div className='flex items-center gap-1.5'>
+            <Label htmlFor='from'>Od:</Label>
+            <Input
+              id='from'
+              type='date'
+              className='w-36'
+              defaultValue={searchParams.get('from') || ''}
+              onChange={(e) => {
+                router.push(
+                  pathname + '?' + createQueryString('from', e.target.value),
+                );
+              }}
+            />
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <Label htmlFor='from'>Do:</Label>
+            <Input
+              type='date'
+              className='w-36'
+              defaultValue={searchParams.get('to') || ''}
+              onChange={(e) => {
+                router.push(
+                  pathname + '?' + createQueryString('to', e.target.value),
+                );
+              }}
+            />
+          </div>
+
           <Button
             variant='outline'
             onClick={() => {
@@ -330,7 +364,9 @@ export function DataTable<TData, TValue>({
             >
               <RefreshCcw />
             </Button>
+            {/* {session && session.user?.roles.includes('failures-lv2') && ( */}
             <AddFailureDialog />
+            {/* )} */}
           </div>
         </div>
       </CardHeader>

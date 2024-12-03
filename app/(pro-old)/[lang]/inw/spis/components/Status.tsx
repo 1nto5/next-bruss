@@ -1,10 +1,10 @@
 'use client';
 
-import { useContext } from 'react';
-import { PersonsContext } from '../lib/PersonsContext';
-import { InventoryContext } from '../lib/InventoryContext';
 import StatusBox from '@/app/(pro-old)/[lang]/components/StatusBox';
-import { shortenLastName } from '../../../../../../lib/utils/nameFormat';
+import { useContext } from 'react';
+import { shortenLastName } from '../../../../../../lib/utils/name-format';
+import { InventoryContext } from '../lib/InventoryContext';
+import { PersonsContext } from '../lib/PersonsContext';
 
 export default function Status() {
   const personsContext = useContext(PersonsContext);

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { TableCell } from '@/components/ui/table';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog';
 import { ClipboardPen } from 'lucide-react';
 

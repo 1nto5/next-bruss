@@ -58,7 +58,7 @@ import { cn } from '@/lib/utils';
 import {
   extractFullNameFromEmail,
   extractNameFromEmail,
-} from '@/lib/utils/nameFormat';
+} from '@/lib/utils/name-format';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format, set } from 'date-fns';

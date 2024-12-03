@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 import { DeviationType } from '@/lib/types/deviation';
 // import { extractNameFromEmail } from '@/lib/utils/nameFormat';
-import { extractNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { CopyPlus, Plus, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';

@@ -1,5 +1,5 @@
 import { dbc } from '@/lib/mongo';
-import { extractFullNameFromEmail } from '@/lib/utils/nameFormat';
+import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
 import { NextResponse, type NextRequest } from 'next/server';
 
