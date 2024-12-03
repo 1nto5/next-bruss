@@ -292,31 +292,6 @@ export function DataTable<TData, TValue>({
               </Command>
             </PopoverContent>
           </Popover>
-          <Input
-            placeholder='nadzorujący'
-            className='w-auto'
-            value={searchParams.get('supervisor') ?? ''}
-            onChange={(e) => {
-              router.push(
-                pathname +
-                  '?' +
-                  createQueryString('supervisor', e.target.value),
-              );
-            }}
-          />
-          <Input
-            placeholder='odpowiedzialny'
-            className='w-36'
-            value={searchParams.get('responsible') ?? ''}
-            onChange={(e) => {
-              router.push(
-                pathname +
-                  '?' +
-                  createQueryString('responsible', e.target.value),
-              );
-            }}
-          />
-
           <div className='flex items-center gap-1.5'>
             <Label htmlFor='from'>Od:</Label>
             <Input
@@ -344,6 +319,30 @@ export function DataTable<TData, TValue>({
               }}
             />
           </div>
+          <Input
+            placeholder='nadzorujący'
+            className='w-auto'
+            value={searchParams.get('supervisor') ?? ''}
+            onChange={(e) => {
+              router.push(
+                pathname +
+                  '?' +
+                  createQueryString('supervisor', e.target.value),
+              );
+            }}
+          />
+          <Input
+            placeholder='odpowiedzialny'
+            className='w-36'
+            value={searchParams.get('responsible') ?? ''}
+            onChange={(e) => {
+              router.push(
+                pathname +
+                  '?' +
+                  createQueryString('responsible', e.target.value),
+              );
+            }}
+          />
 
           <Button
             variant='outline'

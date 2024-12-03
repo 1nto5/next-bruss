@@ -11,14 +11,11 @@ async function getFailures(
   fetchTime: string;
   formattedFailures: FailureType[];
 }> {
-  let fromQuery = searchParams.from ? `?from=${searchParams.from}` : '';
-  let toQuery = searchParams.to ? `&to=${searchParams.to}` : '';
-  if (fromQuery === '?from=') {
-    fromQuery = '';
-  }
-  if (toQuery === '&to=') {
-    toQuery = '';
-  }
+  const fromQuery = searchParams.from ? `?from=${searchParams.from}` : '';
+  const toQuery = searchParams.to
+    ? `${searchParams.from ? '&' : '?'}to=${searchParams.to}`
+    : '';
+
   const res = await fetch(
     `${process.env.API}/failures-lv2${fromQuery}${toQuery}`,
     {

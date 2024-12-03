@@ -9,8 +9,6 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    console.log('api/failures-lv2/get');
-    // from to
     const from = req.nextUrl.searchParams.get('from');
     const to = req.nextUrl.searchParams.get('to');
     const coll = await dbc('failures_lv2');
@@ -23,6 +21,8 @@ export async function GET(req: NextRequest) {
       toDate.setDate(toDate.getDate() + 1);
       query.to = { $lte: toDate };
     }
+
+    console.log();
 
     const failures = await coll
       .find(query)
