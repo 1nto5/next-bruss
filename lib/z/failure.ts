@@ -8,7 +8,7 @@ export const AddFailureSchema = z
     to: z.date(),
     supervisor: z.string().min(1),
     responsible: z.string().min(1),
-    solution: z.string().min(1),
+    solution: z.string().optional(),
   })
   .refine((data) => data.from < data.to, {
     // message: 'Data rozpoczęcia musi być wcześniejsza niż data zakończenia',
