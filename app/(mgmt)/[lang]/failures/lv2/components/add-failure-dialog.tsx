@@ -1,11 +1,6 @@
-// TODO: save draft and go to edit page
-// TODO: get article name
-
 'use client';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
@@ -17,7 +12,7 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
+  // DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -29,7 +24,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -37,29 +31,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
 import { AddFailureSchema } from '@/lib/z/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format, set } from 'date-fns';
-import {
-  AArrowDown,
-  CalendarIcon,
-  Check,
-  ChevronsUpDown,
-  CopyPlus,
-  Eraser,
-  Loader2,
-  Pencil,
-  Plus,
-  Table,
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState, useTransition } from 'react';
+import { format } from 'date-fns';
+import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';
+
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -97,6 +77,10 @@ export default function AddFailureDialog({}: {}) {
   });
 
   const selectedStation = form.watch('station');
+  useEffect(() => {
+    form.setValue('failure', '');
+  }, [selectedStation]);
+
   const selectedFailure = form.watch('failure');
 
   const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
