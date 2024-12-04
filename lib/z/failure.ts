@@ -11,8 +11,10 @@ export const AddFailureSchema = z
     solution: z.string().optional(),
   })
   .refine((data) => data.from < data.to, {
-    // message: 'Data rozpoczęcia musi być wcześniejsza niż data zakończenia',
     path: ['to'],
+  })
+  .refine((data) => data.failure.length > 0, {
+    path: ['failure'],
   });
 
 export type AddFailureType = z.infer<typeof AddFailureSchema>;

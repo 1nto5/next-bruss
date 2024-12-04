@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+// import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
 import { FailureType } from '@/lib/z/failure';
 import { columns } from './table/columns';
@@ -11,17 +11,18 @@ async function getFailures(
   fetchTime: string;
   formattedFailures: FailureType[];
 }> {
-  const fromQuery = searchParams.from ? `?from=${searchParams.from}` : '';
-  const toQuery = searchParams.to
-    ? `${searchParams.from ? '&' : '?'}to=${searchParams.to}`
-    : '';
+  let queryParams = [];
+  if (searchParams.from?.trim()) {
+    queryParams.push(`from=${searchParams.from.trim()}`);
+  }
+  if (searchParams.to?.trim()) {
+    queryParams.push(`to=${searchParams.to.trim()}`);
+  }
+  const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
-  const res = await fetch(
-    `${process.env.API}/failures-lv2${fromQuery}${toQuery}`,
-    {
-      next: { revalidate: 300, tags: ['failures-lv2'] },
-    },
-  );
+  const res = await fetch(`${process.env.API}/failures-lv2${queryString}`, {
+    next: { revalidate: 300, tags: ['failures-lv2'] },
+  });
 
   if (!res.ok) {
     const json = await res.json();
@@ -69,7 +70,7 @@ export default async function FailuresPage(props: {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const session = await auth();
+  // const session = await auth();
   const params = await props.params;
   const searchParams = await props.searchParams;
 

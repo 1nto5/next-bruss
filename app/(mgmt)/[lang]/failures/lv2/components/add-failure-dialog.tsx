@@ -39,7 +39,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -48,19 +48,6 @@ import { insertFailure } from '../actions';
 export default function AddFailureDialog({}: {}) {
   const [open, setOpen] = useState(false);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
-  // const searchParams = useSearchParams();
-  // const router = useRouter();
-  // const pathname = usePathname();
-
-  // const createQueryString = useCallback(
-  //   (name: string, value: string) => {
-  //     const params = new URLSearchParams(searchParams.toString());
-  //     params.set(name, value);
-
-  //     return params.toString();
-  //   },
-  //   [searchParams],
-  // );
 
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
