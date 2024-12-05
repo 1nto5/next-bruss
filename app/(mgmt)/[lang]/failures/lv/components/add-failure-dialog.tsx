@@ -31,6 +31,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
@@ -105,374 +106,384 @@ export default function AddFailureDialog({}: {}) {
       </DialogTrigger>
       <DialogContent className='w-[700px] sm:max-w-[700px]'>
         <DialogHeader>
-          <DialogTitle>Nowa awaria LV2</DialogTitle>
+          <DialogTitle>Nowa awaria</DialogTitle>
           {/* <DialogDescription>
             Make changes to your profile here. Click save when you're done.
           </DialogDescription> */}
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className='grid items-center gap-2'>
-              <FormField
-                control={form.control}
-                name='line'
-                render={({ field }) => (
-                  <FormItem className='mb-2 space-y-3'>
-                    <FormLabel>Linia</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className='flex flex-col space-y-1'
-                      >
-                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                          <FormControl>
-                            <RadioGroupItem value='lv1' />
-                          </FormControl>
-                          <FormLabel className='font-normal'>LV1</FormLabel>
-                        </FormItem>
-                        <FormItem className='flex items-center space-x-3 space-y-0'>
-                          <FormControl>
-                            <RadioGroupItem value='lv2' />
-                          </FormControl>
-                          <FormLabel className='font-normal'>LV2</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='station'
-                render={({ field }) => (
-                  <FormItem className='w-[200px]'>
-                    <div className='flex flex-col items-start space-y-2'>
-                      <FormLabel>Stacja</FormLabel>
+            <ScrollArea className='h-[400px]'>
+              <div className='grid items-center gap-2'>
+                <FormField
+                  control={form.control}
+                  name='line'
+                  render={({ field }) => (
+                    <FormItem className='mb-2 space-y-3'>
+                      <FormLabel>Linia</FormLabel>
                       <FormControl>
-                        <Popover
-                          open={openStation}
-                          onOpenChange={setOpenStation}
-                          modal={true}
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className='flex flex-col space-y-1'
                         >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant='outline'
-                              role='combobox'
-                              // aria-expanded={open}
-                              className={cn(
-                                'w-full justify-between',
-                                !form.getValues('station') && 'opacity-50',
-                              )}
-                            >
-                              {selectedStation ? selectedStation : 'wybierz'}
-                              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-[200px] p-0'>
-                            <Command>
-                              <CommandInput placeholder='wyszukaj...' />
-                              <CommandList>
-                                <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                                <CommandGroup>
-                                  <CommandItem
-                                    key='reset'
-                                    onSelect={() => {
-                                      form.setValue('station', '');
-                                      setOpenStation(false);
-                                    }}
-                                  >
-                                    <Check className='mr-2 h-4 w-4 opacity-0' />
-                                    nie wybrano
-                                  </CommandItem>
-                                  {stationsOptions.map((station) => (
+                          <FormItem className='flex items-center space-x-3 space-y-0'>
+                            <FormControl>
+                              <RadioGroupItem value='lv1' />
+                            </FormControl>
+                            <FormLabel className='font-normal'>LV1</FormLabel>
+                          </FormItem>
+                          <FormItem className='flex items-center space-x-3 space-y-0'>
+                            <FormControl>
+                              <RadioGroupItem value='lv2' />
+                            </FormControl>
+                            <FormLabel className='font-normal'>LV2</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='station'
+                  render={({ field }) => (
+                    <FormItem className='w-[200px]'>
+                      <div className='flex flex-col items-start space-y-2'>
+                        <FormLabel>Stacja</FormLabel>
+                        <FormControl>
+                          <Popover
+                            open={openStation}
+                            onOpenChange={setOpenStation}
+                            modal={true}
+                          >
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                // aria-expanded={open}
+                                className={cn(
+                                  'w-full justify-between',
+                                  !form.getValues('station') && 'opacity-50',
+                                )}
+                              >
+                                {selectedStation ? selectedStation : 'wybierz'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[200px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='wyszukaj...' />
+                                <CommandList>
+                                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                                  <CommandGroup>
                                     <CommandItem
-                                      key={station}
-                                      value={station}
-                                      onSelect={(currentValue) => {
-                                        form.setValue('station', currentValue);
+                                      key='reset'
+                                      onSelect={() => {
+                                        form.setValue('station', '');
                                         setOpenStation(false);
                                       }}
                                     >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          form.getValues('station') === station
-                                            ? 'opacity-100'
-                                            : 'opacity-0',
-                                        )}
-                                      />
-                                      {station}
+                                      <Check className='mr-2 h-4 w-4 opacity-0' />
+                                      nie wybrano
                                     </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </div>
-                  </FormItem>
-                )}
-              />
+                                    {stationsOptions.map((station) => (
+                                      <CommandItem
+                                        key={station}
+                                        value={station}
+                                        onSelect={(currentValue) => {
+                                          form.setValue(
+                                            'station',
+                                            currentValue,
+                                          );
+                                          setOpenStation(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            form.getValues('station') ===
+                                              station
+                                              ? 'opacity-100'
+                                              : 'opacity-0',
+                                          )}
+                                        />
+                                        {station}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name='failure'
-                render={({ field }) => (
-                  <FormItem className='w-[350px]'>
-                    <div className='flex flex-col items-start space-y-2'>
-                      <FormLabel>Awaria</FormLabel>
-                      <FormControl>
-                        <Popover
-                          open={openFailure}
-                          onOpenChange={setOpenFailure}
-                          modal={true}
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant='outline'
-                              role='combobox'
-                              className={cn(
-                                'w-full justify-between',
-                                !form.getValues('failure') && 'opacity-50',
-                              )}
-                              disabled={!selectedStation}
-                            >
-                              {selectedFailure ? selectedFailure : 'wybierz'}
-                              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-[350px] p-0'>
-                            <Command>
-                              <CommandInput placeholder='wyszukaj...' />
-                              <CommandList>
-                                <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                                <CommandGroup>
-                                  <CommandItem
-                                    key='reset'
-                                    onSelect={() => {
-                                      form.setValue('failure', '');
-                                      setOpenFailure(false);
-                                    }}
-                                  >
-                                    <Check className='mr-2 h-4 w-4 opacity-0' />
-                                    nie wybrano
-                                  </CommandItem>
-                                  {filteredFailures.map((failure) => (
+                <FormField
+                  control={form.control}
+                  name='failure'
+                  render={({ field }) => (
+                    <FormItem className='w-[350px]'>
+                      <div className='flex flex-col items-start space-y-2'>
+                        <FormLabel>Awaria</FormLabel>
+                        <FormControl>
+                          <Popover
+                            open={openFailure}
+                            onOpenChange={setOpenFailure}
+                            modal={true}
+                          >
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant='outline'
+                                role='combobox'
+                                className={cn(
+                                  'w-full justify-between',
+                                  !form.getValues('failure') && 'opacity-50',
+                                )}
+                                disabled={!selectedStation}
+                              >
+                                {selectedFailure ? selectedFailure : 'wybierz'}
+                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-[350px] p-0'>
+                              <Command>
+                                <CommandInput placeholder='wyszukaj...' />
+                                <CommandList>
+                                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                                  <CommandGroup>
                                     <CommandItem
-                                      key={failure}
-                                      value={failure}
-                                      onSelect={(currentValue) => {
-                                        form.setValue('failure', currentValue);
+                                      key='reset'
+                                      onSelect={() => {
+                                        form.setValue('failure', '');
                                         setOpenFailure(false);
                                       }}
                                     >
-                                      <Check
-                                        className={cn(
-                                          'mr-2 h-4 w-4',
-                                          form.getValues('failure') === failure
-                                            ? 'opacity-100'
-                                            : 'opacity-0',
-                                        )}
-                                      />
-                                      {failure}
+                                      <Check className='mr-2 h-4 w-4 opacity-0' />
+                                      nie wybrano
                                     </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </div>
-                  </FormItem>
-                )}
-              />
+                                    {filteredFailures.map((failure) => (
+                                      <CommandItem
+                                        key={failure}
+                                        value={failure}
+                                        onSelect={(currentValue) => {
+                                          form.setValue(
+                                            'failure',
+                                            currentValue,
+                                          );
+                                          setOpenFailure(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            form.getValues('failure') ===
+                                              failure
+                                              ? 'opacity-100'
+                                              : 'opacity-0',
+                                          )}
+                                        />
+                                        {failure}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </div>
+                    </FormItem>
+                  )}
+                />
 
-              <div className='flex space-x-2'>
+                <div className='flex space-x-2'>
+                  <FormField
+                    control={form.control}
+                    name='from'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rozpoczęcie dn.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='date'
+                            defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                            onChange={(e) => {
+                              const currentFrom =
+                                form.getValues('from') || new Date();
+                              const newDate = new Date(e.target.value);
+                              const updatedFrom = new Date(
+                                newDate.getFullYear(),
+                                newDate.getMonth(),
+                                newDate.getDate(),
+                                currentFrom.getHours(),
+                                currentFrom.getMinutes(),
+                              );
+
+                              form.setValue('from', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='from'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>godz.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='time'
+                            defaultValue={format(new Date(), 'HH:mm')}
+                            onChange={(e) => {
+                              const [hours, minutes] = e.target.value
+                                .split(':')
+                                .map(Number);
+                              const currentFrom =
+                                form.getValues('from') || new Date();
+                              const updatedFrom = new Date(
+                                currentFrom.getFullYear(),
+                                currentFrom.getMonth(),
+                                currentFrom.getDate(),
+                                hours,
+                                minutes,
+                              );
+
+                              form.setValue('from', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className='flex space-x-2'>
+                  <FormField
+                    control={form.control}
+                    name='to'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Zakończenie dn.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='date'
+                            defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                            onChange={(e) => {
+                              const currentFrom =
+                                form.getValues('to') || new Date();
+                              const newDate = new Date(e.target.value);
+                              const updatedFrom = new Date(
+                                newDate.getFullYear(),
+                                newDate.getMonth(),
+                                newDate.getDate(),
+                                currentFrom.getHours(),
+                                currentFrom.getMinutes(),
+                              );
+
+                              form.setValue('to', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='to'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>godz.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='time'
+                            defaultValue={format(
+                              new Date(new Date().getTime() + 60 * 60 * 1000),
+                              'HH:mm',
+                            )}
+                            onChange={(e) => {
+                              const [hours, minutes] = e.target.value
+                                .split(':')
+                                .map(Number);
+                              const currentFrom =
+                                form.getValues('to') || new Date();
+                              const updatedFrom = new Date(
+                                currentFrom.getFullYear(),
+                                currentFrom.getMonth(),
+                                currentFrom.getDate(),
+                                hours,
+                                minutes,
+                              );
+
+                              form.setValue('to', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
-                  name='from'
+                  name='supervisor'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Rozpoczęcie dn.</FormLabel>
+                    <FormItem className='w-[200px]'>
+                      <FormLabel>Nadzorujący</FormLabel>
                       <FormControl>
-                        <Input
-                          type='date'
-                          defaultValue={format(new Date(), 'yyyy-MM-dd')}
-                          onChange={(e) => {
-                            const currentFrom =
-                              form.getValues('from') || new Date();
-                            const newDate = new Date(e.target.value);
-                            const updatedFrom = new Date(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate(),
-                              currentFrom.getHours(),
-                              currentFrom.getMinutes(),
-                            );
-
-                            form.setValue('from', updatedFrom);
-                          }}
-                        />
+                        <Input placeholder='' {...field} />
                       </FormControl>
+                      {/* <FormDescription>
+                      This is your public display name.
+                    </FormDescription> */}
                       {/* <FormMessage /> */}
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
-                  name='from'
+                  name='responsible'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>godz.</FormLabel>
+                    <FormItem className='w-[200px]'>
+                      <FormLabel>Odpowiedzialny</FormLabel>
                       <FormControl>
-                        <Input
-                          type='time'
-                          defaultValue={format(new Date(), 'HH:mm')}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(':')
-                              .map(Number);
-                            const currentFrom =
-                              form.getValues('from') || new Date();
-                            const updatedFrom = new Date(
-                              currentFrom.getFullYear(),
-                              currentFrom.getMonth(),
-                              currentFrom.getDate(),
-                              hours,
-                              minutes,
-                            );
+                        <Input placeholder='' {...field} />
+                      </FormControl>
+                      {/* <FormDescription>
+                      This is your public display name.
+                    </FormDescription> */}
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
 
-                            form.setValue('from', updatedFrom);
-                          }}
-                        />
+                <FormField
+                  control={form.control}
+                  name='solution'
+                  render={({ field }) => (
+                    <FormItem className='w-[400px]'>
+                      <FormLabel>Rozwiązanie</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
                       </FormControl>
                       {/* <FormMessage /> */}
                     </FormItem>
                   )}
                 />
               </div>
-
-              <div className='flex space-x-2'>
-                <FormField
-                  control={form.control}
-                  name='to'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Zakończenie dn.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='date'
-                          defaultValue={format(new Date(), 'yyyy-MM-dd')}
-                          onChange={(e) => {
-                            const currentFrom =
-                              form.getValues('to') || new Date();
-                            const newDate = new Date(e.target.value);
-                            const updatedFrom = new Date(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate(),
-                              currentFrom.getHours(),
-                              currentFrom.getMinutes(),
-                            );
-
-                            form.setValue('to', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='to'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>godz.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='time'
-                          defaultValue={format(
-                            new Date(new Date().getTime() + 60 * 60 * 1000),
-                            'HH:mm',
-                          )}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(':')
-                              .map(Number);
-                            const currentFrom =
-                              form.getValues('to') || new Date();
-                            const updatedFrom = new Date(
-                              currentFrom.getFullYear(),
-                              currentFrom.getMonth(),
-                              currentFrom.getDate(),
-                              hours,
-                              minutes,
-                            );
-
-                            form.setValue('to', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name='supervisor'
-                render={({ field }) => (
-                  <FormItem className='w-[200px]'>
-                    <FormLabel>Nadzorujący</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>
-                      This is your public display name.
-                    </FormDescription> */}
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='responsible'
-                render={({ field }) => (
-                  <FormItem className='w-[200px]'>
-                    <FormLabel>Odpowiedzialny</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>
-                      This is your public display name.
-                    </FormDescription> */}
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='solution'
-                render={({ field }) => (
-                  <FormItem className='w-[400px]'>
-                    <FormLabel>Rozwiązanie</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} />
-                    </FormControl>
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-            </div>
+            </ScrollArea>
             <DialogFooter className='mt-4'>
               {isPendingInsert ? (
                 <Button disabled>
