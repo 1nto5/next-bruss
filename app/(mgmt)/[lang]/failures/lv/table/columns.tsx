@@ -1,9 +1,28 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { FailureType } from '@/lib/z/failure';
 import { ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontal, Trash2 } from 'lucide-react';
+import EditFailureDialog from '../components/edit-failure-dialog';
 
 export const columns: ColumnDef<FailureType>[] = [
+  {
+    accessorKey: 'line',
+    header: 'Linia',
+    cell: ({ row }) => {
+      const line = row.getValue('line');
+      return (line as string).toUpperCase();
+    },
+  },
   {
     accessorKey: 'station',
     header: 'Stacja',
@@ -11,22 +30,41 @@ export const columns: ColumnDef<FailureType>[] = [
   {
     accessorKey: 'failure',
     header: 'Awaria',
+    cell: ({ row }) => {
+      const failure = row.getValue('failure');
+      return <div className='w-[200px]'>{failure as React.ReactNode}</div>;
+    },
+  },
+
+  {
+    id: 'actions',
+    header: 'Edytuj',
+
+    cell: ({ row }) => {
+      const failure = row.original;
+
+      return <EditFailureDialog failure={failure} />;
+    },
   },
   {
-    accessorKey: 'from',
+    accessorKey: 'fromLocaleString',
     header: 'Rozpoczęcie',
     cell: ({ row }) => {
-      const from = row.getValue('from');
+      const from = row.getValue('fromLocaleString');
       return <div className='w-[150px]'>{from as React.ReactNode}</div>;
     },
   },
   {
-    accessorKey: 'to',
+    accessorKey: 'toLocaleString',
     header: 'Zakończenie',
     cell: ({ row }) => {
-      const to = row.getValue('to');
+      const to = row.getValue('toLocaleString');
       return <div className='w-[150px]'>{to as React.ReactNode}</div>;
     },
+  },
+  {
+    accessorKey: 'duration',
+    header: 'Czas trwania (min)',
   },
   {
     accessorKey: 'supervisor',

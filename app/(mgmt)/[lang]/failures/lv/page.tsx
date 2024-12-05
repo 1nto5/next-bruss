@@ -20,8 +20,8 @@ async function getFailures(
   }
   const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
-  const res = await fetch(`${process.env.API}/failures-lv2${queryString}`, {
-    next: { revalidate: 300, tags: ['failures-lv2'] },
+  const res = await fetch(`${process.env.API}/failures-lv${queryString}`, {
+    next: { revalidate: 300, tags: ['failures-lv'] },
   });
 
   if (!res.ok) {
@@ -54,15 +54,21 @@ async function getFailures(
     );
   }
 
+  // const duration = (failure: FailureType) =>
+  //   Math.round(failure.to.getTime() - failure.from.getTime()) / 60000;
+
   const formatTime = (failure: FailureType) => ({
     ...failure,
-    from: new Date(failure.from).toLocaleString(lang),
-    to: new Date(failure.to).toLocaleString(lang),
+    fromLocaleString: new Date(failure.from).toLocaleString(lang),
+    toLocaleString: new Date(failure.to).toLocaleString(lang),
+    duration: Math.round(
+      (new Date(failure.to).getTime() - new Date(failure.from).getTime()) /
+        60000,
+    ),
     createdAt: new Date(failure.createdAt).toLocaleString(lang),
   });
 
   const formattedFailures: FailureType[] = failures.map(formatTime);
-
   return { fetchTime, formattedFailures };
 }
 

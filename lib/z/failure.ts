@@ -2,6 +2,7 @@ import * as z from 'zod';
 
 export const AddFailureSchema = z
   .object({
+    line: z.string(),
     station: z.string(),
     failure: z.string(),
     from: z.date(),
@@ -17,10 +18,23 @@ export const AddFailureSchema = z
     path: ['failure'],
   });
 
-export type AddFailureType = z.infer<typeof AddFailureSchema>;
+export type InsertFailureType = z.infer<typeof AddFailureSchema>;
 
-export type FailureType = Omit<AddFailureType, 'from' | 'to'> & {
-  from: string | Date;
-  to: string | Date;
+export type UpdateFailureType = InsertFailureType & {
+  _id: string;
+};
+
+// export type FailureType = Omit<InsertFailureType, 'from' | 'to'> & {
+//   fromLocaleString: string;
+//   toLocaleString: string;
+//   createdAt: string | Date;
+//   duration: number;
+// };
+
+export type FailureType = InsertFailureType & {
+  _id: string;
+  fromLocaleString: string;
+  toLocaleString: string;
   createdAt: string | Date;
+  duration: number;
 };

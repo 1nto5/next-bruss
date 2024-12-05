@@ -11,18 +11,16 @@ export async function GET(req: NextRequest) {
   try {
     const from = req.nextUrl.searchParams.get('from');
     const to = req.nextUrl.searchParams.get('to');
-    const coll = await dbc('failures_lv2');
+    const coll = await dbc('failures_lv');
 
     let query: any = {};
 
     if (from) query.from = { $gte: new Date(from) };
     if (to) {
       const toDate = new Date(to);
-      toDate.setDate(toDate.getDate() + 1);
+      toDate.setDate(toDate.getDate());
       query.to = { $lte: toDate };
     }
-
-    console.log();
 
     const failures = await coll
       .find(query)

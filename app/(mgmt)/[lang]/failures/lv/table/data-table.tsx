@@ -56,7 +56,6 @@ import {
   CircleX,
   RefreshCcw,
 } from 'lucide-react';
-import { Session } from 'next-auth';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { revalidateFailures } from '../actions';
@@ -97,6 +96,16 @@ export function DataTable<TData, TValue>({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [fromValue, setFromValue] = React.useState(
+    searchParams.get('from') || '',
+  );
+  const [toValue, setToValue] = React.useState(searchParams.get('to') || '');
+
+  React.useEffect(() => {
+    setFromValue(searchParams.get('from') || '');
+    setToValue(searchParams.get('to') || '');
+  }, [searchParams]); // Aktualizacja stanu, gdy zmienią się parametry w URL
+
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
   const createQueryString = useCallback(
@@ -137,7 +146,7 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Awarie LV2</CardTitle>
+        <CardTitle>Awarie LV</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
 
         <div className='flex flex-wrap gap-1'>
@@ -298,24 +307,84 @@ export function DataTable<TData, TValue>({
               id='from'
               type='date'
               className='w-36'
-              defaultValue={searchParams.get('from') || ''}
+              // defaultValue={searchParams.get('from') || ''}
+              value={fromValue.split('T')[0] || ''}
               onChange={(e) => {
                 router.push(
                   pathname + '?' + createQueryString('from', e.target.value),
                 );
               }}
             />
+            <Input
+              type='time'
+              // defaultValue={searchParams.get('from') || ''}
+              value={fromValue.split('T')[1]?.slice(0, 5) || ''}
+              onChange={(e) => {
+                const [hours, minutes] = e.target.value.split(':').map(Number);
+                const fromParam = searchParams.get('from'); // Pobieramy wartość 'from'
+                const currentFrom = fromParam
+                  ? new Date(fromParam)
+                  : new Date(); // Walidacja wartości
+
+                if (!isNaN(hours) && !isNaN(minutes)) {
+                  const updatedFrom = new Date(
+                    currentFrom.getFullYear(),
+                    currentFrom.getMonth(),
+                    currentFrom.getDate(),
+                    hours,
+                    minutes,
+                  );
+
+                  if (!isNaN(updatedFrom.getTime())) {
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('from', updatedFrom.toISOString()),
+                    );
+                  }
+                }
+              }}
+            />
           </div>
           <div className='flex items-center gap-1.5'>
-            <Label htmlFor='from'>Do:</Label>
+            <Label htmlFor='to'>Do:</Label>
             <Input
+              id='to'
               type='date'
               className='w-36'
-              defaultValue={searchParams.get('to') || ''}
+              // defaultValue={searchParams.get('to') || ''}
+              value={toValue.split('T')[0] || ''}
               onChange={(e) => {
                 router.push(
                   pathname + '?' + createQueryString('to', e.target.value),
                 );
+              }}
+            />
+            <Input
+              type='time'
+              // defaultValue={searchParams.get('to') || ''}
+              value={toValue.split('T')[1]?.slice(0, 5) || ''}
+              onChange={(e) => {
+                const [hours, minutes] = e.target.value.split(':').map(Number);
+                const toParam = searchParams.get('to');
+                const currentTo = toParam ? new Date(toParam) : new Date();
+                if (!isNaN(hours) && !isNaN(minutes)) {
+                  const updatedTo = new Date(
+                    currentTo.getFullYear(),
+                    currentTo.getMonth(),
+                    currentTo.getDate(),
+                    hours,
+                    minutes,
+                  );
+
+                  if (!isNaN(updatedTo.getTime())) {
+                    router.push(
+                      pathname +
+                        '?' +
+                        createQueryString('to', updatedTo.toISOString()),
+                    );
+                  }
+                }
               }}
             />
           </div>

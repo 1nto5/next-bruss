@@ -37,8 +37,10 @@ import { cn } from '@/lib/utils';
 import { AddFailureSchema } from '@/lib/z/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';
+import { Check, ChevronsUpDown, CopyPlus, Loader2 } from 'lucide-react';
 
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -55,9 +57,8 @@ export default function AddFailureDialog({}: {}) {
   const form = useForm<z.infer<typeof AddFailureSchema>>({
     resolver: zodResolver(AddFailureSchema),
     defaultValues: {
-      supervisor: '',
       responsible: '',
-      solution: '',
+      supervisor: '',
       from: new Date(new Date()),
       to: new Date(new Date().getTime() + 60 * 60 * 1000),
     },
@@ -112,6 +113,36 @@ export default function AddFailureDialog({}: {}) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid items-center gap-2'>
+              <FormField
+                control={form.control}
+                name='line'
+                render={({ field }) => (
+                  <FormItem className='mb-2 space-y-3'>
+                    <FormLabel>Linia</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className='flex flex-col space-y-1'
+                      >
+                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                          <FormControl>
+                            <RadioGroupItem value='lv1' />
+                          </FormControl>
+                          <FormLabel className='font-normal'>LV1</FormLabel>
+                        </FormItem>
+                        <FormItem className='flex items-center space-x-3 space-y-0'>
+                          <FormControl>
+                            <RadioGroupItem value='lv2' />
+                          </FormControl>
+                          <FormLabel className='font-normal'>LV2</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    {/* <FormMessage /> */}
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name='station'
@@ -443,7 +474,14 @@ export default function AddFailureDialog({}: {}) {
               />
             </div>
             <DialogFooter className='mt-4'>
-              <Button type='submit'>Dodaj</Button>
+              {isPendingInsert ? (
+                <Button disabled>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Dodaj
+                </Button>
+              ) : (
+                <Button type='submit'>Dodaj</Button>
+              )}
             </DialogFooter>
           </form>
         </Form>
