@@ -102,7 +102,7 @@ export default function EditFailureDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div>
-          <Button size='sm' variant='outline'>
+          <Button size='icon' variant='ghost'>
             <Pencil />
           </Button>
         </div>
