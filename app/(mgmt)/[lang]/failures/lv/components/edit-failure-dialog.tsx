@@ -111,7 +111,8 @@ export default function EditFailureDialog({
         <DialogHeader>
           <DialogTitle>Edycja awarii</DialogTitle>
           <DialogDescription>
-            Stacja: {failure.station}, awaria: {failure.failure}
+            Linia: {failure.line.toUpperCase()}, stacja: {failure.station},
+            awaria: {failure.failure}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
