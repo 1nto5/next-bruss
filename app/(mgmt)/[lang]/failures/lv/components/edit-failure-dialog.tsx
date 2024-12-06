@@ -27,6 +27,7 @@ import { format } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
 
 // import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { UpdateFailureSchema } from '@/lib/z/failure';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -101,102 +102,25 @@ export default function EditFailureDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className='grid items-center gap-2'>
-              <div className='flex space-x-2'>
-                <FormField
-                  control={form.control}
-                  name='from'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Rozpoczęcie dn.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='date'
-                          defaultValue={format(
-                            new Date(failure.from),
-                            'yyyy-MM-dd',
-                          )}
-                          onChange={(e) => {
-                            const currentFrom =
-                              form.getValues('from') || new Date();
-                            const newDate = new Date(e.target.value);
-                            const updatedFrom = new Date(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate(),
-                              currentFrom.getHours(),
-                              currentFrom.getMinutes(),
-                            );
-
-                            form.setValue('from', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='from'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>godz.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='time'
-                          defaultValue={format(new Date(failure.from), 'HH:mm')}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(':')
-                              .map(Number);
-                            const currentFrom =
-                              form.getValues('from') || new Date();
-                            const updatedFrom = new Date(
-                              currentFrom.getFullYear(),
-                              currentFrom.getMonth(),
-                              currentFrom.getDate(),
-                              hours,
-                              minutes,
-                            );
-
-                            form.setValue('from', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <FormField
-                control={form.control}
-                name='from'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {failure.to && (
+            <ScrollArea className='h-[450px]'>
+              <div className='grid items-center gap-2 p-2'>
                 <div className='flex space-x-2'>
                   <FormField
                     control={form.control}
-                    name='to'
+                    name='from'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Zakończenie dn.</FormLabel>
+                        <FormLabel>Rozpoczęcie dn.</FormLabel>
                         <FormControl>
                           <Input
                             type='date'
                             defaultValue={format(
-                              new Date(failure.to || Date.now()),
+                              new Date(failure.from),
                               'yyyy-MM-dd',
                             )}
                             onChange={(e) => {
                               const currentFrom =
-                                form.getValues('to') || new Date();
+                                form.getValues('from') || new Date();
                               const newDate = new Date(e.target.value);
                               const updatedFrom = new Date(
                                 newDate.getFullYear(),
@@ -206,7 +130,7 @@ export default function EditFailureDialog({
                                 currentFrom.getMinutes(),
                               );
 
-                              form.setValue('to', updatedFrom);
+                              form.setValue('from', updatedFrom);
                             }}
                           />
                         </FormControl>
@@ -216,7 +140,7 @@ export default function EditFailureDialog({
                   />
                   <FormField
                     control={form.control}
-                    name='to'
+                    name='from'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>godz.</FormLabel>
@@ -224,7 +148,7 @@ export default function EditFailureDialog({
                           <Input
                             type='time'
                             defaultValue={format(
-                              new Date(failure.to || Date.now()),
+                              new Date(failure.from),
                               'HH:mm',
                             )}
                             onChange={(e) => {
@@ -232,7 +156,7 @@ export default function EditFailureDialog({
                                 .split(':')
                                 .map(Number);
                               const currentFrom =
-                                form.getValues('to') || new Date();
+                                form.getValues('from') || new Date();
                               const updatedFrom = new Date(
                                 currentFrom.getFullYear(),
                                 currentFrom.getMonth(),
@@ -241,7 +165,7 @@ export default function EditFailureDialog({
                                 minutes,
                               );
 
-                              form.setValue('to', updatedFrom);
+                              form.setValue('from', updatedFrom);
                             }}
                           />
                         </FormControl>
@@ -250,68 +174,150 @@ export default function EditFailureDialog({
                     )}
                   />
                 </div>
-              )}
+                <FormField
+                  control={form.control}
+                  name='from'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name='supervisor'
-                render={({ field }) => (
-                  <FormItem className='w-[200px]'>
-                    <FormLabel>Nadzorujący</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>
+                {failure.to && (
+                  <div className='flex space-x-2'>
+                    <FormField
+                      control={form.control}
+                      name='to'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Zakończenie dn.</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='date'
+                              defaultValue={format(
+                                new Date(failure.to || Date.now()),
+                                'yyyy-MM-dd',
+                              )}
+                              onChange={(e) => {
+                                const currentFrom =
+                                  form.getValues('to') || new Date();
+                                const newDate = new Date(e.target.value);
+                                const updatedFrom = new Date(
+                                  newDate.getFullYear(),
+                                  newDate.getMonth(),
+                                  newDate.getDate(),
+                                  currentFrom.getHours(),
+                                  currentFrom.getMinutes(),
+                                );
+
+                                form.setValue('to', updatedFrom);
+                              }}
+                            />
+                          </FormControl>
+                          {/* <FormMessage /> */}
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='to'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>godz.</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='time'
+                              defaultValue={format(
+                                new Date(failure.to || Date.now()),
+                                'HH:mm',
+                              )}
+                              onChange={(e) => {
+                                const [hours, minutes] = e.target.value
+                                  .split(':')
+                                  .map(Number);
+                                const currentFrom =
+                                  form.getValues('to') || new Date();
+                                const updatedFrom = new Date(
+                                  currentFrom.getFullYear(),
+                                  currentFrom.getMonth(),
+                                  currentFrom.getDate(),
+                                  hours,
+                                  minutes,
+                                );
+
+                                form.setValue('to', updatedFrom);
+                              }}
+                            />
+                          </FormControl>
+                          {/* <FormMessage /> */}
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name='supervisor'
+                  render={({ field }) => (
+                    <FormItem className='w-[200px]'>
+                      <FormLabel>Nadzorujący</FormLabel>
+                      <FormControl>
+                        <Input placeholder='' {...field} />
+                      </FormControl>
+                      {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='responsible'
-                render={({ field }) => (
-                  <FormItem className='w-[200px]'>
-                    <FormLabel>Odpowiedzialny</FormLabel>
-                    <FormControl>
-                      <Input placeholder='' {...field} />
-                    </FormControl>
-                    {/* <FormDescription>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='responsible'
+                  render={({ field }) => (
+                    <FormItem className='w-[200px]'>
+                      <FormLabel>Odpowiedzialny</FormLabel>
+                      <FormControl>
+                        <Input placeholder='' {...field} />
+                      </FormControl>
+                      {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name='solution'
-                render={({ field }) => (
-                  <FormItem className='w-[400px]'>
-                    <FormLabel>Rozwiązanie</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} />
-                    </FormControl>
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='comment'
-                render={({ field }) => (
-                  <FormItem className='w-[400px]'>
-                    <FormLabel>Komentarz</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} />
-                    </FormControl>
-                    {/* <FormMessage /> */}
-                  </FormItem>
-                )}
-              />
-            </div>
+                <FormField
+                  control={form.control}
+                  name='solution'
+                  render={({ field }) => (
+                    <FormItem className='w-[400px]'>
+                      <FormLabel>Rozwiązanie</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='comment'
+                  render={({ field }) => (
+                    <FormItem className='w-[400px]'>
+                      <FormLabel>Komentarz</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </ScrollArea>
             <DialogFooter className='mt-4'>
               {isPendingUpdate ? (
                 <Button disabled>
