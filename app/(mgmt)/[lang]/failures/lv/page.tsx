@@ -36,7 +36,10 @@ async function getFailures(
 
   let failures: FailureType[] = await res.json();
 
-  const { station, failure, supervisor, responsible } = searchParams;
+  const { line, station, failure, supervisor, responsible } = searchParams;
+  if (line) {
+    failures = failures.filter((failure) => failure.line === line);
+  }
   if (station) {
     failures = failures.filter((failure) => failure.station === station);
   }
