@@ -66,6 +66,7 @@ async function getFailures(
         60000,
     ),
     createdAt: new Date(failure.createdAt).toLocaleString(lang),
+    updatedAt: new Date(failure.updatedAt).toLocaleString(lang),
   });
 
   const formattedFailures: FailureType[] = failures.map(formatTime);

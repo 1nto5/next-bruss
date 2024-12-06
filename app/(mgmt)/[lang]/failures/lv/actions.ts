@@ -2,11 +2,9 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { InsertFailureType, UpdateFailureType } from '@/lib/z/failure';
+import { FailureType, InsertFailureType } from '@/lib/z/failure';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { Update } from 'next/dist/build/swc/types';
-import { redirect } from 'next/navigation';
 // import { redirect } from 'next/navigation';
 
 // export async function deleteDraftDeviation(_id: ObjectId) {
@@ -46,7 +44,7 @@ export async function revalidateFailures() {
   revalidateTag('failures-lv');
 }
 
-export async function insertFailure(failure: InsertFailureType) {
+export async function insertFailure(failureInsertData: InsertFailureType) {
   const session = await auth();
   // if (
   //   !session ||
@@ -58,8 +56,9 @@ export async function insertFailure(failure: InsertFailureType) {
   try {
     const collection = await dbc('failures_lv');
     const failureWithDate = {
-      ...failure,
+      ...failureInsertData,
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
     const res = await collection.insertOne(failureWithDate);
     if (res) {
@@ -73,12 +72,13 @@ export async function insertFailure(failure: InsertFailureType) {
     return { error: 'insertDeviation server action error' };
   }
 }
-
-export async function updateFailure(failure: UpdateFailureType) {
+export async function updateFailure(failureUpdateData: FailureType) {
   try {
     const collection = await dbc('failures_lv');
 
-    const { _id, ...updateFields } = failure;
+    const { _id, createdAt, line, station, failure, ...updateFields } =
+      failureUpdateData;
+    updateFields.updatedAt = new Date();
 
     const res = await collection.updateOne(
       { _id: new ObjectId(_id) },

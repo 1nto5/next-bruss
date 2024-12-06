@@ -20,9 +20,9 @@ export const AddFailureSchema = z
 
 export type InsertFailureType = z.infer<typeof AddFailureSchema>;
 
-export type UpdateFailureType = InsertFailureType & {
-  _id: string;
-};
+// export type UpdateFailureType = InsertFailureType & {
+//   _id: string;
+// };
 
 // export type FailureType = Omit<InsertFailureType, 'from' | 'to'> & {
 //   fromLocaleString: string;
@@ -36,5 +36,6 @@ export type FailureType = InsertFailureType & {
   fromLocaleString: string;
   toLocaleString: string;
   createdAt: string | Date;
+  updatedAt: string | Date;
   duration: number;
 };

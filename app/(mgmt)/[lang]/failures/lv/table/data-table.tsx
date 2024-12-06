@@ -103,8 +103,10 @@ export function DataTable<TData, TValue>({
 
   React.useEffect(() => {
     setFromValue(searchParams.get('from') || '');
+  }, [searchParams.get('from')]);
+  React.useEffect(() => {
     setToValue(searchParams.get('to') || '');
-  }, [searchParams]); // Aktualizacja stanu, gdy zmienią się parametry w URL
+  }, [searchParams.get('to')]);
 
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
@@ -309,23 +311,23 @@ export function DataTable<TData, TValue>({
               className='w-36'
               // defaultValue={searchParams.get('from') || ''}
               value={fromValue.split('T')[0] || ''}
+              // value={new Date().toISOString() || ''}
               onChange={(e) => {
                 router.push(
                   pathname + '?' + createQueryString('from', e.target.value),
                 );
               }}
             />
-            <Input
+            {/* <Input
               type='time'
-              // defaultValue={searchParams.get('from') || ''}
+              // defaultValue={searchParams.get('to') || ''}
               value={fromValue.split('T')[1]?.slice(0, 5) || ''}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':').map(Number);
-                const fromParam = searchParams.get('from'); // Pobieramy wartość 'from'
+                const fromParam = searchParams.get('from');
                 const currentFrom = fromParam
                   ? new Date(fromParam)
-                  : new Date(); // Walidacja wartości
-
+                  : new Date();
                 if (!isNaN(hours) && !isNaN(minutes)) {
                   const updatedFrom = new Date(
                     currentFrom.getFullYear(),
@@ -344,7 +346,22 @@ export function DataTable<TData, TValue>({
                   }
                 }
               }}
-            />
+            /> */}
+
+            <Input
+              disabled={!fromValue}
+              type='time'
+              defaultValue={
+                fromValue
+                  ? new Date(fromValue).toDateString()
+                  : new Date().toDateString()
+              }
+              onChange={(e) => {
+                router.push(
+                  pathname + '?' + createQueryString('from', e.target.value),
+                );
+              }}
+            ></Input>
           </div>
           <div className='flex items-center gap-1.5'>
             <Label htmlFor='to'>Do:</Label>

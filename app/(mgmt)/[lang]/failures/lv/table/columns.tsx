@@ -91,4 +91,12 @@ export const columns: ColumnDef<FailureType>[] = [
       return <div className='w-[150px]'>{createdAt as React.ReactNode}</div>;
     },
   },
+  {
+    accessorKey: 'updatedAt',
+    header: 'Ostania aktualizacja',
+    cell: ({ row }) => {
+      const updatedAt = row.getValue('updatedAt');
+      return <div className='w-[150px]'>{updatedAt as React.ReactNode}</div>;
+    },
+  },
 ];
