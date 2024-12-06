@@ -98,3 +98,28 @@ export async function updateFailure(failureUpdateData: UpdateFailureType) {
     return { error: 'updateFailure server action error' };
   }
 }
+
+export async function endFailure(id: string) {
+  try {
+    const collection = await dbc('failures_lv');
+
+    const res = await collection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          to: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (res.matchedCount > 0) {
+      revalidateTag('failures-lv');
+      return { success: 'ended' };
+    }
+    return { error: 'not ended' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'endFailure server action error' };
+  }
+}

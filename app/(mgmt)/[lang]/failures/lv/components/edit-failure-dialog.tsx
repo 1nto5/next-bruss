@@ -17,19 +17,18 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { FailureType } from '@/lib/types/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Check, ChevronsUpDown, CopyPlus, Loader2, Pencil } from 'lucide-react';
+import { Loader2, Pencil } from 'lucide-react';
 
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 // import { Separator } from '@/components/ui/separator';
-import { AddFailureSchema } from '@/lib/z/failure';
-import { ObjectId } from 'mongodb';
-import { useEffect, useState } from 'react';
+import { UpdateFailureSchema } from '@/lib/z/failure';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -43,28 +42,26 @@ export default function EditFailureDialog({
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
 
-  const [openStation, setOpenStation] = useState(false);
-  const [openFailure, setOpenFailure] = useState(false);
-
-  const form = useForm<z.infer<typeof AddFailureSchema>>({
-    resolver: zodResolver(AddFailureSchema),
+  const form = useForm<z.infer<typeof UpdateFailureSchema>>({
+    resolver: zodResolver(UpdateFailureSchema),
     defaultValues: {
       from: new Date(failure.from),
-      to: new Date(failure.to),
+      to: failure.to ? new Date(failure.to) : undefined,
       supervisor: failure.supervisor,
       responsible: failure.responsible,
       solution: failure.solution,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
+  const onSubmit = async (data: z.infer<typeof UpdateFailureSchema>) => {
     // setIsDraft(false);
     setIsPendingUpdate(true);
     try {
+      console.log('data', data);
       const res = await updateFailure({
         _id: failure._id,
         from: data.from,
-        to: data.to,
+        to: data.to ? data.to : undefined,
         supervisor: data.supervisor,
         responsible: data.responsible,
         solution: data.solution,
@@ -89,7 +86,7 @@ export default function EditFailureDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div>
-          <Button size='icon' variant='ghost'>
+          <Button size={'sm'} variant={'outline'}>
             <Pencil />
           </Button>
         </div>
@@ -172,74 +169,88 @@ export default function EditFailureDialog({
                   )}
                 />
               </div>
+              <FormField
+                control={form.control}
+                name='from'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className='flex space-x-2'>
-                <FormField
-                  control={form.control}
-                  name='to'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Zakończenie dn.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='date'
-                          defaultValue={format(
-                            new Date(failure.to),
-                            'yyyy-MM-dd',
-                          )}
-                          onChange={(e) => {
-                            const currentFrom =
-                              form.getValues('to') || new Date();
-                            const newDate = new Date(e.target.value);
-                            const updatedFrom = new Date(
-                              newDate.getFullYear(),
-                              newDate.getMonth(),
-                              newDate.getDate(),
-                              currentFrom.getHours(),
-                              currentFrom.getMinutes(),
-                            );
+              {failure.to && (
+                <div className='flex space-x-2'>
+                  <FormField
+                    control={form.control}
+                    name='to'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Zakończenie dn.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='date'
+                            defaultValue={format(
+                              new Date(failure.to || Date.now()),
+                              'yyyy-MM-dd',
+                            )}
+                            onChange={(e) => {
+                              const currentFrom =
+                                form.getValues('to') || new Date();
+                              const newDate = new Date(e.target.value);
+                              const updatedFrom = new Date(
+                                newDate.getFullYear(),
+                                newDate.getMonth(),
+                                newDate.getDate(),
+                                currentFrom.getHours(),
+                                currentFrom.getMinutes(),
+                              );
 
-                            form.setValue('to', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='to'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>godz.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='time'
-                          defaultValue={format(new Date(failure.to), 'HH:mm')}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(':')
-                              .map(Number);
-                            const currentFrom =
-                              form.getValues('to') || new Date();
-                            const updatedFrom = new Date(
-                              currentFrom.getFullYear(),
-                              currentFrom.getMonth(),
-                              currentFrom.getDate(),
-                              hours,
-                              minutes,
-                            );
+                              form.setValue('to', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='to'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>godz.</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='time'
+                            defaultValue={format(
+                              new Date(failure.to || Date.now()),
+                              'HH:mm',
+                            )}
+                            onChange={(e) => {
+                              const [hours, minutes] = e.target.value
+                                .split(':')
+                                .map(Number);
+                              const currentFrom =
+                                form.getValues('to') || new Date();
+                              const updatedFrom = new Date(
+                                currentFrom.getFullYear(),
+                                currentFrom.getMonth(),
+                                currentFrom.getDate(),
+                                hours,
+                                minutes,
+                              );
 
-                            form.setValue('to', updatedFrom);
-                          }}
-                        />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-              </div>
+                              form.setValue('to', updatedFrom);
+                            }}
+                          />
+                        </FormControl>
+                        {/* <FormMessage /> */}
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
               <FormField
                 control={form.control}

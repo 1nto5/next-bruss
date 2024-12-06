@@ -1,18 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { FailureType } from '@/lib/types/failure';
+import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
 import EditFailureDialog from '../components/edit-failure-dialog';
+import EndFailureButton from '../components/end-failure-button';
 
 export const columns: ColumnDef<FailureType>[] = [
   {
@@ -32,7 +24,19 @@ export const columns: ColumnDef<FailureType>[] = [
     header: 'Awaria',
     cell: ({ row }) => {
       const failure = row.getValue('failure');
-      return <div className='w-[200px]'>{failure as React.ReactNode}</div>;
+      const failureInProgress =
+        row.getValue('fromLocaleString') && !row.getValue('toLocaleString');
+
+      return (
+        <div
+          className={cn(
+            'w-[200px]',
+            !!failureInProgress && 'animate-pulse font-bold text-red-500',
+          )}
+        >
+          {failure as React.ReactNode}
+        </div>
+      );
     },
   },
 
@@ -59,6 +63,14 @@ export const columns: ColumnDef<FailureType>[] = [
     header: 'Zakończenie',
     cell: ({ row }) => {
       const to = row.getValue('toLocaleString');
+      const id = row.original._id;
+      if (!to) {
+        return (
+          <div className='w-[150px]'>
+            <EndFailureButton failureId={id} />
+          </div>
+        );
+      }
       return <div className='w-[150px]'>{to as React.ReactNode}</div>;
     },
   },

@@ -60,18 +60,23 @@ async function getFailures(
   // const duration = (failure: FailureType) =>
   //   Math.round(failure.to.getTime() - failure.from.getTime()) / 60000;
 
-  const formatTime = (failure: FailureType) => ({
-    ...failure,
-    fromLocaleString: new Date(failure.from).toLocaleString(lang),
-    toLocaleString: new Date(failure.to).toLocaleString(lang),
-    duration: Math.round(
-      (new Date(failure.to).getTime() - new Date(failure.from).getTime()) /
-        60000,
-    ),
-    createdAt: new Date(failure.createdAt).toLocaleString(lang),
-    updatedAt: new Date(failure.updatedAt).toLocaleString(lang),
-  });
+  const formatTime = (failure: FailureType) => {
+    const fromTime = new Date(failure.from).getTime();
+    const toTime = failure.to ? new Date(failure.to).getTime() : Date.now();
 
+    return {
+      ...failure,
+      fromLocaleString: new Date(failure.from).toLocaleString(lang),
+      toLocaleString: failure.to
+        ? new Date(failure.to).toLocaleString(lang)
+        : '', // Jeśli `to` nie istnieje, pozostaw pusty ciąg
+      duration: Math.round((toTime - fromTime) / 60000), // Oblicz różnicę w minutach
+      createdAt: new Date(failure.createdAt).toLocaleString(lang),
+      updatedAt: failure.updatedAt
+        ? new Date(failure.updatedAt).toLocaleString(lang)
+        : '', // Jeśli `updatedAt` nie istnieje, pozostaw pusty ciąg
+    };
+  };
   const formattedFailures: FailureType[] = failures.map(formatTime);
   return { fetchTime, formattedFailures };
 }

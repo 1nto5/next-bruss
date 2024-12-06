@@ -24,6 +24,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -41,7 +42,6 @@ import { format } from 'date-fns';
 import { Check, ChevronsUpDown, CopyPlus, Loader2 } from 'lucide-react';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Separator } from '@/components/ui/separator';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -61,7 +61,7 @@ export default function AddFailureDialog({}: {}) {
       responsible: '',
       supervisor: '',
       from: new Date(new Date()),
-      to: new Date(new Date().getTime() + 60 * 60 * 1000),
+      // to: new Date(new Date().getTime() + 60 * 60 * 1000),
     },
   });
 
@@ -113,8 +113,8 @@ export default function AddFailureDialog({}: {}) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[400px]'>
-              <div className='grid items-center gap-2'>
+            <ScrollArea className='h-[450px]'>
+              <div className='grid items-center gap-2 pl-2'>
                 <FormField
                   control={form.control}
                   name='line'
@@ -367,74 +367,15 @@ export default function AddFailureDialog({}: {}) {
                     )}
                   />
                 </div>
-
-                <div className='flex space-x-2'>
-                  <FormField
-                    control={form.control}
-                    name='to'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Zakończenie dn.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='date'
-                            defaultValue={format(new Date(), 'yyyy-MM-dd')}
-                            onChange={(e) => {
-                              const currentFrom =
-                                form.getValues('to') || new Date();
-                              const newDate = new Date(e.target.value);
-                              const updatedFrom = new Date(
-                                newDate.getFullYear(),
-                                newDate.getMonth(),
-                                newDate.getDate(),
-                                currentFrom.getHours(),
-                                currentFrom.getMinutes(),
-                              );
-
-                              form.setValue('to', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='to'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>godz.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='time'
-                            defaultValue={format(
-                              new Date(new Date().getTime() + 60 * 60 * 1000),
-                              'HH:mm',
-                            )}
-                            onChange={(e) => {
-                              const [hours, minutes] = e.target.value
-                                .split(':')
-                                .map(Number);
-                              const currentFrom =
-                                form.getValues('to') || new Date();
-                              const updatedFrom = new Date(
-                                currentFrom.getFullYear(),
-                                currentFrom.getMonth(),
-                                currentFrom.getDate(),
-                                hours,
-                                minutes,
-                              );
-
-                              form.setValue('to', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name='from'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
