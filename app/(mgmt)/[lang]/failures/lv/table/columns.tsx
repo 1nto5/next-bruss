@@ -100,8 +100,8 @@ export const columns: ColumnDef<FailureType>[] = [
     header: 'Komentarz',
     // header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
-      const solution = row.getValue('solution');
-      return <div className='w-[300px]'>{solution as React.ReactNode}</div>;
+      const comment = row.getValue('comment');
+      return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
     },
   },
   {
