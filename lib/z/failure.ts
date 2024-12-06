@@ -10,6 +10,7 @@ export const AddFailureSchema = z
     supervisor: z.string().min(1),
     responsible: z.string().min(1),
     solution: z.string().optional(),
+    comment: z.string().optional(),
   })
   // .refine((data) => data.from < data.to, {
   //   path: ['to'],
@@ -32,6 +33,7 @@ export const UpdateFailureSchema = z
     supervisor: z.string().min(1),
     responsible: z.string().min(1),
     solution: z.string().optional(),
+    comment: z.string().optional(),
   })
   .refine((data) => data.from < new Date(), {
     path: ['from'],

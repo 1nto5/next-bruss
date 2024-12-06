@@ -114,7 +114,7 @@ export default function AddFailureDialog({}: {}) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <ScrollArea className='h-[450px]'>
-              <div className='grid items-center gap-2 pl-2'>
+              <div className='grid items-center gap-2 p-2'>
                 <FormField
                   control={form.control}
                   name='line'
@@ -416,6 +416,20 @@ export default function AddFailureDialog({}: {}) {
                   render={({ field }) => (
                     <FormItem className='w-[400px]'>
                       <FormLabel>Rozwiązanie</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='comment'
+                  render={({ field }) => (
+                    <FormItem className='w-[400px]'>
+                      <FormLabel>Komentarz</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>

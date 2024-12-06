@@ -96,6 +96,15 @@ export const columns: ColumnDef<FailureType>[] = [
     },
   },
   {
+    accessorKey: 'comment',
+    header: 'Komentarz',
+    // header: () => <div className="text-right">Amount</div>,
+    cell: ({ row }) => {
+      const solution = row.getValue('solution');
+      return <div className='w-[300px]'>{solution as React.ReactNode}</div>;
+    },
+  },
+  {
     accessorKey: 'createdAt',
     header: 'Utworzono',
     cell: ({ row }) => {

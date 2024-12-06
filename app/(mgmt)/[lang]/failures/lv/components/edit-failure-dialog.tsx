@@ -298,6 +298,19 @@ export default function EditFailureDialog({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name='comment'
+                render={({ field }) => (
+                  <FormItem className='w-[400px]'>
+                    <FormLabel>Komentarz</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    {/* <FormMessage /> */}
+                  </FormItem>
+                )}
+              />
             </div>
             <DialogFooter className='mt-4'>
               {isPendingUpdate ? (
