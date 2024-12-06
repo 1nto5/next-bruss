@@ -4,7 +4,7 @@
 import Container from '@/components/ui/container';
 
 export const metadata = {
-  title: 'Awarie LV2 (Next BRUSS)',
+  title: 'Awarie LV (Next BRUSS)',
 };
 
 export default async function Layout({
