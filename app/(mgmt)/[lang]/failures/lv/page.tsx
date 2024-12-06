@@ -1,6 +1,6 @@
 // import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
-import { FailureType } from '@/lib/z/failure';
+import { FailureType } from '@/lib/types/failure';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 

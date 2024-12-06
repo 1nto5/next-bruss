@@ -2,14 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -27,21 +19,15 @@ import {
   FormLabel,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
-import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
-import { cn } from '@/lib/utils';
-import { AddFailureSchema, FailureType } from '@/lib/z/failure';
+import { FailureType } from '@/lib/types/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { Check, ChevronsUpDown, CopyPlus, Loader2, Pencil } from 'lucide-react';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 // import { Separator } from '@/components/ui/separator';
+import { AddFailureSchema } from '@/lib/z/failure';
 import { ObjectId } from 'mongodb';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -63,9 +49,6 @@ export default function EditFailureDialog({
   const form = useForm<z.infer<typeof AddFailureSchema>>({
     resolver: zodResolver(AddFailureSchema),
     defaultValues: {
-      line: failure.line,
-      station: failure.station,
-      failure: failure.failure,
       from: new Date(failure.from),
       to: new Date(failure.to),
       supervisor: failure.supervisor,
@@ -79,8 +62,12 @@ export default function EditFailureDialog({
     setIsPendingUpdate(true);
     try {
       const res = await updateFailure({
-        ...data,
         _id: failure._id,
+        from: data.from,
+        to: data.to,
+        supervisor: data.supervisor,
+        responsible: data.responsible,
+        solution: data.solution,
       });
       if (res.success) {
         toast.success('Awaria zapisana!');

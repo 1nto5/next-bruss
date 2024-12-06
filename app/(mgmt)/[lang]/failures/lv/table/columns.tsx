@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { FailureType } from '@/lib/z/failure';
+import { FailureType } from '@/lib/types/failure';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import EditFailureDialog from '../components/edit-failure-dialog';

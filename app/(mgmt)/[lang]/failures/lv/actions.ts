@@ -2,9 +2,10 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { FailureType, InsertFailureType } from '@/lib/z/failure';
+import { InsertFailureType, UpdateFailureType } from '@/lib/types/failure';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
+import { Update } from 'next/dist/build/swc/types';
 // import { redirect } from 'next/navigation';
 
 // export async function deleteDraftDeviation(_id: ObjectId) {
@@ -72,16 +73,17 @@ export async function insertFailure(failureInsertData: InsertFailureType) {
     return { error: 'insertDeviation server action error' };
   }
 }
-export async function updateFailure(failureUpdateData: FailureType) {
+export async function updateFailure(failureUpdateData: UpdateFailureType) {
   try {
     const collection = await dbc('failures_lv');
 
-    const { _id, createdAt, line, station, failure, ...updateFields } =
-      failureUpdateData;
-    updateFields.updatedAt = new Date();
+    const { _id, ...updateFields } = {
+      ...failureUpdateData,
+      updatedAt: new Date(),
+    };
 
     const res = await collection.updateOne(
-      { _id: new ObjectId(_id) },
+      { _id: new ObjectId(failureUpdateData._id) },
       { $set: updateFields },
     );
 
