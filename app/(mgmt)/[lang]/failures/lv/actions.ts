@@ -77,6 +77,7 @@ export async function updateFailure(failureUpdateData: UpdateFailureType) {
   try {
     const collection = await dbc('failures_lv');
 
+    console.log(failureUpdateData.to);
     const { _id, ...updateFields } = {
       ...failureUpdateData,
       updatedAt: new Date(),

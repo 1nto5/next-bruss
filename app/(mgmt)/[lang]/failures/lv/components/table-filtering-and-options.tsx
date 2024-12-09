@@ -112,12 +112,12 @@ export default function TableFilteringAndOptions({
   };
 
   const handleClearFilters = () => {
+    router.push(pathname);
+
     setFromDate('');
     setFromTime('06:00');
     setToDate('');
     setToTime('22:00');
-    setFilter('from', '');
-    setFilter('to', '');
     setFilter('line', '');
     setFilter('station', '');
     setFilter('failure', '');

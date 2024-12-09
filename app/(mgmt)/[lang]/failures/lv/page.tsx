@@ -36,26 +36,26 @@ async function getFailures(
 
   let failures: FailureType[] = await res.json();
 
-  const { line, station, failure, supervisor, responsible } = searchParams;
-  if (line) {
-    failures = failures.filter((failure) => failure.line === line);
-  }
-  if (station) {
-    failures = failures.filter((failure) => failure.station === station);
-  }
-  if (failure) {
-    failures = failures.filter((failure_) => failure_.failure === failure);
-  }
-  if (supervisor) {
-    failures = failures.filter((failure) =>
-      failure.supervisor.toLowerCase().includes(supervisor.toLowerCase()),
-    );
-  }
-  if (responsible) {
-    failures = failures.filter((failure) =>
-      failure.responsible.toLowerCase().includes(responsible.toLowerCase()),
-    );
-  }
+  // const { line, station, failure, supervisor, responsible } = searchParams;
+  // if (line) {
+  //   failures = failures.filter((failure) => failure.line === line);
+  // }
+  // if (station) {
+  //   failures = failures.filter((failure) => failure.station === station);
+  // }
+  // if (failure) {
+  //   failures = failures.filter((failure_) => failure_.failure === failure);
+  // }
+  // if (supervisor) {
+  //   failures = failures.filter((failure) =>
+  //     failure.supervisor.toLowerCase().includes(supervisor.toLowerCase()),
+  //   );
+  // }
+  // if (responsible) {
+  //   failures = failures.filter((failure) =>
+  //     failure.responsible.toLowerCase().includes(responsible.toLowerCase()),
+  //   );
+  // }
 
   // const duration = (failure: FailureType) =>
   //   Math.round(failure.to.getTime() - failure.from.getTime()) / 60000;

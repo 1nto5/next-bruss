@@ -42,7 +42,6 @@ export default function EditFailureDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
-
   const form = useForm<z.infer<typeof UpdateFailureSchema>>({
     resolver: zodResolver(UpdateFailureSchema),
     defaultValues: {
@@ -51,6 +50,7 @@ export default function EditFailureDialog({
       supervisor: failure.supervisor,
       responsible: failure.responsible,
       solution: failure.solution,
+      comment: failure.comment,
     },
   });
 
@@ -58,14 +58,14 @@ export default function EditFailureDialog({
     // setIsDraft(false);
     setIsPendingUpdate(true);
     try {
-      console.log('data', data);
       const res = await updateFailure({
         _id: failure._id,
         from: data.from,
-        to: data.to ? data.to : undefined,
+        to: failure.to ? data.to : undefined,
         supervisor: data.supervisor,
         responsible: data.responsible,
         solution: data.solution,
+        comment: data.comment,
       });
       if (res.success) {
         toast.success('Awaria zapisana!');
