@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { revalidateFailures } from '../actions';
@@ -90,7 +91,11 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Awarie LV</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <TableFilteringAndOptions />
+        <TableFilteringAndOptions
+          setFilter={(columnId, value) =>
+            table.getColumn(columnId)?.setFilterValue(value)
+          }
+        />
       </CardHeader>
       <CardContent>
         <div className='rounded-md border'>

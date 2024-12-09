@@ -31,7 +31,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { revalidateFailures } from '../actions';
 import AddFailureDialog from './add-failure-dialog';
 
-export default function TableFilteringAndOptions() {
+export default function TableFilteringAndOptions({
+  setFilter,
+}: {
+  setFilter: (columnId: string, value: string) => void;
+}) {
+  const [filterValue, setFilterValue] = useState('');
+  const [filterLineValue, setFilterLineValue] = useState('');
+  const [filterStationValue, setFilterStationValue] = useState('');
+  const [filterFailureValue, setFilterFailureValue] = useState('');
+  const [filterSupervisorValue, setFilterSupervisorValue] = useState('');
+  const [filterResponsibleValue, setFilterResponsibleValue] = useState('');
+
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
 
@@ -89,9 +100,8 @@ export default function TableFilteringAndOptions() {
   );
 
   const filteredFailures =
-    failuresOptions.find(
-      (option) => option.station === searchParams.get('station'),
-    )?.options || [];
+    failuresOptions.find((option) => option.station === filterStationValue)
+      ?.options || [];
 
   const handleSearchClick = () => {
     const params = {
@@ -106,16 +116,24 @@ export default function TableFilteringAndOptions() {
     setFromTime('06:00');
     setToDate('');
     setToTime('22:00');
-    router.push(pathname);
+    setFilter('from', '');
+    setFilter('to', '');
+    setFilter('line', '');
+    setFilter('station', '');
+    setFilter('failure', '');
+    setFilter('supervisor', '');
+    setFilter('responsible', '');
   };
 
   return (
     <div className='flex flex-wrap gap-2'>
       <div className='flex space-x-4'>
         <RadioGroup
-          value={searchParams.get('line') || ''}
+          value={filterLineValue}
           onValueChange={(value) => {
-            router.push(pathname + '?' + createQueryString('line', value));
+            // router.push(pathname + '?' + createQueryString('line', value));
+            setFilterLineValue(value);
+            setFilter('line', value); // Przykład: ustawienie filtra na kolumnę 'station'
           }}
           className='flex flex-row '
         >
@@ -138,12 +156,12 @@ export default function TableFilteringAndOptions() {
             // aria-expanded={open}
             className={cn(
               'justify-between',
-              !searchParams.get('station') && 'opacity-50',
+              !filterStationValue && 'opacity-50',
             )}
           >
-            {searchParams.get('station')
+            {filterStationValue
               ? stationsOptions.find(
-                  (station) => station === searchParams.get('station'),
+                  (station) => station === filterStationValue,
                 )
               : 'stacja'}
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -159,7 +177,9 @@ export default function TableFilteringAndOptions() {
                   key='reset'
                   onSelect={() => {
                     // setWarehouseValue('');
-                    router.push(pathname);
+                    // router.push(pathname);
+                    setFilterStationValue('');
+                    setFilter('station', '');
                     setOpenStation(false);
                   }}
                 >
@@ -176,23 +196,25 @@ export default function TableFilteringAndOptions() {
                       //     ? ''
                       //     : currentValue,
                       // );
-                      router.push(
-                        pathname +
-                          '?' +
-                          createQueryString(
-                            'station',
-                            currentValue === searchParams.get('station')
-                              ? ''
-                              : currentValue,
-                          ),
-                      );
+                      // router.push(
+                      //   pathname +
+                      //     '?' +
+                      //     createQueryString(
+                      //       'station',
+                      //       currentValue === searchParams.get('station')
+                      //         ? ''
+                      //         : currentValue,
+                      //     ),
+                      // );
+                      setFilterStationValue(currentValue);
+                      setFilter('station', currentValue);
                       setOpenStation(false);
                     }}
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        searchParams.get('station') === station
+                        filterStationValue === station
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
@@ -205,21 +227,22 @@ export default function TableFilteringAndOptions() {
           </Command>
         </PopoverContent>
       </Popover>
+
       <Popover open={openFailure} onOpenChange={setOpenFailure}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
             role='combobox'
-            disabled={!searchParams.get('station')}
+            disabled={!filterStationValue}
             // aria-expanded={open}
             className={cn(
               'justify-between',
-              !searchParams.get('failure') && 'opacity-50',
+              !filterFailureValue && 'opacity-50',
             )}
           >
-            {searchParams.get('failure')
+            {filterFailureValue
               ? filteredFailures.find(
-                  (failure) => failure === searchParams.get('failure'),
+                  (failure) => failure === filterFailureValue,
                 )
               : 'awaria'}
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -235,7 +258,9 @@ export default function TableFilteringAndOptions() {
                   key='reset'
                   onSelect={() => {
                     // setWarehouseValue('');
-                    router.push(pathname);
+                    // router.push(pathname);
+                    setFilterFailureValue('');
+                    setFilter('failure', '');
                     setOpenFailure(false);
                   }}
                 >
@@ -252,23 +277,25 @@ export default function TableFilteringAndOptions() {
                       //     ? ''
                       //     : currentValue,
                       // );
-                      router.push(
-                        pathname +
-                          '?' +
-                          createQueryString(
-                            'failure',
-                            currentValue === searchParams.get('failure')
-                              ? ''
-                              : currentValue,
-                          ),
-                      );
+                      // router.push(
+                      //   pathname +
+                      //     '?' +
+                      //     createQueryString(
+                      //       'failure',
+                      //       currentValue === searchParams.get('failure')
+                      //         ? ''
+                      //         : currentValue,
+                      //     ),
+                      // );
+                      setFilterFailureValue(currentValue);
+                      setFilter('failure', currentValue);
                       setOpenFailure(false);
                     }}
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        searchParams.get('failure') === failure
+                        filterFailureValue === failure
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
@@ -285,21 +312,25 @@ export default function TableFilteringAndOptions() {
       <Input
         placeholder='nadzorujący'
         className='w-auto'
-        value={searchParams.get('supervisor') ?? ''}
+        value={filterSupervisorValue}
         onChange={(e) => {
-          router.push(
-            pathname + '?' + createQueryString('supervisor', e.target.value),
-          );
+          // router.push(
+          //   pathname + '?' + createQueryString('supervisor', e.target.value),
+          // );
+          setFilterSupervisorValue(e.target.value);
+          setFilter('supervisor', e.target.value);
         }}
       />
       <Input
         placeholder='odpowiedzialny'
         className='w-36'
-        value={searchParams.get('responsible') ?? ''}
+        value={filterResponsibleValue}
         onChange={(e) => {
-          router.push(
-            pathname + '?' + createQueryString('responsible', e.target.value),
-          );
+          // router.push(
+          //   pathname + '?' + createQueryString('responsible', e.target.value),
+          // );
+          setFilterResponsibleValue(e.target.value);
+          setFilter('responsible', e.target.value);
         }}
       />
 
