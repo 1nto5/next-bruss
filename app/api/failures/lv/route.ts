@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       .toArray();
     return new NextResponse(JSON.stringify(failures));
   } catch (error) {
-    console.error('api/deviations/get-deviations: ' + error);
-    return NextResponse.json({ error: 'get-deviations api' }, { status: 503 });
+    console.error('api/failures/lv: ' + error);
+    return NextResponse.json({ error: 'failures/lv api' }, { status: 503 });
   }
 }

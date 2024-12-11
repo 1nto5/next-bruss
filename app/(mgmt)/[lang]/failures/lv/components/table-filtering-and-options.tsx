@@ -25,7 +25,9 @@ import {
   CircleX,
   RefreshCcw,
   Search,
+  Sheet,
 } from 'lucide-react';
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { revalidateFailures } from '../actions';
@@ -36,7 +38,6 @@ export default function TableFilteringAndOptions({
 }: {
   setFilter: (columnId: string, value: string) => void;
 }) {
-  const [filterValue, setFilterValue] = useState('');
   const [filterLineValue, setFilterLineValue] = useState('');
   const [filterStationValue, setFilterStationValue] = useState('');
   const [filterFailureValue, setFilterFailureValue] = useState('');
@@ -74,15 +75,15 @@ export default function TableFilteringAndOptions({
 
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
+  // const createQueryString = useCallback(
+  //   (name: string, value: string) => {
+  //     const params = new URLSearchParams(searchParams.toString());
+  //     params.set(name, value);
 
-      return params.toString();
-    },
-    [searchParams],
-  );
+  //     return params.toString();
+  //   },
+  //   [searchParams],
+  // );
 
   const createDateTimeQueryString = useCallback(
     (params: Record<string, string>) => {
@@ -113,7 +114,6 @@ export default function TableFilteringAndOptions({
 
   const handleClearFilters = () => {
     router.push(pathname);
-
     setFromDate('');
     setFromTime('06:00');
     setToDate('');
@@ -125,9 +125,31 @@ export default function TableFilteringAndOptions({
     setFilter('responsible', '');
   };
 
+  // const [isPendingExcelGenerate, setIsPendingExcelGenerate] = useState(false);
+
+  // const handleGenerateExcel = async () => {
+  //   setIsPendingExcelGenerate(true);
+  //   try {
+  //     const response = await fetch('/api/failures/lv/excel', {});
+
+  //     console.log('response', response);
+  //   } catch (error) {
+  //     toast.error('Skontaktuj się z działem IT');
+  //     console.error('There was an error generating the Excel file:', error);
+  //   } finally {
+  //     setIsPendingExcelGenerate(false);
+  //   }
+  // };
+
   return (
     <div className='flex flex-wrap gap-2'>
       <div className='flex space-x-4'>
+        {/* <Link
+          className='hover:underline'
+          href={`${process.env.API}/failures/lv/excel}`}
+        >
+          XLSX
+        </Link> */}
         <RadioGroup
           value={filterLineValue}
           onValueChange={(value) => {
@@ -381,13 +403,12 @@ export default function TableFilteringAndOptions({
         </Button>
         <Button
           variant='outline'
-          onClick={handleClearFilters}
+          onClick={() => handleClearFilters()}
           size='icon'
           title='wyczyść filtry'
         >
           <CircleX />
         </Button>
-
         <Button
           variant='outline'
           onClick={() => revalidateFailures()}
@@ -396,6 +417,16 @@ export default function TableFilteringAndOptions({
         >
           <RefreshCcw />
         </Button>
+        <Link href={`/api/failures/lv/excel`}>
+          <Button
+            variant='outline'
+            onClick={() => revalidateFailures()}
+            size='icon'
+            title='export do Excel'
+          >
+            <Sheet />
+          </Button>
+        </Link>
         <AddFailureDialog />
       </div>
     </div>

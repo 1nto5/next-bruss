@@ -7,4 +7,5 @@ TODO: <div className='flex flex-wrap gap-1'> for tables searching and icons (lik
 FIXME: router.back() in login-form does not work properly when auto redirect to auth
 FIXME: deviations id copy to clipboard
 PLAN: tempering process BRI (article login, get batch, show degrees and timer)
+FIXME: data format for default data Input in safari
 */
