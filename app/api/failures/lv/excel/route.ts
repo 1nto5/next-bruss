@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const failures = await coll
       .find({})
       .sort({ _id: -1 })
-      .limit(1000)
+      .limit(100000)
       .toArray();
 
     const workbook = new Workbook();
