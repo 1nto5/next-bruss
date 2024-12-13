@@ -13,3 +13,8 @@ export async function revalidateCards() {
 export async function revalidatePositions() {
   revalidateTag('inventory-positions');
 }
+
+export async function revalidateAll() {
+  revalidateTag('inventory-cards');
+  revalidateTag('inventory-positions');
+}

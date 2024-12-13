@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const deviations = await coll
       .find({})
       .sort({ _id: -1 })
-      .limit(100)
+      .limit(10000)
       .toArray();
     return new NextResponse(JSON.stringify(deviations));
   } catch (error) {

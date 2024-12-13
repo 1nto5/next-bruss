@@ -418,12 +418,7 @@ export default function TableFilteringAndOptions({
           <RefreshCcw />
         </Button>
         <Link href={`/api/failures/lv/excel`}>
-          <Button
-            variant='outline'
-            onClick={() => revalidateFailures()}
-            size='icon'
-            title='export do Excel'
-          >
+          <Button variant='outline' size='icon' title='export do Excel'>
             <Sheet />
           </Button>
         </Link>

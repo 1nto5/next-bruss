@@ -77,11 +77,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error generating Excel file:', error);
-    return new NextResponse(
-      JSON.stringify({ message: 'Error generating Excel file' }),
-      {
-        status: 500,
-      },
+    return NextResponse.json(
+      { error: 'failures/lv/excel api' },
+      { status: 503 },
     );
   }
 }

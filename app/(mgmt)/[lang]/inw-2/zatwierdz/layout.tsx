@@ -4,7 +4,7 @@
 // import Container from '@/components/ui/container';
 
 export const metadata = {
-  title: 'Odchylenia (Next BRUSS)',
+  title: 'Inwentaryzacja (Next BRUSS)',
 };
 
 export default async function Layout({

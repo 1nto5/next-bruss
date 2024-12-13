@@ -20,3 +20,8 @@ export type CardType = {
   time: string;
   positions: PositionType[];
 };
+
+export type CardTableDataType = CardType & {
+  positionsLength: number;
+  approvedPositions: number;
+};

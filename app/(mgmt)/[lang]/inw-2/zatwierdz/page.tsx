@@ -1,18 +1,17 @@
 import { Locale } from '@/i18n.config';
-import { CardType } from '@/lib/types/inventory';
-import { columns } from './table/columns';
-import { DataTable } from './table/data-table';
+import { CardTableDataType } from '@/lib/types/inventory';
+import { columns } from './cards-table/columns';
+import { DataTable } from './cards-table/data-table';
 
 async function getCards(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
   fetchTime: string;
-  cards: CardType[];
+  cards: CardTableDataType[];
 }> {
   const res = await fetch(`${process.env.API}/inventory/cards`, {
-    // TODO: search params
-    next: { revalidate: 30, tags: ['deviations'] },
+    next: { revalidate: 30, tags: ['inventory-cards'] },
   });
 
   if (!res.ok) {
@@ -25,19 +24,17 @@ async function getCards(
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  let cards: CardType[] = await res.json();
+  let cards: CardTableDataType[] = await res.json();
 
-  const { number, creator, warehouse } = searchParams;
-  console.log('searchParams:', searchParams);
-  if (number) {
-    cards = cards.filter((card) => card.number === Number(number));
-  }
-  if (creator) {
-    cards = cards.filter((card) => card.creators.includes(creator));
-  }
-  if (warehouse) {
-    cards = cards.filter((card) => card.warehouse === warehouse);
-  }
+  cards = cards.map((card) => ({
+    ...card,
+    positionsLength: card.positions ? card.positions.length : 0,
+    approvedPositions: card.positions
+      ? card.positions.filter((p) => p.approver).length
+      : 0,
+  }));
+
+  cards = cards.filter((card) => card.positions && card.positions.length > 0);
 
   return { fetchTime, cards };
 }

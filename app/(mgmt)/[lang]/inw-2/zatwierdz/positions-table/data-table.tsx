@@ -46,7 +46,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { warehouseSelectOptions } from '@/lib/options/warehouse';
+import { warehouseSelectOptions } from '@/lib/options/inventory';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -57,7 +57,7 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
-import { revalidateDeviations } from '../actions';
+import { revalidatePositions as revalidate } from '../actions';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   useEffect(() => {
     const interval = setInterval(() => {
-      revalidateDeviations();
+      revalidate();
     }, 1000 * 30); // 30 seconds
 
     return () => clearInterval(interval);
@@ -287,7 +287,7 @@ export function DataTable<TData, TValue>({
                 </Button>
                 <Button
                   variant='outline'
-                  onClick={() => revalidateDeviations()}
+                  onClick={() => revalidate()}
                   size='icon'
                 >
                   <RefreshCcw />

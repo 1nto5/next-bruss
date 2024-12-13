@@ -46,7 +46,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { warehouseSelectOptions } from '@/lib/options/warehouse';
+import { warehouseSelectOptions } from '@/lib/options/inventory';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -57,7 +57,8 @@ import {
 } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
-import { revalidateDeviations } from '../actions';
+import { revalidateCards as revalidate } from '../actions';
+import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -74,7 +75,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   useEffect(() => {
     const interval = setInterval(() => {
-      revalidateDeviations();
+      revalidate();
     }, 1000 * 30); // 30 seconds
 
     return () => clearInterval(interval);
@@ -82,23 +83,6 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
-  );
-  const [openWarehouse, setOpenWarehouse] = React.useState(false);
-  // const [warehouseValue, setWarehouseValue] = React.useState('');
-
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  // Get a new searchParams string by merging the current
-  // searchParams with a provided key/value pair
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams],
   );
 
   const table = useReactTable({
@@ -134,166 +118,11 @@ export function DataTable<TData, TValue>({
             <CardDescription>
               Ostatnia synchronizacja: {fetchTime}
             </CardDescription>
-            <div className='flex items-center justify-between'>
-              <div className='flex flex-col space-y-1 sm:flex-row sm:space-x-1 sm:space-y-0'>
-                {/* <Input
-                  placeholder='id'
-                  value={
-                    (table.getColumn('_id')?.getFilterValue() as string) ?? ''
-                  }
-                  onChange={(event) =>
-                    table.getColumn('_id')?.setFilterValue(event.target.value)
-                  }
-                  className='w-24'
-                /> */}
-                <Input
-                  placeholder='nr karty'
-                  className='w-24'
-                  value={searchParams.get('number') ?? ''}
-                  onChange={(e) => {
-                    router.push(
-                      pathname +
-                        '?' +
-                        createQueryString('number', e.target.value),
-                    );
-                  }}
-                />
-                <Input
-                  placeholder='spisujący'
-                  className='w-24'
-                  value={searchParams.get('creator') ?? ''}
-                  onChange={(e) => {
-                    router.push(
-                      pathname +
-                        '?' +
-                        createQueryString('creator', e.target.value),
-                    );
-                  }}
-                />
-                <Input
-                  placeholder='spisujący'
-                  className='w-24'
-                  value={searchParams.get('creator') ?? ''}
-                  onChange={(e) => {
-                    router.push(
-                      pathname +
-                        '?' +
-                        createQueryString('creator', e.target.value),
-                    );
-                  }}
-                />
-                {/* <Input
-                  placeholder='magazyn'
-                  className='w-24'
-                  value={searchParams.get('warehouse') ?? ''}
-                  onChange={(e) => {
-                    router.push(
-                      pathname +
-                        '?' +
-                        createQueryString('warehouse', e.target.value),
-                    );
-                  }}
-                /> */}
-                <Popover open={openWarehouse} onOpenChange={setOpenWarehouse}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      // aria-expanded={open}
-                      className={cn(
-                        'justify-between',
-                        !searchParams.get('warehouse') && 'opacity-50',
-                      )}
-                    >
-                      {searchParams.get('warehouse')
-                        ? warehouseSelectOptions.find(
-                            (warehouse) =>
-                              warehouse.value === searchParams.get('warehouse'),
-                          )?.value
-                        : 'magazyn'}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-[300px] p-0'>
-                    <Command>
-                      <CommandInput placeholder='wyszukaj...' />
-                      <CommandList>
-                        <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                        <CommandGroup>
-                          <CommandItem
-                            key='reset'
-                            onSelect={() => {
-                              // setWarehouseValue('');
-                              router.push(pathname);
-                              setOpenWarehouse(false);
-                            }}
-                          >
-                            <Check className='mr-2 h-4 w-4 opacity-0' />
-                            nie wybrano
-                          </CommandItem>
-                          {warehouseSelectOptions.map((warehouse) => (
-                            <CommandItem
-                              key={warehouse.value}
-                              value={warehouse.value}
-                              onSelect={(currentValue) => {
-                                // setWarehouseValue(
-                                //   currentValue === warehouseValue
-                                //     ? ''
-                                //     : currentValue,
-                                // );
-                                router.push(
-                                  pathname +
-                                    '?' +
-                                    createQueryString(
-                                      'warehouse',
-                                      currentValue ===
-                                        searchParams.get('warehouse')
-                                        ? ''
-                                        : currentValue,
-                                    ),
-                                );
-                                setOpenWarehouse(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  searchParams.get('warehouse') ===
-                                    warehouse.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {warehouse.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className='flex items-center space-x-1'>
-                <Button
-                  variant='outline'
-                  onClick={() => {
-                    // setWarehouseValue('');
-                    router.push(pathname);
-                  }}
-                  size='icon'
-                >
-                  <CircleX />
-                </Button>
-                <Button
-                  variant='outline'
-                  onClick={() => revalidateDeviations()}
-                  size='icon'
-                >
-                  <RefreshCcw />
-                </Button>
-              </div>
-            </div>
+            <CardsTableFilteringAndOptions
+              setFilter={(columnId, value) =>
+                table.getColumn(columnId)?.setFilterValue(value)
+              }
+            />
           </CardHeader>
           <CardContent>
             <div className='rounded-md border'>

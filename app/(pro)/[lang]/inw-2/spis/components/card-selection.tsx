@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { newCardSchema as formSchema } from '../lib/zod';
@@ -38,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   sectorsSelectOptions,
   warehouseSelectOptions,
-} from '@/lib/options/warehouse';
+} from '@/lib/options/inventory';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';

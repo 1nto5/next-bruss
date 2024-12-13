@@ -1,89 +1,31 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { DeviationType } from '@/lib/types/deviation';
-import { CardType } from '@/lib/types/inventory';
+import { CardTableDataType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
-import { Table } from 'lucide-react';
-import { ObjectId } from 'mongodb';
+import { ArrowUpDown, List, Table } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
 
-const handleCopyId = async (id: ObjectId | undefined) => {
-  if (id) {
-    try {
-      await navigator.clipboard.writeText(id.toString());
-      toast.success('ID skopiowane!');
-    } catch (error) {
-      toast.error('Nie udało się skopiować ID');
-    }
-  } else {
-    toast.error('Skontaktuj się z IT!');
-  }
-};
-
-export const columns: ColumnDef<CardType>[] = [
-  // {
-  //   accessorKey: 'status',
-  //   header: 'Status',
-  //   cell: ({ row }) => {
-  //     const status = row.original.status;
-  //     let statusLabel;
-
-  //     switch (status) {
-  //       case 'approval':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-orange-100 px-2 py-1 italic dark:bg-orange-600'>
-  //             W trakcie zatwierdzania
-  //           </span>
-  //         );
-  //         break;
-  //       case 'valid':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-green-100 px-2 py-1 font-bold dark:bg-green-600'>
-  //             Obowiązuje
-  //           </span>
-  //         );
-  //         break;
-  //       case 'closed':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-600'>
-  //             Zamknięte
-  //           </span>
-  //         );
-  //         break;
-  //       case 'rejected':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-red-100 px-2 py-1 dark:bg-red-600'>
-  //             Odrzucone
-  //           </span>
-  //         );
-  //         break;
-  //       case 'to approve':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-yellow-100 px-2 py-1 dark:bg-yellow-600'>
-  //             Do zatwierdzenia
-  //           </span>
-  //         );
-  //         break;
-  //       case 'draft':
-  //         statusLabel = (
-  //           <span className='rounded-md bg-gray-100 px-2 py-1 font-extralight italic tracking-widest dark:bg-gray-600'>
-  //             Szkic
-  //           </span>
-  //         );
-  //         break;
-  //       default:
-  //         statusLabel = <span>{status}</span>;
-  //     }
-
-  //     return statusLabel;
-  //   },
-  // },
-
+export const columns: ColumnDef<CardTableDataType>[] = [
   {
     accessorKey: 'number',
-    header: 'Numer',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          size={'sm'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Numer
+          <ArrowUpDown className='ml-2' />
+        </Button>
+      );
+    },
+    filterFn: 'includesString',
+    cell: ({ row }) => {
+      const cardNumber = row.original.number;
+      return <div className='text-center'>{cardNumber}</div>;
+    },
   },
   {
     id: 'actions',
@@ -92,8 +34,8 @@ export const columns: ColumnDef<CardType>[] = [
       const cardNumber = row.original.number;
       return (
         <Link href={`/inw-2/zatwierdz/${cardNumber}`}>
-          <Button size='icon' type='button' variant='outline'>
-            <Table />
+          <Button size='sm' type='button' variant='outline'>
+            <List />
           </Button>
         </Link>
       );
@@ -102,29 +44,55 @@ export const columns: ColumnDef<CardType>[] = [
   {
     accessorKey: 'creators',
     header: 'Spisujący',
+    filterFn: 'includesString',
+
     cell: ({ row }) => {
       const creators = row.original.creators;
       return <span className='text-nowrap'>{creators.join(', ')}</span>;
     },
   },
   {
-    accessorKey: 'positions',
-    header: 'Pozycje',
+    accessorKey: 'positionsLength',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          size={'sm'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Poz.
+          <ArrowUpDown className='ml-2' />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const positions = row.original.positions;
-      return <span>{(positions && positions.length) || 0}</span>;
+      const positionsLength = row.original.positionsLength;
+      return <div className='text-center'>{positionsLength}</div>;
     },
   },
   {
-    id: 'approvedPositions',
-    accessorKey: 'positions',
-    header: 'Pozycje zatwierdzone',
+    accessorKey: 'approvedPositions',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          size={'sm'}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Zatw. poz.
+          <ArrowUpDown className='ml-2' />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const positions = row.original.positions;
-      const approvedCount = positions
-        ? positions.filter((pos) => pos.approver).length
-        : 0;
-      return <span>{approvedCount}</span>;
+      const approvedPositions = row.original.approvedPositions;
+      return (
+        <div
+          className={`text-center ${approvedPositions < 3 ? 'animate-pulse font-bold text-red-500' : ''}`}
+        >
+          {approvedPositions}
+        </div>
+      );
     },
   },
   {
