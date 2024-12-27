@@ -32,31 +32,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
-import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { warehouseSelectOptions } from '@/lib/options/inventory';
-import { cn } from '@/lib/utils';
-import {
-  ArrowRight,
-  Check,
-  ChevronsUpDown,
-  CircleX,
-  RefreshCcw,
-} from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect } from 'react';
+
+import { ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
 import { revalidateCards as revalidate } from '../actions';
 import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
 

@@ -7,9 +7,13 @@ export type PositionType = {
   quantity: number;
   unit: string;
   wip: boolean;
-  creators: string[];
   approver: string;
   approvedAt: string;
+};
+
+export type CardPositionsTableDataType = PositionType & {
+  timeLocaleString: string;
+  approvedAtLocaleString: string;
 };
 
 export type CardType = {

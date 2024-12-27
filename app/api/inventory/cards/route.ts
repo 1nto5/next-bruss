@@ -10,29 +10,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     const coll = await dbc('inventory_cards');
-    const deviations = await coll
-      .find({})
-      .sort({ _id: -1 })
-      .limit(10000)
-      .toArray();
-    return new NextResponse(JSON.stringify(deviations));
+    const cards = await coll.find({}).sort({ _id: -1 }).limit(10000).toArray();
+    return new NextResponse(JSON.stringify(cards));
   } catch (error) {
-    console.error('api/deviations/get-deviations: ' + error);
-    return NextResponse.json({ error: 'get-deviations api' }, { status: 503 });
+    console.error('api/inventory/cards: ' + error);
+    return NextResponse.json({ error: 'inventory/cards api' }, { status: 503 });
   }
 }
-
-// export async function GET(req: NextRequest) {
-//   try {
-//     const coll = await dbc('deviations');
-//     const deviations = await coll.find({}).sort({ _id: -1 }).toArray();
-//     return new Promise((resolve, reject) => {
-//       setTimeout(() => {
-//         resolve(new NextResponse(JSON.stringify(deviations)));
-//       }, 2500); // 5 seconds timeout
-//     });
-//   } catch (error) {
-//     console.error('api/deviations/get-reasons: ' + error);
-//     return new NextResponse('get-deviations api error', { status: 503 });
-//   }
-// }

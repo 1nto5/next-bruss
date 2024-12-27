@@ -35,11 +35,10 @@ async function getCards(
   }));
 
   cards = cards.filter((card) => card.positions && card.positions.length > 0);
-
   return { fetchTime, cards };
 }
 
-export default async function DeviationsPage(props: {
+export default async function InventoryPage(props: {
   params: Promise<{ lang: Locale }>;
   // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;

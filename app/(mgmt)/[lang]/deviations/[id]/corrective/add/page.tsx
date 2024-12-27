@@ -5,7 +5,7 @@ import AddCorrectiveAction from './components/add-corrective-action';
 
 async function getUsers(): Promise<UsersListType> {
   const res = await fetch(`${process.env.API}/users`, {
-    next: { revalidate: 0, tags: ['users'] }, // TODO: add revalidate time
+    next: { revalidate: 60 * 60 * 24, tags: ['users'] },
   });
 
   if (!res.ok) {
@@ -18,17 +18,12 @@ async function getUsers(): Promise<UsersListType> {
   return data;
 }
 
-export default async function AddDeviationPage(
-  props: {
-    params: Promise<{ lang: Locale; id: string }>;
-  }
-) {
+export default async function AddDeviationPage(props: {
+  params: Promise<{ lang: Locale; id: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang,
-    id
-  } = params;
+  const { lang, id } = params;
 
   // const dict = await getDictionary(lang);
   const users = await getUsers();

@@ -5,7 +5,7 @@ import AddDeviation from './components/add-deviation';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/reasons`, {
-    next: { revalidate: 0, tags: ['deviationReasons'] }, // TODO: add revalidate time
+    next: { revalidate: 60 * 60 * 24, tags: ['deviationReasons'] },
   });
 
   if (!res.ok) {
@@ -18,16 +18,12 @@ async function getReasons(): Promise<DeviationReasonType[]> {
   return data;
 }
 
-export default async function AddDeviationPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function AddDeviationPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();

@@ -415,7 +415,6 @@ export default function PositionEdit() {
               )}
             </CardContent>
 
-            {/* TODO: stała pozycja dla CardFooter */}
             <CardFooter className='flex justify-between'>
               {position !== 1 ? (
                 <Button

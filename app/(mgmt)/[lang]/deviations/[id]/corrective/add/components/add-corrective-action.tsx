@@ -1,6 +1,3 @@
-// TODO: save draft and go to edit page
-// TODO: get article name
-
 'use client';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
