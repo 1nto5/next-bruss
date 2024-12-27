@@ -46,7 +46,7 @@ interface DataTableProps<TData, TValue> {
   cardNumber: string;
   cardWarehouse: string;
   cardSector: string;
-  cardCreators: string;
+  cardCreators: string[];
 }
 
 export function DataTable<TData, TValue>({
@@ -90,13 +90,14 @@ export function DataTable<TData, TValue>({
       },
     },
   });
-  console.log('creatos', cardCreators);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Pozycje na karcie: {cardNumber}</CardTitle>
         <CardDescription className='font-bold'>
-          Magazyn: {cardWarehouse}, sektor: {cardSector}, twórcy: {cardCreators}
+          Magazyn: {cardWarehouse}, sektor: {cardSector}, twórcy:{' '}
+          {cardCreators.join(', ')}
         </CardDescription>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
         <CardsTableFilteringAndOptions

@@ -29,6 +29,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
+import { is } from 'date-fns/locale';
 import { Loader2, RefreshCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { findArticles, savePosition } from '../actions';
@@ -181,13 +182,36 @@ export default function PositionEdit() {
     return <ErrorAlert refetch={refetch} isFetching={isFetching} />;
   }
 
+  if (isFetching) {
+    return (
+      <Card className='w-[500px]'>
+        <CardHeader>
+          <CardTitle>Pozycja nr: {position}</CardTitle>
+          <CardDescription>
+            karta nr: {card}, magazyn: {warehouse}, sektor: {sector},
+            zalogowani: {persons.join(', ')}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='g-full grid w-full items-center gap-4'>
+          <Skeleton className='h-28'></Skeleton>
+          <Skeleton className='h-28'></Skeleton>
+          <Skeleton className='h-12'></Skeleton>
+          <Skeleton className='h-20'></Skeleton>
+          <Skeleton className='h-12'></Skeleton>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className='w-[500px]'>
       <CardHeader>
         <CardTitle>Pozycja nr: {position}</CardTitle>
         <CardDescription>
           karta nr: {card}, magazyn: {warehouse}, sektor: {sector}, zalogowani:{' '}
-          {persons.join(', ')}
+          {persons.join(', ')},{' '}
+          {data?.success.approver &&
+            'pozycja zatwierdzona - edycja niedozwolona'}
         </CardDescription>
       </CardHeader>
       {!isFetching && (
@@ -219,6 +243,7 @@ export default function PositionEdit() {
                         <Input
                           {...field}
                           value={field.value ?? ''}
+                          disabled={data?.success.approver}
                           onChange={(e) => {
                             field.onChange(e);
                             handleFindArticle(e);
@@ -245,6 +270,7 @@ export default function PositionEdit() {
                     <FormItem className='space-y-3 rounded-lg border p-4'>
                       <FormControl>
                         <RadioGroup
+                          disabled={data?.success.approver}
                           onValueChange={(value) => {
                             field.onChange(value);
                             const selectedArticle = foundArticles.find(
@@ -370,6 +396,7 @@ export default function PositionEdit() {
                         <FormControl>
                           <Input
                             className=''
+                            disabled={data?.success.approver}
                             placeholder={`podaj ilość w ${form.getValues('unit') || selectedArticle.unit}`}
                             {...field}
                           />
@@ -407,6 +434,7 @@ export default function PositionEdit() {
                       </div>
                       <FormControl>
                         <Switch
+                          disabled={data?.success.approver}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -437,7 +465,12 @@ export default function PositionEdit() {
                   Zapisywanie
                 </Button>
               ) : (
-                <Button disabled={!selectedArticle || isPending} type='submit'>
+                <Button
+                  disabled={
+                    !selectedArticle || isPending || data?.success.approver
+                  }
+                  type='submit'
+                >
                   Zapisz
                 </Button>
               )}

@@ -20,6 +20,7 @@ import {
   warehouseSelectOptions,
 } from '@/lib/options/inventory';
 import { cn } from '@/lib/utils';
+import { set } from 'date-fns';
 import {
   Check,
   ChevronsUpDown,
@@ -38,19 +39,17 @@ export default function CardsTableFilteringAndOptions({
 }: {
   setFilter: (columnId: string, value: string) => void;
 }) {
-  const [filterCardNumberValue, setFilterCardNumberValue] = useState('');
-  const [filterCreatorsValue, setFilterCreatorsValue] = useState('');
-  const [filterWarehouseValue, setFilterWarehouseValue] = useState('');
-  const [filterSectorValue, setFilterSectorValue] = useState('');
-
-  const [openWarehouse, setOpenWarehouse] = useState(false);
-  const [openSector, setOpenSector] = useState(false);
+  const [filterPositionValue, setFilterPositionValue] = useState('');
+  const [filterArticleNameValue, setFilterArticleNameValue] = useState('');
+  const [filterArticleNumberValue, setFilterArticleNumberValue] = useState('');
 
   const handleClearFilters = () => {
-    setFilter('number', '');
-    setFilter('creators', '');
-    setFilter('warehouse', '');
-    setFilter('sector', '');
+    setFilter('position', '');
+    setFilterPositionValue('');
+    setFilter('articleName', '');
+    setFilterArticleNameValue('');
+    setFilter('articleNumber', '');
+    setFilterArticleNumberValue('');
   };
 
   return (
@@ -65,146 +64,30 @@ export default function CardsTableFilteringAndOptions({
         type='number'
         placeholder='nr poz.'
         className='w-24'
-        value={filterCardNumberValue}
+        value={filterPositionValue}
         onChange={(e) => {
-          setFilterCardNumberValue(e.target.value);
+          setFilterPositionValue(e.target.value);
           setFilter('position', e.target.value);
         }}
       />
       <Input
-        placeholder='spisujący'
+        placeholder='art.'
         className='w-24'
-        value={filterCreatorsValue}
+        value={filterArticleNameValue}
         onChange={(e) => {
-          setFilterCreatorsValue(e.target.value);
-          setFilter('creators', e.target.value);
+          setFilterArticleNameValue(e.target.value);
+          setFilter('articleName', e.target.value);
         }}
       />
-
-      <Popover open={openWarehouse} onOpenChange={setOpenWarehouse}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            // aria-expanded={open}
-            className={cn(
-              'justify-between',
-              !filterWarehouseValue && 'opacity-50',
-            )}
-          >
-            {filterWarehouseValue
-              ? warehouseSelectOptions.find(
-                  (warehouse) => warehouse.value === filterWarehouseValue,
-                )?.label
-              : 'magazyn'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
-          <Command>
-            <CommandInput placeholder='wyszukaj...' />
-            <CommandList>
-              <CommandEmpty>nie znaleziono</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setFilterWarehouseValue('');
-                    setFilter('warehouse', '');
-                    setOpenWarehouse(false);
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {warehouseSelectOptions.map((warehouse) => (
-                  <CommandItem
-                    key={warehouse.value}
-                    value={warehouse.value}
-                    onSelect={(currentValue) => {
-                      setFilterWarehouseValue(currentValue);
-                      setFilter('warehouse', currentValue);
-                      setOpenWarehouse(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        filterWarehouseValue === warehouse.value
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {warehouse.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-
-      <Popover open={openSector} onOpenChange={setOpenSector}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={cn(
-              'justify-between',
-              !filterSectorValue && 'opacity-50',
-            )}
-          >
-            {filterSectorValue
-              ? sectorsSelectOptions.find(
-                  (sector) => sector.value === filterSectorValue,
-                )?.label
-              : 'sektor'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
-          <Command>
-            <CommandInput placeholder='wyszukaj...' />
-            <CommandList>
-              <CommandEmpty>nie znaleziono</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setFilterSectorValue('');
-                    setFilter('sector', '');
-                    setOpenSector(false);
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {sectorsSelectOptions.map((sector) => (
-                  <CommandItem
-                    key={sector.value}
-                    value={sector.value}
-                    onSelect={() => {
-                      setFilterSectorValue(sector.value);
-                      setFilter('sector', sector.value);
-                      setOpenSector(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        filterSectorValue === sector.value
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {sector.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+      <Input
+        placeholder='nr art.'
+        className='w-24'
+        value={filterArticleNumberValue}
+        onChange={(e) => {
+          setFilterArticleNumberValue(e.target.value);
+          setFilter('articleNumber', e.target.value);
+        }}
+      />
 
       <Button
         variant='outline'
@@ -222,11 +105,6 @@ export default function CardsTableFilteringAndOptions({
       >
         <RefreshCcw />
       </Button>
-      <Link href={`/api/failures/lv/excel`}>
-        <Button variant='outline' size='icon' title='export do Excel'>
-          <Sheet />
-        </Button>
-      </Link>
     </div>
   );
 }

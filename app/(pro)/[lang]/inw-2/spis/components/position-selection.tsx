@@ -114,8 +114,6 @@ export default function PositionSelection() {
                   <TableHead>Nazwa</TableHead>
                   <TableHead>Ilość</TableHead>
                   <TableHead>WIP</TableHead>
-                  {/* TODO: uruchomić jak dodasz nowe pozycje z creators */}
-                  {/* <TableHead>Utworzył</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -127,7 +125,6 @@ export default function PositionSelection() {
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell></TableCell>
-                    {/* <TableCell>{position.creators.join(', ')}</TableCell> */}
                   </TableRow>
                 ))}
               </TableBody>
@@ -137,7 +134,6 @@ export default function PositionSelection() {
       </CardContent>
       {data?.success && (
         <CardFooter className='flex justify-end'>
-          {/* TODO: onClick new position */}
           <Button
             onClick={() => {
               setPosition(data.success.length + 1);

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PositionType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Check, List, Table } from 'lucide-react';
+import EditPositionDialog from '../../components/edit-position-dialog';
 
 export const columns: ColumnDef<PositionType>[] = [
   {
@@ -26,23 +27,32 @@ export const columns: ColumnDef<PositionType>[] = [
       return <div className='text-center'>{position}</div>;
     },
   },
+
   {
     accessorKey: 'identifier',
     header: 'Id',
   },
   {
+    id: 'actions',
+    header: 'Edycja',
+    cell: ({ row }) => {
+      return <EditPositionDialog position={row.original} />;
+    },
+  },
+  {
     accessorKey: 'articleName',
-    header: 'Artykuł',
+    header: 'Art.',
     cell: ({ row }) => {
       const articleName = row.original.articleName;
       const articleNumber = row.original.articleNumber;
-      return (
-        <div className='text-nowrap'>
-          {articleNumber} - {articleName}
-        </div>
-      );
+      return <div className='text-nowrap'>{articleName}</div>;
     },
   },
+  {
+    accessorKey: 'articleNumber',
+    header: 'Nr art.',
+  },
+
   // export type PositionType = {
   //   position: number;
   //   identifier: string;

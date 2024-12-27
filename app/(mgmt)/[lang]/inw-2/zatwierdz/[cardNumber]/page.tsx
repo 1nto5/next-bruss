@@ -13,7 +13,7 @@ async function getCardPositions(
   positions: CardPositionsTableDataType[];
   cardWarehouse: string;
   cardSector: string;
-  cardCreators: string;
+  cardCreators: string[];
 }> {
   const res = await fetch(
     `${process.env.API}/inventory/card-positions?card-number=${cardNumber}`,
@@ -36,11 +36,12 @@ async function getCardPositions(
     positions: CardPositionsTableDataType[];
     cardWarehouse: string;
     cardSector: string;
+    cardCreators: string[];
   } = await res.json();
   let positions = resJson.positions;
   const cardWarehouse = resJson.cardWarehouse;
   const cardSector = resJson.cardSector;
-  const cardCreators = positions[0].approver;
+  const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
     timeLocaleString: new Date(position.time).toLocaleString(lang),

@@ -123,6 +123,13 @@ export default function TableFilteringAndOptions({
     setFilter('failure', '');
     setFilter('supervisor', '');
     setFilter('responsible', '');
+    setFilterLineValue('');
+    setFilterStationValue('');
+    setFilterFailureValue('');
+    setFilterSupervisorValue('');
+    setFilterResponsibleValue('');
+    setFromTime('06:00');
+    setToTime('22:00');
   };
 
   // const [isPendingExcelGenerate, setIsPendingExcelGenerate] = useState(false);
