@@ -240,25 +240,6 @@ export async function findArticles(search: string) {
   }
 }
 
-async function generateIdentifier(
-  card: number,
-  position: number,
-  creators: string[],
-) {
-  const collection = await dbc('persons');
-  const person1 = await collection.findOne({
-    personalNumber: creators[0],
-  });
-  const person2 = await collection.findOne({
-    personalNumber: creators[1],
-  });
-  const personInitials =
-    getLastNameFirstLetter(person1?.name || '') +
-    getLastNameFirstLetter(person2?.name || '');
-
-  return `${card}${personInitials}${position}`;
-}
-
 export async function savePosition(
   card: number,
   position: number,
@@ -276,7 +257,7 @@ export async function savePosition(
 
     const collection = await dbc('inventory_cards');
 
-    const identifier = await generateIdentifier(card, position, creators);
+    const identifier = `${card}/${position}`;
 
     const positionData = {
       position: position,

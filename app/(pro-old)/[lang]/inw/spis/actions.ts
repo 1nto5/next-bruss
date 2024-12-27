@@ -353,7 +353,8 @@ export async function savePosition(
     const db = client.db();
     const collection = db.collection(collectionName);
 
-    const identifier = generateIdentifier(card, position, persons);
+    // const identifier = generateIdentifier(card, position, persons);
+    const identifier = `${card}/${position}`;
 
     const positionData = {
       position: position,

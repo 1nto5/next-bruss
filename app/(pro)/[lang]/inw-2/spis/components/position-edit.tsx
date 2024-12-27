@@ -142,6 +142,8 @@ export default function PositionEdit() {
     }
   };
 
+  const unit = form.watch('unit');
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
@@ -355,7 +357,7 @@ export default function PositionEdit() {
                       <FormLabel>
                         Ilość wyrażona w{' '}
                         {selectedArticle.converter
-                          ? form.getValues('unit')
+                          ? unit
                           : selectedArticle.unit}
                       </FormLabel>
                       {selectedArticle.converter &&

@@ -19,6 +19,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import clsx from 'clsx';
+import { set } from 'date-fns';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { PositionType } from '../../../../../../lib/types/inventory';
@@ -137,7 +138,14 @@ export default function PositionSelection() {
       {data?.success && (
         <CardFooter className='flex justify-end'>
           {/* TODO: onClick new position */}
-          <Button>Nowa pozycja</Button>
+          <Button
+            onClick={() => {
+              setPosition(data.success.length + 1);
+              toast.success('Nowa pozycja wybrana!');
+            }}
+          >
+            Nowa pozycja
+          </Button>
         </CardFooter>
       )}
     </Card>
