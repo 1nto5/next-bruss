@@ -100,6 +100,16 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `${dict?.header?.inventory?.inventoryApprove.description}`,
         },
         {
+          href: '/inw-2/spis',
+          title: `${dict?.header?.inventory?.inventory2.title}`,
+          description: `${dict?.header?.inventory?.inventory.description}`,
+        },
+        {
+          href: '/inw-2/zatwierdz',
+          title: `${dict?.header?.inventory?.inventoryApprove2.title}`,
+          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
+        },
+        {
           href: '/failures/lv',
           title: `Awarie LV`,
           description: `Raport awarii LV.`,

@@ -1,40 +1,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+
 import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  sectorsSelectOptions,
-  warehouseSelectOptions,
-} from '@/lib/options/inventory';
-import { cn } from '@/lib/utils';
-import { set } from 'date-fns';
-import {
-  Check,
-  ChevronsUpDown,
-  CircleX,
-  RefreshCcw,
-  Sheet,
-  TableIcon,
-  Undo2,
-} from 'lucide-react';
+import { CircleX, RefreshCcw, Undo2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { revalidateCardPositions as revalidate } from '../actions';
+import { revalidatePositions as revalidate } from '../actions';
 
-export default function CardsTableFilteringAndOptions({
+export default function PositionsTableFilteringAndOptions({
   setFilter,
 }: {
   setFilter: (columnId: string, value: string) => void;
@@ -44,7 +18,7 @@ export default function CardsTableFilteringAndOptions({
   const [filterArticleNumberValue, setFilterArticleNumberValue] = useState('');
 
   const handleClearFilters = () => {
-    setFilter('position', '');
+    setFilter('identifier', '');
     setFilterPositionValue('');
     setFilter('articleName', '');
     setFilterArticleNameValue('');
@@ -54,20 +28,13 @@ export default function CardsTableFilteringAndOptions({
 
   return (
     <div className='flex flex-wrap gap-2'>
-      <Link href='/inw-2/zatwierdz'>
-        <Button size='icon' variant='outline' title='wróć do kart'>
-          <Undo2 />
-        </Button>
-      </Link>
-
       <Input
-        type='number'
-        placeholder='nr poz.'
+        placeholder='id pozycji'
         className='w-24'
         value={filterPositionValue}
         onChange={(e) => {
           setFilterPositionValue(e.target.value);
-          setFilter('position', e.target.value);
+          setFilter('identifier', e.target.value);
         }}
       />
       <Input

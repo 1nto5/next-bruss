@@ -29,8 +29,16 @@
         "title": "Inwentaryzacja",
         "description": "Aplikacja wspierająca proces inwentaryzacji."
       },
+      "inventory2": {
+        "title": "Inwentaryzacja v2",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      },
       "inventoryApprove": {
         "title": "Zatwierdzanie inwentaryzacji",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      },
+      "inventoryApprove2": {
+        "title": "Zatwierdzanie inwentaryzacji v2",
         "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
       }
     }

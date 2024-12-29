@@ -6,7 +6,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, List, Table } from 'lucide-react';
 import Link from 'next/link';
 
-export const columns: ColumnDef<CardTableDataType>[] = [
+export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   {
     accessorKey: 'number',
     header: ({ column }) => {

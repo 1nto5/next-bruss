@@ -34,29 +34,21 @@ import {
 
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
-import { revalidateCardPositions as revalidate } from '../actions';
-import CardPositionsTableFilteringAndOptions from '../components/card-positions-table-filtering-and-options';
+import { revalidateCards as revalidate } from '../actions';
+import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTime: string;
   lang: string;
-  cardNumber: string;
-  cardWarehouse: string;
-  cardSector: string;
-  cardCreators: string[];
 }
 
-export function DataTable<TData, TValue>({
+export function CardsDataTable<TData, TValue>({
   columns,
   data,
   fetchTime,
   lang,
-  cardNumber,
-  cardWarehouse,
-  cardSector,
-  cardCreators,
 }: DataTableProps<TData, TValue>) {
   useEffect(() => {
     const interval = setInterval(() => {
@@ -85,7 +77,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 25,
+        pageSize: 20,
       },
     },
   });
@@ -93,13 +85,9 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pozycje na karcie: {cardNumber}</CardTitle>
-        <CardDescription className='font-bold'>
-          Magazyn: {cardWarehouse}, sektor: {cardSector}, twórcy:{' '}
-          {cardCreators.join(', ')}
-        </CardDescription>
+        <CardTitle>Karty</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <CardPositionsTableFilteringAndOptions
+        <CardsTableFilteringAndOptions
           setFilter={(columnId, value) =>
             table.getColumn(columnId)?.setFilterValue(value)
           }
@@ -158,7 +146,7 @@ export function DataTable<TData, TValue>({
         </div>
       </CardContent>
       <CardFooter className='flex justify-between'>
-        {/* <Button
+        <Button
           variant='outline'
           size='sm'
           onClick={() => table.previousPage()}
@@ -173,7 +161,7 @@ export function DataTable<TData, TValue>({
           disabled={!table.getCanNextPage()}
         >
           <ArrowRight />
-        </Button> */}
+        </Button>
       </CardFooter>
     </Card>
   );

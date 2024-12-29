@@ -1,13 +1,20 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/i18n.config';
-import { CardTableDataType } from '@/lib/types/inventory';
-import { columns } from './cards-table/columns';
-import { DataTable } from './cards-table/data-table';
+import {
+  CardPositionsTableDataType,
+  CardTableDataType,
+} from '@/lib/types/inventory';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { cardsColumns } from './cards-table/cards-columns';
+import { CardsDataTable } from './cards-table/cards-data-table';
+import { positionsColumns } from './positions-table/positions-columns';
+import { PositionsDataTable } from './positions-table/positions-data-table';
 
 async function getCards(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  fetchTime: string;
+  cardsFetchTime: string;
   cards: CardTableDataType[];
 }> {
   const res = await fetch(`${process.env.API}/inventory/cards`, {
@@ -22,7 +29,7 @@ async function getCards(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const cardsFetchTime = dateFromResponse.toLocaleString(lang);
 
   let cards: CardTableDataType[] = await res.json();
 
@@ -35,7 +42,50 @@ async function getCards(
   }));
 
   cards = cards.filter((card) => card.positions && card.positions.length > 0);
-  return { fetchTime, cards };
+  return { cardsFetchTime, cards };
+}
+
+async function getPositions(
+  lang: string,
+  searchParams: { [key: string]: string | undefined },
+): Promise<{
+  positionsFetchTime: string;
+  positions: CardPositionsTableDataType[];
+}> {
+  const res = await fetch(`${process.env.API}/inventory/positions`, {
+    next: { revalidate: 30, tags: ['inventory-positions'] },
+  });
+
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(
+      `getCardPositions error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
+  }
+
+  const dateFromResponse = new Date(res.headers.get('date') || '');
+  const positionsFetchTime = dateFromResponse.toLocaleString(lang);
+
+  const resJson: {
+    positions: CardPositionsTableDataType[];
+    cardWarehouse: string;
+    cardSector: string;
+    cardCreators: string[];
+  } = await res.json();
+  let positions = resJson.positions;
+  const cardWarehouse = resJson.cardWarehouse;
+  const cardSector = resJson.cardSector;
+  const cardCreators = resJson.cardCreators;
+  positions = positions.map((position) => ({
+    ...position,
+    timeLocaleString: new Date(position.time).toLocaleString(lang),
+    approver: position.approver ? extractNameFromEmail(position.approver) : '',
+  }));
+
+  return {
+    positionsFetchTime,
+    positions,
+  };
 }
 
 export default async function InventoryPage(props: {
@@ -48,16 +98,33 @@ export default async function InventoryPage(props: {
 
   const { lang } = params;
 
-  let fetchTime, cards;
+  let positionsFetchTime, cardsFetchTime, cards, positions;
   // const { number = '' } = searchParams;
-  ({ fetchTime, cards } = await getCards(lang, searchParams));
+  ({ cardsFetchTime, cards } = await getCards(lang, searchParams));
+  ({ positionsFetchTime, positions } = await getPositions(lang, searchParams));
 
   return (
-    <DataTable
-      columns={columns}
-      data={cards}
-      fetchTime={fetchTime}
-      lang={lang}
-    />
+    <Tabs defaultValue='cards'>
+      <TabsList className='grid w-full grid-cols-2'>
+        <TabsTrigger value='cards'>Karty</TabsTrigger>
+        <TabsTrigger value='positions'>Pozycje</TabsTrigger>
+      </TabsList>
+      <TabsContent value='cards'>
+        <CardsDataTable
+          columns={cardsColumns}
+          data={cards}
+          fetchTime={cardsFetchTime}
+          lang={lang}
+        />
+      </TabsContent>
+      <TabsContent value='positions'>
+        <PositionsDataTable
+          columns={positionsColumns}
+          fetchTime={positionsFetchTime}
+          data={positions}
+          lang={lang}
+        />
+      </TabsContent>
+    </Tabs>
   );
 }

@@ -248,7 +248,6 @@ export async function savePosition(
   quantity: number,
   unit: string,
   wip: boolean,
-  creators: string[],
 ) {
   try {
     // const timeout = (ms: number) =>

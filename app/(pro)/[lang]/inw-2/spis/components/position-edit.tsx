@@ -1,11 +1,5 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { positionEditSchema as formSchema } from '../lib/zod';
-// import { login } from '../actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -29,9 +23,12 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
-import { is } from 'date-fns/locale';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, RefreshCcw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import * as z from 'zod';
 import { findArticles, savePosition } from '../actions';
 import { useGetPosition } from '../data/get-position';
 import {
@@ -39,6 +36,7 @@ import {
   usePersonalNumberStore,
   usePositionStore,
 } from '../lib/stores';
+import { positionEditSchema as formSchema } from '../lib/zod';
 import ErrorAlert from './error-alert';
 
 export default function PositionEdit() {
@@ -158,7 +156,6 @@ export default function PositionEdit() {
           : Number(data.quantity),
         selectedArticle.unit,
         data.wip,
-        persons,
       );
       if ('error' in res) {
         console.error('onSubmit', res.error);

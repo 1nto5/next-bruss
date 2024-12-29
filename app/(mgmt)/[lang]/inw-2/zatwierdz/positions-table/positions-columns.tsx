@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { PositionType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Check, List, Table } from 'lucide-react';
-import EditPositionDialog from '../../components/edit-position-dialog';
+import EditPositionDialog from '../components/edit-position-dialog';
 
-export const columns: ColumnDef<PositionType>[] = [
+export const positionsColumns: ColumnDef<PositionType>[] = [
   {
     accessorKey: 'position',
     header: ({ column }) => {

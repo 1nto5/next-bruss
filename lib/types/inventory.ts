@@ -9,6 +9,7 @@ export type PositionType = {
   wip: boolean;
   approver: string;
   approvedAt: string;
+  comment: string;
 };
 
 export type CardPositionsTableDataType = PositionType & {
