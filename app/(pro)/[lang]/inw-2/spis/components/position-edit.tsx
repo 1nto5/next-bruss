@@ -207,7 +207,7 @@ export default function PositionEdit() {
         <CardDescription>
           karta nr: {card}, magazyn: {warehouse}, sektor: {sector}, zalogowani:{' '}
           {persons.join(', ')},{' '}
-          {data?.success.approver &&
+          {data?.success?.approver &&
             'pozycja zatwierdzona - edycja niedozwolona'}
         </CardDescription>
       </CardHeader>
@@ -240,7 +240,7 @@ export default function PositionEdit() {
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          disabled={data?.success.approver}
+                          disabled={data?.success?.approver}
                           onChange={(e) => {
                             field.onChange(e);
                             handleFindArticle(e);
@@ -267,7 +267,7 @@ export default function PositionEdit() {
                     <FormItem className='space-y-3 rounded-lg border p-4'>
                       <FormControl>
                         <RadioGroup
-                          disabled={data?.success.approver}
+                          disabled={data?.success?.approver}
                           onValueChange={(value) => {
                             field.onChange(value);
                             const selectedArticle = foundArticles.find(
@@ -393,7 +393,7 @@ export default function PositionEdit() {
                         <FormControl>
                           <Input
                             className=''
-                            disabled={data?.success.approver}
+                            disabled={data?.success?.approver}
                             placeholder={`podaj ilość w ${form.getValues('unit') || selectedArticle.unit}`}
                             {...field}
                           />
@@ -431,7 +431,7 @@ export default function PositionEdit() {
                       </div>
                       <FormControl>
                         <Switch
-                          disabled={data?.success.approver}
+                          disabled={data?.success?.approver}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -464,7 +464,7 @@ export default function PositionEdit() {
               ) : (
                 <Button
                   disabled={
-                    !selectedArticle || isPending || data?.success.approver
+                    !selectedArticle || isPending || data?.success?.approver
                   }
                   type='submit'
                 >
