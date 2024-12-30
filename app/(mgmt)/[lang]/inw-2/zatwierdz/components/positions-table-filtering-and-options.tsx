@@ -16,6 +16,7 @@ export default function PositionsTableFilteringAndOptions({
   const [filterPositionValue, setFilterPositionValue] = useState('');
   const [filterArticleNameValue, setFilterArticleNameValue] = useState('');
   const [filterArticleNumberValue, setFilterArticleNumberValue] = useState('');
+  const [filterQuantityValue, setFilterQuantityValue] = useState('');
 
   const handleClearFilters = () => {
     setFilter('identifier', '');
@@ -53,6 +54,15 @@ export default function PositionsTableFilteringAndOptions({
         onChange={(e) => {
           setFilterArticleNumberValue(e.target.value);
           setFilter('articleNumber', e.target.value);
+        }}
+      />
+      <Input
+        placeholder='ilość'
+        className='w-24'
+        value={filterQuantityValue}
+        onChange={(e) => {
+          setFilterQuantityValue(e.target.value);
+          setFilter('quantity', e.target.value);
         }}
       />
 

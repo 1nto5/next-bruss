@@ -412,14 +412,14 @@ export default function PositionEdit() {
                       {selectedArticle.converter &&
                         form.getValues('unit') === 'kg' &&
                         form.getValues('quantity') && (
-                          <FormMessage>
+                          <div>
                             ={' '}
                             {Math.floor(
                               Number(form.getValues('quantity')) /
                                 selectedArticle.converter,
                             )}{' '}
                             st
-                          </FormMessage>
+                          </div>
                         )}
                       <FormMessage />
                       {/* FIX: double FormMessage */}

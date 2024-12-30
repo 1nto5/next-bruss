@@ -77,6 +77,9 @@ export const positionsColumns: ColumnDef<PositionType>[] = [
         </div>
       );
     },
+    filterFn: (row, columnId, value) => {
+      return row.getValue(columnId) === Number(value);
+    },
   },
   {
     accessorKey: 'wip',
