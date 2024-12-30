@@ -540,8 +540,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
       qrBatch = batchPart ? batchPart.split(':')[1] : '';
     } else {
       const splitHydraQr = hydra.split('|');
-      const qrArticle =
-        splitHydraQr[0].length === 7 && splitHydraQr[0].substr(2);
+      const qrArticle = splitHydraQr[0].slice(2);
       if (qrArticle !== articleConfig.articleNumber) {
         return { message: 'qr wrong article' };
       }
