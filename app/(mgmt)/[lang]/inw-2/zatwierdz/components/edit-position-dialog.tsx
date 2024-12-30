@@ -67,6 +67,8 @@ export default function EditPositionDialog({
         form.setError('articleNumber', { message: 'Artykuł nie istnieje' });
       } else if (res.error === 'wip not allowed') {
         form.setError('wip', { message: 'Niedozwolony dla S900' });
+      } else if (res.error === 'unauthorized') {
+        toast.error('Brak uprawnień!');
       } else if (res.error) {
         console.error(res.error);
         toast.error('Skontaktuj się z IT!');

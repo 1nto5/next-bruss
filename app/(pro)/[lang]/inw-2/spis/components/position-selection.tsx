@@ -77,8 +77,6 @@ export default function PositionSelection() {
                 <TableHead>Nazwa</TableHead>
                 <TableHead>Ilość</TableHead>
                 <TableHead>WIP</TableHead>
-                {/* TODO: uruchomić jak dodasz nowe pozycje z creators */}
-                {/* <TableHead>Utworzył</TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>

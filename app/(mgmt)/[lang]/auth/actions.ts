@@ -10,7 +10,7 @@ export async function logout() {
 export async function login(email: string, password: string) {
   try {
     await signIn('credentials', {
-      email,
+      email: email.toLowerCase(),
       password,
       // redirect: false,
     });
