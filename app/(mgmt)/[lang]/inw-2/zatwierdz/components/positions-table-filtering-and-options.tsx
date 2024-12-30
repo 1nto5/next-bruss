@@ -25,6 +25,8 @@ export default function PositionsTableFilteringAndOptions({
     setFilterArticleNameValue('');
     setFilter('articleNumber', '');
     setFilterArticleNumberValue('');
+    setFilter('quantity', '');
+    setFilterQuantityValue('');
   };
 
   return (
