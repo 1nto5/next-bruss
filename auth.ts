@@ -52,7 +52,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               let user;
 
               try {
-                user = await usersCollection.findOne({ email });
+                user = await usersCollection.findOne({
+                  email: email.toLowerCase(),
+                });
               } catch (error) {
                 await ldapClient.unbind();
                 throw new Error('authorize database error: findOne failed');
