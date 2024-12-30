@@ -88,7 +88,7 @@ export default function EditPositionDialog({
           </Button>
         </div>
       </DialogTrigger>
-      <DialogContent className='w-[700px] sm:max-w-[700px]'>
+      <DialogContent className=' sm:max-w-[700px]'>
         <DialogHeader>
           <DialogTitle>Edycja pozycji {position.identifier}</DialogTitle>
           {/* <DialogDescription>
@@ -96,100 +96,98 @@ export default function EditPositionDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[450px]'>
-              <div className='grid items-center gap-2 p-2'>
-                <FormField
-                  control={form.control}
-                  name='articleNumber'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Artykuł</FormLabel>
-                      <FormControl>
-                        <Input className='w-[80px]' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='quantity'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ilość {`[${position.unit}]`}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          className='w-[120px]'
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='wip'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-center justify-between rounded-lg border p-2'>
-                      <div className='space-y-0.5'>
-                        <FormLabel className='text-base'>WIP</FormLabel>
-                      </div>
-                      <FormMessage />
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='comment'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Komentarz</FormLabel>
-                      <FormControl>
-                        <Textarea className='w-[400px]' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Separator className='mb-2' />
-                <FormField
-                  control={form.control}
-                  name='approved'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-                      <div className='space-y-0.5'>
-                        <FormLabel className='text-base'>
-                          Zatwierdź pozycję
-                        </FormLabel>
-                        {position.approver && (
-                          <FormDescription>
-                            Pozycja została juz zatwierdzona przez{' '}
-                            {position.approver}
-                          </FormDescription>
-                        )}
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </ScrollArea>
+            {/* <ScrollArea className='h-[450px]'> */}
+            <div className='grid items-center gap-2 p-2'>
+              <FormField
+                control={form.control}
+                name='articleNumber'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Artykuł</FormLabel>
+                    <FormControl>
+                      <Input className='w-[80px]' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='quantity'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ilość {`[${position.unit}]`}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        className='w-[120px]'
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='wip'
+                render={({ field }) => (
+                  <FormItem className='flex flex-row items-center justify-between rounded-lg border p-2'>
+                    <div className='space-y-0.5'>
+                      <FormLabel className='text-base'>WIP</FormLabel>
+                    </div>
+                    <FormMessage />
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='comment'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Komentarz</FormLabel>
+                    <FormControl>
+                      <Textarea className='' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Separator className='mb-2' />
+              <FormField
+                control={form.control}
+                name='approved'
+                render={({ field }) => (
+                  <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                    <div className='space-y-0.5'>
+                      <FormLabel className='text-base'>
+                        Zatwierdź pozycję
+                      </FormLabel>
+                      {position.approver && (
+                        <FormDescription>
+                          Pozycja została juz zatwierdzona przez{' '}
+                          {position.approver}
+                        </FormDescription>
+                      )}
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            {/* </ScrollArea> */}
             <DialogFooter className='mt-4'>
               {isPendingUpdate ? (
                 <Button disabled>

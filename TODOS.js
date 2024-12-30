@@ -7,4 +7,5 @@ FIXME: router.back() in login-form does not work properly when auto redirect to 
 FIXME: deviations id copy to clipboard
 PLAN: tempering process BRI (article login, get batch, show degrees and timer)
 FIXME: data format for default data Input in safari
+FIXME: email wielkie litery przy logowaniu
 */
