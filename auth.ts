@@ -1,5 +1,5 @@
 import { dbc } from '@/lib/mongo';
-import { th } from 'date-fns/locale';
+
 import NextAuth, { User, type DefaultSession } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 const LdapClient = require('ldapjs-client');
@@ -12,7 +12,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        const { email, password } = credentials;
+        const { email, password } = credentials as {
+          email: string;
+          password: string;
+        };
         const ldapClient = new LdapClient({
           url: process.env.LDAP,
         });
@@ -58,7 +61,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               if (!user) {
                 try {
                   await usersCollection.insertOne({
-                    email,
+                    email: email.toLowerCase(),
                     roles: ['user'],
                     firstLogin: new Date(),
                   });
