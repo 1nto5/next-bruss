@@ -503,7 +503,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
     }
 
     const schema = z.object({
-      hydra: z.string().min(34),
+      hydra: z.string(),
     });
     const parse = schema.safeParse({
       hydra: formData?.get('hydra')?.toString(),
