@@ -63,13 +63,19 @@ export default function PositionEdit() {
   const [selectedArticle, setSelectedArticle] = useState<any>();
   const [identifier, setIdentifier] = useState('');
 
+  useEffect(() => {
+    if (isSuccess && !data?.success?.identifier) {
+      setIdentifier('');
+    }
+  }, [isSuccess, data]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      findArticle: '', // Use empty string for text inputs
+      findArticle: '',
       article: '',
       quantity: '',
-      wip: false, // Boolean values can remain as false
+      wip: false,
       unit: '',
     },
   });
@@ -213,9 +219,9 @@ export default function PositionEdit() {
         <CardTitle>Pozycja nr: {position}</CardTitle>
         <CardDescription>
           karta nr: {card}, magazyn: {warehouse}, sektor: {sector}, zalogowani:{' '}
-          {persons.join(', ')},{' '}
+          {persons.join(', ')}
           {data?.success?.approver &&
-            'pozycja zatwierdzona - edycja niedozwolona'}
+            ', pozycja zatwierdzona - edycja niedozwolona'}
         </CardDescription>
       </CardHeader>
       {!isFetching && (
