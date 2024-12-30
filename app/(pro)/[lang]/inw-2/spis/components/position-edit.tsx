@@ -158,6 +158,13 @@ export default function PositionEdit() {
         data.wip,
       );
       if ('error' in res) {
+        if (res.error === 'wrong quantity') {
+          form.setError('quantity', {
+            message:
+              'Niepoprawna wartość, użyj "." (kropka) dla wartości dziesiętnych',
+          });
+          return;
+        }
         console.error('onSubmit', res.error);
         toast.error('Skontaktuj się z IT!');
         return;
@@ -415,6 +422,7 @@ export default function PositionEdit() {
                           </FormMessage>
                         )}
                       <FormMessage />
+                      {/* FIX: double FormMessage */}
                     </FormItem>
                   )}
                 />

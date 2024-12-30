@@ -259,7 +259,7 @@ export async function savePosition(
     const identifier = `${card}/${position}`;
 
     if (!quantity) {
-      return { error: 'quantity is required' };
+      return { error: 'wrong quantity' };
     }
 
     const positionData = {
