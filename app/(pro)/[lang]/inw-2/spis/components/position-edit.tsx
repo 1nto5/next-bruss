@@ -386,7 +386,7 @@ export default function PositionEdit() {
                       {selectedArticle.converter &&
                         form.getValues('unit') === 'kg' && (
                           <FormDescription>
-                            {`10 st = ${selectedArticle.converter} kg`}
+                            {`10 st = ${selectedArticle.converter} kg, użyj "." (kropka) dla wartości dziesiętnych`}
                           </FormDescription>
                         )}
                       <div className='flex items-center space-x-2'>
