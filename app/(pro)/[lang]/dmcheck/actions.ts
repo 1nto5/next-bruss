@@ -527,6 +527,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
 
     let qrBatch;
 
+    // old hydra qr validation
     // SAP article format includes '/'
     // if (hydra.includes('/')) {
     //   const qrArticle = hydra.match(/:\d+\.\d+\.\d+/)?.[0].slice(1) || '';

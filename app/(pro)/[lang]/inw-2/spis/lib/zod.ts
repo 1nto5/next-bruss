@@ -70,8 +70,18 @@ export const newCardSchema = z.object({
 
 export const positionEditSchema = z.object({
   findArticle: z.string().optional(),
-  article: z.string().min(1, { message: 'Wybierz artykułu!' }),
-  quantity: z.string().min(1, { message: 'Wprowadź ilość!' }),
+  article: z.string().min(1, { message: 'Wybierz artykuł!' }),
+  quantity: z
+    .string()
+    .min(1, { message: 'Wprowadź ilość!' })
+    .refine(
+      (value) => {
+        return /^\d+(\.\d{1,})?$/.test(value);
+      },
+      {
+        message: 'Wprowadź poprawną wartość używając "." zamiast ","!',
+      },
+    ),
   wip: z.boolean(),
   unit: z.string().min(1, { message: 'Wybierz jednostkę!' }).optional(),
 });

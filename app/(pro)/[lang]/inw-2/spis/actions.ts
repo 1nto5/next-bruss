@@ -262,6 +262,10 @@ export async function savePosition(
       return { error: 'wrong quantity' };
     }
 
+    if (unit === 'st' && !Number.isInteger(quantity)) {
+      return { error: 'wrong quantity' };
+    }
+
     const positionData = {
       position: position,
       identifier: identifier,

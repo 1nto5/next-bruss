@@ -166,8 +166,7 @@ export default function PositionEdit() {
       if ('error' in res) {
         if (res.error === 'wrong quantity') {
           form.setError('quantity', {
-            message:
-              'Niepoprawna wartość, użyj "." (kropka) dla wartości dziesiętnych',
+            message: 'Niepoprawna wartość!',
           });
           return;
         }
@@ -418,14 +417,14 @@ export default function PositionEdit() {
                       {selectedArticle.converter &&
                         form.getValues('unit') === 'kg' &&
                         form.getValues('quantity') && (
-                          <div>
+                          <FormDescription>
                             ={' '}
                             {Math.floor(
                               Number(form.getValues('quantity')) /
-                                selectedArticle.converter,
+                                selectedArticle.converter || 0,
                             )}{' '}
                             st
-                          </div>
+                          </FormDescription>
                         )}
                       <FormMessage />
                       {/* FIX: double FormMessage */}
