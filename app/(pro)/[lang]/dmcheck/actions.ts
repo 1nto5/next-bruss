@@ -488,6 +488,18 @@ export async function saveDmcRework(
   }
 }
 
+function extractQrValues(hydra: string) {
+  const qrArticleMatch = hydra.match(/A:([^|]+)/);
+  const qrQuantityMatch = hydra.match(/Q:([^|]+)/);
+  const qrBatchMatch = hydra.match(/B:([^|]+)/);
+
+  const qrArticle = qrArticleMatch ? qrArticleMatch[1] : '';
+  const qrQuantity = qrQuantityMatch ? parseInt(qrQuantityMatch[1], 10) : 0;
+  const qrBatch = qrBatchMatch ? qrBatchMatch[1] : '';
+
+  return { qrArticle, qrQuantity, qrBatch };
+}
+
 export async function saveHydra(prevState: any, formData: FormData) {
   try {
     const articleConfigId = formData.get('articleConfigId');
@@ -516,44 +528,65 @@ export async function saveHydra(prevState: any, formData: FormData) {
     let qrBatch;
 
     // SAP article format includes '/'
-    if (hydra.includes('/')) {
-      const qrArticle = hydra.match(/:\d+\.\d+\.\d+/)?.[0].slice(1) || '';
-      if (qrArticle !== articleConfig.articleNumber) {
-        return { message: 'qr wrong article' };
-      }
-      const quantityPart = hydra
-        .split('|')
-        .find((part) => part.startsWith('Q:'));
-      const qrQuantity = quantityPart
-        ? parseInt(quantityPart.split(':')[1], 10)
-        : 0;
-      if (qrQuantity !== articleConfig.piecesPerBox) {
-        return { message: 'qr wrong quantity' };
-      }
-      const matchResult = hydra.match(/\/(\d{3})/);
-      const qrProcess = matchResult ? matchResult[1] : '';
-      if (!articleConfig.hydraProcess.includes(qrProcess)) {
-        return { message: 'qr wrong process' };
-      }
-      const batchPart = hydra.split('|').find((part) => part.startsWith('B:'));
-      if (!batchPart) return { message: 'qr not valid' };
-      qrBatch = batchPart ? batchPart.split(':')[1] : '';
-    } else {
-      const splitHydraQr = hydra.split('|');
-      const qrArticle = splitHydraQr[0].slice(2);
-      if (qrArticle !== articleConfig.articleNumber) {
-        return { message: 'qr wrong article' };
-      }
-      const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
-      if (qrQuantity !== articleConfig.piecesPerBox) {
-        return { message: 'qr wrong quantity' };
-      }
-      const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
-      if (!articleConfig.hydraProcess.includes(qrProcess)) {
-        return { message: 'qr wrong process' };
-      }
-      qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
+    // if (hydra.includes('/')) {
+    //   const qrArticle = hydra.match(/:\d+\.\d+\.\d+/)?.[0].slice(1) || '';
+    //   if (qrArticle !== articleConfig.articleNumber) {
+    //     return { message: 'qr wrong article' };
+    //   }
+    //   const quantityPart = hydra
+    //     .split('|')
+    //     .find((part) => part.startsWith('Q:'));
+    //   const qrQuantity = quantityPart
+    //     ? parseInt(quantityPart.split(':')[1], 10)
+    //     : 0;
+    //   if (qrQuantity !== articleConfig.piecesPerBox) {
+    //     return { message: 'qr wrong quantity' };
+    //   }
+    //   const matchResult = hydra.match(/\/(\d{3})/);
+    //   const qrProcess = matchResult ? matchResult[1] : '';
+    //   if (!articleConfig.hydraProcess.includes(qrProcess)) {
+    //     return { message: 'qr wrong process' };
+    //   }
+    //   const batchPart = hydra.split('|').find((part) => part.startsWith('B:'));
+    //   if (!batchPart) return { message: 'qr not valid' };
+    //   qrBatch = batchPart ? batchPart.split(':')[1] : '';
+    // } else {
+    //   const splitHydraQr = hydra.split('|');
+    //   const qrArticle = splitHydraQr[0].slice(2);
+    //   if (qrArticle !== articleConfig.articleNumber) {
+    //     return { message: 'qr wrong article' };
+    //   }
+    //   const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
+    //   if (qrQuantity !== articleConfig.piecesPerBox) {
+    //     return { message: 'qr wrong quantity' };
+    //   }
+    //   const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
+    //   if (!articleConfig.hydraProcess.includes(qrProcess)) {
+    //     return { message: 'qr wrong process' };
+    //   }
+    //   qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
+    // }
+
+    const {
+      qrArticle,
+      qrQuantity,
+      qrBatch: extractedBatch,
+    } = extractQrValues(hydra);
+
+    if (qrArticle !== articleConfig.articleNumber) {
+      return { message: 'qr wrong article' };
     }
+
+    if (qrQuantity !== articleConfig.piecesPerBox) {
+      return { message: 'qr wrong quantity' };
+    }
+
+    qrBatch = extractedBatch;
+
+    if (!qrBatch) {
+      return { message: 'qr not valid' };
+    }
+
     const scansCollection = await dbc('scans');
     const existingBatch = await scansCollection.findOne({
       hydra_batch: qrBatch,
