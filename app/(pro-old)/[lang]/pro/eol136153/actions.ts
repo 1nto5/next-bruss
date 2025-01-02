@@ -1,7 +1,7 @@
 'use server';
 
-import clientPromise from '@/lib/mongo';
 import config from '@/app/(pro-old)/[lang]/pro/config';
+import clientPromise from '@/lib/mongo';
 import { countBoxesOnPallet } from '../actions';
 
 type ArticleConfig = {
@@ -21,7 +21,7 @@ type ArticleConfig = {
   palletProc?: string;
 };
 
-const collectionName = 'scans';
+const collectionName = 'scans_no_dmc';
 
 export async function saveHydraBatch136153(hydraQr: string, operator: string) {
   try {
