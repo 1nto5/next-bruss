@@ -24,7 +24,7 @@ type ArticleConfig = {
   palletProc?: string;
 };
 
-const collectionName = 'scans';
+const collectionName = 'scans_no_dmc';
 
 export async function loginPerson(number: string) {
   try {
