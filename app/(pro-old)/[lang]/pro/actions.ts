@@ -1,11 +1,11 @@
 'use server';
-import clientPromise from '@/lib/mongo';
 import config from '@/app/(pro-old)/[lang]/pro/config';
-import generatePalletQr from '@/app/(pro-old)/[lang]/pro/lib/utils/generatePalletQr';
 import {
-  fordValidation,
   bmwValidation,
+  fordValidation,
 } from '@/app/(pro-old)/[lang]/pro/lib/utils/dmcDateValidation';
+import generatePalletQr from '@/app/(pro-old)/[lang]/pro/lib/utils/generatePalletQr';
+import clientPromise from '@/lib/mongo';
 
 type ArticleConfig = {
   article: string;
@@ -24,7 +24,7 @@ type ArticleConfig = {
   palletProc?: string;
 };
 
-const collectionName = 'scans';
+const collectionName = 'scans_no_dmc';
 
 export async function loginPerson(number: string) {
   try {
