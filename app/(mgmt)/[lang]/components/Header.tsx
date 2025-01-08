@@ -63,16 +63,6 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           title: `${dict?.header?.production?.rework.title}`,
           description: `${dict?.header?.production?.rework.description}`,
         },
-        {
-          href: '/pro/add-article-config',
-          title: `${dict?.header?.production?.articleConfig.title}`,
-          description: `${dict?.header?.production?.articleConfig.description}`,
-        },
-        {
-          href: '/pro/add-person-config',
-          title: `${dict?.header?.production?.personsConfig.title}`,
-          description: `${dict?.header?.production?.personsConfig.description}`,
-        },
       ],
     },
     {
@@ -176,16 +166,6 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           href: '/pro/rework',
           title: `${dict?.header?.production?.rework.title}`,
           description: `${dict?.header?.production?.rework.description}`,
-        },
-        {
-          href: '/pro/add-article-config',
-          title: `${dict?.header?.production?.articleConfig.title}`,
-          description: `${dict?.header?.production?.articleConfig.description}`,
-        },
-        {
-          href: '/pro/add-person-config',
-          title: `${dict?.header?.production?.personsConfig.title}`,
-          description: `${dict?.header?.production?.personsConfig.description}`,
         },
       ],
     },
