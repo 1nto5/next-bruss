@@ -6,8 +6,8 @@ import { PositionZodType } from '@/lib/z/inventory';
 import { revalidateTag } from 'next/cache';
 // import { redirect } from 'next/navigation';
 
-export async function revalidateDmcheckData() {
-  revalidateTag('dmcheck-data');
+export async function revalidateDmcheckTableData() {
+  revalidateTag('dmcheck-table-data');
 }
 
 export async function updatePosition(

@@ -7,6 +7,20 @@ import {
 import { dmcColumns } from './dmc-table/dmc-columns';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
 
+async function getConfigs() {
+  const res = await fetch(`${process.env.API}/dmcheck-configs`, {
+    next: { revalidate: 60 * 60 * 24, tags: ['dmcheck-configs'] },
+  });
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(
+      `getConfigs error:  ${res.status}  ${res.statusText} ${json.error}`,
+    );
+  }
+
+  return await res.json();
+}
+
 async function getScans(
   lang: string,
   searchParams: { [key: string]: string | undefined },
@@ -14,8 +28,19 @@ async function getScans(
   fetchTime: string;
   data: TableDataType[];
 }> {
-  const res = await fetch(`${process.env.API}/dmcheck-data`, {
-    next: { revalidate: 600, tags: ['dmcheck-data'] },
+  console.log('getScans', lang, searchParams);
+
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const url = `${process.env.API}/dmcheck-mgmt/table-data?${queryParams}`;
+
+  const res = await fetch(url, {
+    next: { revalidate: 600, tags: ['dmcheck-table-data'] },
   });
 
   if (!res.ok) {
@@ -48,7 +73,8 @@ export default async function InventoryPage(props: {
 
   let fetchTime, data;
   ({ fetchTime, data } = await getScans(lang, searchParams));
-
+  const configs = await getConfigs();
+  console.log('configs', configs);
   return (
     <DmcDataTable
       columns={dmcColumns}

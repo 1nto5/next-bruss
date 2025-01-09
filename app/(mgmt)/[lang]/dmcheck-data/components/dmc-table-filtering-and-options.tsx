@@ -31,7 +31,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useState } from 'react';
-import { revalidateDmcheckData as revalidate } from '../actions';
+import { revalidateDmcheckTableData as revalidate } from '../actions';
 
 export default function DmcTableFilteringAndOptions({
   setFilter,
@@ -53,7 +53,7 @@ export default function DmcTableFilteringAndOptions({
     },
     [searchParams],
   );
-  const [dmcFiltr, setDmcFiltr] = useState('');
+  const [dmcFiltr, setDmcFiltr] = useState(searchParams.get('dmc') || '');
   const [filterCreatorsValue, setFilterCreatorsValue] = useState('');
   const [filterWarehouseValue, setFilterWarehouseValue] = useState('');
   const [filterSectorValue, setFilterSectorValue] = useState('');

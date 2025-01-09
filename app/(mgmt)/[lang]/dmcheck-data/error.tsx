@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCcw, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { revalidateDmcheckData as revalidate } from './actions';
+import { revalidateDmcheckTableData as revalidate } from './actions';
 
 export default function Error({
   error,

@@ -9,11 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const coll = await dbc('scans');
-    const scans = await coll.find({}).sort({ _id: -1 }).limit(1000).toArray();
+    const coll = await dbc('articles_config');
+
+    const scans = await coll.find().toArray();
     return new NextResponse(JSON.stringify(scans));
   } catch (error) {
-    console.error('api/dmcheck-data: ' + error);
-    return NextResponse.json({ error: 'dmcheck-data api' }, { status: 503 });
+    console.error('api/dmcheck-mgmt/article-configs: ' + error);
+    return NextResponse.json(
+      { error: 'dmcheck-mgmt/article-configs' },
+      { status: 503 },
+    );
   }
 }
