@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Command,
   CommandEmpty,
@@ -38,10 +39,13 @@ import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
 import { AddFailureSchema } from '@/lib/z/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
+
 import { Check, ChevronsUpDown, CopyPlus, Loader2 } from 'lucide-react';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -60,7 +64,7 @@ export default function AddFailureDialog({}: {}) {
     defaultValues: {
       responsible: '',
       supervisor: '',
-      from: undefined,
+      from: new Date(),
     },
   });
 
@@ -71,8 +75,17 @@ export default function AddFailureDialog({}: {}) {
 
   const selectedFailure = form.watch('failure');
 
+  const filteredFailures =
+    failuresOptions.find((option) => option.station === selectedStation)
+      ?.options || [];
+
+  function handleDateSelect(date: Date | undefined) {
+    if (date) {
+      form.setValue('from', date);
+    }
+  }
+
   const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
-    // setIsDraft(false);
     setIsPendingInserting(true);
     try {
       const res = await insertFailure(data);
@@ -91,10 +104,6 @@ export default function AddFailureDialog({}: {}) {
       setOpen(false);
     }
   };
-
-  const filteredFailures =
-    failuresOptions.find((option) => option.station === selectedStation)
-      ?.options || [];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -302,75 +311,31 @@ export default function AddFailureDialog({}: {}) {
                   )}
                 />
 
-                <div className='flex space-x-2'>
-                  <FormField
-                    control={form.control}
-                    name='from'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Rozpoczęcie dn.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='date'
-                            // defaultValue={format(new Date(), 'yyyy-MM-dd')}
-                            onChange={(e) => {
-                              const currentFrom =
-                                form.getValues('from') || new Date();
-                              const newDate = new Date(e.target.value);
-                              const updatedFrom = new Date(
-                                newDate.getFullYear(),
-                                newDate.getMonth(),
-                                newDate.getDate(),
-                                currentFrom.getHours(),
-                                currentFrom.getMinutes(),
-                              );
-
-                              form.setValue('from', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='from'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>godz.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='time'
-                            // defaultValue={format(new Date(), 'HH:mm')}
-                            onChange={(e) => {
-                              const [hours, minutes] = e.target.value
-                                .split(':')
-                                .map(Number);
-                              const currentFrom =
-                                form.getValues('from') || new Date();
-                              const updatedFrom = new Date(
-                                currentFrom.getFullYear(),
-                                currentFrom.getMonth(),
-                                currentFrom.getDate(),
-                                hours,
-                                minutes,
-                              );
-
-                              form.setValue('from', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <FormField
                   control={form.control}
                   name='from'
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className='w-[350px]'>
+                      <FormLabel>Rozpoczęcie</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          max={new Date(Date.now())}
+                          min={new Date(Date.now() - 3600 * 1000)}
+                          modal
+                          value={field.value}
+                          onChange={field.onChange}
+                          timePicker={{ hour: true, minute: true }}
+                          renderTrigger={({ open, value, setOpen }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={(x) => !open && field.onChange(x)}
+                              format='dd/MM/yyyy HH:mm'
+                              disabled={open}
+                              onCalendarClick={() => setOpen(!open)}
+                            />
+                          )}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

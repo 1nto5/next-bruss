@@ -6,19 +6,18 @@ export const AddFailureSchema = z
     station: z.string(),
     failure: z.string(),
     from: z.date(),
-    // to: z.date(),
     supervisor: z.string().min(1),
     responsible: z.string().min(1),
     solution: z.string().optional(),
     comment: z.string().optional(),
   })
-  // .refine((data) => data.from < data.to, {
-  //   path: ['to'],
-  // })
-  // data nie moe być z przyszłości
   .refine((data) => data.from < new Date(), {
     path: ['from'],
-    message: 'Data nie może być z przyszłości!',
+    message: 'Nie planujemy awarii w przyszłości!',
+  })
+  .refine((data) => data.from >= new Date(Date.now() - 3600 * 1000), {
+    path: ['from'],
+    message: 'Nie możemy cofnąć się w czasie więcej niż 1 godzinę!',
   })
   .refine((data) => data.failure.length > 0, {
     path: ['failure'],
