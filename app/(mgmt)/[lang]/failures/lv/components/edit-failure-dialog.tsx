@@ -61,7 +61,7 @@ export default function EditFailureDialog({
       const res = await updateFailure({
         _id: failure._id,
         from: data.from,
-        to: failure.to ? data.to : undefined,
+        to: data.to,
         supervisor: data.supervisor,
         responsible: data.responsible,
         solution: data.solution,
@@ -114,10 +114,10 @@ export default function EditFailureDialog({
                         <FormControl>
                           <Input
                             type='date'
-                            defaultValue={format(
-                              new Date(failure.from),
-                              'yyyy-MM-dd',
-                            )}
+                            // defaultValue={format(
+                            //   new Date(failure.from),
+                            //   'yyyy-MM-dd',
+                            // )}
                             onChange={(e) => {
                               const currentFrom =
                                 form.getValues('from') || new Date();
@@ -147,10 +147,10 @@ export default function EditFailureDialog({
                         <FormControl>
                           <Input
                             type='time'
-                            defaultValue={format(
-                              new Date(failure.from),
-                              'HH:mm',
-                            )}
+                            // defaultValue={format(
+                            //   new Date(failure.from),
+                            //   'HH:mm',
+                            // )}
                             onChange={(e) => {
                               const [hours, minutes] = e.target.value
                                 .split(':')
@@ -195,10 +195,10 @@ export default function EditFailureDialog({
                           <FormControl>
                             <Input
                               type='date'
-                              defaultValue={format(
-                                new Date(failure.to || Date.now()),
-                                'yyyy-MM-dd',
-                              )}
+                              // defaultValue={format(
+                              //   new Date(failure.to || Date.now()),
+                              //   'yyyy-MM-dd',
+                              // )}
                               onChange={(e) => {
                                 const currentFrom =
                                   form.getValues('to') || new Date();
@@ -228,10 +228,10 @@ export default function EditFailureDialog({
                           <FormControl>
                             <Input
                               type='time'
-                              defaultValue={format(
-                                new Date(failure.to || Date.now()),
-                                'HH:mm',
-                              )}
+                              // defaultValue={format(
+                              //   new Date(failure.to || Date.now()),
+                              //   'HH:mm',
+                              // )}
                               onChange={(e) => {
                                 const [hours, minutes] = e.target.value
                                   .split(':')

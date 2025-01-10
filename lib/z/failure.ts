@@ -26,16 +26,15 @@ export const AddFailureSchema = z
 
 export type FailureZodType = z.infer<typeof AddFailureSchema>;
 
-export const UpdateFailureSchema = z
-  .object({
-    from: z.date(),
-    to: z.date().optional(),
-    supervisor: z.string().min(1),
-    responsible: z.string().min(1),
-    solution: z.string().optional(),
-    comment: z.string().optional(),
-  })
-  .refine((data) => data.from < new Date(), {
-    path: ['from'],
-    message: 'Data nie może być z przyszłości!',
-  });
+export const UpdateFailureSchema = z.object({
+  from: z.date(),
+  to: z.date(),
+  supervisor: z.string().min(1),
+  responsible: z.string().min(1),
+  solution: z.string().optional(),
+  comment: z.string().optional(),
+});
+// .refine((data) => data.from < new Date(), {
+//   path: ['from'],
+//   message: 'Data nie może być z przyszłości!',
+// });
