@@ -6,4 +6,5 @@ FIXME: deviations id copy to clipboard
 PLAN: tempering process BRI (article login, get batch, show degrees and timer)
 PLAN: synchronize articles with SFMS SQL? 
 FIXME: time validation failures (time to cant be less than time from)
+FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
 */

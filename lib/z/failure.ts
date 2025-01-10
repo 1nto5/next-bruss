@@ -17,7 +17,7 @@ export const AddFailureSchema = z
   })
   .refine((data) => data.from >= new Date(Date.now() - 3600 * 1000), {
     path: ['from'],
-    message: 'Nie możemy cofnąć się w czasie więcej niż 1 godzinę!',
+    message: 'Nie możemy cofnąć się w czasie więcej niż 1h!',
   })
   .refine((data) => data.failure.length > 0, {
     path: ['failure'],
@@ -44,5 +44,5 @@ export const UpdateFailureSchema = z
   })
   .refine((data) => data.to >= data.from, {
     path: ['to'],
-    message: 'Data nie może być wcześniejsza niż rozpoczęcie!',
+    message: 'Zakończenie nie może być wcześniej niż rozpoczęcie!',
   });
