@@ -56,7 +56,7 @@ export function DataTable<TData, TValue>({
       () => {
         revalidateFailures();
       },
-      1000 * 60 * 5, // 5 minutes
+      1000 * 60 * 1, // 1 minute refresh
     );
 
     return () => clearInterval(interval);
