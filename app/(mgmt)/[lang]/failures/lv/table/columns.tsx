@@ -47,7 +47,7 @@ export const columns: ColumnDef<FailureType>[] = [
     cell: ({ row }) => {
       const failure = row.original;
 
-      return <EditFailureDialog failure={failure} />;
+      return failure.to && <EditFailureDialog failure={failure} />;
     },
   },
   {

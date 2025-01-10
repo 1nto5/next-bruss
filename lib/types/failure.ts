@@ -7,12 +7,12 @@ export type UpdateFailureType = Omit<
   'line' | 'station' | 'failure'
 > & {
   _id: string;
-  to?: Date;
+  to: Date;
 };
 
 export type FailureType = InsertFailureType & {
   _id: string;
-  to?: string | Date;
+  to: string | Date;
   fromLocaleString: string;
   toLocaleString?: string;
   createdAt: string | Date;

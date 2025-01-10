@@ -27,6 +27,8 @@ import { format } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
 
 // import { Separator } from '@/components/ui/separator';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UpdateFailureSchema } from '@/lib/z/failure';
 import { useState } from 'react';
@@ -46,7 +48,7 @@ export default function EditFailureDialog({
     resolver: zodResolver(UpdateFailureSchema),
     defaultValues: {
       from: new Date(failure.from),
-      to: failure.to ? new Date(failure.to) : undefined,
+      to: new Date(failure.to),
       supervisor: failure.supervisor,
       responsible: failure.responsible,
       solution: failure.solution,
@@ -104,158 +106,61 @@ export default function EditFailureDialog({
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <ScrollArea className='h-[450px]'>
               <div className='grid items-center gap-2 p-2'>
-                <div className='flex space-x-2'>
-                  <FormField
-                    control={form.control}
-                    name='from'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Rozpoczęcie dn.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='date'
-                            // defaultValue={format(
-                            //   new Date(failure.from),
-                            //   'yyyy-MM-dd',
-                            // )}
-                            onChange={(e) => {
-                              const currentFrom =
-                                form.getValues('from') || new Date();
-                              const newDate = new Date(e.target.value);
-                              const updatedFrom = new Date(
-                                newDate.getFullYear(),
-                                newDate.getMonth(),
-                                newDate.getDate(),
-                                currentFrom.getHours(),
-                                currentFrom.getMinutes(),
-                              );
-
-                              form.setValue('from', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name='from'
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>godz.</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='time'
-                            // defaultValue={format(
-                            //   new Date(failure.from),
-                            //   'HH:mm',
-                            // )}
-                            onChange={(e) => {
-                              const [hours, minutes] = e.target.value
-                                .split(':')
-                                .map(Number);
-                              const currentFrom =
-                                form.getValues('from') || new Date();
-                              const updatedFrom = new Date(
-                                currentFrom.getFullYear(),
-                                currentFrom.getMonth(),
-                                currentFrom.getDate(),
-                                hours,
-                                minutes,
-                              );
-
-                              form.setValue('from', updatedFrom);
-                            }}
-                          />
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                {/* Data rozpoczęcia */}
                 <FormField
                   control={form.control}
                   name='from'
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className='w-[350px]'>
+                      <FormLabel>Rozpoczęcie</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          max={new Date()}
+                          modal
+                          renderTrigger={({ value, setOpen, open }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={field.onChange}
+                              format='dd/MM/yyyy HH:mm'
+                              onCalendarClick={() => setOpen(!open)}
+                            />
+                          )}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {failure.to && (
-                  <div className='flex space-x-2'>
-                    <FormField
-                      control={form.control}
-                      name='to'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Zakończenie dn.</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='date'
-                              // defaultValue={format(
-                              //   new Date(failure.to || Date.now()),
-                              //   'yyyy-MM-dd',
-                              // )}
-                              onChange={(e) => {
-                                const currentFrom =
-                                  form.getValues('to') || new Date();
-                                const newDate = new Date(e.target.value);
-                                const updatedFrom = new Date(
-                                  newDate.getFullYear(),
-                                  newDate.getMonth(),
-                                  newDate.getDate(),
-                                  currentFrom.getHours(),
-                                  currentFrom.getMinutes(),
-                                );
-
-                                form.setValue('to', updatedFrom);
-                              }}
+                {/* Data zakończenia */}
+                <FormField
+                  control={form.control}
+                  name='to'
+                  render={({ field }) => (
+                    <FormItem className='w-[350px]'>
+                      <FormLabel>Zakończenie</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          max={new Date()}
+                          modal
+                          renderTrigger={({ value, setOpen, open }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={field.onChange}
+                              format='dd/MM/yyyy HH:mm'
+                              onCalendarClick={() => setOpen(!open)}
                             />
-                          </FormControl>
-                          {/* <FormMessage /> */}
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name='to'
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>godz.</FormLabel>
-                          <FormControl>
-                            <Input
-                              type='time'
-                              // defaultValue={format(
-                              //   new Date(failure.to || Date.now()),
-                              //   'HH:mm',
-                              // )}
-                              onChange={(e) => {
-                                const [hours, minutes] = e.target.value
-                                  .split(':')
-                                  .map(Number);
-                                const currentFrom =
-                                  form.getValues('to') || new Date();
-                                const updatedFrom = new Date(
-                                  currentFrom.getFullYear(),
-                                  currentFrom.getMonth(),
-                                  currentFrom.getDate(),
-                                  hours,
-                                  minutes,
-                                );
-
-                                form.setValue('to', updatedFrom);
-                              }}
-                            />
-                          </FormControl>
-                          {/* <FormMessage /> */}
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
