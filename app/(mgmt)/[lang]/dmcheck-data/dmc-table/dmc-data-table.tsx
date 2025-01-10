@@ -34,7 +34,7 @@ import {
 
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
-import { revalidateDmcheckData as revalidate } from '../actions';
+import { revalidateDmcheckTableData as revalidate } from '../actions';
 import DmcTableFilteringAndOptions from '../components/dmc-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
