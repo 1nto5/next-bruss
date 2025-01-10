@@ -60,8 +60,7 @@ export default function AddFailureDialog({}: {}) {
     defaultValues: {
       responsible: '',
       supervisor: '',
-      from: new Date(new Date()),
-      // to: new Date(new Date().getTime() + 60 * 60 * 1000),
+      from: undefined,
     },
   });
 
@@ -313,7 +312,7 @@ export default function AddFailureDialog({}: {}) {
                         <FormControl>
                           <Input
                             type='date'
-                            defaultValue={format(new Date(), 'yyyy-MM-dd')}
+                            // defaultValue={format(new Date(), 'yyyy-MM-dd')}
                             onChange={(e) => {
                               const currentFrom =
                                 form.getValues('from') || new Date();
@@ -343,7 +342,7 @@ export default function AddFailureDialog({}: {}) {
                         <FormControl>
                           <Input
                             type='time'
-                            defaultValue={format(new Date(), 'HH:mm')}
+                            // defaultValue={format(new Date(), 'HH:mm')}
                             onChange={(e) => {
                               const [hours, minutes] = e.target.value
                                 .split(':')
