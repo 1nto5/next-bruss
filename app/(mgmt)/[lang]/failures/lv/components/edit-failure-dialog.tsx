@@ -111,7 +111,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='from'
                   render={({ field }) => (
-                    <FormItem className='w-[350px]'>
+                    <FormItem className='w-48'>
                       <FormLabel>Rozpoczęcie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -139,7 +139,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='to'
                   render={({ field }) => (
-                    <FormItem className='w-[350px]'>
+                    <FormItem className='w-48'>
                       <FormLabel>Zakończenie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -166,7 +166,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='supervisor'
                   render={({ field }) => (
-                    <FormItem className='w-[200px]'>
+                    <FormItem className='w-48'>
                       <FormLabel>Nadzorujący</FormLabel>
                       <FormControl>
                         <Input placeholder='' {...field} />
