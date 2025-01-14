@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  failuresOptions,
+  stationsOptions,
+} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -18,7 +22,6 @@ import {
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import {
   sectorsSelectOptions,
   warehouseSelectOptions,

@@ -1,7 +1,7 @@
 // import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
-import { FailureType } from '@/lib/types/failure';
 import Link from 'next/link';
+import { FailureType } from './lib/types-failures';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -21,6 +21,7 @@ async function getFailures(
   }
   const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
+  console.log(process.env.API);
   const res = await fetch(`${process.env.API}/failures/lv${queryString}`, {
     next: { revalidate: 300, tags: ['failures-lv'] },
   });

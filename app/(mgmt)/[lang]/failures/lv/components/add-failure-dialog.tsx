@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  failuresOptions,
+  stationsOptions,
+} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
+import { AddFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -35,9 +40,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
-import { AddFailureSchema } from '@/lib/z/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Check, ChevronsUpDown, CopyPlus, Loader2 } from 'lucide-react';

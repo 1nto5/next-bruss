@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  failuresOptions,
+  stationsOptions,
+} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -17,7 +21,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { failuresOptions, stationsOptions } from '@/lib/options/failures-lv2';
 import { cn } from '@/lib/utils';
 import {
   Check,

@@ -34,9 +34,9 @@ export const UpdateFailureSchema = z
     solution: z.string().optional(),
     comment: z.string().optional(),
   })
-  .refine((data) => data.from < new Date(), {
+  .refine((data) => data.from >= new Date(Date.now() - 8 * 3600 * 1000), {
     path: ['from'],
-    message: 'Data nie może być z przyszłości!',
+    message: 'Możliwość edycji tylko 8h wstecz!',
   })
   .refine((data) => data.to < new Date(), {
     path: ['to'],

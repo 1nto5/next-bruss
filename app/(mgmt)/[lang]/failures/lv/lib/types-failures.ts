@@ -1,4 +1,4 @@
-import { FailureZodType } from '../z/failure';
+import { FailureZodType } from './zod-failures';
 
 export type InsertFailureType = FailureZodType;
 

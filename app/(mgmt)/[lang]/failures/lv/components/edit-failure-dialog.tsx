@@ -21,16 +21,16 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { FailureType } from '@/lib/types/failure';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
+import { FailureType } from '../lib/types-failures';
 
 // import { Separator } from '@/components/ui/separator';
+import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { UpdateFailureSchema } from '@/lib/z/failure';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -117,6 +117,7 @@ export default function EditFailureDialog({
                         <DateTimePicker
                           value={field.value}
                           onChange={field.onChange}
+                          min={new Date(Date.now() - 24 * 3600 * 1000)}
                           max={new Date()}
                           modal
                           renderTrigger={({ value, setOpen, open }) => (
@@ -145,6 +146,7 @@ export default function EditFailureDialog({
                         <DateTimePicker
                           value={field.value}
                           onChange={field.onChange}
+                          min={new Date(Date.now() - 16 * 3600 * 1000)}
                           max={new Date()}
                           modal
                           renderTrigger={({ value, setOpen, open }) => (
