@@ -13,6 +13,8 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -54,27 +56,29 @@ export default function TableFilteringAndOptions({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [fromDate, setFromDate] = useState('');
-  const [fromTime, setFromTime] = useState('06:00');
-  const [toDate, setToDate] = useState('');
-  const [toTime, setToTime] = useState('22:00');
+  // const [fromDate, setFromDate] = useState('');
+  // const [fromTime, setFromTime] = useState('06:00');
+  // const [toDate, setToDate] = useState('');
+  // const [toTime, setToTime] = useState('22:00');
 
-  useEffect(() => {
-    const fromParam = searchParams.get('from');
-    const toParam = searchParams.get('to');
+  const [from, setFrom] = useState<Date | undefined>(undefined);
 
-    if (fromParam) {
-      const [date, time] = fromParam.split('T');
-      setFromDate(date || '');
-      setFromTime(time || '06:00');
-    }
+  // useEffect(() => {
+  //   const fromParam = searchParams.get('from');
+  //   const toParam = searchParams.get('to');
 
-    if (toParam) {
-      const [date, time] = toParam.split('T');
-      setToDate(date || '');
-      setToTime(time || '22:00');
-    }
-  }, [searchParams]);
+  //   if (fromParam) {
+  //     const [date, time] = fromParam.split('T');
+  //     setFromDate(date || '');
+  //     setFromTime(time || '06:00');
+  //   }
+
+  //   if (toParam) {
+  //     const [date, time] = toParam.split('T');
+  //     setToDate(date || '');
+  //     setToTime(time || '22:00');
+  //   }
+  // }, [searchParams]);
 
   // Get a new searchParams string by merging the current
   // searchParams with a provided key/value pair
@@ -107,20 +111,28 @@ export default function TableFilteringAndOptions({
     failuresOptions.find((option) => option.station === filterStationValue)
       ?.options || [];
 
+  // const handleSearchClick = () => {
+  //   const params = {
+  //     from: `${fromDate}T${fromTime}` || '',
+  //     to: `${toDate}T${toTime}` || '',
+  //   };
+  //   router.push(`${pathname}?${createDateTimeQueryString(params)}`);
+  // };
+
   const handleSearchClick = () => {
     const params = {
-      from: `${fromDate}T${fromTime}` || '',
-      to: `${toDate}T${toTime}` || '',
+      from: `${from}` || '',
+      to: `${from}` || '',
     };
     router.push(`${pathname}?${createDateTimeQueryString(params)}`);
   };
 
   const handleClearFilters = () => {
     router.push(pathname);
-    setFromDate('');
-    setFromTime('06:00');
-    setToDate('');
-    setToTime('22:00');
+    // setFromDate('');
+    // setFromTime('06:00');
+    // setToDate('');
+    // setToTime('22:00');
     setFilter('line', '');
     setFilter('station', '');
     setFilter('failure', '');
@@ -131,41 +143,18 @@ export default function TableFilteringAndOptions({
     setFilterFailureValue('');
     setFilterSupervisorValue('');
     setFilterResponsibleValue('');
-    setFromTime('06:00');
-    setToTime('22:00');
+    // setFromTime('06:00');
+    // setToTime('22:00');
   };
-
-  // const [isPendingExcelGenerate, setIsPendingExcelGenerate] = useState(false);
-
-  // const handleGenerateExcel = async () => {
-  //   setIsPendingExcelGenerate(true);
-  //   try {
-  //     const response = await fetch('/api/failures/lv/excel', {});
-
-  //     console.log('response', response);
-  //   } catch (error) {
-  //     toast.error('Skontaktuj się z działem IT');
-  //     console.error('There was an error generating the Excel file:', error);
-  //   } finally {
-  //     setIsPendingExcelGenerate(false);
-  //   }
-  // };
 
   return (
     <div className='flex flex-wrap gap-2'>
       <div className='flex space-x-4'>
-        {/* <Link
-          className='hover:underline'
-          href={`${process.env.API}/failures/lv/excel}`}
-        >
-          XLSX
-        </Link> */}
         <RadioGroup
           value={filterLineValue}
           onValueChange={(value) => {
-            // router.push(pathname + '?' + createQueryString('line', value));
             setFilterLineValue(value);
-            setFilter('line', value); // Przykład: ustawienie filtra na kolumnę 'station'
+            setFilter('line', value);
           }}
           className='flex flex-row '
         >
@@ -366,8 +355,23 @@ export default function TableFilteringAndOptions({
         }}
       />
 
+      <DateTimePicker
+        value={from}
+        onChange={setFrom}
+        // modal
+        renderTrigger={({ value, setOpen, open }) => (
+          <DateTimeInput
+            value={value}
+            onChange={(x) => !open && setFrom(x)}
+            format='dd/MM/yyyy HH:mm'
+            disabled={open}
+            onCalendarClick={() => setOpen(!open)}
+          />
+        )}
+      />
+
       <div className='flex flex-wrap gap-2'>
-        <div className='flex items-center gap-1.5'>
+        {/* <div className='flex items-center gap-1.5'>
           <Label htmlFor='from'>Od:</Label>
           <Input
             id='fromDate'
@@ -400,8 +404,8 @@ export default function TableFilteringAndOptions({
             onChange={(e) => setToTime(e.target.value)}
             disabled={!toDate}
           />
-        </div>
-        <Button
+        </div> */}
+        {/* <Button
           type='submit'
           variant='outline'
           disabled={!fromDate || !toDate}
@@ -410,7 +414,7 @@ export default function TableFilteringAndOptions({
           title='szukaj'
         >
           <Search />
-        </Button>
+        </Button> */}
         <Button
           variant='outline'
           onClick={() => handleClearFilters()}

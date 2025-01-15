@@ -117,7 +117,7 @@ export default function EditFailureDialog({
                         <DateTimePicker
                           value={field.value}
                           onChange={field.onChange}
-                          min={new Date(Date.now() - 24 * 3600 * 1000)}
+                          min={new Date(Date.now() - 8 * 3600 * 1000)}
                           max={new Date()}
                           modal
                           renderTrigger={({ value, setOpen, open }) => (
@@ -146,7 +146,7 @@ export default function EditFailureDialog({
                         <DateTimePicker
                           value={field.value}
                           onChange={field.onChange}
-                          min={new Date(Date.now() - 16 * 3600 * 1000)}
+                          min={new Date(Date.now() - 8 * 3600 * 1000)}
                           max={new Date()}
                           modal
                           renderTrigger={({ value, setOpen, open }) => (

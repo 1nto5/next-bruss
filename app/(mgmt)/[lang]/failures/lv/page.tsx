@@ -1,9 +1,9 @@
 // import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
 import Link from 'next/link';
+import { columns } from './components/table/columns';
+import { DataTable } from './components/table/data-table';
 import { FailureType } from './lib/types-failures';
-import { columns } from './table/columns';
-import { DataTable } from './table/data-table';
 
 async function getFailures(
   lang: string,
@@ -21,7 +21,6 @@ async function getFailures(
   }
   const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
 
-  console.log(process.env.API);
   const res = await fetch(`${process.env.API}/failures/lv${queryString}`, {
     next: { revalidate: 300, tags: ['failures-lv'] },
   });
@@ -73,8 +72,9 @@ async function getFailures(
         ? new Date(failure.to).toLocaleString(lang)
         : '', // Jeśli `to` nie istnieje, pozostaw pusty ciąg
       duration: Math.round((toTime - fromTime) / 60000), // Oblicz różnicę w minutach
-      createdAt: new Date(failure.createdAt).toLocaleString(lang),
-      updatedAt: failure.updatedAt
+      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(lang),
+
+      updatedAtLocaleString: failure.updatedAt
         ? new Date(failure.updatedAt).toLocaleString(lang)
         : '', // Jeśli `updatedAt` nie istnieje, pozostaw pusty ciąg
     };

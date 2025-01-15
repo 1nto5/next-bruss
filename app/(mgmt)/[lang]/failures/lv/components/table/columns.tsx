@@ -1,10 +1,13 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import EditFailureDialog from '../components/edit-failure-dialog';
-import EndFailureButton from '../components/end-failure-button';
-import { FailureType } from '../lib/types-failures';
+import { is } from 'date-fns/locale';
+import { Activity, Ban, Clock, Hourglass, Timer } from 'lucide-react';
+import { FailureType } from '../../lib/types-failures';
+import EditFailureDialog from '../edit-failure-dialog';
+import EndFailureButton from '../end-failure-button';
 
 export const columns: ColumnDef<FailureType>[] = [
   {
@@ -43,14 +46,24 @@ export const columns: ColumnDef<FailureType>[] = [
   {
     id: 'actions',
     header: 'Edytuj',
-
     cell: ({ row }) => {
       const failure = row.original;
       const createdAt = new Date(failure.createdAt);
       const isRecent =
-        (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60) < 16;
-
-      return !isRecent && failure.to && <EditFailureDialog failure={failure} />;
+        (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60) < 8;
+      if (!isRecent)
+        return (
+          <Button disabled size={'sm'} variant={'ghost'}>
+            <Ban />
+          </Button>
+        );
+      if (!failure.to)
+        return (
+          <Button disabled size={'sm'} variant={'ghost'}>
+            <Activity />
+          </Button>
+        );
+      return <EditFailureDialog failure={failure} />;
     },
   },
   {
@@ -108,18 +121,18 @@ export const columns: ColumnDef<FailureType>[] = [
     },
   },
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'createdAtLocaleString',
     header: 'Utworzono',
     cell: ({ row }) => {
-      const createdAt = row.getValue('createdAt');
+      const createdAt = row.getValue('createdAtLocaleString');
       return <div className='w-[150px]'>{createdAt as React.ReactNode}</div>;
     },
   },
   {
-    accessorKey: 'updatedAt',
+    accessorKey: 'updatedAtLocaleString',
     header: 'Ostania aktualizacja',
     cell: ({ row }) => {
-      const updatedAt = row.getValue('updatedAt');
+      const updatedAt = row.getValue('updatedAtLocaleString');
       return <div className='w-[150px]'>{updatedAt as React.ReactNode}</div>;
     },
   },

@@ -33,8 +33,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
-import { revalidateFailures } from '../actions';
-import TableFilteringAndOptions from '../components/table-filtering-and-options';
+import { revalidateFailures } from '../../actions';
+import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
