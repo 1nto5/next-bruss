@@ -71,6 +71,16 @@ export default function AddFailureDialog({}: {}) {
     },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        responsible: '',
+        supervisor: '',
+        from: new Date(),
+      });
+    }
+  }, [open]);
+
   const selectedStation = form.watch('station');
   useEffect(() => {
     form.setValue('failure', '');
