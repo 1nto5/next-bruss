@@ -1,6 +1,6 @@
-import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut } from 'lucide-react';
+import * as React from 'react';
 
 interface LoginLogoutButtonProps {
   isLoggedIn: boolean;
