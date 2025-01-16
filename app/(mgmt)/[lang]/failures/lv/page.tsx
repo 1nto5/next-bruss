@@ -20,7 +20,6 @@ async function getFailures(
     queryParams.push(`to=${searchParams.to.trim()}`);
   }
   const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
-
   const res = await fetch(`${process.env.API}/failures/lv${queryString}`, {
     next: { revalidate: 300, tags: ['failures-lv'] },
   });

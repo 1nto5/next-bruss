@@ -1,16 +1,12 @@
 import { dbc } from '@/lib/mongo';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
-// https://nextjs.org/docs/app/building-your-application/caching#on-demand-revalidation
-// https://nextjs.org/docs/app/api-reference/functions/revalidateTag
 export const dynamic = 'force-dynamic';
-// 'auto' | 'force-dynamic' | 'error' | 'force-static'
 
 export async function GET(req: NextRequest) {
   try {
-    const from = req.nextUrl.searchParams.get('from');
-    const to = req.nextUrl.searchParams.get('to');
+    const from = req.nextUrl.searchParams.get('from')?.replace(' ', '+');
+    const to = req.nextUrl.searchParams.get('to')?.replace(' ', '+');
     const coll = await dbc('failures_lv');
 
     let query: any = {};
@@ -19,7 +15,7 @@ export async function GET(req: NextRequest) {
     if (to) {
       const toDate = new Date(to);
       toDate.setDate(toDate.getDate());
-      query.to = { $lte: toDate };
+      query.$or = [{ to: { $lte: toDate } }, { to: { $exists: false } }];
     }
 
     const failures = await coll

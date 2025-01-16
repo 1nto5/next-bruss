@@ -56,41 +56,8 @@ export default function TableFilteringAndOptions({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // const [fromDate, setFromDate] = useState('');
-  // const [fromTime, setFromTime] = useState('06:00');
-  // const [toDate, setToDate] = useState('');
-  // const [toTime, setToTime] = useState('22:00');
-
   const [from, setFrom] = useState<Date | undefined>(undefined);
-
-  // useEffect(() => {
-  //   const fromParam = searchParams.get('from');
-  //   const toParam = searchParams.get('to');
-
-  //   if (fromParam) {
-  //     const [date, time] = fromParam.split('T');
-  //     setFromDate(date || '');
-  //     setFromTime(time || '06:00');
-  //   }
-
-  //   if (toParam) {
-  //     const [date, time] = toParam.split('T');
-  //     setToDate(date || '');
-  //     setToTime(time || '22:00');
-  //   }
-  // }, [searchParams]);
-
-  // Get a new searchParams string by merging the current
-  // searchParams with a provided key/value pair
-  // const createQueryString = useCallback(
-  //   (name: string, value: string) => {
-  //     const params = new URLSearchParams(searchParams.toString());
-  //     params.set(name, value);
-
-  //     return params.toString();
-  //   },
-  //   [searchParams],
-  // );
+  const [to, setTo] = useState<Date | undefined>(undefined);
 
   const createDateTimeQueryString = useCallback(
     (params: Record<string, string>) => {
@@ -111,28 +78,16 @@ export default function TableFilteringAndOptions({
     failuresOptions.find((option) => option.station === filterStationValue)
       ?.options || [];
 
-  // const handleSearchClick = () => {
-  //   const params = {
-  //     from: `${fromDate}T${fromTime}` || '',
-  //     to: `${toDate}T${toTime}` || '',
-  //   };
-  //   router.push(`${pathname}?${createDateTimeQueryString(params)}`);
-  // };
-
   const handleSearchClick = () => {
     const params = {
-      from: `${from}` || '',
-      to: `${from}` || '',
+      from: from ? from.toISOString() : '',
+      to: to ? to.toISOString() : '',
     };
     router.push(`${pathname}?${createDateTimeQueryString(params)}`);
   };
 
   const handleClearFilters = () => {
     router.push(pathname);
-    // setFromDate('');
-    // setFromTime('06:00');
-    // setToDate('');
-    // setToTime('22:00');
     setFilter('line', '');
     setFilter('station', '');
     setFilter('failure', '');
@@ -143,8 +98,8 @@ export default function TableFilteringAndOptions({
     setFilterFailureValue('');
     setFilterSupervisorValue('');
     setFilterResponsibleValue('');
-    // setFromTime('06:00');
-    // setToTime('22:00');
+    setFrom(undefined);
+    setTo(undefined);
   };
 
   return (
@@ -174,7 +129,6 @@ export default function TableFilteringAndOptions({
           <Button
             variant='outline'
             role='combobox'
-            // aria-expanded={open}
             className={cn(
               'justify-between',
               !filterStationValue && 'opacity-50',
@@ -197,8 +151,6 @@ export default function TableFilteringAndOptions({
                 <CommandItem
                   key='reset'
                   onSelect={() => {
-                    // setWarehouseValue('');
-                    // router.push(pathname);
                     setFilterStationValue('');
                     setFilter('station', '');
                     setOpenStation(false);
@@ -212,21 +164,6 @@ export default function TableFilteringAndOptions({
                     key={station}
                     value={station}
                     onSelect={(currentValue) => {
-                      // setWarehouseValue(
-                      //   currentValue === warehouseValue
-                      //     ? ''
-                      //     : currentValue,
-                      // );
-                      // router.push(
-                      //   pathname +
-                      //     '?' +
-                      //     createQueryString(
-                      //       'station',
-                      //       currentValue === searchParams.get('station')
-                      //         ? ''
-                      //         : currentValue,
-                      //     ),
-                      // );
                       setFilterStationValue(currentValue);
                       setFilter('station', currentValue);
                       setOpenStation(false);
@@ -255,7 +192,6 @@ export default function TableFilteringAndOptions({
             variant='outline'
             role='combobox'
             disabled={!filterStationValue}
-            // aria-expanded={open}
             className={cn(
               'justify-between',
               !filterFailureValue && 'opacity-50',
@@ -278,8 +214,6 @@ export default function TableFilteringAndOptions({
                 <CommandItem
                   key='reset'
                   onSelect={() => {
-                    // setWarehouseValue('');
-                    // router.push(pathname);
                     setFilterFailureValue('');
                     setFilter('failure', '');
                     setOpenFailure(false);
@@ -293,21 +227,6 @@ export default function TableFilteringAndOptions({
                     key={failure}
                     value={failure}
                     onSelect={(currentValue) => {
-                      // setWarehouseValue(
-                      //   currentValue === warehouseValue
-                      //     ? ''
-                      //     : currentValue,
-                      // );
-                      // router.push(
-                      //   pathname +
-                      //     '?' +
-                      //     createQueryString(
-                      //       'failure',
-                      //       currentValue === searchParams.get('failure')
-                      //         ? ''
-                      //         : currentValue,
-                      //     ),
-                      // );
                       setFilterFailureValue(currentValue);
                       setFilter('failure', currentValue);
                       setOpenFailure(false);
@@ -335,9 +254,6 @@ export default function TableFilteringAndOptions({
         className='w-auto'
         value={filterSupervisorValue}
         onChange={(e) => {
-          // router.push(
-          //   pathname + '?' + createQueryString('supervisor', e.target.value),
-          // );
           setFilterSupervisorValue(e.target.value);
           setFilter('supervisor', e.target.value);
         }}
@@ -347,74 +263,56 @@ export default function TableFilteringAndOptions({
         className='w-36'
         value={filterResponsibleValue}
         onChange={(e) => {
-          // router.push(
-          //   pathname + '?' + createQueryString('responsible', e.target.value),
-          // );
           setFilterResponsibleValue(e.target.value);
           setFilter('responsible', e.target.value);
         }}
       />
 
-      <DateTimePicker
-        value={from}
-        onChange={setFrom}
-        // modal
-        renderTrigger={({ value, setOpen, open }) => (
-          <DateTimeInput
-            value={value}
-            onChange={(x) => !open && setFrom(x)}
-            format='dd/MM/yyyy HH:mm'
-            disabled={open}
-            onCalendarClick={() => setOpen(!open)}
-          />
-        )}
-      />
+      <div className='flex items-center space-x-2'>
+        <Label>od:</Label>
+        <DateTimePicker
+          value={from}
+          onChange={setFrom}
+          renderTrigger={({ value, setOpen, open }) => (
+            <DateTimeInput
+              value={value}
+              onChange={(x) => !open && setFrom(x)}
+              format='dd/MM/yyyy HH:mm'
+              disabled={open}
+              onCalendarClick={() => setOpen(!open)}
+            />
+          )}
+        />
+      </div>
+
+      <div className='flex items-center space-x-2'>
+        <Label>do:</Label>
+        <DateTimePicker
+          value={to}
+          onChange={setTo}
+          renderTrigger={({ value, setOpen, open }) => (
+            <DateTimeInput
+              value={value}
+              onChange={(x) => !open && setTo(x)}
+              format='dd/MM/yyyy HH:mm'
+              disabled={open}
+              onCalendarClick={() => setOpen(!open)}
+            />
+          )}
+        />
+      </div>
 
       <div className='flex flex-wrap gap-2'>
-        {/* <div className='flex items-center gap-1.5'>
-          <Label htmlFor='from'>Od:</Label>
-          <Input
-            id='fromDate'
-            type='date'
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className='w-36'
-          />
-          <Input
-            id='fromTime'
-            type='time'
-            value={fromTime}
-            onChange={(e) => setFromTime(e.target.value)}
-            disabled={!fromDate}
-          />
-        </div>
-        <div className='flex items-center gap-1.5'>
-          <Label htmlFor='to'>Do:</Label>
-          <Input
-            id='toDate'
-            type='date'
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className='w-36'
-          />
-          <Input
-            id='toTime'
-            type='time'
-            value={toTime}
-            onChange={(e) => setToTime(e.target.value)}
-            disabled={!toDate}
-          />
-        </div> */}
-        {/* <Button
+        <Button
           type='submit'
           variant='outline'
-          disabled={!fromDate || !toDate}
+          disabled={!from || !to}
           onClick={handleSearchClick}
           size='icon'
           title='szukaj'
         >
           <Search />
-        </Button> */}
+        </Button>
         <Button
           variant='outline'
           onClick={() => handleClearFilters()}
