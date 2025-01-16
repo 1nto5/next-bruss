@@ -31,7 +31,7 @@ import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-fai
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -55,6 +55,19 @@ export default function EditFailureDialog({
       comment: failure.comment,
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        from: new Date(failure.from),
+        to: new Date(failure.to),
+        supervisor: failure.supervisor,
+        responsible: failure.responsible,
+        solution: failure.solution,
+        comment: failure.comment,
+      });
+    }
+  }, [open, failure]);
 
   const onSubmit = async (data: z.infer<typeof UpdateFailureSchema>) => {
     // setIsDraft(false);
