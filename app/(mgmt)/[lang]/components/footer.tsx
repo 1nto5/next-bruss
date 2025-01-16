@@ -18,7 +18,7 @@ export default function Footer() {
     >
       <Container>
         <div className='text-right text-sm text-muted-foreground'>
-          Adrian Antosiak 2024
+          Adrian Antosiak 2025
         </div>
       </Container>
     </footer>
