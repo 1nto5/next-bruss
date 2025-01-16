@@ -33,8 +33,8 @@ import {
 } from '@/components/ui/card';
 
 import { ArrowRight } from 'lucide-react';
-import { useEffect } from 'react';
-import { revalidateCardPositions as revalidate } from '../actions';
+// import { useEffect } from 'react';
+// import { revalidateCardPositions as revalidate } from '../actions';
 import PositionsTableFilteringAndOptions from '../components/positions-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
@@ -50,13 +50,13 @@ export function PositionsDataTable<TData, TValue>({
   fetchTime,
   lang,
 }: DataTableProps<TData, TValue>) {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      revalidate();
-    }, 1000 * 30); // 30 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     revalidate();
+  //   }, 1000 * 30); // 30 seconds
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
