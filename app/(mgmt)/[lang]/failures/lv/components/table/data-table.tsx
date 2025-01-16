@@ -30,41 +30,30 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
-import { useEffect } from 'react';
-import { revalidateFailures } from '../../actions';
+import { FailureType } from '../../lib/types-failures';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  columns: ColumnDef<FailureType>[];
+  data: FailureType[];
   fetchTime: string;
-  // lang: string;
-  // session: Session | null;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  fetchTime,
-  // lang,
-  // session,
-}: DataTableProps<TData, TValue>) {
-  useEffect(() => {
-    const interval = setInterval(
-      () => {
-        revalidateFailures();
-      },
-      1000 * 60 * 1, // 1 minute refresh
-    );
-
-    return () => clearInterval(interval);
-  }, []);
+export function DataTable({ columns, data, fetchTime }: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  const [currentTime, setCurrentTime] = React.useState(Date.now());
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // Update every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const table = useReactTable({
     data,

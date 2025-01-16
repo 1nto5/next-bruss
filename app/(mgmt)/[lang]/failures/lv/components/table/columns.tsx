@@ -3,8 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
-import { is } from 'date-fns/locale';
-import { Activity, Ban, Clock, Hourglass, Timer } from 'lucide-react';
+import { Activity, Ban } from 'lucide-react';
 import { FailureType } from '../../lib/types-failures';
 import EditFailureDialog from '../edit-failure-dialog';
 import EndFailureButton from '../end-failure-button';
@@ -93,6 +92,14 @@ export const columns: ColumnDef<FailureType>[] = [
   {
     accessorKey: 'duration',
     header: 'Czas trwania (min)',
+    cell: ({ row }) => {
+      const fromTime = new Date(row.original.from);
+      const toTime = row.original.to ? new Date(row.original.to) : new Date();
+      const duration = Math.round(
+        (toTime.getTime() - fromTime.getTime()) / (1000 * 60),
+      );
+      return <div className='w-[150px]'>{duration} min</div>;
+    },
   },
   {
     accessorKey: 'supervisor',
@@ -105,7 +112,6 @@ export const columns: ColumnDef<FailureType>[] = [
   {
     accessorKey: 'solution',
     header: 'Rozwiązanie',
-    // header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const solution = row.getValue('solution');
       return <div className='w-[300px]'>{solution as React.ReactNode}</div>;
@@ -114,7 +120,6 @@ export const columns: ColumnDef<FailureType>[] = [
   {
     accessorKey: 'comment',
     header: 'Komentarz',
-    // header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const comment = row.getValue('comment');
       return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
