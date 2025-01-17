@@ -30,30 +30,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+// import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
-import { FailureType } from '../../lib/types-failures';
+// import { useEffect } from 'react';
+// import { revalidateFailures } from '../../actions';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
-interface DataTableProps {
-  columns: ColumnDef<FailureType>[];
-  data: FailureType[];
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
   fetchTime: string;
+  // lang: string;
+  // session: Session | null;
 }
 
-export function DataTable({ columns, data, fetchTime }: DataTableProps) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  fetchTime,
+  // lang,
+  // session,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [currentTime, setCurrentTime] = React.useState(Date.now());
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000); // Update every 60 seconds
-
-    return () => clearInterval(interval);
-  }, []);
+  const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
   const table = useReactTable({
     data,

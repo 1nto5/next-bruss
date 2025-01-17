@@ -1,5 +1,6 @@
 'use client';
 
+import { ArticleConfigType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -9,16 +10,15 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  sectorsSelectOptions,
-  warehouseSelectOptions,
-} from '@/lib/options/inventory';
 import { cn } from '@/lib/utils';
 import {
   Check,
@@ -30,124 +30,231 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { revalidateDmcheckTableData as revalidate } from '../actions';
 
 export default function DmcTableFilteringAndOptions({
-  setFilter,
+  articles,
+  setIsPendingSearch,
+  isPendingSearch,
 }: {
-  setFilter: (columnId: string, value: string) => void;
+  articles: ArticleConfigType[];
+  setIsPendingSearch: (value: boolean) => void;
+  isPendingSearch: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Get a new searchParams string by merging the current
-  // searchParams with a provided key/value pair
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams],
+  const [fromFilter, setFromFilter] = useState(() => {
+    const fromParam = searchParams.get('from');
+    return fromParam ? new Date(fromParam) : undefined;
+  });
+  const [toFilter, setToFilter] = useState(() => {
+    const toParam = searchParams.get('to');
+    return toParam ? new Date(toParam) : undefined;
+  });
+  const [dmcFilter, setDmcFilter] = useState(searchParams.get('dmc') || '');
+  const [hydraFilter, setHydraFilter] = useState(
+    searchParams.get('hydra_batch') || '',
   );
-  const [dmcFiltr, setDmcFiltr] = useState(searchParams.get('dmc') || '');
-  const [filterCreatorsValue, setFilterCreatorsValue] = useState('');
-  const [filterWarehouseValue, setFilterWarehouseValue] = useState('');
-  const [filterSectorValue, setFilterSectorValue] = useState('');
+  const [palletFilter, setPalletFilter] = useState(
+    searchParams.get('pallet_batch') || '',
+  );
+  const [workplaceFilter, setWorkplaceFilter] = useState(
+    searchParams.get('workplace') || '',
+  );
+  const [articleFilter, setArticleFilter] = useState(
+    searchParams.get('article') || '',
+  );
 
-  // change to dmcheck workplace
-  const [openWarehouse, setOpenWarehouse] = useState(false);
-  const [openSector, setOpenSector] = useState(false);
+  const areFiltersSet =
+    fromFilter ||
+    toFilter ||
+    dmcFilter ||
+    hydraFilter ||
+    palletFilter ||
+    workplaceFilter ||
+    articleFilter;
+
+  const [openWorkplace, setOpenWorkplace] = useState(false);
+  const [openArticle, setOpenArticle] = useState(false);
 
   const handleClearFilters = () => {
-    setFilter('number', '');
-    setFilter('creators', '');
-    setFilter('warehouse', '');
-    setFilter('sector', '');
+    setFromFilter(undefined);
+    setToFilter(undefined);
+    setDmcFilter('');
+    setHydraFilter('');
+    setPalletFilter('');
+    setWorkplaceFilter('');
+    setArticleFilter('');
+
+    if (searchParams.toString()) {
+      setIsPendingSearch(true);
+      router.push(pathname);
+    }
   };
 
+  const handleSearchClick = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (fromFilter) params.set('from', fromFilter.toISOString());
+    if (toFilter) params.set('to', toFilter.toISOString());
+    // if (fromFilter && toFilter && fromFilter > toFilter) {
+    //   toast.error('"From" date cannot be greater than "To" date');
+    //   return;
+    // }
+    if (dmcFilter) params.set('dmc', dmcFilter);
+    if (hydraFilter) params.set('hydra_batch', hydraFilter);
+    if (palletFilter) params.set('pallet_batch', palletFilter);
+    if (workplaceFilter) params.set('workplace', workplaceFilter);
+    if (articleFilter) params.set('article', articleFilter);
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (newUrl !== `${pathname}?${searchParams.toString()}`) {
+      setIsPendingSearch(true);
+      router.push(newUrl);
+    }
+  };
+
+  const workplaceOptions = Array.from(
+    new Set(articles.map((article) => article.workplace)),
+  ).map((workplace) => ({
+    value: workplace,
+    label: workplace.toUpperCase(),
+  }));
+
+  const articleOptions = articles
+    .filter(
+      (article) => !workplaceFilter || article.workplace === workplaceFilter,
+    )
+    .reduce((acc: { value: string; label: string }[], current) => {
+      const x = acc.find((item) => item.value === current.articleNumber);
+      if (!x) {
+        return acc.concat([
+          {
+            value: current.articleNumber,
+            label: `${current.articleNumber} - ${current.articleName}`,
+          },
+        ]);
+      } else {
+        return acc;
+      }
+    }, [])
+    .sort((a, b) => a.value.localeCompare(b.value));
+
   return (
-    <div className='flex flex-wrap gap-2'>
+    <form onSubmit={handleSearchClick} className='flex flex-wrap gap-2'>
+      <div className='flex items-center space-x-2'>
+        <Label>from:</Label>
+        <DateTimePicker
+          value={fromFilter}
+          onChange={setFromFilter}
+          max={toFilter || new Date()}
+          renderTrigger={({ value, setOpen, open }) => (
+            <DateTimeInput
+              value={value}
+              onChange={(x) => !open && setFromFilter(x)}
+              format='dd/MM/yyyy HH:mm'
+              disabled={open}
+              onCalendarClick={() => setOpen(!open)}
+            />
+          )}
+        />
+      </div>
+
+      <div className='flex items-center space-x-2'>
+        <Label>to:</Label>
+        <DateTimePicker
+          value={toFilter}
+          onChange={setToFilter}
+          max={new Date()}
+          min={fromFilter}
+          renderTrigger={({ value, setOpen, open }) => (
+            <DateTimeInput
+              value={value}
+              onChange={(x) => !open && setToFilter(x)}
+              format='dd/MM/yyyy HH:mm'
+              disabled={open}
+              onCalendarClick={() => setOpen(!open)}
+            />
+          )}
+        />
+      </div>
+
       <Input
         type='string'
         placeholder='dmc'
-        className='w-24'
-        value={dmcFiltr}
-        onChange={(e) => {
-          setDmcFiltr(e.target.value);
-          router.push(
-            pathname + '?' + createQueryString('dmc', e.target.value),
-          );
-        }}
+        className='w-auto'
+        value={dmcFilter}
+        onChange={(e) => setDmcFilter(e.target.value)}
       />
       <Input
-        placeholder='spisujący'
-        className='w-24'
-        value={filterCreatorsValue}
-        onChange={(e) => {
-          setFilterCreatorsValue(e.target.value);
-          setFilter('creators', e.target.value);
-        }}
+        type='string'
+        placeholder='HYDRA batch'
+        className='w-auto'
+        value={hydraFilter}
+        onChange={(e) => setHydraFilter(e.target.value)}
+      />
+      <Input
+        type='string'
+        placeholder='pallet batch'
+        className='w-auto'
+        value={palletFilter}
+        onChange={(e) => setPalletFilter(e.target.value)}
       />
 
-      <Popover open={openWarehouse} onOpenChange={setOpenWarehouse}>
+      <Popover open={openWorkplace} onOpenChange={setOpenWorkplace}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
             role='combobox'
-            // aria-expanded={open}
-            className={cn(
-              'justify-between',
-              !filterWarehouseValue && 'opacity-50',
-            )}
+            className={cn('justify-between', !workplaceFilter && 'opacity-50')}
           >
-            {filterWarehouseValue
-              ? warehouseSelectOptions.find(
-                  (warehouse) => warehouse.value === filterWarehouseValue,
+            {workplaceFilter
+              ? workplaceOptions.find(
+                  (workplace) => workplace.value === workplaceFilter,
                 )?.label
-              : 'magazyn'}
+              : 'workplace'}
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
+        <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
           <Command>
-            <CommandInput placeholder='wyszukaj...' />
+            <CommandInput placeholder='search...' />
             <CommandList>
-              <CommandEmpty>nie znaleziono</CommandEmpty>
+              <CommandEmpty>not found</CommandEmpty>
               <CommandGroup>
                 <CommandItem
                   key='reset'
                   onSelect={() => {
-                    setFilterWarehouseValue('');
-                    setFilter('warehouse', '');
-                    setOpenWarehouse(false);
+                    setWorkplaceFilter('');
+                    setOpenWorkplace(false);
+                    setArticleFilter('');
                   }}
                 >
                   <Check className='mr-2 h-4 w-4 opacity-0' />
                   nie wybrano
                 </CommandItem>
-                {warehouseSelectOptions.map((warehouse) => (
+                {workplaceOptions.map((workplace) => (
                   <CommandItem
-                    key={warehouse.value}
-                    value={warehouse.value}
+                    key={workplace.value}
+                    value={workplace.value}
                     onSelect={(currentValue) => {
-                      setFilterWarehouseValue(currentValue);
-                      setFilter('warehouse', currentValue);
-                      setOpenWarehouse(false);
+                      setWorkplaceFilter(currentValue);
+                      setOpenWorkplace(false);
+                      setArticleFilter('');
                     }}
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        filterWarehouseValue === warehouse.value
+                        workplaceFilter === workplace.value
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
                     />
-                    {warehouse.label}
+                    {workplace.label}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -156,60 +263,55 @@ export default function DmcTableFilteringAndOptions({
         </PopoverContent>
       </Popover>
 
-      <Popover open={openSector} onOpenChange={setOpenSector}>
+      <Popover open={openArticle} onOpenChange={setOpenArticle}>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
             role='combobox'
-            className={cn(
-              'justify-between',
-              !filterSectorValue && 'opacity-50',
-            )}
+            className={cn('justify-between', !articleFilter && 'opacity-50')}
           >
-            {filterSectorValue
-              ? sectorsSelectOptions.find(
-                  (sector) => sector.value === filterSectorValue,
+            {articleFilter
+              ? articleOptions.find(
+                  (article) => article.value === articleFilter,
                 )?.label
-              : 'sektor'}
+              : 'article'}
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
+        <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
           <Command>
-            <CommandInput placeholder='wyszukaj...' />
+            <CommandInput placeholder='search...' />
             <CommandList>
-              <CommandEmpty>nie znaleziono</CommandEmpty>
+              <CommandEmpty>not found</CommandEmpty>
               <CommandGroup>
                 <CommandItem
                   key='reset'
                   onSelect={() => {
-                    setFilterSectorValue('');
-                    setFilter('sector', '');
-                    setOpenSector(false);
+                    setArticleFilter('');
+                    setOpenArticle(false);
                   }}
                 >
                   <Check className='mr-2 h-4 w-4 opacity-0' />
                   nie wybrano
                 </CommandItem>
-                {sectorsSelectOptions.map((sector) => (
+                {articleOptions.map((article) => (
                   <CommandItem
-                    key={sector.value}
-                    value={sector.value}
-                    onSelect={() => {
-                      setFilterSectorValue(sector.value);
-                      setFilter('sector', sector.value);
-                      setOpenSector(false);
+                    key={article.value}
+                    value={article.value}
+                    onSelect={(currentValue) => {
+                      setArticleFilter(currentValue);
+                      setOpenArticle(false);
                     }}
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        filterSectorValue === sector.value
+                        articleFilter === article.value
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
                     />
-                    {sector.label}
+                    {article.label}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -219,27 +321,63 @@ export default function DmcTableFilteringAndOptions({
       </Popover>
 
       <Button
-        variant='outline'
-        onClick={() => handleClearFilters()}
-        size='icon'
-        title='wyczyść filtry'
+        type='submit'
+        variant='secondary'
+        className='w-32 justify-start'
+        disabled={isPendingSearch || !areFiltersSet}
       >
-        <CircleX />
+        {isPendingSearch ? (
+          <>
+            <Search className={'animate-pulse'} /> <span>Searching...</span>
+          </>
+        ) : (
+          <>
+            <Search /> <span>Search</span>
+          </>
+        )}
       </Button>
+
       <Button
+        variant='destructive'
+        onClick={handleClearFilters}
+        title='Clear filters'
+        disabled={!areFiltersSet}
+      >
+        <CircleX /> <span>Clear</span>
+      </Button>
+
+      {/* <Button
         variant='outline'
         onClick={() => revalidate()}
         size='icon'
-        title='odśwież'
+        title='refresh data'
       >
         <RefreshCcw />
-      </Button>
-      {/* PLAN: export to stock program compatible file */}
-      {/* <Link href={`/api/failures/lv/excel`}>
-        <Button variant='outline' size='icon' title='export do Excel'>
-          <Sheet />
+      </Button> */}
+
+      <Link
+        href={`/api/dmcheck-data/excel?${new URLSearchParams(
+          Object.entries({
+            from: fromFilter?.toISOString(),
+            to: toFilter?.toISOString(),
+            dmc: dmcFilter,
+            hydra_batch: hydraFilter,
+            pallet_batch: palletFilter,
+            workplace: workplaceFilter,
+            article: articleFilter,
+          }).reduce(
+            (acc, [key, value]) => {
+              if (value) acc[key] = value;
+              return acc;
+            },
+            {} as Record<string, string>,
+          ),
+        ).toString()}`}
+      >
+        <Button>
+          <Sheet /> <span>Export to Excel</span>
         </Button>
-      </Link> */}
-    </div>
+      </Link>
+    </form>
   );
 }

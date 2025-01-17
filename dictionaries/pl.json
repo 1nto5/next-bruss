@@ -2,9 +2,9 @@
   "header": {
     "production": {
       "title": "Produkcja",
-      "exportData": {
-        "title": "Export danych",
-        "description": "Generowanie pliku excel z danymi systemu skanowania."
+      "dmcheckData": {
+        "title": "DMCheck Data",
+        "description": "Dane w systemie skanowania DMCheck."
       },
       "rework": {
         "title": "Oznacz rework",

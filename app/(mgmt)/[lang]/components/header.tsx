@@ -54,14 +54,9 @@ export default function Header({ session, dict, lang }: HeaderProps) {
       href: '',
       submenu: [
         {
-          href: `/pro/export-data`,
-          title: `${dict?.header?.production?.exportData.title}`,
-          description: `${dict?.header?.production?.exportData.description}`,
-        },
-        {
-          href: '/pro/rework',
-          title: `${dict?.header?.production?.rework.title}`,
-          description: `${dict?.header?.production?.rework.description}`,
+          href: `/dmcheck-data`,
+          title: `${dict?.header?.production?.dmcheckData.title}`,
+          description: `${dict?.header?.production?.dmcheckData.description}`,
         },
       ],
     },
@@ -158,14 +153,9 @@ export default function Header({ session, dict, lang }: HeaderProps) {
       href: '',
       submenu: [
         {
-          href: `/pro/export-data`,
-          title: `${dict?.header?.production?.exportData.title}`,
-          description: `${dict?.header?.production?.exportData.description}`,
-        },
-        {
-          href: '/pro/rework',
-          title: `${dict?.header?.production?.rework.title}`,
-          description: `${dict?.header?.production?.rework.description}`,
+          href: `/dmcheck-data`,
+          title: `${dict?.header?.production?.dmcheckData.title}`,
+          description: `${dict?.header?.production?.dmcheckData.description}`,
         },
       ],
     },

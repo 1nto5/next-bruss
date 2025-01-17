@@ -318,42 +318,6 @@ export default function ExportCard({
               <Label htmlFor='date'>{cDict.timeFrameLabel}</Label>
               {/* className in '' if needed */}
               <div className={cn('grid gap-2', '')}>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id='date'
-                      variant={'outline'}
-                      className={cn(
-                        'justify-between font-normal',
-                        !date && 'text-muted-foreground',
-                      )}
-                    >
-                      <CalendarIcon className='mr-2 h-4 w-4' />
-                      {date?.from ? (
-                        date.to ? (
-                          <>
-                            {format(date.from, 'LLL dd, y')} -{' '}
-                            {format(date.to, 'LLL dd, y')}
-                          </>
-                        ) : (
-                          format(date.from, 'LLL dd, y')
-                        )
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='p-0' align='center'>
-                    <Calendar
-                      initialFocus
-                      mode='range'
-                      defaultMonth={date?.from}
-                      selected={date}
-                      onSelect={setDate}
-                      numberOfMonths={1}
-                    />
-                  </PopoverContent>
-                </Popover>
                 <Label htmlFor='input'>DMC / batch hydra / paleta</Label>
                 <Input
                   type='text'

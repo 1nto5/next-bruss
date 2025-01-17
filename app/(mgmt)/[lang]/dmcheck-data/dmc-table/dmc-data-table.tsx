@@ -34,12 +34,12 @@ import {
 
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
-import { revalidateDmcheckTableData as revalidate } from '../actions';
 import DmcTableFilteringAndOptions from '../components/dmc-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  articles: [];
   fetchTime: string;
   lang: string;
 }
@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
 export function DmcDataTable<TData, TValue>({
   columns,
   data,
+  articles,
   fetchTime,
   lang,
 }: DataTableProps<TData, TValue>) {
@@ -61,6 +62,7 @@ export function DmcDataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
   const table = useReactTable({
     data,
@@ -82,15 +84,22 @@ export function DmcDataTable<TData, TValue>({
     },
   });
 
+  useEffect(() => {
+    setIsPendingSearch(false);
+  }, [fetchTime]);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dane z systemu DMCheck</CardTitle>
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
+        <CardTitle>DMCheck data</CardTitle>
+        <CardDescription>Last sync: {fetchTime}</CardDescription>
         <DmcTableFilteringAndOptions
-          setFilter={(columnId, value) =>
-            table.getColumn(columnId)?.setFilterValue(value)
-          }
+          // setFilter={(columnId, value) =>
+          //   table.getColumn(columnId)?.setFilterValue(value)
+          // }
+          articles={articles}
+          isPendingSearch={isPendingSearch}
+          setIsPendingSearch={setIsPendingSearch}
         />
       </CardHeader>
       <CardContent>

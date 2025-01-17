@@ -7,7 +7,7 @@ import { revalidateTag } from 'next/cache';
 // import { redirect } from 'next/navigation';
 
 export async function revalidateDmcheckTableData() {
-  revalidateTag('dmcheck-table-data');
+  revalidateTag('dmcheck-data-dmc');
 }
 
 export async function updatePosition(

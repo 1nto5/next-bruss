@@ -1,37 +1,55 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ScanTableDataType } from '@/lib/types/dmcheck-data';
+import { DmcTableDataType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, List, Table } from 'lucide-react';
-import Link from 'next/link';
 
-export const dmcColumns: ColumnDef<ScanTableDataType>[] = [
+export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
+  {
+    accessorKey: 'status',
+    header: 'Status',
+  },
+
   {
     accessorKey: 'dmc',
     header: 'DMC',
-    filterFn: (row, columnId, value) => {
-      return row.getValue(columnId) === value;
-    },
-  },
-
-  {
-    accessorKey: 'workplace',
-    header: 'Stanowisko',
-    filterFn: (row, columnId, value) => {
-      return row.getValue(columnId) === value;
-    },
-    cell: ({ row }) => {
-      const workplace = row.original.workplace;
-      return workplace.toUpperCase();
-    },
+    // filterFn: (row, columnId, value) => {
+    //   return row.getValue(columnId) === value;
+    // },
   },
   {
     accessorKey: 'timeLocaleString',
-    header: 'Czas',
+    header: 'Time',
+  },
+  {
+    accessorKey: 'article',
+    header: 'Article',
   },
   {
     accessorKey: 'operator',
     header: 'Operator',
+  },
+  {
+    accessorKey: 'workplace',
+    header: 'Workplace',
+    cell: ({ row }) => {
+      return row.original.workplace.toUpperCase();
+    },
+  },
+
+  {
+    accessorKey: 'hydra_batch',
+    header: 'HYDRA batch',
+  },
+  {
+    accessorKey: 'hydraTimeLocaleString',
+    header: 'HYDRA time',
+  },
+  {
+    accessorKey: 'pallet_batch',
+    header: 'Pallet batch',
+  },
+  {
+    accessorKey: 'palletTimeLocaleString',
+    header: 'Pallet time',
   },
 ];

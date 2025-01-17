@@ -1,20 +1,16 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DmcTableDataType as TableDataType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
 import { Locale } from '@/i18n.config';
-import {
-  ScanType,
-  ScanTableDataType as TableDataType,
-} from '@/lib/types/dmcheck-data';
 import { dmcColumns } from './dmc-table/dmc-columns';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
 
-async function getConfigs() {
-  const res = await fetch(`${process.env.API}/dmcheck-configs`, {
-    next: { revalidate: 60 * 60 * 24, tags: ['dmcheck-configs'] },
+async function getArticles() {
+  const res = await fetch(`${process.env.API}/dmcheck-data/articles`, {
+    next: { revalidate: 60 * 60 * 24, tags: ['dmcheck-articles'] },
   });
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
-      `getConfigs error:  ${res.status}  ${res.statusText} ${json.error}`,
+      `getArticles error:  ${res.status}  ${res.statusText} ${json.error}`,
     );
   }
 
@@ -28,8 +24,6 @@ async function getScans(
   fetchTime: string;
   data: TableDataType[];
 }> {
-  console.log('getScans', lang, searchParams);
-
   const filteredSearchParams = Object.fromEntries(
     Object.entries(searchParams).filter(
       ([_, value]) => value !== undefined,
@@ -37,10 +31,10 @@ async function getScans(
   );
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const url = `${process.env.API}/dmcheck-mgmt/table-data?${queryParams}`;
+  const url = `${process.env.API}/dmcheck-data/dmc?${queryParams}`;
 
   const res = await fetch(url, {
-    next: { revalidate: 600, tags: ['dmcheck-table-data'] },
+    next: { revalidate: 0, tags: ['dmcheck-data-dmc'] },
   });
 
   if (!res.ok) {
@@ -57,6 +51,12 @@ async function getScans(
   data = data.map((item) => ({
     ...item,
     timeLocaleString: new Date(item.time).toLocaleString(lang),
+    hydraTimeLocaleString: item.hydra_time
+      ? new Date(item.hydra_time).toLocaleString(lang)
+      : '',
+    palletTimeLocaleString: item.pallet_time
+      ? new Date(item.pallet_time).toLocaleString(lang)
+      : '',
   }));
   return { fetchTime, data };
 }
@@ -73,12 +73,13 @@ export default async function InventoryPage(props: {
 
   let fetchTime, data;
   ({ fetchTime, data } = await getScans(lang, searchParams));
-  const configs = await getConfigs();
-  console.log('configs', configs);
+  const articles = await getArticles();
+
   return (
     <DmcDataTable
       columns={dmcColumns}
       data={data}
+      articles={articles}
       fetchTime={fetchTime}
       lang={lang}
     />

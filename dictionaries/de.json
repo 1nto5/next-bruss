@@ -2,9 +2,9 @@
   "header": {
     "production": {
       "title": "Produktion",
-      "exportData": {
-        "title": "Datenexport",
-        "description": "Erstellung einer Excel-Datei mit den Daten des DMC-Scansystems."
+      "dmcheckData": {
+        "title": "DMCheck Data",
+        "description": "Daten im DMCheck."
       },
       "rework": {
         "title": "Nacharbeit",
