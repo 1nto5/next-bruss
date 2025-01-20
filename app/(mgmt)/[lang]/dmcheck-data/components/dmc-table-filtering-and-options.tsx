@@ -230,7 +230,7 @@ export default function DmcTableFilteringAndOptions({
                     }}
                   >
                     <Check className='mr-2 h-4 w-4 opacity-0' />
-                    nie wybrano
+                    clear
                   </CommandItem>
                   {workplaceOptions.map((workplace) => (
                     <CommandItem
@@ -288,7 +288,7 @@ export default function DmcTableFilteringAndOptions({
                     }}
                   >
                     <Check className='mr-2 h-4 w-4 opacity-0' />
-                    nie wybrano
+                    clear
                   </CommandItem>
                   {articleOptions.map((article) => (
                     <CommandItem
