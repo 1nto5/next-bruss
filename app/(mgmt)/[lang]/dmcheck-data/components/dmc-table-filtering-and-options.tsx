@@ -20,19 +20,11 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import {
-  Check,
-  ChevronsUpDown,
-  CircleX,
-  RefreshCcw,
-  Search,
-  Sheet,
-} from 'lucide-react';
+import { Check, ChevronsUpDown, CircleX, Search, Sheet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { revalidateDmcheckTableData as revalidate } from '../actions';
 
 export default function DmcTableFilteringAndOptions({
   articles,
@@ -101,10 +93,6 @@ export default function DmcTableFilteringAndOptions({
     const params = new URLSearchParams();
     if (fromFilter) params.set('from', fromFilter.toISOString());
     if (toFilter) params.set('to', toFilter.toISOString());
-    // if (fromFilter && toFilter && fromFilter > toFilter) {
-    //   toast.error('"From" date cannot be greater than "To" date');
-    //   return;
-    // }
     if (dmcFilter) params.set('dmc', dmcFilter);
     if (hydraFilter) params.set('hydra_batch', hydraFilter);
     if (palletFilter) params.set('pallet_batch', palletFilter);
@@ -144,240 +132,242 @@ export default function DmcTableFilteringAndOptions({
     .sort((a, b) => a.value.localeCompare(b.value));
 
   return (
-    <form onSubmit={handleSearchClick} className='flex flex-wrap gap-2'>
-      <div className='flex items-center space-x-2'>
-        <Label>from:</Label>
-        <DateTimePicker
-          value={fromFilter}
-          onChange={setFromFilter}
-          max={toFilter || new Date()}
-          renderTrigger={({ value, setOpen, open }) => (
-            <DateTimeInput
-              value={value}
-              onChange={(x) => !open && setFromFilter(x)}
-              format='dd/MM/yyyy HH:mm'
-              disabled={open}
-              onCalendarClick={() => setOpen(!open)}
-            />
-          )}
-        />
+    <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+      {/* Wybór daty/czasu */}
+      <div className='flex flex-wrap gap-4'>
+        <div className='flex items-center space-x-2'>
+          <Label>from:</Label>
+          <DateTimePicker
+            value={fromFilter}
+            onChange={setFromFilter}
+            max={toFilter || new Date()}
+            renderTrigger={({ value, setOpen, open }) => (
+              <DateTimeInput
+                value={value}
+                onChange={(x) => !open && setFromFilter(x)}
+                format='dd/MM/yyyy HH:mm'
+                disabled={open}
+                onCalendarClick={() => setOpen(!open)}
+              />
+            )}
+          />
+        </div>
+        <div className='flex items-center space-x-2'>
+          <Label>to:</Label>
+          <DateTimePicker
+            value={toFilter}
+            onChange={setToFilter}
+            max={new Date()}
+            min={fromFilter}
+            renderTrigger={({ value, setOpen, open }) => (
+              <DateTimeInput
+                value={value}
+                onChange={(x) => !open && setToFilter(x)}
+                format='dd/MM/yyyy HH:mm'
+                disabled={open}
+                onCalendarClick={() => setOpen(!open)}
+              />
+            )}
+          />
+        </div>
       </div>
 
-      <div className='flex items-center space-x-2'>
-        <Label>to:</Label>
-        <DateTimePicker
-          value={toFilter}
-          onChange={setToFilter}
-          max={new Date()}
-          min={fromFilter}
-          renderTrigger={({ value, setOpen, open }) => (
-            <DateTimeInput
-              value={value}
-              onChange={(x) => !open && setToFilter(x)}
-              format='dd/MM/yyyy HH:mm'
-              disabled={open}
-              onCalendarClick={() => setOpen(!open)}
-            />
-          )}
+      {/* Inne filtry */}
+      <div className='flex flex-wrap gap-2'>
+        <Input
+          type='string'
+          placeholder='dmc'
+          className='w-auto'
+          value={dmcFilter}
+          onChange={(e) => setDmcFilter(e.target.value)}
         />
-      </div>
+        <Input
+          type='string'
+          placeholder='HYDRA batch'
+          className='w-auto'
+          value={hydraFilter}
+          onChange={(e) => setHydraFilter(e.target.value)}
+        />
+        <Input
+          type='string'
+          placeholder='pallet batch'
+          className='w-auto'
+          value={palletFilter}
+          onChange={(e) => setPalletFilter(e.target.value)}
+        />
 
-      <Input
-        type='string'
-        placeholder='dmc'
-        className='w-auto'
-        value={dmcFilter}
-        onChange={(e) => setDmcFilter(e.target.value)}
-      />
-      <Input
-        type='string'
-        placeholder='HYDRA batch'
-        className='w-auto'
-        value={hydraFilter}
-        onChange={(e) => setHydraFilter(e.target.value)}
-      />
-      <Input
-        type='string'
-        placeholder='pallet batch'
-        className='w-auto'
-        value={palletFilter}
-        onChange={(e) => setPalletFilter(e.target.value)}
-      />
-
-      <Popover open={openWorkplace} onOpenChange={setOpenWorkplace}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={cn('justify-between', !workplaceFilter && 'opacity-50')}
-          >
-            {workplaceFilter
-              ? workplaceOptions.find(
-                  (workplace) => workplace.value === workplaceFilter,
-                )?.label
-              : 'workplace'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
-          <Command>
-            <CommandInput placeholder='search...' />
-            <CommandList>
-              <CommandEmpty>not found</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setWorkplaceFilter('');
-                    setOpenWorkplace(false);
-                    setArticleFilter('');
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {workplaceOptions.map((workplace) => (
+        <Popover open={openWorkplace} onOpenChange={setOpenWorkplace}>
+          <PopoverTrigger asChild>
+            <Button
+              variant='outline'
+              role='combobox'
+              className={cn(
+                'justify-between',
+                !workplaceFilter && 'opacity-50',
+              )}
+            >
+              {workplaceFilter
+                ? workplaceOptions.find(
+                    (workplace) => workplace.value === workplaceFilter,
+                  )?.label
+                : 'workplace'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
+            <Command>
+              <CommandInput placeholder='search...' />
+              <CommandList>
+                <CommandEmpty>not found</CommandEmpty>
+                <CommandGroup>
                   <CommandItem
-                    key={workplace.value}
-                    value={workplace.value}
-                    onSelect={(currentValue) => {
-                      setWorkplaceFilter(currentValue);
+                    key='reset'
+                    onSelect={() => {
+                      setWorkplaceFilter('');
                       setOpenWorkplace(false);
                       setArticleFilter('');
                     }}
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        workplaceFilter === workplace.value
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {workplace.label}
+                    <Check className='mr-2 h-4 w-4 opacity-0' />
+                    nie wybrano
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  {workplaceOptions.map((workplace) => (
+                    <CommandItem
+                      key={workplace.value}
+                      value={workplace.value}
+                      onSelect={(currentValue) => {
+                        setWorkplaceFilter(currentValue);
+                        setOpenWorkplace(false);
+                        setArticleFilter('');
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          workplaceFilter === workplace.value
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {workplace.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
 
-      <Popover open={openArticle} onOpenChange={setOpenArticle}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={cn('justify-between', !articleFilter && 'opacity-50')}
-          >
-            {articleFilter
-              ? articleOptions.find(
-                  (article) => article.value === articleFilter,
-                )?.label
-              : 'article'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
-          <Command>
-            <CommandInput placeholder='search...' />
-            <CommandList>
-              <CommandEmpty>not found</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setArticleFilter('');
-                    setOpenArticle(false);
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {articleOptions.map((article) => (
+        <Popover open={openArticle} onOpenChange={setOpenArticle}>
+          <PopoverTrigger asChild>
+            <Button
+              variant='outline'
+              role='combobox'
+              className={cn('justify-between', !articleFilter && 'opacity-50')}
+            >
+              {articleFilter
+                ? articleOptions.find(
+                    (article) => article.value === articleFilter,
+                  )?.label
+                : 'article'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
+            <Command>
+              <CommandInput placeholder='search...' />
+              <CommandList>
+                <CommandEmpty>not found</CommandEmpty>
+                <CommandGroup>
                   <CommandItem
-                    key={article.value}
-                    value={article.value}
-                    onSelect={(currentValue) => {
-                      setArticleFilter(currentValue);
+                    key='reset'
+                    onSelect={() => {
+                      setArticleFilter('');
                       setOpenArticle(false);
                     }}
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        articleFilter === article.value
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {article.label}
+                    <Check className='mr-2 h-4 w-4 opacity-0' />
+                    nie wybrano
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                  {articleOptions.map((article) => (
+                    <CommandItem
+                      key={article.value}
+                      value={article.value}
+                      onSelect={(currentValue) => {
+                        setArticleFilter(currentValue);
+                        setOpenArticle(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          articleFilter === article.value
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {article.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
 
-      <Button
-        type='submit'
-        variant='secondary'
-        className='w-32 justify-start'
-        disabled={isPendingSearch || !areFiltersSet}
-      >
-        {isPendingSearch ? (
-          <>
-            <Search className={'animate-pulse'} /> <span>Searching...</span>
-          </>
-        ) : (
-          <>
-            <Search /> <span>Search</span>
-          </>
-        )}
-      </Button>
-
-      <Button
-        variant='destructive'
-        onClick={handleClearFilters}
-        title='Clear filters'
-        disabled={!areFiltersSet}
-      >
-        <CircleX /> <span>Clear</span>
-      </Button>
-
-      {/* <Button
-        variant='outline'
-        onClick={() => revalidate()}
-        size='icon'
-        title='refresh data'
-      >
-        <RefreshCcw />
-      </Button> */}
-
-      <Link
-        href={`/api/dmcheck-data/excel?${new URLSearchParams(
-          Object.entries({
-            from: fromFilter?.toISOString(),
-            to: toFilter?.toISOString(),
-            dmc: dmcFilter,
-            hydra_batch: hydraFilter,
-            pallet_batch: palletFilter,
-            workplace: workplaceFilter,
-            article: articleFilter,
-          }).reduce(
-            (acc, [key, value]) => {
-              if (value) acc[key] = value;
-              return acc;
-            },
-            {} as Record<string, string>,
-          ),
-        ).toString()}`}
-      >
-        <Button>
-          <Sheet /> <span>Export to Excel</span>
+      {/* Przyciski */}
+      <div className='flex flex-wrap gap-2'>
+        <Button
+          type='submit'
+          variant='secondary'
+          className='w-32 justify-start'
+          disabled={isPendingSearch || !areFiltersSet}
+        >
+          {isPendingSearch ? (
+            <>
+              <Search className={'animate-pulse'} /> <span>Searching...</span>
+            </>
+          ) : (
+            <>
+              <Search /> <span>Search</span>
+            </>
+          )}
         </Button>
-      </Link>
+
+        <Button
+          variant='destructive'
+          onClick={handleClearFilters}
+          title='Clear filters'
+          disabled={!areFiltersSet}
+        >
+          <CircleX /> <span>Clear</span>
+        </Button>
+
+        <Link
+          href={`/api/dmcheck-data/excel?${new URLSearchParams(
+            Object.entries({
+              from: fromFilter?.toISOString(),
+              to: toFilter?.toISOString(),
+              dmc: dmcFilter,
+              hydra_batch: hydraFilter,
+              pallet_batch: palletFilter,
+              workplace: workplaceFilter,
+              article: articleFilter,
+            }).reduce(
+              (acc, [key, value]) => {
+                if (value) acc[key] = value;
+                return acc;
+              },
+              {} as Record<string, string>,
+            ),
+          ).toString()}`}
+        >
+          <Button>
+            <Sheet /> <span>Export to Excel</span>
+          </Button>
+        </Link>
+      </div>
     </form>
   );
 }

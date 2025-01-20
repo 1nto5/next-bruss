@@ -4,7 +4,7 @@
       "title": "Produkcja",
       "dmcheckData": {
         "title": "DMCheck Data",
-        "description": "Dane w systemie skanowania DMCheck."
+        "description": "Dane w systemie skanowania części - kodów DMC."
       },
       "rework": {
         "title": "Oznacz rework",
