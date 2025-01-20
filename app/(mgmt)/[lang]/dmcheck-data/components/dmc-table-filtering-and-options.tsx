@@ -19,6 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Locale } from '@/i18n.config';
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CircleX, Search, Sheet } from 'lucide-react';
 import Link from 'next/link';
@@ -30,10 +31,12 @@ export default function DmcTableFilteringAndOptions({
   articles,
   setIsPendingSearch,
   isPendingSearch,
+  lang,
 }: {
   articles: ArticleConfigType[];
   setIsPendingSearch: (value: boolean) => void;
   isPendingSearch: boolean;
+  lang: Locale;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -354,6 +357,7 @@ export default function DmcTableFilteringAndOptions({
               pallet_batch: palletFilter,
               workplace: workplaceFilter,
               article: articleFilter,
+              lang,
             }).reduce(
               (acc, [key, value]) => {
                 if (value) acc[key] = value;

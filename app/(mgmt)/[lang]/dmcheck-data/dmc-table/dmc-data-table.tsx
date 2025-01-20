@@ -32,6 +32,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
+import { Locale } from '@/i18n.config';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
 import DmcTableFilteringAndOptions from '../components/dmc-table-filtering-and-options';
@@ -41,7 +42,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   articles: [];
   fetchTime: string;
-  lang: string;
+  lang: Locale;
 }
 
 export function DmcDataTable<TData, TValue>({
@@ -100,6 +101,7 @@ export function DmcDataTable<TData, TValue>({
           articles={articles}
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}
+          lang={lang}
         />
       </CardHeader>
       <CardContent>

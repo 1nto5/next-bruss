@@ -1,9 +1,13 @@
 import { dbc } from '@/lib/mongo';
+import { formatInTimeZone } from 'date-fns-tz';
 import { Workbook } from 'exceljs';
 import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
+
+  const lang = searchParams.get('lang');
+  searchParams.delete('lang');
 
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
@@ -41,14 +45,14 @@ export async function GET(req: NextRequest) {
       { header: 'ID', key: '_id', width: 24, hidden: true },
       { header: 'Status', key: 'status', width: 15 },
       { header: 'DMC', key: 'dmc', width: 36 },
-      { header: 'Time', key: 'time', width: 18 },
+      { header: 'Time (UTC)', key: 'time', width: 18 },
       { header: 'Article', key: 'article', width: 10 },
       { header: 'Operator', key: 'operator', width: 8 },
       { header: 'Workplace', key: 'workplace', width: 15 },
       { header: 'Hydra batch', key: 'hydra_batch', width: 18 },
-      { header: 'Hydra time', key: 'hydra_time', width: 18 },
+      { header: 'Hydra time (UTC)', key: 'hydra_time', width: 18 },
       { header: 'Pallet batch', key: 'pallet_batch', width: 18 },
-      { header: 'Pallet time', key: 'pallet_time', width: 18 },
+      { header: 'Pallet time (UTC)', key: 'pallet_time', width: 18 },
     ];
 
     scans.forEach((doc) => {
@@ -60,8 +64,7 @@ export async function GET(req: NextRequest) {
         type: doc.type,
         article: doc.article,
         operator: doc.operator,
-        // FIXME: convert time to local time
-        time: doc.time ? new Date(doc.time) : '',
+        time: new Date(doc.time),
         hydra_batch: doc.hydra_batch,
         hydra_time: doc.hydra_time ? new Date(doc.hydra_time) : '',
         pallet_batch: doc.pallet_batch,
