@@ -6,9 +6,6 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
 
-  const lang = searchParams.get('lang');
-  searchParams.delete('lang');
-
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
       if (!query.time) query.time = {};

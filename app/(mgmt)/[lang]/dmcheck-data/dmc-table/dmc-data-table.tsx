@@ -101,7 +101,6 @@ export function DmcDataTable<TData, TValue>({
           articles={articles}
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}
-          lang={lang}
         />
       </CardHeader>
       <CardContent>

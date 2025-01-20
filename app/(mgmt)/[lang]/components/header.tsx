@@ -112,11 +112,7 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 title: 'Users management',
                 description: 'Manage users roles.',
               },
-              {
-                href: '/admin/dmcheck-articles',
-                title: 'DMCheck articles',
-                description: 'Manage articles in DMCheck app.',
-              },
+
               {
                 href: '/admin/employees',
                 title: 'Employees',
@@ -128,13 +124,13 @@ export default function Header({ session, dict, lang }: HeaderProps) {
                 description: 'Add many employees from HYDRA export file.',
               },
               {
-                href: '/admin/employees/add-many',
-                title: 'Add many employees for inventory',
-                description: 'Add many employees from excel file.',
+                href: '/admin/dmcheck-articles',
+                title: 'DMCheck articles',
+                description: 'Manage articles in DMCheck app.',
               },
               {
                 href: '/admin/rework-many',
-                title: 'Rework many',
+                title: 'DMCheck rework many',
                 description: 'Rework many DMCs / batches at once.',
               },
             ],
@@ -177,17 +173,17 @@ export default function Header({ session, dict, lang }: HeaderProps) {
               },
               {
                 href: '/admin/employees',
-                title: 'Employees',
+                title: 'DMCheck employees',
                 description: 'Manage employees in Next BRUSS apps.',
               },
               {
                 href: '/admin/employees/add-many',
-                title: 'Add many employees',
+                title: 'DMCheck add many employees',
                 description: 'Add many employees from HYDRA export file.',
               },
               {
                 href: '/admin/rework-many',
-                title: 'Rework many',
+                title: 'DMCheck rework many',
                 description: 'Rework many DMCs / batches at once.',
               },
             ],
