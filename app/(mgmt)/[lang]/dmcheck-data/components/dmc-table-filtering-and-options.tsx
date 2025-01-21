@@ -421,6 +421,7 @@ export default function DmcTableFilteringAndOptions({
         <Link
           href={`/api/dmcheck-data/excel?${new URLSearchParams(
             Object.entries({
+              status: statusFilter,
               from: fromFilter?.toISOString(),
               to: toFilter?.toISOString(),
               dmc: dmcFilter,
