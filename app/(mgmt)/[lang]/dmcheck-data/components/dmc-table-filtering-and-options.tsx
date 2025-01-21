@@ -19,20 +19,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Locale } from '@/i18n.config';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, CircleX, Search, Sheet } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  CircleX,
+  Loader,
+  Search,
+  Sheet,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function DmcTableFilteringAndOptions({
   articles,
@@ -395,12 +393,12 @@ export default function DmcTableFilteringAndOptions({
         <Button
           type='submit'
           variant='secondary'
-          className='w-32 justify-start'
+          className='justify-start'
           disabled={isPendingSearch || !areFiltersSet}
         >
           {isPendingSearch ? (
             <>
-              <Search className={'animate-pulse'} /> <span>Searching...</span>
+              <Loader className={'animate-spin'} /> <span>Search</span>
             </>
           ) : (
             <>
