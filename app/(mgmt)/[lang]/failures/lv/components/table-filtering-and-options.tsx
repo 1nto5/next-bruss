@@ -306,7 +306,7 @@ export default function TableFilteringAndOptions({
           type='submit'
           variant='secondary'
           className='justify-start'
-          disabled={isPendingSearch || !areFiltersSet}
+          disabled={isPendingSearch}
         >
           {isPendingSearch ? (
             <>

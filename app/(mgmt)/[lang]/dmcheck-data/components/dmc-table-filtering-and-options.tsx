@@ -394,7 +394,7 @@ export default function DmcTableFilteringAndOptions({
           type='submit'
           variant='secondary'
           className='justify-start'
-          disabled={isPendingSearch || !areFiltersSet}
+          disabled={isPendingSearch}
         >
           {isPendingSearch ? (
             <>
