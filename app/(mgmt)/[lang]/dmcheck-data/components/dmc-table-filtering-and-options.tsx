@@ -19,6 +19,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Locale } from '@/i18n.config';
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CircleX, Search, Sheet } from 'lucide-react';
@@ -40,6 +47,7 @@ export default function DmcTableFilteringAndOptions({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status'));
   const [fromFilter, setFromFilter] = useState(() => {
     const fromParam = searchParams.get('from');
     return fromParam ? new Date(fromParam) : undefined;
@@ -63,6 +71,7 @@ export default function DmcTableFilteringAndOptions({
   );
 
   const areFiltersSet =
+    statusFilter ||
     fromFilter ||
     toFilter ||
     dmcFilter ||
@@ -71,10 +80,12 @@ export default function DmcTableFilteringAndOptions({
     workplaceFilter ||
     articleFilter;
 
+  const [openStatus, setOpenStatus] = useState(false);
   const [openWorkplace, setOpenWorkplace] = useState(false);
   const [openArticle, setOpenArticle] = useState(false);
 
   const handleClearFilters = () => {
+    setStatusFilter('');
     setFromFilter(undefined);
     setToFilter(undefined);
     setDmcFilter('');
@@ -92,6 +103,7 @@ export default function DmcTableFilteringAndOptions({
   const handleSearchClick = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
+    if (statusFilter) params.set('status', statusFilter);
     if (fromFilter) params.set('from', fromFilter.toISOString());
     if (toFilter) params.set('to', toFilter.toISOString());
     if (dmcFilter) params.set('dmc', dmcFilter);
@@ -105,6 +117,12 @@ export default function DmcTableFilteringAndOptions({
       router.push(newUrl);
     }
   };
+
+  const statusOptions = [
+    { value: 'box', label: 'box - scanned' },
+    { value: 'pallet', label: 'pallet - confirmed with hydra label' },
+    { value: 'warehouse', label: 'warehouse - confirmed with pallet label' },
+  ];
 
   const workplaceOptions = Array.from(
     new Set(articles.map((article) => article.workplace)),
@@ -134,7 +152,6 @@ export default function DmcTableFilteringAndOptions({
 
   return (
     <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
-      {/* Wybór daty/czasu */}
       <div className='flex flex-wrap gap-4'>
         <div className='flex items-center space-x-2'>
           <Label>from:</Label>
@@ -173,8 +190,65 @@ export default function DmcTableFilteringAndOptions({
         </div>
       </div>
 
-      {/* Inne filtry */}
       <div className='flex flex-wrap gap-2'>
+        <Popover open={openStatus} onOpenChange={setOpenStatus}>
+          <PopoverTrigger asChild>
+            <Button
+              variant='outline'
+              role='combobox'
+              className={cn('justify-between', !statusFilter && 'opacity-50')}
+            >
+              {statusFilter
+                ? statusOptions.find((status) => status.value === statusFilter)
+                    ?.value
+                : 'status'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
+            <Command>
+              <CommandInput placeholder='search...' />
+              <CommandList>
+                <CommandEmpty>not found</CommandEmpty>
+                <CommandGroup>
+                  <CommandItem
+                    key='reset'
+                    onSelect={() => {
+                      setStatusFilter('');
+                      setOpenStatus(false);
+                      setArticleFilter('');
+                    }}
+                  >
+                    <Check className='mr-2 h-4 w-4 opacity-0' />
+                    not set
+                  </CommandItem>
+                  {statusOptions.map((status) => (
+                    <CommandItem
+                      key={status.value}
+                      value={status.value}
+                      onSelect={(currentValue) => {
+                        setStatusFilter(currentValue);
+                        setOpenStatus(false);
+                        setArticleFilter('');
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          statusFilter === status.value
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {status.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+
         <Input
           type='string'
           placeholder='dmc'
@@ -230,7 +304,7 @@ export default function DmcTableFilteringAndOptions({
                     }}
                   >
                     <Check className='mr-2 h-4 w-4 opacity-0' />
-                    clear
+                    not set
                   </CommandItem>
                   {workplaceOptions.map((workplace) => (
                     <CommandItem
@@ -288,7 +362,7 @@ export default function DmcTableFilteringAndOptions({
                     }}
                   >
                     <Check className='mr-2 h-4 w-4 opacity-0' />
-                    clear
+                    not set
                   </CommandItem>
                   {articleOptions.map((article) => (
                     <CommandItem
@@ -317,7 +391,6 @@ export default function DmcTableFilteringAndOptions({
         </Popover>
       </div>
 
-      {/* Przyciski */}
       <div className='flex flex-wrap gap-2'>
         <Button
           type='submit'
