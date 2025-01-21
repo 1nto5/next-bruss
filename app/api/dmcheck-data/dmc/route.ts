@@ -16,6 +16,12 @@ export async function GET(req: NextRequest) {
       if (!query.time) query.time = {};
       if (key === 'from') query.time.$gte = new Date(value);
       if (key === 'to') query.time.$lte = new Date(value);
+    } else if (
+      key === 'dmc' ||
+      key === 'hydra_batch' ||
+      key === 'pallet_batch'
+    ) {
+      query[key] = { $regex: new RegExp(value, 'i') };
     } else {
       query[key] = value;
     }

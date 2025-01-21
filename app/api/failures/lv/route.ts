@@ -4,20 +4,28 @@ import { NextResponse, type NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  try {
-    const from = req.nextUrl.searchParams.get('from')?.replace(' ', '+');
-    const to = req.nextUrl.searchParams.get('to')?.replace(' ', '+');
-    const coll = await dbc('failures_lv');
+  const searchParams = req.nextUrl.searchParams;
+  const query: any = {};
 
-    let query: any = {};
-
-    if (from) query.from = { $gte: new Date(from) };
-    if (to) {
-      const toDate = new Date(to);
-      toDate.setDate(toDate.getDate());
-      query.$or = [{ to: { $lte: toDate } }, { to: { $exists: false } }];
+  searchParams.forEach((value, key) => {
+    if (key === 'from' || key === 'to') {
+      if (key === 'from') {
+        if (!query.from) query.from = {};
+        query.from.$gte = new Date(value);
+      }
+      if (key === 'to') {
+        if (!query.to) query.to = {};
+        query.to.$lte = new Date(value);
+      }
+    } else if (key === 'responsible' || key === 'supervisor') {
+      query[key] = { $regex: new RegExp(value, 'i') };
+    } else {
+      query[key] = value;
     }
+  });
 
+  try {
+    const coll = await dbc('failures_lv');
     const failures = await coll
       .find(query)
       .sort({ _id: -1 })

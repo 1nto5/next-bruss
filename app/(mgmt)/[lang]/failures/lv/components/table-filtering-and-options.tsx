@@ -28,88 +28,140 @@ import {
   Check,
   ChevronsUpDown,
   CircleX,
-  RefreshCcw,
+  Loader,
   Search,
   Sheet,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { revalidateFailures } from '../actions';
+import { useState } from 'react';
 import AddFailureDialog from './add-failure-dialog';
 
 export default function TableFilteringAndOptions({
-  setFilter,
+  setIsPendingSearch,
+  isPendingSearch,
 }: {
-  setFilter: (columnId: string, value: string) => void;
+  setIsPendingSearch: (value: boolean) => void;
+  isPendingSearch: boolean;
 }) {
-  const [filterLineValue, setFilterLineValue] = useState('');
-  const [filterStationValue, setFilterStationValue] = useState('');
-  const [filterFailureValue, setFilterFailureValue] = useState('');
-  const [filterSupervisorValue, setFilterSupervisorValue] = useState('');
-  const [filterResponsibleValue, setFilterResponsibleValue] = useState('');
-
-  const [openStation, setOpenStation] = useState(false);
-  const [openFailure, setOpenFailure] = useState(false);
-
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [from, setFrom] = useState<Date | undefined>(undefined);
-  const [to, setTo] = useState<Date | undefined>(undefined);
-
-  const createDateTimeQueryString = useCallback(
-    (params: Record<string, string>) => {
-      const search = new URLSearchParams(searchParams.toString());
-      Object.entries(params).forEach(([key, value]) => {
-        if (value) {
-          search.set(key, value);
-        } else {
-          search.delete(key);
-        }
-      });
-      return search.toString();
-    },
-    [searchParams],
+  const [fromFilter, setFromFilter] = useState(() => {
+    const fromParam = searchParams.get('from');
+    return fromParam ? new Date(fromParam) : undefined;
+  });
+  const [toFilter, setToFilter] = useState(() => {
+    const toParam = searchParams.get('to');
+    return toParam ? new Date(toParam) : undefined;
+  });
+  const [lineFilter, setLineFilter] = useState(searchParams.get('line') || '');
+  const [stationFilter, setStationFilter] = useState(
+    searchParams.get('station') || '',
+  );
+  const [failureFilter, setFailureFilter] = useState(
+    searchParams.get('failure') || '',
+  );
+  const [supervisorFilter, setSupervisorFilter] = useState(
+    searchParams.get('supervisor') || '',
+  );
+  const [responsibleFilter, setResponsibleFilter] = useState(
+    searchParams.get('responsible') || '',
   );
 
-  const filteredFailures =
-    failuresOptions.find((option) => option.station === filterStationValue)
-      ?.options || [];
+  const areFiltersSet =
+    fromFilter ||
+    toFilter ||
+    lineFilter ||
+    stationFilter ||
+    failureFilter ||
+    supervisorFilter ||
+    responsibleFilter;
 
-  const handleSearchClick = () => {
-    const params = {
-      from: from ? from.toISOString() : '',
-      to: to ? to.toISOString() : '',
-    };
-    router.push(`${pathname}?${createDateTimeQueryString(params)}`);
-  };
+  const [openStation, setOpenStation] = useState(false);
+  const [openFailure, setOpenFailure] = useState(false);
 
   const handleClearFilters = () => {
-    router.push(pathname);
-    setFilter('line', '');
-    setFilter('station', '');
-    setFilter('failure', '');
-    setFilter('supervisor', '');
-    setFilter('responsible', '');
-    setFilterLineValue('');
-    setFilterStationValue('');
-    setFilterFailureValue('');
-    setFilterSupervisorValue('');
-    setFilterResponsibleValue('');
-    setFrom(undefined);
-    setTo(undefined);
+    setFromFilter(undefined);
+    setToFilter(undefined);
+    setLineFilter('');
+    setStationFilter('');
+    setFailureFilter('');
+    setSupervisorFilter('');
+    setResponsibleFilter('');
+    if (searchParams.toString()) {
+      setIsPendingSearch(true);
+      router.push(pathname);
+    }
   };
 
+  const handleSearchClick = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (fromFilter) params.set('from', fromFilter.toISOString());
+    if (toFilter) params.set('to', toFilter.toISOString());
+    if (lineFilter) params.set('line', lineFilter);
+    if (stationFilter) params.set('station', stationFilter);
+    if (failureFilter) params.set('failure', failureFilter);
+    if (supervisorFilter) params.set('supervisor', supervisorFilter);
+    if (responsibleFilter) params.set('responsible', responsibleFilter);
+    const newUrl = `${pathname}?${params.toString()}`;
+    if (newUrl !== `${pathname}?${searchParams.toString()}`) {
+      setIsPendingSearch(true);
+      router.push(newUrl);
+    }
+  };
+
+  const filteredFailures =
+    failuresOptions.find((option) => option.station === stationFilter)
+      ?.options || [];
+
   return (
-    <div className='flex flex-wrap gap-2'>
-      <div className='flex space-x-4'>
+    <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+      <div className='flex flex-wrap gap-4'>
+        <div className='flex items-center space-x-2'>
+          <Label>od:</Label>
+          <DateTimePicker
+            value={fromFilter}
+            onChange={setFromFilter}
+            max={toFilter || new Date()}
+            renderTrigger={({ value, setOpen, open }) => (
+              <DateTimeInput
+                value={value}
+                onChange={(x) => !open && setFromFilter(x)}
+                format='dd/MM/yyyy HH:mm'
+                disabled={open}
+                onCalendarClick={() => setOpen(!open)}
+              />
+            )}
+          />
+        </div>
+        <div className='flex items-center space-x-2'>
+          <Label>do:</Label>
+          <DateTimePicker
+            value={toFilter}
+            onChange={setToFilter}
+            max={new Date()}
+            min={fromFilter}
+            renderTrigger={({ value, setOpen, open }) => (
+              <DateTimeInput
+                value={value}
+                onChange={(x) => !open && setToFilter(x)}
+                format='dd/MM/yyyy HH:mm'
+                disabled={open}
+                onCalendarClick={() => setOpen(!open)}
+              />
+            )}
+          />
+        </div>
+      </div>
+
+      <div className='flex flex-wrap gap-2'>
         <RadioGroup
-          value={filterLineValue}
+          value={lineFilter}
           onValueChange={(value) => {
-            setFilterLineValue(value);
-            setFilter('line', value);
+            setLineFilter(value);
           }}
           className='flex flex-row '
         >
@@ -122,220 +174,185 @@ export default function TableFilteringAndOptions({
             <Label htmlFor='lv2'>LV2</Label>
           </div>
         </RadioGroup>
-      </div>
-
-      <Popover open={openStation} onOpenChange={setOpenStation}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            className={cn(
-              'justify-between',
-              !filterStationValue && 'opacity-50',
-            )}
-          >
-            {filterStationValue
-              ? stationsOptions.find(
-                  (station) => station === filterStationValue,
-                )
-              : 'stacja'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
-          <Command>
-            <CommandInput placeholder='wyszukaj...' />
-            <CommandList>
-              <CommandEmpty>Nie znaleziono.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setFilterStationValue('');
-                    setFilter('station', '');
-                    setOpenStation(false);
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {stationsOptions.map((station) => (
+        <Popover open={openStation} onOpenChange={setOpenStation}>
+          <PopoverTrigger asChild>
+            <Button
+              variant='outline'
+              role='combobox'
+              className={cn('justify-between', !stationFilter && 'opacity-50')}
+            >
+              {stationFilter
+                ? stationsOptions.find((station) => station === stationFilter)
+                : 'stacja'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
+            <Command>
+              <CommandInput placeholder='search...' />
+              <CommandList>
+                <CommandEmpty>not found</CommandEmpty>
+                <CommandGroup>
                   <CommandItem
-                    key={station}
-                    value={station}
-                    onSelect={(currentValue) => {
-                      setFilterStationValue(currentValue);
-                      setFilter('station', currentValue);
+                    key='reset'
+                    onSelect={() => {
+                      setStationFilter('');
                       setOpenStation(false);
                     }}
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        filterStationValue === station
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {station}
+                    <Check className='mr-2 h-4 w-4 opacity-0' />
+                    not set
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-
-      <Popover open={openFailure} onOpenChange={setOpenFailure}>
-        <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            role='combobox'
-            disabled={!filterStationValue}
-            className={cn(
-              'justify-between',
-              !filterFailureValue && 'opacity-50',
-            )}
-          >
-            {filterFailureValue
-              ? filteredFailures.find(
-                  (failure) => failure === filterFailureValue,
-                )
-              : 'awaria'}
-            <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className='w-[300px] p-0'>
-          <Command>
-            <CommandInput placeholder='wyszukaj...' />
-            <CommandList>
-              <CommandEmpty>Nie znaleziono.</CommandEmpty>
-              <CommandGroup>
-                <CommandItem
-                  key='reset'
-                  onSelect={() => {
-                    setFilterFailureValue('');
-                    setFilter('failure', '');
-                    setOpenFailure(false);
-                  }}
-                >
-                  <Check className='mr-2 h-4 w-4 opacity-0' />
-                  nie wybrano
-                </CommandItem>
-                {filteredFailures.map((failure) => (
+                  {stationsOptions.map((station) => (
+                    <CommandItem
+                      key={station}
+                      value={station}
+                      onSelect={(currentValue) => {
+                        setStationFilter(currentValue);
+                        setOpenStation(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          stationFilter === station
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {station}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <Popover open={openFailure} onOpenChange={setOpenFailure}>
+          <PopoverTrigger asChild>
+            <Button
+              variant='outline'
+              disabled={!stationFilter}
+              role='combobox'
+              className={cn('justify-between', !failureFilter && 'opacity-50')}
+            >
+              {failureFilter
+                ? filteredFailures.find((failure) => failure === failureFilter)
+                : 'awaria'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
+            <Command>
+              <CommandInput placeholder='search...' />
+              <CommandList>
+                <CommandEmpty>not found</CommandEmpty>
+                <CommandGroup>
                   <CommandItem
-                    key={failure}
-                    value={failure}
-                    onSelect={(currentValue) => {
-                      setFilterFailureValue(currentValue);
-                      setFilter('failure', currentValue);
+                    key='reset'
+                    onSelect={() => {
+                      setFailureFilter('');
                       setOpenFailure(false);
                     }}
                   >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        filterFailureValue === failure
-                          ? 'opacity-100'
-                          : 'opacity-0',
-                      )}
-                    />
-                    {failure}
+                    <Check className='mr-2 h-4 w-4 opacity-0' />
+                    not set
                   </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-
-      <Input
-        placeholder='nadzorujący'
-        className='w-auto'
-        value={filterSupervisorValue}
-        onChange={(e) => {
-          setFilterSupervisorValue(e.target.value);
-          setFilter('supervisor', e.target.value);
-        }}
-      />
-      <Input
-        placeholder='odpowiedzialny'
-        className='w-36'
-        value={filterResponsibleValue}
-        onChange={(e) => {
-          setFilterResponsibleValue(e.target.value);
-          setFilter('responsible', e.target.value);
-        }}
-      />
-
-      <div className='flex items-center space-x-2'>
-        <Label>od:</Label>
-        <DateTimePicker
-          value={from}
-          onChange={setFrom}
-          renderTrigger={({ value, setOpen, open }) => (
-            <DateTimeInput
-              value={value}
-              onChange={(x) => !open && setFrom(x)}
-              format='dd/MM/yyyy HH:mm'
-              disabled={open}
-              onCalendarClick={() => setOpen(!open)}
-            />
-          )}
+                  {filteredFailures.map((failure) => (
+                    <CommandItem
+                      key={failure}
+                      value={failure}
+                      onSelect={(currentValue) => {
+                        setFailureFilter(currentValue);
+                        setOpenFailure(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          'mr-2 h-4 w-4',
+                          failureFilter === failure
+                            ? 'opacity-100'
+                            : 'opacity-0',
+                        )}
+                      />
+                      {failure}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <Input
+          placeholder='nadzorujący'
+          className='w-auto'
+          value={supervisorFilter}
+          onChange={(e) => {
+            setSupervisorFilter(e.target.value);
+          }}
         />
-      </div>
-
-      <div className='flex items-center space-x-2'>
-        <Label>do:</Label>
-        <DateTimePicker
-          value={to}
-          onChange={setTo}
-          renderTrigger={({ value, setOpen, open }) => (
-            <DateTimeInput
-              value={value}
-              onChange={(x) => !open && setTo(x)}
-              format='dd/MM/yyyy HH:mm'
-              disabled={open}
-              onCalendarClick={() => setOpen(!open)}
-            />
-          )}
+        <Input
+          placeholder='odpowiedzialny'
+          className='w-auto'
+          value={responsibleFilter}
+          onChange={(e) => {
+            setResponsibleFilter(e.target.value);
+          }}
         />
       </div>
 
       <div className='flex flex-wrap gap-2'>
         <Button
           type='submit'
-          variant='outline'
-          disabled={!from || !to}
-          onClick={handleSearchClick}
-          size='icon'
-          title='szukaj'
+          variant='secondary'
+          className='justify-start'
+          disabled={isPendingSearch || !areFiltersSet}
         >
-          <Search />
+          {isPendingSearch ? (
+            <>
+              <Loader className={'animate-spin'} /> <span>Szukaj</span>
+            </>
+          ) : (
+            <>
+              <Search /> <span>Szukaj</span>
+            </>
+          )}
         </Button>
+
         <Button
-          variant='outline'
-          onClick={() => handleClearFilters()}
-          size='icon'
-          title='wyczyść filtry'
+          variant='destructive'
+          onClick={handleClearFilters}
+          title='Clear filters'
+          // disabled={!areFiltersSet}
         >
-          <CircleX />
+          <CircleX /> <span>Wyczyść</span>
         </Button>
-        <Button
-          variant='outline'
-          onClick={() => revalidateFailures()}
-          size='icon'
-          title='odśwież'
+
+        <Link
+          href={`/api/failures/lv/excel?${new URLSearchParams(
+            Object.entries({
+              line: lineFilter,
+              station: stationFilter,
+              failure: failureFilter,
+              supervisor: supervisorFilter,
+              responsible: responsibleFilter,
+              from: fromFilter?.toISOString(),
+              to: toFilter?.toISOString(),
+            }).reduce(
+              (acc, [key, value]) => {
+                if (value) acc[key] = value;
+                return acc;
+              },
+              {} as Record<string, string>,
+            ),
+          ).toString()}`}
         >
-          <RefreshCcw />
-        </Button>
-        <Link href={`/api/failures/lv/excel`}>
-          <Button variant='outline' size='icon' title='export do Excel'>
-            <Sheet />
+          <Button>
+            <Sheet /> <span>Export do Excel</span>
           </Button>
         </Link>
         <AddFailureDialog />
       </div>
-    </div>
+    </form>
   );
 }

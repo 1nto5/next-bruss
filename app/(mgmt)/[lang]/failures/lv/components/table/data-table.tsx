@@ -34,6 +34,7 @@ import {
 import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
+import { useEffect } from 'react';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
@@ -77,15 +78,18 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  useEffect(() => {
+    setIsPendingSearch(false);
+  }, [fetchTime]);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Awarie LV</CardTitle>
         <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
         <TableFilteringAndOptions
-          setFilter={(columnId, value) =>
-            table.getColumn(columnId)?.setFilterValue(value)
-          }
+          isPendingSearch={isPendingSearch}
+          setIsPendingSearch={setIsPendingSearch}
         />
       </CardHeader>
       <CardContent>

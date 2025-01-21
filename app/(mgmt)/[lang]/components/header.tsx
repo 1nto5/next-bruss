@@ -75,16 +75,6 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `Tabela CAPA dla artykułów.`,
         },
         {
-          href: '/inw/spis',
-          title: `${dict?.header?.inventory?.inventory.title}`,
-          description: `${dict?.header?.inventory?.inventory.description}`,
-        },
-        {
-          href: '/inw/zatwierdz',
-          title: `${dict?.header?.inventory?.inventoryApprove.title}`,
-          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
-        },
-        {
           href: '/inw-2/spis',
           title: `${dict?.header?.inventory?.inventory2.title}`,
           description: `${dict?.header?.inventory?.inventory.description}`,

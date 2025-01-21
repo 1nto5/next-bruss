@@ -121,8 +121,8 @@ export default function AddFailureDialog({}: {}) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size='icon' variant='outline' title='dodaj awarię'>
-          <CopyPlus />
+        <Button variant='outline' title='dodaj awarię'>
+          <CopyPlus /> <span>Dodaj awarię</span>
         </Button>
       </DialogTrigger>
       <DialogContent className='w-[700px] sm:max-w-[700px]'>

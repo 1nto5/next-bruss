@@ -3,13 +3,32 @@ import { Workbook } from 'exceljs';
 import moment from 'moment-timezone';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const query: any = {};
+
+  searchParams.forEach((value, key) => {
+    if (key === 'from' || key === 'to') {
+      if (key === 'from') {
+        if (!query.from) query.from = {};
+        query.from.$gte = new Date(value);
+      }
+      if (key === 'to') {
+        if (!query.to) query.to = {};
+        query.to.$lte = new Date(value);
+      }
+    } else if (key === 'responsible' || key === 'supervisor') {
+      query[key] = { $regex: new RegExp(value, 'i') };
+    } else {
+      query[key] = value;
+    }
+  });
   try {
     const coll = await dbc('failures_lv');
     const failures = await coll
-      .find({})
+      .find(query)
       .sort({ _id: -1 })
-      .limit(100000)
+      .limit(10000)
       .toArray();
 
     const workbook = new Workbook();
@@ -20,14 +39,14 @@ export async function GET(request: NextRequest) {
       { header: 'Line', key: 'line', width: 10 },
       { header: 'Station', key: 'station', width: 15 },
       { header: 'Failure', key: 'failure', width: 30 },
-      { header: 'From', key: 'from', width: 12 },
-      { header: 'To', key: 'to', width: 12 },
+      { header: 'From (UTC)', key: 'from', width: 12 },
+      { header: 'To (UTC)', key: 'to', width: 12 },
       { header: 'Supervisor', key: 'supervisor', width: 15 },
       { header: 'Responsible', key: 'responsible', width: 15 },
       { header: 'Solution', key: 'solution', width: 30 },
       { header: 'Comment', key: 'comment', width: 30 },
-      { header: 'Created At', key: 'createdAt', width: 12 },
-      { header: 'Updated At', key: 'updatedAt', width: 12 },
+      { header: 'Created At (UTC)', key: 'createdAt', width: 12 },
+      { header: 'Updated At (UTC)', key: 'updatedAt', width: 12 },
     ];
 
     const convertToLocalTimeWithMoment = (date: Date) => {

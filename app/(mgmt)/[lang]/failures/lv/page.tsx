@@ -11,16 +11,15 @@ async function getFailures(
   fetchTime: string;
   formattedFailures: FailureType[];
 }> {
-  let queryParams = [];
-  if (searchParams.from?.trim()) {
-    queryParams.push(`from=${searchParams.from.trim()}`);
-  }
-  if (searchParams.to?.trim()) {
-    queryParams.push(`to=${searchParams.to.trim()}`);
-  }
-  const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
-  const res = await fetch(`${process.env.API}/failures/lv${queryString}`, {
-    next: { revalidate: 300, tags: ['failures-lv'] },
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const res = await fetch(`${process.env.API}/failures/lv?${queryParams}`, {
+    next: { revalidate: 0, tags: ['failures-lv'] },
   });
 
   if (!res.ok) {
@@ -41,12 +40,12 @@ async function getFailures(
       fromLocaleString: new Date(failure.from).toLocaleString(lang),
       toLocaleString: failure.to
         ? new Date(failure.to).toLocaleString(lang)
-        : '', // Jeśli `to` nie istnieje, pozostaw pusty ciąg
+        : '',
       createdAtLocaleString: new Date(failure.createdAt).toLocaleString(lang),
 
       updatedAtLocaleString: failure.updatedAt
         ? new Date(failure.updatedAt).toLocaleString(lang)
-        : '', // Jeśli `updatedAt` nie istnieje, pozostaw pusty ciąg
+        : '',
     };
   };
   const formattedFailures: FailureType[] = failures.map(formatTime);
@@ -64,7 +63,6 @@ export default async function FailuresPage(props: {
   const { lang } = params;
 
   let fetchTime, formattedFailures;
-  // const { number = '' } = searchParams;
   ({ fetchTime, formattedFailures } = await getFailures(lang, searchParams));
 
   return (
@@ -72,8 +70,6 @@ export default async function FailuresPage(props: {
       columns={columns}
       data={formattedFailures}
       fetchTime={fetchTime}
-      // lang={lang}
-      // session={session}
     />
   );
 }

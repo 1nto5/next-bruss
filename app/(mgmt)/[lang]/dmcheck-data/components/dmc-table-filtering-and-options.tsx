@@ -411,7 +411,7 @@ export default function DmcTableFilteringAndOptions({
           variant='destructive'
           onClick={handleClearFilters}
           title='Clear filters'
-          disabled={!areFiltersSet}
+          // disabled={!areFiltersSet}
         >
           <CircleX /> <span>Clear</span>
         </Button>
