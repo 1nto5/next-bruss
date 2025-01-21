@@ -35,6 +35,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { revalidateFailures as revalidate } from '../actions';
 import AddFailureDialog from './add-failure-dialog';
 
 export default function TableFilteringAndOptions({
@@ -110,6 +111,9 @@ export default function TableFilteringAndOptions({
     if (newUrl !== `${pathname}?${searchParams.toString()}`) {
       setIsPendingSearch(true);
       router.push(newUrl);
+    } else {
+      setIsPendingSearch(true);
+      revalidate();
     }
   };
 

@@ -40,7 +40,8 @@ import TableFilteringAndOptions from '../table-filtering-and-options';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  fetchTime: string;
+  fetchTimeLocaleString: string;
+  fetchTime: Date;
   // lang: string;
   // session: Session | null;
 }
@@ -48,6 +49,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fetchTimeLocaleString,
   fetchTime,
   // lang,
   // session,
@@ -86,7 +88,9 @@ export function DataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <CardTitle>Awarie LV</CardTitle>
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
+        <CardDescription>
+          Ostatnia synchronizacja: {fetchTimeLocaleString}
+        </CardDescription>
         <TableFilteringAndOptions
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}

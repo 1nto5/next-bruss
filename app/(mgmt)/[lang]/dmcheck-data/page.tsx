@@ -21,7 +21,8 @@ async function getScans(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  fetchTime: string;
+  fetchTimeLocaleString: string;
+  fetchTime: Date;
   data: TableDataType[];
 }> {
   const filteredSearchParams = Object.fromEntries(
@@ -44,8 +45,8 @@ async function getScans(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = new Date(res.headers.get('date') || '');
+  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
   let data: TableDataType[] = await res.json();
   data = data.map((item) => ({
@@ -58,7 +59,7 @@ async function getScans(
       ? new Date(item.pallet_time).toLocaleString(lang)
       : '',
   }));
-  return { fetchTime, data };
+  return { fetchTimeLocaleString, fetchTime, data };
 }
 
 export default async function InventoryPage(props: {
@@ -71,8 +72,11 @@ export default async function InventoryPage(props: {
 
   const { lang } = params;
 
-  let fetchTime, data;
-  ({ fetchTime, data } = await getScans(lang, searchParams));
+  let fetchTime, fetchTimeLocaleString, data;
+  ({ fetchTime, fetchTimeLocaleString, data } = await getScans(
+    lang,
+    searchParams,
+  ));
   const articles = await getArticles();
 
   return (
@@ -81,6 +85,7 @@ export default async function InventoryPage(props: {
       data={data}
       articles={articles}
       fetchTime={fetchTime}
+      fetchTimeLocaleString={fetchTimeLocaleString}
       lang={lang}
     />
   );

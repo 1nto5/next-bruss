@@ -41,7 +41,8 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   articles: [];
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   lang: Locale;
 }
 
@@ -50,6 +51,7 @@ export function DmcDataTable<TData, TValue>({
   data,
   articles,
   fetchTime,
+  fetchTimeLocaleString,
   lang,
 }: DataTableProps<TData, TValue>) {
   // useEffect(() => {
@@ -93,7 +95,7 @@ export function DmcDataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <CardTitle>DMCheck data</CardTitle>
-        <CardDescription>Last sync: {fetchTime}</CardDescription>
+        <CardDescription>Last sync: {fetchTimeLocaleString}</CardDescription>
         <DmcTableFilteringAndOptions
           // setFilter={(columnId, value) =>
           //   table.getColumn(columnId)?.setFilterValue(value)

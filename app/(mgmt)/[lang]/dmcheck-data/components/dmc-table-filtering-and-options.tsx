@@ -31,6 +31,7 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { revalidateDmcheckTableData as revalidate } from '../actions';
 
 export default function DmcTableFilteringAndOptions({
   articles,
@@ -113,6 +114,9 @@ export default function DmcTableFilteringAndOptions({
     if (newUrl !== `${pathname}?${searchParams.toString()}`) {
       setIsPendingSearch(true);
       router.push(newUrl);
+    } else {
+      setIsPendingSearch(true);
+      revalidate();
     }
   };
 

@@ -8,7 +8,8 @@ async function getFailures(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   formattedFailures: FailureType[];
 }> {
   const filteredSearchParams = Object.fromEntries(
@@ -29,8 +30,8 @@ async function getFailures(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = new Date(res.headers.get('date') || '');
+  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
   let failures: FailureType[] = await res.json();
 
@@ -49,7 +50,7 @@ async function getFailures(
     };
   };
   const formattedFailures: FailureType[] = failures.map(formatTime);
-  return { fetchTime, formattedFailures };
+  return { fetchTime, fetchTimeLocaleString, formattedFailures };
 }
 
 export default async function FailuresPage(props: {
@@ -62,13 +63,17 @@ export default async function FailuresPage(props: {
 
   const { lang } = params;
 
-  let fetchTime, formattedFailures;
-  ({ fetchTime, formattedFailures } = await getFailures(lang, searchParams));
+  let fetchTime, fetchTimeLocaleString, formattedFailures;
+  ({ fetchTime, fetchTimeLocaleString, formattedFailures } = await getFailures(
+    lang,
+    searchParams,
+  ));
 
   return (
     <DataTable
       columns={columns}
       data={formattedFailures}
+      fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
     />
   );
