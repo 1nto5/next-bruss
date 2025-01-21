@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   fetchTime: string;
   lang: Locale;
 }
+// test
 
 export function DmcDataTable<TData, TValue>({
   columns,
