@@ -8,4 +8,13 @@ PLAN: synchronize articles with SFMS SQL?
 FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
 FIXME: datetime pickers like in failure dialogs
 FIXME: useEffect with revalidation sets the table page to 1
+FIXME: dmcheck english version
+FIXME: dmcheck error when rework
+BRI TEMPERING
+Wybór pieca
+Wybór artykułu - możliwy skan z hydra
+Batch hydra więcej niż 1
+Logowanie do całej aplikacji 
+Opóźnione wyjęcie z pieca zaznacz na czerwono
++ panel do zarządzania artykułami i piecami
 */
