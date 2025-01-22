@@ -39,17 +39,17 @@ export async function GET(req: NextRequest) {
       { header: 'Line', key: 'line', width: 10 },
       { header: 'Station', key: 'station', width: 15 },
       { header: 'Failure', key: 'failure', width: 30 },
-      { header: 'From (UTC)', key: 'from', width: 12 },
-      { header: 'To (UTC)', key: 'to', width: 12 },
+      { header: 'From', key: 'from', width: 12 },
+      { header: 'To', key: 'to', width: 12 },
       { header: 'Supervisor', key: 'supervisor', width: 15 },
       { header: 'Responsible', key: 'responsible', width: 15 },
       { header: 'Solution', key: 'solution', width: 30 },
       { header: 'Comment', key: 'comment', width: 30 },
-      { header: 'Created At (UTC)', key: 'createdAt', width: 12 },
-      { header: 'Updated At (UTC)', key: 'updatedAt', width: 12 },
+      { header: 'Created At', key: 'createdAt', width: 12 },
+      { header: 'Updated At', key: 'updatedAt', width: 12 },
     ];
 
-    const convertToLocalTimeWithMoment = (date: Date) => {
+    const convertToWarsawTimeWithMoment = (date: Date) => {
       if (!date) return null;
       const offset = moment(date).tz('Europe/Warsaw').utcOffset();
       const localDate = new Date(date);
@@ -64,20 +64,20 @@ export async function GET(req: NextRequest) {
         station: failure.station,
         failure: failure.failure,
         from: failure.from
-          ? convertToLocalTimeWithMoment(new Date(failure.from))
+          ? convertToWarsawTimeWithMoment(new Date(failure.from))
           : '',
         to: failure.to
-          ? convertToLocalTimeWithMoment(new Date(failure.to))
+          ? convertToWarsawTimeWithMoment(new Date(failure.to))
           : '',
         supervisor: failure.supervisor,
         responsible: failure.responsible,
         solution: failure.solution,
         comment: failure.comment,
         createdAt: failure.createdAt
-          ? convertToLocalTimeWithMoment(new Date(failure.createdAt))
+          ? convertToWarsawTimeWithMoment(new Date(failure.createdAt))
           : '',
         updatedAt: failure.updatedAt
-          ? convertToLocalTimeWithMoment(new Date(failure.updatedAt))
+          ? convertToWarsawTimeWithMoment(new Date(failure.updatedAt))
           : '',
       };
       sheet.addRow(row);
