@@ -360,17 +360,17 @@ export async function saveDmcRework(
     }
     const dmc = parse.data.dmc;
 
-    if (articleConfig.bmw) {
-      if (!bmwDateValidation(dmc)) {
-        return { message: 'bmw date not valid' };
-      }
-    }
+    // if (articleConfig.bmw) {
+    //   if (!bmwDateValidation(dmc)) {
+    //     return { message: 'bmw date not valid' };
+    //   }
+    // }
 
-    if (articleConfig.ford) {
-      if (!fordDateValidation(dmc)) {
-        return { message: 'ford date not valid' };
-      }
-    }
+    // if (articleConfig.ford) {
+    //   if (!fordDateValidation(dmc)) {
+    //     return { message: 'ford date not valid' };
+    //   }
+    // }
 
     const scansCollection = await dbc('scans');
 
@@ -385,7 +385,8 @@ export async function saveDmcRework(
     if (
       !existingDmc ||
       existingDmc.status === 'rework' ||
-      existingDmc.status === 'box'
+      existingDmc.status === 'box' ||
+      (articleConfig.pallet && existingDmc.status === 'pallet')
     ) {
       return { message: 'rework not possible' };
     }
@@ -405,26 +406,26 @@ export async function saveDmcRework(
     }
 
     // BRI 40040 check in external pg DB
-    if (articleConfig.articleNumber.includes('40040')) {
-      try {
-        // console.log('BRI 40040 check' + ' date: ' + new Date().toISOString());
-        const pgc = await pgp.connect();
-        await pgc.query('SET statement_timeout TO 3000');
-        const res = await pgc.query(
-          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
-        );
-        // console.log(
-        //   res.rows[0].haube_io + ' date: ' + new Date().toISOString(),
-        // );
-        pgc.release();
-        if (res.rows.length === 0 || !res.rows[0].haube_io) {
-          return { message: '40040 nok' };
-        }
-      } catch (error) {
-        console.error('Failed to execute BRI pg query:', error);
-        return { message: 'bri pg saving error' };
-      }
-    }
+    // if (articleConfig.articleNumber.includes('40040')) {
+    //   try {
+    //     // console.log('BRI 40040 check' + ' date: ' + new Date().toISOString());
+    //     const pgc = await pgp.connect();
+    //     await pgc.query('SET statement_timeout TO 3000');
+    //     const res = await pgc.query(
+    //       `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
+    //     );
+    //     // console.log(
+    //     //   res.rows[0].haube_io + ' date: ' + new Date().toISOString(),
+    //     // );
+    //     pgc.release();
+    //     if (res.rows.length === 0 || !res.rows[0].haube_io) {
+    //       return { message: '40040 nok' };
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to execute BRI pg query:', error);
+    //     return { message: 'bri pg saving error' };
+    //   }
+    // }
 
     // EOL810/EOL488 check in external SMART API
     if (
