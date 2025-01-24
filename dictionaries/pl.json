@@ -280,7 +280,7 @@
         "qrWrongQuantity": "Niepoprawna ilość sztuk na etykiecie!",
         "qrWrongProcess": "Etykieta z niepoprawnym numerem procesu!",
         "briPgSavingError": "Kontaktfehler mit externer Datenbank",
-        "reworkNotPossible": "Rework niemożliwy! Cześć w aktualnym boxie lub brak części.",
+        "reworkNotPossible": "Rework możliwy dopiero po zakończeniu boxa/palety!",
         "reworkDmcSaved": "Rework DMC zapisany!",
         "batchSaved": "Batch zapisany!",
         "batchExists": "Batch istnieje w bazie!"
