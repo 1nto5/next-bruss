@@ -27,27 +27,21 @@ export default async function RootLayout(props: {
   const session = await auth();
   const dictionary = await getDictionary(lang);
   return (
-    <html lang={lang} suppressHydrationWarning>
-      <head />
+    <ThemeProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      // disableTransitionOnChange
+    >
+      <Container>
+        <div className='flex min-h-screen flex-col'>
+          <Header session={session} dict={dictionary} lang={lang} />
+          <main className='flex-1'>{children}</main>
+          <Footer />
+        </div>
 
-      <body className='min-h-screen bg-background font-sans antialiased '>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          // disableTransitionOnChange
-        >
-          <Container>
-            <div className='flex min-h-screen flex-col'>
-              <Header session={session} dict={dictionary} lang={lang} />
-              <main className='flex-1'>{children}</main>
-              <Footer />
-            </div>
-
-            <Toaster className='mt-6' position='top-center' richColors />
-          </Container>
-        </ThemeProvider>
-      </body>
-    </html>
+        <Toaster className='mt-6' position='top-center' richColors />
+      </Container>
+    </ThemeProvider>
   );
 }

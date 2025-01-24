@@ -8,20 +8,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning>
-      {/* <html> */}
-      <head />
-      <body>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Footer />
-        </ThemeProvider>
-      </body>
-    </html>
+    <ThemeProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      disableTransitionOnChange
+    >
+      {children}
+      <Footer />
+    </ThemeProvider>
   );
 }

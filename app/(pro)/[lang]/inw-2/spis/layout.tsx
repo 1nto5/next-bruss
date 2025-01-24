@@ -15,47 +15,36 @@ export const metadata: Metadata = {
   // description: 'Company helper applications',
 };
 
-export default async function RootLayout(
-  props: {
-    children: React.ReactNode;
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function RootLayout(props: {
+  children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   // const dictionary = await getDictionary(lang);
   return (
-    <html lang={lang} suppressHydrationWarning>
-      <head />
-      <body>
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
-          enableSystem
-          // disableTransitionOnChange
-        >
-          <QueryProvider>
-            <Container>
-              <div className='flex min-h-screen flex-col'>
-                <Header />
-                <main className='flex-1'>
-                  <FormContainer>{children}</FormContainer>
-                </main>
-                <Footer />
-              </div>
-            </Container>
-          </QueryProvider>
-          <Toaster richColors position='top-center' />
-        </ThemeProvider>
-      </body>
-    </html>
+    <ThemeProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      // disableTransitionOnChange
+    >
+      <QueryProvider>
+        <Container>
+          <div className='flex min-h-screen flex-col'>
+            <Header />
+            <main className='flex-1'>
+              <FormContainer>{children}</FormContainer>
+            </main>
+            <Footer />
+          </div>
+        </Container>
+      </QueryProvider>
+      <Toaster richColors position='top-center' />
+    </ThemeProvider>
   );
 }
