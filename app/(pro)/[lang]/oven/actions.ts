@@ -60,14 +60,12 @@ export async function createNewCard(
   try {
     const coll = await dbc('inventory_cards');
 
-    // Pobierz wszystkie istniejące numery kart
     const existingCards = await coll
       .find({}, { projection: { number: 1 } })
       .sort({ number: 1 })
       .toArray();
     const existingNumbers = existingCards.map((card) => card.number);
 
-    // Znajdź najniższy wolny numer
     let newCardNumber = 1;
     for (let i = 0; i < existingNumbers.length; i++) {
       if (existingNumbers[i] !== newCardNumber) {
@@ -76,7 +74,6 @@ export async function createNewCard(
       newCardNumber++;
     }
 
-    // Tworzenie nowej karty z najniższym wolnym numerem
     const result = await coll.insertOne({
       number: newCardNumber,
       creators: persons,
@@ -97,9 +94,6 @@ export async function createNewCard(
 
 export async function fetchCards(persons: string[]) {
   try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
     const coll = await dbc('inventory_cards');
     const cards = await coll
       .find({
@@ -124,9 +118,6 @@ export async function fetchCardPositions(
   cardNumber: number,
 ) {
   try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
     const coll = await dbc('inventory_cards');
     const card = await coll.findOne({
       number: Number(cardNumber),
@@ -156,10 +147,6 @@ export async function fetchPosition(
   position: number,
 ) {
   try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(1000);
-
     const coll = await dbc('inventory_cards');
     const existingCard = await coll.findOne({
       number: cardNumber,
@@ -224,7 +211,6 @@ export async function findArticles(search: string) {
       })
       .toArray();
 
-    // Sprawdzenie liczby wyników
     if (results.length === 0) {
       return { error: 'no articles' };
     }
@@ -250,10 +236,6 @@ export async function savePosition(
   wip: boolean,
 ) {
   try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
-
     const collection = await dbc('inventory_cards');
 
     const identifier = `${card}/${position}`;

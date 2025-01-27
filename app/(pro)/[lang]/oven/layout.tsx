@@ -11,7 +11,7 @@ import Header from './components/header';
 import QueryProvider from './lib/query-provider';
 
 export const metadata: Metadata = {
-  title: 'Inwentaryzacja - spis (Next BRUSS)',
+  title: 'Oven (Next BRUSS)',
   // description: 'Company helper applications',
 };
 
@@ -21,7 +21,7 @@ export default async function RootLayout(props: {
 }) {
   const params = await props.params;
 
-  const { lang } = params;
+  // const { lang } = params;
 
   const { children } = props;
 

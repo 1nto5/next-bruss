@@ -20,7 +20,7 @@ export default function Header() {
       <header className='px-6 py-4 sm:flex sm:justify-between'>
         <div className='relative flex h-10 w-full items-center justify-between '>
           <div className='flex items-center'>
-            <span className='font-mono font-semibold'>inw-2 spis</span>
+            <span className='font-mono font-semibold'>oven</span>
           </div>
 
           <div className='flex items-center space-x-2'>
