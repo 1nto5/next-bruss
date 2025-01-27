@@ -33,7 +33,6 @@ export default async function RootLayout(props: {
     >
       {/* <QueryProvider> */}
       <Header
-        dict={dictionary}
         workplaceName={workplaceName}
         workplaceHref={`/${lang}/dmcheck/${workplaceName}`}
       />

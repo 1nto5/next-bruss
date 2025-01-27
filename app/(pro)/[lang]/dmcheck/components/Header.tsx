@@ -7,13 +7,11 @@ import { ThemeModeToggle } from './theme-mode-toggle';
 import VolumeButton from './volume-button';
 
 type HeaderProps = {
-  dict: any;
   workplaceName: string;
   workplaceHref: string;
 };
 
 export default async function Header({
-  dict,
   workplaceName,
   workplaceHref,
 }: HeaderProps) {
@@ -22,17 +20,8 @@ export default async function Header({
       <Container>
         <div className='relative flex h-10 w-full items-center justify-between '>
           <div className='flex items-center'>
-            <Link
-              href={workplaceHref}
-              className='ml-4 flex items-center lg:ml-0'
-            >
-              <h1 className='font-bold'>Next</h1>
-              <div className='w-24'>
-                <Logo />
-              </div>
-            </Link>
             <span className='font-mono font-semibold'>
-              {workplaceName.toLocaleUpperCase()}
+              DMCheck {workplaceName.toLocaleUpperCase()}
             </span>
           </div>
 
