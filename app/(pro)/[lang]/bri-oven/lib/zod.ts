@@ -1,67 +1,56 @@
 import * as z from 'zod';
 
-export const inventoryLoginSchema = z
+export const ovenLoginSchema = z
   .object({
-    personalNumber1: z
-      .string()
-      .min(1, { message: 'Wprowadź numer personalny!' }),
-    pin1: z.string().min(4, { message: 'Wprowadź PIN złożony z 4 cyfr!' }),
-    personalNumber2: z
+    operator1Code: z.string().min(1, { message: 'Wprowadź numer personalny!' }),
+    operator2Code: z
       .string()
       .min(1, { message: 'Wprowadź numer personalny!' })
       .optional(),
-    pin2: z
-      .string()
-      .min(4, { message: 'Wprowadź PIN złożony z 4 cyfr!' })
-      .optional(),
-    personalNumber3: z
+    operator3Code: z
       .string()
       .min(1, { message: 'Wprowadź numer personalny!' })
-      .optional(),
-    pin3: z
-      .string()
-      .min(4, { message: 'Wprowadź PIN złożony z 4 cyfr!' })
       .optional(),
   })
   .superRefine((data, ctx) => {
-    const { personalNumber1, personalNumber2, personalNumber3 } = data;
-    if (personalNumber2) {
-      if (personalNumber1 === personalNumber2) {
+    const { operator1Code, operator2Code, operator3Code } = data;
+    if (operator2Code) {
+      if (operator1Code === operator2Code) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber2'], // Error assigned to personalNumber2
+          path: ['operator2Code'], // Error assigned to operator2Code
         });
       }
     }
-    if (personalNumber3) {
-      if (personalNumber1 === personalNumber3) {
+    if (operator3Code) {
+      if (operator1Code === operator3Code) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber3'], // Error assigned to personalNumber3
+          path: ['operator3Code'], // Error assigned to operator3Code
         });
       }
-      if (personalNumber1 === personalNumber3) {
+      if (operator1Code === operator3Code) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber3'], // Error assigned to personalNumber3
+          path: ['operator3Code'], // Error assigned to operator3Code
         });
       }
     }
-    if (personalNumber2 && personalNumber3) {
-      if (personalNumber2 === personalNumber3) {
+    if (operator2Code && operator3Code) {
+      if (operator2Code === operator3Code) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber3'], // Error assigned to personalNumber3
+          path: ['operator3Code'], // Error assigned to operator3Code
         });
       }
     }
   });
 
-export type loginInventoryType = z.infer<typeof inventoryLoginSchema>;
+export type ovenLoginType = z.infer<typeof ovenLoginSchema>;
 
 export const newCardSchema = z.object({
   warehouse: z.string().min(1, { message: 'Wybierz magazyn!' }),

@@ -4,43 +4,27 @@
 import { dbc } from '@/lib/mongo';
 import { getLastNameFirstLetter } from '@/lib/utils/name-format';
 
-import { loginInventoryType } from './lib/zod';
+import { ovenLoginType } from './lib/zod';
 
-export async function login(data: loginInventoryType) {
+export async function login(data: ovenLoginType) {
   try {
     const collection = await dbc('persons');
 
-    const person1 = await collection.findOne({
-      personalNumber: data.personalNumber1,
-    });
-    if (!person1) {
-      return { error: 'wrong number 1' };
-    }
-    if (data.pin1 !== person1.password) {
-      return { error: 'wrong pin 1' };
-    }
+    // Create an array of operator codes to validate
+    const operatorCodes = [
+      data.operator1Code,
+      data.operator2Code,
+      data.operator3Code,
+    ].filter(Boolean);
 
-    if (data.personalNumber2) {
-      const person2 = await collection.findOne({
-        personalNumber: data.personalNumber2,
+    // Check each operator code
+    for (let i = 0; i < operatorCodes.length; i++) {
+      const operator = await collection.findOne({
+        personalNumber: operatorCodes[i],
       });
-      if (!person2) {
-        return { error: 'wrong number 2' };
-      }
-      if (data.pin2 !== person2.password) {
-        return { error: 'wrong pin 2' };
-      }
-    }
 
-    if (data.personalNumber3) {
-      const person3 = await collection.findOne({
-        personalNumber: data.personalNumber3,
-      });
-      if (!person3) {
-        return { error: 'wrong number 3' };
-      }
-      if (data.pin3 !== person3.password) {
-        return { error: 'wrong pin 3' };
+      if (!operator) {
+        return { error: `wrong code ${i + 1}` };
       }
     }
     return {

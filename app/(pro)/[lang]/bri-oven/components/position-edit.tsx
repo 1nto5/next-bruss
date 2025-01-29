@@ -31,28 +31,19 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { findArticles, savePosition } from '../actions';
 import { useGetPosition } from '../data/get-position';
-import {
-  useCardStore,
-  usePersonalNumberStore,
-  usePositionStore,
-} from '../lib/stores';
+import { usePersonalNumberStore } from '../lib/stores';
 import { positionEditSchema as formSchema } from '../lib/zod';
 import ErrorAlert from './error-alert';
 
 export default function PositionEdit() {
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
-  const { card, warehouse, sector } = useCardStore();
-  const { setPosition, position } = usePositionStore();
 
   const persons = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
   );
-  const { data, error, isSuccess, refetch, isFetching } = useGetPosition(
-    persons,
-    card,
-    position,
-  );
+  const { data, error, isSuccess, refetch, isFetching } =
+    useGetPosition(persons);
 
   const [isPending, setIsPending] = useState(false);
   const [isPendingFindArticle, setIsPendingFindArticle] = useState(false);

@@ -11,7 +11,7 @@ import Header from './components/header';
 import QueryProvider from './lib/query-provider';
 
 export const metadata: Metadata = {
-  title: 'Oven (Next BRUSS)',
+  title: 'BRI oven (Next BRUSS)',
   // description: 'Company helper applications',
 };
 
