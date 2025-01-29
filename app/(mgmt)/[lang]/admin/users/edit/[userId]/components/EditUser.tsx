@@ -1,8 +1,12 @@
 'use client';
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -12,23 +16,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { saveUser, getResetPasswordLink } from '../../../actions';
-import Link from 'next/link';
-import { Table, SquareAsterisk } from 'lucide-react';
 import { UserType } from '@/lib/types/user';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, SquareAsterisk, Table } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+import { getResetPasswordLink, saveUser } from '../../../actions';
 
 export default function EditUser({ userObject }: { userObject: UserType }) {
   // it should be under function declaration -> no recreate on every render but how to add translations?
@@ -156,13 +154,13 @@ export default function EditUser({ userObject }: { userObject: UserType }) {
           {extractNameFromEmail(data.edited?.email ?? '')}
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
-          <Button
+          {/* <Button
             onClick={() => passwordReset()}
             className='mr-2'
             variant='outline'
           >
             <SquareAsterisk />
-          </Button>
+          </Button> */}
           <Link href='/admin/users'>
             <Button className='mr-2' variant='outline'>
               <Table />
