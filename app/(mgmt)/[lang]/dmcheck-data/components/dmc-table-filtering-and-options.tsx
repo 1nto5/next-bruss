@@ -69,16 +69,6 @@ export default function DmcTableFilteringAndOptions({
     searchParams.get('article') || '',
   );
 
-  const areFiltersSet =
-    statusFilter ||
-    fromFilter ||
-    toFilter ||
-    dmcFilter ||
-    hydraFilter ||
-    palletFilter ||
-    workplaceFilter ||
-    articleFilter;
-
   const [openStatus, setOpenStatus] = useState(false);
   const [openWorkplace, setOpenWorkplace] = useState(false);
   const [openArticle, setOpenArticle] = useState(false);
