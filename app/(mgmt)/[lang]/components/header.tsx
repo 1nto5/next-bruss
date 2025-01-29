@@ -143,6 +143,11 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           title: `${dict?.header?.production?.dmcheckData.title}`,
           description: `${dict?.header?.production?.dmcheckData.description}`,
         },
+        {
+          href: `/pro-old/rework`,
+          title: `${dict?.header?.production?.rework.title}`,
+          description: `${dict?.header?.production?.rework.description}`,
+        },
       ],
     },
     ...(session?.user?.roles?.includes('admin')
