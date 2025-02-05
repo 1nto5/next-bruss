@@ -10,6 +10,7 @@ FIXME: datetime pickers like in failure dialogs
 FIXME: useEffect with revalidation sets the table page to 1
 FIXME: dmcheck english version
 PLAN: add "disable date validation" switch- switch to dmcheck 
+FIXME: fix layouts 
 BRI TEMPERING
 Wybór pieca
 Wybór artykułu - możliwy skan z hydra
