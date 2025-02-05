@@ -20,7 +20,6 @@ import {
 import {
   Form,
   FormControl,
-  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -67,25 +66,25 @@ export default function Login() {
       const res = await login(data);
       if (res.error) {
         const errorMessages: Record<string, string> = {
-          'wrong code 1': 'Nieprawidłowy kod logowania!',
-          'wrong code 2': 'Nieprawidłowy kod logowania!',
-          'wrong code 3': 'Nieprawidłowy kod logowania!',
+          'wrong code 1': 'Ungültiger Anmeldecode!',
+          'wrong code 2': 'Ungültiger Anmeldecode!',
+          'wrong code 3': 'Ungültiger Anmeldecode!',
         };
         const errorField =
           `operator${res.error.split(' ')[2]}Code` as keyof typeof data;
         form.setError(errorField, {
           type: 'manual',
-          message: errorMessages[res.error] || 'Nieznany błąd!',
+          message: errorMessages[res.error] || 'Unbekannter Fehler!',
         });
       } else if (res.success) {
         setOperator1(data.operator1Code);
         setOperator2(data.operator2Code || '');
         setOperator3(data.operator3Code || '');
-        toast.success('Zalogowano pomyślnie!');
+        toast.success('Erfolgreich eingeloggt!');
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error('Bitte kontaktieren Sie die IT!');
     } finally {
       setIsPending(false);
     }
@@ -94,28 +93,35 @@ export default function Login() {
   return (
     <Card className='w-[400px]'>
       <CardHeader>
-        <CardTitle>Logowanie</CardTitle>
+        <CardTitle>Anmeldung</CardTitle>
         <CardDescription>
-          Wpisz dane jednej, dwóch lub trzech osób spisujących w Twojej grupie.
-          Jedna osoba loguje całą grupę na jednym urządzeniu.
+          Scannen Sie Ihren Code von Ihrer Mitarbeiterkarte, um sich anzumelden.
+          Sie können 3 Operatoren gleichzeitig anmelden.
         </CardDescription>
       </CardHeader>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          // prevent form submission on Enter key - employee use barcode scanners with "auto-enter" feature
+          onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
+        >
           <CardContent className='grid w-full items-center gap-4 '>
             <FormField
               control={form.control}
               name='operator1Code'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nr personalny 1</FormLabel>
+                  <FormLabel>Operator 1</FormLabel>
                   <FormControl>
-                    <Input autoComplete='off' placeholder='' {...field} />
+                    <Input
+                      type='password'
+                      autoFocus
+                      autoComplete='off'
+                      placeholder=''
+                      {...field}
+                    />
                   </FormControl>
-                  {/* <FormDescription>
-                        Wprowadź służbowy adres personalNumber.
-                      </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
@@ -123,7 +129,7 @@ export default function Login() {
 
             <FormItem className='flex flex-row items-center justify-between'>
               <div className='space-y-0.5'>
-                <FormLabel className='text-base'>Osoba 2</FormLabel>
+                <FormLabel className='text-base'>Operator 2</FormLabel>
               </div>
               <FormControl>
                 <Switch
@@ -139,13 +145,15 @@ export default function Login() {
                 name='operator2Code'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Numer personalny 2</FormLabel>
+                    {/* <FormLabel>Operator 2</FormLabel> */}
                     <FormControl>
-                      <Input autoComplete='off' placeholder='' {...field} />
+                      <Input
+                        type='password'
+                        autoComplete='off'
+                        placeholder=''
+                        {...field}
+                      />
                     </FormControl>
-                    {/* <FormDescription>
-                        Wprowadź służbowy adres personalNumber.
-                      </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -154,7 +162,7 @@ export default function Login() {
 
             <FormItem className='flex flex-row items-center justify-between'>
               <div className='space-y-0.5'>
-                <FormLabel className='text-base'>Osoba 3</FormLabel>
+                <FormLabel className='text-base'>Operator 3</FormLabel>
               </div>
               <FormControl>
                 <Switch
@@ -170,13 +178,15 @@ export default function Login() {
                 name='operator3Code'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Numer personalny 3</FormLabel>
+                    {/* <FormLabel>Operator 3</FormLabel> */}
                     <FormControl>
-                      <Input autoComplete='off' placeholder='' {...field} />
+                      <Input
+                        type='password'
+                        autoComplete='off'
+                        placeholder=''
+                        {...field}
+                      />
                     </FormControl>
-                    {/* <FormDescription>
-                        Wprowadź służbowy adres personalNumber.
-                      </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -188,10 +198,10 @@ export default function Login() {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Logowanie
+                Anmelden
               </Button>
             ) : (
-              <Button type='submit'>Zaloguj</Button>
+              <Button type='submit'>Anmelden</Button>
             )}
           </CardFooter>
         </form>

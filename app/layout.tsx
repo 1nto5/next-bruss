@@ -1,5 +1,6 @@
 import '@/app/globals.css';
 import { Locale } from '@/i18n.config';
+import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -22,7 +23,14 @@ export default async function RootLayout(props: {
       <head />
 
       <body className='min-h-screen bg-background font-sans antialiased'>
-        {children}
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          // disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
