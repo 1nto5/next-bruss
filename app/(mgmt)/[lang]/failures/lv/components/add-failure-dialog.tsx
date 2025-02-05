@@ -6,7 +6,6 @@ import {
 } from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { AddFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Command,
   CommandEmpty,
@@ -88,15 +87,11 @@ export default function AddFailureDialog({}: {}) {
 
   const selectedFailure = form.watch('failure');
 
-  const filteredFailures =
-    failuresOptions.find((option) => option.station === selectedStation)
-      ?.options || [];
-
-  function handleDateSelect(date: Date | undefined) {
-    if (date) {
-      form.setValue('from', date);
-    }
-  }
+  const filteredFailures = [
+    'konserwacja',
+    ...(failuresOptions.find((option) => option.station === selectedStation)
+      ?.options || []),
+  ].sort();
 
   const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
     setIsPendingInserting(true);
