@@ -8,7 +8,7 @@ export async function GET() {
       from: 'no-reply@bruss-group.com', // modyfikuj w razie potrzeby
       to: 'adrian.antosiak@bruss-group.com',
       subject: 'Przykładowa wiadomość',
-      text: 'To jest przykładowa wiadomość wysłana przez Next.js endpoint w nowym formacie app router.',
+      html: 'Test.',
     };
     const info = await mailer.sendMail(mailOptions);
     return NextResponse.json({ message: 'Wiadomość wysłana', info });

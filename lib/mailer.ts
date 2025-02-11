@@ -1,22 +1,47 @@
-import { createTransport, SendMailOptions } from 'nodemailer';
+import { createTransport, SendMailOptions, SentMessageInfo } from 'nodemailer';
 
-const transporter = createTransport({
-  host: '10.21.10.241',
-  port: 26,
-  secure: false,
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const config =
+  process.env.NODE_ENV === 'development'
+    ? {
+        service: 'gmail',
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS,
+        },
+      }
+    : {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: false,
+        tls: {
+          rejectUnauthorized: false,
+        },
+      };
 
-async function sendMail(mailOptions: SendMailOptions): Promise<any> {
-  // ...existing code...
+const transporter = createTransport(config);
+
+const FOOTER_TEXT =
+  '\n\n--\nWiadomość wysłana automatycznie przez: / Automatically sent by: / Automatisch gesendet von: Next BRUSS - http://next.mrg700.bruss-group.com';
+
+async function sendMail(
+  mailOptions: SendMailOptions,
+): Promise<SentMessageInfo> {
+  // Append footer to text version if exists, otherwise, create it.
+  if (mailOptions.text) {
+    mailOptions.text += FOOTER_TEXT;
+  } else {
+    mailOptions.text = FOOTER_TEXT.trim();
+  }
+
+  if (mailOptions.html) {
+    mailOptions.html += `<br/><br/><hr/>Wiadomość wysłana automatycznie przez: / Automatically sent by: / Automatisch gesendet von: <a href="http://next.mrg700.bruss-group.com">Next BRUSS</a>`;
+  }
+
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Wiadomość wysłana:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Błąd podczas wysyłki:', error);
+    console.error('Error occurred during sending:', error);
     throw error;
   }
 }
