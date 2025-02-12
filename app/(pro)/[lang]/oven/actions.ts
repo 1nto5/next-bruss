@@ -1,7 +1,6 @@
 'use server';
 
 import { dbc } from '@/lib/mongo';
-
 import { loginOvenType } from './lib/zod';
 
 export async function login(data: loginOvenType) {
@@ -51,8 +50,59 @@ export async function fetchOvenProcesses() {
   return processes;
 }
 
-export async function fetchOvenConfigs() {
-  const collection = await dbc('oven_configs');
-  const configs = await collection.find().toArray();
-  return configs;
+export async function findOvenProcessConfig(search: string) {
+  try {
+    const coll = await dbc('oven_configs');
+    const results = await coll
+      .find({
+        $or: [
+          { articleNumber: { $regex: search, $options: 'i' } },
+          { articleName: { $regex: search, $options: 'i' } },
+        ],
+      })
+      .toArray();
+
+    // Sprawdzenie liczby wyników
+    if (results.length === 0) {
+      return { error: 'no articles' };
+    }
+
+    if (results.length > 5) {
+      return { error: 'too many articles' };
+    }
+    const sanitizedResults = results.map(({ _id, ...rest }) => rest);
+    return { success: sanitizedResults };
+  } catch (error) {
+    console.error(error);
+    return { error: 'findArticles server action error' };
+  }
+}
+
+// TODO: add type
+export async function insertOvenProcess(ovenProcessSelectedArticle: {
+  articleNumber: string;
+  articleName: string;
+  temp: number;
+  ovenTime: number;
+}) {
+  try {
+    const collection = await dbc('oven_processes');
+    const process = {
+      ...ovenProcessSelectedArticle,
+      endTime: new Date(
+        new Date().getTime() + ovenProcessSelectedArticle.ovenTime,
+      ),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const res = await collection.insertOne(process);
+    if (res) {
+      return { success: 'inserted' };
+    } else {
+      return { error: 'not inserted' };
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: 'insertDeviation server action error' };
+  }
 }

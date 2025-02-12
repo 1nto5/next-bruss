@@ -57,3 +57,20 @@ export const ovenLoginSchema = z
   });
 
 export type loginOvenType = z.infer<typeof ovenLoginSchema>;
+
+export const addOvenProcessSchema = z
+  .object({
+    findArticle: z.string().optional(),
+    article: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.article.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Wählen Sie einen Artikel aus, um einen Vorgang hinzuzufügen!',
+        path: ['findArticle'],
+      });
+    }
+  });
+
+export type addOvenProcessType = z.infer<typeof addOvenProcessSchema>;
