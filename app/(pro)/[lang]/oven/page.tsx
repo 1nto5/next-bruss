@@ -1,12 +1,12 @@
 'use client';
 import Login from './components/login';
-import { useCodeStore } from './lib/stores';
+import { useOperatorsStore } from './lib/stores';
 
 // import { getDictionary } from '@/lib/dictionary';
 
 export default function App() {
-  const { code1 } = useCodeStore();
-  if (!code1) {
+  const { operator1 } = useOperatorsStore();
+  if (!operator1.code) {
     return <Login />;
   } else {
     ('test');

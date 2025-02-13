@@ -4,8 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { login } from '../actions';
-import { useCodeStore } from '../lib/stores';
+import { useOperatorsStore } from '../lib/stores';
 import { ovenLoginSchema as formSchema } from '../lib/zod';
 
 import { Button } from '@/components/ui/button';
@@ -28,9 +27,10 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { operatorsLogin } from '../actions';
 
 export default function Login() {
-  const { setCode1, setCode2, setCode3 } = useCodeStore();
+  const { setOperator1, setOperator2, setOperator3 } = useOperatorsStore();
   const [code2Form, setCode2Form] = useState(false);
   const [code3Form, setCode3Form] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -60,7 +60,7 @@ export default function Login() {
     setIsPending(true);
     console.log('data', data);
     try {
-      const res = await login(data);
+      const res = await operatorsLogin(data);
       if (res.error) {
         switch (res.error) {
           case 'wrong code 1':
@@ -85,9 +85,9 @@ export default function Login() {
             toast.error('Wenden Sie sich an die IT!');
         }
       } else if (res.success) {
-        setCode1(data.code1);
-        setCode2(data.code2 || '');
-        setCode3(data.code3 || '');
+        setOperator1(res.operator1 || '');
+        setOperator2(res.operator2 || '');
+        setOperator3(res.operator3 || '');
         toast.success('Erfolgreich angemeldet!');
       }
     } catch (error) {

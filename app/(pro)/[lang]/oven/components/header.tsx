@@ -3,12 +3,12 @@
 import { Button } from '@/components/ui/button';
 import Container from '@/components/ui/container';
 import { UserPen } from 'lucide-react';
-import { useCodeStore } from '../lib/stores';
+import { useOperatorsStore } from '../lib/stores';
 import AddOvenProcessDialog from './add-oven-process-dialog';
 import { ThemeModeToggle } from './theme-mode-toggle';
 
 export default function Header() {
-  const { code1, logout } = useCodeStore();
+  const { operator1, logout } = useOperatorsStore();
 
   return (
     <Container>
@@ -20,7 +20,7 @@ export default function Header() {
 
           <div className='flex items-center space-x-2'>
             <AddOvenProcessDialog />
-            {code1 && (
+            {operator1 && (
               <Button onClick={logout} variant='outline' size='icon'>
                 <UserPen className='h-[1.2rem] w-[1.2rem]' />
               </Button>

@@ -1,4 +1,3 @@
-import { InstagramLogoIcon } from '@radix-ui/react-icons';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPosition } from '../actions';
 

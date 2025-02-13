@@ -60,15 +60,32 @@ export type loginOvenType = z.infer<typeof ovenLoginSchema>;
 
 export const addOvenProcessSchema = z
   .object({
-    findArticle: z.string().optional(),
-    article: z.string(),
+    configFiltr: z.string().optional(),
+    article: z.string().optional(),
+    ovenNumber: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.article.trim().length === 0) {
+    if (!data.configFiltr && !data.article && data.ovenNumber) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Wählen Sie einen Artikel aus, um einen Vorgang hinzuzufügen!',
-        path: ['findArticle'],
+        message:
+          'Bitte suchen und wählen Sie einen Artikel aus, um den Vorgang zu starten!',
+        path: ['configFiltr'],
+      });
+    }
+    if (!data.article && data.configFiltr) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'Bitte wählen Sie einen Artikel aus, um einen Vorgang hinzuzufügen!',
+        path: ['article'],
+      });
+    }
+    if (!data.ovenNumber) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Bitte geben Sie eine Ofennummer ein!',
+        path: ['ovenNumber'],
       });
     }
   });

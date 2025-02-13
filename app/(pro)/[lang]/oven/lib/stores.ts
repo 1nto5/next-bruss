@@ -1,27 +1,37 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type CodesStateType = {
-  code1: string;
-  code2: string;
-  code3: string;
-  setCode1: (code1: string) => void;
-  setCode2: (code2: string) => void;
-  setCode3: (code3: string) => void;
+type Operator = {
+  code: string;
+  name: string;
+};
+
+type OperatorsStateType = {
+  operator1: Operator;
+  operator2: Operator;
+  operator3: Operator;
+  setOperator1: (operator: Operator) => void;
+  setOperator2: (operator: Operator) => void;
+  setOperator3: (operator: Operator) => void;
   logout: () => void;
 };
 
-export const useCodeStore = create<CodesStateType>()(
+export const useOperatorsStore = create<OperatorsStateType>()(
   persist(
     (set) => ({
-      code1: '',
-      code2: '',
-      code3: '',
-      setCode1: (code1) => set({ code1 }),
-      setCode2: (code2) => set({ code2 }),
-      setCode3: (code3) => set({ code3 }),
-      logout: () => set({ code1: '', code2: '', code3: '' }),
+      operator1: { code: '', name: '' },
+      operator2: { code: '', name: '' },
+      operator3: { code: '', name: '' },
+      setOperator1: (operator: Operator) => set({ operator1: operator }),
+      setOperator2: (operator: Operator) => set({ operator2: operator }),
+      setOperator3: (operator: Operator) => set({ operator3: operator }),
+      logout: () =>
+        set({
+          operator1: { code: '', name: '' },
+          operator2: { code: '', name: '' },
+          operator3: { code: '', name: '' },
+        }),
     }),
-    { name: 'code' },
+    { name: 'operators' },
   ),
 );

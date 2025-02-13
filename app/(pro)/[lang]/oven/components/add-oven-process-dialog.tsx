@@ -30,17 +30,14 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { findOvenProcessConfig, insertOvenProcess } from '../actions';
+import { insertOvenProcess } from '../actions';
+import { useGetOvenConfigs } from '../data/get-oven-configs';
 import { addOvenProcessSchema } from '../lib/zod';
 
 export default function AddOvenProcessDialog({}: {}) {
   const [open, setOpen] = useState(false);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingFindArticle, setIsPendingFindArticle] = useState(false);
-  const [findMessage, setFindMessage] = useState('');
-  const [foundArticles, setFoundArticles] = useState<{ [key: string]: any }[]>(
-    [],
-  );
+
   const [selectedArticle, setSelectedArticle] = useState<
     { [key: string]: any } | undefined
   >(undefined);
@@ -48,73 +45,49 @@ export default function AddOvenProcessDialog({}: {}) {
   const form = useForm<z.infer<typeof addOvenProcessSchema>>({
     resolver: zodResolver(addOvenProcessSchema),
     defaultValues: {
-      findArticle: '',
+      configFiltr: '',
       article: '',
+      ovenNumber: undefined,
     },
   });
+  const ovenNumber = form.watch('ovenNumber');
+  const configFiltr = form.watch('configFiltr');
+
+  const {
+    data: ovenConfigs,
+    error,
+    refetch: refetchOvenConfigs,
+    isFetching: isFetchingOvenConfigs,
+  } = useGetOvenConfigs(configFiltr || '', open);
 
   useEffect(() => {
     if (open) {
       form.reset({
-        findArticle: '',
+        configFiltr: '',
         article: '',
+        ovenNumber: undefined,
       });
-      setFindMessage('');
-      setFoundArticles([]);
       setSelectedArticle(undefined);
     }
   }, [open]);
-
-  const handleFindArticle = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsPendingFindArticle(true);
-    setSelectedArticle(undefined);
-    form.setValue('article', '');
-    try {
-      const res = await findOvenProcessConfig(e.target.value);
-      if ('error' in res) {
-        switch (res.error) {
-          case 'no articles':
-            setFindMessage('Artikel nicht gefunden!');
-            setFoundArticles([]);
-            setSelectedArticle(undefined);
-            break;
-          case 'too many articles':
-            setFindMessage(
-              'Bitte präzisieren Sie Ihre Suche - zu viele Artikel gefunden!',
-            );
-            setFoundArticles([]);
-            setSelectedArticle(undefined);
-            break;
-          default:
-            console.error('handleFindArticle', res.error);
-            toast.error('Kontaktieren Sie den IT-Support!');
-        }
-        return;
-      }
-      setFindMessage('success');
-      setFoundArticles(res.success);
-    } catch (error) {
-      console.error('handleFindArticle', error);
-      toast.error('Kontaktieren Sie den IT-Support!');
-    } finally {
-      setIsPendingFindArticle(false);
-    }
-  };
 
   const onSubmit = async () => {
     setIsPendingInserting(true);
     try {
       if (!selectedArticle) {
-        throw new Error('No article selected!');
+        return;
       }
-      const res = await insertOvenProcess(
-        selectedArticle as {
-          articleNumber: string;
-          articleName: string;
-          temp: number;
-          ovenTime: number;
-        },
-      );
+
+      const ovenProcessData = {
+        articleNumber: selectedArticle.articleNumber,
+        articleName: selectedArticle.articleName,
+        temp: selectedArticle.temp,
+        ovenTime: selectedArticle.ovenTime,
+        ovenNumber: Number(ovenNumber),
+        operators: [''],
+      };
+
+      const res = await insertOvenProcess(ovenProcessData);
       if (res.success) {
         toast.success('Fehler hinzugefügt!');
       } else if (res.error) {
@@ -140,87 +113,43 @@ export default function AddOvenProcessDialog({}: {}) {
       </DialogTrigger>
       <DialogContent className='w-[700px] sm:max-w-[700px]'>
         <DialogHeader>
-          <DialogTitle>Neuen Prozess hinzufügen</DialogTitle>
+          <DialogTitle>
+            Neuen Prozess hinzufügen{' '}
+            {ovenNumber && `für Ofennummer: ${ovenNumber}`}
+          </DialogTitle>
           {/* <DialogDescription>
             Make changes to your profile here. Click save when you're done.
           </DialogDescription> */}
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[450px]'>
-              <div className='grid items-center gap-2 p-2'>
-                <FormField
-                  control={form.control}
-                  name='findArticle'
-                  render={({ field }) => (
-                    <FormItem className='rounded-lg border p-4'>
-                      <FormLabel>Artikel</FormLabel>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          {/* <Input
-                        className=''
-                        placeholder={'wpisz numer lub nazwę aby wyszukać...'}
-                        {...field}
-                        onChange={(e) => {
-                          handleFindArticle(e);
-                        }}
-                      /> */}
-                          <Input
-                            {...field}
-                            value={field.value ?? ''}
-                            autoComplete='off'
-                            onChange={(e) => {
-                              field.onChange(e);
-                              handleFindArticle(e);
-                            }}
-                            placeholder={
-                              'Geben Sie eine Nummer oder einen Namen ein, um nach einem Artikel zu suchen...'
-                            }
-                          />
-                        </FormControl>
-                      </div>
-                      {isPendingFindArticle && (
-                        <FormMessage>Suche läuft...</FormMessage>
-                      )}
-                      {findMessage !== 'success' && !isPendingFindArticle && (
-                        <FormMessage>{findMessage}</FormMessage>
-                      )}
-                    </FormItem>
-                  )}
-                />
-                {foundArticles[0] && !isPendingFindArticle && (
+            <ScrollArea className='h-[70vh]'>
+              <div className='mr-4 grid items-center gap-2'>
+                {!ovenNumber && (
                   <FormField
                     control={form.control}
-                    name='article'
+                    name='ovenNumber'
                     render={({ field }) => (
                       <FormItem className='space-y-3 rounded-lg border p-4'>
+                        <FormLabel>Ofen auswählen</FormLabel>
                         <FormControl>
                           <RadioGroup
                             onValueChange={(value) => {
                               field.onChange(value);
-                              const selectedArticle = foundArticles.find(
-                                (article) => article.articleNumber === value,
-                              );
-                              setSelectedArticle(selectedArticle);
                             }}
-                            // defaultValue={field.value}
                             value={field.value}
-                            className='flex flex-col space-y-1'
+                            className='flex flex-col space-y-2'
                           >
-                            {foundArticles.map((article) => (
+                            {Array.from({ length: 7 }, (_, i) => (
                               <FormItem
-                                key={article.articleNumber}
+                                key={i + 1}
                                 className='flex items-center space-x-3 space-y-0'
                               >
                                 <FormControl>
-                                  <RadioGroupItem
-                                    value={article.articleNumber}
-                                  />
+                                  <RadioGroupItem value={(i + 1).toString()} />
                                 </FormControl>
                                 <FormLabel className='font-normal'>
-                                  {article.articleNumber} -{' '}
-                                  {article.articleName} - {article.temp}°C -{' '}
-                                  {article.ovenTime / 60} min
+                                  Oven {i + 1}
                                 </FormLabel>
                               </FormItem>
                             ))}
@@ -230,6 +159,83 @@ export default function AddOvenProcessDialog({}: {}) {
                       </FormItem>
                     )}
                   />
+                )}
+                {ovenNumber && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='configFiltr'
+                      render={({ field }) => (
+                        <FormItem className='rounded-lg border p-4'>
+                          <FormLabel>Suche nach Artikel</FormLabel>
+                          <div className='flex items-center space-x-2'>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                value={field.value ?? ''}
+                                autoComplete='off'
+                                autoFocus
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  refetchOvenConfigs();
+                                }}
+                                placeholder={
+                                  'Geben Sie eine Nummer oder einen Namen ein, um nach einem Artikel zu suchen...'
+                                }
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='article'
+                      render={({ field }) => (
+                        <FormItem className='space-y-3 rounded-lg border p-4'>
+                          {/* <FormLabel>Artikel auswählen</FormLabel> */}
+
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                const selectedArticle = (
+                                  ovenConfigs || []
+                                ).find(
+                                  (article) => article.articleNumber === value,
+                                );
+                                setSelectedArticle(selectedArticle);
+                              }}
+                              // defaultValue={field.value}
+                              value={field.value}
+                              className='flex flex-col space-y-2'
+                            >
+                              {(ovenConfigs ?? []).map((config) => (
+                                <FormItem
+                                  key={config.articleNumber}
+                                  className='flex items-center space-x-3 space-y-0'
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value={config.articleNumber}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className='font-normal'>
+                                    {config.articleNumber} -{' '}
+                                    {config.articleName} - {config.temp}°C -{' '}
+                                    {config.ovenTime / 60} min
+                                  </FormLabel>
+                                </FormItem>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
               </div>
             </ScrollArea>
