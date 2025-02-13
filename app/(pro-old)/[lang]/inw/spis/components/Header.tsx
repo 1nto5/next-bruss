@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 sector: null,
               }))
             }
-            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             type='button'
           >
             zakończ kartę
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 position: null,
               }))
             }
-            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             type='button'
           >
             zmień pozycję
@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 nameSecond: null,
               })
             }
-            className='rounded bg-red-600 pb-1 pl-2 pr-2 pt-1 text-center text-sm font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700 sm:p-2 sm:text-base lg:text-lg'
+            className='rounded bg-red-600 pb-1 pl-2 pr-2 pt-1 text-center text-sm font-extralight text-slate-100 shadow-xs hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700 sm:p-2 sm:text-base lg:text-lg'
             type='button'
           >
             wyloguj

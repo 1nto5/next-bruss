@@ -255,7 +255,7 @@ export function DateTimePicker({
         ) : (
           <div
             className={cn(
-              'flex h-9 w-full cursor-pointer items-center rounded-md border border-input pe-1 ps-3 text-sm font-normal shadow-sm',
+              'flex h-9 w-full cursor-pointer items-center rounded-md border border-input pe-1 ps-3 text-sm font-normal shadow-xs',
               !displayValue && 'text-muted-foreground',
               (!clearable || !value) && 'pe-3',
               disabled && 'cursor-not-allowed opacity-50',
@@ -263,7 +263,7 @@ export function DateTimePicker({
             )}
             tabIndex={0}
           >
-            <div className='flex flex-grow items-center'>
+            <div className='flex grow items-center'>
               <CalendarIcon className='mr-2 size-4' />
               {dislayFormat}
             </div>
@@ -833,7 +833,7 @@ function TimePicker({
         <div className='flex-col gap-2 p-2'>
           <div className='flex h-56 grow'>
             {(!timePicker || timePicker.hour) && (
-              <ScrollArea className='h-full flex-grow'>
+              <ScrollArea className='h-full grow'>
                 <div className='flex grow flex-col items-stretch overflow-y-auto pb-48 pe-2'>
                   {hours.map((v) => (
                     <div
@@ -853,7 +853,7 @@ function TimePicker({
               </ScrollArea>
             )}
             {(!timePicker || timePicker.minute) && (
-              <ScrollArea className='h-full flex-grow'>
+              <ScrollArea className='h-full grow'>
                 <div className='flex grow flex-col items-stretch overflow-y-auto pb-48 pe-2'>
                   {minutes.map((v) => (
                     <div
@@ -873,7 +873,7 @@ function TimePicker({
               </ScrollArea>
             )}
             {(!timePicker || timePicker.second) && (
-              <ScrollArea className='h-full flex-grow'>
+              <ScrollArea className='h-full grow'>
                 <div className='flex grow flex-col items-stretch overflow-y-auto pb-48 pe-2'>
                   {seconds.map((v) => (
                     <div
@@ -893,7 +893,7 @@ function TimePicker({
               </ScrollArea>
             )}
             {use12HourFormat && (
-              <ScrollArea className='h-full flex-grow'>
+              <ScrollArea className='h-full grow'>
                 <div className='flex grow flex-col items-stretch overflow-y-auto pe-2'>
                   {ampmOptions.map((v) => (
                     <TimeItem

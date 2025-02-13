@@ -225,7 +225,7 @@ export default function Card() {
               type='button'
               onClick={newCard}
               className={clsx(
-                'w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600 sm:text-base lg:text-lg',
+                'w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600 sm:text-base lg:text-lg',
                 { 'animate-pulse': isPendingNewCard === true },
               )}
             >
@@ -234,7 +234,7 @@ export default function Card() {
 
             <button
               onClick={handleConfirm}
-              className='w-1/2 rounded bg-slate-200 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+              className='w-1/2 rounded bg-slate-200 text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             >
               {isPendingCardData ? 'pobieranie danych' : 'wybierz kartę'}
             </button>

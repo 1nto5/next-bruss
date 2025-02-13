@@ -26,7 +26,7 @@ export default function Logo() {
       // width={80}
       // // Optional blur-up
       // // while loading
-      // // placeholder='blur'
+      // // placeholder='blur-sm'
       alt='BRUSS'
     />
   );

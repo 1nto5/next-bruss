@@ -114,7 +114,7 @@ export default function LoginForm() {
             className='flex w-11/12 flex-col items-center justify-center gap-3'
           >
             <input
-              className=' w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+              className=' w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-xs dark:bg-slate-900 dark:outline-slate-600'
               type='string'
               name='personalNumber'
               placeholder='nr personalny'
@@ -124,7 +124,7 @@ export default function LoginForm() {
               ref={personalNumberInputRef}
             />
             <input
-              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-sm   dark:bg-slate-900 dark:outline-slate-600'
+              className='w-9/12 rounded border-slate-700 bg-white p-1 text-center shadow-xs   dark:bg-slate-900 dark:outline-slate-600'
               type='string'
               name='password'
               placeholder='kod pin'
@@ -134,7 +134,7 @@ export default function LoginForm() {
             <button
               type='submit'
               className={clsx(
-                `w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss`,
+                `w-5/12 max-w-lg rounded bg-slate-200 p-2 text-center text-lg font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss`,
                 { 'animate-pulse': isPending === true },
               )}
               disabled={isPending}

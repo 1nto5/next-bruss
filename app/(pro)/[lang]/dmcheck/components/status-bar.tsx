@@ -44,7 +44,7 @@ export async function StatusBar({
   const palletStatusClass = clsx('text-center text-xl', palletStatusBlinkClass);
   return (
     <div className='flex w-full justify-center space-x-2'>
-      <div className='w-3/12 flex-grow'>
+      <div className='w-3/12 grow'>
         <OperatorCardDialog
           cDict={cDict.operatorCardDialog}
           lang={lang}
@@ -53,7 +53,7 @@ export async function StatusBar({
         />
       </div>
 
-      <div className='w-5/12 flex-grow'>
+      <div className='w-5/12 grow'>
         <ArticleCardDialog
           article={article}
           cDict={cDict.articleCardDialog}
@@ -62,7 +62,7 @@ export async function StatusBar({
         />
       </div>
 
-      <div className='w-2/12 flex-grow'>
+      <div className='w-2/12 grow'>
         <BoxCardDialog
           boxStatus={boxStatus}
           statusDivClass={boxStatusClass}
@@ -73,7 +73,7 @@ export async function StatusBar({
       </div>
 
       {pallet && palletStatus && (
-        <div className='w-2/12 flex-grow'>
+        <div className='w-2/12 grow'>
           <PalletCardDialog
             palletStatus={palletStatus}
             statusDivClass={palletStatusClass}

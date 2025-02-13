@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 card: null,
               }))
             }
-            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             type='button'
           >
             karta/pozycja
@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                 position: null,
               }))
             }
-            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+            className='rounded bg-slate-200 pb-1 pl-2 pr-2 pt-1  text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             type='button'
           >
             pozycja
@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         {/* {session && (
           <button
             onClick={() => signOut()}
-            className='w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-sm hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
+            className='w-20 rounded bg-red-600 p-2 text-center text-lg font-extralight text-slate-100 shadow-xs hover:bg-red-500 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-700'
             type='button'
           >
             wyloguj

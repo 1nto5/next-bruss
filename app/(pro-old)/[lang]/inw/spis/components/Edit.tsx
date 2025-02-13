@@ -298,13 +298,13 @@ export default function Edit() {
                   }}
                   placeholder='ilość'
                   defaultValue={quantity !== 0 ? quantity : undefined}
-                  className='rounded border-slate-700 bg-white p-2 text-center font-bold shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+                  className='rounded border-slate-700 bg-white p-2 text-center font-bold shadow-xs dark:bg-slate-900 dark:outline-slate-600'
                 />
 
                 {selectedArticle.converter && (
                   <select
                     onChange={(e) => setSelectedUnit(e.target.value)}
-                    className='w-12 rounded border-slate-700 bg-white p-1 text-center shadow-sm dark:bg-slate-900 dark:outline-slate-600'
+                    className='w-12 rounded border-slate-700 bg-white p-1 text-center shadow-xs dark:bg-slate-900 dark:outline-slate-600'
                     value={selectedUnit}
                   >
                     <option>kg</option>
@@ -376,7 +376,7 @@ export default function Edit() {
                   }
                 }
               }}
-              className='flex w-1/4 items-center justify-center rounded bg-slate-200 p-3 text-lg font-extralight text-slate-900 shadow-sm hover:bg-orange-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-orange-500'
+              className='flex w-1/4 items-center justify-center rounded bg-slate-200 p-3 text-lg font-extralight text-slate-900 shadow-xs hover:bg-orange-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-orange-500'
             >
               <FaArrowLeft />
             </button>
@@ -413,7 +413,7 @@ export default function Edit() {
                   setErrorMessage('Najpierw zapisz aktualną pozycję!');
                 }
               }}
-              className='flex w-1/4 items-center justify-center rounded bg-slate-200 p-3 text-lg font-extralight text-slate-900 shadow-sm hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
+              className='flex w-1/4 items-center justify-center rounded bg-slate-200 p-3 text-lg font-extralight text-slate-900 shadow-xs hover:bg-blue-400 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-blue-600'
             >
               <FaArrowRight />
             </button>

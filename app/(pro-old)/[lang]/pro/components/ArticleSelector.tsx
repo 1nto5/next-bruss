@@ -19,7 +19,7 @@ export default function ArticleSelector(props: StatusProps) {
         <button
           key={item.article}
           onClick={() => handleClick(item.article, item.name)}
-          className='m-8 rounded bg-slate-200 p-6 text-center text-3xl text-slate-900 shadow-sm hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
+          className='m-8 rounded bg-slate-200 p-6 text-center text-3xl text-slate-900 shadow-xs hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
         >
           <div className='flex flex-col items-center'>
             <span className='font-4xl'>{item.article}</span>

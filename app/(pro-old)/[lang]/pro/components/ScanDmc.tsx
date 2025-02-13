@@ -81,7 +81,7 @@ export default function ScanDmc(props: Props) {
   return (
     <div className='mt-10 flex items-center justify-center'>
       <input
-        className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
+        className='w-1/3 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-hidden focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
         value={dmc}
         onChange={(event) => setDmc(event.target.value)}
         onKeyDown={handleEnter}

@@ -114,7 +114,7 @@ export default function Position() {
             <button
               type='submit'
               onClick={handleConfirm}
-              className='w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-sm hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
+              className='w-1/2 rounded bg-slate-200 p-2 text-center text-sm font-extralight text-slate-900 shadow-xs hover:bg-bruss dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-bruss sm:text-base lg:text-lg'
             >
               potwierdź
             </button>

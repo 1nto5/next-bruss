@@ -14,7 +14,7 @@ type NumberButtonProps = {
 
 const NumberButton: React.FC<NumberButtonProps> = ({ onClick, value }) => (
   <button
-    className='m-2 inline-block h-24 w-24 rounded bg-slate-100 text-center text-4xl text-slate-900 shadow-sm hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
+    className='m-2 inline-block h-24 w-24 rounded bg-slate-100 text-center text-4xl text-slate-900 shadow-xs hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
     onClick={onClick}
     type='button'
   >
@@ -61,7 +61,7 @@ const NumLogIn = () => {
       onSubmit={handleLogin}
     >
       <input
-        className='w-1/5 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-none focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
+        className='w-1/5 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-hidden focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
         type='text'
         value={personalNumber}
         onChange={(e) => setPersonalNumber(e.target.value)}
@@ -86,7 +86,7 @@ const NumLogIn = () => {
         </div>
         <div>
           <button
-            className='m-2 inline-block h-24 w-24 rounded bg-red-500 text-center text-4xl text-slate-50 shadow-sm hover:bg-red-700 dark:bg-red-800 dark:text-slate-100 dark:hover:bg-red-600'
+            className='m-2 inline-block h-24 w-24 rounded bg-red-500 text-center text-4xl text-slate-50 shadow-xs hover:bg-red-700 dark:bg-red-800 dark:text-slate-100 dark:hover:bg-red-600'
             onClick={() => handleClickClear()}
             type='button'
           >
@@ -94,7 +94,7 @@ const NumLogIn = () => {
           </button>
           <NumberButton onClick={() => handleClickNumber(0)} value={0} />
           <button
-            className='m-2 h-24 w-24 rounded bg-bruss text-center text-4xl text-slate-50 shadow-sm hover:bg-green-700 dark:bg-green-800 dark:text-slate-100 dark:hover:bg-green-700'
+            className='m-2 h-24 w-24 rounded bg-bruss text-center text-4xl text-slate-50 shadow-xs hover:bg-green-700 dark:bg-green-800 dark:text-slate-100 dark:hover:bg-green-700'
             type='submit'
           >
             OK
