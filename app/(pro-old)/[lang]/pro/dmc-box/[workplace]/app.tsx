@@ -1,26 +1,26 @@
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { PersonContext } from '@/app/(pro-old)/[lang]/pro/lib/PersonContext';
-import { ScanContext } from '@/app/(pro-old)/[lang]/pro/lib/ScanContext';
-import { ArticleContext } from '@/app/(pro-old)/[lang]/pro/lib/ArticleContext';
 import { countInBox, getBoxSize } from '@/app/(pro-old)/[lang]/pro/actions';
-import NumLogIn from '@/app/(pro-old)/[lang]/pro/components/NumLogIn';
-import Status from '../components/Status';
 import ArticleSelector from '@/app/(pro-old)/[lang]/pro/components/ArticleSelector';
+import NumLogIn from '@/app/(pro-old)/[lang]/pro/components/NumLogIn';
 import ScanDmc from '@/app/(pro-old)/[lang]/pro/components/ScanDmc';
 import ScanHydraQr from '@/app/(pro-old)/[lang]/pro/components/ScanHydraQr';
-import toast from 'react-hot-toast';
 import config from '@/app/(pro-old)/[lang]/pro/config';
+import { ArticleContext } from '@/app/(pro-old)/[lang]/pro/lib/ArticleContext';
+import { PersonContext } from '@/app/(pro-old)/[lang]/pro/lib/PersonContext';
+import { ScanContext } from '@/app/(pro-old)/[lang]/pro/lib/ScanContext';
+import { usePathname } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import Status from '../components/Status';
 
 export default function App() {
   const personContext = useContext(PersonContext);
   const scanContext = useContext(ScanContext);
   const articleContext = useContext(ArticleContext);
   const pathname = usePathname();
-  const workplace = pathname.split('/').pop();
-  const workplaceType = pathname.split('/')[3];
+  const workplace = pathname?.split('/').pop();
+  const workplaceType = pathname?.split('/')[3];
   const workplaceExists = config.some(
     (item) => item.workplace === workplace && item.type === workplaceType,
   );

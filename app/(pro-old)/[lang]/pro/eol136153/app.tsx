@@ -1,16 +1,15 @@
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { PersonContext } from '../lib/PersonContext';
-import { ScanContext } from '../lib/ScanContext';
+import { useContext, useEffect, useState } from 'react';
 import { countBoxesOnPallet, getPalletSize } from '../actions';
 import NumLogIn from '../components/NumLogIn';
-import Status from './components/Status';
-import ScanHydraQr from './components/ScanHydraQr';
-import ScanPalletQr from '../components/ScanPalletQr';
 import PrintPalletLabel from '../components/PrintPalletLabel';
-import toast from 'react-hot-toast';
+import ScanPalletQr from '../components/ScanPalletQr';
+import { PersonContext } from '../lib/PersonContext';
+import { ScanContext } from '../lib/ScanContext';
+import ScanHydraQr from './components/ScanHydraQr';
+import Status from './components/Status';
 
 const article136 = '28067';
 const article153 = '28042';
@@ -19,7 +18,7 @@ export default function App() {
   const personContext = useContext(PersonContext);
   const scanContext = useContext(ScanContext);
   const pathname = usePathname();
-  const workplace = pathname.split('pro/')[1];
+  const workplace = pathname?.split('pro/')[1];
   const [isPending, setIsPending] = useState(true);
   const [boxesOnPallet136, setBoxesOnPallet136] = useState(0);
   const [palletSize136, setPalletSize136] = useState(0);
@@ -39,10 +38,10 @@ export default function App() {
           palletSize136,
           palletSize153,
         ] = await Promise.all([
-          countBoxesOnPallet(workplace, article136),
-          countBoxesOnPallet(workplace, article153),
-          getPalletSize(workplace, article136),
-          getPalletSize(workplace, article153),
+          countBoxesOnPallet(workplace || 'error', article136),
+          countBoxesOnPallet(workplace || 'error', article153),
+          getPalletSize(workplace || 'error', article136),
+          getPalletSize(workplace || 'error', article153),
         ]);
         setBoxesOnPallet136(boxesOnPallet136);
         setBoxesOnPallet153(boxesOnPallet153);

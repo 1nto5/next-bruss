@@ -1,25 +1,25 @@
 'use client';
-import { useCallback } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Drum } from 'lucide-react'; // Removed unused import of VolumeX
-import { Slider } from '@/components/ui/slider';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Slider } from '@/components/ui/slider';
+import { Drum } from 'lucide-react'; // Removed unused import of VolumeX
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback } from 'react';
 
 export default function VolumeButton() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const volume = searchParams.get('volume');
+  const volume = searchParams?.get('volume');
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString());
       params.set(name, value);
 
       return params.toString();

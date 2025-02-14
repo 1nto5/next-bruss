@@ -46,27 +46,27 @@ export default function DmcTableFilteringAndOptions({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status'));
+  const [statusFilter, setStatusFilter] = useState(searchParams?.get('status'));
   const [fromFilter, setFromFilter] = useState(() => {
-    const fromParam = searchParams.get('from');
+    const fromParam = searchParams?.get('from');
     return fromParam ? new Date(fromParam) : undefined;
   });
   const [toFilter, setToFilter] = useState(() => {
-    const toParam = searchParams.get('to');
+    const toParam = searchParams?.get('to');
     return toParam ? new Date(toParam) : undefined;
   });
-  const [dmcFilter, setDmcFilter] = useState(searchParams.get('dmc') || '');
+  const [dmcFilter, setDmcFilter] = useState(searchParams?.get('dmc') || '');
   const [hydraFilter, setHydraFilter] = useState(
-    searchParams.get('hydra_batch') || '',
+    searchParams?.get('hydra_batch') || '',
   );
   const [palletFilter, setPalletFilter] = useState(
-    searchParams.get('pallet_batch') || '',
+    searchParams?.get('pallet_batch') || '',
   );
   const [workplaceFilter, setWorkplaceFilter] = useState(
-    searchParams.get('workplace') || '',
+    searchParams?.get('workplace') || '',
   );
   const [articleFilter, setArticleFilter] = useState(
-    searchParams.get('article') || '',
+    searchParams?.get('article') || '',
   );
 
   const [openStatus, setOpenStatus] = useState(false);
@@ -83,9 +83,9 @@ export default function DmcTableFilteringAndOptions({
     setWorkplaceFilter('');
     setArticleFilter('');
 
-    if (searchParams.toString()) {
+    if (searchParams?.toString()) {
       setIsPendingSearch(true);
-      router.push(pathname);
+      router.push(pathname || '');
     }
   };
 
@@ -101,7 +101,7 @@ export default function DmcTableFilteringAndOptions({
     if (workplaceFilter) params.set('workplace', workplaceFilter);
     if (articleFilter) params.set('article', articleFilter);
     const newUrl = `${pathname}?${params.toString()}`;
-    if (newUrl !== `${pathname}?${searchParams.toString()}`) {
+    if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
       router.push(newUrl);
     } else {

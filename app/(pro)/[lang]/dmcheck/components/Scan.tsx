@@ -38,7 +38,7 @@ export function Scan({
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const volume = parseFloat(searchParams.get('volume') || '0.75');
+  const volume = parseFloat(searchParams?.get('volume') || '0.75');
   if (isNaN(volume) || volume < 0 || volume > 1) {
     throw new Error(
       'Invalid volume value. Please provide a value between 0.0 and 1.0.',
@@ -54,7 +54,7 @@ export function Scan({
 
   const createQueryString = useCallback(
     (dmc: string, time: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParams?.toString());
 
       const prevLastFive = params.get('lastFive') || '';
       let lastFiveArray = prevLastFive ? prevLastFive.split(',') : [];
