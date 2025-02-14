@@ -35,6 +35,7 @@ import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 import { useEffect } from 'react';
+import { FailureOptionType } from '../../lib/types-failures';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
@@ -42,8 +43,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
-  // lang: string;
-  // session: Session | null;
+  failuresOptions: FailureOptionType[];
 }
 
 export function DataTable<TData, TValue>({
@@ -51,6 +51,7 @@ export function DataTable<TData, TValue>({
   data,
   fetchTimeLocaleString,
   fetchTime,
+  failuresOptions,
   // lang,
   // session,
 }: DataTableProps<TData, TValue>) {
@@ -94,6 +95,7 @@ export function DataTable<TData, TValue>({
         <TableFilteringAndOptions
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}
+          failuresOptions={failuresOptions}
         />
       </CardHeader>
       <CardContent>

@@ -1,9 +1,5 @@
 'use client';
 
-import {
-  failuresOptions,
-  stationsOptions,
-} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { AddFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,8 +49,13 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { insertFailure } from '../actions';
+import { FailureOptionType } from '../lib/types-failures';
 
-export default function AddFailureDialog({}: {}) {
+export default function AddFailureDialog({
+  failuresOptions,
+}: {
+  failuresOptions: FailureOptionType[];
+}) {
   const [open, setOpen] = useState(false);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
@@ -81,17 +82,27 @@ export default function AddFailureDialog({}: {}) {
   }, [open]);
 
   const selectedStation = form.watch('station');
+  const selectedLine = form.watch('line');
+
+  useEffect(() => {
+    form.setValue('station', '');
+    form.setValue('failure', '');
+  }, [selectedLine]);
+
   useEffect(() => {
     form.setValue('failure', '');
   }, [selectedStation]);
 
   const selectedFailure = form.watch('failure');
 
-  const filteredFailures = [
-    'konserwacja',
-    ...(failuresOptions.find((option) => option.station === selectedStation)
-      ?.options || []),
-  ].sort();
+  const filteredStations = failuresOptions
+    .filter((option) => option.line === selectedLine)
+    .sort((a, b) => a.station.localeCompare(b.station));
+
+  const filteredFailures = (
+    filteredStations.filter((option) => option.station === selectedStation)[0]
+      ?.options || []
+  ).sort((a, b) => a.localeCompare(b));
 
   const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
     setIsPendingInserting(true);
@@ -143,13 +154,13 @@ export default function AddFailureDialog({}: {}) {
                           defaultValue={field.value}
                           className='flex flex-col space-y-1'
                         >
-                          <FormItem className='flex items-center space-x-3 space-y-0'>
+                          <FormItem className='flex items-center space-y-0 space-x-3'>
                             <FormControl>
                               <RadioGroupItem value='lv1' />
                             </FormControl>
                             <FormLabel className='font-normal'>LV1</FormLabel>
                           </FormItem>
-                          <FormItem className='flex items-center space-x-3 space-y-0'>
+                          <FormItem className='flex items-center space-y-0 space-x-3'>
                             <FormControl>
                               <RadioGroupItem value='lv2' />
                             </FormControl>
@@ -178,7 +189,7 @@ export default function AddFailureDialog({}: {}) {
                               <Button
                                 variant='outline'
                                 role='combobox'
-                                // aria-expanded={open}
+                                disabled={!selectedLine}
                                 className={cn(
                                   'w-full justify-between',
                                   !form.getValues('station') && 'opacity-50',
@@ -204,10 +215,10 @@ export default function AddFailureDialog({}: {}) {
                                       <Check className='mr-2 h-4 w-4 opacity-0' />
                                       nie wybrano
                                     </CommandItem>
-                                    {stationsOptions.map((station) => (
+                                    {filteredStations.map((option) => (
                                       <CommandItem
-                                        key={station}
-                                        value={station}
+                                        key={option.station}
+                                        value={option.station}
                                         onSelect={(currentValue) => {
                                           form.setValue(
                                             'station',
@@ -220,12 +231,12 @@ export default function AddFailureDialog({}: {}) {
                                           className={cn(
                                             'mr-2 h-4 w-4',
                                             form.getValues('station') ===
-                                              station
+                                              option.station
                                               ? 'opacity-100'
                                               : 'opacity-0',
                                           )}
                                         />
-                                        {station}
+                                        {option.station}
                                       </CommandItem>
                                     ))}
                                   </CommandGroup>

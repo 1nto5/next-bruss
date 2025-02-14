@@ -2,7 +2,23 @@
 import { Locale } from '@/i18n.config';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { FailureType } from './lib/types-failures';
+import { FailureOptionType, FailureType } from './lib/types-failures';
+
+async function getFailuresOptions(): Promise<FailureOptionType[]> {
+  const res = await fetch(`${process.env.API}/failures/lv/options`, {
+    next: { revalidate: 0, tags: ['failures-lv-options'] },
+  });
+
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(
+      `getFailuresOptions error: ${res.status} ${res.statusText} ${json.error}`,
+    );
+  }
+
+  const failuresOptions: FailureOptionType[] = await res.json();
+  return failuresOptions;
+}
 
 async function getFailures(
   lang: string,
@@ -69,12 +85,15 @@ export default async function FailuresPage(props: {
     searchParams,
   ));
 
+  const failuresOptions = await getFailuresOptions();
+
   return (
     <DataTable
       columns={columns}
       data={formattedFailures}
       fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
+      failuresOptions={failuresOptions}
     />
   );
 }

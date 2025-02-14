@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  failuresOptions,
-  stationsOptions,
-} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
+import { stationsOptions } from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -36,39 +33,42 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { revalidateFailures as revalidate } from '../actions';
+import { FailureOptionType } from '../lib/types-failures';
 import AddFailureDialog from './add-failure-dialog';
 
 export default function TableFilteringAndOptions({
   setIsPendingSearch,
   isPendingSearch,
+  failuresOptions,
 }: {
   setIsPendingSearch: (value: boolean) => void;
   isPendingSearch: boolean;
+  failuresOptions: FailureOptionType[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [fromFilter, setFromFilter] = useState(() => {
-    const fromParam = searchParams.get('from');
+    const fromParam = searchParams?.get('from');
     return fromParam ? new Date(fromParam) : undefined;
   });
   const [toFilter, setToFilter] = useState(() => {
-    const toParam = searchParams.get('to');
+    const toParam = searchParams?.get('to');
     return toParam ? new Date(toParam) : undefined;
   });
-  const [lineFilter, setLineFilter] = useState(searchParams.get('line') || '');
+  const [lineFilter, setLineFilter] = useState(searchParams?.get('line') || '');
   const [stationFilter, setStationFilter] = useState(
-    searchParams.get('station') || '',
+    searchParams?.get('station') || '',
   );
   const [failureFilter, setFailureFilter] = useState(
-    searchParams.get('failure') || '',
+    searchParams?.get('failure') || '',
   );
   const [supervisorFilter, setSupervisorFilter] = useState(
-    searchParams.get('supervisor') || '',
+    searchParams?.get('supervisor') || '',
   );
   const [responsibleFilter, setResponsibleFilter] = useState(
-    searchParams.get('responsible') || '',
+    searchParams?.get('responsible') || '',
   );
 
   const areFiltersSet =
@@ -91,9 +91,9 @@ export default function TableFilteringAndOptions({
     setFailureFilter('');
     setSupervisorFilter('');
     setResponsibleFilter('');
-    if (searchParams.toString()) {
+    if (searchParams?.toString()) {
       setIsPendingSearch(true);
-      router.push(pathname);
+      router.push(pathname || '');
     }
   };
 
@@ -108,7 +108,7 @@ export default function TableFilteringAndOptions({
     if (supervisorFilter) params.set('supervisor', supervisorFilter);
     if (responsibleFilter) params.set('responsible', responsibleFilter);
     const newUrl = `${pathname}?${params.toString()}`;
-    if (newUrl !== `${pathname}?${searchParams.toString()}`) {
+    if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
       router.push(newUrl);
     } else {
@@ -167,7 +167,7 @@ export default function TableFilteringAndOptions({
           onValueChange={(value) => {
             setLineFilter(value);
           }}
-          className='flex flex-row '
+          className='flex flex-row'
         >
           <div className='flex items-center space-x-2'>
             <RadioGroupItem value='lv1' id='lv1' />
@@ -355,7 +355,7 @@ export default function TableFilteringAndOptions({
             <Sheet /> <span>Export do Excel</span>
           </Button>
         </Link>
-        <AddFailureDialog />
+        <AddFailureDialog failuresOptions={failuresOptions} />
       </div>
     </form>
   );

@@ -143,7 +143,7 @@ export default function AddOvenProcessDialog({}: {}) {
                             {Array.from({ length: 7 }, (_, i) => (
                               <FormItem
                                 key={i + 1}
-                                className='flex items-center space-x-3 space-y-0'
+                                className='flex items-center space-y-0 space-x-3'
                               >
                                 <FormControl>
                                   <RadioGroupItem value={(i + 1).toString()} />
@@ -177,6 +177,10 @@ export default function AddOvenProcessDialog({}: {}) {
                                 autoFocus
                                 onChange={(e) => {
                                   field.onChange(e);
+                                  setSelectedArticle(undefined);
+                                  form.clearErrors('article');
+                                  form.clearErrors('configFiltr');
+                                  form.setValue('article', '');
                                   refetchOvenConfigs();
                                 }}
                                 placeholder={
@@ -196,42 +200,57 @@ export default function AddOvenProcessDialog({}: {}) {
                       render={({ field }) => (
                         <FormItem className='space-y-3 rounded-lg border p-4'>
                           {/* <FormLabel>Artikel auswählen</FormLabel> */}
+                          {ovenConfigs?.length === 0 &&
+                            !isFetchingOvenConfigs && (
+                              <FormMessage>
+                                Keine Suchergebnisse gefunden!
+                              </FormMessage>
+                            )}
+                          {isFetchingOvenConfigs && (
+                            <FormMessage>Suche nach Artikeln...</FormMessage>
+                          )}
+                          {!isFetchingOvenConfigs &&
+                            ovenConfigs?.length !== 0 && (
+                              <>
+                                <FormControl>
+                                  <RadioGroup
+                                    onValueChange={(value) => {
+                                      field.onChange(value);
+                                      const selectedArticle = (
+                                        ovenConfigs || []
+                                      ).find(
+                                        (article) =>
+                                          article.articleNumber === value,
+                                      );
+                                      setSelectedArticle(selectedArticle);
+                                    }}
+                                    // defaultValue={field.value}
+                                    value={field.value}
+                                    className='flex flex-col space-y-2'
+                                  >
+                                    {(ovenConfigs ?? []).map((config) => (
+                                      <FormItem
+                                        key={config.articleNumber}
+                                        className='flex items-center space-y-0 space-x-3'
+                                      >
+                                        <FormControl>
+                                          <RadioGroupItem
+                                            value={config.articleNumber}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className='font-normal'>
+                                          {config.articleNumber} -{' '}
+                                          {config.articleName} - {config.temp}°C
+                                          - {config.ovenTime / 60} min
+                                        </FormLabel>
+                                      </FormItem>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
 
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={(value) => {
-                                field.onChange(value);
-                                const selectedArticle = (
-                                  ovenConfigs || []
-                                ).find(
-                                  (article) => article.articleNumber === value,
-                                );
-                                setSelectedArticle(selectedArticle);
-                              }}
-                              // defaultValue={field.value}
-                              value={field.value}
-                              className='flex flex-col space-y-2'
-                            >
-                              {(ovenConfigs ?? []).map((config) => (
-                                <FormItem
-                                  key={config.articleNumber}
-                                  className='flex items-center space-x-3 space-y-0'
-                                >
-                                  <FormControl>
-                                    <RadioGroupItem
-                                      value={config.articleNumber}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className='font-normal'>
-                                    {config.articleNumber} -{' '}
-                                    {config.articleName} - {config.temp}°C -{' '}
-                                    {config.ovenTime / 60} min
-                                  </FormLabel>
-                                </FormItem>
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
+                                <FormMessage />
+                              </>
+                            )}
                         </FormItem>
                       )}
                     />
