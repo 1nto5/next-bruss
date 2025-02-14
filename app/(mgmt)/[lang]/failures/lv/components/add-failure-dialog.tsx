@@ -38,7 +38,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Check, ChevronsUpDown, CopyPlus, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
@@ -53,18 +53,20 @@ import { FailureOptionType } from '../lib/types-failures';
 
 export default function AddFailureDialog({
   failuresOptions,
+  line,
 }: {
   failuresOptions: FailureOptionType[];
+  line: string;
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
-
   const form = useForm<z.infer<typeof AddFailureSchema>>({
     resolver: zodResolver(AddFailureSchema),
     defaultValues: {
+      line: line,
       responsible: '',
       supervisor: '',
       from: new Date(),
@@ -79,6 +81,7 @@ export default function AddFailureDialog({
         from: new Date(),
       });
     }
+    form.setValue('line', line);
   }, [open]);
 
   const selectedStation = form.watch('station');
@@ -133,303 +136,324 @@ export default function AddFailureDialog({
       </DialogTrigger>
       <DialogContent className='w-[700px] sm:max-w-[700px]'>
         <DialogHeader>
-          <DialogTitle>Nowa awaria</DialogTitle>
+          <DialogTitle>
+            Nowa awaria{' '}
+            {selectedLine && 'na lini: ' + selectedLine.toUpperCase()}
+          </DialogTitle>
           {/* <DialogDescription>
             Make changes to your profile here. Click save when you're done.
           </DialogDescription> */}
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[450px]'>
+            <ScrollArea className='h-[70vh]'>
               <div className='grid items-center gap-2 p-2'>
-                <FormField
-                  control={form.control}
-                  name='line'
-                  render={({ field }) => (
-                    <FormItem className='mb-2 space-y-3'>
-                      <FormLabel>Linia</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className='flex flex-col space-y-1'
-                        >
-                          <FormItem className='flex items-center space-y-0 space-x-3'>
-                            <FormControl>
-                              <RadioGroupItem value='lv1' />
-                            </FormControl>
-                            <FormLabel className='font-normal'>LV1</FormLabel>
-                          </FormItem>
-                          <FormItem className='flex items-center space-y-0 space-x-3'>
-                            <FormControl>
-                              <RadioGroupItem value='lv2' />
-                            </FormControl>
-                            <FormLabel className='font-normal'>LV2</FormLabel>
-                          </FormItem>
-                        </RadioGroup>
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='station'
-                  render={({ field }) => (
-                    <FormItem className='w-[200px]'>
-                      <div className='flex flex-col items-start space-y-2'>
-                        <FormLabel>Stacja</FormLabel>
+                {!selectedLine && (
+                  <FormField
+                    control={form.control}
+                    name='line'
+                    render={({ field }) => (
+                      <FormItem className='mb-2 space-y-3'>
+                        <FormLabel>Linia</FormLabel>
                         <FormControl>
-                          <Popover
-                            open={openStation}
-                            onOpenChange={setOpenStation}
-                            modal={true}
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className='flex flex-col space-y-1'
                           >
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant='outline'
-                                role='combobox'
-                                disabled={!selectedLine}
-                                className={cn(
-                                  'w-full justify-between',
-                                  !form.getValues('station') && 'opacity-50',
-                                )}
-                              >
-                                {selectedStation ? selectedStation : 'wybierz'}
-                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-[200px] p-0'>
-                              <Command>
-                                <CommandInput placeholder='wyszukaj...' />
-                                <CommandList>
-                                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      key='reset'
-                                      onSelect={() => {
-                                        form.setValue('station', '');
-                                        setOpenStation(false);
-                                      }}
-                                    >
-                                      <Check className='mr-2 h-4 w-4 opacity-0' />
-                                      nie wybrano
-                                    </CommandItem>
-                                    {filteredStations.map((option) => (
-                                      <CommandItem
-                                        key={option.station}
-                                        value={option.station}
-                                        onSelect={(currentValue) => {
-                                          form.setValue(
-                                            'station',
-                                            currentValue,
-                                          );
-                                          setOpenStation(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            form.getValues('station') ===
-                                              option.station
-                                              ? 'opacity-100'
-                                              : 'opacity-0',
-                                          )}
-                                        />
-                                        {option.station}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
+                            <FormItem className='flex items-center space-y-0 space-x-3'>
+                              <FormControl>
+                                <RadioGroupItem value='lv1' />
+                              </FormControl>
+                              <FormLabel className='font-normal'>LV1</FormLabel>
+                            </FormItem>
+                            <FormItem className='flex items-center space-y-0 space-x-3'>
+                              <FormControl>
+                                <RadioGroupItem value='lv2' />
+                              </FormControl>
+                              <FormLabel className='font-normal'>LV2</FormLabel>
+                            </FormItem>
+                          </RadioGroup>
                         </FormControl>
-                        {/* <FormMessage /> */}
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name='failure'
-                  render={({ field }) => (
-                    <FormItem className='w-[350px]'>
-                      <div className='flex flex-col items-start space-y-2'>
-                        <FormLabel>Awaria</FormLabel>
-                        <FormControl>
-                          <Popover
-                            open={openFailure}
-                            onOpenChange={setOpenFailure}
-                            modal={true}
-                          >
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant='outline'
-                                role='combobox'
-                                className={cn(
-                                  'w-full justify-between',
-                                  !form.getValues('failure') && 'opacity-50',
-                                )}
-                                disabled={!selectedStation}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+                {selectedLine && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name='station'
+                      render={({ field }) => (
+                        <FormItem className='w-[200px]'>
+                          <div className='flex flex-col items-start space-y-2'>
+                            <FormLabel>Stacja</FormLabel>
+                            <FormControl>
+                              <Popover
+                                open={openStation}
+                                onOpenChange={setOpenStation}
+                                modal={true}
                               >
-                                {selectedFailure ? selectedFailure : 'wybierz'}
-                                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-[350px] p-0'>
-                              <Command>
-                                <CommandInput placeholder='wyszukaj...' />
-                                <CommandList>
-                                  <CommandEmpty>Nie znaleziono.</CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      key='reset'
-                                      onSelect={() => {
-                                        form.setValue('failure', '');
-                                        setOpenFailure(false);
-                                      }}
-                                    >
-                                      <Check className='mr-2 h-4 w-4 opacity-0' />
-                                      nie wybrano
-                                    </CommandItem>
-                                    {filteredFailures.map((failure) => (
-                                      <CommandItem
-                                        key={failure}
-                                        value={failure}
-                                        onSelect={(currentValue) => {
-                                          form.setValue(
-                                            'failure',
-                                            currentValue,
-                                          );
-                                          setOpenFailure(false);
-                                        }}
-                                      >
-                                        <Check
-                                          className={cn(
-                                            'mr-2 h-4 w-4',
-                                            form.getValues('failure') ===
-                                              failure
-                                              ? 'opacity-100'
-                                              : 'opacity-0',
-                                          )}
-                                        />
-                                        {failure}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                        </FormControl>
-                        {/* <FormMessage /> */}
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    role='combobox'
+                                    disabled={!selectedLine}
+                                    className={cn(
+                                      'w-full justify-between',
+                                      !form.getValues('station') &&
+                                        'opacity-50',
+                                    )}
+                                  >
+                                    {selectedStation
+                                      ? selectedStation
+                                      : 'wybierz'}
+                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className='w-[200px] p-0'>
+                                  <Command>
+                                    <CommandInput placeholder='wyszukaj...' />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        Nie znaleziono.
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        <CommandItem
+                                          key='reset'
+                                          onSelect={() => {
+                                            form.setValue('station', '');
+                                            setOpenStation(false);
+                                          }}
+                                        >
+                                          <Check className='mr-2 h-4 w-4 opacity-0' />
+                                          nie wybrano
+                                        </CommandItem>
+                                        {filteredStations.map((option) => (
+                                          <CommandItem
+                                            key={option.station}
+                                            value={option.station}
+                                            onSelect={(currentValue) => {
+                                              form.setValue(
+                                                'station',
+                                                currentValue,
+                                              );
+                                              setOpenStation(false);
+                                            }}
+                                          >
+                                            <Check
+                                              className={cn(
+                                                'mr-2 h-4 w-4',
+                                                form.getValues('station') ===
+                                                  option.station
+                                                  ? 'opacity-100'
+                                                  : 'opacity-0',
+                                              )}
+                                            />
+                                            {option.station}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name='from'
-                  render={({ field }) => (
-                    <FormItem className='w-[350px]'>
-                      <FormLabel>Rozpoczęcie</FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          max={new Date(Date.now())}
-                          min={new Date(Date.now() - 3600 * 1000)}
-                          modal
-                          value={field.value}
-                          onChange={field.onChange}
-                          timePicker={{ hour: true, minute: true }}
-                          renderTrigger={({ open, value, setOpen }) => (
-                            <DateTimeInput
-                              value={value}
-                              onChange={(x) => !open && field.onChange(x)}
-                              format='dd/MM/yyyy HH:mm'
-                              disabled={open}
-                              onCalendarClick={() => setOpen(!open)}
+                    <FormField
+                      control={form.control}
+                      name='failure'
+                      render={({ field }) => (
+                        <FormItem className='w-[350px]'>
+                          <div className='flex flex-col items-start space-y-2'>
+                            <FormLabel>Awaria</FormLabel>
+                            <FormControl>
+                              <Popover
+                                open={openFailure}
+                                onOpenChange={setOpenFailure}
+                                modal={true}
+                              >
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    role='combobox'
+                                    className={cn(
+                                      'w-full justify-between',
+                                      !form.getValues('failure') &&
+                                        'opacity-50',
+                                    )}
+                                    disabled={!selectedStation}
+                                  >
+                                    {selectedFailure
+                                      ? selectedFailure
+                                      : 'wybierz'}
+                                    <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className='w-[350px] p-0'>
+                                  <Command>
+                                    <CommandInput placeholder='wyszukaj...' />
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        Nie znaleziono.
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        <CommandItem
+                                          key='reset'
+                                          onSelect={() => {
+                                            form.setValue('failure', '');
+                                            setOpenFailure(false);
+                                          }}
+                                        >
+                                          <Check className='mr-2 h-4 w-4 opacity-0' />
+                                          nie wybrano
+                                        </CommandItem>
+                                        {filteredFailures.map((failure) => (
+                                          <CommandItem
+                                            key={failure}
+                                            value={failure}
+                                            onSelect={(currentValue) => {
+                                              form.setValue(
+                                                'failure',
+                                                currentValue,
+                                              );
+                                              setOpenFailure(false);
+                                            }}
+                                          >
+                                            <Check
+                                              className={cn(
+                                                'mr-2 h-4 w-4',
+                                                form.getValues('failure') ===
+                                                  failure
+                                                  ? 'opacity-100'
+                                                  : 'opacity-0',
+                                              )}
+                                            />
+                                            {failure}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name='from'
+                      render={({ field }) => (
+                        <FormItem className='w-[350px]'>
+                          <FormLabel>Rozpoczęcie</FormLabel>
+                          <FormControl>
+                            <DateTimePicker
+                              max={new Date(Date.now())}
+                              min={new Date(Date.now() - 3600 * 1000)}
+                              modal
+                              value={field.value}
+                              onChange={field.onChange}
+                              timePicker={{ hour: true, minute: true }}
+                              renderTrigger={({ open, value, setOpen }) => (
+                                <DateTimeInput
+                                  value={value}
+                                  onChange={(x) => !open && field.onChange(x)}
+                                  format='dd/MM/yyyy HH:mm'
+                                  disabled={open}
+                                  onCalendarClick={() => setOpen(!open)}
+                                />
+                              )}
                             />
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name='supervisor'
-                  render={({ field }) => (
-                    <FormItem className='w-[200px]'>
-                      <FormLabel>Nadzorujący</FormLabel>
-                      <FormControl>
-                        <Input placeholder='' {...field} />
-                      </FormControl>
-                      {/* <FormDescription>
+                    <FormField
+                      control={form.control}
+                      name='supervisor'
+                      render={({ field }) => (
+                        <FormItem className='w-[200px]'>
+                          <FormLabel>Nadzorujący</FormLabel>
+                          <FormControl>
+                            <Input placeholder='' {...field} />
+                          </FormControl>
+                          {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='responsible'
-                  render={({ field }) => (
-                    <FormItem className='w-[200px]'>
-                      <FormLabel>Odpowiedzialny</FormLabel>
-                      <FormControl>
-                        <Input placeholder='' {...field} />
-                      </FormControl>
-                      {/* <FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name='responsible'
+                      render={({ field }) => (
+                        <FormItem className='w-[200px]'>
+                          <FormLabel>Odpowiedzialny</FormLabel>
+                          <FormControl>
+                            <Input placeholder='' {...field} />
+                          </FormControl>
+                          {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name='solution'
-                  render={({ field }) => (
-                    <FormItem className='w-[400px]'>
-                      <FormLabel>Rozwiązanie</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name='solution'
+                      render={({ field }) => (
+                        <FormItem className='w-[400px]'>
+                          <FormLabel>Rozwiązanie</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                          {/* <FormMessage /> */}
+                        </FormItem>
+                      )}
+                    />
 
-                <FormField
-                  control={form.control}
-                  name='comment'
-                  render={({ field }) => (
-                    <FormItem className='w-[400px]'>
-                      <FormLabel>Komentarz</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      {/* <FormMessage /> */}
-                    </FormItem>
-                  )}
-                />
+                    <FormField
+                      control={form.control}
+                      name='comment'
+                      render={({ field }) => (
+                        <FormItem className='w-[400px]'>
+                          <FormLabel>Komentarz</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                          {/* <FormMessage /> */}
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
               </div>
             </ScrollArea>
             <DialogFooter className='mt-4'>
               {isPendingInsert ? (
-                <Button disabled>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Dodaj
+                <Button className='w-full' disabled>
+                  <CopyPlus className='animate-spin' />
+                  Dodawanie awarii...
                 </Button>
               ) : (
-                <Button type='submit'>Dodaj</Button>
+                <Button className='w-full' type='submit'>
+                  <CopyPlus /> Dodaj awarię
+                </Button>
               )}
             </DialogFooter>
           </form>

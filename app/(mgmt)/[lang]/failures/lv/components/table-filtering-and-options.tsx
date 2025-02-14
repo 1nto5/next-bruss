@@ -71,14 +71,14 @@ export default function TableFilteringAndOptions({
     searchParams?.get('responsible') || '',
   );
 
-  const areFiltersSet =
-    fromFilter ||
-    toFilter ||
-    lineFilter ||
-    stationFilter ||
-    failureFilter ||
-    supervisorFilter ||
-    responsibleFilter;
+  // const areFiltersSet =
+  //   fromFilter ||
+  //   toFilter ||
+  //   lineFilter ||
+  //   stationFilter ||
+  //   failureFilter ||
+  //   supervisorFilter ||
+  //   responsibleFilter;
 
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
@@ -355,7 +355,7 @@ export default function TableFilteringAndOptions({
             <Sheet /> <span>Export do Excel</span>
           </Button>
         </Link>
-        <AddFailureDialog failuresOptions={failuresOptions} />
+        <AddFailureDialog failuresOptions={failuresOptions} line={lineFilter} />
       </div>
     </form>
   );
