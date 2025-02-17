@@ -7,8 +7,9 @@ import { FailureOptionType, FailureType } from './lib/types-failures';
 async function getFailuresOptions(): Promise<FailureOptionType[]> {
   const res = await fetch(`${process.env.API}/failures/lv/options`, {
     next: {
-      revalidate: 60 * 60 * 8,
-      tags: ['failures-options-lv'],
+      // revalidate: 60 * 60 * 8,
+      revalidate: 0,
+      tags: ['failures-lv-options'],
     },
   });
 
