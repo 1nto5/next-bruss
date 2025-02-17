@@ -70,11 +70,6 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           description: `Zarządzanie odchyleniami produkcji.`,
         },
         {
-          href: '/capa',
-          title: `CAPA`,
-          description: `Tabela CAPA dla artykułów.`,
-        },
-        {
           href: '/inw-2/spis',
           title: `${dict?.header?.inventory?.inventory2.title}`,
           description: `${dict?.header?.inventory?.inventory.description}`,
@@ -192,10 +187,10 @@ export default function Header({ session, dict, lang }: HeaderProps) {
   return (
     // <header className='px-6 py-4 sm:flex sm:justify-between'>
     <header
-      className={`sticky top-0 z-50 px-6 py-4 transition-colors duration-200 sm:flex sm:justify-between ${isScrolled ? 'border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60' : 'bg-background'}`}
+      className={`sticky top-0 z-50 px-6 py-4 transition-colors duration-200 sm:flex sm:justify-between ${isScrolled ? 'bg-background/95 supports-backdrop-filter:bg-background/60 border-b backdrop-blur-sm' : 'bg-background'}`}
     >
       <Container>
-        <div className='relative flex h-6 w-full items-center justify-between '>
+        <div className='relative flex h-6 w-full items-center justify-between'>
           <div className='flex items-center'>
             <Sheet>
               <SheetTrigger>
@@ -319,13 +314,13 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors select-none',
             className,
           )}
           {...props}
         >
-          <div className='text-sm font-medium leading-none'>{title}</div>
-          <p className='line-clamp-2 text-sm leading-snug text-muted-foreground'>
+          <div className='text-sm leading-none font-medium'>{title}</div>
+          <p className='text-muted-foreground line-clamp-2 text-sm leading-snug'>
             {children}
           </p>
         </a>
