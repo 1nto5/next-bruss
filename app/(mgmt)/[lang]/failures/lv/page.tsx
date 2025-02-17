@@ -8,7 +8,7 @@ async function getFailuresOptions(): Promise<FailureOptionType[]> {
   const res = await fetch(`${process.env.API}/failures/lv/options`, {
     next: {
       revalidate: 60 * 60 * 8,
-      tags: ['failures-lv-options'],
+      tags: ['failures-options-lv'],
     },
   });
 

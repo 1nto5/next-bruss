@@ -1,6 +1,5 @@
 'use client';
 
-import { stationsOptions } from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -117,6 +116,10 @@ export default function TableFilteringAndOptions({
     }
   };
 
+  const stationsOptions = failuresOptions
+    .filter((option) => option.line === lineFilter)
+    .map((option) => option.station);
+
   const filteredFailures =
     failuresOptions.find((option) => option.station === stationFilter)
       ?.options || [];
@@ -183,6 +186,7 @@ export default function TableFilteringAndOptions({
             <Button
               variant='outline'
               role='combobox'
+              disabled={!lineFilter}
               className={cn('justify-between', !stationFilter && 'opacity-50')}
             >
               {stationFilter
