@@ -1,9 +1,5 @@
 'use client';
 
-import {
-  failuresOptions,
-  stationsOptions,
-} from '@/app/(mgmt)/[lang]/failures/lv/lib/options-failures-lv2';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -14,31 +10,19 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Switch } from '@/components/ui/switch';
 import {
   sectorsSelectOptions,
   warehouseSelectOptions,
 } from '@/lib/options/inventory';
 import { cn } from '@/lib/utils';
-import {
-  Check,
-  ChevronsUpDown,
-  CircleX,
-  RefreshCcw,
-  Search,
-  Sheet,
-} from 'lucide-react';
-import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { setTokenSourceMapRange } from 'typescript';
+import { Check, ChevronsUpDown, CircleX, RefreshCcw } from 'lucide-react';
+import { useState } from 'react';
+
 import { revalidateCards as revalidate } from '../actions';
 
 export default function CardsTableFilteringAndOptions({
