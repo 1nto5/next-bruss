@@ -17,3 +17,13 @@ Logowanie do całej aplikacji
 Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
 */
+// TODO: synchronization employees with r2platnik db?
+
+// 1. TL/GL składa wniosek o wykonywanie nadgodzin (weekend)
+// 2. Dyrektor zatwierdza + powiadomienia mailowe (najlipiej z linkiem do zatwierdzenia)
+// 3. TL/GL dostaje powiadomienia o zgodzie / odrzuceniu
+
+// - zamiana 1:1 pracownika po zaakceptowaniu
+// - formularz od Mariola - zgodność
+// - jeden wniosek - wiele pracowników
+// -
