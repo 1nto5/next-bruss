@@ -17,6 +17,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  adminHeaderRoutes,
+  deHeaderRoutes,
+  plHeaderRoutes,
+} from '@/lib/header-routes';
 import { cn } from '@/lib/utils';
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { Menu } from 'lucide-react';
@@ -48,141 +53,10 @@ export default function Header({ session, dict, lang }: HeaderProps) {
 
   const router = useRouter();
 
-  const routes = [
-    {
-      title: `${dict?.header?.production?.title}`,
-      href: '',
-      submenu: [
-        {
-          href: `/dmcheck-data`,
-          title: `${dict?.header?.production?.dmcheckData.title}`,
-          description: `${dict?.header?.production?.dmcheckData.description}`,
-        },
-      ],
-    },
-    {
-      title: `Wsparcie`,
-      href: '',
-      submenu: [
-        {
-          href: '/deviations',
-          title: `Odchylenia`,
-          description: `Zarządzanie odchyleniami produkcji.`,
-        },
-        {
-          href: '/inw-2/spis',
-          title: `${dict?.header?.inventory?.inventory2.title}`,
-          description: `${dict?.header?.inventory?.inventory.description}`,
-        },
-        {
-          href: '/inw-2/zatwierdz',
-          title: `${dict?.header?.inventory?.inventoryApprove2.title}`,
-          description: `${dict?.header?.inventory?.inventoryApprove.description}`,
-        },
-        {
-          href: '/failures/lv',
-          title: `Awarie LV`,
-          description: `Raport awarii LV.`,
-        },
-      ],
-    },
-    ...(session?.user?.roles?.includes('admin')
-      ? [
-          {
-            title: 'Admin',
-            href: '',
-            submenu: [
-              {
-                href: '/admin/users',
-                title: 'Users management',
-                description: 'Manage users roles.',
-              },
-
-              {
-                href: '/admin/employees',
-                title: 'Employees',
-                description: 'Manage employees in Next BRUSS apps.',
-              },
-              {
-                href: '/admin/employees/add-many',
-                title: 'Add many employees',
-                description: 'Add many employees from HYDRA export file.',
-              },
-              {
-                href: '/admin/dmcheck-articles',
-                title: 'DMCheck articles',
-                description: 'Manage articles in DMCheck app.',
-              },
-              {
-                href: '/admin/rework-many',
-                title: 'DMCheck rework many',
-                description: 'Rework many DMCs / batches at once.',
-              },
-            ],
-          },
-        ]
-      : []),
-    // {
-    //   title: 'Nadgodziny',
-    //   href: '/extra-hours',
-    // },
-  ];
-
-  const routesDe = [
-    {
-      title: `${dict?.header?.production?.title}`,
-      href: '',
-      submenu: [
-        {
-          href: `/dmcheck-data`,
-          title: `${dict?.header?.production?.dmcheckData.title}`,
-          description: `${dict?.header?.production?.dmcheckData.description}`,
-        },
-        {
-          href: `/pro-old/rework`,
-          title: `${dict?.header?.production?.rework.title}`,
-          description: `${dict?.header?.production?.rework.description}`,
-        },
-      ],
-    },
-    ...(session?.user?.roles?.includes('admin')
-      ? [
-          {
-            title: 'Admin',
-            href: '',
-            submenu: [
-              {
-                href: '/admin/users',
-                title: 'Users management',
-                description: 'Manage users roles.',
-              },
-              {
-                href: '/admin/dmcheck-articles',
-                title: 'DMCheck articles',
-                description: 'Manage articles in DMCheck app.',
-              },
-              {
-                href: '/admin/employees',
-                title: 'DMCheck employees',
-                description: 'Manage employees in Next BRUSS apps.',
-              },
-              {
-                href: '/admin/employees/add-many',
-                title: 'DMCheck add many employees',
-                description: 'Add many employees from HYDRA export file.',
-              },
-              {
-                href: '/admin/rework-many',
-                title: 'DMCheck rework many',
-                description: 'Rework many DMCs / batches at once.',
-              },
-            ],
-          },
-        ]
-      : []),
-  ];
-
-  const selectedRoutes = lang === 'de' ? routesDe : routes;
+  const baseRoutes = lang === 'de' ? deHeaderRoutes : plHeaderRoutes;
+  const selectedRoutes = session?.user?.roles?.includes('admin')
+    ? [...baseRoutes, ...adminHeaderRoutes]
+    : baseRoutes;
 
   return (
     // <header className='px-6 py-4 sm:flex sm:justify-between'>
