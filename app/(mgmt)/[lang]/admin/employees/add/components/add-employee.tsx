@@ -22,16 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-import { Checkbox } from '@/components/ui/checkbox';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2, Table } from 'lucide-react';
@@ -64,7 +54,6 @@ export default function AddEmployee({ lang }: { lang: string }) {
       firstName: '',
       lastName: '',
       loginCode: '',
-      password: '',
     },
   });
 

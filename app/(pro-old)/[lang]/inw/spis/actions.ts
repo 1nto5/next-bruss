@@ -54,8 +54,8 @@ export async function login(personalNumber: string, password: string) {
   try {
     const client = await clientPromise;
     const db = client.db();
-    const collection = db.collection('persons');
-    const person = await collection.findOne({ personalNumber });
+    const collection = db.collection('employees');
+    const person = await collection.findOne({ identifier: personalNumber });
     if (!person) {
       return null;
     }

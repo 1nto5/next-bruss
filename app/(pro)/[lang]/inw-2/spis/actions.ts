@@ -2,16 +2,15 @@
 
 // import clientPromise from '@/lib/mongo';
 import { dbc } from '@/lib/mongo';
-import { getLastNameFirstLetter } from '@/lib/utils/name-format';
 
 import { loginInventoryType } from './lib/zod';
 
 export async function login(data: loginInventoryType) {
   try {
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
 
     const person1 = await collection.findOne({
-      personalNumber: data.personalNumber1,
+      identifier: data.personalNumber1,
     });
     if (!person1) {
       return { error: 'wrong number 1' };
@@ -22,7 +21,7 @@ export async function login(data: loginInventoryType) {
 
     if (data.personalNumber2) {
       const person2 = await collection.findOne({
-        personalNumber: data.personalNumber2,
+        identifier: data.personalNumber2,
       });
       if (!person2) {
         return { error: 'wrong number 2' };
@@ -34,7 +33,7 @@ export async function login(data: loginInventoryType) {
 
     if (data.personalNumber3) {
       const person3 = await collection.findOne({
-        personalNumber: data.personalNumber3,
+        identifier: data.personalNumber3,
       });
       if (!person3) {
         return { error: 'wrong number 3' };

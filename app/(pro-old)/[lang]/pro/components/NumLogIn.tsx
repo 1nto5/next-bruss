@@ -4,7 +4,6 @@ import { FormEvent, useContext, useState } from 'react';
 import { loginPerson } from '../actions';
 import { PersonContext } from '../lib/PersonContext';
 
-import { login } from '@/app/(pro-old)/[lang]/inw/spis/actions';
 import toast from 'react-hot-toast';
 
 type NumberButtonProps = {
@@ -57,11 +56,11 @@ const NumLogIn = () => {
 
   return (
     <form
-      className='mb-4 mt-4 flex flex-col items-center justify-center'
+      className='mt-4 mb-4 flex flex-col items-center justify-center'
       onSubmit={handleLogin}
     >
       <input
-        className='w-1/5 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-hidden focus:border-2 focus:border-solid focus:border-bruss dark:bg-slate-800'
+        className='focus:border-bruss w-1/5 rounded bg-slate-100 p-2 text-center text-4xl shadow-md outline-hidden focus:border-2 focus:border-solid dark:bg-slate-800'
         type='text'
         value={personalNumber}
         onChange={(e) => setPersonalNumber(e.target.value)}
@@ -94,7 +93,7 @@ const NumLogIn = () => {
           </button>
           <NumberButton onClick={() => handleClickNumber(0)} value={0} />
           <button
-            className='m-2 h-24 w-24 rounded bg-bruss text-center text-4xl text-slate-50 shadow-xs hover:bg-green-700 dark:bg-green-800 dark:text-slate-100 dark:hover:bg-green-700'
+            className='bg-bruss m-2 h-24 w-24 rounded text-center text-4xl text-slate-50 shadow-xs hover:bg-green-700 dark:bg-green-800 dark:text-slate-100 dark:hover:bg-green-700'
             type='submit'
           >
             OK

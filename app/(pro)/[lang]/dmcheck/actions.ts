@@ -48,9 +48,9 @@ export async function personLogin(
   }
   const data = parse.data;
   try {
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
     const person = await collection.findOne({
-      personalNumber: data.personalNumber,
+      identifier: data.personalNumber,
     });
     if (!person) {
       return { message: 'not exist' };

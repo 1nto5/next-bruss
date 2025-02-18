@@ -3,7 +3,7 @@ import FormContainer from '@/components/ui/form-container';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Logowanie / rejestracja (Next BRUSS)',
+  title: 'Login (Next BRUSS)',
 };
 
 export default async function Layout({
@@ -11,11 +11,11 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  // const session = await auth();
+  const session = await auth();
 
-  // if (session) {
-  //   redirect('/');
-  // }
+  if (session) {
+    redirect('/');
+  }
 
   return <FormContainer>{children}</FormContainer>;
 }
