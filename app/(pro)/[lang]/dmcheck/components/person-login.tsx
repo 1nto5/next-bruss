@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { usePathname, useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { personLogin } from '../actions';
 
@@ -16,9 +16,9 @@ type PersonLoginProps = {
   lang: string;
 };
 
+const buttonClass = 'h-14 w-28';
+
 export function PersonLogin({ cDict, lang }: PersonLoginProps) {
-  // const [state, formAction] = useFormState(personLogin, initialState);
-  // const { pending } = useFormStatus();
   const [state, formAction, pending] = useActionState(
     personLogin,
     initialState,
@@ -28,17 +28,19 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleNumberClick = (number: number) => {
-    setPersonalNumber(personalNumber + number.toString());
-  };
+  // Optimised by memoizing the click handler
+  const handleNumberClick = useCallback((number: number) => {
+    setPersonalNumber((prev) => prev + number.toString());
+  }, []);
 
   useEffect(() => {
-    if (state?.message === 'not valid') {
+    if (!state) return;
+    if (state.message === 'not valid') {
       toast.error(cDict.loginNotValid);
-    } else if (state?.message === 'not exist') {
+    } else if (state.message === 'not exist') {
       toast.error(cDict.loginNotExist);
-    } else {
-      router.push(pathname + `/${state?.message}`);
+    } else if (state.message) {
+      router.push(pathname + `/${state.message}`);
     }
     setPersonalNumber('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,34 +61,37 @@ export function PersonLogin({ cDict, lang }: PersonLoginProps) {
       />
       {lang !== 'de' && (
         <>
-          {Array.from(Array(9).keys()).map((number) => (
-            <Button
-              type='button'
-              className='h-14 w-28'
-              variant='outline'
-              key={number + 1}
-              onClick={() => handleNumberClick(number + 1)}
-            >
-              {number + 1}
-            </Button>
-          ))}
+          {
+            // Render digits 1-9 from a numeric array
+            [1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+              <Button
+                key={number}
+                type='button'
+                className={buttonClass}
+                variant='outline'
+                onClick={() => handleNumberClick(number)}
+              >
+                {number}
+              </Button>
+            ))
+          }
           <Button
             type='button'
             variant='destructive'
             onClick={() => setPersonalNumber('')}
-            className='h-14 w-28'
+            className={buttonClass}
           >
             Reset
           </Button>
           <Button
             type='button'
-            className='h-14 w-28'
+            className={buttonClass}
             variant='outline'
             onClick={() => handleNumberClick(0)}
           >
             0
           </Button>
-          <Button type='submit' aria-disabled={pending} className='w-18 h-12'>
+          <Button type='submit' aria-disabled={pending} className={buttonClass}>
             {cDict.confirmButton}
           </Button>
         </>
