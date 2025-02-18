@@ -14,26 +14,19 @@ import {
 import { LastFiveTable } from '../../../components/last-five-table';
 import { PrintPalletLabel } from '../../../components/print-pallet-label';
 
-export default async function ScanPage(
-  props: {
-    params: Promise<{
-      lang: Locale;
-      workplaceName: string;
-      articleConfigId: string;
-      operatorId: string;
-    }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  }
-) {
+export default async function ScanPage(props: {
+  params: Promise<{
+    lang: Locale;
+    workplaceName: string;
+    articleConfigId: string;
+    operatorId: string;
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const searchParams = await props.searchParams;
   const params = await props.params;
 
-  const {
-    lang,
-    workplaceName,
-    articleConfigId,
-    operatorId
-  } = params;
+  const { lang, workplaceName, articleConfigId, operatorId } = params;
 
   const dict = await getDictionary(lang);
   if (
@@ -56,11 +49,11 @@ export default async function ScanPage(
     }
     if (article?.pallet === true) {
       redirect(
-        `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`,
+        `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`,
       );
     }
     redirect(
-      `?operatorName=${operator.name}&operatorPersonalNumber=${operator.personalNumber}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`,
+      `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`,
     );
   }
 

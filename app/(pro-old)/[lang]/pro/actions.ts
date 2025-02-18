@@ -35,7 +35,7 @@ export async function loginPerson(number: string) {
     if (!person) {
       return null;
     }
-    return person.name;
+    return person.firstName + ' ' + person.lastName;
   } catch (error) {
     console.error(error);
     throw new Error('An error occurred during the login process.');

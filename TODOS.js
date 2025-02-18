@@ -9,6 +9,7 @@ FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which i
 FIXME: datetime pickers like in failure dialogs
 FIXME: useEffect with revalidation sets the table page to 1
 FIXME: dmcheck english version
+
 BRI TEMPERING
 Wybór pieca
 Wybór artykułu - możliwy skan z hydra
@@ -17,10 +18,9 @@ Logowanie do całej aplikacji
 Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
 */
-// TODO: synchronization employees with r2platnik db?
 
 // 1. TL/GL składa wniosek o wykonywanie nadgodzin (weekend)
-// 2. Dyrektor zatwierdza + powiadomienia mailowe (najlipiej z linkiem do zatwierdzenia)
+// 2. Dyrektor zatwierdza + powiadomienia mailowe (najlepiej z linkiem do zatwierdzenia)
 // 3. TL/GL dostaje powiadomienia o zgodzie / odrzuceniu
 
 // - zamiana 1:1 pracownika po zaakceptowaniu

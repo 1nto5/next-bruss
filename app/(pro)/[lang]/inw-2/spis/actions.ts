@@ -15,7 +15,7 @@ export async function login(data: loginInventoryType) {
     if (!person1) {
       return { error: 'wrong number 1' };
     }
-    if (data.pin1 !== person1.password) {
+    if (data.pin1 !== person1.pin) {
       return { error: 'wrong pin 1' };
     }
 
@@ -26,7 +26,7 @@ export async function login(data: loginInventoryType) {
       if (!person2) {
         return { error: 'wrong number 2' };
       }
-      if (data.pin2 !== person2.password) {
+      if (data.pin2 !== person2.pin) {
         return { error: 'wrong pin 2' };
       }
     }
@@ -38,7 +38,7 @@ export async function login(data: loginInventoryType) {
       if (!person3) {
         return { error: 'wrong number 3' };
       }
-      if (data.pin3 !== person3.password) {
+      if (data.pin3 !== person3.pin) {
         return { error: 'wrong pin 3' };
       }
     }
