@@ -2,40 +2,35 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { EmployeeType } from '@/lib/types/employee';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { EmployeeType, InsertEmployeeType } from './lib/employee-types';
 
-export async function insertEmployee(employee: EmployeeType) {
+export async function insertEmployee(data: InsertEmployeeType) {
   try {
     const session = await auth();
-    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
+    if (!session || !(session.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
 
-    const exists = await collection.findOne({
-      personalNumber: employee.loginCode,
-    });
-
+    const exists = await collection.findOne({ identifier: data.identifier });
     if (exists) {
       return { error: 'exists' };
     }
 
-    const res = await collection.insertOne({
-      name: employee.name,
-      personalNumber: employee.loginCode,
-      password: employee.password,
-    });
-    if (res) {
+    const res = await collection.insertOne(data);
+    if (res.insertedId) {
       revalidateTag('employees');
       return { success: 'inserted' };
     }
+
+    return { error: 'not inserted' };
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the user.');
+    return { error: 'insertEmployee server action error' };
   }
 }
 
@@ -48,118 +43,68 @@ export async function insertManyEmployee(pastedEmployees: string) {
 
     const employees = pastedEmployees
       .split('\n')
-      .map((line) => line.split('\t'))
-      .map(([name, loginCode]) => {
-        const [lastName, firstName] = name.split(', ').map((s) => s.trim());
-        return {
-          name: `${firstName} ${lastName}`,
-          loginCode,
-        };
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map((line) => {
+        let parts = line.split(/[,\t]+/).map((part) => part.trim());
+        if (parts.length < 3) {
+          parts = line.split(/\s+/).map((part) => part.trim());
+        }
+        if (parts.length < 3) {
+          throw new Error(`Invalid employee data: ${line}`);
+        }
+        const clean = (str: string) => str.replace(/[^a-zA-Z0-9]/g, '');
+        const firstName = clean(parts[0]);
+        const identifier = clean(parts[parts.length - 1]);
+        const lastName = clean(parts.slice(1, parts.length - 1).join(' '));
+        return { firstName, lastName, identifier };
       });
 
-    const collection = await dbc('persons');
-
-    const existingEmployees = await collection
-      .find({
-        personalNumber: { $in: employees.map((e) => e.loginCode) },
-        name: { $ne: '' },
-        loginCode: { $ne: '' },
-      })
-      .toArray();
-
-    const existingLoginCodes = existingEmployees.map((e) => e.personalNumber);
-
-    const newEmployees = employees.filter(
-      (e) => !existingLoginCodes.includes(e.loginCode) && e.name && e.loginCode,
-    );
-
-    console.log('newEmployees', newEmployees);
-
-    const res = await collection.insertMany(
-      newEmployees.map((employee) => ({
-        name: employee.name,
-        personalNumber: employee.loginCode,
-      })),
-    );
-
-    if (res.insertedCount > 0) {
-      revalidateTag('employees');
-      return { success: res.insertedCount };
-    }
-  } catch (error) {
-    console.error(error);
-    throw new Error('An error occurred while saving employees.');
-  }
-}
-
-export async function insertManyEmployeesInventory(pastedEmployees: string) {
-  try {
-    const session = await auth();
-    if (!session || !(session?.user?.roles ?? []).includes('admin')) {
-      redirect('/');
-    }
-
-    // Przetwarzanie wklejonych danych
-    const employees = pastedEmployees
-      .split('\n')
-      .map((line) => line.split('\t'))
-      .map(([fullName, personalNumber, password]) => {
-        return {
-          name: fullName, // Bez zamiany kolejności imię -> nazwisko
-          personalNumber,
-          password,
-        };
-      });
-
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
 
     for (const employee of employees) {
-      // Sprawdzenie, czy pracownik o danym personalNumber już istnieje
       const existingEmployee = await collection.findOne({
-        personalNumber: employee.personalNumber,
+        identifier: employee.identifier,
       });
 
       if (existingEmployee) {
-        // Jeśli istnieje, zaktualizuj dane
         await collection.updateOne(
-          { personalNumber: employee.personalNumber },
+          { identifier: employee.identifier },
           {
             $set: {
-              name: employee.name,
-              password: employee.password, // Aktualizujemy hasło (możesz zmienić to według potrzeb)
+              firstName: employee.firstName,
+              lastName: employee.lastName,
             },
           },
         );
       } else {
-        // Jeśli nie istnieje, wstaw nowego pracownika
         await collection.insertOne({
-          name: employee.name,
-          personalNumber: employee.personalNumber,
-          password: employee.password,
+          firstName: employee.firstName,
+          lastName: employee.lastName,
+          identifier: employee.identifier,
         });
       }
     }
 
-    // Rewalidacja po zapisaniu nowych danych
     revalidateTag('employees');
     return { success: 'added' };
   } catch (error) {
     console.error(error);
-    throw new Error('insertManyEmployeesInventory server action error');
+    return { error: 'insertManyEmployee server action error' };
   }
 }
 
-export async function updateEmployee(employee: EmployeeType) {
+export async function updateEmployee(data: EmployeeType) {
   try {
     const session = await auth();
     if (!session || !(session?.user?.roles ?? []).includes('admin')) {
       redirect('/');
     }
 
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
 
     const exists = await collection.findOne({
-      _id: new ObjectId(employee._id),
+      identifier: data.identifier,
     });
 
     if (!exists) {
@@ -167,12 +112,13 @@ export async function updateEmployee(employee: EmployeeType) {
     }
 
     const res = await collection.updateOne(
-      { _id: new ObjectId(employee._id) },
+      { identifier: data.identifier },
       {
         $set: {
-          name: employee.name,
-          personalNumber: employee.loginCode,
-          password: employee.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          identifier: data.identifier,
+          pin: data.pin,
         },
       },
     );
@@ -182,7 +128,7 @@ export async function updateEmployee(employee: EmployeeType) {
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while saving the user.');
+    return { error: 'updateEmployee server action error' };
   }
 }
 
@@ -190,24 +136,21 @@ export async function getEmployee(
   userId: ObjectId,
 ): Promise<EmployeeType | null> {
   try {
-    const collection = await dbc('persons');
-    const user = await collection.findOne({
-      _id: userId,
-    });
+    const collection = await dbc('employees');
+    const user = await collection.findOne({ _id: userId });
+    if (!user) return null;
 
-    if (user) {
-      return {
-        _id: user._id.toString(),
-        name: user.name,
-        loginCode: user.personalNumber,
-        password: user.password ?? undefined,
-      };
-    }
-
-    return null;
+    const { _id, firstName, lastName, identifier, pin } = user;
+    return {
+      _id: _id.toString(),
+      firstName,
+      lastName,
+      identifier,
+      pin,
+    };
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while retrieving the user.');
+    return null;
   }
 }
 
@@ -218,7 +161,7 @@ export async function deleteEmployee(userId: string) {
       redirect('/');
     }
 
-    const collection = await dbc('persons');
+    const collection = await dbc('employees');
 
     const exists = await collection.findOne({ _id: new ObjectId(userId) });
 
@@ -228,15 +171,15 @@ export async function deleteEmployee(userId: string) {
 
     const res = await collection.deleteOne({ _id: new ObjectId(userId) });
     if (res) {
-      revalidateTag('users');
+      revalidateTag('employees');
       return { success: 'deleted' };
     }
   } catch (error) {
     console.error(error);
-    throw new Error('An error occurred while deleting the user');
+    return { error: 'deleteEmployee server action error' };
   }
 }
 
-export async function revalidateUsers() {
+export async function revalidateEmployees() {
   revalidateTag('employees');
 }

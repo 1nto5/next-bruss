@@ -3,6 +3,17 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 
+import { EmployeeType } from '@/app/(mgmt)/[lang]/admin/employees/lib/employee-types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,23 +24,11 @@ import {
   // DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { Trash2, Pencil } from 'lucide-react';
-import { deleteEmployee } from '../actions';
-import { EmployeeType } from '@/lib/types/employee';
-import { toast } from 'sonner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  // AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { deleteEmployee } from '../actions';
 
 const onDeleteEmployee = async (articleId: string) => {
   try {
@@ -69,7 +68,7 @@ const ActionsCell = ({ row }: { row: any }) => {
             </DropdownMenuItem>
           </Link>
           <DropdownMenuItem
-            className=' focus:bg-red-400 dark:focus:bg-red-700'
+            className='focus:bg-red-400 dark:focus:bg-red-700'
             onClick={() => setIsOpen(true)}
           >
             <Trash2 className='mr-2 h-4 w-4' />
@@ -111,16 +110,19 @@ const ActionsCell = ({ row }: { row: any }) => {
 
 export const columns: ColumnDef<EmployeeType>[] = [
   {
-    accessorKey: 'name',
-    header: 'Name',
+    accessorKey: 'firstName',
+    header: 'First Name',
   },
   {
-    accessorKey: 'personalNumber',
-    header: 'Login code',
+    accessorKey: 'lastName',
+    header: 'Last Name',
   },
+
   {
     id: 'actions',
     header: 'Actions',
     cell: (props) => <ActionsCell {...props} />,
   },
+  { accessorKey: 'identifier', header: 'Identifier' },
+  { accessorKey: 'pin', header: 'PIN' },
 ];

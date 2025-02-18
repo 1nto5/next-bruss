@@ -2,7 +2,7 @@
 import { Locale } from '@/i18n.config';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { FailureOptionType, FailureType } from './lib/types-failures';
+import { FailureOptionType, FailureType } from './lib/failures-types';
 
 async function getFailuresOptions(): Promise<FailureOptionType[]> {
   const res = await fetch(`${process.env.API}/failures/lv/options`, {

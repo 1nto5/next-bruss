@@ -31,21 +31,12 @@ import { toast } from 'sonner';
 import { insertEmployee } from '../../actions';
 // import { useQuery } from '@tanstack/react-query';
 
-export default function AddEmployee({ lang }: { lang: string }) {
+export default function AddEmployee() {
   const formSchema = z.object({
-    firstName: z
-      .string()
-      .min(3, { message: 'Minimum 3 characters!' })
-      .optional(),
-    lastName: z
-      .string()
-      .min(3, { message: 'Minimum 3 characters!' })
-      .optional(),
-    loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
-    password: z
-      .string()
-      .min(4, { message: 'Minimum 4 characters!' })
-      .optional(),
+    firstName: z.string().min(3, { message: 'Minimum 3 characters!' }),
+    lastName: z.string().min(3, { message: 'Minimum 3 characters!' }),
+    identifier: z.string().min(3, { message: 'Minimum 1 character!' }),
+    pin: z.string().min(4, { message: 'Minimum 4 characters!' }).optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -53,7 +44,8 @@ export default function AddEmployee({ lang }: { lang: string }) {
     defaultValues: {
       firstName: '',
       lastName: '',
-      loginCode: '',
+      identifier: '',
+      pin: undefined,
     },
   });
 
@@ -61,16 +53,11 @@ export default function AddEmployee({ lang }: { lang: string }) {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
-    const employee = {
-      name: `${data.firstName} ${data.lastName}`,
-      loginCode: data.loginCode,
-      password: data.password,
-    };
     try {
-      const res = await insertEmployee(employee);
+      const res = await insertEmployee(data);
 
       if (res?.success) {
-        toast.success('Employee config saved successfully!');
+        toast.success('Employee saved successfully!');
         // form.reset(); // Uncomment to reset the form after a successful save.
       } else if (res?.error === 'exists') {
         toast.error('Employee already exists!');
@@ -98,8 +85,8 @@ export default function AddEmployee({ lang }: { lang: string }) {
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
           <Link href='/admin/employees'>
-            <Button className='mr-2' variant='outline'>
-              <Table />
+            <Button variant='outline'>
+              <Table /> <span>Employees table</span>
             </Button>
           </Link>
         </div>
@@ -127,7 +114,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,12 +122,12 @@ export default function AddEmployee({ lang }: { lang: string }) {
             />
             <FormField
               control={form.control}
-              name='loginCode'
+              name='identifier'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Login code</FormLabel>
+                  <FormLabel>Identifier</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormDescription>
                     Personal number (MRG) or contents of the employee card code
@@ -152,12 +139,12 @@ export default function AddEmployee({ lang }: { lang: string }) {
             />
             <FormField
               control={form.control}
-              name='password'
+              name='pin'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>PIN</FormLabel>
                   <FormControl>
-                    <Input autoFocus placeholder='' {...field} />
+                    <Input placeholder='' {...field} />
                   </FormControl>
                   <FormDescription>
                     For inventory support applications - not for DMCheck, leave
@@ -172,10 +159,10 @@ export default function AddEmployee({ lang }: { lang: string }) {
             {isPending ? (
               <Button disabled>
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Saving
+                Adding
               </Button>
             ) : (
-              <Button type='submit'>Save</Button>
+              <Button type='submit'>Add</Button>
             )}
           </CardFooter>
         </form>

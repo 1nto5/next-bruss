@@ -1,4 +1,5 @@
 'use client';
+import { EmployeeType } from '@/app/(mgmt)/[lang]/admin/employees/lib/employee-types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,10 +19,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { EmployeeType } from '@/lib/types/employee';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, SquareAsterisk, Table } from 'lucide-react';
+import { Loader2, Table } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -29,34 +28,21 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { updateEmployee } from '../../../actions';
 
-export default function EditEmployee({
-  employeeObject,
-}: {
-  employeeObject: EmployeeType;
-}) {
+export default function EditEmployee({ employee }: { employee: EmployeeType }) {
   const formSchema = z.object({
-    firstName: z
-      .string()
-      .min(3, { message: 'Minimum 3 characters!' })
-      .optional(),
-    lastName: z
-      .string()
-      .min(3, { message: 'Minimum 3 characters!' })
-      .optional(),
-    loginCode: z.string().min(3, { message: 'Minimum 1 character!' }),
-    password: z
-      .string()
-      .min(4, { message: 'Minimum 4 characters!' })
-      .optional(),
+    firstName: z.string().min(3, { message: 'Minimum 3 characters!' }),
+    lastName: z.string().min(3, { message: 'Minimum 3 characters!' }),
+    identifier: z.string().min(3, { message: 'Minimum 1 character!' }),
+    pin: z.string().min(4, { message: 'Minimum 4 characters!' }).optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: employeeObject.name.split(' ')[0],
-      lastName: employeeObject.name.split(' ')[1],
-      loginCode: employeeObject.loginCode,
-      password: employeeObject.password,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      identifier: employee.identifier,
+      pin: employee.pin ?? '',
     },
   });
 
@@ -65,14 +51,10 @@ export default function EditEmployee({
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
     try {
-      const employee = {
-        _id: employeeObject._id,
-        name: `${data.firstName} ${data.lastName}`,
-        loginCode: data.loginCode,
-      };
-      const res = await updateEmployee(employee);
+      const res = await updateEmployee(data);
+
       if (res?.success) {
-        toast.success('User saved!');
+        toast.success('Employee saved!');
       } else if (res?.error) {
         console.error('An error occurred:', res?.error);
         toast.error('An error occurred! Check console for more info.');
@@ -95,8 +77,8 @@ export default function EditEmployee({
         </CardDescription> */}
         <div className='flex items-center justify-end py-4'>
           <Link href='/admin/employees'>
-            <Button className='mr-2' variant='outline'>
-              <Table />
+            <Button variant='outline'>
+              <Table /> <span>Employees table</span>
             </Button>
           </Link>
         </div>
@@ -132,10 +114,10 @@ export default function EditEmployee({
             />
             <FormField
               control={form.control}
-              name='loginCode'
+              name='identifier'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Login code</FormLabel>
+                  <FormLabel>Identifier</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
@@ -149,10 +131,10 @@ export default function EditEmployee({
             />
             <FormField
               control={form.control}
-              name='password'
+              name='pin'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>PIN</FormLabel>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>

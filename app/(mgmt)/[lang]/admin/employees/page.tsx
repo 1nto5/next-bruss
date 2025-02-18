@@ -1,21 +1,20 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { EmployeeType } from '@/lib/types/employee';
-import { User } from 'next-auth';
+import { EmployeeType } from '@/app/(mgmt)/[lang]/admin/employees/lib/employee-types';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
-async function getPersons(
+async function getEmployees(
   lang: string,
 ): Promise<{ fetchTime: string; allUsers: EmployeeType[] }> {
-  const res = await fetch(`${process.env.API}/admin/all-persons`, {
+  const res = await fetch(`${process.env.API}/admin/employees`, {
     next: { revalidate: 60 * 15, tags: ['employees'] },
   });
 
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
-      `getPersons error:  ${res.status}  ${res.statusText} ${json.error}`,
+      `getEmployees error:  ${res.status}  ${res.statusText} ${json.error}`,
     );
   }
 
@@ -27,17 +26,13 @@ async function getPersons(
   return { fetchTime, allUsers };
 }
 
-export default async function AdminEmployeesPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function AdminEmployeesPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
-  const { fetchTime, allUsers } = await getPersons(lang);
+  const { fetchTime, allUsers } = await getEmployees(lang);
   return <DataTable columns={columns} data={allUsers} fetchTime={fetchTime} />;
 }

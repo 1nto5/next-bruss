@@ -1,6 +1,6 @@
 'use client';
 
-import { AddFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
+import { AddFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/failures-zod';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -49,7 +49,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { insertFailure } from '../actions';
-import { FailureOptionType } from '../lib/types-failures';
+import { FailureOptionType } from '../lib/failures-types';
 
 export default function AddFailureDialog({
   failuresOptions,

@@ -35,7 +35,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
-import { revalidateUsers } from '../actions';
+import { revalidateEmployees as revalidate } from '../actions';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,6 +65,11 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageSize: 20,
+      },
+    },
   });
 
   return (
@@ -72,33 +77,63 @@ export function DataTable<TData, TValue>({
       <CardHeader>
         <CardTitle>Employees management</CardTitle>
         <CardDescription>Last synchronization: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between'>
-          <div className='flex flex-row space-x-1'>
-            <Input
-              autoFocus
-              placeholder='name'
-              value={
-                (table.getColumn('name')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table.getColumn('name')?.setFilterValue(event.target.value)
-              }
-              className='w-48'
-            />
-          </div>
-          <div className='flex items-center space-x-1'>
-            <Link href='/admin/employees/add'>
-              <Button size={'icon'} variant='outline'>
-                <CopyPlus />
+        <div className='flex flex-col gap-4'>
+          <div className='flex flex-wrap gap-4'>
+            <div className='flex flex-wrap gap-2'>
+              <Input
+                autoFocus
+                placeholder='first name'
+                value={
+                  (table.getColumn('firstName')?.getFilterValue() as string) ??
+                  ''
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn('firstName')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-auto'
+              />
+              <Input
+                autoFocus
+                placeholder='last name'
+                value={
+                  (table.getColumn('lastName')?.getFilterValue() as string) ??
+                  ''
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn('lastName')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-auto'
+              />
+              <Input
+                autoFocus
+                placeholder='identifier'
+                value={
+                  (table.getColumn('identifier')?.getFilterValue() as string) ??
+                  ''
+                }
+                onChange={(event) =>
+                  table
+                    .getColumn('identifier')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-auto'
+              />
+            </div>
+
+            <div className='flex flex-wrap gap-2'>
+              <Link href='/admin/employees/add'>
+                <Button variant='outline'>
+                  <CopyPlus /> <span>Add employee</span>
+                </Button>
+              </Link>
+              <Button variant='outline' onClick={() => revalidate()}>
+                <RefreshCcw /> <span>Refresh</span>
               </Button>
-            </Link>
-            <Button
-              size={'icon'}
-              variant='outline'
-              onClick={() => revalidateUsers()}
-            >
-              <RefreshCcw />
-            </Button>
+            </div>
           </div>
         </div>
       </CardHeader>

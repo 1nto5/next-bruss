@@ -1,9 +1,17 @@
 'use client';
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -13,20 +21,11 @@ import {
   // FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 
 // import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 // import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { insertManyEmployee } from '../../actions';
@@ -37,7 +36,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
   const formSchema = z.object({
     pastedEmployees: z
       .string()
-      .min(10, { message: 'Paste export from hydra to add' }),
+      .min(10, { message: 'Paste export from MOC to add' }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,13 +54,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
       const res = await insertManyEmployee(data.pastedEmployees);
 
       if (res?.success) {
-        if (res?.success === 1) {
-          toast.success('Employee saved successfully!');
-        } else if (res?.success > 1) {
-          toast.success(`${res?.success} new employees saved successfully!`);
-        } else {
-          toast.error('The employees listed already exist!');
-        }
+        toast.success('Employee/s saved successfully!');
         form.reset();
       } else {
         toast.error('Unknown problem during saving employees');
@@ -79,7 +72,7 @@ export default function AddEmployee({ lang }: { lang: string }) {
       <CardHeader>
         <CardTitle>Add many employees</CardTitle>
         <CardDescription>
-          Paste columns B and C from the HYDRA export file
+          Paste columns B and C from the MOC export file
         </CardDescription>
         {/* <div className='flex items-center justify-end py-4'>
           <Link href='/admin/employees'>

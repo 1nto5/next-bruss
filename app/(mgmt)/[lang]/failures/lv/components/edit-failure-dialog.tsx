@@ -22,12 +22,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
-import { FailureType } from '../lib/types-failures';
+import { FailureType } from '../lib/failures-types';
 
 // import { Separator } from '@/components/ui/separator';
-import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/zod-failures';
+import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/failures-zod';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';

@@ -1,10 +1,9 @@
 'use server';
 
-import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { InsertFailureType, UpdateFailureType } from './lib/types-failures';
+import { InsertFailureType, UpdateFailureType } from './lib/failures-types';
 
 export async function revalidateFailures() {
   revalidateTag('failures-lv');

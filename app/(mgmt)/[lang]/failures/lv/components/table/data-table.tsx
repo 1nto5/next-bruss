@@ -35,7 +35,7 @@ import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 import { useEffect } from 'react';
-import { FailureOptionType } from '../../lib/types-failures';
+import { FailureOptionType } from '../../lib/failures-types';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {

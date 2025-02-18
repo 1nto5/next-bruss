@@ -32,7 +32,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { revalidateFailures as revalidate } from '../actions';
-import { FailureOptionType } from '../lib/types-failures';
+import { FailureOptionType } from '../lib/failures-types';
 import AddFailureDialog from './add-failure-dialog';
 
 export default function TableFilteringAndOptions({
@@ -197,7 +197,7 @@ export default function TableFilteringAndOptions({
           </PopoverTrigger>
           <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
             <Command>
-              <CommandInput placeholder='search...' />
+              <CommandInput placeholder='szukaj...' />
               <CommandList>
                 <CommandEmpty>not found</CommandEmpty>
                 <CommandGroup>
@@ -252,7 +252,7 @@ export default function TableFilteringAndOptions({
           </PopoverTrigger>
           <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
             <Command>
-              <CommandInput placeholder='search...' />
+              <CommandInput placeholder='szukaj...' />
               <CommandList>
                 <CommandEmpty>not found</CommandEmpty>
                 <CommandGroup>

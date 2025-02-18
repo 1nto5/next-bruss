@@ -9,14 +9,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const coll = await dbc('persons');
-    const persons = await coll.find({}).toArray();
+    const coll = await dbc('employees');
+    const persons = await coll
+      .find({})
+      .sort({ firstName: 1, lastName: 1 })
+      .toArray();
     return new NextResponse(JSON.stringify(persons));
   } catch (error) {
-    console.error('api/admin/all-persons: ' + error);
-    return NextResponse.json(
-      { error: 'admin/all-persons api' },
-      { status: 503 },
-    );
+    console.error('api/admin/employees: ' + error);
+    return NextResponse.json({ error: 'admin/employees api' }, { status: 503 });
   }
 }
