@@ -22,7 +22,7 @@ import {
 import { DeviationType } from '@/lib/types/deviation';
 // import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { CopyPlus, Plus, Table as TableIcon } from 'lucide-react';
+import { CopyPlus, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
@@ -147,7 +147,7 @@ export default function Deviation({
       <Separator className='mb-4' />
       <CardContent>
         <div className='flex-col space-y-4'>
-          <div className='space-y-4 lg:flex lg:justify-between lg:space-x-4 lg:space-y-0'>
+          <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             <Card className='lg:w-2/5'>
               <CardHeader>
                 <CardTitle>Szczegóły</CardTitle>

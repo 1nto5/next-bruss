@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Next BRUSS',
+  title: 'BRUSS',
   // description: 'Company helper applications',
 };
 
@@ -22,7 +22,7 @@ export default async function RootLayout(props: {
     <html lang={lang} suppressHydrationWarning>
       <head />
 
-      <body className='min-h-screen bg-background font-sans antialiased'>
+      <body className='bg-background min-h-screen font-sans antialiased'>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

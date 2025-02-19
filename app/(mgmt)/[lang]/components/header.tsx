@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import Container from '@/components/ui/container';
 import Logo from '@/components/ui/logo';
 import {
@@ -9,7 +10,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import {
   Sheet,
@@ -23,17 +23,14 @@ import {
   plHeaderRoutes,
 } from '@/lib/header-routes';
 import { cn } from '@/lib/utils';
-import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { Menu } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React from 'react';
-import { toast } from 'sonner';
+import React, { useEffect, useState } from 'react';
 import { logout } from '../auth/actions';
 import { LoginLogout } from './login-logout';
 import { ThemeModeToggle } from './theme-mode-toggle';
-import UserAvatar from './user-avatar';
 type HeaderProps = {
   session: Session | null;
   dict: any;
@@ -41,123 +38,92 @@ type HeaderProps = {
 };
 
 export default function Header({ session, dict, lang }: HeaderProps) {
-  const [isScrolled, setIsScrolled] = React.useState(false);
+  const router = useRouter();
 
-  React.useEffect(() => {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 0);
+      setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const router = useRouter();
-
   const baseRoutes = lang === 'de' ? deHeaderRoutes : plHeaderRoutes;
-  const selectedRoutes = session?.user?.roles?.includes('admin')
+  const routes = session?.user?.roles?.includes('admin')
     ? [...baseRoutes, ...adminHeaderRoutes]
     : baseRoutes;
 
   return (
-    // <header className='px-6 py-4 sm:flex sm:justify-between'>
     <header
-      className={`sticky top-0 z-50 px-6 py-4 transition-colors duration-200 sm:flex sm:justify-between ${isScrolled ? 'bg-background/95 supports-backdrop-filter:bg-background/60 border-b backdrop-blur-sm' : 'bg-background'}`}
+      className={`sticky top-0 z-50 px-6 transition-all duration-300 ${scrolled ? 'bg-background/80 py-2' : 'bg-background py-4'} sm:flex sm:justify-between`}
     >
       <Container>
-        <div className='relative flex h-6 w-full items-center justify-between'>
+        <div className='relative flex h-4 w-full items-center justify-between'>
           <div className='flex items-center'>
             <Sheet>
               <SheetTrigger>
-                <Menu className='mr-2 h-6 w-6 md:hidden' />
+                <Button className='sm:hidden' variant={'ghost'} size='icon'>
+                  <Menu />
+                </Button>
               </SheetTrigger>
-              <SheetContent side='left' className='w-[300px] sm:w-[400px]'>
+              <SheetContent side='left' className='w-[250px] sm:w-[300px]'>
                 <nav className='flex flex-col gap-4'>
-                  {selectedRoutes.map((route, i) =>
-                    route.submenu ? (
-                      <div key={i}>
-                        <span className='block px-2 py-1 text-sm'>
-                          {route.title}
-                        </span>
-                        <div className='ml-4'>
-                          {route.submenu.map((sub) => (
-                            <SheetClose key={sub.title} asChild>
-                              <Link
-                                href={sub.href}
-                                className='block px-2 py-1 text-lg'
-                              >
-                                {sub.title}
-                              </Link>
-                            </SheetClose>
-                          ))}
-                        </div>
+                  {routes.map((route, i) => (
+                    <div key={i}>
+                      <span className='block px-2 py-1 text-sm'>
+                        {route.title}
+                      </span>
+                      <div className='ml-4'>
+                        {route.submenu.map((sub) => (
+                          <SheetClose key={sub.title} asChild>
+                            <Link
+                              href={sub.href}
+                              className='block px-2 py-1 text-lg'
+                            >
+                              {sub.title}
+                            </Link>
+                          </SheetClose>
+                        ))}
                       </div>
-                    ) : (
-                      <SheetClose key={i} asChild>
-                        <Link
-                          key={i}
-                          href={route.href}
-                          className='block px-2 py-1 text-lg'
-                        >
-                          {route.title}
-                        </Link>
-                      </SheetClose>
-                    ),
-                  )}
+                    </div>
+                  ))}
                 </nav>
               </SheetContent>
             </Sheet>
             <Link href='/' className='flex items-center'>
-              <h1 className='font-bold'>Next</h1>
-              <div className='w-24'>
-                <Logo />
-              </div>
+              <Logo />
             </Link>
           </div>
-          <nav className='mx-6 hidden items-center space-x-4 md:block lg:space-x-6'>
+          <nav className='hidden items-center sm:block'>
             <NavigationMenu>
               <NavigationMenuList>
-                {selectedRoutes.map((route) =>
-                  route.submenu ? (
-                    <NavigationMenuItem key={route.title}>
-                      <NavigationMenuTrigger>
-                        {route.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent className=''>
-                        <ul className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-                          {route.submenu.map((subItem) => (
-                            <ListItem
-                              key={subItem.title}
-                              title={subItem.title}
-                              href={subItem.href}
-                            >
-                              {subItem.description}
-                            </ListItem>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  ) : (
-                    <NavigationMenuItem key={route.title}>
-                      <Link href={route.href} legacyBehavior passHref>
-                        <NavigationMenuLink
-                          className={navigationMenuTriggerStyle()}
-                        >
-                          {route.title}
-                        </NavigationMenuLink>
-                      </Link>
-                    </NavigationMenuItem>
-                  ),
-                )}
+                {routes.map((route) => (
+                  <NavigationMenuItem className='m-0 p-0' key={route.title}>
+                    <NavigationMenuTrigger
+                      className={`p-2 ${scrolled && 'bg-background/40 h-6'}`}
+                    >
+                      {route.title}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className='grid w-[400px] gap-1 p-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
+                        {route.submenu.map((subItem) => (
+                          <ListItem
+                            key={subItem.title}
+                            title={subItem.title}
+                            href={subItem.href}
+                          >
+                            {subItem.description}
+                          </ListItem>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
               </NavigationMenuList>
             </NavigationMenu>
           </nav>
-          <div className='flex items-center space-x-2'>
-            {session?.user?.email && (
-              <UserAvatar
-                userInitials={getInitialsFromEmail(session.user.email)}
-              />
-            )}
-
+          <div className='flex items-center'>
             <LoginLogout
               isLoggedIn={!!session}
               onLogin={() => {
@@ -165,19 +131,18 @@ export default function Header({ session, dict, lang }: HeaderProps) {
               }}
               onLogout={() => {
                 logout();
-                toast.success('Wylogowano!');
                 router.refresh();
               }}
             />
 
-            <ThemeModeToggle />
+            <ThemeModeToggle buttonStyle='' />
           </div>
         </div>
       </Container>
     </header>
   );
 }
-// test
+
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'>

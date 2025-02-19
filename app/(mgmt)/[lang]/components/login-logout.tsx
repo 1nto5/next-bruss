@@ -19,7 +19,7 @@ export const LoginLogout: React.FC<LoginLogoutButtonProps> = ({
     <Button
       className={buttonStyle}
       onClick={isLoggedIn ? onLogout : onLogin}
-      variant='outline'
+      variant={'ghost'}
       size='icon'
     >
       {isLoggedIn ? <LogOut /> : <LogIn />}

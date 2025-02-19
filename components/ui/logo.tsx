@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import logo from '@/public/logo.png';
+import Image from 'next/image';
 
 // type LogoProps = {
 //   logoStyles?: string;
@@ -17,6 +17,7 @@ export default function Logo() {
     // />
     <Image
       src={logo}
+      className='w-20'
       // className={logoStyles ?? ''}
       // // You don't need to specify
       // //either height nor width but
