@@ -22,6 +22,7 @@ export const ROUTE_PATHS = {
   adminEmployeesAddMany: '/admin/employees/add-many',
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
+  productionOvertime: '/production-overtime',
 };
 
 export const plHeaderRoutes: HeaderRoute[] = [
@@ -59,6 +60,18 @@ export const plHeaderRoutes: HeaderRoute[] = [
         href: ROUTE_PATHS.inw2zatwierdz,
         title: 'Zatwierdzenie inwentaryzacji',
         description: 'Narzędzie do zatwierdzania zinwentaryzowanych pozycji.',
+      },
+    ],
+  },
+  {
+    title: 'Kadry',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.productionOvertime,
+        title: 'Praca w godzinach nadliczbowych - produkcja',
+        description:
+          'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
       },
     ],
   },

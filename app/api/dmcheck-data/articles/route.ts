@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('api/dmcheck-mgmt/article-configs: ' + error);
     return NextResponse.json(
-      { error: 'dmcheck-mgmt/article-configs' },
+      { error: 'dmcheck-mgmt/article-configs api' },
       { status: 503 },
     );
   }

@@ -1,5 +1,4 @@
 'use client';
-import { EmployeeType } from '@/app/(mgmt)/[lang]/admin/employees/lib/employee-types';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Table } from 'lucide-react';
 import Link from 'next/link';

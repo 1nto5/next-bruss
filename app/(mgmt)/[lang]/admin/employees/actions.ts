@@ -5,7 +5,10 @@ import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { EmployeeType, InsertEmployeeType } from './lib/employee-types';
+import {
+  EmployeeType,
+  InsertEmployeeType,
+} from '../../../../../lib/types/employee-types';
 
 export async function insertEmployee(data: InsertEmployeeType) {
   try {

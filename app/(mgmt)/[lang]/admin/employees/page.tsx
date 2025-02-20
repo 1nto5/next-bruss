@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { EmployeeType } from '@/app/(mgmt)/[lang]/admin/employees/lib/employee-types';
+import { EmployeeType } from '@/lib/types/employee-types';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
