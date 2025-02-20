@@ -15,6 +15,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {
@@ -23,6 +24,7 @@ import {
   plHeaderRoutes,
 } from '@/lib/header-routes';
 import { cn } from '@/lib/utils';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Menu } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
@@ -56,18 +58,21 @@ export default function Header({ session, dict, lang }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-50 px-6 transition-all duration-300 ${scrolled ? 'bg-background/80 py-2' : 'bg-background py-4'} sm:flex sm:justify-between`}
+      className={`sticky top-0 z-50 px-6 transition-all duration-300 ${scrolled ? 'bg-background/80 border-b py-2' : 'bg-background py-4'} sm:flex sm:justify-between`}
     >
       <Container>
         <div className='relative flex h-4 w-full items-center justify-between'>
           <div className='flex items-center'>
             <Sheet>
-              <SheetTrigger>
+              <SheetTrigger asChild>
                 <Button className='sm:hidden' variant={'ghost'} size='icon'>
                   <Menu />
                 </Button>
               </SheetTrigger>
               <SheetContent side='left' className='w-[250px] sm:w-[300px]'>
+                <VisuallyHidden asChild>
+                  <SheetTitle>Navigation Menu</SheetTitle>
+                </VisuallyHidden>
                 <nav className='flex flex-col gap-4'>
                   {routes.map((route, i) => (
                     <div key={i}>
