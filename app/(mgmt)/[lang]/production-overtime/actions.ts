@@ -3,7 +3,10 @@
 import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { InsertFailureType, UpdateFailureType } from './lib/failures-types';
+import {
+  InsertFailureType,
+  UpdateFailureType,
+} from './lib/production-overtime-types';
 
 export async function revalidateFailures() {
   revalidateTag('failures-lv');

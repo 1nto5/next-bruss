@@ -25,4 +25,14 @@ TODO: MARIOLA WNIOSKI
 - formularz od Mariola - zgodność (masz w Code)
 - jeden wniosek - wiele pracowników
 
+TODO: inwentaryzacja maj
+wymagane dla okreslonych obszarów pola:
++ dodatkowe pole: BIN (tylko wedle excela od jakuba - opcjonalnie dla wszystkich
++ dodatkowe pole: data (czas dostawy tego artykułu - fifo)
+obszary:
+{ value: 'GUMA', label: 'GUMA' },
+{ value: 'S900', label: 'S900' },
+{ value: 'S2', label: 'S2 Powlekanie + Chemia' }, - rozbić oddzielnie S2-Powlekanie - tu wymagane i S2-Chemia - nie wymagane
+nowy obszar Sedia-granulaty - też wymagane
+
 */

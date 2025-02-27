@@ -17,7 +17,7 @@ export default function Logo() {
     // />
     <Image
       src={logo}
-      className='w-20'
+      className='w-24'
       // className={logoStyles ?? ''}
       // // You don't need to specify
       // //either height nor width but

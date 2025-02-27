@@ -32,7 +32,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { revalidateFailures as revalidate } from '../actions';
-import { FailureOptionType } from '../lib/failures-types';
+import { FailureOptionType } from '../lib/production-overtime-types';
 import AddFailureDialog from './add-failure-dialog';
 
 export default function TableFilteringAndOptions({

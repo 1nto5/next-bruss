@@ -6,7 +6,10 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const coll = await dbc('employees');
-    const employees = await coll.find().toArray();
+    const employees = await coll
+      .find()
+      .sort({ firstName: 1, lastName: 1 })
+      .toArray();
     return new NextResponse(JSON.stringify(employees));
   } catch (error) {
     console.error('api/employees: ' + error);

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { Activity, Ban } from 'lucide-react';
-import { FailureType } from '../../lib/failures-types';
+import { FailureType } from '../../lib/production-overtime-types';
 import EditFailureDialog from '../edit-failure-dialog';
 import EndFailureButton from '../end-failure-button';
 

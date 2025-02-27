@@ -2,14 +2,17 @@
 import { Locale } from '@/i18n.config';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { FailureOptionType, FailureType } from './lib/failures-types';
+import {
+  FailureOptionType,
+  FailureType,
+} from './lib/production-overtime-types';
 
 async function getFailuresOptions(): Promise<FailureOptionType[]> {
   const res = await fetch(`${process.env.API}/failures/lv/options`, {
     next: {
       revalidate: 60 * 60 * 8,
       // revalidate: 0,
-      tags: ['failures-lv-options'],
+      tags: ['production-overtime'],
     },
   });
 
@@ -40,7 +43,7 @@ async function getFailures(
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(`${process.env.API}/failures/lv?${queryParams}`, {
-    next: { revalidate: 0, tags: ['failures-lv'] },
+    next: { revalidate: 0, tags: ['production-overtime'] },
   });
 
   if (!res.ok) {

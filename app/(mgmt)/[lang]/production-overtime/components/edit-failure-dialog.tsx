@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Pencil } from 'lucide-react';
-import { FailureType } from '../lib/failures-types';
+import { FailureType } from '../lib/production-overtime-types';
 
 // import { Separator } from '@/components/ui/separator';
 import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/failures-zod';

@@ -49,7 +49,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { insertFailure } from '../actions';
-import { FailureOptionType } from '../lib/failures-types';
+import { FailureOptionType } from '../lib/production-overtime-types';
 
 export default function AddFailureDialog({
   failuresOptions,
