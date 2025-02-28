@@ -8,6 +8,7 @@ TODO: dmcheck english version
 TODO: BRI migrate to employees collection
 TODO: DMCheck v3 - zustand + react-query
 TODO: users admin rebuild
+TODO: all dialogs formatting as in failures lv
 
 TODO: tempering process BRI (article login, get batch, show degrees and timer)
 Wybór pieca
