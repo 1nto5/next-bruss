@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import Info from '../../components/info';
+import Info from '../../components/welcome-alert';
 
 export const metadata = {
   title: 'Inventory approve (Next BRUSS)',

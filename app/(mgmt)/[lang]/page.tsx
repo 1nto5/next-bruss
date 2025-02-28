@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import Info from './components/info';
+import Info from './components/welcome-alert';
 
 export default async function Home(props: {
   params: Promise<{ lang: Locale }>;
@@ -14,7 +14,7 @@ export default async function Home(props: {
     <>
       {dict.home.description}
       <a
-        href={`mailto:adrian.antosiakt@bruss-group.com?subject=Next BRUSS: `}
+        href={`mailto:adrian.antosiak@bruss-group.com?subject=Next BRUSS: `}
         className='text-blue-600 hover:text-blue-800'
       >
         adrian.antosiak@bruss-group.com

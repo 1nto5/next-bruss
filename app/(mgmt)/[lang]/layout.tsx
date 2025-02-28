@@ -1,9 +1,7 @@
 import '@/app/globals.css';
-import { auth } from '@/auth';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
-import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Footer from './components/footer';
 import Header from './components/header';
@@ -23,22 +21,20 @@ export default async function RootLayout(props: {
 
   const { children } = props;
 
-  const session = await auth();
   const dictionary = await getDictionary(lang);
   return (
-    <ThemeProvider
-      attribute='class'
-      defaultTheme='system'
-      enableSystem
-      // disableTransitionOnChange
-    >
-      <div className='flex min-h-screen flex-col'>
-        <Header session={session} dict={dictionary} lang={lang} />
-        <main className='flex-1'>{children}</main>
+    <>
+      <div className='flex min-h-screen flex-col space-y-1'>
+        <Header dict={dictionary} lang={lang} />
+        <main className='mx-auto max-w-7xl flex-1'>{children}</main>
         <Footer />
       </div>
 
       <Toaster className='mt-6' position='top-center' richColors />
-    </ThemeProvider>
+    </>
   );
+}
+
+export function MgmtLayout({ children }: { children: React.ReactNode }) {
+  return { children };
 }

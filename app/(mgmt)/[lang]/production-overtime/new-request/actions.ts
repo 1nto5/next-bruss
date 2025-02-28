@@ -21,6 +21,7 @@ export async function insertOvertimeRequest(
       ...data,
       requestedAt: new Date(),
       requestedBy: session.user.email,
+      editedAt: new Date(),
     };
 
     const res = await coll.insertOne(overtimeRequestToInsert);
@@ -50,6 +51,7 @@ export async function insertDraftOvertimeRequest(
       ...data,
       createdAt: new Date(),
       createdBy: session.user.email,
+      editedAt: new Date(),
     };
     const res = await coll.insertOne(draftRequestToInsert);
     if (res.insertedId) {

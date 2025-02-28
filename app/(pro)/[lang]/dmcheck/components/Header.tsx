@@ -13,7 +13,7 @@ export default async function Header({
   workplaceHref,
 }: HeaderProps) {
   return (
-    <header className='px-6 py-4 sm:flex sm:justify-between'>
+    <header className='px-2 py-4'>
       <div className='relative flex h-10 w-full items-center justify-between'>
         <div className='flex items-center'>
           <span className='font-mono font-semibold'>

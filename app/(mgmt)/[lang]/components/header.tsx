@@ -1,7 +1,6 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 
+import { auth, signOut } from '@/auth';
 import Logo from '@/components/ui/logo';
 import {
   NavigationMenu,
@@ -25,31 +24,20 @@ import {
 } from '@/lib/header-routes';
 import { cn } from '@/lib/utils';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Menu } from 'lucide-react';
-import { Session } from 'next-auth';
+import { LogIn, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { logout } from '../auth/actions';
-import { LoginLogout } from './login-logout';
+import { redirect } from 'next/navigation';
+import React from 'react';
 import { ThemeModeToggle } from './theme-mode-toggle';
 type HeaderProps = {
-  session: Session | null;
   dict: any;
   lang: string;
 };
 
-export default function Header({ session, dict, lang }: HeaderProps) {
-  const router = useRouter();
+export const dynamic = 'force-dynamic';
 
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+export default async function Header({ dict, lang }: HeaderProps) {
+  const session = await auth();
 
   const baseRoutes = lang === 'de' ? deHeaderRoutes : plHeaderRoutes;
   const routes = session?.user?.roles?.includes('admin')
@@ -58,9 +46,9 @@ export default function Header({ session, dict, lang }: HeaderProps) {
 
   return (
     <header
-      className={`bg-background/80 sticky top-0 z-50 px-2 py-2 transition-all duration-200 ${scrolled && 'border-b'} sm:flex sm:justify-between`}
+      className={`bg-background sticky top-0 z-50 w-full border-b px-2 py-4 transition-all`}
     >
-      <div className='relative flex h-4 w-full items-center justify-between'>
+      <div className='relative mx-auto flex h-4 w-full max-w-7xl items-center justify-between'>
         <div className='flex items-center'>
           <Sheet>
             <SheetTrigger asChild>
@@ -103,10 +91,8 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           <NavigationMenu>
             <NavigationMenuList>
               {routes.map((route) => (
-                <NavigationMenuItem className='m-0 p-0' key={route.title}>
-                  <NavigationMenuTrigger
-                    className={`p-2 ${scrolled && 'bg-background/40 h-6'}`}
-                  >
+                <NavigationMenuItem className='m-0 h-8 p-0' key={route.title}>
+                  <NavigationMenuTrigger className={`p-2`}>
                     {route.title}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -128,16 +114,29 @@ export default function Header({ session, dict, lang }: HeaderProps) {
           </NavigationMenu>
         </nav>
         <div className='flex items-center'>
-          <LoginLogout
-            isLoggedIn={!!session}
-            onLogin={() => {
-              router.push(`/auth`);
-            }}
-            onLogout={() => {
-              logout();
-              router.refresh();
-            }}
-          />
+          {session ? (
+            <form
+              action={async () => {
+                'use server';
+                await signOut({ redirectTo: '/' });
+              }}
+            >
+              <Button variant={'ghost'} size='icon'>
+                <LogOut />
+              </Button>
+            </form>
+          ) : (
+            <form
+              action={async () => {
+                'use server';
+                redirect('/auth');
+              }}
+            >
+              <Button variant={'ghost'} size='icon'>
+                <LogIn />
+              </Button>
+            </form>
+          )}
 
           <ThemeModeToggle buttonStyle='' />
         </div>

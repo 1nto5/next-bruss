@@ -11,6 +11,11 @@ export function getLastNameFirstLetter(fullName: string): string {
   return `${nameParts[1].charAt(0).toUpperCase()}`;
 }
 
+export function getFirstNameFromEmail(email: string): string {
+  let nameParts = email.split('@')[0].split('.');
+  return nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
+}
+
 export function extractNameFromEmail(email: string): string {
   let nameParts = email.split('@')[0].split('.');
   const lastName =

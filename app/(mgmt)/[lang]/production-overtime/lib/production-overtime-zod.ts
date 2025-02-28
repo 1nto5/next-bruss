@@ -2,7 +2,7 @@ import * as z from 'zod';
 
 export const NewOvertimeRequestSchema = z
   .object({
-    selectedEmployees: z
+    employees: z
       .array(
         z.object({
           firstName: z.string(),

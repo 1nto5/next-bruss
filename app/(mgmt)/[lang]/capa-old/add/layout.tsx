@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { redirect } from 'next/navigation';
-import Info from '../../components/info';
+import Info from '../../components/welcome-alert';
 
 export const metadata = {
   title: 'Add new CAPA (Next BRUSS)',

@@ -86,7 +86,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
   }
 
   return (
-    <Card className='w-[400px]'>
+    <Card className='sm:w-[400px]'>
       <CardHeader>
         <CardTitle>{cDict.cardTitle}</CardTitle>
         <CardDescription>{cDict.cardDescription}</CardDescription>
@@ -131,7 +131,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
           <CardFooter className='flex justify-end'>
             {isPending ? (
               <Button disabled>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className='animate-spin' />
                 {cDict.loggingButton}
               </Button>
             ) : (

@@ -70,7 +70,7 @@ export default function NewOvertimeRequestForm({
   const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
-      selectedEmployees: [],
+      employees: [],
       from: nextSaturdayFrom,
       to: nextSaturdayTo,
       reason: '',
@@ -195,7 +195,7 @@ export default function NewOvertimeRequestForm({
             />
             <FormField
               control={form.control}
-              name='selectedEmployees'
+              name='employees'
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
@@ -394,7 +394,7 @@ export default function NewOvertimeRequestForm({
 
           <Separator className='mb-4' />
 
-          {/* FIXME: dopasuj do niskich rozdzielczości wyświetlanie przycisków */}
+          {/* FIXME: dopasuj do niskich rozdzielczości wyświetlanie przycisków - problem z przewijaniem*/}
           <CardFooter className='flex justify-between'>
             <Button
               variant='destructive'
