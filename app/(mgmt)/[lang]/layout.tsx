@@ -1,6 +1,5 @@
 import '@/app/globals.css';
 import { auth } from '@/auth';
-import Container from '@/components/ui/container';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
@@ -33,15 +32,13 @@ export default async function RootLayout(props: {
       enableSystem
       // disableTransitionOnChange
     >
-      <Container>
-        <div className='flex min-h-screen flex-col'>
-          <Header session={session} dict={dictionary} lang={lang} />
-          <main className='flex-1'>{children}</main>
-          <Footer />
-        </div>
+      <div className='flex min-h-screen flex-col'>
+        <Header session={session} dict={dictionary} lang={lang} />
+        <main className='flex-1'>{children}</main>
+        <Footer />
+      </div>
 
-        <Toaster className='mt-6' position='top-center' richColors />
-      </Container>
+      <Toaster className='mt-6' position='top-center' richColors />
     </ThemeProvider>
   );
 }

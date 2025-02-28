@@ -1,5 +1,4 @@
 import { auth } from '@/auth';
-import FormContainer from '@/components/ui/form-container';
 import { redirect } from 'next/navigation';
 import Info from '../../components/info';
 
@@ -34,9 +33,9 @@ export default async function Layout({
 
   if (!session?.user?.roles?.includes('inventory-approve')) {
     return (
-      <FormContainer>
+      <div className='flex justify-center'>
         <Info title='Brak uprawnień!' description={infoDescription} />
-      </FormContainer>
+      </div>
     );
   }
   return <>{children}</>;

@@ -1,4 +1,3 @@
-import FormContainer from '@/components/ui/form-container';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import Info from './components/info';
@@ -24,8 +23,8 @@ export default async function Home(props: {
     </>
   );
   return (
-    <FormContainer>
+    <div className='flex justify-center'>
       <Info title={dict?.home?.title} description={infoDescription} />
-    </FormContainer>
+    </div>
   );
 }

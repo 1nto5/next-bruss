@@ -1,5 +1,4 @@
 import { auth } from '@/auth';
-import FormContainer from '@/components/ui/form-container';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
@@ -17,5 +16,5 @@ export default async function Layout({
     redirect('/');
   }
 
-  return <FormContainer>{children}</FormContainer>;
+  return <div className='flex justify-center'>{children}</div>;
 }

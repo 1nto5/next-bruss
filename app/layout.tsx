@@ -22,7 +22,7 @@ export default async function RootLayout(props: {
     <html lang={lang} suppressHydrationWarning>
       <head />
 
-      <body className='bg-background min-h-screen font-sans antialiased'>
+      <body className='bg-background mx-auto min-h-screen max-w-7xl font-sans antialiased'>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

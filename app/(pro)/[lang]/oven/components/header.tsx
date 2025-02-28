@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Container from '@/components/ui/container';
 import { UserPen } from 'lucide-react';
 import { useOperatorsStore } from '../lib/stores';
 import AddOvenProcessDialog from './add-oven-process-dialog';
@@ -11,9 +10,9 @@ export default function Header() {
   const { operator1, logout } = useOperatorsStore();
 
   return (
-    <Container>
+    <div className='flex justify-center'>
       <header className='px-6 py-4 sm:flex sm:justify-between'>
-        <div className='relative flex h-10 w-full items-center justify-between '>
+        <div className='relative flex h-10 w-full items-center justify-between'>
           <div className='flex items-center'>
             <span className='font-mono font-semibold'>oven</span>
           </div>
@@ -29,6 +28,6 @@ export default function Header() {
           </div>
         </div>
       </header>
-    </Container>
+    </div>
   );
 }

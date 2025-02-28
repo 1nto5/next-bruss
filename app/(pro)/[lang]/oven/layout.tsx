@@ -1,7 +1,5 @@
 import '@/app/globals.css';
-import Container from '@/components/ui/container';
 import Footer from '@/components/ui/footer';
-import FormContainer from '@/components/ui/form-container';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
@@ -34,15 +32,13 @@ export default async function RootLayout(props: {
       // disableTransitionOnChange
     >
       <QueryProvider>
-        <Container>
-          <div className='flex min-h-screen flex-col'>
-            <Header />
-            <main className='flex-1'>
-              <FormContainer>{children}</FormContainer>
-            </main>
-            <Footer />
-          </div>
-        </Container>
+        <div className='flex min-h-screen flex-col'>
+          <Header />
+          <main className='flex-1'>
+            <div className='flex justify-center'>{children}</div>
+          </main>
+          <Footer />
+        </div>
       </QueryProvider>
       <Toaster richColors position='top-center' />
     </ThemeProvider>
