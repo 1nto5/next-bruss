@@ -4,7 +4,7 @@
 // import Container from '@/components/ui/container';
 
 export const metadata = {
-  title: 'Inwentaryzacja (Next BRUSS)',
+  title: 'Inwentaryzacja (BRUSS)',
 };
 
 export default async function Layout({

@@ -35,7 +35,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect } from 'react';
 import { revalidateDeviations } from '../actions';
 
 interface DataTableProps<TData, TValue> {
@@ -51,13 +50,13 @@ export function DataTable<TData, TValue>({
   fetchTime,
   lang,
 }: DataTableProps<TData, TValue>) {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      revalidateDeviations();
-    }, 1000 * 30); // 30 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     revalidateDeviations();
+  //   }, 1000 * 30); // 30 seconds
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],

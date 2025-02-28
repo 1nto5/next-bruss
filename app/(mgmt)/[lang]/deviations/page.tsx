@@ -33,8 +33,12 @@ async function getAllDeviations(lang: string): Promise<{
 
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
-      from: new Date(deviation.timePeriod.from).toLocaleDateString(lang),
-      to: new Date(deviation.timePeriod.to).toLocaleDateString(lang),
+      from: deviation.timePeriod?.from
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        : '',
+      to: deviation.timePeriod?.to
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
   };
@@ -119,8 +123,12 @@ async function getUserDeviations(
 
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
-      from: new Date(deviation.timePeriod.from).toLocaleDateString(lang),
-      to: new Date(deviation.timePeriod.to).toLocaleDateString(lang),
+      from: deviation.timePeriod?.from
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        : '',
+      to: deviation.timePeriod?.to
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
   };

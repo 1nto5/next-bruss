@@ -1,5 +1,5 @@
 import '@/app/globals.css';
-import Footer from '@/components/ui/footer';
+import Footer from '@/components/footer';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';

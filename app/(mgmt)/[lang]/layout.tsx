@@ -1,9 +1,9 @@
 import '@/app/globals.css';
+import Footer from '@/components/footer';
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { Metadata } from 'next';
-import Footer from './components/footer';
 import Header from './components/header';
 
 export const metadata: Metadata = {
@@ -26,7 +26,9 @@ export default async function RootLayout(props: {
     <>
       <div className='flex min-h-screen flex-col space-y-1'>
         <Header dict={dictionary} lang={lang} />
-        <main className='mx-auto max-w-7xl flex-1'>{children}</main>
+        <main className='mx-auto max-w-7xl flex-1'>
+          <div className='max-w-[100vw]'>{children}</div>
+        </main>
         <Footer />
       </div>
 

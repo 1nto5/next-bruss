@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 
 import { auth, signOut } from '@/auth';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Logo from '@/components/ui/logo';
 import {
   NavigationMenu,
@@ -23,18 +24,19 @@ import {
   plHeaderRoutes,
 } from '@/lib/header-routes';
 import { cn } from '@/lib/utils';
+import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { LogIn, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
-import { ThemeModeToggle } from './theme-mode-toggle';
+import { ThemeModeToggle } from '../../../../components/theme-mode-toggle';
 type HeaderProps = {
   dict: any;
   lang: string;
 };
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export default async function Header({ dict, lang }: HeaderProps) {
   const session = await auth();
@@ -91,7 +93,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
           <NavigationMenu>
             <NavigationMenuList>
               {routes.map((route) => (
-                <NavigationMenuItem className='m-0 h-8 p-0' key={route.title}>
+                <NavigationMenuItem key={route.title}>
                   <NavigationMenuTrigger className={`p-2`}>
                     {route.title}
                   </NavigationMenuTrigger>
@@ -113,18 +115,27 @@ export default async function Header({ dict, lang }: HeaderProps) {
             </NavigationMenuList>
           </NavigationMenu>
         </nav>
-        <div className='flex items-center'>
+        <div className='flex items-center space-x-1'>
           {session ? (
-            <form
-              action={async () => {
-                'use server';
-                await signOut({ redirectTo: '/' });
-              }}
-            >
-              <Button variant={'ghost'} size='icon'>
-                <LogOut />
-              </Button>
-            </form>
+            <>
+              {session.user?.email && (
+                <Avatar>
+                  <AvatarFallback>
+                    {getInitialsFromEmail(session.user.email)}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              <form
+                action={async () => {
+                  'use server';
+                  await signOut({ redirectTo: '/' });
+                }}
+              >
+                <Button variant={'ghost'} size='icon'>
+                  <LogOut />
+                </Button>
+              </form>
+            </>
           ) : (
             <form
               action={async () => {
@@ -138,7 +149,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
             </form>
           )}
 
-          <ThemeModeToggle buttonStyle='' />
+          <ThemeModeToggle />
         </div>
       </div>
     </header>

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { CardTableDataType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, List, Table } from 'lucide-react';
+import { ArrowUpDown, List } from 'lucide-react';
 import Link from 'next/link';
 
 export const cardsColumns: ColumnDef<CardTableDataType>[] = [

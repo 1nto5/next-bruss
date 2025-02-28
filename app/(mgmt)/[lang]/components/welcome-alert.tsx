@@ -12,14 +12,18 @@ export default async function WelcomeAlert({ title, description }: InfoProps) {
   const session = await auth();
   const email = session?.user?.email;
   return (
-    <Alert className='sm:w-[500px]'>
+    <Alert className='text-justify sm:w-[500px]'>
       <Terminal className='h-4 w-4' />
       <AlertTitle>
         {!session
           ? title + '!'
           : `${title} ${email ? getFirstNameFromEmail(email) : ''}!`}
       </AlertTitle>
-      {description && <AlertDescription>{description}</AlertDescription>}
+      {description && (
+        <AlertDescription className='text-justify'>
+          {description}
+        </AlertDescription>
+      )}
     </Alert>
   );
 }

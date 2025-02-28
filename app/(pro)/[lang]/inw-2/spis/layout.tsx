@@ -1,6 +1,6 @@
 import '@/app/globals.css';
 
-import Footer from '@/components/ui/footer';
+import Footer from '@/components/footer';
 
 import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
@@ -34,9 +34,9 @@ export default async function RootLayout(props: {
       // disableTransitionOnChange
     >
       <QueryProvider>
-        <div className='flex min-h-screen flex-col'>
+        <div className='flex min-h-screen flex-col space-y-1'>
           <Header />
-          <main className='flex-1'>
+          <main className='mx-auto max-w-7xl flex-1'>
             <div className='flex justify-center'>{children}</div>
           </main>
           <Footer />
