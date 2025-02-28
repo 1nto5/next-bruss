@@ -1,6 +1,5 @@
 import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
-import Container from '@/components/ui/container';
+// import { getDictionary } from '@/lib/dictionary';`
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Capa, columns } from './table/columns';
 import { DataTable } from './table/data-table';
