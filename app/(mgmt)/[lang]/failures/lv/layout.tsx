@@ -1,10 +1,5 @@
-// import { redirect } from 'next/navigation';
-// import { auth } from '@/auth';
-
-import Container from '@/components/ui/container';
-
 export const metadata = {
-  title: 'Awarie LV (Next BRUSS)',
+  title: 'Awarie LV (BRUSS)',
 };
 
 export default async function Layout({

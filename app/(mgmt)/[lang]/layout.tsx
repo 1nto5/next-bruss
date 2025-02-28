@@ -36,7 +36,3 @@ export default async function RootLayout(props: {
     </>
   );
 }
-
-export function MgmtLayout({ children }: { children: React.ReactNode }) {
-  return { children };
-}
