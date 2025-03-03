@@ -26,7 +26,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 // import { ScrollArea } from '@/components/ui/scroll-area';
 import { addDays } from 'date-fns';

@@ -26,8 +26,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/cn';
 import { DeviationReasonType } from '@/lib/types/deviation';
-import { cn } from '@/lib/utils';
 import { addDeviationDraftSchema, addDeviationSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
@@ -337,7 +337,7 @@ export default function AddDeviation({
                       >
                         <FormItem
                           key={'pcs'}
-                          className='flex items-center space-x-3 space-y-0'
+                          className='flex items-center space-y-0 space-x-3'
                         >
                           <FormControl>
                             <RadioGroupItem value='pcs' />
@@ -346,7 +346,7 @@ export default function AddDeviation({
                         </FormItem>
                         <FormItem
                           key={'kg'}
-                          className='flex items-center space-x-3 space-y-0'
+                          className='flex items-center space-y-0 space-x-3'
                         >
                           <FormControl>
                             <RadioGroupItem value='kg' />
@@ -411,7 +411,7 @@ export default function AddDeviation({
                       {reasons.map((reason) => (
                         <FormItem
                           key={reason._id.toString()}
-                          className='flex items-center space-x-3 space-y-0'
+                          className='flex items-center space-y-0 space-x-3'
                         >
                           <FormControl>
                             <RadioGroupItem value={reason.content} />

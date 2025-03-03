@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import {
   Check,
   ChevronsUpDown,

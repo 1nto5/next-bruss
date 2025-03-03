@@ -35,7 +35,7 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';

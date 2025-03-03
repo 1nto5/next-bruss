@@ -31,8 +31,8 @@ import {
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/cn';
 import { UsersListType } from '@/lib/types/user';
-import { cn } from '@/lib/utils';
 import { addCorrectiveActionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
@@ -46,7 +46,7 @@ import {
   Table,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';

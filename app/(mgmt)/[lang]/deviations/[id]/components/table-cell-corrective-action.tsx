@@ -41,9 +41,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/cn';
 import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
 import { correctiveActionType } from '@/lib/types/deviation';
-import { cn } from '@/lib/utils';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';

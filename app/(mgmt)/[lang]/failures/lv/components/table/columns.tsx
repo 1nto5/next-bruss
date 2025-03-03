@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import { ColumnDef } from '@tanstack/react-table';
 import { Activity, Ban } from 'lucide-react';
 import { FailureType } from '../../lib/failures-types';

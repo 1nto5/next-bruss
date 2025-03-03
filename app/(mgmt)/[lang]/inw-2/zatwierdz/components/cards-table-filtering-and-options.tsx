@@ -15,11 +15,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/lib/cn';
 import {
   sectorsSelectOptions,
   warehouseSelectOptions,
 } from '@/lib/options/inventory';
-import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CircleX, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 

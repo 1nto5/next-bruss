@@ -18,12 +18,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { cn } from '@/lib/cn';
 import {
   adminHeaderRoutes,
   deHeaderRoutes,
   plHeaderRoutes,
 } from '@/lib/header-routes';
-import { cn } from '@/lib/utils';
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { LogIn, LogOut, Menu } from 'lucide-react';
