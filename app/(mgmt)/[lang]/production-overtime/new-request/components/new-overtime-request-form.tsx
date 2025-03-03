@@ -36,6 +36,7 @@ import { NewOvertimeRequestSchema } from '../../lib/production-overtime-zod';
 import {
   insertOvertimeRequest as insert,
   insertDraftOvertimeRequest as insertDraft,
+  redirectToProductionOvertime as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from './multi-select-employees';
 
@@ -82,8 +83,8 @@ export default function NewOvertimeRequestForm({
       const res = await insert(data);
       if ('success' in res) {
         toast.success('Zlecenie dodane!');
-        // form.reset(); // Reset form after successful submission
-        // redirect();
+        form.reset(); // Reset form after successful submission
+        redirect();
       } else if ('error' in res) {
         console.error(res.error);
         toast.error('Skontaktuj się z IT!');

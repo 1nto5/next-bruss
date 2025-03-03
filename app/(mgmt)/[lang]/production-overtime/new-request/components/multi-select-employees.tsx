@@ -72,22 +72,23 @@ export const MultiSelectEmployees = ({
   const [pendingEmployee, setPendingEmployee] = useState<EmployeeType | null>(
     null,
   );
-  const [date, setDate] = useState<Date | undefined>(undefined);
-  const [note, setNote] = useState('');
-  const [isDayOffAgreed, setIsDayOffAgreed] = useState(true);
   const [dateError, setDateError] = useState(false);
 
-  // Update the validation schema to conditionally require date
-  const DayOffSchema = z.object({
-    isDayOffAgreed: z.boolean(),
-    date: z
-      .date({ message: 'Wybierz datę odbioru!' })
-      .optional()
-      .refine((date) => !isDayOffAgreed || date !== undefined, {
-        message: 'Wybierz datę odbioru!',
-      }),
-    note: z.string().optional(),
-  });
+  const DayOffSchema = z
+    .object({
+      isDayOffAgreed: z.boolean().default(true),
+      date: z.date({ message: 'Wybierz datę odbioru!' }).optional(),
+      note: z.string().optional().default(''),
+    })
+    .superRefine((data, ctx) => {
+      if (data.isDayOffAgreed && data.date === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Wybierz datę odbioru!',
+          path: ['date'],
+        });
+      }
+    });
 
   const form = useForm<z.infer<typeof DayOffSchema>>({
     resolver: zodResolver(DayOffSchema),
@@ -97,6 +98,8 @@ export const MultiSelectEmployees = ({
       isDayOffAgreed: true,
     },
   });
+
+  const isDayOffAgreed = form.watch('isDayOffAgreed');
 
   const handleSelect = (employee: EmployeeType) => {
     const isSelected = value.some(
@@ -108,37 +111,45 @@ export const MultiSelectEmployees = ({
       );
     } else {
       setPendingEmployee(employee);
-      form.reset();
+      form.reset({
+        isDayOffAgreed: true,
+        date: undefined,
+        note: '',
+      });
       setOpenDialog(true);
     }
     setInputValue('');
   };
 
-  const onSubmit = () => {
-    if (isDayOffAgreed && !date) {
-      setDateError(true);
-      return;
-    }
-
-    if (pendingEmployee) {
-      let normalizedDate;
-      if (isDayOffAgreed && date) {
-        normalizedDate = new Date(date);
-        normalizedDate.setHours(12, 0, 0, 0);
+  const handleAddEmployee = () => {
+    // Walidacja danych formularza
+    form.handleSubmit((formData) => {
+      if (formData.isDayOffAgreed && !formData.date) {
+        setDateError(true);
+        return;
       }
 
-      const newEmployee = {
-        ...pendingEmployee,
-        note,
-        ...(isDayOffAgreed && date
-          ? { agreedReceivingAt: normalizedDate }
-          : {}),
-      };
-      onSelectChange([...value, newEmployee]);
-    }
-    setOpenDialog(false);
-    setPendingEmployee(null);
-    form.reset();
+      if (pendingEmployee) {
+        let normalizedDate;
+        if (formData.isDayOffAgreed && formData.date) {
+          normalizedDate = new Date(formData.date);
+          normalizedDate.setHours(12, 0, 0, 0);
+        }
+
+        const newEmployee = {
+          ...pendingEmployee,
+          note: formData.note || '',
+          ...(formData.isDayOffAgreed && formData.date
+            ? { agreedReceivingAt: normalizedDate }
+            : {}),
+        };
+        onSelectChange([...value, newEmployee]);
+      }
+      setOpenDialog(false);
+      setPendingEmployee(null);
+      form.reset();
+      setDateError(false);
+    })();
   };
 
   const agreedTimeDialog = (
@@ -151,87 +162,91 @@ export const MultiSelectEmployees = ({
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogScrollArea className='h-[50vh] sm:h-[50vh]'>
-              <DialogFormWithScroll>
-                <FormField
-                  control={form.control}
-                  name='isDayOffAgreed'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-center justify-between space-y-0 py-2'>
-                      <FormLabel className='leading-normal'>
-                        Uzgodniono odbiór dnia wolnego
-                      </FormLabel>
-                      <FormControl>
-                        <Switch
-                          checked={isDayOffAgreed}
-                          onCheckedChange={(checked) => {
-                            setIsDayOffAgreed(checked);
-                            field.onChange(checked);
-                            // Reset date when toggling off
-                            if (!checked) {
-                              form.setValue('date', undefined);
-                              setDate(undefined);
-                              setDateError(false);
+          <DialogScrollArea className='h-[50vh] sm:h-[50vh]'>
+            <DialogFormWithScroll>
+              <FormField
+                control={form.control}
+                name='isDayOffAgreed'
+                render={({ field }) => (
+                  <FormItem className='flex flex-row items-center justify-between space-y-0 py-2'>
+                    <FormLabel className='leading-normal'>
+                      Uzgodniono odbiór dnia wolnego
+                    </FormLabel>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          if (!checked) {
+                            form.setValue('date', undefined);
+                            setDateError(false);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='date'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rozpoczęcie</FormLabel>
+                    <FormControl>
+                      <DateTimePicker
+                        modal
+                        hideTime
+                        value={field.value}
+                        onChange={field.onChange}
+                        timePicker={{ hour: true, minute: true }}
+                        disabled={!isDayOffAgreed}
+                        renderTrigger={({ open, value, setOpen }) => (
+                          <DateTimeInput
+                            value={value}
+                            onChange={(x) => !open && field.onChange(x)}
+                            format='dd/MM/yyyy'
+                            disabled={open || !isDayOffAgreed}
+                            onCalendarClick={() =>
+                              isDayOffAgreed && setOpen(!open)
                             }
-                          }}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='date'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Rozpoczęcie</FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          modal
-                          hideTime
-                          value={field.value}
-                          onChange={field.onChange}
-                          timePicker={{ hour: true, minute: true }}
-                          disabled={!isDayOffAgreed}
-                          renderTrigger={({ open, value, setOpen }) => (
-                            <DateTimeInput
-                              value={value}
-                              onChange={(x) => !open && field.onChange(x)}
-                              format='dd/MM/yyyy'
-                              disabled={open || !isDayOffAgreed}
-                              onCalendarClick={() =>
-                                isDayOffAgreed && setOpen(!open)
-                              }
-                            />
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='note'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Uwagi</FormLabel>
-                      <FormControl>
-                        <Textarea {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </DialogFormWithScroll>
-            </DialogScrollArea>
-            <DialogFooter className='mt-4'>
-              <Button className='w-full'>
-                <CopyPlus /> Dodaj zlecenie pracownika
-              </Button>
-            </DialogFooter>
-          </form>
+                          />
+                        )}
+                      />
+                    </FormControl>
+                    {dateError && isDayOffAgreed && (
+                      <p className='text-destructive text-sm'>
+                        Wybierz datę odbioru!
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='note'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Uwagi</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </DialogFormWithScroll>
+          </DialogScrollArea>
+          <DialogFooter className='mt-4'>
+            <Button
+              type='button'
+              className='w-full'
+              onClick={handleAddEmployee}
+            >
+              <CopyPlus /> Dodaj zlecenie pracownika
+            </Button>
+          </DialogFooter>
         </Form>
       </DialogContent>
     </Dialog>
