@@ -8,7 +8,7 @@ import { getDictionary } from '@/lib/dictionary';
 import Header from '../components/header';
 
 export const metadata: Metadata = {
-  title: 'DMCheck (Next BRUSS)',
+  title: 'DMCheck (BRUSS)',
   description: 'Company helper applications',
 };
 

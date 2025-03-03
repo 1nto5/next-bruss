@@ -23,7 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +37,7 @@ import {
   insertOvertimeRequest as insert,
   insertDraftOvertimeRequest as insertDraft,
 } from '../actions';
-import { MultiSelect } from './multi-select-employees';
+import { MultiSelectEmployees } from './multi-select-employees';
 
 export default function NewOvertimeRequestForm({
   employees,
@@ -122,7 +121,7 @@ export default function NewOvertimeRequestForm({
   return (
     <Card className='sm:w-[768px]'>
       <CardHeader>
-        <div className='flex justify-between gap-2 sm:gap-4'>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>
             Nowe zlecenie wykonania pracy w godzinach nadliczbowych - produkcja
           </CardTitle>
@@ -133,7 +132,6 @@ export default function NewOvertimeRequestForm({
           </Link>
         </div>
       </CardHeader>
-      <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* <ScrollArea className='h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[30rem]'> */}
@@ -201,7 +199,7 @@ export default function NewOvertimeRequestForm({
                   <div className='flex flex-col items-start space-y-2'>
                     <FormLabel>Pracownicy</FormLabel>
                     <FormControl>
-                      <MultiSelect
+                      <MultiSelectEmployees
                         employees={employees}
                         value={field.value}
                         onSelectChange={field.onChange}
@@ -314,99 +312,26 @@ export default function NewOvertimeRequestForm({
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-
-            {/* <div className='flex space-x-2'>
-              <FormField
-                control={form.control}
-                name='articleNumber'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Artykuł</FormLabel>
-                    <FormControl>
-                      <Input
-                        className='w-20'
-                        autoFocus
-                        placeholder='12345'
-                        {...field}
-                      />
-                    </FormControl>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='articleName'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nazwa</FormLabel>
-                    <div className='flex items-center space-x-2'>
-                      <FormControl>
-                        <Input
-                          className='w-44'
-                          placeholder='F-IWDR92,1L-ST'
-                          {...field}
-                        />
-                      </FormControl>
-                      {isPendingFindArticleName ? (
-                        <Button
-                          size='icon'
-                          variant='outline'
-                          type='button'
-                          disabled
-                        >
-                          <Loader2 className='h-4 w-4 animate-spin' />
-                        </Button>
-                      ) : (
-                        <Button
-                          size='icon'
-                          variant='outline'
-                          type='button'
-                          onClick={handleFindArticleName}
-                        >
-                          <AArrowDown />
-                        </Button>
-                      )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div> */}
-
-            {/* <FormField
-              control={form.control}
-              name='customerNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numer części klienta</FormLabel>
-                  <FormControl>
-                    <Input className='w-48' placeholder='' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
           </CardContent>
           {/* </ScrollArea> */}
 
-          <Separator className='mb-4' />
-
-          {/* FIXME: dopasuj do niskich rozdzielczości wyświetlanie przycisków - problem z przewijaniem*/}
-          <CardFooter className='flex justify-between'>
+          <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <Button
               variant='destructive'
               type='button'
               onClick={() => form.reset()}
+              className='w-full sm:w-auto'
             >
-              <CircleX />
+              <CircleX className='' />
               Wyczyść
             </Button>
-            <div className='flex space-x-2'>
+            <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
               {isPendingInsertDraft ? (
-                <Button variant='secondary' disabled>
+                <Button
+                  variant='secondary'
+                  disabled
+                  className='w-full sm:w-auto'
+                >
                   <Loader2 className='animate-spin' />
                   Zapisywanie
                 </Button>
@@ -419,19 +344,20 @@ export default function NewOvertimeRequestForm({
                     // form.handleSubmit(handleDraftInsert)();
                     // handleDraftInsert(form.getValues());
                   }}
+                  className='w-full sm:w-auto'
                 >
-                  <Pencil />
+                  <Pencil className='' />
                   Zapisz szkic
                 </Button>
               )}
               {isPendingInsert ? (
-                <Button disabled>
+                <Button disabled className='w-full sm:w-auto'>
                   <Loader2 className='animate-spin' />
                   Dodawanie
                 </Button>
               ) : (
-                <Button type='submit'>
-                  <Plus />
+                <Button type='submit' className='w-full sm:w-auto'>
+                  <Plus className='' />
                   Dodaj zlecenie
                 </Button>
               )}

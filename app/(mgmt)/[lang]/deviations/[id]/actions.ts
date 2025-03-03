@@ -7,7 +7,6 @@ import {
   correctiveActionType,
   DeviationType,
 } from '@/lib/types/deviation';
-import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 // import { AddDeviationType } from '@/lib/z/deviation';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';

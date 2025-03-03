@@ -14,7 +14,7 @@ export default async function Home(props: {
     <>
       {dict.home.description}
       <a
-        href={`mailto:adrian.antosiak@bruss-group.com?subject=Next BRUSS: `}
+        href={`mailto:adrian.antosiak@bruss-group.com `}
         className='text-blue-600 hover:text-blue-800'
       >
         adrian.antosiak@bruss-group.com

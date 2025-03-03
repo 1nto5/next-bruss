@@ -29,9 +29,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 // import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar } from '@/components/ui/calendar';
-import { addDays, format } from 'date-fns';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { addDays } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 import { toast } from 'sonner';
 
@@ -155,7 +153,7 @@ export default function ExportCard({
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.setAttribute('download', `DMCheck export (Next BRUSS).xlsx`);
+      link.setAttribute('download', `DMCheck export (BRUSS).xlsx`);
       document.body.appendChild(link);
       link.click();
       if (link.parentNode) {
@@ -190,7 +188,7 @@ export default function ExportCard({
                     variant='outline'
                     role='combobox'
                     aria-expanded={openWorkplace}
-                    className='justify-between font-normal '
+                    className='justify-between font-normal'
                   >
                     {selectedWorkplace
                       ? selectedWorkplace.toUpperCase()
@@ -198,7 +196,7 @@ export default function ExportCard({
                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className=' w-fit p-0'>
+                <PopoverContent className='w-fit p-0'>
                   <Command>
                     <CommandInput placeholder='Wyszukaj...' />
                     <CommandEmpty>{cDict.emptyCommand}</CommandEmpty>

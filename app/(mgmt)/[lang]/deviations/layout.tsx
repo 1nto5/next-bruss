@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Odchylenia (Next BRUSS)',
+  title: 'Odchylenia (BRUSS)',
 };
 
 export default async function Layout({

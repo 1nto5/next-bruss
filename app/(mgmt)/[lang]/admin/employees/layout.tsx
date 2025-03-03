@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Employees management (Next BRUSS)',
+  title: 'Employees management (BRUSS)',
 };
 
 export default async function Layout({

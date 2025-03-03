@@ -1,15 +1,9 @@
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { format, getYear, isValid, parse } from 'date-fns';
-import { CalendarIcon, CircleAlert, CircleCheck } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import {
   useCallback,
   useEffect,
@@ -201,6 +195,19 @@ const DateTimeInput = React.forwardRef<HTMLInputElement, DateTimeInputProps>(
       [segments],
     );
 
+    // New handler for focusing the first segment when tabbing to the input
+    const onFocus = useEventCallback(() => {
+      setIsFocused(true);
+
+      // Find the first non-space segment and select it
+      const validSegments = segments.filter((s) => s.type !== 'space');
+      if (validSegments.length > 0) {
+        const firstSegment = validSegments[0];
+        setCurrentSegment(firstSegment);
+        setSelection(inputRef, firstSegment);
+      }
+    }, [segments]);
+
     const onSegmentChange = useEventCallback(
       (direction: 'left' | 'right') => {
         if (!curSegment) return;
@@ -313,6 +320,12 @@ const DateTimeInput = React.forwardRef<HTMLInputElement, DateTimeInputProps>(
     const onKeyDown = useEventCallback(
       (event: React.KeyboardEvent<HTMLInputElement>) => {
         const key = event.key;
+
+        // Allow Tab key to pass through for normal form navigation
+        if (key === 'Tab') {
+          return; // Let the browser handle tab navigation
+        }
+
         setSelection(inputRef, curSegment);
 
         switch (key) {
@@ -349,8 +362,8 @@ const DateTimeInput = React.forwardRef<HTMLInputElement, DateTimeInputProps>(
       <div
         ref={ref}
         className={cn(
-          'flex h-10 items-center justify-start rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground  disabled:cursor-not-allowed disabled:opacity-50',
-          isFocused ? 'outline-hidden ring-2 ring-ring ring-offset-2' : '',
+          'border-input bg-background ring-offset-background file:text-foreground placeholder:text-muted-foreground flex h-10 items-center justify-start space-x-2 rounded-md border text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:cursor-not-allowed disabled:opacity-50',
+          isFocused ? 'ring-ring ring-2 ring-offset-2 outline-hidden' : '',
           options.hideCalendarIcon && 'ps-2',
           options.className,
         )}
@@ -362,13 +375,13 @@ const DateTimeInput = React.forwardRef<HTMLInputElement, DateTimeInputProps>(
             size='icon'
             onClick={options.onCalendarClick}
           >
-            <CalendarIcon className='size-4 text-muted-foreground' />
+            <CalendarIcon className='text-muted-foreground size-4' />
           </Button>
         )}
         <input
           ref={mergeRefs(inputRef)}
           className='min-w-0 grow bg-transparent py-1 pe-2 font-mono text-sm focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-50'
-          onFocus={() => setIsFocused(true)}
+          onFocus={onFocus}
           onBlur={() => setIsFocused(false)}
           onClick={onClick}
           onKeyDown={onKeyDown}
@@ -484,6 +497,12 @@ function safeSetSelection(
       } else {
         element.setSelectionRange(selectionStart, selectionEnd, 'none');
       }
+    } else {
+      // Ensure element is focused before setting selection
+      element.focus();
+      requestAnimationFrame(() => {
+        element.setSelectionRange(selectionStart, selectionEnd, 'none');
+      });
     }
   });
 }

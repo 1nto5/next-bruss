@@ -124,7 +124,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='from'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[350px]'>
+                    <FormItem className=''>
                       <FormLabel>Rozpoczęcie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -153,7 +153,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='to'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[350px]'>
+                    <FormItem className=''>
                       <FormLabel>Zakończenie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -181,7 +181,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='supervisor'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[200px]'>
+                    <FormItem className=''>
                       <FormLabel>Nadzorujący</FormLabel>
                       <FormControl>
                         <Input placeholder='' {...field} />
@@ -197,7 +197,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='responsible'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[200px]'>
+                    <FormItem className=''>
                       <FormLabel>Odpowiedzialny</FormLabel>
                       <FormControl>
                         <Input placeholder='' {...field} />
@@ -214,7 +214,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='solution'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[400px]'>
+                    <FormItem className=''>
                       <FormLabel>Rozwiązanie</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
@@ -227,7 +227,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='comment'
                   render={({ field }) => (
-                    <FormItem className='sm:w-[400px]'>
+                    <FormItem className=''>
                       <FormLabel>Komentarz</FormLabel>
                       <FormControl>
                         <Textarea {...field} />

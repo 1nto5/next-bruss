@@ -1,5 +1,7 @@
 'use client';
 
+import DialogFormWithScroll from '@/components/dialog-form-with-scroll';
+import DialogScrollArea from '@/components/dialog-scroll-area';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -42,19 +44,19 @@ import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
 import * as React from 'react';
 import { selectedEmployeeForOvertimeType } from '../../lib/production-overtime-types';
 
-interface MultiSelectProps {
+interface MultiSelectEmployeesProps {
   employees: selectedEmployeeForOvertimeType[];
   value: selectedEmployeeForOvertimeType[];
   onSelectChange: (value: selectedEmployeeForOvertimeType[]) => void;
   placeholder?: string;
 }
 
-export const MultiSelect = ({
+export const MultiSelectEmployees = ({
   employees,
   value,
   onSelectChange,
   placeholder = 'Wybierz pracowników...',
-}: MultiSelectProps) => {
+}: MultiSelectEmployeesProps) => {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
 
@@ -160,7 +162,7 @@ export const MultiSelect = ({
           <Button
             variant='outline'
             role='combobox'
-            className='w-[350px] justify-between'
+            className='w-full justify-between'
           >
             <span className={cn(!value.length && 'opacity-50')}>
               {value.length > 0
@@ -261,7 +263,7 @@ export const MultiSelect = ({
         // </ScrollArea>
       )}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className='w-[700px] sm:max-w-[700px]'>
+        <DialogContent className='sm:max-w-[700px]'>
           <DialogHeader>
             <DialogTitle>
               Uzgodniony termin odbioru dnia wolnego dla:{' '}
@@ -271,21 +273,20 @@ export const MultiSelect = ({
             Make changes to your profile here. Click save when you're done.
           </DialogDescription> */}
           </DialogHeader>
-          {/* <ScrollArea className='h-[70vh]'> */}
-          <div className='grid items-center gap-2 p-2'>
-            <div className='flex items-center justify-between space-y-2'>
-              <Label htmlFor='day-off-agreed' className='leading-normal'>
-                Uzgodniono odbiór dnia wolnego
-              </Label>
-              <Switch
-                id='day-off-agreed'
-                checked={isDayOffAgreed}
-                onCheckedChange={setIsDayOffAgreed}
-              />
-            </div>
+          <DialogScrollArea className='h-[50vh] sm:h-[50vh]'>
+            <DialogFormWithScroll>
+              <div className='flex items-center justify-between space-y-2'>
+                <Label htmlFor='day-off-agreed' className='leading-normal'>
+                  Uzgodniono odbiór dnia wolnego
+                </Label>
+                <Switch
+                  id='day-off-agreed'
+                  checked={isDayOffAgreed}
+                  onCheckedChange={setIsDayOffAgreed}
+                />
+              </div>
 
-            {/* Date picker with error state */}
-            <div className={cn(!isDayOffAgreed && 'opacity-50')}>
+              {/* Date picker with error state */}
               <DateTimePicker
                 min={new Date(Date.now())}
                 modal
@@ -309,16 +310,15 @@ export const MultiSelect = ({
               {dateError && isDayOffAgreed && (
                 <FormMessage>Data odbioru jest wymagana</FormMessage>
               )}
-            </div>
 
-            <Label htmlFor='note'>Uwagi</Label>
-            <Textarea
-              id='note'
-              value={note} // controlled textarea value
-              onChange={(e) => setNote(e.target.value)} // update note state
-            />
-          </div>
-          {/* </ScrollArea> */}
+              <Label htmlFor='note'>Uwagi</Label>
+              <Textarea
+                id='note'
+                value={note} // controlled textarea value
+                onChange={(e) => setNote(e.target.value)} // update note state
+              />
+            </DialogFormWithScroll>
+          </DialogScrollArea>
           <DialogFooter className='mt-4'>
             <Button className='w-full' type='button' onClick={handleConfirm}>
               <CopyPlus /> Dodaj zlecenie pracownika

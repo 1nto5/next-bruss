@@ -1,7 +1,7 @@
 export interface SubHeaderRoute {
   href: string;
   title: string;
-  description: string;
+  description?: string;
 }
 
 export interface HeaderRoute {
@@ -38,7 +38,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.deviations,
         title: 'Odchylenia - test',
-        description: 'Zarządzanie odchyleniami produkcji. Wersja testowa.',
+        description: 'Zarządzanie odchyleniami produkcji.',
       },
       {
         href: ROUTE_PATHS.failuresLv,
@@ -69,7 +69,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
     submenu: [
       {
         href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja',
+        title: 'Praca w godzinach nadliczbowych - produkcja - test',
         description:
           'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
       },
@@ -104,27 +104,22 @@ export const adminHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.adminUsers,
         title: 'Users management',
-        description: 'Manage users roles.',
       },
       {
         href: ROUTE_PATHS.adminEmployees,
         title: 'Employees',
-        description: 'Manage employees in Next BRUSS apps.',
       },
       {
         href: ROUTE_PATHS.adminEmployeesAddMany,
         title: 'Add many employees',
-        description: 'Add many employees from HYDRA export file.',
       },
       {
         href: ROUTE_PATHS.adminDmcheckArticles,
-        title: 'DMCheck articles',
-        description: 'Manage articles in DMCheck app.',
+        title: 'DMCheck configs',
       },
       {
         href: ROUTE_PATHS.adminReworkMany,
         title: 'DMCheck rework many',
-        description: 'Rework many DMCs / batches at once.',
       },
     ],
   },

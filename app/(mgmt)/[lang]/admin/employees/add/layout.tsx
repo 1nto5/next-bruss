@@ -5,7 +5,7 @@ import { Locale } from '@/i18n.config';
 // import Info from '../../../../components/Info';
 
 export const metadata = {
-  title: 'Add employee (Next BRUSS)',
+  title: 'Add employee (BRUSS)',
 };
 
 export default async function Layout(props: {

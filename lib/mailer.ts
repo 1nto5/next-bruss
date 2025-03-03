@@ -21,7 +21,7 @@ const config =
 const transporter = createTransport(config);
 
 const FOOTER_TEXT =
-  '\n\n--\nWiadomość wysłana automatycznie przez: / Automatically sent by: / Automatisch gesendet von: Next BRUSS - http://next.mrg700.bruss-group.com';
+  '\n\n--\nWiadomość wysłana automatycznie. Nie odpowiadaj. / Message sent automatically. Do not reply. / Nachricht automatisch gesendet. Bitte nicht antworten.';
 
 async function sendMail(
   mailOptions: SendMailOptions,
