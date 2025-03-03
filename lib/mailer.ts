@@ -23,7 +23,7 @@ const transporter = createTransport(config);
 const FOOTER_TEXT =
   '\n\n--\nWiadomość wysłana automatycznie. Nie odpowiadaj. / Message sent automatically. Do not reply. / Nachricht automatisch gesendet. Bitte nicht antworten.';
 
-async function sendMail(
+export default async function sendMail(
   mailOptions: SendMailOptions,
 ): Promise<SentMessageInfo> {
   // Append footer to text version if exists, otherwise, create it.
@@ -45,5 +45,3 @@ async function sendMail(
     throw error;
   }
 }
-
-export default { sendMail };
