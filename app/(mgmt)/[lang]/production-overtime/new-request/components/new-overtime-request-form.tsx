@@ -26,7 +26,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleX, Loader2, Pencil, Plus, Table } from 'lucide-react';
+import { CircleX, Pencil, Plus, Table } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -326,41 +326,31 @@ export default function NewOvertimeRequestForm({
               Wyczyść
             </Button>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              {isPendingInsertDraft ? (
-                <Button
-                  variant='secondary'
-                  disabled
-                  className='w-full sm:w-auto'
-                >
-                  <Loader2 className='animate-spin' />
-                  Zapisywanie
-                </Button>
-              ) : (
-                <Button
-                  variant='secondary'
-                  type='button'
-                  onClick={() => {
-                    // setIsDraft(true);
-                    // form.handleSubmit(handleDraftInsert)();
-                    // handleDraftInsert(form.getValues());
-                  }}
-                  className='w-full sm:w-auto'
-                >
-                  <Pencil className='' />
-                  Zapisz szkic
-                </Button>
-              )}
-              {isPendingInsert ? (
-                <Button disabled className='w-full sm:w-auto'>
-                  <Loader2 className='animate-spin' />
-                  Dodawanie
-                </Button>
-              ) : (
-                <Button type='submit' className='w-full sm:w-auto'>
-                  <Plus className='' />
-                  Dodaj zlecenie
-                </Button>
-              )}
+              <Button
+                variant='secondary'
+                type='button'
+                onClick={() => {
+                  // setIsDraft(true);
+                  // form.handleSubmit(handleDraftInsert)();
+                  // handleDraftInsert(form.getValues());
+                }}
+                disabled={isPendingInsertDraft}
+                className='w-full sm:w-auto'
+              >
+                <Pencil
+                  className={isPendingInsertDraft ? 'animate-spin' : ''}
+                />
+                Zapisz szkic
+              </Button>
+
+              <Button
+                type='submit'
+                className='w-full sm:w-auto'
+                disabled={isPendingInsertDraft}
+              >
+                <Plus className={isPendingInsertDraft ? 'animate-spin' : ''} />
+                Dodaj zlecenie
+              </Button>
             </div>
           </CardFooter>
         </form>

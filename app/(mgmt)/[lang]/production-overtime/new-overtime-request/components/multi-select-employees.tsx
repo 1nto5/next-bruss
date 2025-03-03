@@ -15,8 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/lib/cn';
 import { EmployeeType } from '@/lib/types/employee-types';
-import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CircleX, X } from 'lucide-react';
 import * as React from 'react';
 

@@ -20,14 +20,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { FormMessage } from '@/components/ui/form';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch'; // Add Switch import
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -38,10 +44,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/cn';
 import { EmployeeType } from '@/lib/types/employee-types';
-import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
-import * as React from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { selectedEmployeeForOvertimeType } from '../../lib/production-overtime-types';
 
 interface MultiSelectEmployeesProps {
@@ -57,25 +66,38 @@ export const MultiSelectEmployees = ({
   onSelectChange,
   placeholder = 'Wybierz pracowników...',
 }: MultiSelectEmployeesProps) => {
-  const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState('');
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [pendingEmployee, setPendingEmployee] = useState<EmployeeType | null>(
+    null,
+  );
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [note, setNote] = useState('');
+  const [isDayOffAgreed, setIsDayOffAgreed] = useState(true);
+  const [dateError, setDateError] = useState(false);
 
-  const [openDialog, setOpenDialog] = React.useState(false);
+  // Update the validation schema to conditionally require date
+  const DayOffSchema = z.object({
+    isDayOffAgreed: z.boolean(),
+    date: z
+      .date({ message: 'Wybierz datę odbioru!' })
+      .optional()
+      .refine((date) => !isDayOffAgreed || date !== undefined, {
+        message: 'Wybierz datę odbioru!',
+      }),
+    note: z.string().optional(),
+  });
 
-  // new states for pending employee and selected date
-  const [pendingEmployee, setPendingEmployee] =
-    React.useState<EmployeeType | null>(null);
-  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
-  // new state for note
-  const [note, setNote] = React.useState('');
+  const form = useForm<z.infer<typeof DayOffSchema>>({
+    resolver: zodResolver(DayOffSchema),
+    defaultValues: {
+      date: undefined,
+      note: '',
+      isDayOffAgreed: true,
+    },
+  });
 
-  // New state for tracking if day off is agreed
-  const [isDayOffAgreed, setIsDayOffAgreed] = React.useState(true);
-
-  // Add state to track validation errors
-  const [dateError, setDateError] = React.useState(false);
-
-  // Reset form when opening dialog for a new employee
   const handleSelect = (employee: EmployeeType) => {
     const isSelected = value.some(
       (item) => item.identifier === employee.identifier,
@@ -86,36 +108,29 @@ export const MultiSelectEmployees = ({
       );
     } else {
       setPendingEmployee(employee);
-      // Reset form values when opening dialog
-      setSelectedDate(null);
-      setNote('');
-      setIsDayOffAgreed(true);
-      setDateError(false);
+      form.reset();
       setOpenDialog(true);
     }
     setInputValue('');
   };
 
-  // Modified handleConfirm to validate date when switch is on
-  const handleConfirm = () => {
-    // Validate: if day off is agreed, date must be selected
-    if (isDayOffAgreed && !selectedDate) {
+  const onSubmit = () => {
+    if (isDayOffAgreed && !date) {
       setDateError(true);
-      return; // Don't proceed if validation fails
+      return;
     }
 
     if (pendingEmployee) {
-      // Set the time to noon to avoid timezone issues
-      const normalizedDate = selectedDate ? new Date(selectedDate) : null;
-      if (normalizedDate) {
-        normalizedDate.setHours(12, 0, 0, 0); // Set time to 12:00:00.000
+      let normalizedDate;
+      if (isDayOffAgreed && date) {
+        normalizedDate = new Date(date);
+        normalizedDate.setHours(12, 0, 0, 0);
       }
 
       const newEmployee = {
         ...pendingEmployee,
-        note: note,
-        // Only include the date if day off is agreed
-        ...(isDayOffAgreed && normalizedDate
+        note,
+        ...(isDayOffAgreed && date
           ? { agreedReceivingAt: normalizedDate }
           : {}),
       };
@@ -123,37 +138,104 @@ export const MultiSelectEmployees = ({
     }
     setOpenDialog(false);
     setPendingEmployee(null);
-    setSelectedDate(null); // Reset to null instead of new Date()
-    setNote('');
-    setIsDayOffAgreed(true);
-    setDateError(false);
+    form.reset();
   };
 
-  // Reset date error when date is selected or switch is turned off
-  React.useEffect(() => {
-    if (selectedDate || !isDayOffAgreed) {
-      setDateError(false);
-    }
-  }, [selectedDate, isDayOffAgreed]);
-
-  const handleRemove = (identifier: string) => {
-    onSelectChange(value.filter((item) => item.identifier !== identifier));
-  };
-
-  const handleClear = () => {
-    onSelectChange([]);
-  };
-
-  // Normalize the date when it's selected from the DateTimePicker
-  const handleDateChange = (date: Date | null) => {
-    if (isDayOffAgreed && date) {
-      const normalizedDate = new Date(date);
-      normalizedDate.setHours(12, 0, 0, 0); // Set time to 12:00:00.000
-      setSelectedDate(normalizedDate);
-    } else {
-      setSelectedDate(date);
-    }
-  };
+  const agreedTimeDialog = (
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+      <DialogContent className='sm:max-w-[700px]'>
+        <DialogHeader>
+          <DialogTitle>
+            Uzgodniony termin odbioru dnia wolnego dla:{' '}
+            {pendingEmployee?.firstName} {pendingEmployee?.lastName}
+          </DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogScrollArea className='h-[50vh] sm:h-[50vh]'>
+              <DialogFormWithScroll>
+                <FormField
+                  control={form.control}
+                  name='isDayOffAgreed'
+                  render={({ field }) => (
+                    <FormItem className='flex flex-row items-center justify-between space-y-0 py-2'>
+                      <FormLabel className='leading-normal'>
+                        Uzgodniono odbiór dnia wolnego
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={isDayOffAgreed}
+                          onCheckedChange={(checked) => {
+                            setIsDayOffAgreed(checked);
+                            field.onChange(checked);
+                            // Reset date when toggling off
+                            if (!checked) {
+                              form.setValue('date', undefined);
+                              setDate(undefined);
+                              setDateError(false);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='date'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rozpoczęcie</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          modal
+                          hideTime
+                          value={field.value}
+                          onChange={field.onChange}
+                          timePicker={{ hour: true, minute: true }}
+                          disabled={!isDayOffAgreed}
+                          renderTrigger={({ open, value, setOpen }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={(x) => !open && field.onChange(x)}
+                              format='dd/MM/yyyy'
+                              disabled={open || !isDayOffAgreed}
+                              onCalendarClick={() =>
+                                isDayOffAgreed && setOpen(!open)
+                              }
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='note'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Uwagi</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </DialogFormWithScroll>
+            </DialogScrollArea>
+            <DialogFooter className='mt-4'>
+              <Button className='w-full'>
+                <CopyPlus /> Dodaj zlecenie pracownika
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <>
@@ -166,10 +248,8 @@ export const MultiSelectEmployees = ({
           >
             <span className={cn(!value.length && 'opacity-50')}>
               {value.length > 0
-                ? `wybrano ${value.length} ${
-                    value.length === 1 ? 'pracownika' : 'pracowników'
-                  }`
-                : 'wybierz pracowników'}
+                ? `wybrano ${value.length} ${value.length === 1 ? 'pracownika' : 'pracowników'}`
+                : placeholder}
             </span>
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
@@ -185,12 +265,7 @@ export const MultiSelectEmployees = ({
               <CommandEmpty>Nie znaleziono pracowników.</CommandEmpty>
               <CommandGroup>
                 {value.length > 0 && (
-                  <CommandItem
-                    key='reset'
-                    onSelect={() => {
-                      handleClear();
-                    }}
-                  >
+                  <CommandItem key='reset' onSelect={() => onSelectChange([])}>
                     <CircleX className='mr-2 h-4 w-4 text-red-500' />
                     usuń wszystkich
                   </CommandItem>
@@ -198,11 +273,7 @@ export const MultiSelectEmployees = ({
                 {employees.map((employee) => (
                   <CommandItem
                     key={employee.identifier}
-                    value={
-                      employee.identifier +
-                      employee.firstName +
-                      employee.lastName
-                    }
+                    value={`${employee.identifier}${employee.firstName}${employee.lastName}`}
                     onSelect={() => handleSelect(employee)}
                   >
                     <Check
@@ -224,8 +295,8 @@ export const MultiSelectEmployees = ({
           </Command>
         </PopoverContent>
       </Popover>
+
       {value.length > 0 && (
-        // <ScrollArea className='h-[300px] w-full'>
         <Table>
           <TableCaption>Wybrani pracownicy</TableCaption>
           <TableHeader>
@@ -249,83 +320,25 @@ export const MultiSelectEmployees = ({
                     ? employee.agreedReceivingAt.toLocaleDateString('pl')
                     : '-'}
                 </TableCell>
-                <TableCell>{employee.note ? employee.note : '-'}</TableCell>
+                <TableCell>{employee.note || '-'}</TableCell>
                 <TableCell>
                   <CircleX
-                    className='mr-2 h-4 w-4 cursor-pointer text-red-500'
-                    onClick={() => handleRemove(employee.identifier)}
+                    className='h-4 w-4 cursor-pointer text-red-500'
+                    onClick={() =>
+                      onSelectChange(
+                        value.filter(
+                          (item) => item.identifier !== employee.identifier,
+                        ),
+                      )
+                    }
                   />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        // </ScrollArea>
       )}
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className='sm:max-w-[700px]'>
-          <DialogHeader>
-            <DialogTitle>
-              Uzgodniony termin odbioru dnia wolnego dla:{' '}
-              {pendingEmployee?.firstName} {pendingEmployee?.lastName}
-            </DialogTitle>
-            {/* <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DialogDescription> */}
-          </DialogHeader>
-          <DialogScrollArea className='h-[50vh] sm:h-[50vh]'>
-            <DialogFormWithScroll>
-              <div className='flex items-center justify-between space-y-2'>
-                <Label htmlFor='day-off-agreed' className='leading-normal'>
-                  Uzgodniono odbiór dnia wolnego
-                </Label>
-                <Switch
-                  id='day-off-agreed'
-                  checked={isDayOffAgreed}
-                  onCheckedChange={setIsDayOffAgreed}
-                />
-              </div>
-
-              {/* Date picker with error state */}
-              <DateTimePicker
-                min={new Date(Date.now())}
-                modal
-                value={selectedDate ?? undefined}
-                onChange={(date) => handleDateChange(date ?? null)}
-                hideTime
-                disabled={!isDayOffAgreed}
-                renderTrigger={({ open, value, setOpen }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) =>
-                      !open && isDayOffAgreed && handleDateChange(x || null)
-                    }
-                    format='dd/MM/yyyy'
-                    disabled={open || !isDayOffAgreed}
-                    onCalendarClick={() => isDayOffAgreed && setOpen(!open)}
-                    className={cn(dateError && 'border-red-500')}
-                  />
-                )}
-              />
-              {dateError && isDayOffAgreed && (
-                <FormMessage>Data odbioru jest wymagana</FormMessage>
-              )}
-
-              <Label htmlFor='note'>Uwagi</Label>
-              <Textarea
-                id='note'
-                value={note} // controlled textarea value
-                onChange={(e) => setNote(e.target.value)} // update note state
-              />
-            </DialogFormWithScroll>
-          </DialogScrollArea>
-          <DialogFooter className='mt-4'>
-            <Button className='w-full' type='button' onClick={handleConfirm}>
-              <CopyPlus /> Dodaj zlecenie pracownika
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {agreedTimeDialog}
     </>
   );
 };
