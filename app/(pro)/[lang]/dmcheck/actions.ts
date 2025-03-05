@@ -182,6 +182,26 @@ export async function save(
   }
 }
 
+function createDmcValidationSchema(articleConfig: any) {
+  return z.object({
+    dmc: z
+      .string()
+      .length(articleConfig.dmc.length)
+      .refine((dmc) =>
+        dmc
+          .toLowerCase()
+          .includes(articleConfig.dmcFirstValidation.toLowerCase()),
+      )
+      .refine(
+        (dmc) =>
+          !articleConfig.secondValidation ||
+          dmc
+            .toLowerCase()
+            .includes(articleConfig.dmcSecondValidation.toLowerCase()),
+      ),
+  });
+}
+
 export async function saveDmc(
   prevState: any,
   formData: FormData,
@@ -198,20 +218,8 @@ export async function saveDmc(
     if (!articleConfig) {
       return { message: 'article not found' };
     }
-    const schema = z.object({
-      dmc: z
-        .string()
-        .length(articleConfig.dmc.length)
-        .transform((val) => val.toLowerCase())
-        .refine((dmc) =>
-          dmc.includes(articleConfig.dmcFirstValidation.toLowerCase()),
-        )
-        .refine(
-          (dmc) =>
-            !articleConfig.secondValidation ||
-            dmc.includes(articleConfig.dmcSecondValidation.toLowerCase()),
-        ),
-    });
+
+    const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({
       dmc: formData?.get('dmc')?.toString(),
     });
@@ -343,17 +351,8 @@ export async function saveDmcRework(
     if (!articleConfig) {
       return { message: 'article not found' };
     }
-    const schema = z.object({
-      dmc: z
-        .string()
-        .length(articleConfig.dmc.length)
-        .includes(articleConfig.dmcFirstValidation)
-        .refine(
-          (dmc) =>
-            !articleConfig.secondValidation ||
-            dmc.includes(articleConfig.dmcSecondValidation),
-        ),
-    });
+
+    const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({
       dmc: formData?.get('dmc-rework')?.toString(),
     });

@@ -2,38 +2,15 @@
 import { Locale } from '@/i18n.config';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import {
-  FailureOptionType,
-  FailureType,
-} from './lib/production-overtime-types';
+import { OvertimeType } from './lib/production-overtime-types';
 
-async function getFailuresOptions(): Promise<FailureOptionType[]> {
-  const res = await fetch(`${process.env.API}/failures/lv/options`, {
-    next: {
-      revalidate: 60 * 60 * 8,
-      // revalidate: 0,
-      tags: ['production-overtime'],
-    },
-  });
-
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(
-      `getFailuresOptions error: ${res.status} ${res.statusText} ${json.error}`,
-    );
-  }
-
-  const failuresOptions: FailureOptionType[] = await res.json();
-  return failuresOptions;
-}
-
-async function getFailures(
+async function getOvertimeRequests(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
-  formattedFailures: FailureType[];
+  overtimeRequestsLocaleString: OvertimeType[];
 }> {
   const filteredSearchParams = Object.fromEntries(
     Object.entries(searchParams).filter(
@@ -42,9 +19,12 @@ async function getFailures(
   );
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const res = await fetch(`${process.env.API}/failures/lv?${queryParams}`, {
-    next: { revalidate: 0, tags: ['production-overtime'] },
-  });
+  const res = await fetch(
+    `${process.env.API}/production-overtime?${queryParams}`,
+    {
+      next: { revalidate: 60, tags: ['production-overtime'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
@@ -56,51 +36,49 @@ async function getFailures(
   const fetchTime = new Date(res.headers.get('date') || '');
   const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
-  let failures: FailureType[] = await res.json();
+  const overtimeRequests: OvertimeType[] = await res.json();
+  const overtimeRequestsLocaleString = overtimeRequests.map(
+    (overtimeRequest) => {
+      return {
+        ...overtimeRequest,
+        fromLocaleString: new Date(overtimeRequest.from).toLocaleString(lang),
+        toLocaleString: new Date(overtimeRequest.to).toLocaleString(lang),
+        approvedAtLocaleString: overtimeRequest.approvedAt
+          ? new Date(overtimeRequest.approvedAt).toLocaleString(lang)
+          : undefined,
+        requestedAtLocaleString: new Date(
+          overtimeRequest.requestedAt,
+        ).toLocaleString(lang),
+        editedAtLocaleString: new Date(overtimeRequest.editedAt).toLocaleString(
+          lang,
+        ),
+      };
+    },
+  );
+  console.log('overtimeRequestsLocaleString', overtimeRequestsLocaleString);
 
-  const formatTime = (failure: FailureType) => {
-    return {
-      ...failure,
-      fromLocaleString: new Date(failure.from).toLocaleString(lang),
-      toLocaleString: failure.to
-        ? new Date(failure.to).toLocaleString(lang)
-        : '',
-      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(lang),
-
-      updatedAtLocaleString: failure.updatedAt
-        ? new Date(failure.updatedAt).toLocaleString(lang)
-        : '',
-    };
-  };
-  const formattedFailures: FailureType[] = failures.map(formatTime);
-  return { fetchTime, fetchTimeLocaleString, formattedFailures };
+  return { fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString };
 }
 
 export default async function FailuresPage(props: {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  // const session = await auth();
   const params = await props.params;
   const searchParams = await props.searchParams;
 
   const { lang } = params;
 
-  let fetchTime, fetchTimeLocaleString, formattedFailures;
-  ({ fetchTime, fetchTimeLocaleString, formattedFailures } = await getFailures(
-    lang,
-    searchParams,
-  ));
-
-  const failuresOptions = await getFailuresOptions();
+  let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
+  ({ fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString } =
+    await getOvertimeRequests(lang, searchParams));
 
   return (
     <DataTable
       columns={columns}
-      data={formattedFailures}
+      data={overtimeRequestsLocaleString}
       fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
-      failuresOptions={failuresOptions}
     />
   );
 }

@@ -1,5 +1,8 @@
 /*
 FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
+FIXME: podwójne toast dmcheck
+FIXME: wielkość znaków w dmcheck powinna nie robić różnicy
+
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
 
@@ -19,7 +22,7 @@ Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
 
 TODO: MARIOLA WNIOSKI
-1. TL/GL składa wniosek o wykonywanie nadgodzin (weekend)
+1. GL składa wniosek o wykonywanie nadgodzin (weekend)
 2. Dyrektor zatwierdza + powiadomienia mailowe (najlepiej z linkiem do zatwierdzenia)
 3. TL/GL dostaje powiadomienia o zgodzie / odrzuceniu
 - zamiana 1:1 pracownika po zaakceptowaniu

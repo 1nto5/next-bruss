@@ -22,14 +22,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Pencil } from 'lucide-react';
-import { FailureType } from '../lib/production-overtime-types';
+import { Pencil, Save } from 'lucide-react';
+import { FailureType } from '../lib/failures-types';
 
 // import { Separator } from '@/components/ui/separator';
 import { UpdateFailureSchema } from '@/app/(mgmt)/[lang]/failures/lv/lib/failures-zod';
+import DialogFormWithScroll from '@/components/dialog-form-with-scroll';
+import DialogScrollArea from '@/components/dialog-scroll-area';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -106,7 +107,7 @@ export default function EditFailureDialog({
           </Button>
         </div>
       </DialogTrigger>
-      <DialogContent className='w-[700px] sm:max-w-[700px]'>
+      <DialogContent className='sm:max-w-[700px]'>
         <DialogHeader>
           <DialogTitle>Edycja awarii</DialogTitle>
           <DialogDescription>
@@ -116,14 +117,14 @@ export default function EditFailureDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[450px]'>
-              <div className='grid items-center gap-2 p-2'>
+            <DialogScrollArea>
+              <DialogFormWithScroll>
                 {/* Data rozpoczęcia */}
                 <FormField
                   control={form.control}
                   name='from'
                   render={({ field }) => (
-                    <FormItem className='w-48'>
+                    <FormItem className=''>
                       <FormLabel>Rozpoczęcie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -152,7 +153,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='to'
                   render={({ field }) => (
-                    <FormItem className='w-48'>
+                    <FormItem className=''>
                       <FormLabel>Zakończenie</FormLabel>
                       <FormControl>
                         <DateTimePicker
@@ -180,7 +181,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='supervisor'
                   render={({ field }) => (
-                    <FormItem className='w-48'>
+                    <FormItem className=''>
                       <FormLabel>Nadzorujący</FormLabel>
                       <FormControl>
                         <Input placeholder='' {...field} />
@@ -188,7 +189,7 @@ export default function EditFailureDialog({
                       {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                      {/* <FormMessage /> */}
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -196,7 +197,7 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='responsible'
                   render={({ field }) => (
-                    <FormItem className='w-[200px]'>
+                    <FormItem className=''>
                       <FormLabel>Odpowiedzialny</FormLabel>
                       <FormControl>
                         <Input placeholder='' {...field} />
@@ -204,7 +205,7 @@ export default function EditFailureDialog({
                       {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                      {/* <FormMessage /> */}
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -213,12 +214,12 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='solution'
                   render={({ field }) => (
-                    <FormItem className='w-[400px]'>
+                    <FormItem className=''>
                       <FormLabel>Rozwiązanie</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
-                      {/* <FormMessage /> */}
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -226,25 +227,28 @@ export default function EditFailureDialog({
                   control={form.control}
                   name='comment'
                   render={({ field }) => (
-                    <FormItem className='w-[400px]'>
+                    <FormItem className=''>
                       <FormLabel>Komentarz</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
-                      {/* <FormMessage /> */}
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-            </ScrollArea>
+              </DialogFormWithScroll>
+            </DialogScrollArea>
             <DialogFooter className='mt-4'>
               {isPendingUpdate ? (
-                <Button disabled>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Button disabled className='w-full'>
+                  <Save className='animate-spin' />
                   Zapisz
                 </Button>
               ) : (
-                <Button type='submit'>Zapisz</Button>
+                <Button type='submit' className='w-full'>
+                  <Save />
+                  Zapisz
+                </Button>
               )}
             </DialogFooter>
           </form>

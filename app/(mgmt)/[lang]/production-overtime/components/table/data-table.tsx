@@ -35,7 +35,6 @@ import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 import { useEffect } from 'react';
-import { FailureOptionType } from '../../lib/production-overtime-types';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
@@ -43,7 +42,6 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
-  failuresOptions: FailureOptionType[];
 }
 
 export function DataTable<TData, TValue>({
@@ -51,9 +49,6 @@ export function DataTable<TData, TValue>({
   data,
   fetchTimeLocaleString,
   fetchTime,
-  failuresOptions,
-  // lang,
-  // session,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -88,14 +83,15 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Awarie LV</CardTitle>
+        <CardTitle>
+          Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
+        </CardTitle>
         <CardDescription>
           Ostatnia synchronizacja: {fetchTimeLocaleString}
         </CardDescription>
         <TableFilteringAndOptions
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}
-          failuresOptions={failuresOptions}
         />
       </CardHeader>
       <CardContent>

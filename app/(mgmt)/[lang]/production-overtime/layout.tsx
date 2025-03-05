@@ -1,5 +1,6 @@
 export const metadata = {
-  title: 'Awarie LV (BRUSS)',
+  title:
+    'Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
 };
 
 export default async function Layout({

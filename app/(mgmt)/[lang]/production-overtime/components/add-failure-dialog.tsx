@@ -33,7 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,6 +41,8 @@ import { Check, ChevronsUpDown, CopyPlus } from 'lucide-react';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
+import DialogFormWithScroll from '@/components/dialog-form-with-scroll';
+import DialogScrollArea from '@/components/dialog-scroll-area';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { useEffect, useState } from 'react';
@@ -49,7 +50,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { insertFailure } from '../actions';
-import { FailureOptionType } from '../lib/production-overtime-types';
+import { FailureOptionType } from '../lib/failures-types';
 
 export default function AddFailureDialog({
   failuresOptions,
@@ -134,7 +135,7 @@ export default function AddFailureDialog({
           <CopyPlus /> <span>Dodaj awarię</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='w-[700px] sm:max-w-[700px]'>
+      <DialogContent className='sm:max-w-[700px]'>
         <DialogHeader>
           <DialogTitle>
             Nowa awaria{' '}
@@ -146,8 +147,8 @@ export default function AddFailureDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <ScrollArea className='h-[70vh]'>
-              <div className='grid items-center gap-2 p-2'>
+            <DialogScrollArea>
+              <DialogFormWithScroll>
                 {!selectedLine && (
                   <FormField
                     control={form.control}
@@ -186,7 +187,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='station'
                       render={({ field }) => (
-                        <FormItem className='w-[200px]'>
+                        <FormItem className=''>
                           <div className='flex flex-col items-start space-y-2'>
                             <FormLabel>Stacja</FormLabel>
                             <FormControl>
@@ -212,7 +213,11 @@ export default function AddFailureDialog({
                                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                   </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className='w-[200px] p-0'>
+                                <PopoverContent
+                                  className='p-0'
+                                  side='bottom'
+                                  align='start'
+                                >
                                   <Command>
                                     <CommandInput placeholder='wyszukaj...' />
                                     <CommandList>
@@ -270,7 +275,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='failure'
                       render={({ field }) => (
-                        <FormItem className='w-[350px]'>
+                        <FormItem className=' '>
                           <div className='flex flex-col items-start space-y-2'>
                             <FormLabel>Awaria</FormLabel>
                             <FormControl>
@@ -296,7 +301,11 @@ export default function AddFailureDialog({
                                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                   </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className='w-[350px] p-0'>
+                                <PopoverContent
+                                  side='bottom'
+                                  align='start'
+                                  className='p-0'
+                                >
                                   <Command>
                                     <CommandInput placeholder='wyszukaj...' />
                                     <CommandList>
@@ -354,7 +363,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='from'
                       render={({ field }) => (
-                        <FormItem className='w-[350px]'>
+                        <FormItem>
                           <FormLabel>Rozpoczęcie</FormLabel>
                           <FormControl>
                             <DateTimePicker
@@ -384,15 +393,17 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='supervisor'
                       render={({ field }) => (
-                        <FormItem className='w-[200px]'>
-                          <FormLabel>Nadzorujący</FormLabel>
-                          <FormControl>
-                            <Input placeholder='' {...field} />
-                          </FormControl>
-                          {/* <FormDescription>
+                        <FormItem>
+                          <div className='space-y-2'>
+                            <FormLabel>Nadzorujący</FormLabel>
+                            <FormControl>
+                              <Input placeholder='' {...field} />
+                            </FormControl>
+                            {/* <FormDescription>
                       This is your public display name.
                     </FormDescription> */}
-                          <FormMessage />
+                            <FormMessage />
+                          </div>
                         </FormItem>
                       )}
                     />
@@ -400,7 +411,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='responsible'
                       render={({ field }) => (
-                        <FormItem className='w-[200px]'>
+                        <FormItem className=' '>
                           <FormLabel>Odpowiedzialny</FormLabel>
                           <FormControl>
                             <Input placeholder='' {...field} />
@@ -417,7 +428,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='solution'
                       render={({ field }) => (
-                        <FormItem className='w-[400px]'>
+                        <FormItem className=' '>
                           <FormLabel>Rozwiązanie</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
@@ -431,7 +442,7 @@ export default function AddFailureDialog({
                       control={form.control}
                       name='comment'
                       render={({ field }) => (
-                        <FormItem className='w-[400px]'>
+                        <FormItem className=' '>
                           <FormLabel>Komentarz</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
@@ -442,8 +453,8 @@ export default function AddFailureDialog({
                     />
                   </>
                 )}
-              </div>
-            </ScrollArea>
+              </DialogFormWithScroll>
+            </DialogScrollArea>
             <DialogFooter className='mt-4'>
               {isPendingInsert ? (
                 <Button className='w-full' disabled>

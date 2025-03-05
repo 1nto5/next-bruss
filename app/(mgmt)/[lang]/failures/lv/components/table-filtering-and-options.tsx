@@ -145,7 +145,7 @@ export default function TableFilteringAndOptions({
 
       {showFilters && (
         <>
-          <div className='flex flex-wrap gap-4'>
+          <div className='flex flex-wrap gap-2'>
             <div className='flex items-center space-x-2'>
               <Label>od:</Label>
               <DateTimePicker

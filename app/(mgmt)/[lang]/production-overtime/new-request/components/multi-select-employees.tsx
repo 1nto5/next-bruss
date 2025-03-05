@@ -192,7 +192,7 @@ export const MultiSelectEmployees = ({
                 name='date'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rozpoczęcie</FormLabel>
+                    {/* <FormLabel>Rozpoczęcie</FormLabel> */}
                     <FormControl>
                       <DateTimePicker
                         modal
