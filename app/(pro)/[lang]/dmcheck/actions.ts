@@ -202,11 +202,14 @@ export async function saveDmc(
       dmc: z
         .string()
         .length(articleConfig.dmc.length)
-        .includes(articleConfig.dmcFirstValidation)
+        .transform((val) => val.toLowerCase())
+        .refine((dmc) =>
+          dmc.includes(articleConfig.dmcFirstValidation.toLowerCase()),
+        )
         .refine(
           (dmc) =>
             !articleConfig.secondValidation ||
-            dmc.includes(articleConfig.dmcSecondValidation),
+            dmc.includes(articleConfig.dmcSecondValidation.toLowerCase()),
         ),
     });
     const parse = schema.safeParse({
