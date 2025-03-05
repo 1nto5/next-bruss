@@ -1,7 +1,5 @@
 /*
 FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
-FIXME: podwójne toast dmcheck
-FIXME: wielkość znaków w dmcheck powinna nie robić różnicy
 
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 

@@ -3,7 +3,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  // title: 'BRI oven (Next BRUSS)',
+  // title: 'DMCheck (BRUSS)',
   // description: 'Company helper applications',
 };
 

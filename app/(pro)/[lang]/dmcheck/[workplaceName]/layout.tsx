@@ -2,14 +2,13 @@ import '@/app/globals.css';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 // import QueryProvider from '@/lib/query-provider';
-import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import Header from '../components/header';
 
 export const metadata: Metadata = {
   title: 'DMCheck (BRUSS)',
-  description: 'Company helper applications',
+  // description: 'Company helper applications',
 };
 
 export default async function RootLayout(props: {
@@ -39,7 +38,6 @@ export default async function RootLayout(props: {
       {/* <main className='m-2 flex flex-col items-center space-y-8'>
             {children}
           </main> */}
-      <Toaster richColors position='bottom-center' />
       {/* </QueryProvider> */}
     </ThemeProvider>
   );
