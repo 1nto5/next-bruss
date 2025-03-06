@@ -1,5 +1,12 @@
 // import { auth } from '@/auth';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { OvertimeType } from './lib/production-overtime-types';
@@ -74,11 +81,23 @@ export default async function FailuresPage(props: {
     await getOvertimeRequests(lang, searchParams));
 
   return (
-    <DataTable
-      columns={columns}
-      data={overtimeRequestsLocaleString}
-      fetchTimeLocaleString={fetchTimeLocaleString}
-      fetchTime={fetchTime}
-    />
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
+        </CardTitle>
+        <CardDescription>
+          Ostatnia synchronizacja: {fetchTimeLocaleString}
+        </CardDescription>
+        <TableFilteringAndOptions fetchTime={fetchTime} />
+      </CardHeader>
+
+      <DataTable
+        columns={columns}
+        data={overtimeRequestsLocaleString}
+        fetchTimeLocaleString={fetchTimeLocaleString}
+        fetchTime={fetchTime}
+      />
+    </Card>
   );
 }

@@ -1,6 +1,6 @@
 /*
-FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
 
+FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
 
@@ -26,6 +26,8 @@ TODO: MARIOLA WNIOSKI
 - zamiana 1:1 pracownika po zaakceptowaniu
 - formularz od Mariola - zgodność (masz w Code)
 - jeden wniosek - wiele pracowników
+TODO: ilość godzin w tabeli? 
+FIXME: tabela formularz dodania overtime mobilna wersja rozjeżdża się
 
 TODO: inwentaryzacja maj
 wymagane dla okreslonych obszarów pola:
@@ -36,5 +38,6 @@ obszary:
 { value: 'S900', label: 'S900' },
 { value: 'S2', label: 'S2 Powlekanie + Chemia' }, - rozbić oddzielnie S2-Powlekanie - tu wymagane i S2-Chemia - nie wymagane
 nowy obszar Sedia-granulaty - też wymagane
+
 
 */

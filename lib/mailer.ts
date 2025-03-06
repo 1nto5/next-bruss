@@ -1,4 +1,4 @@
-import { createTransport, SendMailOptions, SentMessageInfo } from 'nodemailer';
+import { createTransport } from 'nodemailer';
 
 const config =
   process.env.NODE_ENV === 'development'
@@ -23,25 +23,31 @@ const transporter = createTransport(config);
 const FOOTER_TEXT =
   '\n\n--\nWiadomość wysłana automatycznie. Nie odpowiadaj. / Message sent automatically. Do not reply. / Nachricht automatisch gesendet. Bitte nicht antworten.';
 
-export default async function sendMail(
-  mailOptions: SendMailOptions,
-): Promise<SentMessageInfo> {
+const mailer = async (mailOptions: any) => {
+  // Add the default "from" address to the options
+  const completeMailOptions = {
+    from: 'no-reply@bruss-group.com',
+    ...mailOptions,
+  };
+
   // Append footer to text version if exists, otherwise, create it.
-  if (mailOptions.text) {
-    mailOptions.text += FOOTER_TEXT;
+  if (completeMailOptions.text) {
+    completeMailOptions.text += FOOTER_TEXT;
   } else {
-    mailOptions.text = FOOTER_TEXT.trim();
+    completeMailOptions.text = FOOTER_TEXT.trim();
   }
 
-  if (mailOptions.html) {
-    mailOptions.html += `<br/><br/><hr/>Wiadomość wysłana automatycznie przez: / Automatically sent by: / Automatisch gesendet von: <a href="http://next.mrg700.bruss-group.com">Next BRUSS</a>`;
+  if (completeMailOptions.html) {
+    completeMailOptions.html += `<br/><br/><hr/>Wiadomość wysłana automatycznie przez: / Automatically sent by: / Automatisch gesendet von: <a href="http://next.mrg700.bruss-group.com">BRUSS</a>`;
   }
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(completeMailOptions);
     return info;
   } catch (error) {
     console.error('Error occurred during sending:', error);
     throw error;
   }
-}
+};
+
+export default mailer;

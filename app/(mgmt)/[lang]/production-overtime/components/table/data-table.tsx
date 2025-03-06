@@ -22,20 +22,11 @@ import {
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CardContent, CardFooter } from '@/components/ui/card';
 // import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
-import { useEffect } from 'react';
-import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -47,14 +38,11 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  fetchTimeLocaleString,
-  fetchTime,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
-  const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
   const table = useReactTable({
     data,
@@ -76,24 +64,8 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  useEffect(() => {
-    setIsPendingSearch(false);
-  }, [fetchTime]);
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
-        </CardTitle>
-        <CardDescription>
-          Ostatnia synchronizacja: {fetchTimeLocaleString}
-        </CardDescription>
-        <TableFilteringAndOptions
-          isPendingSearch={isPendingSearch}
-          setIsPendingSearch={setIsPendingSearch}
-        />
-      </CardHeader>
+    <>
       <CardContent>
         <div className='rounded-md border'>
           <Table>
@@ -146,6 +118,7 @@ export function DataTable<TData, TValue>({
           </Table>
         </div>
       </CardContent>
+
       <CardFooter className='flex justify-between'>
         <Button
           variant='outline'
@@ -164,6 +137,6 @@ export function DataTable<TData, TValue>({
           <ArrowRight />
         </Button>
       </CardFooter>
-    </Card>
+    </>
   );
 }

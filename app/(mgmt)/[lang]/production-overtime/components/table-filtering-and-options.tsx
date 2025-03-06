@@ -15,19 +15,24 @@ import { Switch } from '@/components/ui/switch';
 import { CircleX, Loader, Plus, RefreshCw, Search, Sheet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { revalidateProductionOvertime as revalidate } from '../actions';
 
 export default function TableFilteringAndOptions({
-  setIsPendingSearch,
-  isPendingSearch,
+  fetchTime,
 }: {
-  setIsPendingSearch: (value: boolean) => void;
-  isPendingSearch: boolean;
+  fetchTime: Date;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const [isPendingSearch, setIsPendingSearch] = useState(false);
+
+  useEffect(() => {
+    setIsPendingSearch(false);
+  }, [fetchTime]);
+
   const [showFilters, setShowFilters] = useState(false);
 
   const [dateFilter, setDateFilter] = useState(() => {
