@@ -23,19 +23,11 @@ import {
 } from '@/components/ui/table';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CardContent, CardFooter } from '@/components/ui/card';
 
 import { Locale } from '@/i18n.config';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
-import DmcTableFilteringAndOptions from '../components/dmc-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -92,19 +84,7 @@ export function DmcDataTable<TData, TValue>({
   }, [fetchTime]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>DMCheck data</CardTitle>
-        <CardDescription>Last sync: {fetchTimeLocaleString}</CardDescription>
-        <DmcTableFilteringAndOptions
-          // setFilter={(columnId, value) =>
-          //   table.getColumn(columnId)?.setFilterValue(value)
-          // }
-          articles={articles}
-          isPendingSearch={isPendingSearch}
-          setIsPendingSearch={setIsPendingSearch}
-        />
-      </CardHeader>
+    <>
       <CardContent>
         <div className='rounded-md border'>
           <Table>
@@ -175,6 +155,6 @@ export function DmcDataTable<TData, TValue>({
           <ArrowRight />
         </Button>
       </CardFooter>
-    </Card>
+    </>
   );
 }

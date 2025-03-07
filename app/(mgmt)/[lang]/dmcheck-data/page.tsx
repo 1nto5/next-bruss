@@ -1,11 +1,18 @@
 import { DmcTableDataType as TableDataType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import DmcTableFilteringAndOptions from './components/dmc-table-filtering-and-options';
 import { dmcColumns } from './dmc-table/dmc-columns';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
 
 async function getArticles() {
   const res = await fetch(`${process.env.API}/dmcheck-data/articles`, {
-    next: { revalidate: 60 * 60 * 24, tags: ['dmcheck-articles'] },
+    next: { revalidate: 60 * 60 * 8, tags: ['dmcheck-articles'] },
   });
   if (!res.ok) {
     const json = await res.json();
@@ -80,13 +87,23 @@ export default async function InventoryPage(props: {
   const articles = await getArticles();
 
   return (
-    <DmcDataTable
-      columns={dmcColumns}
-      data={data}
-      articles={articles}
-      fetchTime={fetchTime}
-      fetchTimeLocaleString={fetchTimeLocaleString}
-      lang={lang}
-    />
+    <Card>
+      <CardHeader>
+        <CardTitle>DMCheck data</CardTitle>
+        <CardDescription>Last sync: {fetchTimeLocaleString}</CardDescription>
+        <DmcTableFilteringAndOptions
+          articles={articles}
+          fetchTime={fetchTime}
+        />
+      </CardHeader>
+      <DmcDataTable
+        columns={dmcColumns}
+        data={data}
+        articles={articles}
+        fetchTime={fetchTime}
+        fetchTimeLocaleString={fetchTimeLocaleString}
+        lang={lang}
+      />
+    </Card>
   );
 }

@@ -62,12 +62,10 @@ async function getOvertimeRequests(
       };
     },
   );
-  console.log('overtimeRequestsLocaleString', overtimeRequestsLocaleString);
-
   return { fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString };
 }
 
-export default async function FailuresPage(props: {
+export default async function ProductionOvertimePage(props: {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {

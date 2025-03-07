@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('api/production-overtime: ' + error);
     return NextResponse.json(
-      { error: 'production_overtime api' },
+      { error: 'production-overtime api' },
       { status: 503 },
     );
   }
