@@ -1,6 +1,7 @@
 /*
 
 FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which is used in the project for datetime-picker
+FIXME: duplicate mongodb errors in pm2 logs
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
 

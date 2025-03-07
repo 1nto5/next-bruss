@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
   // Get parameters from URL
   const searchParams = request.nextUrl.searchParams;
   const to = searchParams.get('to');
-  const subject = searchParams.get('subject') || 'System message';
-  const html = searchParams.get('html') || 'Message content was not provided.';
+  const subject = searchParams.get('subject');
+  const html = searchParams.get('html');
 
   // Check if recipient was specified
   if (!to) {
