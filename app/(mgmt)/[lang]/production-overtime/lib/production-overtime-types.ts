@@ -2,7 +2,7 @@ import { EmployeeType } from '@/lib/types/employee-types';
 
 export type OvertimeType = {
   _id: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'draft';
   employees: selectedEmployeeForOvertimeType[];
   from: Date;
   fromLocaleString?: string;
@@ -16,7 +16,6 @@ export type OvertimeType = {
   editedAt: Date;
   editedBy: string;
   editedAtLocaleString?: string;
-  approved?: boolean;
   approvedAt?: Date;
   approvedBy?: string;
   approvedAtLocaleString?: string;

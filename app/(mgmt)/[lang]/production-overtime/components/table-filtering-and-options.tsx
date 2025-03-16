@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { CircleX, Loader, Plus, RefreshCw, Search, Sheet } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -26,6 +27,8 @@ export default function TableFilteringAndOptions({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  console.log('session', session);
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
 
@@ -197,11 +200,13 @@ export default function TableFilteringAndOptions({
             </Link>
           </>
         )}
-        <Link href='/production-overtime/new-request'>
-          <Button variant={'outline'}>
-            <Plus /> <span>Nowe zlecenie</span>
-          </Button>
-        </Link>
+        {session?.user?.roles.includes('group-leader') && (
+          <Link href='/production-overtime/new-request'>
+            <Button variant={'outline'}>
+              <Plus /> <span>Nowe zlecenie</span>
+            </Button>
+          </Link>
+        )}
       </div>
     </form>
   );

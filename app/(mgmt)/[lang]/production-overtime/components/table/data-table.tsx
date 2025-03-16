@@ -25,10 +25,12 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
 // import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
+import { Session } from 'next-auth';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 
 interface DataTableProps<TData, TValue> {
+  session: Session | null;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
@@ -36,6 +38,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
+  session,
   columns,
   data,
 }: DataTableProps<TData, TValue>) {

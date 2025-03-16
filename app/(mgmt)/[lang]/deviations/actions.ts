@@ -6,7 +6,7 @@ import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 // import { redirect } from 'next/navigation';
 
-export async function deleteDraftDeviation(_id: ObjectId) {
+export async function deleteDraftDeviation(_id: string) {
   const session = await auth();
   if (!session || !session.user?.email) {
     return { error: 'unauthorized' };

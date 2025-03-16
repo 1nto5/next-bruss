@@ -1,4 +1,5 @@
 // import { auth } from '@/auth';
+import { auth } from '@/auth';
 import {
   Card,
   CardDescription,
@@ -71,6 +72,7 @@ export default async function ProductionOvertimePage(props: {
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
+  const session = await auth();
 
   const { lang } = params;
 
@@ -89,8 +91,8 @@ export default async function ProductionOvertimePage(props: {
         </CardDescription>
         <TableFilteringAndOptions fetchTime={fetchTime} />
       </CardHeader>
-
       <DataTable
+        session={session}
         columns={columns}
         data={overtimeRequestsLocaleString}
         fetchTimeLocaleString={fetchTimeLocaleString}

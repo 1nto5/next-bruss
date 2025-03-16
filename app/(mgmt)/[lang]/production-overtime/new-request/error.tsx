@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCcw, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { revalidateReasons as revalidate } from './actions';
+import { revalidateProductionOvertime as revalidate } from '../actions';
 
 export default function Error({
   error,
