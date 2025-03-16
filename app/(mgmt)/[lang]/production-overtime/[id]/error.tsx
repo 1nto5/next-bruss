@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCcw, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-// import { revalidateReasons as revalidate } from './actions';
+import { revalidateProductionOvertimeRequest as revalidate } from '../actions';
 
 export default function Error({
   error,
@@ -19,12 +19,11 @@ export default function Error({
 
   const reload = () => {
     startTransition(() => {
-      // revalidate();
+      revalidate();
       router.refresh();
       reset();
     });
   };
-
   return (
     <main className='mt-24 flex justify-center'>
       <Alert className='w-[450px]'>

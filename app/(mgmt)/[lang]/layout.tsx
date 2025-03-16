@@ -1,6 +1,5 @@
 import '@/app/globals.css';
 import Footer from '@/components/footer';
-import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 import { getDictionary } from '@/lib/dictionary';
 import { Metadata } from 'next';
@@ -31,8 +30,6 @@ export default async function RootLayout(props: {
         </main>
         <Footer />
       </div>
-
-      <Toaster className='mt-6' position='top-center' richColors />
     </>
   );
 }

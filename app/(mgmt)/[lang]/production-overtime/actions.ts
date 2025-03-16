@@ -12,6 +12,10 @@ export async function revalidateProductionOvertime() {
   revalidateTag('production-overtime');
 }
 
+export async function revalidateProductionOvertimeRequest() {
+  revalidateTag('production-overtime-request');
+}
+
 export async function deleteOvertimeRequestDraft(id: string) {
   const session = await auth();
   if (!session || !session.user?.email) {

@@ -51,12 +51,12 @@ import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { selectedEmployeeForOvertimeType } from '../../lib/production-overtime-types';
+import { overtimeRequestEmployeeType } from '../../lib/production-overtime-types';
 
 interface MultiSelectEmployeesProps {
-  employees: selectedEmployeeForOvertimeType[];
-  value: selectedEmployeeForOvertimeType[];
-  onSelectChange: (value: selectedEmployeeForOvertimeType[]) => void;
+  employees: overtimeRequestEmployeeType[];
+  value: overtimeRequestEmployeeType[];
+  onSelectChange: (value: overtimeRequestEmployeeType[]) => void;
   placeholder?: string;
 }
 

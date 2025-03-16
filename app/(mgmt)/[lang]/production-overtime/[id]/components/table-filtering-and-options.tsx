@@ -16,7 +16,7 @@ import { CircleX, Loader, Plus, RefreshCw, Search, Sheet } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateProductionOvertime as revalidate } from '../actions';
+import { revalidateProductionOvertime as revalidate } from '../../actions';
 
 export default function TableFilteringAndOptions({
   fetchTime,

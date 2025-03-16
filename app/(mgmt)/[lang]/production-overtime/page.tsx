@@ -37,7 +37,7 @@ async function getOvertimeRequests(
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
-      `getFailures error: ${res.status} ${res.statusText} ${json.error}`,
+      `getOvertimeRequests error: ${res.status} ${res.statusText} ${json.error}`,
     );
   }
 
@@ -73,6 +73,9 @@ export default async function ProductionOvertimePage(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const session = await auth();
+  const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
+  const isPlantManager =
+    session?.user?.roles?.includes('plant-manager') || false;
 
   const { lang } = params;
 
@@ -89,7 +92,10 @@ export default async function ProductionOvertimePage(props: {
         <CardDescription>
           Ostatnia synchronizacja: {fetchTimeLocaleString}
         </CardDescription>
-        <TableFilteringAndOptions fetchTime={fetchTime} />
+        <TableFilteringAndOptions
+          fetchTime={fetchTime}
+          isGroupLeader={isGroupLeader}
+        />
       </CardHeader>
       <DataTable
         session={session}

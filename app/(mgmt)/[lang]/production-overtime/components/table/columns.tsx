@@ -11,13 +11,35 @@ import { cn } from '@/lib/cn';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { BookOpen, Check, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import {
   approveOvertimeRequest as approve,
   deleteOvertimeRequestDraft as deleteDraft,
 } from '../../actions';
 import { OvertimeType } from '../../lib/production-overtime-types';
+
+const handleApprove = async (id: string) => {
+  toast.promise(
+    approve(id).then((res) => {
+      if (res.error) {
+        throw new Error(res.error);
+      }
+      return res;
+    }),
+    {
+      loading: 'Zapisuję zmiany...',
+      success: 'Zlecenie zatwierdzone!',
+      error: (error) => {
+        const errorMsg = error.message;
+        if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
+        if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+        console.error('handleApprove', errorMsg);
+        return 'Skontaktuj się z IT!';
+      },
+    },
+  );
+};
 
 export const columns: ColumnDef<OvertimeType>[] = [
   {
@@ -47,7 +69,6 @@ export const columns: ColumnDef<OvertimeType>[] = [
     id: 'actions',
     header: 'Akcje',
     cell: ({ row }) => {
-      const { data: session } = useSession();
       const request = row.original;
       return (
         <>
@@ -68,21 +89,20 @@ export const columns: ColumnDef<OvertimeType>[] = [
               )}
               {request.status !== 'draft' && (
                 <>
-                  <Link href={`/deviations/${request._id}`}>
+                  <Link href={`/production-overtime/${request._id}`}>
                     <DropdownMenuItem>
                       <BookOpen className='mr-2 h-4 w-4' />
                       <span>Otwórz</span>
                     </DropdownMenuItem>
                   </Link>
-                  {session?.user?.roles?.includes('plant-manager') &&
-                    request.status !== 'approved' && (
-                      <DropdownMenuItem
-                        onClick={() => request._id && approve(request._id)}
-                      >
-                        <Check className='mr-2 h-4 w-4' />
-                        <span>Zatwierdź</span>
-                      </DropdownMenuItem>
-                    )}
+                  {request.status !== 'approved' && (
+                    <DropdownMenuItem
+                      onClick={() => request._id && handleApprove(request._id)}
+                    >
+                      <Check className='mr-2 h-4 w-4' />
+                      <span>Zatwierdź</span>
+                    </DropdownMenuItem>
+                  )}
                 </>
               )}
               {request.status === 'draft' && (
@@ -158,7 +178,6 @@ export const columns: ColumnDef<OvertimeType>[] = [
       );
     },
   },
-
   {
     accessorKey: 'editedAtLocaleString',
     header: 'Ostatnia zmiana',

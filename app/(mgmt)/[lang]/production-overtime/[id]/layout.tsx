@@ -1,30 +1,12 @@
-// import { auth } from '@/auth';
-import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
-// import { redirect } from 'next/navigation';
-// import Info from '../../components/Info';
-
 export const metadata = {
   title:
-    'Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
+    'Zlecenie wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
 };
 
-export default async function Layout(props: {
+export default async function Layout({
+  children,
+}: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
 }) {
-  const params = await props.params;
-
-  const { lang } = params;
-
-  const { children } = props;
-
-  // const dict = await getDictionary(lang);
-
-  // const session = await auth();
-  // if (!session) {
-  //   redirect('/auth');
-  // }
-
   return <>{children}</>;
 }
