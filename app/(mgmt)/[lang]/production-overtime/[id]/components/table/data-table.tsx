@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -21,14 +22,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, CircleX } from 'lucide-react';
 import * as React from 'react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  fetchTimeLocaleString: string;
-  fetchTime: Date;
 }
 
 export function DataTable<TData, TValue>({
@@ -60,9 +59,52 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const clearFilters = () => {
+    setColumnFilters([]);
+  };
+
+  const firstNameFilter =
+    (table.getColumn('firstName')?.getFilterValue() as string) || '';
+  const lastNameFilter =
+    (table.getColumn('lastName')?.getFilterValue() as string) || '';
+  const hasActiveFilters = firstNameFilter || lastNameFilter;
+
   return (
     <>
       <CardContent>
+        <div className='mb-4 flex flex-wrap gap-2'>
+          <div>
+            <Input
+              placeholder='imie'
+              value={firstNameFilter}
+              onChange={(event) =>
+                table.getColumn('firstName')?.setFilterValue(event.target.value)
+              }
+              className='max-w-sm'
+            />
+          </div>
+          <div>
+            <Input
+              placeholder='nazwisko'
+              value={lastNameFilter}
+              onChange={(event) =>
+                table.getColumn('lastName')?.setFilterValue(event.target.value)
+              }
+              className='max-w-sm'
+            />
+          </div>
+          <div>
+            <Button
+              variant='destructive'
+              title='Clear filters'
+              onClick={clearFilters}
+              disabled={!hasActiveFilters}
+            >
+              <CircleX /> <span>Wyczyść</span>
+            </Button>
+          </div>
+        </div>
+
         <div className='rounded-md border'>
           <Table>
             <TableHeader>

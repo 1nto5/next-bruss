@@ -1,5 +1,4 @@
 // import { auth } from '@/auth';
-import { auth } from '@/auth';
 import {
   Card,
   CardDescription,
@@ -7,8 +6,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { OvertimeType } from '../lib/production-overtime-types';
-import TableFilteringAndOptions from './components/table-filtering-and-options';
+import {
+  overtimeRequestEmployeeType,
+  OvertimeType,
+} from '../lib/production-overtime-types';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 
@@ -37,7 +38,24 @@ async function getOvertimeRequest(
   const fetchTime = new Date(res.headers.get('date') || '');
   const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
-  const overtimeRequestLocaleString = await res.json();
+  const overtimeRequest = await res.json();
+
+  // Transform each employee to include localized agreedReceivingAt
+  const employees = overtimeRequest.employees.map(
+    (employee: overtimeRequestEmployeeType) => ({
+      ...employee,
+      agreedReceivingAtLocaleString: employee.agreedReceivingAt
+        ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
+        : null,
+    }),
+  );
+
+  const overtimeRequestLocaleString = {
+    ...overtimeRequest,
+    employees,
+  };
+
+  console.log('overtimeRequestLocaleString', overtimeRequestLocaleString);
   return { fetchTime, fetchTimeLocaleString, overtimeRequestLocaleString };
 }
 
@@ -46,16 +64,11 @@ export default async function ProductionOvertimePage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await props.params;
-  const session = await auth();
-  const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
-  const isPlantManager =
-    session?.user?.roles?.includes('plant-manager') || false;
 
   const { lang, id } = params;
 
-  let fetchTime, fetchTimeLocaleString, overtimeRequestLocaleString;
-  ({ fetchTime, fetchTimeLocaleString, overtimeRequestLocaleString } =
-    await getOvertimeRequest(lang, id));
+  let overtimeRequestLocaleString;
+  ({ overtimeRequestLocaleString } = await getOvertimeRequest(lang, id));
 
   return (
     <Card>
@@ -64,19 +77,11 @@ export default async function ProductionOvertimePage(props: {
           Pracownicy w zleceniu wykonania pracy w godzinach nadliczbowych -
           produkcja
         </CardTitle>
-        <CardDescription>
-          ID: {id} | Ostatnia synchronizacja: {fetchTimeLocaleString}
-        </CardDescription>
-        <TableFilteringAndOptions
-          fetchTime={fetchTime}
-          isGroupLeader={isGroupLeader}
-        />
+        <CardDescription>ID: {id}</CardDescription>
       </CardHeader>
       <DataTable
         columns={columns}
         data={overtimeRequestLocaleString.employees}
-        fetchTimeLocaleString={fetchTimeLocaleString}
-        fetchTime={fetchTime}
       />
     </Card>
   );

@@ -23,5 +23,6 @@ export type OvertimeType = {
 
 export type overtimeRequestEmployeeType = EmployeeType & {
   agreedReceivingAt?: Date;
+  agreedReceivingAtLocaleString?: string;
   note?: string;
 };

@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/cn';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { BookOpen, Check, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Check, MoreHorizontal, Pencil, Trash2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
@@ -91,8 +91,8 @@ export const columns: ColumnDef<OvertimeType>[] = [
                 <>
                   <Link href={`/production-overtime/${request._id}`}>
                     <DropdownMenuItem>
-                      <BookOpen className='mr-2 h-4 w-4' />
-                      <span>Otwórz</span>
+                      <Users className='mr-2 h-4 w-4' />
+                      <span>Pracownicy</span>
                     </DropdownMenuItem>
                   </Link>
                   {request.status !== 'approved' && (
