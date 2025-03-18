@@ -1,4 +1,5 @@
 // import { auth } from '@/auth';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardDescription,
@@ -6,6 +7,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { Table } from 'lucide-react';
+import Link from 'next/link';
 import {
   overtimeRequestEmployeeType,
   OvertimeType,
@@ -73,10 +76,18 @@ export default async function ProductionOvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Pracownicy w zleceniu wykonania pracy w godzinach nadliczbowych -
-          produkcja
-        </CardTitle>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
+          <CardTitle>
+            Pracownicy w zleceniu wykonania pracy w godzinach nadliczbowych -
+            produkcja
+          </CardTitle>
+          <Link href='/production-overtime'>
+            <Button variant='outline'>
+              <Table /> <span>Tabela zleceń</span>
+            </Button>
+          </Link>
+        </div>
+
         <CardDescription>ID: {id}</CardDescription>
       </CardHeader>
       <DataTable
