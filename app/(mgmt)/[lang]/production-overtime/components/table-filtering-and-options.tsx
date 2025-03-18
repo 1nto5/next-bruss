@@ -21,9 +21,13 @@ import { revalidateProductionOvertime as revalidate } from '../actions';
 export default function TableFilteringAndOptions({
   fetchTime,
   isGroupLeader,
+  isLogged,
+  userEmail,
 }: {
   fetchTime: Date;
   isGroupLeader: boolean;
+  isLogged: boolean;
+  userEmail?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -41,6 +45,11 @@ export default function TableFilteringAndOptions({
       searchParams?.get('requestedAtFilter') ||
       searchParams?.get('status')
     );
+  });
+
+  const [showOnlyMine, setShowOnlyMine] = useState(() => {
+    const requestedBy = searchParams?.get('requestedBy');
+    return requestedBy === userEmail;
   });
 
   const [dateFilter, setDateFilter] = useState(() => {
@@ -61,6 +70,7 @@ export default function TableFilteringAndOptions({
     setDateFilter(undefined);
     setRequestedAtFilter(undefined);
     setStatusFilter('');
+    setShowOnlyMine(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -75,6 +85,7 @@ export default function TableFilteringAndOptions({
       if (requestedAtFilter)
         params.set('requestedAt', requestedAtFilter.toISOString());
       if (statusFilter) params.set('status', statusFilter);
+      if (showOnlyMine) params.set('requestedBy', 'true');
       const newUrl = `${pathname}?${params.toString()}`;
       if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
         setIsPendingSearch(true);
@@ -89,6 +100,18 @@ export default function TableFilteringAndOptions({
     }
   };
 
+  const handleShowOnlyMineChange = (checked: boolean) => {
+    setShowOnlyMine(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('requestedBy', userEmail || '');
+    } else {
+      params.delete('requestedBy');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   return (
     <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
       <div className='flex items-center space-x-2'>
@@ -97,7 +120,17 @@ export default function TableFilteringAndOptions({
           checked={showFilters}
           onCheckedChange={setShowFilters}
         />
-        <Label htmlFor='show-filters'>Pokaż filtry</Label>
+        {isLogged && (
+          <>
+            <Label htmlFor='show-filters'>Pokaż filtry</Label>
+            <Switch
+              id='only-my-requests'
+              checked={showOnlyMine}
+              onCheckedChange={handleShowOnlyMineChange}
+            />
+            <Label htmlFor='only-my-requests'>Tylko moje zlecenia</Label>
+          </>
+        )}
       </div>
 
       {showFilters && (

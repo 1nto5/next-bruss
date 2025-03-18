@@ -6,6 +6,12 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
+  const userEmail = searchParams.get('userEmail');
+
+  if (searchParams.get('requestedBy')) {
+    query.requestedBy = searchParams.get('requestedBy');
+  }
+
   searchParams.forEach((value, key) => {
     if (key === 'date') {
       // Create date objects for start and end of the specified date
@@ -34,6 +40,18 @@ export async function GET(req: NextRequest) {
 
     // Query where requestedAt falls within the specified date
     query.requestedAt = { $gte: startOfDay, $lte: endOfDay };
+  }
+
+  // Add condition to only show draft documents that belong to the current user
+  if (userEmail) {
+    // Either status is not draft OR (status is draft AND requestedBy equals userEmail)
+    query.$and = query.$and || [];
+    query.$and.push({
+      $or: [
+        { status: { $ne: 'draft' } },
+        { $and: [{ status: 'draft' }, { requestedBy: userEmail }] },
+      ],
+    });
   }
 
   try {

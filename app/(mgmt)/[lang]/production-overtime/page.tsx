@@ -15,6 +15,7 @@ import { OvertimeType } from './lib/production-overtime-types';
 async function getOvertimeRequests(
   lang: string,
   searchParams: { [key: string]: string | undefined },
+  userEmail?: string,
 ): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
@@ -25,6 +26,11 @@ async function getOvertimeRequests(
       ([_, value]) => value !== undefined,
     ) as [string, string][],
   );
+
+  // Add userEmail to query params for draft filtering on the server
+  if (userEmail) {
+    filteredSearchParams.userEmail = userEmail;
+  }
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(
@@ -71,17 +77,15 @@ export default async function ProductionOvertimePage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await props.params;
+  const { lang } = params;
   const searchParams = await props.searchParams;
   const session = await auth();
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
-  const isPlantManager =
-    session?.user?.roles?.includes('plant-manager') || false;
-
-  const { lang } = params;
+  const userEmail = session?.user?.email || undefined;
 
   let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
   ({ fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString } =
-    await getOvertimeRequests(lang, searchParams));
+    await getOvertimeRequests(lang, searchParams, userEmail));
 
   return (
     <Card>
@@ -95,10 +99,11 @@ export default async function ProductionOvertimePage(props: {
         <TableFilteringAndOptions
           fetchTime={fetchTime}
           isGroupLeader={isGroupLeader}
+          isLogged={!!session}
+          userEmail={session?.user?.email || undefined}
         />
       </CardHeader>
       <DataTable
-        session={session}
         columns={columns}
         data={overtimeRequestsLocaleString}
         fetchTimeLocaleString={fetchTimeLocaleString}
