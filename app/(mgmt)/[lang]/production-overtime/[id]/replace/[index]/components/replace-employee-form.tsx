@@ -21,70 +21,67 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleX, Pencil, Plus, Table } from 'lucide-react';
+import { CircleX, Save, Table } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import {
-  insertOvertimeRequest as insert,
-  insertDraftOvertimeRequest as insertDraft,
-  redirectToProductionOvertime as redirect,
-} from '../../../actions';
-import { NewOvertimeRequestSchema } from '../../../lib/production-overtime-zod';
-import { MultiSelectEmployees } from './multi-select-employees';
+import { replaceEmployee as update } from '../../../../actions';
+import { overtimeRequestEmployeeType } from '../../../../lib/production-overtime-types';
+import { SelectEmployee } from './select-employee';
+
+// Update the schema to use a single employee instead of an array
+const ReplaceEmployeeSchema = z.object({
+  employee: z
+    .object({
+      identifier: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+      agreedReceivingAt: z.date().optional(),
+      note: z.string().optional(),
+    })
+    .nullable(),
+});
 
 export default function ReplaceEmployeeForm({
   employees,
   requestId,
+  currentEmployeeIndex,
+  currentEmployeeData,
 }: {
   employees: EmployeeType[];
   requestId: string;
+  currentEmployeeIndex: number;
+  currentEmployeeData: overtimeRequestEmployeeType;
 }) {
-  const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
+  const [isPendingUpdate, setIsPendingUpdate] = useState(false);
+  const router = useRouter();
 
-  const today = new Date();
-  const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
-  const nextSaturdayFrom = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + daysUntilSaturday,
-    6,
-    0,
-    0,
-  );
-  const nextSaturdayTo = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + daysUntilSaturday,
-    14,
-    0,
-    0,
-  );
-
-  const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
-    resolver: zodResolver(NewOvertimeRequestSchema),
+  const form = useForm<z.infer<typeof ReplaceEmployeeSchema>>({
+    resolver: zodResolver(ReplaceEmployeeSchema),
     defaultValues: {
-      employees: [],
-      from: nextSaturdayFrom,
-      to: nextSaturdayTo,
-      reason: '',
+      employee: null,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof NewOvertimeRequestSchema>) => {
-    setIsPendingInserting(true);
+  const onSubmit = async (data: z.infer<typeof ReplaceEmployeeSchema>) => {
+    setIsPendingUpdate(true);
     try {
-      const res = await insert(data);
+      const res = await update(requestId, currentEmployeeIndex, {
+        identifier: data.employee?.identifier || '',
+        firstName: data.employee?.firstName || '',
+        lastName: data.employee?.lastName || '',
+        agreedReceivingAt: data.employee?.agreedReceivingAt,
+        note: data.employee?.note,
+      });
       if ('success' in res) {
-        toast.success('Zlecenie dodane!');
+        toast.success('Pracownik został wymieniony!');
         form.reset(); // Reset form after successful submission
-        redirect();
+        router.back();
       } else if ('error' in res) {
         console.error(res.error);
         toast.error('Skontaktuj się z IT!');
@@ -93,29 +90,7 @@ export default function ReplaceEmployeeForm({
       console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPendingInserting(false);
-    }
-  };
-
-  const handleDraftInsert = async (
-    data: z.infer<typeof NewOvertimeRequestSchema>,
-  ) => {
-    setIsPendingInsertingDraft(true);
-    try {
-      const res = await insertDraft(data);
-      if ('success' in res) {
-        toast.success('Szkic zapisany!');
-        // form.reset();
-        // redirect();
-      } else if ('error' in res) {
-        console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
-      }
-    } catch (error) {
-      console.error('handleDraftInsert', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPendingInsertingDraft(false);
+      setIsPendingUpdate(false);
     }
   };
 
@@ -123,27 +98,29 @@ export default function ReplaceEmployeeForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Zmień pracownika w zleceniu</CardTitle>
+          <CardTitle>
+            Wymiana pracownika: {currentEmployeeData.firstName}{' '}
+            {currentEmployeeData.lastName} ({currentEmployeeData.identifier})
+          </CardTitle>
           <Link href={`/production-overtime/${requestId}`}>
             <Button variant='outline'>
-              <Table /> <span>Zlecenie</span>
+              <Table /> <span>Powrót do zlecenia</span>
             </Button>
           </Link>
         </div>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* <ScrollArea className='h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[30rem]'> */}
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
-              name='employees'
+              name='employee'
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
-                    <FormLabel>Pracownicy</FormLabel>
+                    <FormLabel>Pracownik zastępujący</FormLabel>
                     <FormControl>
-                      <MultiSelectEmployees
+                      <SelectEmployee
                         employees={employees}
                         value={field.value}
                         onSelectChange={field.onChange}
@@ -151,42 +128,6 @@ export default function ReplaceEmployeeForm({
                     </FormControl>
                     <FormMessage />
                   </div>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='reason'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Uzasadnienie pracy w godzinach nadliczbowych
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      // placeholder='Tell us a little bit about yourself'
-                      className=''
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='note'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dodatkowe informacje</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      // placeholder='Tell us a little bit about yourself'
-                      className=''
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -257,7 +198,6 @@ export default function ReplaceEmployeeForm({
               </AccordionItem>
             </Accordion>
           </CardContent>
-          {/* </ScrollArea> */}
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <Button
@@ -270,31 +210,13 @@ export default function ReplaceEmployeeForm({
               Wyczyść
             </Button>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              {/* TODO: finish save draft */}
-              <Button
-                variant='secondary'
-                type='button'
-                onClick={() => {
-                  // setIsDraft(true);
-                  // form.handleSubmit(handleDraftInsert)();
-                  // handleDraftInsert(form.getValues());
-                }}
-                disabled={isPendingInsertDraft}
-                className='w-full sm:w-auto'
-              >
-                <Pencil
-                  className={isPendingInsertDraft ? 'animate-spin' : ''}
-                />
-                Zapisz szkic
-              </Button>
-
               <Button
                 type='submit'
                 className='w-full sm:w-auto'
-                disabled={isPendingInsertDraft}
+                disabled={isPendingUpdate}
               >
-                <Plus className={isPendingInsertDraft ? 'animate-spin' : ''} />
-                Dodaj zlecenie
+                <Save className={isPendingUpdate ? 'animate-spin' : ''} />
+                Zapisz
               </Button>
             </div>
           </CardFooter>

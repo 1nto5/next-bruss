@@ -3,8 +3,7 @@ import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title:
-    'Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
+  title: 'Zmiana pracownika w zleceniu(BRUSS)',
 };
 
 export default async function Layout(props: {

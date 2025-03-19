@@ -45,6 +45,12 @@ export const plHeaderRoutes: HeaderRoute[] = [
         title: 'Awarie LV',
         description: 'Raport oraz zgłaszanie awarii LV.',
       },
+      {
+        href: ROUTE_PATHS.productionOvertime,
+        title: 'Praca w godzinach nadliczbowych - produkcja - test',
+        description:
+          'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
+      },
     ],
   },
   {
@@ -60,18 +66,6 @@ export const plHeaderRoutes: HeaderRoute[] = [
         href: ROUTE_PATHS.inw2zatwierdz,
         title: 'Zatwierdzenie inwentaryzacji',
         description: 'Narzędzie do zatwierdzania zinwentaryzowanych pozycji.',
-      },
-    ],
-  },
-  {
-    title: 'Kadry',
-    href: '',
-    submenu: [
-      {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja - test',
-        description:
-          'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
       },
     ],
   },

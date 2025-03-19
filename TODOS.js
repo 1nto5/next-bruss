@@ -27,8 +27,6 @@ TODO: MARIOLA WNIOSKI
 - zamiana 1:1 pracownika po zaakceptowaniu
 - formularz od Mariola - zgodność (masz w Code)
 - jeden wniosek - wiele pracowników
-TODO: ilość godzin w tabeli? 
-FIXME: tabela formularz dodania overtime mobilna wersja rozjeżdża się
 
 TODO: inwentaryzacja maj
 wymagane dla okreslonych obszarów pola:

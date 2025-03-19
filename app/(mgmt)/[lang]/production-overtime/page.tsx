@@ -48,7 +48,7 @@ async function getOvertimeRequests(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString();
 
   const overtimeRequests: OvertimeType[] = await res.json();
   const overtimeRequestsLocaleString = overtimeRequests.map(

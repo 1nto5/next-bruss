@@ -25,7 +25,6 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
     id: 'actions',
     header: 'Akcje',
     cell: ({ row }) => {
-      const request = row.original;
       const pathname = usePathname();
       return (
         <>
@@ -36,7 +35,7 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-              <Link href={`${pathname}/${row.index}`}>
+              <Link href={`${pathname}/replace/${row.index}`}>
                 <DropdownMenuItem>
                   <Replace className='mr-2 h-4 w-4' />
                   <span>Wymień</span>

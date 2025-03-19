@@ -47,25 +47,25 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
+import { Check, ChevronsUpDown, CircleX } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { overtimeRequestEmployeeType } from '../../lib/production-overtime-types';
+import { overtimeRequestEmployeeType } from '../../../../lib/production-overtime-types';
 
-interface MultiSelectEmployeesProps {
+interface SelectEmployeeProps {
   employees: overtimeRequestEmployeeType[];
-  value: overtimeRequestEmployeeType[];
-  onSelectChange: (value: overtimeRequestEmployeeType[]) => void;
+  value: overtimeRequestEmployeeType | null;
+  onSelectChange: (value: overtimeRequestEmployeeType | null) => void;
   placeholder?: string;
 }
 
-export const MultiSelectEmployees = ({
+export const SelectEmployee = ({
   employees,
   value,
   onSelectChange,
-  placeholder = 'Wybierz pracowników...',
-}: MultiSelectEmployeesProps) => {
+  placeholder = 'Wybierz pracownika...',
+}: SelectEmployeeProps) => {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
@@ -102,13 +102,9 @@ export const MultiSelectEmployees = ({
   const isDayOffAgreed = form.watch('isDayOffAgreed');
 
   const handleSelect = (employee: EmployeeType) => {
-    const isSelected = value.some(
-      (item) => item.identifier === employee.identifier,
-    );
+    const isSelected = value && value.identifier === employee.identifier;
     if (isSelected) {
-      onSelectChange(
-        value.filter((item) => item.identifier !== employee.identifier),
-      );
+      onSelectChange(null);
     } else {
       setPendingEmployee(employee);
       form.reset({
@@ -119,6 +115,7 @@ export const MultiSelectEmployees = ({
       setOpenDialog(true);
     }
     setInputValue('');
+    setOpen(false); // Close popover after selection
   };
 
   const handleAddEmployee = () => {
@@ -143,7 +140,7 @@ export const MultiSelectEmployees = ({
             ? { agreedReceivingAt: normalizedDate }
             : {}),
         };
-        onSelectChange([...value, newEmployee]);
+        onSelectChange(newEmployee);
       }
       setOpenDialog(false);
       setPendingEmployee(null);
@@ -192,7 +189,6 @@ export const MultiSelectEmployees = ({
                 name='date'
                 render={({ field }) => (
                   <FormItem>
-                    {/* <FormLabel>Rozpoczęcie</FormLabel> */}
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -244,7 +240,7 @@ export const MultiSelectEmployees = ({
               className='w-full'
               onClick={handleAddEmployee}
             >
-              <CopyPlus /> Dodaj zlecenie pracownika
+              <Check /> Potwierdź
             </Button>
           </DialogFooter>
         </Form>
@@ -261,9 +257,9 @@ export const MultiSelectEmployees = ({
             role='combobox'
             className='w-full justify-between'
           >
-            <span className={cn(!value.length && 'opacity-50')}>
-              {value.length > 0
-                ? `wybrano ${value.length} ${value.length === 1 ? 'pracownika' : 'pracowników'}`
+            <span className={cn(!value && 'opacity-50')}>
+              {value
+                ? `${value.firstName} ${value.lastName} (${value.identifier})`
                 : placeholder}
             </span>
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -272,17 +268,20 @@ export const MultiSelectEmployees = ({
         <PopoverContent className='p-0' side='bottom' align='start'>
           <Command>
             <CommandInput
-              placeholder='Szukaj pracowników...'
+              placeholder='Szukaj pracownika...'
               value={inputValue}
               onValueChange={setInputValue}
             />
             <CommandList>
-              <CommandEmpty>Nie znaleziono pracowników.</CommandEmpty>
+              <CommandEmpty>Nie znaleziono.</CommandEmpty>
               <CommandGroup>
-                {value.length > 0 && (
-                  <CommandItem key='reset' onSelect={() => onSelectChange([])}>
+                {value && (
+                  <CommandItem
+                    key='reset'
+                    onSelect={() => onSelectChange(null)}
+                  >
                     <CircleX className='mr-2 h-4 w-4 text-red-500' />
-                    usuń wszystkich
+                    usuń wybór
                   </CommandItem>
                 )}
                 {employees.map((employee) => (
@@ -294,9 +293,7 @@ export const MultiSelectEmployees = ({
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        value.some(
-                          (item) => item.identifier === employee.identifier,
-                        )
+                        value && value.identifier === employee.identifier
                           ? 'opacity-100'
                           : 'opacity-0',
                       )}
@@ -311,45 +308,30 @@ export const MultiSelectEmployees = ({
         </PopoverContent>
       </Popover>
 
-      {value.length > 0 && (
+      {value && (
         <Table>
-          <TableCaption>Wybrani pracownicy</TableCaption>
+          <TableCaption>Wybrany pracownik</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Pracownik</TableHead>
               <TableHead>Nr personalny</TableHead>
               <TableHead>Data odbioru</TableHead>
               <TableHead>Uwagi</TableHead>
-              <TableHead>Usuń</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {value.map((employee) => (
-              <TableRow key={employee.identifier}>
-                <TableCell className='font-medium'>
-                  {employee.firstName} {employee.lastName}
-                </TableCell>
-                <TableCell>{employee.identifier}</TableCell>
-                <TableCell>
-                  {employee.agreedReceivingAt
-                    ? employee.agreedReceivingAt.toLocaleDateString('pl')
-                    : '-'}
-                </TableCell>
-                <TableCell>{employee.note || '-'}</TableCell>
-                <TableCell>
-                  <CircleX
-                    className='h-4 w-4 cursor-pointer text-red-500'
-                    onClick={() =>
-                      onSelectChange(
-                        value.filter(
-                          (item) => item.identifier !== employee.identifier,
-                        ),
-                      )
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            <TableRow>
+              <TableCell className='font-medium'>
+                {value.firstName} {value.lastName}
+              </TableCell>
+              <TableCell>{value.identifier}</TableCell>
+              <TableCell>
+                {value.agreedReceivingAt
+                  ? value.agreedReceivingAt.toLocaleDateString('pl')
+                  : '-'}
+              </TableCell>
+              <TableCell>{value.note || '-'}</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       )}
