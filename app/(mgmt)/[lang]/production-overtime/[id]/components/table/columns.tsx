@@ -12,8 +12,31 @@ import { MoreHorizontal, Replace } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { overtimeRequestEmployeeType } from '../../../lib/production-overtime-types';
-const pathname = usePathname();
 
+// Separate component for the cell content
+function ActionsCell({ row }: { row: any }) {
+  const pathname = usePathname(); // Hook is now used inside a React component
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant='ghost' className='h-8 w-8 p-0'>
+          <MoreHorizontal className='h-4 w-4' />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <Link href={`${pathname}/replace/${row.index}`}>
+          <DropdownMenuItem>
+            <Replace className='mr-2 h-4 w-4' />
+            <span>Wymień</span>
+          </DropdownMenuItem>
+        </Link>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+// Columns definition
 export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
   {
     accessorKey: 'firstName',
@@ -26,27 +49,7 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
   {
     id: 'actions',
     header: 'Akcje',
-    cell: ({ row }) => {
-      return (
-        <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <MoreHorizontal className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <Link href={`${pathname}/replace/${row.index}`}>
-                <DropdownMenuItem>
-                  <Replace className='mr-2 h-4 w-4' />
-                  <span>Wymień</span>
-                </DropdownMenuItem>
-              </Link>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      );
-    },
+    cell: ({ row }) => <ActionsCell row={row} />, // Use the component here
   },
   {
     accessorKey: 'agreedReceivingAtLocaleString',

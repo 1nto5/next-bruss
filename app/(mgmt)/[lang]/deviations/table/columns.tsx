@@ -76,7 +76,7 @@ export const columns: ColumnDef<DeviationType>[] = [
           break;
         case 'draft':
           statusLabel = (
-            <span className='rounded-md bg-gray-100 px-2 py-1 font-extralight italic tracking-widest dark:bg-gray-600'>
+            <span className='rounded-md bg-gray-100 px-2 py-1 font-extralight tracking-widest italic dark:bg-gray-600'>
               Szkic
             </span>
           );
@@ -143,9 +143,9 @@ export const columns: ColumnDef<DeviationType>[] = [
             {deviation.status === 'draft' && (
               <DropdownMenuItem
                 onClick={() =>
-                  deviation._id && deleteDraftDeviation(deviation._id)
+                  deviation._id && deleteDraftDeviation(`${deviation._id}`)
                 }
-                className=' focus:bg-red-400 dark:focus:bg-red-700'
+                className='focus:bg-red-400 dark:focus:bg-red-700'
               >
                 <Trash2 className='mr-2 h-4 w-4' />
                 <span>Usuń</span>
