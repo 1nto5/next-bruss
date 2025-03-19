@@ -6,6 +6,7 @@ import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { overtimeRequestEmployeeType } from './lib/production-overtime-types';
 import { NewOvertimeRequestType } from './lib/production-overtime-zod';
 
 export async function revalidateProductionOvertime() {
@@ -14,6 +15,10 @@ export async function revalidateProductionOvertime() {
 
 export async function revalidateProductionOvertimeRequest() {
   revalidateTag('production-overtime-request');
+}
+
+export async function redirectToProductionOvertime() {
+  redirect('/production-overtime');
 }
 
 export async function deleteOvertimeRequestDraft(id: string) {
@@ -163,6 +168,46 @@ export async function insertDraftOvertimeRequest(
   }
 }
 
-export async function redirectToProductionOvertime() {
-  redirect('/production-overtime');
+export async function replaceEmployee(
+  overtimeId: string,
+  toReplaceEmployeeArrayPosition: number,
+  newEmployee: overtimeRequestEmployeeType,
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('production_overtime');
+
+    // Check if the user is authorized to modify this request
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('plant-manager')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(overtimeId) },
+      {
+        $set: {
+          [`employees.${toReplaceEmployeeArrayPosition}`]: newEmployee,
+        },
+      },
+    );
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+    revalidateProductionOvertime();
+    return { success: 'replaced' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'replaceEmployee server action error' };
+  }
 }

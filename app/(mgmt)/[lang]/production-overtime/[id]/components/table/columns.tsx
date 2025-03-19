@@ -10,32 +10,8 @@ import {
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Replace } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
-import { approveOvertimeRequest as approve } from '../../../actions';
+import { usePathname } from 'next/navigation';
 import { overtimeRequestEmployeeType } from '../../../lib/production-overtime-types';
-
-const handleApprove = async (id: string) => {
-  toast.promise(
-    approve(id).then((res) => {
-      if (res.error) {
-        throw new Error(res.error);
-      }
-      return res;
-    }),
-    {
-      loading: 'Zapisuję zmiany...',
-      success: 'Zlecenie zatwierdzone!',
-      error: (error) => {
-        const errorMsg = error.message;
-        if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-        if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
-        console.error('handleApprove', errorMsg);
-        return 'Skontaktuj się z IT!';
-      },
-    },
-  );
-};
-
 export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
   {
     accessorKey: 'firstName',
@@ -50,6 +26,7 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
     header: 'Akcje',
     cell: ({ row }) => {
       const request = row.original;
+      const pathname = usePathname();
       return (
         <>
           <DropdownMenu>
@@ -59,7 +36,7 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-              <Link href={`/production-overtime/edit/${request._id}`}>
+              <Link href={`${pathname}/${row.index}`}>
                 <DropdownMenuItem>
                   <Replace className='mr-2 h-4 w-4' />
                   <span>Wymień</span>

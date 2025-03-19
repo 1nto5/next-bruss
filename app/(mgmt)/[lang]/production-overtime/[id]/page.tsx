@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import getEmployees from '@/lib/get-from-api/get-employees';
 import { Table } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -58,7 +59,6 @@ async function getOvertimeRequest(
     employees,
   };
 
-  console.log('overtimeRequestLocaleString', overtimeRequestLocaleString);
   return { fetchTime, fetchTimeLocaleString, overtimeRequestLocaleString };
 }
 
@@ -67,7 +67,7 @@ export default async function ProductionOvertimePage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await props.params;
-
+  const employees = await getEmployees();
   const { lang, id } = params;
 
   let overtimeRequestLocaleString;
