@@ -120,9 +120,9 @@ export default function TableFilteringAndOptions({
           checked={showFilters}
           onCheckedChange={setShowFilters}
         />
+        <Label htmlFor='show-filters'>Pokaż filtry</Label>
         {isLogged && (
           <>
-            <Label htmlFor='show-filters'>Pokaż filtry</Label>
             <Switch
               id='only-my-requests'
               checked={showOnlyMine}
