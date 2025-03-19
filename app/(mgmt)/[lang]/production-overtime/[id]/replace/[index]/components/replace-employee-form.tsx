@@ -82,6 +82,8 @@ export default function ReplaceEmployeeForm({
         toast.success('Pracownik został wymieniony!');
         form.reset(); // Reset form after successful submission
         router.back();
+      } else if (res.error === 'unauthorized') {
+        toast.error('Brak uprawnień do wykonania tej akcji!');
       } else if ('error' in res) {
         console.error(res.error);
         toast.error('Skontaktuj się z IT!');

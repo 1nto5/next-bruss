@@ -335,6 +335,7 @@ export default function NewOvertimeRequestForm({
                   // setIsDraft(true);
                   // form.handleSubmit(handleDraftInsert)();
                   // handleDraftInsert(form.getValues());
+                  toast.error('Funkcjonalność w trakcie implementacji!');
                 }}
                 disabled={isPendingInsertDraft}
                 className='w-full sm:w-auto'

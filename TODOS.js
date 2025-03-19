@@ -27,6 +27,9 @@ TODO: MARIOLA WNIOSKI
 - zamiana 1:1 pracownika po zaakceptowaniu
 - formularz od Mariola - zgodność (masz w Code)
 - jeden wniosek - wiele pracowników
+TODO: oprócz wymiany pracownika w zleceniu można go kasować
+TODO: nieobecny (zostawić wpis, ale brak wykonania pracy)
+TODO: zapisz szkic
 
 TODO: inwentaryzacja maj
 wymagane dla okreslonych obszarów pola:
