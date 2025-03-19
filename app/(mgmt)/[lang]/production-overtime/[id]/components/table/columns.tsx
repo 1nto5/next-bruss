@@ -12,6 +12,8 @@ import { MoreHorizontal, Replace } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { overtimeRequestEmployeeType } from '../../../lib/production-overtime-types';
+const pathname = usePathname();
+
 export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
   {
     accessorKey: 'firstName',
@@ -25,7 +27,6 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
     id: 'actions',
     header: 'Akcje',
     cell: ({ row }) => {
-      const pathname = usePathname();
       return (
         <>
           <DropdownMenu>
