@@ -70,7 +70,7 @@ export default async function ProductionOvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Time Sheet - Adrian's Projects</CardTitle>
+        <CardTitle>Time Sheet - Adrian&apos;s Projects</CardTitle>
         <CardDescription>
           Last synchronization: {fetchTimeLocaleString}
         </CardDescription>

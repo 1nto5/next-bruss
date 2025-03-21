@@ -76,7 +76,7 @@ export default async function ProductionOvertimePage(props: {
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <div>
-            <CardTitle>Monthly Summary - Adrian's Projects</CardTitle>
+            <CardTitle>Monthly Summary - Adrian&apos;s Projects</CardTitle>
             <CardDescription>
               Last synchronization: {fetchTimeLocaleString}
             </CardDescription>
