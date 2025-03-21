@@ -68,6 +68,8 @@ export function DataTable<TData, TValue>({
   const lastNameFilter =
     (table.getColumn('lastName')?.getFilterValue() as string) || '';
   const hasActiveFilters = firstNameFilter || lastNameFilter;
+  const identifierFilter =
+    (table.getColumn('identifier')?.getFilterValue() as string) || '';
 
   return (
     <>
@@ -89,6 +91,18 @@ export function DataTable<TData, TValue>({
               value={lastNameFilter}
               onChange={(event) =>
                 table.getColumn('lastName')?.setFilterValue(event.target.value)
+              }
+              className='max-w-sm'
+            />
+          </div>
+          <div>
+            <Input
+              placeholder='nr pers.'
+              value={identifierFilter}
+              onChange={(event) =>
+                table
+                  .getColumn('identifier')
+                  ?.setFilterValue(event.target.value)
               }
               className='max-w-sm'
             />

@@ -126,6 +126,7 @@ export async function insertOvertimeRequest(
       requestedAt: new Date(),
       requestedBy: session.user.email,
       editedAt: new Date(),
+      editedBy: session.user.email,
     };
 
     const res = await coll.insertOne(overtimeRequestToInsert);
@@ -188,7 +189,8 @@ export async function replaceEmployee(
 
     if (
       request.requestedBy !== session.user.email &&
-      !session.user.roles?.includes('plant-manager')
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('hr')
     ) {
       return { error: 'unauthorized' };
     }
@@ -209,5 +211,92 @@ export async function replaceEmployee(
   } catch (error) {
     console.error(error);
     return { error: 'replaceEmployee server action error' };
+  }
+}
+
+export async function deleteEmployee(
+  overtimeId: string,
+  employeeIndex: number,
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('production_overtime');
+
+    // Check if the user is authorized to modify this request
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('hr')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(overtimeId) },
+      {
+        $set: {
+          [`employees.${employeeIndex}.status`]: 'deleted',
+        },
+      },
+    );
+    console.log('deleteEmployee update', update);
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+    revalidateProductionOvertime();
+    return { success: 'deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteEmployee server action error' };
+  }
+}
+
+export async function reportAbsence(overtimeId: string, employeeIndex: number) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('production_overtime');
+
+    console.log('reportAbsence', overtimeId, employeeIndex);
+    // Check if the user is authorized to modify this request
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('hr')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(overtimeId) },
+      {
+        $set: {
+          [`employees.${employeeIndex}.status`]: 'absent',
+        },
+      },
+    );
+    if (update.matchedCount === 0) {
+      return { error: 'not found employee' };
+    }
+    revalidateProductionOvertime();
+    return { success: 'reported' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'reportAbsence server action error' };
   }
 }

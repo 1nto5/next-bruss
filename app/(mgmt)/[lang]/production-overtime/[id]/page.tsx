@@ -42,7 +42,10 @@ export default async function ProductionOvertimePage(props: {
       </CardHeader>
       <DataTable
         columns={columns}
-        data={overtimeRequestLocaleString.employees}
+        data={overtimeRequestLocaleString.employees.map((employee) => ({
+          ...employee,
+          overtimeId: overtimeRequestLocaleString._id,
+        }))}
       />
     </Card>
   );
