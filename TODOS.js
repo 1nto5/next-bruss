@@ -41,5 +41,4 @@ obszary:
 { value: 'S2', label: 'S2 Powlekanie + Chemia' }, - rozbić oddzielnie S2-Powlekanie - tu wymagane i S2-Chemia - nie wymagane
 nowy obszar Sedia-granulaty - też wymagane
 
-
 */

@@ -1,4 +1,5 @@
 // import { auth } from '@/auth';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardDescription,
@@ -6,13 +7,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { Table } from 'lucide-react';
+import Link from 'next/link';
+import { ProjectsLocaleStringType } from '../lib/projects-types';
+import { ProjectsType } from '../lib/projects-zod';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { ProjectsLocaleStringType } from './lib/projects-types';
-import { ProjectsType } from './lib/projects-zod';
 
-async function getProjects(
+async function getMonthlyProjectsSummary(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
@@ -27,14 +30,17 @@ async function getProjects(
   );
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const res = await fetch(`${process.env.API}/projects?${queryParams}`, {
-    next: { revalidate: 60, tags: ['projects'] },
-  });
+  const res = await fetch(
+    `${process.env.API}/projects/summary?${queryParams}`,
+    {
+      next: { revalidate: 60, tags: ['projects'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
     throw new Error(
-      `getProjects error: ${res.status} ${res.statusText} ${json.error}`,
+      `getMonthlyProjectsSummary error: ${res.status} ${res.statusText} ${json.error}`,
     );
   }
 
@@ -62,18 +68,25 @@ export default async function ProductionOvertimePage(props: {
   const searchParams = await props.searchParams;
 
   let fetchTime, fetchTimeLocaleString, dataLocaleString;
-  ({ fetchTime, fetchTimeLocaleString, dataLocaleString } = await getProjects(
-    lang,
-    searchParams,
-  ));
+  ({ fetchTime, fetchTimeLocaleString, dataLocaleString } =
+    await getMonthlyProjectsSummary(lang, searchParams));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Time Sheet - Adrian's Projects</CardTitle>
-        <CardDescription>
-          Last synchronization: {fetchTimeLocaleString}
-        </CardDescription>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
+          <div>
+            <CardTitle>Monthly Summary - Adrian's Projects</CardTitle>
+            <CardDescription>
+              Last synchronization: {fetchTimeLocaleString}
+            </CardDescription>
+          </div>
+          <Link href='/projects'>
+            <Button variant='outline'>
+              <Table /> <span>Projects</span>
+            </Button>
+          </Link>
+        </div>
         <TableFilteringAndOptions fetchTime={fetchTime} />
       </CardHeader>
       <DataTable

@@ -3,7 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
-import { CircleX, Loader, Plus, RefreshCw, Search } from 'lucide-react';
+import {
+  CalendarClock,
+  CircleX,
+  Loader,
+  Plus,
+  RefreshCw,
+  Search,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -103,6 +110,11 @@ export default function TableFilteringAndOptions({
         <Link href='/projects/new-entry'>
           <Button variant={'outline'}>
             <Plus /> <span>Add New Entry</span>
+          </Button>
+        </Link>
+        <Link href='/projects/summary'>
+          <Button variant={'outline'}>
+            <CalendarClock /> <span>Summary</span>
           </Button>
         </Link>
       </div>
