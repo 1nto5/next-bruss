@@ -1,6 +1,5 @@
 export const metadata = {
-  title:
-    'Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
+  title: "Monthly Summary - Adrian's Projects (BRUSS)",
 };
 
 export default async function Layout({

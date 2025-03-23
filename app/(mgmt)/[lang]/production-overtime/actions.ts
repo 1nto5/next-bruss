@@ -21,6 +21,33 @@ export async function redirectToProductionOvertime() {
   redirect('/production-overtime');
 }
 
+export async function insertDraftOvertimeRequest(
+  data: NewOvertimeRequestType,
+): Promise<{ success: 'inserted' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('production_overtime');
+    const draftRequestToInsert = {
+      status: 'draft',
+      ...data,
+      createdAt: new Date(),
+      createdBy: session.user.email,
+      editedAt: new Date(),
+    };
+    const res = await coll.insertOne(draftRequestToInsert);
+    if (res.insertedId) {
+      return { success: 'inserted' };
+    }
+    return { error: 'not inserted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'insertDraftOvertimeRequest server action error' };
+  }
+}
+
 export async function deleteOvertimeRequestDraft(id: string) {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -142,33 +169,6 @@ export async function insertOvertimeRequest(
   }
 }
 
-export async function insertDraftOvertimeRequest(
-  data: NewOvertimeRequestType,
-): Promise<{ success: 'inserted' } | { error: string }> {
-  const session = await auth();
-  if (!session || !session.user?.email) {
-    redirect('/auth');
-  }
-  try {
-    const coll = await dbc('production_overtime');
-    const draftRequestToInsert = {
-      status: 'draft',
-      ...data,
-      createdAt: new Date(),
-      createdBy: session.user.email,
-      editedAt: new Date(),
-    };
-    const res = await coll.insertOne(draftRequestToInsert);
-    if (res.insertedId) {
-      return { success: 'inserted' };
-    }
-    return { error: 'not inserted' };
-  } catch (error) {
-    console.error(error);
-    return { error: 'insertDraftOvertimeRequest server action error' };
-  }
-}
-
 export async function replaceEmployee(
   overtimeId: string,
   toReplaceEmployeeArrayPosition: number,
@@ -200,6 +200,8 @@ export async function replaceEmployee(
       {
         $set: {
           [`employees.${toReplaceEmployeeArrayPosition}`]: newEmployee,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -244,6 +246,8 @@ export async function deleteEmployee(
       {
         $set: {
           [`employees.${employeeIndex}.status`]: 'deleted',
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -287,6 +291,8 @@ export async function reportAbsence(overtimeId: string, employeeIndex: number) {
       {
         $set: {
           [`employees.${employeeIndex}.status`]: 'absent',
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );

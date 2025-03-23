@@ -21,14 +21,6 @@ Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
 
 TODO: MARIOLA WNIOSKI
-1. GL składa wniosek o wykonywanie nadgodzin (weekend)
-2. Dyrektor zatwierdza + powiadomienia mailowe (najlepiej z linkiem do zatwierdzenia)
-3. TL/GL dostaje powiadomienia o zgodzie / odrzuceniu
-- zamiana 1:1 pracownika po zaakceptowaniu
-- formularz od Mariola - zgodność (masz w Code)
-- jeden wniosek - wiele pracowników
-TODO: oprócz wymiany pracownika w zleceniu można go kasować
-TODO: nieobecny (zostawić wpis, ale brak wykonania pracy)
 TODO: zapisz szkic
 
 TODO: inwentaryzacja maj
