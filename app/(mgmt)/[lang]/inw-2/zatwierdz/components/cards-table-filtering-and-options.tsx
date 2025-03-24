@@ -1,5 +1,9 @@
 'use client';
 
+import {
+  sectorsSelectOptions,
+  warehouseSelectOptions,
+} from '@/app/(pro)/[lang]/inw-2/spis/lib/options';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -16,10 +20,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/cn';
-import {
-  sectorsSelectOptions,
-  warehouseSelectOptions,
-} from '@/lib/options/inventory';
 import { Check, ChevronsUpDown, CircleX, RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 

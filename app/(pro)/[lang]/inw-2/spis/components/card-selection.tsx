@@ -6,6 +6,10 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { newCardSchema as formSchema } from '../lib/zod';
 // import { login } from '../actions';
+import {
+  sectorsSelectOptions,
+  warehouseSelectOptions,
+} from '@/app/(pro)/[lang]/inw-2/spis/lib/options';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -35,10 +39,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  sectorsSelectOptions,
-  warehouseSelectOptions,
-} from '@/lib/options/inventory';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -117,7 +117,7 @@ export default function CardSelection() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmitNewCard)}>
-              <CardContent className='grid w-full items-center gap-4 '>
+              <CardContent className='grid w-full items-center gap-4'>
                 <FormField
                   control={form.control}
                   name='warehouse'
@@ -133,7 +133,7 @@ export default function CardSelection() {
                           {warehouseSelectOptions.map((warehouse) => (
                             <FormItem
                               key={warehouse.value}
-                              className='flex items-center space-x-3 space-y-0'
+                              className='flex items-center space-y-0 space-x-3'
                             >
                               <FormControl>
                                 <RadioGroupItem value={warehouse.value} />
@@ -164,7 +164,7 @@ export default function CardSelection() {
                           {sectorsSelectOptions.map((sector) => (
                             <FormItem
                               key={sector.value}
-                              className='flex items-center space-x-3 space-y-0'
+                              className='flex items-center space-y-0 space-x-3'
                             >
                               <FormControl>
                                 <RadioGroupItem value={sector.value} />
@@ -206,7 +206,7 @@ export default function CardSelection() {
                 Tylko karty gdzie autorem jest jedna z zalogowanych osób.
               </CardDescription>
             </CardHeader>
-            <CardContent className='grid w-full items-center gap-4 '>
+            <CardContent className='grid w-full items-center gap-4'>
               <Table>
                 {/* <TableCaption>A list of instruments.</TableCaption> */}
                 <TableHeader>
@@ -258,7 +258,7 @@ export default function CardSelection() {
                 Tylko karty gdzie autorem jest jedna z zalogowanych osób.
               </CardDescription>
             </CardHeader>
-            <CardContent className='grid w-full items-center gap-4 '>
+            <CardContent className='grid w-full items-center gap-4'>
               <Skeleton>
                 <Table>
                   {/* <TableCaption>A list of instruments.</TableCaption> */}

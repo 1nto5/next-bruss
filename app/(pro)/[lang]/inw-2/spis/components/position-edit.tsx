@@ -29,7 +29,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { findArticles, savePosition } from '../actions';
+import { findArticles, findBins, savePosition } from '../actions';
 import { useGetPosition } from '../data/get-position';
 import {
   useCardStore,
@@ -56,11 +56,15 @@ export default function PositionEdit() {
 
   const [isPending, setIsPending] = useState(false);
   const [isPendingFindArticle, setIsPendingFindArticle] = useState(false);
+  const [isPendingFindBin, setIsPendingFindBin] = useState(false);
   const [foundArticles, setFoundArticles] = useState<{ [key: string]: any }[]>(
     [],
   );
-  const [findMessage, setFindMessage] = useState('');
+  const [foundBins, setFoundBins] = useState<{ [key: string]: any }[]>([]);
+  const [findArticleMessage, setFindArticleMessage] = useState('');
+  const [findBinMessage, setFindBinMessage] = useState('');
   const [selectedArticle, setSelectedArticle] = useState<any>();
+  const [selectedBin, setSelectedBin] = useState<any>();
   const [identifier, setIdentifier] = useState('');
 
   useEffect(() => {
@@ -120,12 +124,12 @@ export default function PositionEdit() {
       if ('error' in res) {
         switch (res.error) {
           case 'no articles':
-            setFindMessage('Nie znaleziono artykułu!');
+            setFindArticleMessage('Nie znaleziono artykułu!');
             setFoundArticles([]);
             setSelectedArticle(undefined);
             break;
           case 'too many articles':
-            setFindMessage(
+            setFindArticleMessage(
               'Sprecyzuj wyszukiwanie - znaleziono za dużo artykułów!',
             );
             setFoundArticles([]);
@@ -137,7 +141,7 @@ export default function PositionEdit() {
         }
         return;
       }
-      setFindMessage('success');
+      setFindArticleMessage('success');
       setFoundArticles(res.success);
     } catch (error) {
       console.error('handleFindArticle', error);
@@ -147,10 +151,53 @@ export default function PositionEdit() {
     }
   };
 
+  const handleFindBin = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsPendingFindBin(true);
+    try {
+      const res = await findBins(e.target.value);
+      if ('error' in res) {
+        switch (res.error) {
+          case 'no bins':
+            setFindBinMessage('Nie znaleziono pasującej pozycji!');
+            setFoundBins([]);
+            setSelectedBin(undefined);
+            break;
+          case 'too many bins':
+            setFindBinMessage('Sprecyzuj wyszukiwanie - zbyt wiele wyników!');
+            setFoundBins([]);
+            setSelectedBin(undefined);
+            break;
+          default:
+            console.error('handleFindBin', res.error);
+            toast.error('Skontaktuj się z IT!');
+        }
+        return;
+      }
+      setFindBinMessage('success');
+      setFoundBins(res.success);
+    } catch (error) {
+      console.error('handleFindBin', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingFindBin(false);
+    }
+  };
+
   const unit = form.watch('unit');
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsPending(true);
+    if (
+      ['guma', 's900', 's2-powlekanie', 'sedia-granulaty'].includes(sector) &&
+      !selectedBin
+    ) {
+      setFindBinMessage(
+        'Storage Bin jest wymagany dla sektora: ' + sector + '!',
+      );
+
+      setIsPending(false);
+      return;
+    }
     try {
       const res = await savePosition(
         card,
@@ -162,6 +209,7 @@ export default function PositionEdit() {
           : Number(data.quantity),
         selectedArticle.unit,
         data.wip,
+        selectedBin && selectedBin.value,
       );
       if ('error' in res) {
         if (res.error === 'wrong quantity') {
@@ -264,9 +312,10 @@ export default function PositionEdit() {
                     {isPendingFindArticle && (
                       <FormMessage>Wyszukiwanie...</FormMessage>
                     )}
-                    {findMessage !== 'success' && !isPendingFindArticle && (
-                      <FormMessage>{findMessage}</FormMessage>
-                    )}
+                    {findArticleMessage !== 'success' &&
+                      !isPendingFindArticle && (
+                        <FormMessage>{findArticleMessage}</FormMessage>
+                      )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -294,7 +343,7 @@ export default function PositionEdit() {
                           {foundArticles.map((article) => (
                             <FormItem
                               key={article.number}
-                              className='flex items-center space-x-3 space-y-0'
+                              className='flex items-center space-y-0 space-x-3'
                             >
                               <FormControl>
                                 <RadioGroupItem value={article.number} />
@@ -449,6 +498,81 @@ export default function PositionEdit() {
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {selectedArticle && (
+                <FormField
+                  control={form.control}
+                  name='findBin'
+                  render={({ field }) => (
+                    <FormItem className='rounded-lg border p-4'>
+                      <FormLabel>Storage Bin</FormLabel>
+                      <FormDescription>
+                        Wymagane dla sektorów: guma, s900, s2-powlekanie oraz
+                        sedia-granulaty!
+                      </FormDescription>
+                      <div className='flex items-center space-x-2'>
+                        <FormControl>
+                          <Input
+                            className=''
+                            placeholder={'wpisz aby wyszukać...'}
+                            {...field}
+                            onChange={(e) => {
+                              handleFindBin(e);
+                            }}
+                          />
+                        </FormControl>
+                      </div>
+                      {isPendingFindBin && (
+                        <FormMessage>Wyszukiwanie...</FormMessage>
+                      )}
+                      {findBinMessage !== 'success' && !isPendingFindBin && (
+                        <FormMessage>{findBinMessage}</FormMessage>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {foundBins[0] && !isPendingFindBin && (
+                <FormField
+                  control={form.control}
+                  name='bin'
+                  render={({ field }) => (
+                    <FormItem className='space-y-3 rounded-lg border p-4'>
+                      <FormControl>
+                        <RadioGroup
+                          disabled={data?.success?.approver}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            const selectedBin = foundBins.find(
+                              (bin) => bin.value === value,
+                            );
+                            setFindBinMessage('success');
+                            setSelectedBin(selectedBin);
+                          }}
+                          value={field.value}
+                          className='flex flex-col space-y-1'
+                        >
+                          {foundBins.map((bin) => (
+                            <FormItem
+                              key={bin.value}
+                              className='flex items-center space-y-0 space-x-3'
+                            >
+                              <FormControl>
+                                <RadioGroupItem value={bin.value} />
+                              </FormControl>
+                              <FormLabel className='font-normal'>
+                                {bin.label}
+                              </FormLabel>
+                            </FormItem>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

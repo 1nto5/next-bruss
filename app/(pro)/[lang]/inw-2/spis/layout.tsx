@@ -2,7 +2,6 @@ import '@/app/globals.css';
 
 import Footer from '@/components/footer';
 
-import { Toaster } from '@/components/ui/sonner';
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
@@ -42,7 +41,6 @@ export default async function RootLayout(props: {
           <Footer />
         </div>
       </QueryProvider>
-      <Toaster richColors position='top-center' />
     </ThemeProvider>
   );
 }

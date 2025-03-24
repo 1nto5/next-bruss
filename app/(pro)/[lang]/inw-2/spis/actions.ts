@@ -239,6 +239,31 @@ export async function findArticles(search: string) {
   }
 }
 
+export async function findBins(search: string) {
+  try {
+    const coll = await dbc('inventory_bin_options');
+    const results = await coll
+      .find({
+        value: { $regex: search, $options: 'i' },
+      })
+      .toArray();
+
+    // Check number of results
+    if (results.length === 0) {
+      return { error: 'no bins' };
+    }
+
+    if (results.length > 5) {
+      return { error: 'too many bins' };
+    }
+    const sanitizedResults = results.map(({ _id, ...rest }) => rest);
+    return { success: sanitizedResults };
+  } catch (error) {
+    console.error(error);
+    return { error: 'findBins server action error' };
+  }
+}
+
 export async function savePosition(
   card: number,
   position: number,
@@ -247,6 +272,8 @@ export async function savePosition(
   quantity: number,
   unit: string,
   wip: boolean,
+  bin?: string, // New parameter for BIN
+  deliveryDate?: Date, // New parameter for delivery date
 ) {
   try {
     // const timeout = (ms: number) =>
@@ -274,6 +301,8 @@ export async function savePosition(
       quantity: quantity,
       unit: unit,
       wip: wip,
+      bin: bin, // Add bin field
+      deliveryDate: deliveryDate, // Add delivery date field
     };
     const updateResult = await collection.updateOne(
       {

@@ -84,4 +84,7 @@ export const positionEditSchema = z.object({
     ),
   wip: z.boolean(),
   unit: z.string().min(1, { message: 'Wybierz jednostkę!' }).optional(),
+  bin: z.string().optional(),
+  findBin: z.string().optional(),
+  deliveryDate: z.date().optional(),
 });

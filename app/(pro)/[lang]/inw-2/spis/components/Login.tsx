@@ -29,7 +29,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -43,12 +42,12 @@ export default function Login() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      // personalNumber1: '',
-      // pin1: '',
-      // personalNumber2: '',
-      // pin2: '',
-      // personalNumber3: '',
-      // pin3: '',
+      personalNumber1: '',
+      pin1: '',
+      personalNumber2: '',
+      pin2: '',
+      personalNumber3: '',
+      pin3: '',
     },
   });
 
@@ -140,7 +139,7 @@ export default function Login() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className='grid w-full items-center gap-4 '>
+          <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
               name='personalNumber1'
