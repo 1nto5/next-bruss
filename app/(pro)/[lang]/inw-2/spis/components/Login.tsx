@@ -128,7 +128,7 @@ export default function Login() {
   };
 
   return (
-    <Card className='w-[400px]'>
+    <Card className='sm:w-[600px]'>
       <CardHeader>
         <CardTitle>Logowanie</CardTitle>
         <CardDescription>

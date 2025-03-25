@@ -1,5 +1,11 @@
 'use client';
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -9,6 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Form,
   FormControl,
@@ -66,6 +74,24 @@ export default function PositionEdit() {
   const [selectedArticle, setSelectedArticle] = useState<any>();
   const [selectedBin, setSelectedBin] = useState<any>();
   const [identifier, setIdentifier] = useState('');
+  const isSpecialSector = [
+    'guma',
+    's900',
+    's2-powlekanie',
+    'sedia-granulaty',
+  ].includes(sector);
+  const [accordionValue, setAccordionValue] = useState(
+    isSpecialSector ? 'storage-delivery' : '',
+  );
+
+  useEffect(() => {
+    // Update accordion state when sector changes
+    setAccordionValue(
+      ['guma', 's900', 's2-powlekanie', 'sedia-granulaty'].includes(sector)
+        ? 'storage-delivery'
+        : '',
+    );
+  }, [sector]);
 
   useEffect(() => {
     if (isSuccess && !data?.success?.identifier) {
@@ -81,6 +107,7 @@ export default function PositionEdit() {
       quantity: '',
       wip: false,
       unit: '',
+      deliveryDate: undefined,
     },
   });
 
@@ -96,6 +123,26 @@ export default function PositionEdit() {
           form.setValue('wip', data?.success.wip);
           form.setValue('article', res.success[0].number);
           form.setValue('unit', data?.success.unit);
+          // Set delivery date if it exists in data
+          if (data?.success.deliveryDate) {
+            form.setValue('deliveryDate', new Date(data.success.deliveryDate));
+          }
+
+          // Fix for storage bin display - fetch bin data if available
+          if (data.success.bin) {
+            const binRes = await findBins(data.success.bin);
+            if (binRes.success && binRes.success.length > 0) {
+              setFoundBins(binRes.success);
+              // Set the selected bin to the matching bin object
+              const matchingBin = binRes.success.find(
+                (bin) => bin.value === data.success.bin,
+              );
+              setSelectedBin(matchingBin || binRes.success[0]);
+              setFindBinMessage('success');
+            }
+          }
+
+          form.setValue('bin', data?.success.bin);
         }
       }
     };
@@ -109,6 +156,9 @@ export default function PositionEdit() {
     form.setValue('findArticle', '');
     form.setValue('quantity', '');
     form.setValue('wip', false);
+    form.setValue('unit', '');
+    form.setValue('findBin', '');
+    form.setValue('deliveryDate', undefined);
     refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, refetch, card]);
@@ -183,21 +233,43 @@ export default function PositionEdit() {
     }
   };
 
+  const clearForm = () => {
+    // Reset form fields
+    form.setValue('findArticle', '');
+    form.setValue('article', '');
+    form.setValue('quantity', '');
+    form.setValue('wip', false);
+    form.setValue('unit', '');
+    form.setValue('findBin', '');
+    form.setValue('bin', '');
+    form.setValue('deliveryDate', undefined);
+
+    // Reset states
+    setSelectedArticle(undefined);
+    setSelectedBin(undefined);
+    setFoundArticles([]);
+    setFoundBins([]);
+    setIdentifier('');
+    setFindArticleMessage('');
+    setFindBinMessage('');
+  };
+
   const unit = form.watch('unit');
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsPending(true);
-    if (
-      ['guma', 's900', 's2-powlekanie', 'sedia-granulaty'].includes(sector) &&
-      !selectedBin
-    ) {
+    if (isSpecialSector && !selectedBin) {
       setFindBinMessage(
         'Storage Bin jest wymagany dla sektora: ' + sector + '!',
       );
-
-      setIsPending(false);
       return;
     }
+    if (isSpecialSector && !form.getValues('deliveryDate')) {
+      form.setError('deliveryDate', {
+        message: 'Data dostawy jest wymagana dla sektora: ' + sector + '!',
+      });
+      return;
+    }
+    setIsPending(true);
     try {
       const res = await savePosition(
         card,
@@ -210,6 +282,7 @@ export default function PositionEdit() {
         selectedArticle.unit,
         data.wip,
         selectedBin && selectedBin.value,
+        data.deliveryDate,
       );
       if ('error' in res) {
         if (res.error === 'wrong quantity') {
@@ -241,7 +314,7 @@ export default function PositionEdit() {
 
   if (isFetching) {
     return (
-      <Card className='w-[500px]'>
+      <Card className='sm:w-[600px]'>
         <CardHeader>
           <CardTitle>Pozycja nr: {position}</CardTitle>
           <CardDescription>
@@ -261,7 +334,7 @@ export default function PositionEdit() {
   }
 
   return (
-    <Card className='w-[500px]'>
+    <Card className='sm:w-[600px]'>
       <CardHeader>
         <CardTitle>Pozycja nr: {position}</CardTitle>
         <CardDescription>
@@ -504,82 +577,130 @@ export default function PositionEdit() {
               )}
 
               {selectedArticle && (
-                <FormField
-                  control={form.control}
-                  name='findBin'
-                  render={({ field }) => (
-                    <FormItem className='rounded-lg border p-4'>
-                      <FormLabel>Storage Bin</FormLabel>
-                      <FormDescription>
-                        Wymagane dla sektorów: guma, s900, s2-powlekanie oraz
-                        sedia-granulaty!
-                      </FormDescription>
-                      <div className='flex items-center space-x-2'>
-                        <FormControl>
-                          <Input
-                            className=''
-                            placeholder={'wpisz aby wyszukać...'}
-                            {...field}
-                            onChange={(e) => {
-                              handleFindBin(e);
-                            }}
-                          />
-                        </FormControl>
-                      </div>
-                      {isPendingFindBin && (
-                        <FormMessage>Wyszukiwanie...</FormMessage>
-                      )}
-                      {findBinMessage !== 'success' && !isPendingFindBin && (
-                        <FormMessage>{findBinMessage}</FormMessage>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {foundBins[0] && !isPendingFindBin && (
-                <FormField
-                  control={form.control}
-                  name='bin'
-                  render={({ field }) => (
-                    <FormItem className='space-y-3 rounded-lg border p-4'>
-                      <FormControl>
-                        <RadioGroup
-                          disabled={data?.success?.approver}
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            const selectedBin = foundBins.find(
-                              (bin) => bin.value === value,
-                            );
-                            setFindBinMessage('success');
-                            setSelectedBin(selectedBin);
-                          }}
-                          value={field.value}
-                          className='flex flex-col space-y-1'
-                        >
-                          {foundBins.map((bin) => (
-                            <FormItem
-                              key={bin.value}
-                              className='flex items-center space-y-0 space-x-3'
-                            >
-                              <FormControl>
-                                <RadioGroupItem value={bin.value} />
-                              </FormControl>
-                              <FormLabel className='font-normal'>
-                                {bin.label}
-                              </FormLabel>
+                <Accordion
+                  type='single'
+                  collapsible
+                  value={accordionValue}
+                  onValueChange={setAccordionValue}
+                >
+                  <AccordionItem value='storage-delivery'>
+                    <AccordionTrigger>
+                      Storage Bin i Data Dostawy
+                      {isSpecialSector && ` (wymagane dla sektora: ${sector})`}
+                    </AccordionTrigger>
+
+                    <AccordionContent>
+                      <div className='space-y-4 pt-2'>
+                        <FormField
+                          control={form.control}
+                          name='findBin'
+                          render={({ field }) => (
+                            <FormItem className='rounded-lg border p-4'>
+                              <FormLabel>Storage Bin</FormLabel>
+
+                              <div className='flex items-center space-x-2'>
+                                <FormControl>
+                                  <Input
+                                    className=''
+                                    placeholder={'wpisz aby wyszukać...'}
+                                    {...field}
+                                    onChange={(e) => {
+                                      handleFindBin(e);
+                                    }}
+                                  />
+                                </FormControl>
+                              </div>
+                              {isPendingFindBin && (
+                                <FormMessage>Wyszukiwanie...</FormMessage>
+                              )}
+                              {findBinMessage !== 'success' &&
+                                !isPendingFindBin && (
+                                  <FormMessage>{findBinMessage}</FormMessage>
+                                )}
+                              <FormMessage />
                             </FormItem>
-                          ))}
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                          )}
+                        />
+
+                        {foundBins[0] && !isPendingFindBin && (
+                          <FormField
+                            control={form.control}
+                            name='bin'
+                            render={({ field }) => (
+                              <FormItem className='space-y-3 rounded-lg border p-4'>
+                                <FormControl>
+                                  <RadioGroup
+                                    disabled={data?.success?.approver}
+                                    onValueChange={(value) => {
+                                      field.onChange(value);
+                                      const selectedBin = foundBins.find(
+                                        (bin) => bin.value === value,
+                                      );
+                                      setFindBinMessage('success');
+                                      setSelectedBin(selectedBin);
+                                    }}
+                                    value={field.value}
+                                    className='flex flex-col space-y-1'
+                                  >
+                                    {foundBins.map((bin) => (
+                                      <FormItem
+                                        key={bin.value}
+                                        className='flex items-center space-y-0 space-x-3'
+                                      >
+                                        <FormControl>
+                                          <RadioGroupItem value={bin.value} />
+                                        </FormControl>
+                                        <FormLabel className='font-normal'>
+                                          {bin.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    ))}
+                                  </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+
+                        <FormField
+                          control={form.control}
+                          name='deliveryDate'
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Data dostawy</FormLabel>
+
+                              <FormControl>
+                                <DateTimePicker
+                                  modal
+                                  hideTime
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  renderTrigger={({ open, value, setOpen }) => (
+                                    <DateTimeInput
+                                      value={value}
+                                      onChange={(x) =>
+                                        !open && field.onChange(x)
+                                      }
+                                      format='dd/MM/yyyy'
+                                      disabled={open}
+                                      onCalendarClick={() => setOpen(!open)}
+                                    />
+                                  )}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
             </CardContent>
 
-            <CardFooter className='flex justify-between'>
+            <CardFooter className='flex justify-between gap-2'>
               {position !== 1 ? (
                 <Button
                   onClick={() => setPosition(position - 1)}
@@ -593,21 +714,33 @@ export default function PositionEdit() {
                   - 1
                 </Button>
               )}
-              {isPending ? (
-                <Button disabled type={'button'}>
-                  <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                  Zapisywanie
-                </Button>
-              ) : (
+              <div className='grid w-full grid-cols-2 gap-2'>
                 <Button
-                  disabled={
-                    !selectedArticle || isPending || data?.success?.approver
-                  }
-                  type='submit'
+                  type='button'
+                  variant='destructive'
+                  onClick={clearForm}
+                  disabled={isPending || data?.success?.approver}
+                  className='w-full'
                 >
-                  Zapisz
+                  Wyczyść
                 </Button>
-              )}
+                {isPending ? (
+                  <Button disabled type='button' className='w-full'>
+                    <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+                    Zapisywanie
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={
+                      !selectedArticle || isPending || data?.success?.approver
+                    }
+                    type='submit'
+                    className='w-full'
+                  >
+                    Zapisz
+                  </Button>
+                )}
+              </div>
               {position !== 25 && data?.success ? (
                 <Button
                   onClick={() => setPosition(position + 1)}

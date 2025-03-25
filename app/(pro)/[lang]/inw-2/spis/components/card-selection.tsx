@@ -104,7 +104,7 @@ export default function CardSelection() {
   }
 
   return (
-    <Tabs defaultValue='new' className='w-[500px]'>
+    <Tabs defaultValue='new' className='sm:w-[600px]'>
       <TabsList className='grid w-full grid-cols-2'>
         <TabsTrigger value='new'>Utwórz nową kartę</TabsTrigger>
         <TabsTrigger value='exists'>Wybierz istniejącą kartę</TabsTrigger>

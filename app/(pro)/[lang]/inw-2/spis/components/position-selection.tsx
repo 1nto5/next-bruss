@@ -19,7 +19,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import clsx from 'clsx';
-import { set } from 'date-fns';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { PositionType } from '../../../../../../lib/types/inventory';
@@ -58,14 +57,14 @@ export default function PositionSelection() {
   }
 
   return (
-    <Card className='w-[700px]'>
+    <Card className='sm:w-[600px]'>
       <CardHeader>
         <CardTitle className={clsx('', isFetching && 'animate-pulse')}>
           Wybór pozycji
         </CardTitle>
         <CardDescription>Numer karty: {card}</CardDescription>
       </CardHeader>
-      <CardContent className='grid w-full items-center gap-4 '>
+      <CardContent className='grid w-full items-center gap-4'>
         {data?.success && (
           <Table>
             {/* <TableCaption>A list of instruments.</TableCaption> */}
