@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { PositionType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Check, List, Table } from 'lucide-react';
+import { ArrowUpDown, Check } from 'lucide-react';
 import EditPositionDialog from '../components/edit-position-dialog';
 
 export const positionsColumns: ColumnDef<PositionType>[] = [
@@ -52,19 +52,6 @@ export const positionsColumns: ColumnDef<PositionType>[] = [
     accessorKey: 'articleNumber',
     header: 'Nr art.',
   },
-
-  // export type PositionType = {
-  //   position: number;
-  //   identifier: string;
-  //   time: string;
-  //   articleNumber: string;
-  //   articleName: string;
-  //   quantity: number;
-  //   unit: string;
-  //   wip: boolean;
-  //   approver: string;
-  //   approvedAt: string;
-  // };
   {
     accessorKey: 'quantity',
     header: 'Ilość',
@@ -101,6 +88,19 @@ export const positionsColumns: ColumnDef<PositionType>[] = [
       return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
     },
   },
+  {
+    accessorKey: 'bin',
+    header: 'Storage Bin',
+    cell: ({ row }) => {
+      const bin = row.original.bin;
+      return <div className='text-nowrap'>{bin && bin.toUpperCase()}</div>;
+    },
+  },
+  {
+    accessorKey: 'deliveryDateLocaleString',
+    header: 'Data dostawy',
+  },
+
   {
     accessorKey: 'timeLocaleString',
     header: 'Ostatnia zmiana',

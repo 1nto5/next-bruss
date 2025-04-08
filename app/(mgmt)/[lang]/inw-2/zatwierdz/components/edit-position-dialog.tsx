@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   // DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -28,7 +27,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { PositionType } from '@/lib/types/inventory';
 import { UpdatePositionSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { set } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -51,6 +49,8 @@ export default function EditPositionDialog({
       wip: position.wip,
       unit: position.unit,
       comment: position.comment || '',
+      bin: position.bin || '',
+      deliveryDate: position.deliveryDate || '',
       approved: position.approver ? true : false,
     },
   });
@@ -107,7 +107,7 @@ export default function EditPositionDialog({
                     <FormItem>
                       <FormLabel>Artykuł</FormLabel>
                       <FormControl>
-                        <Input className='w-[80px]' {...field} />
+                        <Input className='' {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -122,7 +122,7 @@ export default function EditPositionDialog({
                       <FormControl>
                         <Input
                           type='number'
-                          className='w-[120px]'
+                          className=''
                           {...field}
                           onChange={(e) =>
                             field.onChange(Number(e.target.value))
@@ -148,6 +148,19 @@ export default function EditPositionDialog({
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='bin'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Storage Bin</FormLabel>
+                      <FormControl>
+                        <Input className='' {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

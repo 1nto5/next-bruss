@@ -54,7 +54,9 @@ export async function updatePosition(
       articleName: article.name,
       quantity: data.quantity,
       wip: data.wip,
-      comment: data.comment,
+      bin: data.bin,
+      deliveryDate: data.deliveryDate,
+      comment: data.comment?.toLowerCase(),
       approver: data.approved ? session.user?.email : '',
     };
 

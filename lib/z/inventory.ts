@@ -6,6 +6,8 @@ export const UpdatePositionSchema = z.object({
   unit: z.string(),
   wip: z.boolean(),
   approved: z.boolean().optional(),
+  bin: z.string().optional(),
+  deliveryDate: z.date().optional(),
   comment: z.string().optional(),
 });
 

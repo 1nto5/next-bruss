@@ -80,6 +80,9 @@ async function getPositions(
     ...position,
     timeLocaleString: new Date(position.time).toLocaleString(lang),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
+    deliveryDateLocaleString:
+      position.deliveryDate &&
+      new Date(position.deliveryDate).toLocaleDateString(lang),
   }));
 
   return {

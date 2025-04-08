@@ -10,11 +10,14 @@ export type PositionType = {
   approver: string;
   approvedAt: string;
   comment: string;
+  bin: string;
+  deliveryDate: Date;
 };
 
 export type CardPositionsTableDataType = PositionType & {
   timeLocaleString: string;
   approvedAtLocaleString: string;
+  deliveryDateLocaleString: string;
 };
 
 export type CardType = {
