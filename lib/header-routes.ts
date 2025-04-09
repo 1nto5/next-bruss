@@ -75,7 +75,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.inw2spis,
+        href: ROUTE_PATHS.qrGenerator,
         title: 'QR Code Generator',
         description: 'Generowanie kodów QR.',
       },
