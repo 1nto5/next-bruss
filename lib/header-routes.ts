@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
   productionOvertime: '/production-overtime',
+  qrGenerator: '/qr-generator',
 };
 
 export const plHeaderRoutes: HeaderRoute[] = [
@@ -66,6 +67,17 @@ export const plHeaderRoutes: HeaderRoute[] = [
         href: ROUTE_PATHS.inw2zatwierdz,
         title: 'Zatwierdzenie inwentaryzacji',
         description: 'Narzędzie do zatwierdzania zinwentaryzowanych pozycji.',
+      },
+    ],
+  },
+  {
+    title: 'Magazyn',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.inw2spis,
+        title: 'QR Code Generator',
+        description: 'Generowanie kodów QR.',
       },
     ],
   },

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { PositionType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Check, List, Table } from 'lucide-react';
+import { ArrowUpDown, Check } from 'lucide-react';
 import EditPositionDialog from '../../components/edit-position-dialog';
 
 export const columns: ColumnDef<PositionType>[] = [
@@ -97,6 +97,18 @@ export const columns: ColumnDef<PositionType>[] = [
       const comment = row.getValue('comment');
       return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
     },
+  },
+  {
+    accessorKey: 'bin',
+    header: 'Storage Bin',
+    cell: ({ row }) => {
+      const bin = row.original.bin;
+      return <div className='text-nowrap'>{bin && bin.toUpperCase()}</div>;
+    },
+  },
+  {
+    accessorKey: 'deliveryDateLocaleString',
+    header: 'Data dostawy',
   },
   {
     accessorKey: 'timeLocaleString',
