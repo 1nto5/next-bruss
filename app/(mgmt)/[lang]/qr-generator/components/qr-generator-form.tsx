@@ -1,8 +1,9 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -32,8 +33,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import React from 'react';
-import { toast } from 'sonner';
 import { generateQrCodePdf } from '../lib/pdf-generator';
 
 const formSchema = z.object({
@@ -45,9 +44,9 @@ const formSchema = z.object({
     }),
   title: z.string().optional(),
   pageSize: z.enum(['standard', 'a4', 'a3']).default('standard'),
-  qrSize: z.number().int().default(85), // QR code size in mm
-  fontSize: z.number().int().default(48), // Font size in points
-  spacing: z.number().int().default(22), // Spacing in mm
+  qrSize: z.number().int().default(85),
+  fontSize: z.number().int().default(48),
+  spacing: z.number().int().default(22),
 });
 
 export default function QrGeneratorForm() {
@@ -59,29 +58,27 @@ export default function QrGeneratorForm() {
       listItems: '',
       title: '',
       pageSize: 'standard',
-      qrSize: 85, // Default QR size for standard format
-      fontSize: 48, // Default font size for standard format
-      spacing: 22, // Default spacing for standard format
+      qrSize: 85,
+      fontSize: 48,
+      spacing: 22,
     },
   });
 
-  // Watch pageSize to update defaults when it changes
   const selectedPageSize = form.watch('pageSize');
 
-  // Update default values based on page size
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedPageSize === 'standard') {
       form.setValue('qrSize', 85);
       form.setValue('fontSize', 48);
       form.setValue('spacing', 22);
     } else if (selectedPageSize === 'a4') {
       form.setValue('qrSize', 190);
-      form.setValue('fontSize', 105); // Increased from 65 to 105 to maintain proportions
-      form.setValue('spacing', 80); // Increased from 40 to 80 (2x)
+      form.setValue('fontSize', 105);
+      form.setValue('spacing', 80);
     } else if (selectedPageSize === 'a3') {
       form.setValue('qrSize', 270);
-      form.setValue('fontSize', 150); // Increased from 90 to 150 to maintain proportions
-      form.setValue('spacing', 120); // Increased from 60 to 120 (2x)
+      form.setValue('fontSize', 150);
+      form.setValue('spacing', 120);
     }
   }, [selectedPageSize, form]);
 
@@ -89,7 +86,6 @@ export default function QrGeneratorForm() {
     try {
       setIsGenerating(true);
 
-      // Split the input by new lines and filter out empty lines
       const items = values.listItems
         .split('\n')
         .map((line) => line.trim())
@@ -100,7 +96,6 @@ export default function QrGeneratorForm() {
         return;
       }
 
-      // Generate and download the PDF
       await generateQrCodePdf({
         items,
         title: values.title || 'QR Codes',
