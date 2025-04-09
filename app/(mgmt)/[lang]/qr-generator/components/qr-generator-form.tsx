@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { FileScan } from 'lucide-react';
 import { generateQrCodePdf } from '../lib/pdf-generator';
 
 const formSchema = z.object({
@@ -82,37 +83,45 @@ export default function QrGeneratorForm() {
     }
   }, [selectedPageSize, form]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setIsGenerating(true);
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof formSchema>) => {
+      if (isGenerating) return; // Prevent multiple submissions
 
-      const items = values.listItems
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
+      try {
+        setIsGenerating(true);
 
-      if (items.length === 0) {
-        toast.error('Please enter at least one item');
-        return;
+        const items = values.listItems
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+
+        if (items.length === 0) {
+          toast.error('Please enter at least one item');
+          return;
+        }
+
+        // Force a UI update before proceeding with the heavy operation
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        await generateQrCodePdf({
+          items,
+          title: values.title || 'QR Codes',
+          pageSize: values.pageSize,
+          qrSize: values.qrSize,
+          fontSize: values.fontSize,
+          spacing: values.spacing,
+        });
+
+        toast.success('PDF generated successfully!');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        toast.error('Failed to generate PDF');
+      } finally {
+        setIsGenerating(false);
       }
-
-      await generateQrCodePdf({
-        items,
-        title: values.title || 'QR Codes',
-        pageSize: values.pageSize,
-        qrSize: values.qrSize,
-        fontSize: values.fontSize,
-        spacing: values.spacing,
-      });
-
-      toast.success('PDF generated successfully!');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Failed to generate PDF');
-    } finally {
-      setIsGenerating(false);
-    }
-  }
+    },
+    [isGenerating],
+  );
 
   return (
     <Card className='sm:w-[768px]'>
@@ -259,7 +268,8 @@ export default function QrGeneratorForm() {
           </CardContent>
           <CardFooter>
             <Button type='submit' className='w-full' disabled={isGenerating}>
-              {isGenerating ? 'Generating PDF...' : 'Generate QR Code PDF'}
+              <FileScan className={isGenerating ? 'animate-spin' : ''} />{' '}
+              Generate QR Code PDF
             </Button>
           </CardFooter>
         </form>
