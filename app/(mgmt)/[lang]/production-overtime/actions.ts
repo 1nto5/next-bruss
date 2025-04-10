@@ -169,53 +169,6 @@ export async function insertOvertimeRequest(
   }
 }
 
-export async function replaceEmployee(
-  overtimeId: string,
-  toReplaceEmployeeArrayPosition: number,
-  newEmployee: overtimeRequestEmployeeType,
-) {
-  const session = await auth();
-  if (!session || !session.user?.email) {
-    redirect('/auth');
-  }
-  try {
-    const coll = await dbc('production_overtime');
-
-    // Check if the user is authorized to modify this request
-    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
-    if (!request) {
-      return { error: 'not found' };
-    }
-
-    if (
-      request.requestedBy !== session.user.email &&
-      !session.user.roles?.includes('plant-manager') &&
-      !session.user.roles?.includes('hr')
-    ) {
-      return { error: 'unauthorized' };
-    }
-
-    const update = await coll.updateOne(
-      { _id: new ObjectId(overtimeId) },
-      {
-        $set: {
-          [`employees.${toReplaceEmployeeArrayPosition}`]: newEmployee,
-          editedAt: new Date(),
-          editedBy: session.user.email,
-        },
-      },
-    );
-    if (update.matchedCount === 0) {
-      return { error: 'not found' };
-    }
-    revalidateProductionOvertime();
-    return { success: 'replaced' };
-  } catch (error) {
-    console.error(error);
-    return { error: 'replaceEmployee server action error' };
-  }
-}
-
 export async function deleteEmployee(
   overtimeId: string,
   employeeIndex: number,
@@ -241,16 +194,20 @@ export async function deleteEmployee(
       return { error: 'unauthorized' };
     }
 
+    // Use $pull to remove the employee at the specified index from the employeesWithScheduledDayOff array
     const update = await coll.updateOne(
       { _id: new ObjectId(overtimeId) },
       {
+        $pull: {
+          employeesWithScheduledDayOff: { $position: employeeIndex },
+        },
         $set: {
-          [`employees.${employeeIndex}.status`]: 'deleted',
           editedAt: new Date(),
           editedBy: session.user.email,
         },
       },
     );
+
     console.log('deleteEmployee update', update);
     if (update.matchedCount === 0) {
       return { error: 'not found' };
@@ -263,7 +220,10 @@ export async function deleteEmployee(
   }
 }
 
-export async function reportAbsence(overtimeId: string, employeeIndex: number) {
+export async function addEmployeeDayOff(
+  overtimeId: string,
+  newEmployee: overtimeRequestEmployeeType,
+) {
   const session = await auth();
   if (!session || !session.user?.email) {
     redirect('/auth');
@@ -271,7 +231,6 @@ export async function reportAbsence(overtimeId: string, employeeIndex: number) {
   try {
     const coll = await dbc('production_overtime');
 
-    console.log('reportAbsence', overtimeId, employeeIndex);
     // Check if the user is authorized to modify this request
     const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
     if (!request) {
@@ -286,23 +245,38 @@ export async function reportAbsence(overtimeId: string, employeeIndex: number) {
       return { error: 'unauthorized' };
     }
 
+    // Check if the number of employees with scheduled days off doesn't exceed the total number
+    const employeesWithDaysOffCount =
+      request.employeesWithScheduledDayOff?.length || 0;
+
+    // Check if adding another employee would exceed the total number of employees
+    if (employeesWithDaysOffCount + 1 > request.numberOfEmployees) {
+      return { error: 'too many employees with scheduled days off' };
+    }
+
+    // Add the new employee to the employeesWithScheduledDayOff array
     const update = await coll.updateOne(
       { _id: new ObjectId(overtimeId) },
       {
+        $push: {
+          employeesWithScheduledDayOff: newEmployee,
+        },
         $set: {
-          [`employees.${employeeIndex}.status`]: 'absent',
           editedAt: new Date(),
           editedBy: session.user.email,
         },
       },
     );
+
     if (update.matchedCount === 0) {
-      return { error: 'not found employee' };
+      return { error: 'not found' };
     }
+
     revalidateProductionOvertime();
-    return { success: 'reported' };
+    revalidateProductionOvertimeRequest();
+    return { success: 'added' };
   } catch (error) {
     console.error(error);
-    return { error: 'reportAbsence server action error' };
+    return { error: 'addEmployeeDayOff server action error' };
   }
 }

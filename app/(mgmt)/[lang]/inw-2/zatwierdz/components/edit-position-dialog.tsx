@@ -151,19 +151,7 @@ export default function EditPositionDialog({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='bin'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Storage Bin</FormLabel>
-                      <FormControl>
-                        <Input className='' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 <FormField
                   control={form.control}
                   name='comment'

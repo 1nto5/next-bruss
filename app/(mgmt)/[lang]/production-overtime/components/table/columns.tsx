@@ -139,10 +139,18 @@ export const columns: ColumnDef<OvertimeType>[] = [
     header: 'Do',
   },
   {
-    accessorKey: 'employees',
-    header: 'Pracownicy',
+    accessorKey: 'numberOfEmployees',
+    header: 'Liczba pracowników',
     cell: ({ row }) => {
-      const employees = row.getValue('employees');
+      const numberOfEmployees = row.getValue('numberOfEmployees') as number;
+      return <div>{numberOfEmployees || 0}</div>;
+    },
+  },
+  {
+    accessorKey: 'employeesWithScheduledDayOff',
+    header: 'Odbiór dnia wolnego',
+    cell: ({ row }) => {
+      const employees = row.getValue('employeesWithScheduledDayOff');
       return <div>{Array.isArray(employees) ? employees.length : 0}</div>;
     },
   },

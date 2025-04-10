@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -40,9 +41,26 @@ export default async function ProductionOvertimePage(props: {
 
         <CardDescription>ID: {id}</CardDescription>
       </CardHeader>
+
+      <CardContent className='py-2'>
+        <div className='mb-4'>
+          <p className='font-semibold'>
+            Łączna liczba pracowników:{' '}
+            {overtimeRequestLocaleString.numberOfEmployees}
+          </p>
+          <p className='text-muted-foreground'>
+            Liczba pracowników odbierających dni wolne:{' '}
+            {overtimeRequestLocaleString.employeesWithScheduledDayOff?.length ||
+              0}
+          </p>
+        </div>
+      </CardContent>
+
       <DataTable
         columns={columns}
-        data={overtimeRequestLocaleString.employees.map((employee) => ({
+        data={(
+          overtimeRequestLocaleString.employeesWithScheduledDayOff || []
+        ).map((employee) => ({
           ...employee,
           overtimeId: overtimeRequestLocaleString._id,
         }))}

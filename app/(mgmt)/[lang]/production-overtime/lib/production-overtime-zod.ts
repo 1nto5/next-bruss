@@ -2,18 +2,24 @@ import * as z from 'zod';
 
 export const NewOvertimeRequestSchema = z
   .object({
-    employees: z
+    numberOfEmployees: z
+      .number()
+      .min(1, { message: 'Liczba pracowników musi wynosić co najmniej 1!' }),
+    employeesWithScheduledDayOff: z
       .array(
         z.object({
           firstName: z.string(),
           lastName: z.string(),
           identifier: z.string(),
           pin: z.string().optional(),
-          agreedReceivingAt: z.date().optional(),
+          agreedReceivingAt: z.date({
+            message: 'Wybierz datę odbioru dnia wolnego!',
+          }),
           note: z.string().optional(),
         }),
       )
-      .nonempty({ message: 'Nie wybrano żadnego pracownika!' }),
+      .optional()
+      .default([]),
     from: z.date({ message: 'Wybierz datę rozpoczęcia!' }),
     to: z.date({ message: 'Wybierz datę zakończenia!' }),
     reason: z.string().nonempty({ message: 'Nie wprowadzono uzasadnienia!' }),
@@ -40,6 +46,16 @@ export const NewOvertimeRequestSchema = z
     {
       message: 'Zlecany czas pracy musi wynosić co najmniej 1h!',
       path: ['to'],
+    },
+  )
+  .refine(
+    (data) =>
+      (data.employeesWithScheduledDayOff?.length || 0) <=
+      data.numberOfEmployees,
+    {
+      message:
+        'Liczba pracowników odbierających nie może przekroczyć łącznej liczby pracowników!',
+      path: ['employeesWithScheduledDayOff'],
     },
   );
 

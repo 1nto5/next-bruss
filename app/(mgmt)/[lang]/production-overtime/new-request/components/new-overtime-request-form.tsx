@@ -23,6 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -70,7 +71,8 @@ export default function NewOvertimeRequestForm({
   const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
-      employees: [],
+      numberOfEmployees: 1,
+      employeesWithScheduledDayOff: [],
       from: nextSaturdayFrom,
       to: nextSaturdayTo,
       reason: '',
@@ -135,7 +137,6 @@ export default function NewOvertimeRequestForm({
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* <ScrollArea className='h-64 sm:h-72 md:h-80 lg:h-96 xl:h-[30rem]'> */}
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
@@ -155,7 +156,6 @@ export default function NewOvertimeRequestForm({
                           onChange={field.onChange}
                           format='dd/MM/yyyy HH:mm'
                           onCalendarClick={() => setOpen(!open)}
-                          // className='w-48'
                         />
                       )}
                     />
@@ -174,7 +174,6 @@ export default function NewOvertimeRequestForm({
                     <DateTimePicker
                       value={field.value}
                       onChange={field.onChange}
-                      // min={new Date(Date.now() - 8 * 3600 * 1000)}
                       min={new Date(Date.now() + 8 * 3600 * 1000)}
                       timePicker={{ hour: true, minute: true, second: false }}
                       renderTrigger={({ value, setOpen, open }) => (
@@ -183,7 +182,6 @@ export default function NewOvertimeRequestForm({
                           onChange={field.onChange}
                           format='dd/MM/yyyy HH:mm'
                           onCalendarClick={() => setOpen(!open)}
-                          // className='w-48'
                         />
                       )}
                     />
@@ -194,16 +192,46 @@ export default function NewOvertimeRequestForm({
             />
             <FormField
               control={form.control}
-              name='employees'
+              name='numberOfEmployees'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Liczba pracowników</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 1)
+                      }
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='employeesWithScheduledDayOff'
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
-                    <FormLabel>Pracownicy</FormLabel>
+                    <FormLabel>Pracownicy odbierający dni wolne</FormLabel>
                     <FormControl>
                       <MultiSelectEmployees
                         employees={employees}
                         value={field.value}
-                        onSelectChange={field.onChange}
+                        onSelectChange={(selectedEmployees) => {
+                          const employeesWithDays = selectedEmployees.map(
+                            (emp) => ({
+                              ...emp,
+                              agreedReceivingAt: new Date(
+                                Date.now() + 7 * 24 * 60 * 60 * 1000,
+                              ),
+                            }),
+                          );
+                          field.onChange(employeesWithDays);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -220,11 +248,7 @@ export default function NewOvertimeRequestForm({
                     Uzasadnienie pracy w godzinach nadliczbowych
                   </FormLabel>
                   <FormControl>
-                    <Textarea
-                      // placeholder='Tell us a little bit about yourself'
-                      className=''
-                      {...field}
-                    />
+                    <Textarea className='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -237,11 +261,7 @@ export default function NewOvertimeRequestForm({
                 <FormItem>
                   <FormLabel>Dodatkowe informacje</FormLabel>
                   <FormControl>
-                    <Textarea
-                      // placeholder='Tell us a little bit about yourself'
-                      className=''
-                      {...field}
-                    />
+                    <Textarea className='' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -314,7 +334,6 @@ export default function NewOvertimeRequestForm({
               </AccordionItem>
             </Accordion>
           </CardContent>
-          {/* </ScrollArea> */}
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <Button
@@ -327,7 +346,6 @@ export default function NewOvertimeRequestForm({
               Wyczyść
             </Button>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              {/* TODO: finish save draft */}
               <Button
                 variant='secondary'
                 type='button'
@@ -349,9 +367,9 @@ export default function NewOvertimeRequestForm({
               <Button
                 type='submit'
                 className='w-full sm:w-auto'
-                disabled={isPendingInsertDraft}
+                disabled={isPendingInsert}
               >
-                <Plus className={isPendingInsertDraft ? 'animate-spin' : ''} />
+                <Plus className={isPendingInsert ? 'animate-spin' : ''} />
                 Dodaj zlecenie
               </Button>
             </div>

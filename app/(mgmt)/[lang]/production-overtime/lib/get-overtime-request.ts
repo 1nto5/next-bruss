@@ -31,19 +31,49 @@ export async function getOvertimeRequest(
   const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
   const overtimeRequest = await res.json();
-  // Transform each employee to include localized agreedReceivingAt
-  const employees = overtimeRequest.employees.map(
-    (employee: overtimeRequestEmployeeType) => ({
-      ...employee,
-      agreedReceivingAtLocaleString: employee.agreedReceivingAt
-        ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
-        : null,
-    }),
-  );
+
+  // Handle data from legacy format (employees) or new format (employeesWithScheduledDayOff)
+  let employeesWithScheduledDayOff: overtimeRequestEmployeeType[] = [];
+
+  if (
+    overtimeRequest.employeesWithScheduledDayOff &&
+    Array.isArray(overtimeRequest.employeesWithScheduledDayOff)
+  ) {
+    // New format - transform each employee to include localized agreedReceivingAt
+    employeesWithScheduledDayOff =
+      overtimeRequest.employeesWithScheduledDayOff.map(
+        (employee: overtimeRequestEmployeeType) => ({
+          ...employee,
+          agreedReceivingAtLocaleString: employee.agreedReceivingAt
+            ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
+            : null,
+        }),
+      );
+  } else if (
+    overtimeRequest.employees &&
+    Array.isArray(overtimeRequest.employees)
+  ) {
+    // Legacy format - copy from employees array
+    employeesWithScheduledDayOff = overtimeRequest.employees.map(
+      (employee: overtimeRequestEmployeeType) => ({
+        ...employee,
+        agreedReceivingAtLocaleString: employee.agreedReceivingAt
+          ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
+          : null,
+      }),
+    );
+  }
 
   const overtimeRequestLocaleString = {
     ...overtimeRequest,
-    employees,
+    // Ensure we have the numberOfEmployees field
+    numberOfEmployees:
+      overtimeRequest.numberOfEmployees ||
+      (Array.isArray(overtimeRequest.employees)
+        ? overtimeRequest.employees.length
+        : 0),
+    // Set the new employeesWithScheduledDayOff field
+    employeesWithScheduledDayOff,
   };
 
   return { fetchTime, fetchTimeLocaleString, overtimeRequestLocaleString };

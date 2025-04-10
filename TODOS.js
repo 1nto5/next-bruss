@@ -24,4 +24,12 @@ TODO: MARIOLA WNIOSKI - poprawki po spotkaniu
 
 TODO: inwentaryzacja maj
 
+TODO: odchylenia: 
+- akcje korygujące zalogowanej osoby - oddzielna tabela
+- drukowanie tylko zatwierdzonych
+- wyszukiwanie rozszerzyć o Quarry
+- obszar tylko wedle quarry -> select + powlekanie
+- załączniki: dodanie uniwersalna, nazwa, autor i data
+
+
 */
