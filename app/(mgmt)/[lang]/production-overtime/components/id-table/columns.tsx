@@ -21,41 +21,40 @@ import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { deleteEmployee } from '../../../actions';
-import { overtimeRequestEmployeeType } from '../../../lib/production-overtime-types';
+import { deleteDayOff } from '../../actions';
+import { overtimeRequestEmployeeType } from '../../lib/production-overtime-types';
 
-const handleDeleteEmployee = async (
+const handleDeleteDayOff = async (
   overtimeId: string,
-  employeeIndex: number,
+  employeeIdentifier: string,
 ) => {
   toast.promise(
-    deleteEmployee(overtimeId, employeeIndex).then((res) => {
+    deleteDayOff(overtimeId, employeeIdentifier).then((res) => {
       if (res && res.error) {
         throw new Error(res.error);
       }
       return res;
     }),
     {
-      loading: 'Usuwam odbiór dnia wolnego...',
-      success: 'Odbiór dnia wolnego usunięty!',
+      loading: 'Trwa usuwanie odbioru dnia wolnego...',
+      success: 'Odbiór został usunięty!',
       error: (error) => {
         const errorMsg = error.message;
-        if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-        if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+        if (errorMsg === 'unauthorized') return 'Brak uprawnień!';
+        if (errorMsg === 'not found') return 'Nie znaleziono!';
         if (errorMsg === 'not found employee')
-          return 'Nie znaleziono pracownika!';
-        console.error('handleDeleteEmployee', errorMsg);
+          return 'Pracownik nie znaleziony!';
+        console.error('handleDeleteDayOff', errorMsg);
         return 'Skontaktuj się z IT!';
       },
     },
   );
 };
 
-function DeleteEmployeeDialog({
+function DeleteDayOffDialog({
   isOpen,
   setIsOpen,
   overtimeId,
-  employeeIndex,
   firstName,
   lastName,
   identifier,
@@ -63,7 +62,6 @@ function DeleteEmployeeDialog({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   overtimeId: string;
-  employeeIndex: number;
   firstName: string;
   lastName: string;
   identifier: string;
@@ -87,7 +85,7 @@ function DeleteEmployeeDialog({
           <AlertDialogAction
             onClick={() => {
               setIsOpen(false);
-              handleDeleteEmployee(overtimeId, employeeIndex);
+              handleDeleteDayOff(overtimeId, identifier);
             }}
           >
             Potwierdź
@@ -123,12 +121,11 @@ function ActionsCell({ row }: { row: any }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Delete employee confirmation dialog */}
-      <DeleteEmployeeDialog
+      {/* Okno potwierdzenia usunięcia wniosku o urlop */}
+      <DeleteDayOffDialog
         isOpen={isDeleteOpen}
         setIsOpen={setDeleteOpen}
         overtimeId={overtimeId}
-        employeeIndex={row.index}
         firstName={firstName}
         lastName={lastName}
         identifier={identifier}
@@ -138,25 +135,6 @@ function ActionsCell({ row }: { row: any }) {
 }
 
 export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ getValue }) => {
-      const status = getValue<string>();
-      if (!status) return <span>Obecny</span>;
-      if (status === 'deleted')
-        return (
-          <span className='animate-pulse font-bold text-red-500'>Usunięty</span>
-        );
-      if (status === 'absent')
-        return (
-          <span className='animate-pulse font-bold text-yellow-500'>
-            Nieobecny
-          </span>
-        );
-      return <span className='animate-pulse'>{status}</span>;
-    },
-  },
   {
     accessorKey: 'firstName',
     header: 'Imię',

@@ -27,7 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleX, Pencil, Plus, Table } from 'lucide-react';
+import { CircleX, Plus, Table } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -35,11 +35,10 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import {
   insertOvertimeRequest as insert,
-  insertDraftOvertimeRequest as insertDraft,
   redirectToProductionOvertime as redirect,
-} from '../../actions';
-import { NewOvertimeRequestSchema } from '../../lib/production-overtime-zod';
-import { MultiSelectEmployees } from './multi-select-employees';
+} from '../actions';
+import { MultiSelectEmployees } from '../components/multi-select-employees';
+import { NewOvertimeRequestSchema } from '../lib/production-overtime-zod';
 
 export default function NewOvertimeRequestForm({
   employees,
@@ -96,28 +95,6 @@ export default function NewOvertimeRequestForm({
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPendingInserting(false);
-    }
-  };
-
-  const handleDraftInsert = async (
-    data: z.infer<typeof NewOvertimeRequestSchema>,
-  ) => {
-    setIsPendingInsertingDraft(true);
-    try {
-      const res = await insertDraft(data);
-      if ('success' in res) {
-        toast.success('Szkic zapisany!');
-        // form.reset();
-        // redirect();
-      } else if ('error' in res) {
-        console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
-      }
-    } catch (error) {
-      console.error('handleDraftInsert', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPendingInsertingDraft(false);
     }
   };
 
@@ -346,24 +323,6 @@ export default function NewOvertimeRequestForm({
               Wyczyść
             </Button>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              <Button
-                variant='secondary'
-                type='button'
-                onClick={() => {
-                  // setIsDraft(true);
-                  // form.handleSubmit(handleDraftInsert)();
-                  // handleDraftInsert(form.getValues());
-                  toast.error('Funkcjonalność w trakcie implementacji!');
-                }}
-                disabled={isPendingInsertDraft}
-                className='w-full sm:w-auto'
-              >
-                <Pencil
-                  className={isPendingInsertDraft ? 'animate-spin' : ''}
-                />
-                Zapisz szkic
-              </Button>
-
               <Button
                 type='submit'
                 className='w-full sm:w-auto'

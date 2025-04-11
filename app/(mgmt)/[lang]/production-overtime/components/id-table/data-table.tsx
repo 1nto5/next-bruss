@@ -22,17 +22,20 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ArrowRight, CircleX } from 'lucide-react';
+import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
+import Link from 'next/link';
 import * as React from 'react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  id: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  id,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -116,6 +119,13 @@ export function DataTable<TData, TValue>({
             >
               <CircleX /> <span>Wyczyść</span>
             </Button>
+          </div>
+          <div>
+            <Link href={`/production-overtime/${id}/add-day-off`}>
+              <Button variant='outline'>
+                <AlarmClockPlus /> <span>Dodaj odbiór</span>
+              </Button>
+            </Link>
           </div>
         </div>
 

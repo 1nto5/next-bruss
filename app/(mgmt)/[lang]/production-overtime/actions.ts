@@ -21,31 +21,8 @@ export async function redirectToProductionOvertime() {
   redirect('/production-overtime');
 }
 
-export async function insertDraftOvertimeRequest(
-  data: NewOvertimeRequestType,
-): Promise<{ success: 'inserted' } | { error: string }> {
-  const session = await auth();
-  if (!session || !session.user?.email) {
-    redirect('/auth');
-  }
-  try {
-    const coll = await dbc('production_overtime');
-    const draftRequestToInsert = {
-      status: 'draft',
-      ...data,
-      createdAt: new Date(),
-      createdBy: session.user.email,
-      editedAt: new Date(),
-    };
-    const res = await coll.insertOne(draftRequestToInsert);
-    if (res.insertedId) {
-      return { success: 'inserted' };
-    }
-    return { error: 'not inserted' };
-  } catch (error) {
-    console.error(error);
-    return { error: 'insertDraftOvertimeRequest server action error' };
-  }
+export async function redirectToProductionOvertimeDaysOff(id: string) {
+  redirect(`/production-overtime/${id}`);
 }
 
 export async function deleteOvertimeRequestDraft(id: string) {
@@ -169,9 +146,9 @@ export async function insertOvertimeRequest(
   }
 }
 
-export async function deleteEmployee(
+export async function deleteDayOff(
   overtimeId: string,
-  employeeIndex: number,
+  employeeIdentifier: string,
 ) {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -194,12 +171,12 @@ export async function deleteEmployee(
       return { error: 'unauthorized' };
     }
 
-    // Use $pull to remove the employee at the specified index from the employeesWithScheduledDayOff array
+    // Use $pull to remove the employee with specified identifier from the employeesWithScheduledDayOff array
     const update = await coll.updateOne(
       { _id: new ObjectId(overtimeId) },
       {
         $pull: {
-          employeesWithScheduledDayOff: { $position: employeeIndex },
+          employeesWithScheduledDayOff: { identifier: employeeIdentifier },
         },
         $set: {
           editedAt: new Date(),
@@ -208,12 +185,48 @@ export async function deleteEmployee(
       },
     );
 
-    console.log('deleteEmployee update', update);
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
+
+    if (update.modifiedCount === 0) {
+      return { error: 'not found employee' };
+    }
+
     revalidateProductionOvertime();
     return { success: 'deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteTimeOffRequest server action error' };
+  }
+}
+
+// Keep deleteEmployee for backward compatibility but make it call the new function
+export async function deleteEmployee(
+  overtimeId: string,
+  employeeIndex: number,
+) {
+  // This is a temporary compatibility function
+  // Get the identifier from the document and delegate to deleteTimeOffRequest
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('production_overtime');
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Get employee at the specified index
+    const employee = request.employeesWithScheduledDayOff[employeeIndex];
+    if (!employee) {
+      return { error: 'not found employee' };
+    }
+
+    // Call the new function with the identifier
+    return await deleteDayOff(overtimeId, employee.identifier);
   } catch (error) {
     console.error(error);
     return { error: 'deleteEmployee server action error' };
@@ -243,6 +256,16 @@ export async function addEmployeeDayOff(
       !session.user.roles?.includes('hr')
     ) {
       return { error: 'unauthorized' };
+    }
+
+    // Check if an employee with the same identifier already exists in the employeesWithScheduledDayOff array
+    const employeeExists = request.employeesWithScheduledDayOff?.some(
+      (employee: overtimeRequestEmployeeType) =>
+        employee.identifier === newEmployee.identifier,
+    );
+
+    if (employeeExists) {
+      return { error: 'employee already exists' };
     }
 
     // Check if the number of employees with scheduled days off doesn't exceed the total number

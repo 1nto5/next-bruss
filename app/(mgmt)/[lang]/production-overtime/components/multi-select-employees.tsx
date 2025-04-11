@@ -33,7 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -51,7 +50,7 @@ import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { overtimeRequestEmployeeType } from '../../lib/production-overtime-types';
+import { overtimeRequestEmployeeType } from '../lib/production-overtime-types';
 
 interface MultiSelectEmployeesProps {
   employees: overtimeRequestEmployeeType[];
@@ -74,32 +73,18 @@ export const MultiSelectEmployees = ({
   );
   const [dateError, setDateError] = useState(false);
 
-  const dayOffSchema = z
-    .object({
-      isDayOffAgreed: z.boolean().default(true),
-      date: z.date({ message: 'Wybierz datę odbioru!' }).optional(),
-      note: z.string().optional().default(''),
-    })
-    .superRefine((data, ctx) => {
-      if (data.isDayOffAgreed && data.date === undefined) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Wybierz datę odbioru!',
-          path: ['date'],
-        });
-      }
-    });
+  const dayOffSchema = z.object({
+    date: z.date({ message: 'Wybierz datę odbioru!' }),
+    note: z.string().optional().default(''),
+  });
 
   const form = useForm<z.infer<typeof dayOffSchema>>({
     resolver: zodResolver(dayOffSchema),
     defaultValues: {
       date: undefined,
       note: '',
-      isDayOffAgreed: true,
     },
   });
-
-  const isDayOffAgreed = form.watch('isDayOffAgreed');
 
   const handleSelect = (employee: EmployeeType) => {
     const isSelected = value.some(
@@ -112,7 +97,6 @@ export const MultiSelectEmployees = ({
     } else {
       setPendingEmployee(employee);
       form.reset({
-        isDayOffAgreed: true,
         date: undefined,
         note: '',
       });
@@ -124,14 +108,14 @@ export const MultiSelectEmployees = ({
   const handleAddEmployee = () => {
     // Walidacja danych formularza
     form.handleSubmit((formData) => {
-      if (formData.isDayOffAgreed && !formData.date) {
+      if (!formData.date) {
         setDateError(true);
         return;
       }
 
       if (pendingEmployee) {
         let normalizedDate;
-        if (formData.isDayOffAgreed && formData.date) {
+        if (formData.date) {
           normalizedDate = new Date(formData.date);
           normalizedDate.setHours(12, 0, 0, 0);
         }
@@ -139,9 +123,7 @@ export const MultiSelectEmployees = ({
         const newEmployee = {
           ...pendingEmployee,
           note: formData.note || '',
-          ...(formData.isDayOffAgreed && formData.date
-            ? { agreedReceivingAt: normalizedDate }
-            : {}),
+          ...(formData.date ? { agreedReceivingAt: normalizedDate } : {}),
         };
         onSelectChange([...value, newEmployee]);
       }
@@ -166,29 +148,6 @@ export const MultiSelectEmployees = ({
             <DialogFormWithScroll>
               <FormField
                 control={form.control}
-                name='isDayOffAgreed'
-                render={({ field }) => (
-                  <FormItem className='flex flex-row items-center justify-between space-y-0 py-2'>
-                    <FormLabel className='leading-normal'>
-                      Uzgodniono odbiór dnia wolnego
-                    </FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(checked) => {
-                          field.onChange(checked);
-                          if (!checked) {
-                            form.setValue('date', undefined);
-                            setDateError(false);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name='date'
                 render={({ field }) => (
                   <FormItem>
@@ -200,21 +159,18 @@ export const MultiSelectEmployees = ({
                         value={field.value}
                         onChange={field.onChange}
                         timePicker={{ hour: true, minute: true }}
-                        disabled={!isDayOffAgreed}
                         renderTrigger={({ open, value, setOpen }) => (
                           <DateTimeInput
                             value={value}
                             onChange={(x) => !open && field.onChange(x)}
                             format='dd/MM/yyyy'
-                            disabled={open || !isDayOffAgreed}
-                            onCalendarClick={() =>
-                              isDayOffAgreed && setOpen(!open)
-                            }
+                            disabled={open}
+                            onCalendarClick={() => setOpen(!open)}
                           />
                         )}
                       />
                     </FormControl>
-                    {dateError && isDayOffAgreed && (
+                    {dateError && (
                       <p className='text-destructive text-sm'>
                         Wybierz datę odbioru!
                       </p>

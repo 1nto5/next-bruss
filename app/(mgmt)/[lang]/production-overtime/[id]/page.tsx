@@ -2,7 +2,6 @@
 import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -10,9 +9,9 @@ import {
 import { Locale } from '@/i18n.config';
 import { Table } from 'lucide-react';
 import Link from 'next/link';
+import { columns } from '../components/id-table/columns';
+import { DataTable } from '../components/id-table/data-table';
 import { getOvertimeRequest } from '../lib/get-overtime-request';
-import { columns } from './components/table/columns';
-import { DataTable } from './components/table/data-table';
 
 export default async function ProductionOvertimePage(props: {
   params: Promise<{ lang: Locale; id: string }>;
@@ -29,8 +28,8 @@ export default async function ProductionOvertimePage(props: {
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>
-            Pracownicy w zleceniu wykonania pracy w godzinach nadliczbowych -
-            produkcja
+            Pracownicy odbierający nadgodziny w zleceniu wykonania pracy w
+            godzinach nadliczbowych - produkcja
           </CardTitle>
           <Link href='/production-overtime'>
             <Button variant='outline'>
@@ -42,20 +41,6 @@ export default async function ProductionOvertimePage(props: {
         <CardDescription>ID: {id}</CardDescription>
       </CardHeader>
 
-      <CardContent className='py-2'>
-        <div className='mb-4'>
-          <p className='font-semibold'>
-            Łączna liczba pracowników:{' '}
-            {overtimeRequestLocaleString.numberOfEmployees}
-          </p>
-          <p className='text-muted-foreground'>
-            Liczba pracowników odbierających dni wolne:{' '}
-            {overtimeRequestLocaleString.employeesWithScheduledDayOff?.length ||
-              0}
-          </p>
-        </div>
-      </CardContent>
-
       <DataTable
         columns={columns}
         data={(
@@ -64,6 +49,7 @@ export default async function ProductionOvertimePage(props: {
           ...employee,
           overtimeId: overtimeRequestLocaleString._id,
         }))}
+        id={id}
       />
     </Card>
   );
