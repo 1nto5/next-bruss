@@ -96,9 +96,7 @@ export default function AddDayOff({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            Dodaj pracowników odbierających dzień wolny do zlecenia #{id}
-          </CardTitle>
+          <CardTitle>Dodaj odbiór dnia wolnego</CardTitle>
           <Link href={`/production-overtime/${id}`}>
             <Button variant='outline'>
               <Table /> <span>Powrót do zlecenia</span>
@@ -132,10 +130,15 @@ export default function AddDayOff({
             <Button
               type='submit'
               className='w-full sm:w-auto'
-              disabled={isPendingInsert}
+              disabled={
+                isPendingInsert || form.watch('employeesToAdd').length === 0
+              }
             >
               <Plus className={isPendingInsert ? 'animate-spin' : ''} />
-              Dodaj pracowników
+              Dodaj{' '}
+              {form.watch('employeesToAdd').length === 1
+                ? 'pracownika'
+                : 'pracowników'}
             </Button>
           </div>
         </CardFooter>
