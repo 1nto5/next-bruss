@@ -1,7 +1,7 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
-import { revalidateInw2 as revalidate } from '../../actions';
+import { revalidateCardPositions as revalidate } from './actions';
 
 export default function Error({
   error,

@@ -41,7 +41,7 @@ export default function ErrorComponent({
             {isPending ? (
               <span className='flex items-center'>
                 <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                Loading
+                Try again
               </span>
             ) : (
               <span className='flex items-center'>
