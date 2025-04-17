@@ -1,4 +1,5 @@
 'use client';
+import { addCorrectiveActionSchema } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -33,7 +34,6 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { UsersListType } from '@/lib/types/user';
-import { addCorrectiveActionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import {

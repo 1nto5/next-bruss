@@ -3,7 +3,7 @@
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 // import { DeviationType } from '@/lib/types/deviation';
-import { AddCorrectiveActionType } from '@/lib/z/deviation';
+import { AddCorrectiveActionType } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';

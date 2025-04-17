@@ -1,5 +1,7 @@
 'use client';
 
+import { correctiveActionStatusOptions as statusOptions } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-options';
+import { confirmActionExecutionSchema } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -42,10 +44,8 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
-import { correctiveActionStatusOptions as statusOptions } from '@/lib/options/deviation';
 import { correctiveActionType } from '@/lib/types/deviation';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { confirmActionExecutionSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, ClipboardCheck, History, Loader2 } from 'lucide-react';

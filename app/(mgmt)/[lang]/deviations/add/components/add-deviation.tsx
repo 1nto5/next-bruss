@@ -1,4 +1,8 @@
 'use client';
+import {
+  addDeviationDraftSchema,
+  addDeviationSchema,
+} from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -28,7 +32,6 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { DeviationReasonType } from '@/lib/types/deviation';
-import { addDeviationDraftSchema, addDeviationSchema } from '@/lib/z/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import {

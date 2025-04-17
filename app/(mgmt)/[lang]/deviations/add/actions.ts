@@ -1,9 +1,12 @@
 'use server';
 
+import {
+  AddDeviationDraftType,
+  AddDeviationType,
+} from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import { DeviationType } from '@/lib/types/deviation';
-import { AddDeviationDraftType, AddDeviationType } from '@/lib/z/deviation';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
