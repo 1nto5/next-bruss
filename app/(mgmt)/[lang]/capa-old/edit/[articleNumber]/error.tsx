@@ -1,52 +1,14 @@
 'use client';
 
-import { Terminal } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { RefreshCcw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
-// import { revalidateCapa as revalidate } from '../../actions';
+import ErrorComponent from '@/components/error-component';
+import { revalidateCapa as revalidate } from '../../actions';
 
 export default function Error({
-  // error,
+  error,
   reset,
 }: {
-  // error: Error;
+  error: Error;
   reset: () => void;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const reload = () => {
-    startTransition(() => {
-      // revalidate();
-      router.refresh();
-      reset();
-    });
-  };
-
-  return (
-    <main className='mt-24 flex justify-center'>
-      <Alert className='w-[450px]'>
-        <Terminal className='h-4 w-4' />
-        <AlertTitle>Something went wrong!</AlertTitle>
-        <AlertDescription className='mt-8 flex justify-end'>
-          <Button onClick={reload} disabled={isPending}>
-            {isPending ? (
-              <span className='flex items-center'>
-                <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                Loading
-              </span>
-            ) : (
-              <span className='flex items-center'>
-                <RefreshCcw className='mr-2 h-4 w-4' />
-                Try again
-              </span>
-            )}
-          </Button>
-        </AlertDescription>
-      </Alert>
-    </main>
-  );
+  return <ErrorComponent error={error} reset={reset} revalidate={revalidate} />;
 }

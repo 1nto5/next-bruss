@@ -4,7 +4,6 @@ import {
   addDeviationSchema,
 } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import {
   Card,
   CardContent,
@@ -12,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Form,
   FormControl,
@@ -21,28 +22,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/cn';
 import { DeviationReasonType } from '@/lib/types/deviation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import {
-  AArrowDown,
-  CalendarIcon,
-  Eraser,
-  Loader2,
-  Pencil,
-  Plus,
-  Table,
-} from 'lucide-react';
+import { AArrowDown, Eraser, Loader2, Pencil, Plus, Table } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,7 +41,7 @@ import {
   redirectToDeviations,
 } from '../actions';
 
-export default function AddDeviation({
+export default function AddDeviationForm({
   reasons,
 }: {
   reasons: DeviationReasonType[];
@@ -77,8 +63,8 @@ export default function AddDeviation({
       // charge: '',
       // description: '',
       // reason: '',
-      periodFrom: new Date(new Date().setHours(12, 0, 0, 0)),
-      periodTo: new Date(new Date().setHours(12, 0, 0, 0)),
+      periodFrom: undefined,
+      periodTo: undefined,
       // area: '',
       // processSpecification: '',
       // customerNumber: '',
@@ -158,7 +144,7 @@ export default function AddDeviation({
   };
 
   return (
-    <Card className='w-[768px]'>
+    <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='flex justify-between'>
           <CardTitle>Nowe odchylenie</CardTitle>
@@ -172,9 +158,6 @@ export default function AddDeviation({
       <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* <form
-          onSubmit={form.handleSubmit(isDraft ? handleDraftInsert : onSubmit)}
-        > */}
           <CardContent className='grid w-full items-center gap-4'>
             <div className='flex space-x-2'>
               <FormField
@@ -436,52 +419,38 @@ export default function AddDeviation({
                 control={form.control}
                 name='periodFrom'
                 render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <FormLabel>Odchylenie od</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={'outline'}
-                            className={cn(
-                              'w-56 pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground',
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, 'PPP')
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className='w-auto p-0' align='start'>
-                        <Calendar
-                          mode='single'
-                          selected={field.value}
-                          onSelect={(date) => {
-                            if (date) {
-                              date.setHours(12, 0, 0, 0);
-                              field.onChange(date);
-                            }
-                          }}
-                          disabled={(date) => {
-                            const today = new Date();
-                            const minDate = new Date(today);
-                            minDate.setDate(today.getDate() - 7);
-                            const maxDate = new Date(today);
-                            maxDate.setDate(today.getDate() + 7);
-                            return date < minDate || date > maxDate;
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
+                  <FormItem>
+                    <FormLabel>Rozpoczęcie</FormLabel>
+                    <FormControl>
+                      <DateTimePicker
+                        modal
+                        hideTime
+                        value={field.value}
+                        onChange={field.onChange}
+                        min={(() => {
+                          const today = new Date();
+                          const minDate = new Date(today);
+                          minDate.setDate(today.getDate() - 7);
+                          return minDate;
+                        })()}
+                        max={(() => {
+                          const today = new Date();
+                          const maxDate = new Date(today);
+                          maxDate.setDate(today.getDate() + 7);
+                          return maxDate;
+                        })()}
+                        timePicker={{ hour: false, minute: false }}
+                        renderTrigger={({ open, value, setOpen }) => (
+                          <DateTimeInput
+                            value={value}
+                            onChange={(x) => !open && field.onChange(x)}
+                            format='dd/MM/yyyy'
+                            disabled={open}
+                            onCalendarClick={() => setOpen(!open)}
+                          />
+                        )}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -491,52 +460,33 @@ export default function AddDeviation({
                 control={form.control}
                 name='periodTo'
                 render={({ field }) => (
-                  <FormItem className='flex flex-col'>
-                    <FormLabel>Odchylenie do</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={'outline'}
-                            className={cn(
-                              'w-56 pl-3 text-left font-normal',
-                              !field.value && 'text-muted-foreground',
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, 'PPP')
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className='w-auto p-0' align='start'>
-                        <Calendar
-                          mode='single'
-                          selected={field.value}
-                          onSelect={(date) => {
-                            if (date) {
-                              date.setHours(12, 0, 0, 0);
-                              field.onChange(date);
-                            }
-                          }}
-                          disabled={(date) => {
-                            const today = new Date();
-                            const maxDate = new Date(today);
-                            maxDate.setDate(today.getDate() + 180);
-                            const periodFrom = form.getValues('periodFrom');
-                            if (!periodFrom) return true;
-                            return date <= periodFrom || date > maxDate;
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    {/* <FormDescription>
-                Your date of birth is used to calculate your age.
-              </FormDescription> */}
+                  <FormItem>
+                    <FormLabel>Zakończenie</FormLabel>
+                    <FormControl>
+                      <DateTimePicker
+                        modal
+                        hideTime
+                        value={field.value}
+                        onChange={field.onChange}
+                        min={form.getValues('periodFrom') || undefined}
+                        max={(() => {
+                          const today = new Date();
+                          const maxDate = new Date(today);
+                          maxDate.setDate(today.getDate() + 30);
+                          return maxDate;
+                        })()}
+                        timePicker={{ hour: false, minute: false }}
+                        renderTrigger={({ open, value, setOpen }) => (
+                          <DateTimeInput
+                            value={value}
+                            onChange={(x) => !open && field.onChange(x)}
+                            format='dd/MM/yyyy'
+                            disabled={open}
+                            onCalendarClick={() => setOpen(!open)}
+                          />
+                        )}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

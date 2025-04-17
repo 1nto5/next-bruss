@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { DeviationReasonType } from '@/lib/types/deviation';
-import AddDeviation from './components/add-deviation';
+import AddDeviationForm from './components/add-deviation-form';
 
 async function getReasons(): Promise<DeviationReasonType[]> {
   const res = await fetch(`${process.env.API}/deviations/reasons`, {
@@ -27,5 +27,5 @@ export default async function AddDeviationPage(props: {
 
   // const dict = await getDictionary(lang);
   const deviationReasons = await getReasons();
-  return <AddDeviation reasons={deviationReasons} />;
+  return <AddDeviationForm reasons={deviationReasons} />;
 }
