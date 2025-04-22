@@ -1,7 +1,8 @@
 'use client';
 
-import { correctiveActionStatusOptions as statusOptions } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-options';
-import { confirmActionExecutionSchema } from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
+import { correctiveActionStatusOptions as statusOptions } from '@/app/(mgmt)/[lang]/deviations/lib/options';
+import { correctiveActionType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
+import { confirmActionExecutionSchema } from '@/app/(mgmt)/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -44,7 +45,6 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
-import { correctiveActionType } from '@/lib/types/deviation';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';

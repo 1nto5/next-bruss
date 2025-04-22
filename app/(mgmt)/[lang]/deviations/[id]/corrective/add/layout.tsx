@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 // import Info from '../../components/Info';
 
 export const metadata = {
-  title: 'Nowe odchylenie (BRUSS)',
+  title: 'Nowa akcja korygująca (BRUSS)',
 };
 
 export default async function Layout(props: {

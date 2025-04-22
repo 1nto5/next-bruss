@@ -22,32 +22,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { CardContent, CardFooter } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ArrowRight, CopyPlus, RefreshCcw } from 'lucide-react';
-import Link from 'next/link';
-import { revalidateDeviations } from '../actions';
+import { ArrowRight } from 'lucide-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  fetchTime: string;
+  fetchTimeLocaleString: string;
   lang: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  fetchTime,
+  fetchTimeLocaleString,
   lang,
 }: DataTableProps<TData, TValue>) {
   // useEffect(() => {
@@ -83,74 +73,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Odchylenia</CardTitle>
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <div className='flex items-center justify-between'>
-          <div className='flex flex-row space-x-1'>
-            <Input
-              placeholder='id'
-              value={(table.getColumn('_id')?.getFilterValue() as string) ?? ''}
-              onChange={(event) =>
-                table.getColumn('_id')?.setFilterValue(event.target.value)
-              }
-              className='w-24'
-            />
-            <Input
-              placeholder='numer art.'
-              value={
-                (table
-                  .getColumn('articleNumber')
-                  ?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table
-                  .getColumn('articleNumber')
-                  ?.setFilterValue(event.target.value)
-              }
-              className='w-28'
-            />
-            <Input
-              placeholder='nazwa art.'
-              value={
-                (table.getColumn('articleName')?.getFilterValue() as string) ??
-                ''
-              }
-              onChange={(event) =>
-                table
-                  .getColumn('articleName')
-                  ?.setFilterValue(event.target.value)
-              }
-              className='w-32'
-            />
-            {/* <Input
-              placeholder='stanowisko'
-              value={
-                (table.getColumn('workplace')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table.getColumn('workplace')?.setFilterValue(event.target.value)
-              }
-              className='mr-2 max-w-xs'
-            /> */}
-          </div>
-          <div className='flex items-center space-x-1'>
-            <Link href='/deviations/add'>
-              <Button variant='outline' size='icon'>
-                <CopyPlus />
-              </Button>
-            </Link>
-            <Button
-              variant='outline'
-              onClick={() => revalidateDeviations()}
-              size='icon'
-            >
-              <RefreshCcw />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
+    <>
       <CardContent>
         <div className='rounded-md border'>
           <Table>
@@ -221,6 +144,6 @@ export function DataTable<TData, TValue>({
           <ArrowRight />
         </Button>
       </CardFooter>
-    </Card>
+    </>
   );
 }

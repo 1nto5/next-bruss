@@ -63,8 +63,13 @@ export type DeviationType = {
 };
 
 export type DeviationReasonType = {
-  _id: ObjectId;
-  content: string;
-  created: { at: Date | string; by: string };
-  edited?: { at: Date | string; by: string };
+  value: string;
+  label: string;
+  pl: string;
+};
+
+export type DeviationAreaType = {
+  value: string;
+  label: string;
+  pl: string;
 };

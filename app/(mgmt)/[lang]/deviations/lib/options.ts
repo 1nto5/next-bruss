@@ -1,4 +1,4 @@
-import { correctiveActionStatusType } from '../../../../../lib/types/deviation';
+import { correctiveActionStatusType } from './types';
 
 export const correctiveActionStatusOptions: {
   value: correctiveActionStatusType['value'];

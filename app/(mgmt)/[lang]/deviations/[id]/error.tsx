@@ -1,7 +1,7 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
-import { revalidateDeviations as revalidate } from '../actions';
+import { revalidateDeviation as revalidate } from '../actions';
 
 export default function Error({
   error,

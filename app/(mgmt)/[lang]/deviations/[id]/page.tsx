@@ -1,49 +1,19 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { auth } from '@/auth';
-import { DeviationType } from '@/lib/types/deviation';
 import { redirect } from 'next/navigation';
-import Deviation from './components/deviation-view';
+import Deviation from '../components/view';
+import { getDeviation } from '../lib/get-deviation';
 
-async function getDeviation(
-  id: string,
-  lang: string,
-): Promise<{
-  fetchTime: string;
-  deviation: DeviationType;
-}> {
-  const res = await fetch(`${process.env.API}/deviations/deviation?id=${id}`, {
-    next: { revalidate: 15, tags: ['deviation'] },
-  });
-
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(
-      `getDeviation error:  ${res.status}  ${res.statusText} ${json.error}`,
-    );
-  }
-
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
-
-  const data = await res.json();
-  return { fetchTime, deviation: data };
-}
-
-export default async function EditDeviationPage(
-  props: {
-    params: Promise<{ lang: Locale; id: string }>;
-  }
-) {
+export default async function EditDeviationPage(props: {
+  params: Promise<{ lang: Locale; id: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang,
-    id
-  } = params;
+  const { lang, id } = params;
 
   // const dict = await getDictionary(lang);
-  const { fetchTime, deviation } = await getDeviation(id, lang);
+  const { fetchTime, deviation } = await getDeviation(id);
   if (deviation === null) {
     redirect('/deviations');
   }

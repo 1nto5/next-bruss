@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 
+import { DeviationType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import {
   Card,
   CardContent,
@@ -19,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { DeviationType } from '@/lib/types/deviation';
 // import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { CopyPlus, Table as TableIcon } from 'lucide-react';
@@ -27,11 +27,7 @@ import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import {
-  approveDeviation,
-  revalidateDeviation,
-  sendReminderEmail,
-} from '../actions';
+import { approveDeviation, revalidateDeviation } from '../actions';
 import TableCellsApprove from './table-cell-approve-role';
 import TableCellCorrectiveAction from './table-cell-corrective-action';
 
@@ -44,7 +40,7 @@ export default function Deviation({
   deviation: DeviationType | null;
   lang: string;
   session: Session | null;
-  fetchTime: string;
+  fetchTime: Date;
 }) {
   useEffect(() => {
     const interval = setInterval(() => {
@@ -94,25 +90,25 @@ export default function Deviation({
     });
   };
 
-  const handleSendReminderEmail = async () => {
-    try {
-      if (!deviation?._id) {
-        console.error('handleSendReminderEmail', 'deviation.id is missing');
-        toast.error('Skontaktuj się z IT!');
-        return;
-      }
-      const res = await sendReminderEmail(deviation._id.toString());
-      if (res.success) {
-        toast.success('Wysłano przypomnienie!');
-      } else if (res.error) {
-        console.error('handleSendReminderEmail', res.error);
-        toast.error('Skontaktuj się z IT!');
-      }
-    } catch (error) {
-      console.error('handleSendReminderEmail', error);
-      toast.error('Skontaktuj się z IT!');
-    }
-  };
+  // const handleSendReminderEmail = async () => {
+  //   try {
+  //     if (!deviation?._id) {
+  //       console.error('handleSendReminderEmail', 'deviation.id is missing');
+  //       toast.error('Skontaktuj się z IT!');
+  //       return;
+  //     }
+  //     const res = await sendReminderEmail(deviation._id.toString());
+  //     if (res.success) {
+  //       toast.success('Wysłano przypomnienie!');
+  //     } else if (res.error) {
+  //       console.error('handleSendReminderEmail', res.error);
+  //       toast.error('Skontaktuj się z IT!');
+  //     }
+  //   } catch (error) {
+  //     console.error('handleSendReminderEmail', error);
+  //     toast.error('Skontaktuj się z IT!');
+  //   }
+  // };
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
@@ -141,7 +137,8 @@ export default function Deviation({
           </Link>
         </div>
         <CardDescription>
-          ID: {deviation?._id?.toString()}, ostatnia synchronizacja: {fetchTime}
+          ID: {deviation?._id?.toString()}, ostatnia synchronizacja:{' '}
+          {fetchTime.toLocaleString()}
         </CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
@@ -339,7 +336,7 @@ export default function Deviation({
                       </TableRow>
                       <TableRow>
                         <TableCellsApprove
-                          roleText='Kierownik Zapewnienia Jakości'
+                          roleText='Kierownik Jakości'
                           deviationUserRole={deviationUserRole}
                           role='quality-manager'
                           approved={deviation?.qualityManagerApproval?.approved}
@@ -349,7 +346,7 @@ export default function Deviation({
                           lang={lang}
                         />
                       </TableRow>
-                      <TableRow>
+                      {/* <TableRow>
                         <TableCellsApprove
                           roleText='Kierownik Działu Inżynieryjnego'
                           deviationUserRole={deviationUserRole}
@@ -362,10 +359,10 @@ export default function Deviation({
                           at={deviation?.engineeringManagerApproval?.at.toString()}
                           lang={lang}
                         />
-                      </TableRow>
+                      </TableRow> */}
                       <TableRow>
                         <TableCellsApprove
-                          roleText='Kierownik Działu Utrzymania Ruchu'
+                          roleText='Kierownik Utrzymania Ruchu'
                           deviationUserRole={deviationUserRole}
                           role='maintenance-manager'
                           approved={
@@ -374,6 +371,20 @@ export default function Deviation({
                           handleApproval={handleApproval}
                           by={deviation?.maintenanceManagerApproval?.by}
                           at={deviation?.maintenanceManagerApproval?.at.toString()}
+                          lang={lang}
+                        />
+                      </TableRow>
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Dyrektor Zakładu'
+                          deviationUserRole={deviationUserRole}
+                          role='plant-manager'
+                          approved={
+                            deviation?.productionManagerApproval?.approved
+                          }
+                          handleApproval={handleApproval}
+                          by={deviation?.productionManagerApproval?.by}
+                          at={deviation?.productionManagerApproval?.at.toString()}
                           lang={lang}
                         />
                       </TableRow>

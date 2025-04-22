@@ -17,14 +17,29 @@ export async function GET(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // Check if ID is a valid MongoDB ObjectId (24 hex characters)
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    if (!isValidObjectId) {
+      return NextResponse.json(
+        { error: 'Invalid ObjectId format' },
+        { status: 404 },
+      );
+    }
     const coll = await dbc('deviations');
     const deviation = await coll.findOne({
       _id: new ObjectId(id),
     });
+    if (!deviation) {
+      return NextResponse.json(
+        { error: 'Deviation not found' },
+        { status: 404 },
+      );
+    }
     // return new NextResponse(JSON.stringify(deviation));
     return NextResponse.json(deviation);
   } catch (error) {
-    console.error('api/deviations/get-deviation: ' + error);
+    console.error('api/deviations/deviation: ' + error);
     return NextResponse.json({ error: 'get-deviation api' }, { status: 503 });
   }
 }

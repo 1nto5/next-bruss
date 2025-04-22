@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Copy, MoreHorizontal } from 'lucide-react';
 
+import { DeviationType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,12 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DeviationType } from '@/lib/types/deviation';
 import { Pencil, Trash2 } from 'lucide-react';
 import { ObjectId } from 'mongodb';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { deleteDraftDeviation } from '../actions';
+import { deleteDraftDeviation } from '../../actions';
 
 const handleCopyId = async (id: ObjectId | undefined) => {
   if (id) {

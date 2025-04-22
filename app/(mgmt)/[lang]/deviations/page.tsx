@@ -1,14 +1,25 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { columns } from './table/columns';
-import { DataTable } from './table/data-table';
+import { columns } from './components/table/columns';
+import { DataTable } from './components/table/data-table';
 // import { extractNameFromEmail } from '@/lib//utils/nameFormat';
+import {
+  ApprovalType,
+  DeviationType,
+} from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
-import { ApprovalType, DeviationType } from '@/lib/types/deviation';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Session } from 'next-auth';
+import TableFilteringAndOptions from './components/table-filtering-and-options';
 
 async function getAllDeviations(lang: string): Promise<{
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   deviations: DeviationType[];
 }> {
   const res = await fetch(`${process.env.API}/deviations/deviations`, {
@@ -22,8 +33,8 @@ async function getAllDeviations(lang: string): Promise<{
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = new Date(res.headers.get('date') || '');
+  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
   const deviations: DeviationType[] = await res.json();
 
@@ -45,14 +56,15 @@ async function getAllDeviations(lang: string): Promise<{
 
   const deviationsFormatted = deviationsFiltered.map(formatDeviation);
 
-  return { fetchTime, deviations: deviationsFormatted };
+  return { fetchTime, fetchTimeLocaleString, deviations: deviationsFormatted };
 }
 
 async function getUserDeviations(
   lang: string,
   session: Session,
 ): Promise<{
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   deviations: DeviationType[];
 }> {
   const res = await fetch(`${process.env.API}/deviations/deviations`, {
@@ -66,8 +78,8 @@ async function getUserDeviations(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = new Date(res.headers.get('date') || '');
+  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
   const deviations: DeviationType[] = await res.json();
 
   const approvalMapping: { [key: string]: keyof DeviationType } = {
@@ -141,6 +153,7 @@ async function getUserDeviations(
 
   return {
     fetchTime,
+    fetchTimeLocaleString,
     deviations: deviationsFormatted,
   };
 }
@@ -152,21 +165,38 @@ export default async function DeviationsPage(props: {
 
   const { lang } = params;
 
-  let fetchTime, deviations;
+  let fetchTime, fetchTimeLocaleString, deviations;
   const session = await auth();
 
   if (!session) {
-    ({ fetchTime, deviations } = await getAllDeviations(lang));
+    ({ fetchTime, fetchTimeLocaleString, deviations } =
+      await getAllDeviations(lang));
   } else {
-    ({ fetchTime, deviations } = await getUserDeviations(lang, session));
+    ({ fetchTime, fetchTimeLocaleString, deviations } = await getUserDeviations(
+      lang,
+      session,
+    ));
   }
 
   return (
-    <DataTable
-      columns={columns}
-      data={deviations}
-      fetchTime={fetchTime}
-      lang={lang}
-    />
+    <Card>
+      <CardHeader>
+        <CardTitle>Odchylenia</CardTitle>
+        <CardDescription>
+          Ostatnia synchronizacja: {fetchTimeLocaleString}
+        </CardDescription>
+        <TableFilteringAndOptions
+          fetchTime={fetchTime}
+          isLogged={!!session}
+          userEmail={session?.user?.email || undefined}
+        />
+      </CardHeader>
+      <DataTable
+        columns={columns}
+        data={deviations}
+        fetchTimeLocaleString={fetchTimeLocaleString}
+        lang={lang}
+      />
+    </Card>
   );
 }

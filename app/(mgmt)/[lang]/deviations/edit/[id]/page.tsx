@@ -1,24 +1,11 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { DeviationReasonType } from '@/lib/types/deviation';
-import { redirect } from 'next/navigation';
-import { findDeviation } from './actions';
-import EditDraftDeviation from './components/edit-draft-deviation';
-
-async function getReasons(): Promise<DeviationReasonType[]> {
-  const res = await fetch(`${process.env.API}/deviations/reasons`, {
-    next: { revalidate: 60 * 60 * 24, tags: ['deviationReasons'] },
-  });
-  if (!res.ok) {
-    const json = await res.json();
-    throw new Error(
-      `getReasons error:  ${res.status}  ${res.statusText} ${json.error}`,
-    );
-  }
-
-  const data = await res.json();
-  return data;
-}
+import EditForm from '../../components/edit-form';
+import {
+  getConfigAreaOptions,
+  getConfigReasonOptions,
+} from '../../lib/get-configs';
+import { getDeviation } from '../../lib/get-deviation';
 
 export default async function EditDeviationPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
@@ -28,13 +15,16 @@ export default async function EditDeviationPage(props: {
   const { lang, id } = params;
 
   // const dict = await getDictionary(lang);
-  const deviationReasons = await getReasons();
-  const deviation = await findDeviation(id);
-  if (deviation === null) {
-    redirect('/deviations');
-  }
-
+  const reasonOptions = await getConfigReasonOptions();
+  const areaOptions = await getConfigAreaOptions();
+  const deviationData = await getDeviation(id);
   return (
-    <EditDraftDeviation reasons={deviationReasons} deviation={deviation} />
+    <EditForm
+      reasonOptions={reasonOptions}
+      areaOptions={areaOptions}
+      deviation={deviationData.deviation}
+      id={id}
+      lang={lang}
+    />
   );
 }

@@ -1,8 +1,12 @@
 'use client';
 import {
+  DeviationAreaType,
+  DeviationReasonType,
+} from '@/app/(mgmt)/[lang]/deviations/lib/types';
+import {
   addDeviationDraftSchema,
   addDeviationSchema,
-} from '@/app/(mgmt)/[lang]/deviations/lib/deviations-zod';
+} from '@/app/(mgmt)/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -26,9 +30,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { DeviationReasonType } from '@/lib/types/deviation';
+import { Locale } from '@/i18n.config';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AArrowDown, Eraser, Loader2, Pencil, Plus, Table } from 'lucide-react';
+import { Eraser, Pencil, Plus, Search, Table } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
@@ -42,9 +46,13 @@ import {
 } from '../actions';
 
 export default function AddDeviationForm({
-  reasons,
+  reasonOptions,
+  areaOptions,
+  lang,
 }: {
-  reasons: DeviationReasonType[];
+  reasonOptions: DeviationReasonType[];
+  areaOptions: DeviationAreaType[];
+  lang: Locale;
 }) {
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingInsert, setIsPendingInserting] = useState(false);
@@ -146,11 +154,11 @@ export default function AddDeviationForm({
   return (
     <Card className='sm:w-[768px]'>
       <CardHeader>
-        <div className='flex justify-between'>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>Nowe odchylenie</CardTitle>
           <Link href='/deviations'>
-            <Button size='icon' variant='outline'>
-              <Table />
+            <Button variant='outline'>
+              <Table /> <span>Tabela odchyleń</span>
             </Button>
           </Link>
         </div>
@@ -159,22 +167,62 @@ export default function AddDeviationForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
-            <div className='flex space-x-2'>
+            {/* <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'> */}
+            <FormField
+              control={form.control}
+              name='articleNumber'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Artykuł</FormLabel>
+                  <FormControl>
+                    <Input autoFocus {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='articleName'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormLabel>Nazwa</FormLabel>
+                  <div className='flex items-center space-x-2'>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <Button
+                      variant='outline'
+                      type='button'
+                      onClick={handleFindArticleName}
+                      disabled={isPendingFindArticleName}
+                    >
+                      <Search
+                        className={
+                          isPendingFindArticleName ? 'animate-spin' : ''
+                        }
+                      />{' '}
+                      <span>Znajdź nazwę</span>
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* </div> */}
+
+            <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'>
               <FormField
                 control={form.control}
-                name='articleNumber'
+                name='customerNumber'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Artykuł</FormLabel>
+                  <FormItem className='w-full'>
+                    <FormLabel>Numer części klienta</FormLabel>
                     <FormControl>
-                      <Input
-                        className='w-20'
-                        autoFocus
-                        placeholder='12345'
-                        {...field}
-                      />
+                      <Input placeholder='' {...field} />
                     </FormControl>
-
                     <FormMessage />
                   </FormItem>
                 )}
@@ -182,38 +230,13 @@ export default function AddDeviationForm({
 
               <FormField
                 control={form.control}
-                name='articleName'
+                name='customerName'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nazwa</FormLabel>
-                    <div className='flex items-center space-x-2'>
-                      <FormControl>
-                        <Input
-                          className='w-44'
-                          placeholder='F-IWDR92,1L-ST'
-                          {...field}
-                        />
-                      </FormControl>
-                      {isPendingFindArticleName ? (
-                        <Button
-                          size='icon'
-                          variant='outline'
-                          type='button'
-                          disabled
-                        >
-                          <Loader2 className='h-4 w-4 animate-spin' />
-                        </Button>
-                      ) : (
-                        <Button
-                          size='icon'
-                          variant='outline'
-                          type='button'
-                          onClick={handleFindArticleName}
-                        >
-                          <AArrowDown />
-                        </Button>
-                      )}
-                    </div>
+                  <FormItem className='w-full'>
+                    <FormLabel>Nazwa części klienta</FormLabel>
+                    <FormControl>
+                      <Input placeholder='' {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -222,60 +245,48 @@ export default function AddDeviationForm({
 
             <FormField
               control={form.control}
-              name='customerNumber'
+              name='workplace'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numer części klienta</FormLabel>
+                <FormItem className='w-full'>
+                  <FormLabel>Stanowisko</FormLabel>
                   <FormControl>
-                    <Input className='w-48' placeholder='' {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
-              name='customerName'
+              name='area'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nazwa części klienta</FormLabel>
+                <FormItem className='w-full'>
+                  <FormLabel>Obszar</FormLabel>
                   <FormControl>
-                    <Input className='w-48' placeholder='' {...field} />
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className='flex flex-col space-y-1'
+                    >
+                      {areaOptions.map((area) => (
+                        <FormItem
+                          key={area.value}
+                          className='flex items-center space-y-0 space-x-3'
+                        >
+                          <FormControl>
+                            <RadioGroupItem value={area.value} />
+                          </FormControl>
+                          <FormLabel className='font-normal'>
+                            {lang === 'pl' ? area.pl : area.label}
+                          </FormLabel>
+                        </FormItem>
+                      ))}
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <div className='flex space-x-2'>
-              <FormField
-                control={form.control}
-                name='workplace'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stanowisko</FormLabel>
-                    <FormControl>
-                      <Input className='w-36' placeholder='EOL74' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='area'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Obszar</FormLabel>
-                    <FormControl>
-                      <Input className='w-16' placeholder='Q4' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
             <FormField
               control={form.control}
               name='drawingNumber'
@@ -283,26 +294,22 @@ export default function AddDeviationForm({
                 <FormItem>
                   <FormLabel>Numer rysunku</FormLabel>
                   <FormControl>
-                    <Input
-                      className='w-36'
-                      placeholder='24769.08T'
-                      {...field}
-                    />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className='flex space-x-4'>
+            <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4'>
               <FormField
                 control={form.control}
                 name='quantity'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
                     <FormLabel>Ilość</FormLabel>
                     <FormControl>
-                      <Input className='w-20' placeholder='997' {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -319,10 +326,10 @@ export default function AddDeviationForm({
                       <RadioGroup
                         onValueChange={field.onChange}
                         // defaultValue={field.value}
-                        className='flex flex-col'
+                        className='flex flex-row sm:flex-col'
                       >
                         <FormItem
-                          key={'pcs'}
+                          key={'pc'}
                           className='flex items-center space-y-0 space-x-3'
                         >
                           <FormControl>
@@ -332,7 +339,7 @@ export default function AddDeviationForm({
                         </FormItem>
                         <FormItem
                           key={'kg'}
-                          className='flex items-center space-y-0 space-x-3'
+                          className='ml-4 flex items-center space-y-0 space-x-3 sm:ml-0'
                         >
                           <FormControl>
                             <RadioGroupItem value='kg' />
@@ -354,11 +361,7 @@ export default function AddDeviationForm({
                 <FormItem>
                   <FormLabel>Partia</FormLabel>
                   <FormControl>
-                    <Input
-                      className='w-72'
-                      placeholder='MATC188678/188352/188501/188679'
-                      {...field}
-                    />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -394,16 +397,16 @@ export default function AddDeviationForm({
                       defaultValue={field.value}
                       className='flex flex-col space-y-1'
                     >
-                      {reasons.map((reason) => (
+                      {reasonOptions.map((reason) => (
                         <FormItem
-                          key={reason._id.toString()}
+                          key={reason.value.toString()}
                           className='flex items-center space-y-0 space-x-3'
                         >
                           <FormControl>
-                            <RadioGroupItem value={reason.content} />
+                            <RadioGroupItem value={reason.value} />
                           </FormControl>
                           <FormLabel className='font-normal'>
-                            {reason.content}
+                            {lang === 'pl' ? reason.pl : reason.label}
                           </FormLabel>
                         </FormItem>
                       ))}
@@ -414,12 +417,12 @@ export default function AddDeviationForm({
               )}
             />
 
-            <div className='flex space-x-2'>
+            <div className='flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'>
               <FormField
                 control={form.control}
                 name='periodFrom'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
                     <FormLabel>Rozpoczęcie</FormLabel>
                     <FormControl>
                       <DateTimePicker
@@ -460,7 +463,7 @@ export default function AddDeviationForm({
                 control={form.control}
                 name='periodTo'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
                     <FormLabel>Zakończenie</FormLabel>
                     <FormControl>
                       <DateTimePicker
@@ -535,46 +538,38 @@ export default function AddDeviationForm({
           </CardContent>
           <Separator className='mb-4' />
 
-          <CardFooter className='flex justify-between'>
+          <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <Button
               variant='destructive'
               type='button'
               onClick={() => form.reset()}
+              className='w-full sm:w-auto'
             >
-              <Eraser className='mr-2 h-4 w-4' />
+              <Eraser className='' />
               Wyczyść
             </Button>
-            <div className='flex space-x-2'>
-              {isPendingInsertDraft ? (
-                <Button variant='secondary' disabled>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Zapisywanie
-                </Button>
-              ) : (
-                <Button
-                  variant='secondary'
-                  type='button'
-                  onClick={() => {
-                    // setIsDraft(true);
-                    // form.handleSubmit(handleDraftInsert)();
-                    handleDraftInsert(form.getValues());
-                  }}
-                >
-                  <Pencil className='mr-2 h-4 w-4' />
-                  Zapisz szkic
-                </Button>
-              )}
-              {isPendingInsert ? (
-                <Button disabled>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Dodawanie
-                </Button>
-              ) : (
-                <Button type='submit'>
-                  <Plus className='mr-2 h-4 w-4' />
-                  Dodaj odchylenie
-                </Button>
-              )}
+            <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
+              <Button
+                variant='secondary'
+                type='button'
+                onClick={() => handleDraftInsert(form.getValues())}
+                disabled={isPendingInsertDraft}
+                className='w-full sm:w-auto'
+              >
+                <Pencil
+                  className={isPendingInsertDraft ? 'animate-spin' : ''}
+                />
+                Zapisz szkic
+              </Button>
+
+              <Button
+                disabled={isPendingInsert}
+                type='submit'
+                className='w-full sm:w-auto'
+              >
+                <Plus className={isPendingInsert ? 'animate-spin' : ''} />
+                Dodaj odchylenie
+              </Button>
             </div>
           </CardFooter>
         </form>

@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -112,6 +113,8 @@ export default function NewOvertimeRequestForm({
           </Link>
         </div>
       </CardHeader>
+      <Separator className='mb-4' />
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
