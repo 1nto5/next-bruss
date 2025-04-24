@@ -530,47 +530,6 @@ export async function saveHydra(prevState: any, formData: FormData) {
 
     let qrBatch;
 
-    // old hydra qr validation
-    // SAP article format includes '/'
-    // if (hydra.includes('/')) {
-    //   const qrArticle = hydra.match(/:\d+\.\d+\.\d+/)?.[0].slice(1) || '';
-    //   if (qrArticle !== articleConfig.articleNumber) {
-    //     return { message: 'qr wrong article' };
-    //   }
-    //   const quantityPart = hydra
-    //     .split('|')
-    //     .find((part) => part.startsWith('Q:'));
-    //   const qrQuantity = quantityPart
-    //     ? parseInt(quantityPart.split(':')[1], 10)
-    //     : 0;
-    //   if (qrQuantity !== articleConfig.piecesPerBox) {
-    //     return { message: 'qr wrong quantity' };
-    //   }
-    //   const matchResult = hydra.match(/\/(\d{3})/);
-    //   const qrProcess = matchResult ? matchResult[1] : '';
-    //   if (!articleConfig.hydraProcess.includes(qrProcess)) {
-    //     return { message: 'qr wrong process' };
-    //   }
-    //   const batchPart = hydra.split('|').find((part) => part.startsWith('B:'));
-    //   if (!batchPart) return { message: 'qr not valid' };
-    //   qrBatch = batchPart ? batchPart.split(':')[1] : '';
-    // } else {
-    //   const splitHydraQr = hydra.split('|');
-    //   const qrArticle = splitHydraQr[0].slice(2);
-    //   if (qrArticle !== articleConfig.articleNumber) {
-    //     return { message: 'qr wrong article' };
-    //   }
-    //   const qrQuantity = splitHydraQr[2] && parseInt(splitHydraQr[2].substr(2));
-    //   if (qrQuantity !== articleConfig.piecesPerBox) {
-    //     return { message: 'qr wrong quantity' };
-    //   }
-    //   const qrProcess = splitHydraQr[1] && splitHydraQr[1].substr(2);
-    //   if (!articleConfig.hydraProcess.includes(qrProcess)) {
-    //     return { message: 'qr wrong process' };
-    //   }
-    //   qrBatch = splitHydraQr[3] && splitHydraQr[3].substr(2).toUpperCase();
-    // }
-
     const {
       qrArticle,
       qrQuantity,
@@ -592,12 +551,16 @@ export async function saveHydra(prevState: any, formData: FormData) {
     }
 
     const scansCollection = await dbc('scans');
-    const existingBatch = await scansCollection.findOne({
-      hydra_batch: qrBatch,
-    });
 
-    if (existingBatch) {
-      return { message: 'batch exists' };
+    // Only check for existing batch if nonUniqueHydraBatch is not enabled
+    if (!articleConfig.nonUniqueHydraBatch) {
+      const existingBatch = await scansCollection.findOne({
+        hydra_batch: qrBatch,
+      });
+
+      if (existingBatch) {
+        return { message: 'batch exists' };
+      }
     }
 
     const updateResult = await scansCollection.updateMany(
