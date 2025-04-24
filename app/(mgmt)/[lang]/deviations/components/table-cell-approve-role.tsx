@@ -23,6 +23,7 @@ type TableCellApproveRoleProps = {
   by: string | undefined;
   at: string | undefined;
   lang: string;
+  isPendingApproval: boolean;
 };
 
 const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
@@ -34,6 +35,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   by,
   at,
   lang,
+  isPendingApproval,
 }) => {
   return (
     <>
@@ -44,7 +46,9 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size='icon' type='button' variant='outline'>
-                <ClipboardPen />
+                <ClipboardPen
+                  className={isPendingApproval ? 'animate-spin' : ''}
+                />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -64,7 +68,9 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
           </AlertDialog>
         )}
       </TableCell>
-      <TableCell>{(by && extractNameFromEmail(by)) || '-'}</TableCell>
+      <TableCell className='whitespace-nowrap'>
+        {(by && extractNameFromEmail(by)) || '-'}
+      </TableCell>
       <TableCell>{at ? new Date(at).toLocaleString(lang) : '-'}</TableCell>
     </>
   );

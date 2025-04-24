@@ -18,6 +18,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { redirectToDeviations as revalidate } from '../actions';
 
+// TODO: change filtering to use with deviations
 export default function TableFilteringAndOptions({
   fetchTime,
   isLogged,
@@ -216,7 +217,6 @@ export default function TableFilteringAndOptions({
               <CircleX /> <span>Wyczyść</span>
             </Button>
 
-            {/* FIXME: excel export api */}
             <Link
               href={`/api/failures/lv/excel?${new URLSearchParams(
                 Object.entries({

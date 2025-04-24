@@ -56,7 +56,7 @@ type AddCorrectiveActionPropsType = {
   users: UsersListType;
 };
 
-export default function AddCorrectiveAction({
+export default function AddCorrectiveActionForm({
   id,
   users,
 }: AddCorrectiveActionPropsType) {
@@ -102,7 +102,7 @@ export default function AddCorrectiveAction({
   return (
     <Card className='w-[768px]'>
       <CardHeader>
-        <div className='flex justify-between'>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>Nowa akcja korygująca</CardTitle>
           <Link href={`/deviations/${id}`}>
             <Button size='icon' variant='outline'>

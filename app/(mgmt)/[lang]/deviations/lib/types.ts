@@ -22,9 +22,18 @@ export type correctiveActionStatusType = {
   changed: { at: Date; by: string };
 };
 
+export type AttachmentType = {
+  filename: string;
+  name: string;
+  note?: string;
+  uploadedBy: string;
+  uploadedAt: Date | string;
+  size: number;
+  type: string;
+};
+
 export type DeviationType = {
   _id?: ObjectId;
-  id?: string;
   status:
     | 'rejected'
     | 'approved'
@@ -58,8 +67,9 @@ export type DeviationType = {
   engineeringManagerApproval?: ApprovalType;
   maintenanceManagerApproval?: ApprovalType;
   productionManagerApproval?: ApprovalType;
-  // plantManagerApproval: ApprovalType;
+  plantManagerApproval?: ApprovalType;
   correctiveActions: correctiveActionType[];
+  attachments?: AttachmentType[];
 };
 
 export type DeviationReasonType = {

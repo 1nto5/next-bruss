@@ -1,9 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
 
-import { DeviationType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
+import {
+  DeviationAreaType,
+  DeviationReasonType,
+  DeviationType,
+} from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import {
   Card,
   CardContent,
@@ -20,44 +23,40 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-// import { extractNameFromEmail } from '@/lib/utils/nameFormat';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { CopyPlus, Table as TableIcon } from 'lucide-react';
+import { CopyPlus, FileDown, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
-import { approveDeviation, revalidateDeviation } from '../actions';
+import { approveDeviation } from '../actions';
+import AddAttachmentDialog from './add-attachment-dialog';
 import TableCellsApprove from './table-cell-approve-role';
 import TableCellCorrectiveAction from './table-cell-corrective-action';
 
-export default function Deviation({
+export default function DeviationView({
   deviation,
   lang,
   session,
   fetchTime,
+  reasonOptions,
+  areaOptions,
 }: {
   deviation: DeviationType | null;
   lang: string;
   session: Session | null;
   fetchTime: Date;
+  reasonOptions: DeviationReasonType[];
+  areaOptions: DeviationAreaType[];
 }) {
-  useEffect(() => {
-    const interval = setInterval(() => {
-      revalidateDeviation();
-    }, 1000 * 15); // 60 seconds
-    return () => clearInterval(interval);
-  }, []);
-
   const [isPendingApproval, startApprovalTransition] = useTransition();
 
   const deviationUserRole = session?.user?.roles?.find((role) => {
     return [
       'group-leader',
       'quality-manager',
-      'engineering-manager',
-      'maintenance-manager',
       'production-manager',
+      'plant-manager',
     ].includes(role);
   });
 
@@ -65,13 +64,11 @@ export default function Deviation({
     startApprovalTransition(async () => {
       try {
         if (!deviation?._id) {
-          console.error('handleApproval', 'deviation.id is missing');
           toast.error('Skontaktuj się z IT!');
           return;
         }
 
-        if (deviation._id && deviationUserRole) {
-          console.log('tu');
+        if (deviation?._id && deviationUserRole) {
           const res = await approveDeviation(
             deviation._id.toString(),
             deviationUserRole,
@@ -79,36 +76,14 @@ export default function Deviation({
           if (res.success) {
             toast.success('Zatwierdzono!');
           } else if (res.error) {
-            console.error('handleApproval', res.error);
             toast.error('Skontaktuj się z IT!');
           }
         }
       } catch (error) {
-        console.error('handleFindArticleName', error);
         toast.error('Skontaktuj się z IT!');
       }
     });
   };
-
-  // const handleSendReminderEmail = async () => {
-  //   try {
-  //     if (!deviation?._id) {
-  //       console.error('handleSendReminderEmail', 'deviation.id is missing');
-  //       toast.error('Skontaktuj się z IT!');
-  //       return;
-  //     }
-  //     const res = await sendReminderEmail(deviation._id.toString());
-  //     if (res.success) {
-  //       toast.success('Wysłano przypomnienie!');
-  //     } else if (res.error) {
-  //       console.error('handleSendReminderEmail', res.error);
-  //       toast.error('Skontaktuj się z IT!');
-  //     }
-  //   } catch (error) {
-  //     console.error('handleSendReminderEmail', error);
-  //     toast.error('Skontaktuj się z IT!');
-  //   }
-  // };
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
@@ -131,14 +106,14 @@ export default function Deviation({
         <div className='flex justify-between'>
           <CardTitle>{statusCardTitle()}</CardTitle>
           <Link href='/deviations'>
-            <Button size='icon' variant='outline'>
-              <TableIcon />
+            <Button variant='outline'>
+              <TableIcon /> Odchylenia
             </Button>
           </Link>
         </div>
-        <CardDescription>
-          ID: {deviation?._id?.toString()}, ostatnia synchronizacja:{' '}
-          {fetchTime.toLocaleString()}
+        <CardDescription className='flex flex-col'>
+          <span>ID: {deviation?._id?.toString()}</span>
+          <span>Ostatnia synchronizacja: {fetchTime.toLocaleString(lang)}</span>
         </CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
@@ -266,9 +241,10 @@ export default function Deviation({
                   <div className='flex justify-between'>
                     <CardTitle>Akcje korygujące</CardTitle>
                     {/* TODO: who should have access to add corrective actions? */}
+
                     <Link href={`/deviations/${deviation?._id}/corrective/add`}>
-                      <Button size='icon' variant='outline'>
-                        <CopyPlus />
+                      <Button variant='outline'>
+                        <CopyPlus /> Dodaj
                       </Button>
                     </Link>
                   </div>
@@ -278,7 +254,7 @@ export default function Deviation({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className='min-w-[250px]'>Akcja</TableHead>
+                        <TableHead>Opis</TableHead>
                         <TableHead>Wykonawca</TableHead>
                         <TableHead>Deadline</TableHead>
                         <TableHead>Status</TableHead>
@@ -318,7 +294,7 @@ export default function Deviation({
                         <TableHead>Stanowisko</TableHead>
                         <TableHead>Zatwierdź</TableHead>
                         <TableHead>Osoba</TableHead>
-                        <TableHead>Czas</TableHead>
+                        <TableHead>Data</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -332,6 +308,7 @@ export default function Deviation({
                           by={deviation?.groupLeaderApproval?.by}
                           at={deviation?.groupLeaderApproval?.at.toString()}
                           lang={lang}
+                          isPendingApproval={isPendingApproval}
                         />
                       </TableRow>
                       <TableRow>
@@ -344,50 +321,10 @@ export default function Deviation({
                           by={deviation?.qualityManagerApproval?.by}
                           at={deviation?.qualityManagerApproval?.at.toString()}
                           lang={lang}
+                          isPendingApproval={isPendingApproval}
                         />
                       </TableRow>
-                      {/* <TableRow>
-                        <TableCellsApprove
-                          roleText='Kierownik Działu Inżynieryjnego'
-                          deviationUserRole={deviationUserRole}
-                          role='engineering-manager'
-                          approved={
-                            deviation?.engineeringManagerApproval?.approved
-                          }
-                          handleApproval={handleApproval}
-                          by={deviation?.engineeringManagerApproval?.by}
-                          at={deviation?.engineeringManagerApproval?.at.toString()}
-                          lang={lang}
-                        />
-                      </TableRow> */}
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Kierownik Utrzymania Ruchu'
-                          deviationUserRole={deviationUserRole}
-                          role='maintenance-manager'
-                          approved={
-                            deviation?.maintenanceManagerApproval?.approved
-                          }
-                          handleApproval={handleApproval}
-                          by={deviation?.maintenanceManagerApproval?.by}
-                          at={deviation?.maintenanceManagerApproval?.at.toString()}
-                          lang={lang}
-                        />
-                      </TableRow>
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Dyrektor Zakładu'
-                          deviationUserRole={deviationUserRole}
-                          role='plant-manager'
-                          approved={
-                            deviation?.productionManagerApproval?.approved
-                          }
-                          handleApproval={handleApproval}
-                          by={deviation?.productionManagerApproval?.by}
-                          at={deviation?.productionManagerApproval?.at.toString()}
-                          lang={lang}
-                        />
-                      </TableRow>
+
                       <TableRow>
                         <TableCellsApprove
                           roleText='Kierownik Produkcji'
@@ -400,6 +337,20 @@ export default function Deviation({
                           by={deviation?.productionManagerApproval?.by}
                           at={deviation?.productionManagerApproval?.at.toString()}
                           lang={lang}
+                          isPendingApproval={isPendingApproval}
+                        />
+                      </TableRow>
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Dyrektor Zakładu'
+                          deviationUserRole={deviationUserRole}
+                          role='plant-manager'
+                          approved={deviation?.plantManagerApproval?.approved}
+                          handleApproval={handleApproval}
+                          by={deviation?.plantManagerApproval?.by}
+                          at={deviation?.plantManagerApproval?.at.toString()}
+                          lang={lang}
+                          isPendingApproval={isPendingApproval}
                         />
                       </TableRow>
                     </TableBody>
@@ -411,83 +362,78 @@ export default function Deviation({
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Załączniki</CardTitle>
+                <div className='flex justify-between'>
+                  <CardTitle>Załączniki</CardTitle>
+                  {deviation?._id && (
+                    <AddAttachmentDialog
+                      deviationId={deviation._id.toString()}
+                    />
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Nazwa</TableHead>
-                      <TableHead>Osoba</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Plik</TableHead>
+                      <TableHead>Notatka</TableHead>
+                      <TableHead>Dodał</TableHead>
+                      <TableHead>Data</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>Analiza ryzyka</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Analiza ryzyka</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Analiza ryzyka</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
+                    {deviation?.attachments &&
+                    deviation.attachments.length > 0 ? (
+                      [...deviation.attachments]
+                        .sort(
+                          (a, b) =>
+                            new Date(b.uploadedAt).getTime() -
+                            new Date(a.uploadedAt).getTime(),
+                        )
+                        .map((attachment, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{attachment.name}</TableCell>
+                            <TableCell>
+                              <a
+                                href={`/api/deviations/download?deviationId=${deviation._id?.toString()}&filename=${encodeURIComponent(attachment.filename)}`}
+                                download={attachment.filename}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                              >
+                                <Button variant='outline' size='icon'>
+                                  <FileDown />
+                                </Button>
+                              </a>
+                            </TableCell>
+                            <TableCell className='max-w-[150px] truncate'>
+                              {attachment.note || '-'}
+                            </TableCell>
+                            <TableCell className='whitespace-nowrap'>
+                              {extractNameFromEmail(attachment.uploadedBy)}
+                            </TableCell>
+                            <TableCell>
+                              {new Date(attachment.uploadedAt).toLocaleString(
+                                lang,
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={6}
+                          className='text-muted-foreground text-center'
+                        >
+                          Brak załączników
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
             </Card>
           </div>
-          {/* <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Historia</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Czas</TableHead>
-                      <TableHead>Osoba</TableHead>
-                      <TableHead>Akcja</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>2021-09-01</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>2021-09-01</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>2021-09-01</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>2021-09-01</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>2021-09-01</TableCell>
-                      <TableCell>Jan Kowalski</TableCell>
-                      <TableCell>Utworzono</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div> */}
         </div>
       </CardContent>
     </Card>

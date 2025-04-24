@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleX, Plus, Table } from 'lucide-react';
@@ -104,6 +105,8 @@ export default function AddDayOff({
           </Link>
         </div>
       </CardHeader>
+      <Separator className='mb-4' />
+
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent className='grid w-full items-center gap-4'>
           <MultiSelectEmployees
@@ -115,6 +118,7 @@ export default function AddDayOff({
             placeholder='Wyszukaj pracownika...'
           />
         </CardContent>
+        <Separator className='mb-4' />
 
         <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
           <Button

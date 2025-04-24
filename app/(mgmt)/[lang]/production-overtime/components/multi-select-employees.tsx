@@ -200,7 +200,7 @@ export const MultiSelectEmployees = ({
               className='w-full'
               onClick={handleAddEmployee}
             >
-              <CopyPlus /> Dodaj zlecenie pracownika
+              <CopyPlus /> Dodaj odbiór dnia wolnego
             </Button>
           </DialogFooter>
         </Form>

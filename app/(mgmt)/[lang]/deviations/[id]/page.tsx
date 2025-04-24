@@ -2,7 +2,11 @@ import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import Deviation from '../components/view';
+import DeviationView from '../components/view';
+import {
+  getConfigAreaOptions,
+  getConfigReasonOptions,
+} from '../lib/get-configs';
 import { getDeviation } from '../lib/get-deviation';
 
 export default async function EditDeviationPage(props: {
@@ -18,13 +22,17 @@ export default async function EditDeviationPage(props: {
     redirect('/deviations');
   }
   const session = await auth();
+  const reasonOptions = await getConfigReasonOptions();
+  const areaOptions = await getConfigAreaOptions();
 
   return (
-    <Deviation
+    <DeviationView
       deviation={deviation}
       lang={lang}
       session={session}
       fetchTime={fetchTime}
+      reasonOptions={reasonOptions}
+      areaOptions={areaOptions}
     />
   );
 }

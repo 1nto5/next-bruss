@@ -1,7 +1,7 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { UsersListType } from '@/lib/types/user';
-import AddCorrectiveAction from '../../../components/add-corrective-action';
+import AddCorrectiveActionForm from '../../../components/add-corrective-action-form';
 
 async function getUsers(): Promise<UsersListType> {
   const res = await fetch(`${process.env.API}/users`, {
@@ -27,5 +27,5 @@ export default async function AddDeviationPage(props: {
 
   // const dict = await getDictionary(lang);
   const users = await getUsers();
-  return <AddCorrectiveAction id={id} users={users} />;
+  return <AddCorrectiveActionForm id={id} users={users} />;
 }

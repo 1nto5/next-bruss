@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CircleX, Loader, Plus, RefreshCw, Search, Sheet } from 'lucide-react';
+import { CircleX, Loader, Plus, RefreshCw, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -217,8 +217,8 @@ export default function TableFilteringAndOptions({
               <CircleX /> <span>Wyczyść</span>
             </Button>
 
-            {/* FIXME: excel export api */}
-            <Link
+            {/* TODO: excel export api */}
+            {/* <Link
               href={`/api/failures/lv/excel?${new URLSearchParams(
                 Object.entries({
                   date: dateFilter?.toISOString(),
@@ -235,7 +235,7 @@ export default function TableFilteringAndOptions({
               <Button>
                 <Sheet /> <span>Export do Excel</span>
               </Button>
-            </Link>
+            </Link> */}
           </>
         )}
         {isGroupLeader && (

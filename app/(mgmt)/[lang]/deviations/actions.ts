@@ -103,9 +103,8 @@ export async function approveDeviation(id: string, userRole: string) {
   const approvalFieldMap: { [key: string]: keyof DeviationType } = {
     'group-leader': 'groupLeaderApproval',
     'quality-manager': 'qualityManagerApproval',
-    'engineering-manager': 'engineeringManagerApproval',
-    'maintenance-manager': 'maintenanceManagerApproval',
     'production-manager': 'productionManagerApproval',
+    'plant-manager': 'plantManagerApproval',
   };
 
   const approvalField = approvalFieldMap[userRole];
@@ -241,7 +240,7 @@ export async function revalidateDeviation() {
 //     const mailOptions = {
 //       // from: `"Odchylenia (Next BRUSS)" <${process.env.NODEMAILER_MAIL}>`,
 //       from: process.env.NODEMAILER_MAIL,
-//       to: deviation.owner, //TODO: change to the proper emails - managers who should take action - group leader, quality manager, engineering manager, maintenance manager, production manager (if they haven’t approved yet)
+//       to: deviation.owner,
 //       subject: 'Prośba o działanie',
 //       // html: `${extractFullNameFromEmail(session.user?.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
 //     };
