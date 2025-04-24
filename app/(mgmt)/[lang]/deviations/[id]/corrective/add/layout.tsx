@@ -25,5 +25,5 @@ export default async function Layout(props: {
     redirect('/auth');
   }
 
-  return <main className='flex justify-center'>{children}</main>;
+  return <div className='flex justify-center'>{children}</div>;
 }

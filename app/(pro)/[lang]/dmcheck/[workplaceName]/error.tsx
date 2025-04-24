@@ -1,7 +1,6 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
-import { revalidateDmcheck as revalidate } from '../actions';
 
 export default function Error({
   error,
@@ -10,5 +9,5 @@ export default function Error({
   error: Error;
   reset: () => void;
 }) {
-  return <ErrorComponent error={error} reset={reset} revalidate={revalidate} />;
+  return <ErrorComponent error={error} reset={reset} />;
 }

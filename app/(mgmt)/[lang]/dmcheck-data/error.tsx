@@ -1,7 +1,7 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
-import { revalidateDmcheckData as revalidate } from './actions';
+import { revalidateDmcheckTableData as revalidate } from './actions';
 
 export default function Error({
   error,

@@ -31,18 +31,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { UsersListType } from '@/lib/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ArrowLeftToLine,
   Check,
   ChevronsUpDown,
   Eraser,
   Loader2,
   Plus,
-  Table,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -105,13 +104,12 @@ export default function AddCorrectiveActionForm({
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>Nowa akcja korygująca</CardTitle>
           <Link href={`/deviations/${id}`}>
-            <Button size='icon' variant='outline'>
-              <Table />
+            <Button variant='outline'>
+              <ArrowLeftToLine /> Odchylenie
             </Button>
           </Link>
         </div>
       </CardHeader>
-      <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* <form
@@ -237,7 +235,6 @@ export default function AddCorrectiveActionForm({
               )}
             />
           </CardContent>
-          <Separator className='mb-4' />
 
           <CardFooter className='flex justify-between'>
             <Button

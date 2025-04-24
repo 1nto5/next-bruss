@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { CopyPlus, FileDown, Table as TableIcon } from 'lucide-react';
+import { FileDown, Hammer, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
@@ -33,6 +33,16 @@ import { approveDeviation } from '../actions';
 import AddAttachmentDialog from './add-attachment-dialog';
 import TableCellsApprove from './table-cell-approve-role';
 import TableCellCorrectiveAction from './table-cell-corrective-action';
+
+// Lista dozwolonych ról do zatwierdzania odchyleń
+const APPROVAL_ROLES = [
+  'group-leader',
+  'quality-manager',
+  'production-manager',
+  'plant-manager',
+] as const;
+
+type ApprovalRole = (typeof APPROVAL_ROLES)[number];
 
 export default function DeviationView({
   deviation,
@@ -51,16 +61,13 @@ export default function DeviationView({
 }) {
   const [isPendingApproval, startApprovalTransition] = useTransition();
 
-  const deviationUserRole = session?.user?.roles?.find((role) => {
-    return [
-      'group-leader',
-      'quality-manager',
-      'production-manager',
-      'plant-manager',
-    ].includes(role);
-  });
+  // Pobieranie wszystkich ról użytkownika, które są uprawnione do zatwierdzania
+  const deviationUserRoles =
+    session?.user?.roles?.filter((role) =>
+      APPROVAL_ROLES.includes(role as ApprovalRole),
+    ) || [];
 
-  const handleApproval = async () => {
+  const handleApproval = async (approvalRole: string) => {
     startApprovalTransition(async () => {
       try {
         if (!deviation?._id) {
@@ -68,16 +75,22 @@ export default function DeviationView({
           return;
         }
 
-        if (deviation?._id && deviationUserRole) {
+        // Sprawdzamy, czy użytkownik posiada rolę, którą próbuje wykorzystać do zatwierdzenia
+        if (
+          deviation?._id &&
+          deviationUserRoles.includes(approvalRole as ApprovalRole)
+        ) {
           const res = await approveDeviation(
             deviation._id.toString(),
-            deviationUserRole,
+            approvalRole,
           );
           if (res.success) {
             toast.success('Zatwierdzono!');
           } else if (res.error) {
             toast.error('Skontaktuj się z IT!');
           }
+        } else {
+          toast.error('Nie posiadasz uprawnień do zatwierdzenia w tej roli!');
         }
       } catch (error) {
         toast.error('Skontaktuj się z IT!');
@@ -191,7 +204,21 @@ export default function DeviationView({
 
                     <TableRow>
                       <TableCell className='font-medium'>Powód:</TableCell>
-                      <TableCell>{deviation?.reason || '-'}</TableCell>
+                      <TableCell>
+                        {deviation?.reason
+                          ? reasonOptions.find(
+                              (option) => option.value === deviation.reason,
+                            )
+                            ? lang === 'pl'
+                              ? reasonOptions.find(
+                                  (option) => option.value === deviation.reason,
+                                )?.pl
+                              : reasonOptions.find(
+                                  (option) => option.value === deviation.reason,
+                                )?.label
+                            : deviation.reason
+                          : '-'}
+                      </TableCell>
                     </TableRow>
 
                     <TableRow>
@@ -206,7 +233,21 @@ export default function DeviationView({
 
                     <TableRow>
                       <TableCell className='font-medium'>Obszar:</TableCell>
-                      <TableCell>{deviation?.area || '-'}</TableCell>
+                      <TableCell>
+                        {deviation?.area
+                          ? areaOptions.find(
+                              (option) => option.value === deviation.area,
+                            )
+                            ? lang === 'pl'
+                              ? areaOptions.find(
+                                  (option) => option.value === deviation.area,
+                                )?.pl
+                              : areaOptions.find(
+                                  (option) => option.value === deviation.area,
+                                )?.label
+                            : deviation.area
+                          : '-'}
+                      </TableCell>
                     </TableRow>
 
                     <TableRow>
@@ -240,13 +281,25 @@ export default function DeviationView({
                 <CardHeader>
                   <div className='flex justify-between'>
                     <CardTitle>Akcje korygujące</CardTitle>
-                    {/* TODO: who should have access to add corrective actions? */}
-
-                    <Link href={`/deviations/${deviation?._id}/corrective/add`}>
-                      <Button variant='outline'>
-                        <CopyPlus /> Dodaj
-                      </Button>
-                    </Link>
+                    {(session?.user?.roles?.some((role) =>
+                      [
+                        'quality',
+                        'team-leader',
+                        'group-leader',
+                        'quality-manager',
+                        'production-manager',
+                        'plant-manager',
+                      ].includes(role),
+                    ) ||
+                      session?.user?.email === deviation?.owner) && (
+                      <Link
+                        href={`/deviations/${deviation?._id}/corrective/add`}
+                      >
+                        <Button variant='outline'>
+                          <Hammer /> Dodaj
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </CardHeader>
 
@@ -301,12 +354,12 @@ export default function DeviationView({
                       <TableRow>
                         <TableCellsApprove
                           roleText='Group Leader'
-                          deviationUserRole={deviationUserRole}
+                          deviationUserRoles={deviationUserRoles}
                           role='group-leader'
                           approved={deviation?.groupLeaderApproval?.approved}
-                          handleApproval={handleApproval}
+                          handleApproval={() => handleApproval('group-leader')}
                           by={deviation?.groupLeaderApproval?.by}
-                          at={deviation?.groupLeaderApproval?.at.toString()}
+                          at={deviation?.groupLeaderApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
                         />
@@ -314,12 +367,14 @@ export default function DeviationView({
                       <TableRow>
                         <TableCellsApprove
                           roleText='Kierownik Jakości'
-                          deviationUserRole={deviationUserRole}
+                          deviationUserRoles={deviationUserRoles}
                           role='quality-manager'
                           approved={deviation?.qualityManagerApproval?.approved}
-                          handleApproval={handleApproval}
+                          handleApproval={() =>
+                            handleApproval('quality-manager')
+                          }
                           by={deviation?.qualityManagerApproval?.by}
-                          at={deviation?.qualityManagerApproval?.at.toString()}
+                          at={deviation?.qualityManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
                         />
@@ -328,14 +383,16 @@ export default function DeviationView({
                       <TableRow>
                         <TableCellsApprove
                           roleText='Kierownik Produkcji'
-                          deviationUserRole={deviationUserRole}
+                          deviationUserRoles={deviationUserRoles}
                           role='production-manager'
                           approved={
                             deviation?.productionManagerApproval?.approved
                           }
-                          handleApproval={handleApproval}
+                          handleApproval={() =>
+                            handleApproval('production-manager')
+                          }
                           by={deviation?.productionManagerApproval?.by}
-                          at={deviation?.productionManagerApproval?.at.toString()}
+                          at={deviation?.productionManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
                         />
@@ -343,12 +400,12 @@ export default function DeviationView({
                       <TableRow>
                         <TableCellsApprove
                           roleText='Dyrektor Zakładu'
-                          deviationUserRole={deviationUserRole}
+                          deviationUserRoles={deviationUserRoles}
                           role='plant-manager'
                           approved={deviation?.plantManagerApproval?.approved}
-                          handleApproval={handleApproval}
+                          handleApproval={() => handleApproval('plant-manager')}
                           by={deviation?.plantManagerApproval?.by}
-                          at={deviation?.plantManagerApproval?.at.toString()}
+                          at={deviation?.plantManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
                         />

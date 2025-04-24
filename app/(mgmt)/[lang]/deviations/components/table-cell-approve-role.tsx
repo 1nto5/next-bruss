@@ -16,7 +16,7 @@ import { ClipboardPen } from 'lucide-react';
 
 type TableCellApproveRoleProps = {
   roleText: string;
-  deviationUserRole: string | undefined;
+  deviationUserRoles: string[];
   role: string;
   approved: boolean | undefined;
   handleApproval: () => void;
@@ -28,7 +28,7 @@ type TableCellApproveRoleProps = {
 
 const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   roleText,
-  deviationUserRole,
+  deviationUserRoles,
   role,
   approved,
   handleApproval,
@@ -37,12 +37,15 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   lang,
   isPendingApproval,
 }) => {
+  // Sprawdzamy, czy użytkownik ma wymaganą rolę wśród swoich ról
+  const hasRole = deviationUserRoles.includes(role);
+
   return (
     <>
       <TableCell className='font-medium'>{roleText}</TableCell>
 
       <TableCell>
-        {deviationUserRole === role && !approved && (
+        {hasRole && !approved && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size='icon' type='button' variant='outline'>
