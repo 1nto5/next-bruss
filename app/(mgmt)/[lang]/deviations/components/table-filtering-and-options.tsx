@@ -238,7 +238,7 @@ export default function TableFilteringAndOptions({
           </>
         )}
 
-        <Link href='/deviations/new'>
+        <Link href='/deviations/add'>
           <Button variant={'outline'}>
             <Plus /> <span>Nowe odchylenie</span>
           </Button>
