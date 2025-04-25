@@ -703,6 +703,7 @@ export async function getInBoxTableData(articleConfigId: string) {
     const scans = await scansCollection
       .find({
         article: articleConfig.articleNumber,
+        workplace: articleConfig.workplace,
         status: 'box',
       })
       .sort({ time: -1 })
@@ -753,6 +754,7 @@ export async function getBoxesOnPalletTableData(articleConfigId: string) {
         {
           $match: {
             article: articleConfig.articleNumber,
+            workplace: articleConfig.workplace,
             status: 'pallet',
           },
         },
