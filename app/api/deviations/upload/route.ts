@@ -89,11 +89,7 @@ export async function POST(req: NextRequest) {
     const buf = Buffer.from(await file.arrayBuffer());
 
     // Utworzenie folderu dla odchylenia
-    const deviationFolder = path.join(
-      BASE_PATH,
-      'uploads/deviations',
-      deviationId,
-    );
+    const deviationFolder = path.join(BASE_PATH, 'deviations', deviationId);
     fs.mkdirSync(deviationFolder, { recursive: true });
 
     // Generowanie nazwy pliku
