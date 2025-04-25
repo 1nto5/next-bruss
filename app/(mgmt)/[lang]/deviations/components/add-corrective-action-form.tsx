@@ -61,6 +61,7 @@ export default function AddCorrectiveActionForm({
 }: AddCorrectiveActionPropsType) {
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingUpdate, setIsPendingUpdating] = useState<boolean>(false);
+  const [responsiblePopoverOpen, setResponsiblePopoverOpen] = useState(false);
 
   const form = useForm<z.infer<typeof addCorrectiveActionSchema>>({
     resolver: zodResolver(addCorrectiveActionSchema),
@@ -163,7 +164,10 @@ export default function AddCorrectiveActionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Osoba odpowiedzialna</FormLabel>
-                  <Popover>
+                  <Popover
+                    open={responsiblePopoverOpen}
+                    onOpenChange={setResponsiblePopoverOpen}
+                  >
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
@@ -195,6 +199,7 @@ export default function AddCorrectiveActionForm({
                                 key={user.email}
                                 onSelect={() => {
                                   form.setValue('responsible', user.email);
+                                  setResponsiblePopoverOpen(false);
                                 }}
                               >
                                 <Check

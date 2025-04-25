@@ -251,23 +251,19 @@ export default function DeviationView({
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Opis:</TableCell>
+                      <TableCell>Opis:</TableCell>
                       <TableCell>{deviation?.description || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>
-                        Specyfikacja procesu:
-                      </TableCell>
+                      <TableCell>Specyfikacja procesu:</TableCell>
                       <TableCell>
                         {deviation?.processSpecification || '-'}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>
-                        Autoryzacja klienta:
-                      </TableCell>
+                      <TableCell>Autoryzacja klienta:</TableCell>
                       <TableCell>
                         {deviation?.customerAuthorization ? 'Tak' : 'Nie'}
                       </TableCell>
@@ -307,7 +303,7 @@ export default function DeviationView({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Opis</TableHead>
+                        <TableHead className='min-w-[250px]'>Opis</TableHead>
                         <TableHead>Wykonawca</TableHead>
                         <TableHead>Deadline</TableHead>
                         <TableHead>Status</TableHead>

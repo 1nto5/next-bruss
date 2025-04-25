@@ -26,12 +26,15 @@ import { CardContent, CardFooter } from '@/components/ui/card';
 
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { DeviationAreaType, DeviationReasonType } from '../../lib/types';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   lang: string;
+  reasonOptions: DeviationReasonType[];
+  areaOptions: DeviationAreaType[];
 }
 
 export function DataTable<TData, TValue>({
@@ -39,6 +42,8 @@ export function DataTable<TData, TValue>({
   data,
   fetchTimeLocaleString,
   lang,
+  reasonOptions,
+  areaOptions,
 }: DataTableProps<TData, TValue>) {
   // useEffect(() => {
   //   const interval = setInterval(() => {
@@ -69,6 +74,11 @@ export function DataTable<TData, TValue>({
       pagination: {
         pageSize: 14,
       },
+    },
+    meta: {
+      reasonOptions,
+      areaOptions,
+      lang,
     },
   });
 

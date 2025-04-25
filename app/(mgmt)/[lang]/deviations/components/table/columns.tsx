@@ -182,8 +182,44 @@ export const columns: ColumnDef<DeviationType>[] = [
     },
   },
   {
+    accessorKey: 'area',
+    header: 'Obszar',
+    cell: ({ row, table }) => {
+      const area = row.original.area;
+      const lang = table.options.meta?.lang as string;
+      const areaOptions = table.options.meta?.areaOptions || [];
+
+      if (area) {
+        const areaOption = areaOptions.find((option) => option.value === area);
+        if (areaOption) {
+          return lang === 'pl' ? areaOption.pl : areaOption.label;
+        }
+        return area;
+      }
+
+      return '-';
+    },
+  },
+  {
     accessorKey: 'reason',
     header: 'Powód',
+    cell: ({ row, table }) => {
+      const reason = row.original.reason;
+      const lang = table.options.meta?.lang as string;
+      const reasonOptions = table.options.meta?.reasonOptions || [];
+
+      if (reason) {
+        const reasonOption = reasonOptions.find(
+          (option) => option.value === reason,
+        );
+        if (reasonOption) {
+          return lang === 'pl' ? reasonOption.pl : reasonOption.label;
+        }
+        return reason;
+      }
+
+      return '-';
+    },
   },
   {
     accessorKey: 'timePeriodLocalDateString.from',

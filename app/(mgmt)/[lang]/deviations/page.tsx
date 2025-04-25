@@ -16,6 +16,10 @@ import {
 } from '@/components/ui/card';
 import { Session } from 'next-auth';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
+import {
+  getConfigAreaOptions,
+  getConfigReasonOptions,
+} from './lib/get-configs';
 
 async function getAllDeviations(lang: string): Promise<{
   fetchTime: Date;
@@ -167,6 +171,8 @@ export default async function DeviationsPage(props: {
 
   let fetchTime, fetchTimeLocaleString, deviations;
   const session = await auth();
+  const reasonOptions = await getConfigReasonOptions();
+  const areaOptions = await getConfigAreaOptions();
 
   if (!session) {
     ({ fetchTime, fetchTimeLocaleString, deviations } =
@@ -196,6 +202,8 @@ export default async function DeviationsPage(props: {
         data={deviations}
         fetchTimeLocaleString={fetchTimeLocaleString}
         lang={lang}
+        reasonOptions={reasonOptions}
+        areaOptions={areaOptions}
       />
     </Card>
   );
