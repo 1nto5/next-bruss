@@ -21,6 +21,8 @@ Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
 
 TODO: MARIOLA WNIOSKI - poprawki po spotkaniu
+- dodanie załącznika do zlecenia oraz zmiana statusu na zakończone
+- wybór liczby osób do zlecenia nie działa poprawnie
 
 TODO: inwentaryzacja maj
 
