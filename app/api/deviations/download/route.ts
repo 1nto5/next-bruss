@@ -29,12 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Konstruowanie ścieżki do pliku
-    const filePath = path.join(
-      BASE_PATH,
-      'uploads/deviations',
-      deviationId,
-      filename,
-    );
+    const filePath = path.join(BASE_PATH, 'deviations', deviationId, filename);
 
     // Sprawdzenie czy plik istnieje
     if (!fs.existsSync(filePath)) {
