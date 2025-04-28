@@ -7,6 +7,7 @@ import {
   DeviationReasonType,
   DeviationType,
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -67,49 +68,103 @@ export default function DeviationView({
       APPROVAL_ROLES.includes(role as ApprovalRole),
     ) || [];
 
-  const handleApproval = async (approvalRole: string) => {
-    startApprovalTransition(async () => {
-      try {
-        if (!deviation?._id) {
-          toast.error('Skontaktuj się z IT!');
-          return;
-        }
-
-        // Sprawdzamy, czy użytkownik posiada rolę, którą próbuje wykorzystać do zatwierdzenia
-        if (
-          deviation?._id &&
-          deviationUserRoles.includes(approvalRole as ApprovalRole)
-        ) {
-          const res = await approveDeviation(
-            deviation._id.toString(),
-            approvalRole,
-          );
-          if (res.success) {
-            toast.success('Zatwierdzono!');
-          } else if (res.error) {
-            toast.error('Skontaktuj się z IT!');
+  const handleApproval = async (
+    approvalRole: string,
+    isApproved: boolean = true,
+    reason?: string,
+  ) => {
+    toast.promise(
+      new Promise<void>(async (resolve, reject) => {
+        startApprovalTransition(async () => {
+          try {
+            if (!deviation?._id) {
+              reject(new Error('Skontaktuj się z IT!'));
+              return;
+            }
+            // Sprawdzamy, czy użytkownik posiada rolę, którą próbuje wykorzystać do zatwierdzenia
+            if (
+              deviation?._id &&
+              deviationUserRoles.includes(approvalRole as ApprovalRole)
+            ) {
+              const res = await approveDeviation(
+                deviation._id.toString(),
+                approvalRole,
+                isApproved,
+                reason,
+              );
+              if (res.success) {
+                resolve();
+              } else if (res.error) {
+                reject(new Error('Skontaktuj się z IT!'));
+              }
+            } else {
+              reject(
+                new Error(
+                  'Nie posiadasz uprawnień do zatwierdzenia w tej roli!',
+                ),
+              );
+            }
+          } catch (error) {
+            reject(new Error('Skontaktuj się z IT!'));
           }
-        } else {
-          toast.error('Nie posiadasz uprawnień do zatwierdzenia w tej roli!');
-        }
-      } catch (error) {
-        toast.error('Skontaktuj się z IT!');
-      }
-    });
+        });
+      }),
+      {
+        loading: isApproved
+          ? 'Zatwierdzanie odchylenia...'
+          : 'Odrzucanie odchylenia...',
+        success: isApproved ? 'Zatwierdzono!' : 'Odrzucono!',
+        error: (err) => err.message,
+      },
+    );
   };
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
       case 'approved':
-        return 'Odchylenie zatwierdzone';
+        return (
+          <Badge
+            variant='default'
+            className='bg-green-100 text-lg text-green-800 hover:bg-green-100'
+          >
+            Odchylenie zatwierdzone
+          </Badge>
+        );
       case 'rejected':
-        return 'Odchylenie odrzucone';
-      case 'approval':
-        return 'Odchylenie w trakcie zatwierdzania';
-      case 'valid':
-        return 'Odchylenie obowiazuje';
+        return (
+          <Badge
+            variant='destructive'
+            className='bg-red-100 text-lg text-red-800 hover:bg-red-100'
+          >
+            Odchylenie odrzucone
+          </Badge>
+        );
+      case 'in approval':
+        return (
+          <Badge variant='outline' className='text-lg text-nowrap'>
+            Odchylenie w trakcie zatwierdzania
+          </Badge>
+        );
+      case 'in progress':
+        return (
+          <Badge
+            variant='default'
+            className='bg-blue-100 text-lg text-blue-800 hover:bg-blue-100'
+          >
+            Odchylenie obowiązuje
+          </Badge>
+        );
       case 'closed':
-        return 'Odchylenie zamknięte';
+        return (
+          <Badge
+            variant='default'
+            className='bg-gray-100 text-lg text-gray-800 hover:bg-gray-100'
+          >
+            Odchylenie zamknięte
+          </Badge>
+        );
+      default:
+        return 'Odchylenie';
     }
   };
 
@@ -303,12 +358,12 @@ export default function DeviationView({
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Zmiana statusu</TableHead>
                         <TableHead className='min-w-[250px]'>Opis</TableHead>
                         <TableHead>Wykonawca</TableHead>
                         <TableHead>Deadline</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Zmiana statusu</TableHead>
-                        <TableHead>Aktualizacja</TableHead>
+                        <TableHead>Ostatnia zmiana</TableHead>
                         <TableHead>Historia</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -340,10 +395,13 @@ export default function DeviationView({
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Status</TableHead>
                         <TableHead>Stanowisko</TableHead>
-                        <TableHead>Zatwierdź</TableHead>
+                        <TableHead>Zatwierdzam</TableHead>
                         <TableHead>Osoba</TableHead>
                         <TableHead>Data</TableHead>
+                        <TableHead>Powód</TableHead>
+                        <TableHead>Historia</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -353,11 +411,15 @@ export default function DeviationView({
                           deviationUserRoles={deviationUserRoles}
                           role='group-leader'
                           approved={deviation?.groupLeaderApproval?.approved}
-                          handleApproval={() => handleApproval('group-leader')}
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval('group-leader', isApproved, reason)
+                          }
                           by={deviation?.groupLeaderApproval?.by}
                           at={deviation?.groupLeaderApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
+                          reason={deviation?.groupLeaderApproval?.reason}
+                          history={deviation?.groupLeaderApproval?.history}
                         />
                       </TableRow>
                       <TableRow>
@@ -366,13 +428,19 @@ export default function DeviationView({
                           deviationUserRoles={deviationUserRoles}
                           role='quality-manager'
                           approved={deviation?.qualityManagerApproval?.approved}
-                          handleApproval={() =>
-                            handleApproval('quality-manager')
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval(
+                              'quality-manager',
+                              isApproved,
+                              reason,
+                            )
                           }
                           by={deviation?.qualityManagerApproval?.by}
                           at={deviation?.qualityManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
+                          reason={deviation?.qualityManagerApproval?.reason}
+                          history={deviation?.qualityManagerApproval?.history}
                         />
                       </TableRow>
 
@@ -384,13 +452,21 @@ export default function DeviationView({
                           approved={
                             deviation?.productionManagerApproval?.approved
                           }
-                          handleApproval={() =>
-                            handleApproval('production-manager')
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval(
+                              'production-manager',
+                              isApproved,
+                              reason,
+                            )
                           }
                           by={deviation?.productionManagerApproval?.by}
                           at={deviation?.productionManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
+                          reason={deviation?.productionManagerApproval?.reason}
+                          history={
+                            deviation?.productionManagerApproval?.history
+                          }
                         />
                       </TableRow>
                       <TableRow>
@@ -399,11 +475,15 @@ export default function DeviationView({
                           deviationUserRoles={deviationUserRoles}
                           role='plant-manager'
                           approved={deviation?.plantManagerApproval?.approved}
-                          handleApproval={() => handleApproval('plant-manager')}
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval('plant-manager', isApproved, reason)
+                          }
                           by={deviation?.plantManagerApproval?.by}
                           at={deviation?.plantManagerApproval?.at?.toString()}
                           lang={lang}
                           isPendingApproval={isPendingApproval}
+                          reason={deviation?.plantManagerApproval?.reason}
+                          history={deviation?.plantManagerApproval?.history}
                         />
                       </TableRow>
                     </TableBody>

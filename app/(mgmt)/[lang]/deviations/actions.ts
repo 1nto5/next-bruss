@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  ApprovalHistoryType,
   ApprovalType,
   correctiveActionType,
   DeviationType,
@@ -90,7 +91,12 @@ export async function revalidateReasons() {
   revalidateTag('deviationReasons');
 }
 
-export async function approveDeviation(id: string, userRole: string) {
+export async function approveDeviation(
+  id: string,
+  userRole: string,
+  isApproved: boolean = true,
+  reason?: string,
+) {
   const session = await auth();
   if (
     !session ||
@@ -112,16 +118,79 @@ export async function approveDeviation(id: string, userRole: string) {
     return { error: 'invalid role' };
   }
 
-  const updateField: Partial<DeviationType> = {
-    [approvalField]: {
-      approved: true,
-      by: session.user?.email,
-      at: new Date(),
-    } as ApprovalType,
-  };
-
   try {
     const coll = await dbc('deviations');
+    const deviation = await coll.findOne({ _id: new ObjectId(id) });
+    if (!deviation) {
+      return { error: 'not found' };
+    }
+
+    // Add validation for approval/rejection rules similar to UI:
+    // 1. Prevent approving if already approved
+    if (isApproved && deviation[approvalField]?.approved === true) {
+      return { error: 'already approved' };
+    }
+
+    // 2. Only allow rejecting if not already decided (undefined)
+    if (!isApproved && deviation[approvalField]?.approved !== undefined) {
+      return { error: 'cannot reject after decision has been made' };
+    }
+
+    const currentApproval = deviation[approvalField] as
+      | ApprovalType
+      | undefined;
+    const newApprovalRecord: ApprovalType = {
+      approved: isApproved,
+      by: session.user?.email,
+      at: new Date(),
+    };
+
+    // Add reason for rejection
+    if (!isApproved && reason) {
+      newApprovalRecord.reason = reason;
+    }
+
+    // Prepare history records
+    let history: ApprovalHistoryType[] = [];
+
+    // Add the current approval to history if it exists
+    if (currentApproval) {
+      // If there's already history, preserve it
+      if (currentApproval.history && currentApproval.history.length > 0) {
+        history = [...currentApproval.history];
+      }
+
+      // Add the current approval state as a history item (excluding its own history)
+      const { history: _, ...currentApprovalWithoutHistory } = currentApproval;
+      history.unshift(currentApprovalWithoutHistory as ApprovalHistoryType);
+    }
+
+    // Set the history to the approval record
+    newApprovalRecord.history = history;
+
+    const updateField: Partial<DeviationType> = {
+      [approvalField]: newApprovalRecord,
+    };
+
+    // If rejection, set status to rejected
+    if (!isApproved) {
+      updateField.status = 'rejected';
+    } else {
+      // Only check for all approvals if this is an approval (not rejection)
+      const hasAllApprovals = Object.values(approvalFieldMap).every((field) =>
+        field === approvalField ? true : deviation[field]?.approved,
+      );
+
+      if (hasAllApprovals) {
+        const now = new Date();
+        const periodFrom = new Date(deviation.timePeriod.from);
+        const periodTo = new Date(deviation.timePeriod.to);
+
+        updateField.status =
+          now >= periodFrom && now <= periodTo ? 'in progress' : 'approved';
+      }
+    }
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -133,7 +202,7 @@ export async function approveDeviation(id: string, userRole: string) {
       return { error: 'not found' };
     }
     revalidateDeviationsAndDeviation();
-    return { success: 'approved' };
+    return { success: isApproved ? 'approved' : 'rejected' };
   } catch (error) {
     console.error(error);
     return { error: 'approveDeviation server action error' };
@@ -263,7 +332,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
     const collection = await dbc('deviations');
 
     const deviationToInsert: DeviationType = {
-      status: 'approval',
+      status: 'in approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
       ...(deviation.workplace && { workplace: deviation.workplace }),
@@ -497,7 +566,7 @@ export async function insertDeviationFromDraft(
     }
 
     const deviationToInsert: DeviationType = {
-      status: 'approval',
+      status: 'in approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
       ...(deviation.workplace && { workplace: deviation.workplace }),

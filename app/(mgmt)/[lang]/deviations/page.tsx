@@ -1,8 +1,3 @@
-import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
-import { columns } from './components/table/columns';
-import { DataTable } from './components/table/data-table';
-// import { extractNameFromEmail } from '@/lib//utils/nameFormat';
 import {
   ApprovalType,
   DeviationType,
@@ -14,21 +9,37 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Locale } from '@/i18n.config';
 import { Session } from 'next-auth';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
+import { columns } from './components/table/columns';
+import { DataTable } from './components/table/data-table';
 import {
   getConfigAreaOptions,
   getConfigReasonOptions,
 } from './lib/get-configs';
 
-async function getAllDeviations(lang: string): Promise<{
+async function getAllDeviations(
+  lang: string,
+  searchParams: { [key: string]: string | undefined },
+): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
   deviations: DeviationType[];
 }> {
-  const res = await fetch(`${process.env.API}/deviations/deviations`, {
-    next: { revalidate: 30, tags: ['deviations'] },
-  });
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const res = await fetch(
+    `${process.env.API}/deviations/deviations?${queryParams}`,
+    {
+      next: { revalidate: 30, tags: ['deviations'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
@@ -41,7 +52,6 @@ async function getAllDeviations(lang: string): Promise<{
   const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
   const deviations: DeviationType[] = await res.json();
-
   const deviationsFiltered = deviations.filter(
     (deviation: DeviationType) => deviation.status !== 'draft',
   );
@@ -66,14 +76,25 @@ async function getAllDeviations(lang: string): Promise<{
 async function getUserDeviations(
   lang: string,
   session: Session,
+  searchParams: { [key: string]: string | undefined } = {},
 ): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
   deviations: DeviationType[];
 }> {
-  const res = await fetch(`${process.env.API}/deviations/deviations`, {
-    next: { revalidate: 30, tags: ['deviations'] },
-  });
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const res = await fetch(
+    `${process.env.API}/deviations/deviations?${queryParams}`,
+    {
+      next: { revalidate: 30, tags: ['deviations'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
@@ -89,15 +110,14 @@ async function getUserDeviations(
   const approvalMapping: { [key: string]: keyof DeviationType } = {
     'group-leader': 'groupLeaderApproval',
     'quality-manager': 'qualityManagerApproval',
-    'engineering-manager': 'engineeringManagerApproval',
-    'maintenance-manager': 'maintenanceManagerApproval',
     'production-manager': 'productionManagerApproval',
+    'plant-manager': 'plantManagerApproval',
   };
 
+  // Find deviations that need approval from the user based on their role
   let deviationsToApprove: DeviationType[] = [];
-
   if (session.user?.roles) {
-    session.user?.roles.forEach((role) => {
+    session.user.roles.forEach((role) => {
       const approvalField = approvalMapping[role];
       if (approvalField) {
         const roleDeviations = deviations
@@ -105,7 +125,11 @@ async function getUserDeviations(
             const approval = deviation[approvalField] as
               | ApprovalType
               | undefined;
-            return deviation.status !== 'draft' && !approval?.approved;
+            return (
+              deviation.status !== 'draft' &&
+              deviation.status !== 'rejected' &&
+              !approval?.approved
+            );
           })
           .map((deviation: DeviationType) => ({
             ...deviation,
@@ -123,12 +147,13 @@ async function getUserDeviations(
     ).values(),
   );
 
-  // Separate deviations into drafts owned by the user and other deviations
+  // Extract user's drafts
   const userDrafts = deviations.filter(
     (deviation: DeviationType) =>
       deviation.status === 'draft' && deviation.owner === session.user?.email,
   );
 
+  // Get other deviations (not drafts, not waiting for user's approval)
   const otherDeviations = deviations.filter(
     (deviation: DeviationType) =>
       deviation.status !== 'draft' &&
@@ -149,7 +174,11 @@ async function getUserDeviations(
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
   };
 
-  const deviationsFormatted = [
+  // Combine all deviations in priority order:
+  // 1. User's drafts
+  // 2. Deviations waiting for user's approval
+  // 3. All other deviations
+  const allDeviationsFormatted = [
     ...userDrafts,
     ...uniqueDeviationsToApprove,
     ...otherDeviations,
@@ -158,12 +187,13 @@ async function getUserDeviations(
   return {
     fetchTime,
     fetchTimeLocaleString,
-    deviations: deviationsFormatted,
+    deviations: allDeviationsFormatted,
   };
 }
 
 export default async function DeviationsPage(props: {
   params: Promise<{ lang: Locale }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await props.params;
 
@@ -173,14 +203,18 @@ export default async function DeviationsPage(props: {
   const session = await auth();
   const reasonOptions = await getConfigReasonOptions();
   const areaOptions = await getConfigAreaOptions();
+  const searchParams = await props.searchParams;
 
   if (!session) {
-    ({ fetchTime, fetchTimeLocaleString, deviations } =
-      await getAllDeviations(lang));
+    ({ fetchTime, fetchTimeLocaleString, deviations } = await getAllDeviations(
+      lang,
+      searchParams,
+    ));
   } else {
     ({ fetchTime, fetchTimeLocaleString, deviations } = await getUserDeviations(
       lang,
       session,
+      searchParams,
     ));
   }
 

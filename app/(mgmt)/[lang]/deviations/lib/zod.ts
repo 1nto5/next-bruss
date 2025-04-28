@@ -116,3 +116,12 @@ export const AttachmentFormSchema = z.object({
 });
 
 export type AttachmentFormType = z.infer<typeof AttachmentFormSchema>;
+
+export const rejectDeviationSchema = z.object({
+  reason: z
+    .string({ message: 'Powód odrzucenia jest wymagany!' })
+    .min(10, { message: 'Powód odrzucenia musi mieć co najmniej 10 znaków!' })
+    .max(500, { message: 'Powód odrzucenia nie może przekraczać 500 znaków!' }),
+});
+
+export type RejectDeviationType = z.infer<typeof rejectDeviationSchema>;

@@ -4,6 +4,15 @@ export type ApprovalType = {
   approved: boolean;
   by: string;
   at: Date | string;
+  reason?: string; // Rejection reason when approved is false
+  history?: ApprovalHistoryType[]; // History of approval status changes
+};
+
+export type ApprovalHistoryType = {
+  approved: boolean;
+  by: string;
+  at: Date | string;
+  reason?: string;
 };
 
 export type correctiveActionType = {
@@ -37,8 +46,8 @@ export type DeviationType = {
   status:
     | 'rejected'
     | 'approved'
-    | 'approval'
-    | 'valid'
+    | 'in approval'
+    | 'in progress'
     | 'closed'
     | 'draft'
     | 'to approve';

@@ -8,10 +8,47 @@ export const dynamic = 'force-dynamic';
 // 'auto' | 'force-dynamic' | 'error' | 'force-static'
 
 export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams;
+  const query: any = {};
+
+  if (searchParams.get('owner')) {
+    query.owner = searchParams.get('owner');
+  }
+
+  searchParams.forEach((value, key) => {
+    if (key === 'date') {
+      // Create date objects for start and end of the specified date
+      const dateValue = new Date(value);
+      const startOfDay = new Date(dateValue.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(dateValue.setHours(23, 59, 59, 999));
+
+      // Query where date falls within the specified range
+      query.$or = [
+        { 'timePeriod.from': { $gte: startOfDay, $lte: endOfDay } },
+        { 'timePeriod.to': { $gte: startOfDay, $lte: endOfDay } },
+      ];
+    }
+
+    if (key === 'status') {
+      query.status = value;
+    }
+  });
+
+  if (searchParams.has('createdAt')) {
+    const createdAtValue = new Date(searchParams.get('createdAt')!);
+    const startOfDay = new Date(createdAtValue);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(createdAtValue);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Query where createdAt falls within the specified date
+    query.createdAt = { $gte: startOfDay, $lte: endOfDay };
+  }
+
   try {
     const coll = await dbc('deviations');
     const deviations = await coll
-      .find({})
+      .find(query)
       .sort({ _id: -1 })
       .limit(1000)
       .toArray();
@@ -21,18 +58,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'get-deviations api' }, { status: 503 });
   }
 }
-
-// export async function GET(req: NextRequest) {
-//   try {
-//     const coll = await dbc('deviations');
-//     const deviations = await coll.find({}).sort({ _id: -1 }).toArray();
-//     return new Promise((resolve, reject) => {
-//       setTimeout(() => {
-//         resolve(new NextResponse(JSON.stringify(deviations)));
-//       }, 2500); // 5 seconds timeout
-//     });
-//   } catch (error) {
-//     console.error('api/deviations/get-reasons: ' + error);
-//     return new NextResponse('get-deviations api error', { status: 503 });
-//   }
-// }

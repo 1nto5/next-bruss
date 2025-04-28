@@ -40,7 +40,6 @@ import {
   Check,
   ChevronsUpDown,
   Eraser,
-  Loader2,
   Plus,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -251,17 +250,10 @@ export default function AddCorrectiveActionForm({
               Wyczyść
             </Button>
             <div className='flex space-x-2'>
-              {isPendingUpdate ? (
-                <Button disabled>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Dodawanie
-                </Button>
-              ) : (
-                <Button type='submit'>
-                  <Plus className='mr-2 h-4 w-4' />
-                  Dodaj akcję korygującą
-                </Button>
-              )}
+              <Button type='submit'>
+                <Plus className={isPendingUpdate ? 'animate-spin' : ''} />
+                Dodaj akcję korygującą
+              </Button>
             </div>
           </CardFooter>
         </form>

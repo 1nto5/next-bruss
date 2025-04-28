@@ -63,69 +63,76 @@ export default function AddAttachmentDialog({
       return;
     }
 
-    setIsUploading(true);
+    // Close dialog immediately
+    setOpen(false);
 
-    try {
-      // Przygotowanie danych FormData do wysyłki
-      const formData = new FormData();
-      formData.append('file', data.file);
-      formData.append('deviationId', deviationId);
-      if (data.name) formData.append('name', data.name);
-      if (data.note) formData.append('note', data.note);
+    toast.promise(
+      new Promise<void>(async (resolve, reject) => {
+        try {
+          // Przygotowanie danych FormData do wysyłki
+          const formData = new FormData();
+          formData.append('file', data.file);
+          formData.append('deviationId', deviationId);
+          if (data.name) formData.append('name', data.name);
+          if (data.note) formData.append('note', data.note);
 
-      // Wywołanie API zamiast server action
-      const response = await fetch('/api/deviations/upload', {
-        method: 'POST',
-        body: formData,
-      });
+          // Wywołanie API zamiast server action
+          const response = await fetch('/api/deviations/upload', {
+            method: 'POST',
+            body: formData,
+          });
 
-      const result = await response.json();
+          const result = await response.json();
 
-      if (response.ok && result.success) {
-        toast.success('Załącznik dodany pomyślnie!');
-        form.reset();
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+          if (response.ok && result.success) {
+            form.reset();
+            if (fileInputRef.current) {
+              fileInputRef.current.value = '';
+            }
+            // Odświeżenie danych
+            revalidateDeviation();
+            resolve();
+          } else {
+            // Mapowanie angielskich błędów API na polskie komunikaty dla użytkownika
+            const errorMap: { [key: string]: string } = {
+              'Unauthorized': 'Brak autoryzacji',
+              'No file': 'Nie wybrano pliku',
+              'No deviation ID': 'Brak ID odchylenia',
+              'File size exceeds the limit (10MB)':
+                'Plik przekracza dozwolony rozmiar (10MB)',
+              'Unsupported file type': 'Nieobsługiwany format pliku',
+              'File already exists': 'Plik o tej nazwie już istnieje',
+              'Failed to update deviation with attachment':
+                'Nie udało się zaktualizować bazy danych',
+              'Database update failed': 'Błąd aktualizacji bazy danych',
+              'File upload failed': 'Błąd podczas przesyłania pliku',
+            };
+
+            // Obsługa konkretnych błędów na podstawie statusu
+            if (response.status === 409) {
+              reject(new Error('Ten plik już istnieje'));
+            } else if (result.error && errorMap[result.error]) {
+              // Wyświetl przetłumaczony komunikat błędu
+              reject(new Error(errorMap[result.error]));
+            } else if (result.error) {
+              // Wyświetl oryginalny komunikat błędu, gdy nie ma tłumaczenia
+              console.warn('Nieprzetłumaczony błąd:', result.error);
+              reject(new Error('Wystąpił błąd podczas dodawania załącznika'));
+            } else {
+              reject(new Error('Wystąpił nieznany błąd'));
+            }
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
+          reject(new Error('Wystąpił błąd podczas wysyłania pliku'));
         }
-        setOpen(false);
-        // Odświeżenie danych
-        revalidateDeviation();
-      } else {
-        // Mapowanie angielskich błędów API na polskie komunikaty dla użytkownika
-        const errorMap: { [key: string]: string } = {
-          'Unauthorized': 'Brak autoryzacji',
-          'No file': 'Nie wybrano pliku',
-          'No deviation ID': 'Brak ID odchylenia',
-          'File size exceeds the limit (10MB)':
-            'Plik przekracza dozwolony rozmiar (10MB)',
-          'Unsupported file type': 'Nieobsługiwany format pliku',
-          'File already exists': 'Plik o tej nazwie już istnieje',
-          'Failed to update deviation with attachment':
-            'Nie udało się zaktualizować bazy danych',
-          'Database update failed': 'Błąd aktualizacji bazy danych',
-          'File upload failed': 'Błąd podczas przesyłania pliku',
-        };
-
-        // Obsługa konkretnych błędów na podstawie statusu
-        if (response.status === 409) {
-          toast.error('Ten plik już istnieje');
-        } else if (result.error && errorMap[result.error]) {
-          // Wyświetl przetłumaczony komunikat błędu
-          toast.error(errorMap[result.error]);
-        } else if (result.error) {
-          // Wyświetl oryginalny komunikat błędu, gdy nie ma tłumaczenia
-          console.warn('Nieprzetłumaczony błąd:', result.error);
-          toast.error('Wystąpił błąd podczas dodawania załącznika');
-        } else {
-          toast.error('Wystąpił nieznany błąd');
-        }
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Wystąpił błąd podczas wysyłania pliku');
-    } finally {
-      setIsUploading(false);
-    }
+      }),
+      {
+        loading: 'Przesyłanie załącznika...',
+        success: 'Załącznik dodany pomyślnie!',
+        error: (err) => err.message,
+      },
+    );
   };
 
   return (

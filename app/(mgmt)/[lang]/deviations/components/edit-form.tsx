@@ -34,13 +34,14 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Locale } from '@/i18n.config';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eraser, Pencil, Plus, Search, Table } from 'lucide-react';
+import { Eraser, Pencil, Plus, Search, Table, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
+  deleteDraftDeviation,
   findArticleName,
   redirectToDeviations,
   updateDraftDeviation,
@@ -61,6 +62,7 @@ export default function EditForm({
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
+  const [isPendingDeleteDraft, setIsPendingDeleteDraft] = useState(false);
   const [isPendingFindArticleName, startFindArticleNameTransition] =
     useTransition();
 
@@ -146,6 +148,25 @@ export default function EditForm({
       toast.error('Skontaktuj się z IT!');
     } finally {
       setIsPendingUpdatingDraft(false);
+    }
+  };
+
+  const handleDeleteDraft = async () => {
+    setIsPendingDeleteDraft(true);
+    try {
+      const res = await deleteDraftDeviation(id);
+      if (res.success) {
+        toast.success('Szkic usunięty!');
+        redirectToDeviations();
+      } else if (res.error) {
+        console.error('handleDeleteDraft', res.error);
+        toast.error('Skontaktuj się z IT!');
+      }
+    } catch (error) {
+      console.error('handleDeleteDraft', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingDeleteDraft(false);
     }
   };
 
@@ -534,15 +555,27 @@ export default function EditForm({
           <Separator className='mb-4' />
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
-            <Button
-              variant='destructive'
-              type='button'
-              onClick={() => form.reset()}
-              className='w-full sm:w-auto'
-            >
-              <Eraser className='' />
-              Wyczyść
-            </Button>
+            <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
+              <Button
+                variant='destructive'
+                type='button'
+                onClick={() => form.reset()}
+                className='w-full sm:w-auto'
+              >
+                <Eraser className='' />
+                Wyczyść
+              </Button>
+              <Button
+                variant='destructive'
+                type='button'
+                onClick={handleDeleteDraft}
+                disabled={isPendingDeleteDraft}
+                className='w-full sm:w-auto'
+              >
+                <Trash className={isPendingDeleteDraft ? 'animate-spin' : ''} />
+                Usuń szkic
+              </Button>
+            </div>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
               <Button
                 variant='secondary'

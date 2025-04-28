@@ -1,34 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Copy, MoreHorizontal } from 'lucide-react';
 
 import { DeviationType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Pencil, Trash2 } from 'lucide-react';
-import { ObjectId } from 'mongodb';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { ExternalLink, Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { toast } from 'sonner';
-import { deleteDraftDeviation } from '../../actions';
-
-const handleCopyId = async (id: ObjectId | undefined) => {
-  if (id) {
-    try {
-      await navigator.clipboard.writeText(id.toString());
-      toast.success('ID skopiowane!');
-    } catch (error) {
-      toast.error('Nie udało się skopiować ID');
-    }
-  } else {
-    toast.error('Skontaktuj się z IT!');
-  }
-};
 
 export const columns: ColumnDef<DeviationType>[] = [
   {
@@ -39,50 +18,75 @@ export const columns: ColumnDef<DeviationType>[] = [
       let statusLabel;
 
       switch (status) {
-        case 'approval':
+        case 'in approval':
           statusLabel = (
-            <span className='rounded-md bg-orange-100 px-2 py-1 italic dark:bg-orange-600'>
-              W trakcie zatwierdzania
-            </span>
+            <Badge variant='outline' className='text-nowrap'>
+              Oczekujące
+            </Badge>
           );
           break;
-        case 'valid':
+        case 'approved':
           statusLabel = (
-            <span className='rounded-md bg-green-100 px-2 py-1 font-bold dark:bg-green-600'>
+            <Badge
+              variant='default'
+              className='bg-green-100 text-green-800 hover:bg-green-100'
+            >
+              Zatwierdzone
+            </Badge>
+          );
+          break;
+        case 'in progress':
+          statusLabel = (
+            <Badge
+              variant='default'
+              className='bg-blue-100 text-blue-800 hover:bg-blue-100'
+            >
               Obowiązuje
-            </span>
+            </Badge>
           );
           break;
         case 'closed':
           statusLabel = (
-            <span className='rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-600'>
+            <Badge
+              variant='default'
+              className='bg-gray-100 text-gray-800 hover:bg-gray-100'
+            >
               Zamknięte
-            </span>
+            </Badge>
           );
           break;
         case 'rejected':
           statusLabel = (
-            <span className='rounded-md bg-red-100 px-2 py-1 dark:bg-red-600'>
+            <Badge
+              variant='destructive'
+              className='bg-red-100 text-red-800 hover:bg-red-100'
+            >
               Odrzucone
-            </span>
+            </Badge>
           );
           break;
         case 'to approve':
           statusLabel = (
-            <span className='rounded-md bg-yellow-100 px-2 py-1 dark:bg-yellow-600'>
+            <Badge
+              variant='outline'
+              className='bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+            >
               Do zatwierdzenia
-            </span>
+            </Badge>
           );
           break;
         case 'draft':
           statusLabel = (
-            <span className='rounded-md bg-gray-100 px-2 py-1 font-extralight tracking-widest italic dark:bg-gray-600'>
+            <Badge
+              variant='outline'
+              className='bg-purple-100 text-purple-800 hover:bg-purple-100'
+            >
               Szkic
-            </span>
+            </Badge>
           );
           break;
         default:
-          statusLabel = <span>{status}</span>;
+          statusLabel = <Badge variant='outline'>{status}</Badge>;
       }
 
       return statusLabel;
@@ -90,81 +94,48 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     id: 'actions',
-    header: 'Akcje',
+    header: '',
     cell: ({ row }) => {
       const deviation = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            {/* <DropdownMenuLabel>
-              ...{deviation._id?.toString().slice(-5)}
-            </DropdownMenuLabel> */}
-            {/* <DropdownMenuSeparator /> */}
-            {deviation.status === 'draft' && (
-              <Link href={`/deviations/edit/${deviation._id}`}>
-                <DropdownMenuItem>
-                  <Pencil className='mr-2 h-4 w-4' />
-                  <span>Edytuj</span>
-                </DropdownMenuItem>
-              </Link>
-            )}
-            {/* {deviation.status !== 'draft' && (
-              <Link href={`/deviations/history/${deviation.articleNumber}`}>
-                <DropdownMenuItem>
-                  <History className='mr-2 h-4 w-4' />
-                  <span>Historia</span>
-                </DropdownMenuItem>
-              </Link>
-            )} */}
-            {deviation.status !== 'draft' && (
-              <>
-                <Link href={`/deviations/${deviation._id}`}>
-                  <DropdownMenuItem>
-                    <Pencil className='mr-2 h-4 w-4' />
-                    <span>Otwórz</span>
-                  </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem
-                  onClick={() => handleCopyId(deviation._id)}
-                  // className=' focus:bg-red-400 dark:focus:bg-red-700'
-                >
-                  <Copy className='mr-2 h-4 w-4' />
-                  <span>Kopiuj ID</span>
-                </DropdownMenuItem>
-              </>
-            )}
-            {deviation.status === 'draft' && (
-              <DropdownMenuItem
-                onClick={() =>
-                  deviation._id && deleteDraftDeviation(`${deviation._id}`)
-                }
-                className='focus:bg-red-400 dark:focus:bg-red-700'
-              >
-                <Trash2 className='mr-2 h-4 w-4' />
-                <span>Usuń</span>
-                {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button variant='outline' size={'icon'} asChild>
+          <Link
+            href={
+              deviation.status === 'draft'
+                ? `/deviations/edit/${deviation._id}`
+                : `/deviations/${deviation._id}`
+            }
+          >
+            {deviation.status === 'draft' ? <Pencil /> : <ExternalLink />}
+            <span className='sr-only'>
+              {deviation.status === 'draft' ? 'Edytuj' : 'Otwórz'}
+            </span>
+          </Link>
+        </Button>
       );
     },
   },
-
   {
-    accessorKey: 'articleNumber',
-    header: 'Numer',
+    accessorKey: 'timePeriodLocalDateString.from',
+    header: 'Od',
   },
   {
-    accessorKey: 'articleName',
-    header: 'Nazwa',
+    accessorKey: 'timePeriodLocalDateString.to',
+    header: 'Do',
+  },
+  {
+    accessorKey: 'articleNumber',
+    header: 'Art. / Materiał',
+    cell: ({ row }) => {
+      const articleNumber = row.original.articleNumber;
+      const articleName = row.original.articleName;
+      return (
+        <span className='whitespace-nowrap'>
+          {articleNumber} - {articleName}
+        </span>
+      );
+    },
   },
   {
     accessorKey: 'quantity.value',
@@ -213,21 +184,39 @@ export const columns: ColumnDef<DeviationType>[] = [
           (option) => option.value === reason,
         );
         if (reasonOption) {
-          return lang === 'pl' ? reasonOption.pl : reasonOption.label;
+          return (
+            <div className='w-[250px] text-justify'>
+              {lang === 'pl' ? reasonOption.pl : reasonOption.label}
+            </div>
+          );
         }
-        return reason;
+        return <div className='w-[250px] text-justify'>{reason}</div>;
       }
 
       return '-';
     },
   },
   {
-    accessorKey: 'timePeriodLocalDateString.from',
-    header: 'Od',
+    accessorKey: 'owner',
+    header: 'Właściciel',
+    cell: ({ row }) => {
+      const owner = row.original.owner;
+      const name = extractNameFromEmail(owner);
+      return <span className='whitespace-nowrap'>{name}</span>;
+    },
   },
   {
-    accessorKey: 'timePeriodLocalDateString.to',
-    header: 'Do',
+    accessorKey: 'createdAt',
+    header: 'Utworzono',
+    cell: ({ row, table }) => {
+      const createdAt = row.original.createdAt;
+      const lang = table.options.meta?.lang as string;
+      return (
+        <span className='whitespace-nowrap'>
+          {createdAt ? new Date(createdAt).toLocaleDateString(lang) : ''}
+        </span>
+      );
+    },
   },
   {
     accessorKey: '_id',

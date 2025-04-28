@@ -12,13 +12,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CircleX, Loader, Plus, RefreshCw, Search, Sheet } from 'lucide-react';
+import { CircleX, Loader, Plus, RefreshCw, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { redirectToDeviations as revalidate } from '../actions';
 
-// TODO: change filtering to use with deviations
 export default function TableFilteringAndOptions({
   fetchTime,
   isLogged,
@@ -26,7 +25,6 @@ export default function TableFilteringAndOptions({
 }: {
   fetchTime: Date;
   isLogged: boolean;
-
   userEmail?: string;
 }) {
   const router = useRouter();
@@ -42,25 +40,23 @@ export default function TableFilteringAndOptions({
   const [showFilters, setShowFilters] = useState(() => {
     return !!(
       searchParams?.get('date') ||
-      searchParams?.get('requestedAtFilter') ||
+      searchParams?.get('createdAt') ||
       searchParams?.get('status')
     );
   });
 
   const [showOnlyMine, setShowOnlyMine] = useState(() => {
-    const requestedBy = searchParams?.get('requestedBy');
-    return requestedBy === userEmail;
+    const owner = searchParams?.get('owner');
+    return owner === userEmail;
   });
 
   const [dateFilter, setDateFilter] = useState(() => {
     const dateParam = searchParams?.get('date');
     return dateParam ? new Date(dateParam) : undefined;
   });
-  const [requestedAtFilter, setRequestedAtFilter] = useState(() => {
-    const requestedAtFilterParam = searchParams?.get('requestedAtFilter');
-    return requestedAtFilterParam
-      ? new Date(requestedAtFilterParam)
-      : undefined;
+  const [createdAtFilter, setRequestedAtFilter] = useState(() => {
+    const createdAtParam = searchParams?.get('createdAt');
+    return createdAtParam ? new Date(createdAtParam) : undefined;
   });
   const [statusFilter, setStatusFilter] = useState(
     searchParams?.get('status') || '',
@@ -82,10 +78,10 @@ export default function TableFilteringAndOptions({
     if (showFilters) {
       const params = new URLSearchParams();
       if (dateFilter) params.set('date', dateFilter.toISOString());
-      if (requestedAtFilter)
-        params.set('requestedAt', requestedAtFilter.toISOString());
+      if (createdAtFilter)
+        params.set('createdAt', createdAtFilter.toISOString());
       if (statusFilter) params.set('status', statusFilter);
-      if (showOnlyMine) params.set('requestedBy', 'true');
+      if (showOnlyMine) params.set('owner', userEmail || '');
       const newUrl = `${pathname}?${params.toString()}`;
       if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
         setIsPendingSearch(true);
@@ -95,18 +91,24 @@ export default function TableFilteringAndOptions({
         revalidate();
       }
     } else {
+      // Zachowaj parametr owner podczas odświeżania
+      const params = new URLSearchParams();
+      if (showOnlyMine) params.set('owner', userEmail || '');
       setIsPendingSearch(true);
-      revalidate();
+      if (params.toString()) {
+        router.push(`${pathname}?${params.toString()}`);
+      } else {
+        revalidate();
+      }
     }
   };
-
   const handleShowOnlyMineChange = (checked: boolean) => {
     setShowOnlyMine(checked);
     const params = new URLSearchParams(searchParams?.toString() || '');
     if (checked) {
-      params.set('requestedBy', userEmail || '');
+      params.set('owner', userEmail || '');
     } else {
-      params.delete('requestedBy');
+      params.delete('owner');
     }
     setIsPendingSearch(true);
     router.push(`${pathname}?${params.toString()}`);
@@ -128,7 +130,7 @@ export default function TableFilteringAndOptions({
               checked={showOnlyMine}
               onCheckedChange={handleShowOnlyMineChange}
             />
-            <Label htmlFor='only-my-requests'>Tylko moje zlecenia</Label>
+            <Label htmlFor='only-my-requests'>Tylko moje odchylenia</Label>
           </>
         )}
       </div>
@@ -143,14 +145,17 @@ export default function TableFilteringAndOptions({
                   <SelectValue placeholder='wybierz' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='pending'>Oczekuje</SelectItem>
-                  <SelectItem value='approved'>Zatwierdzony</SelectItem>
-                  <SelectItem value='rejected'>Odrzucony</SelectItem>
+                  <SelectItem value='in approval'>Oczekujące</SelectItem>
+                  <SelectItem value='in progress'>Obowiązuje</SelectItem>
+                  <SelectItem value='rejected'>Odrzucone</SelectItem>
+                  <SelectItem value='draft'>Szkic</SelectItem>
+                  <SelectItem value='closed'>Zamknięte</SelectItem>
+                  <SelectItem value='approved'>Zatwierdzone</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className='flex items-center space-x-2'>
-              <Label>Termin</Label>
+              <Label>Termin odchylenia</Label>
               <DateTimePicker
                 value={dateFilter}
                 onChange={setDateFilter}
@@ -167,9 +172,9 @@ export default function TableFilteringAndOptions({
               />
             </div>
             <div className='flex items-center space-x-2'>
-              <Label>Zlecono dn</Label>
+              <Label>Data utworzenia</Label>
               <DateTimePicker
-                value={requestedAtFilter}
+                value={createdAtFilter}
                 onChange={setRequestedAtFilter}
                 hideTime
                 renderTrigger={({ value, setOpen, open }) => (
@@ -216,25 +221,6 @@ export default function TableFilteringAndOptions({
             >
               <CircleX /> <span>Wyczyść</span>
             </Button>
-
-            <Link
-              href={`/api/failures/lv/excel?${new URLSearchParams(
-                Object.entries({
-                  date: dateFilter?.toISOString(),
-                  requestedAt: requestedAtFilter?.toISOString(),
-                }).reduce(
-                  (acc, [key, value]) => {
-                    if (value) acc[key] = value;
-                    return acc;
-                  },
-                  {} as Record<string, string>,
-                ),
-              ).toString()}`}
-            >
-              <Button>
-                <Sheet /> <span>Export do Excel</span>
-              </Button>
-            </Link>
           </>
         )}
 

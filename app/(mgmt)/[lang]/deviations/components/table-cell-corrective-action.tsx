@@ -3,8 +3,10 @@
 import { correctiveActionStatusOptions as statusOptions } from '@/app/(mgmt)/[lang]/deviations/lib/options';
 import { correctiveActionType } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { confirmActionExecutionSchema } from '@/app/(mgmt)/[lang]/deviations/lib/zod';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Dialog,
   DialogContent,
@@ -22,11 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -44,11 +42,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/cn';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { CalendarIcon, ClipboardCheck, History, Loader2 } from 'lucide-react';
+import { Check, ClipboardCheck, History } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -78,7 +74,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
     resolver: zodResolver(confirmActionExecutionSchema),
     defaultValues: {
       executedAt: new Date(new Date().setHours(12, 0, 0, 0)),
-      status: '',
+      // status: '',
       comment: '',
     },
   });
@@ -91,59 +87,115 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
     return status?.label || '';
   };
 
+  const getStatusBadge = (statusValue: string) => {
+    switch (statusValue) {
+      case 'open':
+        return (
+          <Badge variant='outline' className='text-nowrap'>
+            Otwarta
+          </Badge>
+        );
+      case 'closed':
+        return (
+          <Badge
+            variant='default'
+            className='bg-green-100 text-nowrap text-green-800 hover:bg-green-100'
+          >
+            Zakończona
+          </Badge>
+        );
+      case 'overdue':
+        return (
+          <Badge
+            variant='destructive'
+            className='bg-orange-100 text-nowrap text-orange-800 hover:bg-orange-100'
+          >
+            Zaległa
+          </Badge>
+        );
+      case 'in progress':
+        return (
+          <Badge
+            variant='default'
+            className='bg-blue-100 text-nowrap text-blue-800 hover:bg-blue-100'
+          >
+            W trakcie
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge
+            variant='destructive'
+            className='bg-red-100 text-nowrap text-red-800 hover:bg-red-100'
+          >
+            Odrzucona
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant='outline' className='text-nowrap'>
+            {getStatusLabel(statusValue)}
+          </Badge>
+        );
+    }
+  };
+
   const onSubmit = async (
     data: z.infer<typeof confirmActionExecutionSchema>,
   ) => {
-    setIsPending(true);
-    try {
-      if (!user) {
-        console.error('onSubmit', 'no user');
-        return;
-      }
-      const status = {
-        value: data.status as correctiveActionType['status']['value'],
-        comment: data.comment,
-        executedAt: new Date(data.executedAt),
-        changed: {
-          at: new Date(),
-          by: user,
-        },
-      };
-      const res = await changeCorrectiveActionStatus(
-        deviationId,
-        correctiveActionIndex,
-        status,
-      );
-      if (res.success) {
-        toast.success('Status został zaktualizowany!');
-        setOpen(false);
-      } else if (res.error) {
-        console.error('onSubmit', res.error);
-        toast.error('Skontaktuj się z IT!');
-      }
-    } catch (error) {
-      console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPending(false);
-    }
+    // Close dialog immediately
+    setOpen(false);
+
+    toast.promise(
+      new Promise<void>(async (resolve, reject) => {
+        try {
+          if (!user) {
+            console.error('onSubmit', 'no user');
+            reject(new Error('Brak użytkownika!'));
+            return;
+          }
+          const status = {
+            value: data.status as correctiveActionType['status']['value'],
+            comment: data.comment,
+            executedAt: new Date(data.executedAt),
+            changed: {
+              at: new Date(),
+              by: user,
+            },
+          };
+          const res = await changeCorrectiveActionStatus(
+            deviationId,
+            correctiveActionIndex,
+            status,
+          );
+          if (res.success) {
+            resolve();
+          } else if (res.error) {
+            console.error('onSubmit', res.error);
+            reject(new Error('Skontaktuj się z IT!'));
+          }
+        } catch (error) {
+          console.error('onSubmit', error);
+          reject(new Error('Skontaktuj się z IT!'));
+        }
+      }),
+      {
+        loading: 'Aktualizowanie statusu...',
+        success: 'Status został zaktualizowany!',
+        error: (err) => err.message || 'Skontaktuj się z IT!',
+      },
+    );
   };
 
   return (
     <>
-      <TableCell>{correctiveAction.description}</TableCell>
-      <TableCell>
-        {extractNameFromEmail(correctiveAction.responsible)}
-      </TableCell>
-      <TableCell>
-        {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
-      </TableCell>
-      <TableCell>{getStatusLabel(correctiveAction.status.value)}</TableCell>
+      <TableCell>{getStatusBadge(correctiveAction.status.value)}</TableCell>
+
       <TableCell>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size='icon' type='button' variant='outline'>
-              <ClipboardCheck />
+            <Button size='icon' type='button' variant='ghost'>
+              <ClipboardCheck className='h-4 w-4' />
             </Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px]'>
@@ -156,76 +208,55 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
               </DialogHeader>
             ) : correctiveAction.created.by === user ||
               user === deviationOwner ||
+              user === correctiveAction.responsible ||
               userRoles?.some((role) =>
                 [
                   'group-leader',
                   'quality-manager',
-                  'engineering-manager',
-                  'maintenance-manager',
                   'production-manager',
+                  'plant-manager',
                 ].includes(role),
               ) ? (
               <>
                 <DialogHeader>
                   <DialogTitle>Zmiana statusu akcji korygującej</DialogTitle>
-                  <DialogDescription>
-                    {correctiveAction.description}
-                  </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className='grid gap-4'>
+                    <div className='grid gap-2'>
                       <FormField
                         control={form.control}
                         name='executedAt'
                         render={({ field }) => (
                           <FormItem className='flex flex-col'>
-                            <FormLabel>Data zmiany statusu</FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={'outline'}
-                                    className={cn(
-                                      'pl-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(field.value, 'PPP')
-                                    ) : (
-                                      <span>Wybierz datę</span>
-                                    )}
-                                    <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className='w-auto p-0'
-                                align='start'
-                              >
-                                <Calendar
-                                  mode='single'
-                                  selected={field.value}
-                                  onSelect={(date) => {
-                                    if (date) {
-                                      date.setHours(12, 0, 0, 0);
-                                      field.onChange(date);
-                                    }
-                                  }}
-                                  disabled={(date) => {
-                                    const today = new Date();
-                                    const minDate = new Date(
-                                      correctiveAction.status.executedAt,
-                                    );
-                                    const maxDate = new Date(today);
-                                    maxDate.setDate(today.getDate() + 0);
-                                    return date < minDate || date > maxDate;
-                                  }}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
+                            <FormLabel>Data zmiany</FormLabel>
+                            <FormControl>
+                              <DateTimePicker
+                                modal
+                                hideTime
+                                value={field.value}
+                                onChange={field.onChange}
+                                min={
+                                  new Date(correctiveAction.status.executedAt)
+                                }
+                                max={(() => {
+                                  const today = new Date();
+                                  const maxDate = new Date(today);
+                                  maxDate.setDate(today.getDate() + 0);
+                                  return maxDate;
+                                })()}
+                                timePicker={{ hour: false, minute: false }}
+                                renderTrigger={({ open, value, setOpen }) => (
+                                  <DateTimeInput
+                                    value={value}
+                                    onChange={(x) => !open && field.onChange(x)}
+                                    format='dd/MM/yyyy'
+                                    disabled={open}
+                                    onCalendarClick={() => setOpen(!open)}
+                                  />
+                                )}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -278,14 +309,10 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                       />
                     </div>
                     <DialogFooter className='pt-4'>
-                      {isPending ? (
-                        <Button disabled>
-                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                          Potwierdzanie
-                        </Button>
-                      ) : (
-                        <Button type='submit'>Potwierdź</Button>
-                      )}
+                      <Button type='submit'>
+                        <Check className={isPending ? 'animate-spin' : ''} />{' '}
+                        Potwierdź
+                      </Button>
                     </DialogFooter>
                   </form>
                 </Form>
@@ -301,10 +328,18 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           </DialogContent>
         </Dialog>
       </TableCell>
+      <TableCell>{correctiveAction.description}</TableCell>
 
       <TableCell>
-        {correctiveAction.created?.at
-          ? new Date(correctiveAction.created.at).toLocaleString(lang)
+        {extractNameFromEmail(correctiveAction.responsible)}
+      </TableCell>
+      <TableCell>
+        {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
+      </TableCell>
+
+      <TableCell className='whitespace-nowrap'>
+        {correctiveAction.status?.changed?.at
+          ? new Date(correctiveAction.status.changed.at).toLocaleString(lang)
           : '-'}
       </TableCell>
 
@@ -317,66 +352,64 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           </DialogTrigger>
           <DialogContent className='sm:max-w-[768px]'>
             <DialogHeader>
-              <DialogTitle>
-                Historia zmian statusu akcji korygującej
-              </DialogTitle>
-              <DialogDescription>
-                {correctiveAction.description}
-              </DialogDescription>
+              <DialogTitle>Historia</DialogTitle>
             </DialogHeader>
-            <Table>
-              {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-              <TableHeader>
-                <TableRow>
-                  <TableHead className='w-[100px]'>Status</TableHead>
-                  <TableHead>Data wykonania</TableHead>
-                  <TableHead>Komentarz</TableHead>
-                  <TableHead>Zmiana przez</TableHead>
-                  <TableHead className='text-right'>Czas edycji</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className='font-medium'>
-                    {getStatusLabel(correctiveAction.status.value)}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(
-                      correctiveAction.status.executedAt,
-                    ).toLocaleDateString(lang)}
-                  </TableCell>
-                  <TableCell>{correctiveAction.status.comment}</TableCell>
-                  <TableCell>
-                    {extractNameFromEmail(correctiveAction.created.by)}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    {new Date(
-                      correctiveAction.status.changed.at,
-                    ).toLocaleString(lang)}
-                  </TableCell>
-                </TableRow>
-                {correctiveAction.history &&
-                  correctiveAction.history.map((historyItem, index) => (
-                    <TableRow key={index}>
-                      <TableCell className='font-medium'>
-                        {getStatusLabel(historyItem.value)}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(historyItem.executedAt).toLocaleDateString(
-                          lang,
-                        )}
-                      </TableCell>
-                      <TableCell>{historyItem.comment}</TableCell>
-                      <TableCell>
-                        {extractNameFromEmail(historyItem.changed.by)}
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        {new Date(historyItem.changed.at).toLocaleString(lang)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
+            <ScrollArea className='my-4 h-[300px]'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Komentarz</TableHead>
+                    <TableHead>Osoba</TableHead>
+                    <TableHead className='text-right'>Czas</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className='font-medium'>
+                      {getStatusBadge(correctiveAction.status.value)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(
+                        correctiveAction.status.executedAt,
+                      ).toLocaleDateString(lang)}
+                    </TableCell>
+                    <TableCell>{correctiveAction.status.comment}</TableCell>
+                    <TableCell>
+                      {extractNameFromEmail(correctiveAction.created.by)}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      {new Date(
+                        correctiveAction.status.changed.at,
+                      ).toLocaleString(lang)}
+                    </TableCell>
+                  </TableRow>
+                  {correctiveAction.history &&
+                    correctiveAction.history.map((historyItem, index) => (
+                      <TableRow key={index}>
+                        <TableCell className='font-medium'>
+                          {getStatusBadge(historyItem.value)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(historyItem.executedAt).toLocaleDateString(
+                            lang,
+                          )}
+                        </TableCell>
+                        <TableCell>{historyItem.comment}</TableCell>
+                        <TableCell>
+                          {extractNameFromEmail(historyItem.changed.by)}
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          {new Date(historyItem.changed.at).toLocaleString(
+                            lang,
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
 
             {/* 
               <DialogFooter className='pt-4'>

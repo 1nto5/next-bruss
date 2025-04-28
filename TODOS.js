@@ -12,6 +12,22 @@ TODO: DMCheck v3 - zustand + react-query
 TODO: users admin rebuild
 TODO: all dialogs formatting as in failures lv
 
+
+TODO: odchylenia: 
+- akcje korygujące zalogowanej osoby - oddzielna tabela
+- drukowanie tylko zatwierdzonych
+- wyszukiwanie rozszerzyć o Quarry
+- akcje korygujące bez blokady daty
+- sprawdzić pobierania upload
+- kod qr na wydruku
+- zmiana statusu akcji korygującej - zmiana kalendarza
+
+
+TODO: MARIOLA WNIOSKI - poprawki po spotkaniu
+- dodanie załącznika do zlecenia oraz zmiana statusu na zakończone
+- wybór liczby osób do zlecenia nie działa poprawnie
+
+
 TODO: tempering process BRI (article login, get batch, show degrees and timer)
 Wybór pieca
 Wybór artykułu - możliwy skan z hydra
@@ -19,19 +35,4 @@ Batch hydra więcej niż 1
 Logowanie do całej aplikacji 
 Opóźnione wyjęcie z pieca zaznacz na czerwono
 + panel do zarządzania artykułami i piecami
-
-TODO: MARIOLA WNIOSKI - poprawki po spotkaniu
-- dodanie załącznika do zlecenia oraz zmiana statusu na zakończone
-- wybór liczby osób do zlecenia nie działa poprawnie
-
-TODO: inwentaryzacja maj
-
-TODO: odchylenia: 
-- akcje korygujące zalogowanej osoby - oddzielna tabela
-- drukowanie tylko zatwierdzonych
-- wyszukiwanie rozszerzyć o Quarry
-- obszar tylko wedle quarry -> select + powlekanie
-- załączniki: dodanie uniwersalna, nazwa, autor i data
-
-
 */
