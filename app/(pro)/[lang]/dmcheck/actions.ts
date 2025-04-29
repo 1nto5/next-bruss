@@ -534,7 +534,7 @@ export async function saveHydra(prevState: any, formData: FormData) {
       qrArticle,
       qrQuantity,
       qrBatch: extractedBatch,
-    } = extractQrValues(hydra);
+    } = extractQrValues(hydra.toUpperCase());
 
     if (qrArticle !== articleConfig.articleNumber) {
       return { message: 'qr wrong article' };
@@ -624,7 +624,7 @@ export async function savePallet(prevState: any, formData: FormData) {
     if (!parse.success) {
       return { message: 'qr not valid' };
     }
-    const pallet = parse.data.pallet;
+    const pallet = parse.data.pallet.toUpperCase();
 
     const splitPalletQr = pallet.split('|');
 
