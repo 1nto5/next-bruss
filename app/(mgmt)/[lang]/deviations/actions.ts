@@ -95,7 +95,7 @@ export async function approveDeviation(
   id: string,
   userRole: string,
   isApproved: boolean = true,
-  reason?: string,
+  comment?: string,
 ) {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -164,9 +164,9 @@ export async function approveDeviation(
       at: new Date(),
     };
 
-    // Add reason for rejection
-    if (!isApproved && reason) {
-      newApprovalRecord.reason = reason;
+    // Add comment for both approval and rejection
+    if (comment) {
+      newApprovalRecord.reason = comment;
     }
 
     // Prepare history records
@@ -291,6 +291,37 @@ export async function revalidateDeviation() {
   revalidateTag('deviation');
 }
 
+// Helper function to generate the next internal ID
+async function generateNextInternalId(): Promise<string> {
+  try {
+    const collection = await dbc('deviations');
+    const currentYear = new Date().getFullYear();
+    const shortYear = currentYear.toString().slice(-2); // Get last two digits of year
+
+    // Find the highest internalId for the current short year
+    const latestDeviation = await collection
+      .find({ internalId: { $regex: `\/+${shortYear}$` } })
+      .sort({ internalId: -1 })
+      .limit(1)
+      .toArray();
+
+    let nextNumber = 1;
+    if (latestDeviation.length > 0 && latestDeviation[0].internalId) {
+      const latestIdParts = latestDeviation[0].internalId.split('/');
+      if (latestIdParts.length === 2) {
+        nextNumber = parseInt(latestIdParts[0], 10) + 1;
+      }
+    }
+
+    return `${nextNumber}/${shortYear}`;
+  } catch (error) {
+    console.error('Failed to generate internal ID:', error);
+    // Fallback to a timestamp-based ID if there's an error
+    return `${Date.now()}/${new Date().getFullYear().toString().slice(-2)}`;
+  }
+}
+
+// Update insertDeviation to include internalId
 export async function insertDeviation(deviation: AddDeviationType) {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -299,14 +330,15 @@ export async function insertDeviation(deviation: AddDeviationType) {
   try {
     const collection = await dbc('deviations');
 
+    // Generate internal ID (only for non-draft deviations)
+    const internalId = await generateNextInternalId();
+
     const deviationToInsert: DeviationType = {
+      internalId,
       status: 'in approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
       ...(deviation.workplace && { workplace: deviation.workplace }),
-      ...(deviation.drawingNumber && {
-        drawingNumber: deviation.drawingNumber,
-      }),
       ...(deviation.quantity && {
         quantity: {
           value: Number(deviation.quantity),
@@ -507,6 +539,7 @@ export async function updateDraftDeviation(
   }
 }
 
+// Update insertDeviationFromDraft to include internalId
 export async function insertDeviationFromDraft(
   id: string,
   deviation: AddDeviationType,
@@ -533,14 +566,15 @@ export async function insertDeviationFromDraft(
       return { error: 'source is not a draft' };
     }
 
+    // Generate internal ID when converting from draft to active deviation
+    const internalId = await generateNextInternalId();
+
     const deviationToInsert: DeviationType = {
+      internalId,
       status: 'in approval',
       articleName: deviation.articleName,
       articleNumber: deviation.articleNumber,
       ...(deviation.workplace && { workplace: deviation.workplace }),
-      ...(deviation.drawingNumber && {
-        drawingNumber: deviation.drawingNumber,
-      }),
       ...(deviation.quantity && {
         quantity: {
           value: Number(deviation.quantity),

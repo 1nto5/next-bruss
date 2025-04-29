@@ -233,7 +233,7 @@ export default function AddDeviationForm({
                 name='customerName'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Nazwa części klienta</FormLabel>
+                    <FormLabel>Nazwa klienta</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -282,19 +282,6 @@ export default function AddDeviationForm({
                         </FormItem>
                       ))}
                     </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='drawingNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numer rysunku</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

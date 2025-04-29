@@ -14,13 +14,14 @@ TODO: all dialogs formatting as in failures lv
 
 
 TODO: odchylenia: 
+- edycja odchylenia autor i osoby zatwierdzające
+- po dokonaniu zmiany po uprzednim odrzuceniu przez jedno z stanowisk powiadomienie do akceptacji
+- jeśli zamiana z odrzucił na zaakceptował to spr czy nie ma innych odrzuconych i zmień status na in approval / in progress 
 - akcje korygujące zalogowanej osoby - oddzielna tabela
 - wyszukiwanie rozszerzyć o Quarry
-- kasowanie załączników?
-- jeśli zamiana z odrzucił na zaakceptował to spr czy nie ma innych odrzuconych i zmień status na in approval / in progress 
 - dodatkowe zabezpieczenie przed drukowaniem oraz zmianami w actions / route 
-- nr odchylenia na wydruku plus coś sensownego dla samej numeracji 
-- po dokonaniu zmiany po uprzednim odrzuceniu przez jedno z stanowisk powiadomienie do akceptacji
+- możliwość dodawania notatek do odchylenia
+
 
 
 TODO: MARIOLA WNIOSKI - poprawki po spotkaniu

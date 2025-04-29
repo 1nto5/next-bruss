@@ -73,7 +73,6 @@ export default function EditForm({
       articleName: deviation?.articleName || undefined,
       workplace: deviation?.workplace || undefined,
       area: deviation?.area || undefined,
-      drawingNumber: deviation?.drawingNumber || undefined,
       quantity: deviation?.quantity?.value?.toString() || undefined,
       unit: deviation?.quantity?.unit || undefined,
       charge: deviation?.charge || undefined,
@@ -252,7 +251,7 @@ export default function EditForm({
                 name='customerName'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Nazwa części klienta</FormLabel>
+                    <FormLabel>Nazwa klienta</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -302,20 +301,6 @@ export default function EditForm({
                         </FormItem>
                       ))}
                     </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='drawingNumber'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Numer rysunku</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

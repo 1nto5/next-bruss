@@ -187,7 +187,7 @@ export default function DeviationView({
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `deviation-card-${deviation?._id?.toString() || 'unknown'}.pdf`;
+            a.download = `deviation-${deviation?._id?.toString() || 'unknown'}.pdf`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -209,9 +209,19 @@ export default function DeviationView({
 
   // Check if deviation can be printed (only approved, active or closed)
   const canPrint =
-    deviation?.status === 'approved' ||
-    deviation?.status === 'in progress' ||
-    deviation?.status === 'closed';
+    (deviation?.status === 'approved' ||
+      deviation?.status === 'in progress' ||
+      deviation?.status === 'closed') &&
+    (session?.user?.roles?.some((role) =>
+      [
+        'team-leader',
+        'group-leader',
+        'quality-manager',
+        'production-manager',
+        'plant-manager',
+      ].includes(role),
+    ) ||
+      session?.user?.email === deviation?.owner);
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
@@ -286,7 +296,7 @@ export default function DeviationView({
           </div>
         </div>
         <CardDescription className='flex flex-col'>
-          <span>ID: {deviation?._id?.toString()}</span>
+          <span>ID: {deviation?.internalId}</span>
           <span>Ostatnia synchronizacja: {fetchTime.toLocaleString(lang)}</span>
         </CardDescription>
       </CardHeader>
@@ -336,19 +346,14 @@ export default function DeviationView({
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Nazwa części klienta:
+                        Nazwa klienta:
                       </TableCell>
-                      <TableCell>{deviation?.customerNumber || '-'}</TableCell>
+                      <TableCell>{deviation?.customerName || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>Stanowisko:</TableCell>
                       <TableCell>{deviation?.workplace || '-'}</TableCell>
-                    </TableRow>
-
-                    <TableRow>
-                      <TableCell className='font-medium'>Nr. rysunku</TableCell>
-                      <TableCell>{deviation?.drawingNumber || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
@@ -506,7 +511,7 @@ export default function DeviationView({
                         <TableHead>Zatwierdzam</TableHead>
                         <TableHead>Osoba</TableHead>
                         <TableHead>Data</TableHead>
-                        <TableHead>Powód</TableHead>
+                        <TableHead>Komentarz</TableHead>
                         <TableHead>Historia</TableHead>
                       </TableRow>
                     </TableHeader>

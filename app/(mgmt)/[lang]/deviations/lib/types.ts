@@ -43,6 +43,7 @@ export type AttachmentType = {
 
 export type DeviationType = {
   _id?: ObjectId;
+  internalId?: string; // Format: "N/YYYY", e.g. "1/2023"
   status:
     | 'rejected'
     | 'approved'
@@ -56,7 +57,6 @@ export type DeviationType = {
   workplace?: string;
   customerNumber?: string;
   customerName?: string;
-  drawingNumber?: string;
   quantity?: { value?: number; unit?: string };
   charge?: string;
   reason?: string;
@@ -69,8 +69,6 @@ export type DeviationType = {
   owner: string;
   createdAt: Date | string;
   edited?: { at: Date | string; by: string };
-  approvedAt?: Date | string;
-  closedAt?: Date | string;
   groupLeaderApproval?: ApprovalType;
   qualityManagerApproval?: ApprovalType;
   engineeringManagerApproval?: ApprovalType;

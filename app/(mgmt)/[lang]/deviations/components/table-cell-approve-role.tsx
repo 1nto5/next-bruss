@@ -19,13 +19,6 @@ import {
 } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -100,8 +93,13 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
 }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
-  const [selectedApprovalRole, setSelectedApprovalRole] =
-    useState<string>(role);
+
+  // Create a form for the approval dialog with comment field
+  const approvalForm = useForm({
+    defaultValues: {
+      comment: '',
+    },
+  });
 
   const form = useForm<z.infer<typeof rejectDeviationSchema>>({
     resolver: zodResolver(rejectDeviationSchema),
@@ -138,6 +136,14 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
     handleApproval(false, data.reason);
     setOpenReject(false);
     form.reset();
+  };
+
+  // Handle approve with comment
+  const handleApproveWithComment = () => {
+    const comment = approvalForm.getValues().comment;
+    handleApproval(true, comment);
+    setOpenApprove(false);
+    approvalForm.reset();
   };
 
   // Determine the status to display
@@ -198,43 +204,29 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     </DialogDescription>
                   </DialogHeader>
 
-                  {/* Show role selector if user has elevated privileges */}
-                  {availableRoles.length > 1 && (
-                    <div className='mb-4'>
-                      <FormLabel>Zatwierdź jako:</FormLabel>
-                      <Select
-                        value={selectedApprovalRole}
-                        onValueChange={setSelectedApprovalRole}
-                      >
-                        <SelectTrigger className='w-full'>
-                          <SelectValue placeholder='Wybierz rolę' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableRoles.map((availableRole) => (
-                            <SelectItem
-                              key={availableRole}
-                              value={availableRole}
-                            >
-                              {ROLE_DISPLAY_NAMES[availableRole] ||
-                                availableRole}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <Form {...approvalForm}>
+                    <div className='grid gap-2'>
+                      <FormField
+                        control={approvalForm.control}
+                        name='comment'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Komentarz</FormLabel>
+                            <FormControl>
+                              <Textarea {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  )}
 
-                  <DialogFooter className='pt-4'>
-                    <Button
-                      onClick={() => {
-                        handleApproval(true);
-                        setOpenApprove(false);
-                      }}
-                    >
-                      <Check />
-                      Zatwierdzam
-                    </Button>
-                  </DialogFooter>
+                    <DialogFooter className='pt-4'>
+                      <Button onClick={handleApproveWithComment}>
+                        <Check />
+                        Zatwierdzam
+                      </Button>
+                    </DialogFooter>
+                  </Form>
                 </DialogContent>
               </Dialog>
             )}
@@ -257,32 +249,6 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     <DialogTitle>Odrzuć odchylenie</DialogTitle>
                   </DialogHeader>
 
-                  {/* Show role selector for rejection too if user has elevated privileges */}
-                  {availableRoles.length > 1 && (
-                    <div className='mb-4'>
-                      <FormLabel>Odrzuć jako:</FormLabel>
-                      <Select
-                        value={selectedApprovalRole}
-                        onValueChange={setSelectedApprovalRole}
-                      >
-                        <SelectTrigger className='w-full'>
-                          <SelectValue placeholder='Wybierz rolę' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {availableRoles.map((availableRole) => (
-                            <SelectItem
-                              key={availableRole}
-                              value={availableRole}
-                            >
-                              {ROLE_DISPLAY_NAMES[availableRole] ||
-                                availableRole}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                       <div className='grid gap-2'>
@@ -291,7 +257,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                           name='reason'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Powód</FormLabel>
+                              <FormLabel>Komentarz</FormLabel>
                               <FormControl>
                                 <Textarea {...field} />
                               </FormControl>
@@ -322,9 +288,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
       <TableCell className='whitespace-nowrap'>
         {at ? new Date(at).toLocaleString(lang) : '-'}
       </TableCell>
-      <TableCell className='min-w-[250px]'>
-        {!approved && reason ? reason : '-'}
-      </TableCell>
+      <TableCell className='min-w-[250px]'>{reason ? reason : '-'}</TableCell>
       <TableCell>
         {history && history.length > 0 ? (
           <Dialog>
@@ -345,7 +309,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       <TableHead>Status</TableHead>
                       <TableHead>Data</TableHead>
                       <TableHead>Osoba</TableHead>
-                      <TableHead>Powód</TableHead>
+                      <TableHead>Komentarz</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

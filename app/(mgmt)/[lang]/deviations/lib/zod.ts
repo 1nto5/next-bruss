@@ -13,10 +13,6 @@ export const addDeviationSchema = z.object({
     .string()
     .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
     .optional(),
-  drawingNumber: z
-    .string() // { message: 'Wprowadź numer rysunku!' }
-    .min(5, { message: 'Wprowadź poprawny numer rysunku!' })
-    .optional(),
   quantity: z
     .string() // .string({ message: 'Podaj ilość!' })
     .min(1, { message: 'Podaj ilość!' })
@@ -27,9 +23,8 @@ export const addDeviationSchema = z.object({
   unit: z.string().optional(),
   charge: z.string().optional(),
   description: z
-    .string()
-    .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' })
-    .optional(),
+    .string({ message: 'Wprowadź opis odchylenia!' })
+    .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' }),
   reason: z.string({ message: 'Wybierz powód!' }),
   periodFrom: z.date({ message: 'Wybierz datę!' }),
   periodTo: z.date({ message: 'Wybierz datę!' }),
