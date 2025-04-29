@@ -98,11 +98,7 @@ export async function approveDeviation(
   reason?: string,
 ) {
   const session = await auth();
-  if (
-    !session ||
-    !session.user?.email ||
-    !(session.user?.roles ?? []).includes(userRole)
-  ) {
+  if (!session || !session.user?.email) {
     return { error: 'unauthorized' };
   }
 
@@ -112,6 +108,29 @@ export async function approveDeviation(
     'production-manager': 'productionManagerApproval',
     'plant-manager': 'plantManagerApproval',
   };
+
+  // Check if user has permission to approve as the specified role
+  const hasDirectRole = (session.user?.roles ?? []).includes(userRole);
+  const isPlantManager = (session.user?.roles ?? []).includes('plant-manager');
+  const isProductionManager = (session.user?.roles ?? []).includes(
+    'production-manager',
+  );
+
+  // Role elevation rules
+  const canElevateToRole =
+    (isPlantManager &&
+      [
+        'group-leader',
+        'quality-manager',
+        'production-manager',
+        'plant-manager',
+      ].includes(userRole)) ||
+    (isProductionManager && userRole === 'group-leader');
+
+  // If user doesn't have direct role or elevated permission, reject
+  if (!hasDirectRole && !canElevateToRole) {
+    return { error: 'unauthorized role' };
+  }
 
   const approvalField = approvalFieldMap[userRole];
   if (!approvalField) {
@@ -271,57 +290,6 @@ export async function revalidateDeviationsAndDeviation() {
 export async function revalidateDeviation() {
   revalidateTag('deviation');
 }
-
-// export async function sendReminderEmail(id: string) {
-//   const session = await auth();
-//   if (!session || !session.user?.email) {
-//     return { error: 'unauthorized' };
-//   }
-//   try {
-//     const coll = await dbc('deviations');
-//     const deviation = await coll.findOne({ _id: new ObjectId(id) });
-//     if (!deviation) {
-//       return { error: 'not found' };
-//     }
-//     if (deviation.owner !== session.user?.email) {
-//       return { error: 'unauthorized' };
-//     }
-
-//     // Create a transporter
-//     const transporter = nodemailer.createTransport({
-//       host: process.env.NODEMAILER_HOST,
-//       secure: false,
-//       // service: process.env.NODEMAILER_SERVICE,
-//       // auth: {
-//       //   user: process.env.NODEMAILER_USER,
-//       //   pass: process.env.NODEMAILER_PASS,
-//       // },
-//     });
-//     transporter.verify(function (error, success) {
-//       if (error) {
-//         console.log(error);
-//       } else {
-//         console.log('Server is ready to take our messages');
-//       }
-//     });
-//     console.log(deviation.owner);
-//     // Define email options
-//     const mailOptions = {
-//       // from: `"Odchylenia (Next BRUSS)" <${process.env.NODEMAILER_MAIL}>`,
-//       from: process.env.NODEMAILER_MAIL,
-//       to: deviation.owner,
-//       subject: 'Prośba o działanie',
-//       // html: `${extractFullNameFromEmail(session.user?.email)} prosi o podjęcie działania w sprawie odchylenia: <a href="${process.env.URL}/deviations/${id}">kliknij aby otworzyć</a>.`,
-//     };
-
-//     // Send the email
-//     const info = await transporter.sendMail(mailOptions);
-//     return { success: 'sent' };
-//   } catch (error) {
-//     console.error(error);
-//     return { error: 'sendReminderEmail server action error' };
-//   }
-// }
 
 export async function insertDeviation(deviation: AddDeviationType) {
   const session = await auth();

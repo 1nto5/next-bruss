@@ -19,6 +19,13 @@ import {
 } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -50,6 +57,34 @@ type TableCellApproveRoleProps = {
   history?: ApprovalHistoryType[];
 };
 
+// Define valid approval roles
+type ApprovalRole =
+  | 'group-leader'
+  | 'quality-manager'
+  | 'production-manager'
+  | 'plant-manager';
+
+// Role elevation mapping - use type to ensure keys are valid roles
+const ROLE_ELEVATIONS: Record<ApprovalRole, ApprovalRole[]> = {
+  'plant-manager': [
+    'group-leader',
+    'quality-manager',
+    'production-manager',
+    'plant-manager',
+  ],
+  'production-manager': ['group-leader', 'production-manager'],
+  'group-leader': ['group-leader'],
+  'quality-manager': ['quality-manager'],
+};
+
+// Role display names
+const ROLE_DISPLAY_NAMES: Record<string, string> = {
+  'group-leader': 'Group Leader',
+  'quality-manager': 'Kierownik Jakości',
+  'production-manager': 'Kierownik Produkcji',
+  'plant-manager': 'Dyrektor Zakładu',
+};
+
 const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   roleText,
   deviationUserRoles,
@@ -65,6 +100,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
 }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
+  const [selectedApprovalRole, setSelectedApprovalRole] =
+    useState<string>(role);
 
   const form = useForm<z.infer<typeof rejectDeviationSchema>>({
     resolver: zodResolver(rejectDeviationSchema),
@@ -73,8 +110,29 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
     },
   });
 
-  // Sprawdzamy, czy użytkownik ma wymaganą rolę wśród swoich ról
-  const hasRole = deviationUserRoles.includes(role);
+  // Get all roles the user can approve as (including elevated roles)
+  const getElevatedRoles = (): string[] => {
+    // Start with the current role if the user has it directly
+    let availableRoles = deviationUserRoles.includes(role) ? [role] : [];
+
+    // Add elevated roles
+    for (const userRole of deviationUserRoles) {
+      // Type guard to ensure userRole is a valid key
+      if (userRole in ROLE_ELEVATIONS) {
+        const elevatedRoles = ROLE_ELEVATIONS[userRole as ApprovalRole];
+        if (elevatedRoles && elevatedRoles.includes(role as ApprovalRole)) {
+          availableRoles.push(userRole);
+        }
+      }
+    }
+
+    // Return array with unique values instead of using Set
+    return availableRoles.filter((v, i, a) => a.indexOf(v) === i);
+  };
+
+  // Check if user has role or elevated privileges
+  const availableRoles = getElevatedRoles();
+  const hasRolePrivilege = availableRoles.length > 0;
 
   const onSubmit = (data: z.infer<typeof rejectDeviationSchema>) => {
     handleApproval(false, data.reason);
@@ -117,7 +175,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
       <TableCell className='text-nowrap'>{roleText}</TableCell>
 
       <TableCell className='flex gap-2'>
-        {hasRole && (
+        {hasRolePrivilege && (
           <>
             {/* Allow approval when not already approved (either undefined or rejected) */}
             {approved !== true && (
@@ -134,11 +192,38 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                 </DialogTrigger>
                 <DialogContent className='sm:max-w-[425px]'>
                   <DialogHeader>
-                    <DialogTitle>Jesteś pewien?</DialogTitle>
+                    <DialogTitle>Zatwierdzenie odchylenia</DialogTitle>
                     <DialogDescription>
                       Czy na pewno chcesz zatwierdzić to odchylenie?
                     </DialogDescription>
                   </DialogHeader>
+
+                  {/* Show role selector if user has elevated privileges */}
+                  {availableRoles.length > 1 && (
+                    <div className='mb-4'>
+                      <FormLabel>Zatwierdź jako:</FormLabel>
+                      <Select
+                        value={selectedApprovalRole}
+                        onValueChange={setSelectedApprovalRole}
+                      >
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder='Wybierz rolę' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableRoles.map((availableRole) => (
+                            <SelectItem
+                              key={availableRole}
+                              value={availableRole}
+                            >
+                              {ROLE_DISPLAY_NAMES[availableRole] ||
+                                availableRole}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <DialogFooter className='pt-4'>
                     <Button
                       onClick={() => {
@@ -171,6 +256,33 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                   <DialogHeader>
                     <DialogTitle>Odrzuć odchylenie</DialogTitle>
                   </DialogHeader>
+
+                  {/* Show role selector for rejection too if user has elevated privileges */}
+                  {availableRoles.length > 1 && (
+                    <div className='mb-4'>
+                      <FormLabel>Odrzuć jako:</FormLabel>
+                      <Select
+                        value={selectedApprovalRole}
+                        onValueChange={setSelectedApprovalRole}
+                      >
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder='Wybierz rolę' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableRoles.map((availableRole) => (
+                            <SelectItem
+                              key={availableRole}
+                              value={availableRole}
+                            >
+                              {ROLE_DISPLAY_NAMES[availableRole] ||
+                                availableRole}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}>
                       <div className='grid gap-2'>
@@ -201,7 +313,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
             )}
           </>
         )}
-        {(!hasRole || (approved === true && approved !== undefined)) && '-'}
+        {(!hasRolePrivilege || (approved === true && approved !== undefined)) &&
+          '-'}
       </TableCell>
       <TableCell className='whitespace-nowrap'>
         {(by && extractNameFromEmail(by)) || '-'}

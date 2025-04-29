@@ -194,8 +194,8 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       <TableCell>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size='icon' type='button' variant='ghost'>
-              <ClipboardCheck className='h-4 w-4' />
+            <Button size='icon' type='button' variant='outline'>
+              <ClipboardCheck className='' />
             </Button>
           </DialogTrigger>
           <DialogContent className='sm:max-w-[425px]'>

@@ -69,7 +69,7 @@ export const columns: ColumnDef<DeviationType>[] = [
           statusLabel = (
             <Badge
               variant='outline'
-              className='bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+              className='bg-yellow-100 text-nowrap text-yellow-800 hover:bg-yellow-100'
             >
               Do zatwierdzenia
             </Badge>

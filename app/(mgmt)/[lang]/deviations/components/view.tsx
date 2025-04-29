@@ -25,7 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { FileDown, Hammer, Table as TableIcon } from 'lucide-react';
+import { FileDown, Hammer, Printer, Table as TableIcon } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
@@ -61,6 +61,7 @@ export default function DeviationView({
   areaOptions: DeviationAreaType[];
 }) {
   const [isPendingApproval, startApprovalTransition] = useTransition();
+  const [isPendingPdfExport, startPdfExportTransition] = useTransition();
 
   // Pobieranie wszystkich ról użytkownika, które są uprawnione do zatwierdzania
   const deviationUserRoles =
@@ -81,11 +82,14 @@ export default function DeviationView({
               reject(new Error('Skontaktuj się z IT!'));
               return;
             }
-            // Sprawdzamy, czy użytkownik posiada rolę, którą próbuje wykorzystać do zatwierdzenia
-            if (
-              deviation?._id &&
-              deviationUserRoles.includes(approvalRole as ApprovalRole)
-            ) {
+
+            // Check if user has direct role or elevated permission
+            const canApproveAsRole = hasElevatedPermission(
+              session?.user?.roles || [],
+              approvalRole,
+            );
+
+            if (deviation?._id && canApproveAsRole) {
               const res = await approveDeviation(
                 deviation._id.toString(),
                 approvalRole,
@@ -118,6 +122,96 @@ export default function DeviationView({
       },
     );
   };
+
+  // Function to check if a user has permission to approve as a specific role
+  const hasElevatedPermission = (
+    userRoles: string[],
+    targetRole: string,
+  ): boolean => {
+    // Direct role check
+    if (userRoles.includes(targetRole)) {
+      return true;
+    }
+
+    // Elevation check
+    if (
+      userRoles.includes('plant-manager') &&
+      [
+        'group-leader',
+        'quality-manager',
+        'production-manager',
+        'plant-manager',
+      ].includes(targetRole)
+    ) {
+      return true;
+    }
+
+    if (
+      userRoles.includes('production-manager') &&
+      targetRole === 'group-leader'
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const handleExportToPdf = () => {
+    if (!deviation?._id) {
+      toast.error('Nie można wyeksportować PDF - brak ID odchylenia');
+      return;
+    }
+
+    toast.promise(
+      new Promise<void>((resolve, reject) => {
+        startPdfExportTransition(async () => {
+          try {
+            const response = await fetch(
+              '/api/deviations/deviation/pdf-export',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  deviationId: deviation?._id?.toString(),
+                }),
+              },
+            );
+
+            if (!response.ok) {
+              throw new Error('Błąd podczas generowania PDF');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `deviation-card-${deviation?._id?.toString() || 'unknown'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            resolve();
+          } catch (error) {
+            console.error('Error generating PDF:', error);
+            reject(new Error('Błąd podczas generowania PDF'));
+          }
+        });
+      }),
+      {
+        loading: 'Generowanie PDF...',
+        success: 'PDF wygenerowano pomyślnie!',
+        error: (err) => err.message,
+      },
+    );
+  };
+
+  // Check if deviation can be printed (only approved, active or closed)
+  const canPrint =
+    deviation?.status === 'approved' ||
+    deviation?.status === 'in progress' ||
+    deviation?.status === 'closed';
 
   const statusCardTitle = () => {
     switch (deviation?.status) {
@@ -173,11 +267,23 @@ export default function DeviationView({
       <CardHeader>
         <div className='flex justify-between'>
           <CardTitle>{statusCardTitle()}</CardTitle>
-          <Link href='/deviations'>
-            <Button variant='outline'>
-              <TableIcon /> Odchylenia
-            </Button>
-          </Link>
+          <div className='flex space-x-2'>
+            {/* Show PDF export button only for approved, active or closed deviations */}
+            {canPrint && (
+              <Button
+                variant='outline'
+                onClick={handleExportToPdf}
+                disabled={isPendingPdfExport}
+              >
+                <Printer className='mr-2 h-4 w-4' /> Drukuj
+              </Button>
+            )}
+            <Link href='/deviations'>
+              <Button variant='outline'>
+                <TableIcon /> Odchylenia
+              </Button>
+            </Link>
+          </div>
         </div>
         <CardDescription className='flex flex-col'>
           <span>ID: {deviation?._id?.toString()}</span>

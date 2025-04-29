@@ -15,12 +15,12 @@ TODO: all dialogs formatting as in failures lv
 
 TODO: odchylenia: 
 - akcje korygujące zalogowanej osoby - oddzielna tabela
-- drukowanie tylko zatwierdzonych
 - wyszukiwanie rozszerzyć o Quarry
-- akcje korygujące bez blokady daty
-- sprawdzić pobierania upload
-- kod qr na wydruku
-- zmiana statusu akcji korygującej - zmiana kalendarza
+- kasowanie załączników?
+- jeśli zamiana z odrzucił na zaakceptował to spr czy nie ma innych odrzuconych i zmień status na in approval / in progress 
+- dodatkowe zabezpieczenie przed drukowaniem oraz zmianami w actions / route 
+- nr odchylenia na wydruku plus coś sensownego dla samej numeracji 
+- po dokonaniu zmiany po uprzednim odrzuceniu przez jedno z stanowisk powiadomienie do akceptacji
 
 
 TODO: MARIOLA WNIOSKI - poprawki po spotkaniu

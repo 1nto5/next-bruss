@@ -33,10 +33,7 @@ export const addDeviationSchema = z.object({
   reason: z.string({ message: 'Wybierz powód!' }),
   periodFrom: z.date({ message: 'Wybierz datę!' }),
   periodTo: z.date({ message: 'Wybierz datę!' }),
-  area: z
-    .string()
-    .min(2, { message: 'Wprowadź poprawną nazwę obszaru!' })
-    .optional(),
+  area: z.string({ message: 'Wybierz obszar!' }),
   processSpecification: z.string().optional(),
   customerAuthorization: z.boolean(),
 });
