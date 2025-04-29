@@ -11,6 +11,7 @@ import { jsPDF } from 'jspdf';
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 import path from 'path';
+import QRCode from 'qrcode';
 
 interface GenerateDeviationPdfOptions {
   deviation: DeviationType;
@@ -118,20 +119,216 @@ async function generateDeviationPdf({
     return false;
   };
 
-  // Header: logo, title, QR code...
-  // ... (bez zmian)
+  // Header: logo, QR, title
+  let logoHeight = 0;
+  const qrSize = 32;
+  const headerHeight = qrSize;
 
-  // Section: Corrective Actions
+  try {
+    const buf = fs.readFileSync(path.join(process.cwd(), 'public', 'logo.png'));
+    const dataUrl = `data:image/png;base64,${buf.toString('base64')}`;
+    const props = doc.getImageProperties(dataUrl);
+    const logoWidth = 30;
+    logoHeight = (props.height * logoWidth) / props.width;
+    const logoY =
+      margin + (Math.max(headerHeight, logoHeight) - logoHeight) / 2;
+    doc.addImage(dataUrl, 'PNG', margin, logoY, logoWidth, logoHeight);
+  } catch {}
+
+  try {
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const qr = await QRCode.toDataURL(
+      `${baseUrl}/deviations/${deviation._id}`,
+      { width: qrSize * 4 },
+    );
+    const qrY = margin + (Math.max(headerHeight, logoHeight) - qrSize) / 2;
+    doc.addImage(qr, 'PNG', width - margin - qrSize, qrY, qrSize, qrSize);
+  } catch {}
+
+  const actualHeaderHeight = Math.max(logoHeight, qrSize);
+  const titleY = margin + actualHeaderHeight / 2;
+  doc.setFont('OpenSans', 'bold').setFontSize(16).setTextColor(0);
+  doc.text(translations.title.pl, width / 2, titleY - 4, { align: 'center' });
+  doc.setFont('OpenSans', 'italic').setFontSize(10);
+  doc.text(translations.title.en, width / 2, titleY + 2, { align: 'center' });
+
+  y = margin + actualHeaderHeight + 10;
+  doc.setFont('OpenSans', 'normal').setFontSize(10).setTextColor(0);
+
+  // Deviation ID
+  doc.setFont('OpenSans', 'bold').setFontSize(14);
+  doc.text(`ID: ${deviation.internalId || '-'}`, margin, y);
+  y += 8;
+
+  // Details section
+  doc.setFont('OpenSans', 'bold').setFontSize(12);
+  doc.text(translations.sections.details.pl, margin, y);
+  const detailsEnW = doc.getTextWidth(translations.sections.details.pl);
+  doc.setFont('OpenSans', 'italic');
+  doc.text(` / ${translations.sections.details.en}`, margin + detailsEnW, y);
+  y += 8;
+  doc.setFont('OpenSans', 'normal').setFontSize(10);
+
+  const printLine = (
+    key: keyof typeof translations.fields,
+    value: string,
+    extra = 0,
+  ) => {
+    const labelX = margin;
+    const valueX = margin + 80;
+    const maxW = width - valueX - margin;
+    doc.setFont('OpenSans', 'normal').setFontSize(10);
+    doc.text(translations.fields[key].pl + ':', labelX, y);
+    const plW = doc.getTextWidth(translations.fields[key].pl + ':');
+    doc.setFont('OpenSans', 'italic');
+    doc.text(` / ${translations.fields[key].en}:`, labelX + plW, y);
+    doc.setFont('OpenSans', 'normal');
+    if (value.length > 40 || key === 'reason') {
+      const lines = doc.splitTextToSize(value, maxW);
+      lines.forEach((line: string, i: number) =>
+        doc.text(line, valueX, y + i * 5),
+      );
+      y += 6 + extra + (lines.length - 1) * 5;
+    } else {
+      doc.text(value, valueX, y);
+      y += 6 + extra;
+    }
+  };
+
+  printLine('created', new Date(deviation.createdAt).toLocaleDateString(lang));
+  printLine('owner', extractNameFromEmail(deviation.owner));
+  printLine('article', deviation.articleName || '-');
+  printLine('number', deviation.articleNumber || '-');
+  printLine('customerNumber', deviation.customerNumber || '-');
+  printLine('customerName', deviation.customerName || '-');
+  printLine('workplace', deviation.workplace || '-');
+  printLine(
+    'quantity',
+    deviation.quantity
+      ? `${deviation.quantity.value} ${deviation.quantity.unit === 'pcs' ? 'szt.' : deviation.quantity.unit}`
+      : '-',
+  );
+  printLine('charge', deviation.charge || '-');
+  printLine(
+    'period',
+    deviation.timePeriod?.from && deviation.timePeriod?.to
+      ? `${new Date(deviation.timePeriod.from).toLocaleDateString(lang)} - ${new Date(
+          deviation.timePeriod.to,
+        ).toLocaleDateString(lang)}`
+      : '-',
+  );
+  const reasonOpt = reasonOptions.find((o) => o.value === deviation.reason);
+  printLine(
+    'reason',
+    reasonOpt ? `${reasonOpt.pl || reasonOpt.label} / ${reasonOpt.label}` : '-',
+    2,
+  );
+  const areaOpt = areaOptions.find((o) => o.value === deviation.area);
+  printLine(
+    'area',
+    areaOpt
+      ? areaOpt.pl && areaOpt.pl !== areaOpt.label
+        ? `${areaOpt.pl} / ${areaOpt.label}`
+        : areaOpt.label
+      : '-',
+  );
+  printLine(
+    'customerAuth',
+    deviation.customerAuthorization ? 'Tak / Yes' : 'Nie / No',
+  );
+  printLine('specification', deviation.processSpecification || '-');
+
+  // Description
+  y += 6;
+  doc.setFont('OpenSans', 'bold').setFontSize(12);
+  doc.text(translations.sections.description.pl, margin, y);
+  const descEnW = doc.getTextWidth(translations.sections.description.pl);
+  doc.setFont('OpenSans', 'bolditalic');
+  doc.text(` / ${translations.sections.description.en}`, margin + descEnW, y);
+  y += 8;
+  doc.setFont('OpenSans', 'normal').setFontSize(10);
+  const descLines = doc.splitTextToSize(
+    deviation.description || '-',
+    width - margin * 2,
+  );
+  descLines.forEach((l: string) => {
+    doc.text(l, margin, y);
+    y += 6;
+  });
+
+  // Approvals
+  y += 6;
+  checkForPageBreak();
+  doc.setFont('OpenSans', 'bold').setFontSize(12);
+  doc.text(translations.sections.approvals.pl, margin, y);
+  const apprEnW = doc.getTextWidth(translations.sections.approvals.pl);
+  doc.setFont('OpenSans', 'bolditalic');
+  doc.text(` / ${translations.sections.approvals.en}`, margin + apprEnW, y);
+  y += 8;
+  doc.setFont('OpenSans', 'normal').setFontSize(10);
+  const colW = [90, 30, 30];
+  let x = margin;
+  (['role', 'by', 'date'] as (keyof typeof translations.approvals)[]).forEach(
+    (f, i) => {
+      const t = translations.approvals[f] as any;
+      doc.setFont('OpenSans', 'bold');
+      doc.text(t.pl, x, y);
+      const wPl = doc.getTextWidth(t.pl);
+      doc.setFont('OpenSans', 'bolditalic');
+      doc.text(` / ${t.en}`, x + wPl, y);
+      x += colW[i];
+    },
+  );
+  y += 6;
+  const approvalsList = [
+    {
+      approval: (deviation as any).groupLeaderApproval,
+      position: 'group-leader',
+    },
+    {
+      approval: (deviation as any).qualityManagerApproval,
+      position: 'quality-manager',
+    },
+    {
+      approval: (deviation as any).productionManagerApproval,
+      position: 'production-manager',
+    },
+    {
+      approval: (deviation as any).plantManagerApproval,
+      position: 'plant-manager',
+    },
+  ];
+  const posMap: Record<string, string> = {
+    'group-leader': 'Group Leader / Group Leader',
+    'quality-manager': 'Kierownik Jakości / Quality Manager',
+    'production-manager': 'Kierownik Produkcji / Production Manager',
+    'plant-manager': 'Dyrektor Zakładu / Plant Manager',
+  };
+  approvalsList.forEach(({ approval, position }) => {
+    x = margin;
+    doc.setFont('OpenSans', 'normal');
+    doc.text(posMap[position], x, y);
+    x += colW[0];
+    doc.text(approval?.by ? extractNameFromEmail(approval.by) : '-', x, y);
+    x += colW[1];
+    doc.text(
+      approval?.at ? new Date(approval.at).toLocaleDateString(lang) : '-',
+      x,
+      y,
+    );
+    y += 6;
+  });
+
+  // Corrective Actions
   y += 6;
   checkForPageBreak();
   doc.setFont('OpenSans', 'bold').setFontSize(12);
   doc.text(translations.sections.actions.pl, margin, y);
-  const actionsEnW = doc.getTextWidth(translations.sections.actions.pl);
+  const actEnW = doc.getTextWidth(translations.sections.actions.pl);
   doc.setFont('OpenSans', 'bolditalic');
-  doc.text(` / ${translations.sections.actions.en}`, margin + actionsEnW, y);
+  doc.text(` / ${translations.sections.actions.en}`, margin + actEnW, y);
   y += 8;
   doc.setFont('OpenSans', 'normal').setFontSize(10);
-
   if (deviation.correctiveActions?.length) {
     deviation.correctiveActions.forEach((act, idx) => {
       checkForPageBreak(15);
@@ -139,32 +336,66 @@ async function generateDeviationPdf({
         `${idx + 1}. ${act.description}`,
         width - margin * 2,
       );
-      lines.forEach((line: string) => {
+      lines.forEach((l: string) => {
         if (y > height - 20) {
           doc.addPage();
           y = margin;
         }
-        doc.text(line, margin, y);
+        doc.text(l, margin, y);
         y += 6;
       });
     });
   } else {
-    // Separate Polish and English with proper styles
     const noPl = 'Brak działań korygujących';
     doc.setFont('OpenSans', 'normal');
     doc.text(noPl, margin, y);
-    const plW = doc.getTextWidth(noPl);
+    const plW2 = doc.getTextWidth(noPl);
     doc.setFont('OpenSans', 'italic');
-    doc.text(` / No corrective actions`, margin + plW, y);
+    doc.text(` / No corrective actions`, margin + plW2, y);
     doc.setFont('OpenSans', 'normal');
     y += 6;
   }
 
-  // Attachments, Footer etc... (bez zmian)
+  // Attachments
+  const attachments = deviation.attachments?.map((a) => a.name) || [];
+  if (attachments.length) {
+    y += 6;
+    checkForPageBreak();
+    doc.setFont('OpenSans', 'bold').setFontSize(12);
+    doc.text(translations.sections.attachments.pl, margin, y);
+    const attEnW = doc.getTextWidth(translations.sections.attachments.pl);
+    doc.setFont('OpenSans', 'bolditalic');
+    doc.text(` / ${translations.sections.attachments.en}`, margin + attEnW, y);
+    y += 8;
+    doc.setFont('OpenSans', 'normal').setFontSize(10);
+    attachments.forEach((name) => {
+      checkForPageBreak();
+      doc.text(`- ${name}`, margin, y);
+      y += 6;
+    });
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont('OpenSans', 'italic').setFontSize(8);
+    const foot =
+      `${translations.footer.generated.pl}: ${new Date().toLocaleString(lang)}, przez: ${generatedBy}` +
+      ` / ${translations.footer.generated.en}: ${new Date().toLocaleString(lang)}, by: ${generatedBy}`;
+    doc.text(foot, margin, height - 10);
+    doc.text(
+      `Strona ${i} z ${pageCount} / Page ${i} of ${pageCount}`,
+      width - margin,
+      height - 10,
+      { align: 'right' },
+    );
+  }
 
   return Buffer.from(await doc.output('arraybuffer'));
 }
 
+// API route handler
 export async function POST(request: Request) {
   try {
     const session = await auth();
