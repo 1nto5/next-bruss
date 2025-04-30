@@ -45,7 +45,6 @@ type TableCellApproveRoleProps = {
   by: string | undefined;
   at: string | undefined;
   lang: string;
-  isPendingApproval: boolean;
   reason?: string;
   history?: ApprovalHistoryType[];
 };
@@ -87,7 +86,6 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   by,
   at,
   lang,
-  isPendingApproval,
   reason,
   history,
 }) => {
@@ -191,7 +189,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     size='icon'
                     type='button'
                     variant='outline'
-                    className='bg-green-100 hover:bg-green-200'
+                    className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
                   >
                     <ThumbsUp color='green' />
                   </Button>
@@ -239,7 +237,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     size='icon'
                     type='button'
                     variant='outline'
-                    className='bg-red-100 hover:bg-red-200'
+                    className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
                   >
                     <ThumbsDown color='red' />
                   </Button>
@@ -337,7 +335,11 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                             {new Date(item.at).toLocaleString(lang)}
                           </span>
                         </TableCell>
-                        <TableCell>{extractNameFromEmail(item.by)}</TableCell>
+                        <TableCell>
+                          <span className='text-nowrap'>
+                            {extractNameFromEmail(item.by)}
+                          </span>
+                        </TableCell>
                         <TableCell>
                           {!item.approved && item.reason ? item.reason : '-'}
                         </TableCell>

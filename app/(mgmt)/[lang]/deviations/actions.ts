@@ -5,10 +5,12 @@ import {
   ApprovalType,
   correctiveActionType,
   DeviationType,
+  NotificationLogType, // Import NotificationLogType
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
+import mailer from '@/lib/mailer'; // Import the mailer utility
 import { dbc } from '@/lib/mongo';
-import { ObjectId } from 'mongodb';
+import { Collection, ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import {
@@ -17,6 +19,402 @@ import {
   AddDeviationType,
 } from './lib/zod';
 // import { redirect } from 'next/navigation';
+
+// Define a simple user type for annotation
+interface UserWithRoles {
+  email: string;
+  roles: string[];
+  // Add other potential user fields if known, or use a more generic approach
+  [key: string]: any;
+}
+
+// Define approval roles
+const APPROVAL_ROLES = [
+  'group-leader',
+  'quality-manager',
+  'production-manager',
+  'plant-manager',
+] as const;
+
+// Polish translations for roles
+const ROLE_TRANSLATIONS: { [key: string]: string } = {
+  'group-leader': 'Group Leader',
+  'quality-manager': 'Kierownik Jakości',
+  'production-manager': 'Kierownik Produkcji',
+  'plant-manager': 'Dyrektor Zakładu', // Updated translation
+};
+
+// --- Notification Helper Functions ---
+
+async function sendGroupLeaderNotification(
+  deviationId: ObjectId,
+  internalId: string,
+  deviationArea: string | undefined,
+  notificationContext: 'creation' | 'edit', // Added context
+  usersColl: Collection,
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+  const targetRole = deviationArea ? `group-leader-${deviationArea}` : null;
+  let targetGroupLeaders: UserWithRoles[] = [];
+
+  if (targetRole) {
+    targetGroupLeaders = (await usersColl
+      .find({ roles: { $all: ['group-leader', targetRole] } })
+      .toArray()) as unknown as UserWithRoles[];
+  }
+
+  const uniqueEmails = Array.from(
+    new Set(targetGroupLeaders.map((user) => user.email).filter(Boolean)),
+  );
+
+  if (uniqueEmails.length > 0) {
+    const roleTranslated = ROLE_TRANSLATIONS['group-leader'];
+    const actionText =
+      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
+    const requirementText = 'zatwierdzenie';
+
+    // Standardized subject
+    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
+    // Standardized HTML body
+    const html = `
+      <div style="font-family: sans-serif;">
+        <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
+        <p>Obszar: ${deviationArea?.toUpperCase() || 'Ogólny'}</p>
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+    for (const email of uniqueEmails) {
+      try {
+        await mailer({ to: email, subject, html });
+        logs.push({
+          to: email,
+          sentAt: new Date(),
+          type:
+            notificationContext === 'creation'
+              ? 'creation-group-leader'
+              : 'edit-group-leader', // Context-based type
+        });
+      } catch (e) {
+        console.error(`Failed GL mail to ${email}:`, e);
+      }
+    }
+    console.log(
+      `Sent GL notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} users.`,
+    );
+  } else {
+    console.log(
+      `No specific GL found for area ${deviationArea || 'N/A'} for [${internalId}].`,
+    );
+    // Return empty logs, handle notification to Plant Manager in handleNotifications
+  }
+  return logs;
+}
+
+// NEW function to notify Plant Manager about a specific vacant role
+async function sendVacancyNotificationToPlantManager(
+  deviationId: ObjectId,
+  internalId: string,
+  vacantRole: string, // The specific role that is vacant
+  notificationContext: 'creation' | 'edit',
+  usersColl: Collection,
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+  const plantManagers = (await usersColl
+    .find({ roles: 'plant-manager' })
+    .toArray()) as unknown as UserWithRoles[];
+  const uniqueEmails = Array.from(
+    new Set(plantManagers.map((user) => user.email).filter(Boolean)),
+  );
+
+  if (uniqueEmails.length > 0) {
+    const actionText =
+      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
+    const requirementText = 'zatwierdzenie';
+    const vacantRoleTranslated = ROLE_TRANSLATIONS[vacantRole] || vacantRole;
+    // Standardized subject for vacancy
+    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat - ${vacantRoleTranslated})`;
+    // Standardized HTML body for vacancy
+    const html = `
+        <div style="font-family: sans-serif;">
+          <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText}.</p>
+          <p style="color: red; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu wakatu na stanowisku: ${vacantRoleTranslated}.</p>
+          <p>
+            <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+          </p>
+        </div>`;
+
+    for (const email of uniqueEmails) {
+      try {
+        await mailer({ to: email, subject, html });
+        logs.push({
+          to: email,
+          sentAt: new Date(),
+          type:
+            notificationContext === 'creation'
+              ? `vacant-role-${vacantRole}` // More specific type
+              : `edit-vacant-role-${vacantRole}`,
+        });
+      } catch (e) {
+        console.error(
+          `Failed Vacancy (${vacantRole}) mail to Plant Manager ${email}:`,
+          e,
+        );
+      }
+    }
+    console.log(
+      `Sent Vacancy (${vacantRole}) notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} Plant Managers.`,
+    );
+  } else {
+    console.error(
+      `Vacancy detected for role (${vacantRole}) in [${internalId}], but no Plant Manager found!`,
+    );
+  }
+  return logs;
+}
+
+async function sendNoGroupLeaderNotification(
+  deviationId: ObjectId,
+  internalId: string,
+  deviationArea: string | undefined,
+  notificationContext: 'creation' | 'edit', // Added context
+  usersColl: Collection,
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+  // This function is only called if sendGroupLeaderNotification found no specific leader
+  const plantManagers = (await usersColl
+    .find({ roles: 'plant-manager' })
+    .toArray()) as unknown as UserWithRoles[];
+  const uniqueEmails = Array.from(
+    new Set(plantManagers.map((user) => user.email).filter(Boolean)),
+  );
+
+  if (uniqueEmails.length > 0) {
+    const actionText =
+      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
+    const requirementText = 'zatwierdzenie';
+
+    // Standardized subject for no GL
+    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat Group Leader)`;
+    // Standardized HTML body for no GL
+    const html = `
+      <div style="font-family: sans-serif;">
+        <p>${actionText} odchylenie [${internalId}] w obszarze ${deviationArea?.toUpperCase()}, które wymaga ${requirementText}.</p>
+        <p style="color: orange; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu braku przypisanego Group Leader dla obszaru ${deviationArea?.toUpperCase}.</p>
+        <p>Proszę o podjęcie odpowiednich działań lub zapewnienie zastępstwa.</p>
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+    for (const email of uniqueEmails) {
+      try {
+        await mailer({ to: email, subject, html });
+        logs.push({
+          to: email,
+          sentAt: new Date(),
+          type:
+            notificationContext === 'creation'
+              ? 'no-group-leader'
+              : 'edit-no-group-leader', // Context-based type
+        });
+      } catch (e) {
+        console.error(`Failed No-GL mail to Plant Manager ${email}:`, e);
+      }
+    }
+    console.log(
+      `Sent No-GL notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} Plant Managers.`,
+    );
+  } else {
+    console.error(
+      `No GL found for area ${deviationArea || 'N/A'} in [${internalId}], and no Plant Manager found to notify!`,
+    );
+  }
+  return logs;
+}
+
+// Ensure sendRoleNotification uses the standard body format
+async function sendRoleNotification(
+  deviationId: ObjectId,
+  internalId: string,
+  role: string, // Role to notify (e.g., 'quality-manager')
+  notificationContext: 'creation' | 'edit',
+  usersColl: Collection,
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+  const targetUsers = (await usersColl
+    .find({ roles: role })
+    .toArray()) as unknown as UserWithRoles[];
+
+  const uniqueEmails = Array.from(
+    new Set(targetUsers.map((user) => user.email).filter(Boolean)),
+  );
+
+  if (uniqueEmails.length > 0) {
+    const roleTranslated = ROLE_TRANSLATIONS[role] || role; // Translate role name if available
+    const actionText =
+      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
+    const requirementText = 'zatwierdzenie';
+
+    // Standardized subject
+    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
+    // Standardized HTML body
+    const html = `
+      <div style="font-family: sans-serif;">
+        <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+    for (const email of uniqueEmails) {
+      try {
+        await mailer({ to: email, subject, html });
+        logs.push({
+          to: email,
+          sentAt: new Date(),
+          type:
+            notificationContext === 'creation'
+              ? `creation-${role}`
+              : `edit-${role}`, // Context-based type using role
+        });
+      } catch (e) {
+        console.error(`Failed ${role} mail to ${email}:`, e);
+      }
+    }
+    console.log(
+      `Sent ${role} notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} users.`,
+    );
+  } else {
+    console.log(`No users found with role ${role} for [${internalId}].`);
+    // Return empty logs, handle vacancy notification in handleNotifications
+  }
+  return logs;
+}
+
+// Refactored handleNotifications logic
+async function handleNotifications(
+  deviation: DeviationType,
+  deviationId: ObjectId,
+  notificationContext: 'creation' | 'edit',
+) {
+  const allNotificationLogs: NotificationLogType[] = [];
+  const deviationUrl = `${process.env.BASE_URL}/deviations/${deviationId.toString()}`;
+  const internalId = deviation.internalId!; // Assume internalId exists
+
+  try {
+    const usersColl = await dbc('users');
+    const deviationsColl = await dbc('deviations');
+
+    // 1. Group Leader Notification (+ Fallback)
+    const glLogs = await sendGroupLeaderNotification(
+      deviationId,
+      internalId,
+      deviation.area,
+      notificationContext,
+      usersColl,
+      deviationUrl,
+    );
+    allNotificationLogs.push(...glLogs);
+
+    // If no specific GL found for the area, notify Plant Manager
+    if (glLogs.length === 0 && deviation.area) {
+      const noGlLogs = await sendNoGroupLeaderNotification(
+        deviationId,
+        internalId,
+        deviation.area,
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...noGlLogs);
+    }
+
+    // 2. Quality Manager Notification (+ Vacancy Fallback)
+    const qualityManagerExists = await usersColl.findOne({
+      roles: 'quality-manager',
+    });
+    if (qualityManagerExists) {
+      const qmLogs = await sendRoleNotification(
+        deviationId,
+        internalId,
+        'quality-manager',
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...qmLogs);
+    } else {
+      console.log(
+        `No Quality Manager found for [${internalId}], notifying Plant Manager.`,
+      );
+      const vacancyQmLogs = await sendVacancyNotificationToPlantManager(
+        deviationId,
+        internalId,
+        'quality-manager', // Specify vacant role
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...vacancyQmLogs);
+    }
+
+    // 3. Production Manager Notification (+ Vacancy Fallback)
+    const productionManagerExists = await usersColl.findOne({
+      roles: 'production-manager',
+    });
+    if (productionManagerExists) {
+      const pmLogs = await sendRoleNotification(
+        deviationId,
+        internalId,
+        'production-manager',
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...pmLogs);
+    } else {
+      console.log(
+        `No Production Manager found for [${internalId}], notifying Plant Manager.`,
+      );
+      const vacancyPmLogs = await sendVacancyNotificationToPlantManager(
+        deviationId,
+        internalId,
+        'production-manager', // Specify vacant role
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...vacancyPmLogs);
+    }
+
+    // 4. Update Deviation with All Logs
+    if (allNotificationLogs.length > 0) {
+      try {
+        const updateOperation =
+          notificationContext === 'creation'
+            ? { $set: { notificationLogs: allNotificationLogs } }
+            : { $push: { notificationLogs: { $each: allNotificationLogs } } };
+
+        await deviationsColl.updateOne({ _id: deviationId }, updateOperation);
+        console.log(
+          `Successfully updated notification logs for [${internalId}].`,
+        );
+      } catch (e) {
+        console.error(`Failed to update logs for [${internalId}]:`, e);
+      }
+    }
+  } catch (e) {
+    console.error(`Error handling notifications for [${internalId}]:`, e);
+  }
+}
+
+// --- End Notification Helper Functions ---
 
 export async function revalidateDeviations() {
   revalidateTag('deviations');
@@ -94,7 +492,7 @@ export async function revalidateReasons() {
 export async function approveDeviation(
   id: string,
   userRole: string,
-  isApproved: boolean = true,
+  isApproved: boolean,
   comment?: string,
 ) {
   const session = await auth();
@@ -321,7 +719,7 @@ async function generateNextInternalId(): Promise<string> {
   }
 }
 
-// Update insertDeviation to include internalId
+// Update insertDeviation to include internalId and email notification logging
 export async function insertDeviation(deviation: AddDeviationType) {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -329,8 +727,6 @@ export async function insertDeviation(deviation: AddDeviationType) {
   }
   try {
     const collection = await dbc('deviations');
-
-    // Generate internal ID (only for non-draft deviations)
     const internalId = await generateNextInternalId();
 
     const deviationToInsert: DeviationType = {
@@ -360,12 +756,17 @@ export async function insertDeviation(deviation: AddDeviationType) {
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user?.email,
       correctiveActions: [],
+      notificationLogs: [], // Initialize notificationLogs
     };
 
     const res = await collection.insertOne(deviationToInsert);
-    if (res) {
+    if (res.insertedId) {
       revalidateTag('deviations');
-      return { success: 'inserted' };
+
+      // Call the centralized notification handler for creation
+      await handleNotifications(deviationToInsert, res.insertedId, 'creation'); // Pass 'creation' context
+
+      return { success: 'inserted', insertedId: res.insertedId.toString() };
     } else {
       return { error: 'not inserted' };
     }
@@ -391,9 +792,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
         articleNumber: deviation.articleNumber,
       }),
       ...(deviation.workplace && { workplace: deviation.workplace }),
-      ...(deviation.drawingNumber && {
-        drawingNumber: deviation.drawingNumber,
-      }),
+
       ...(deviation.quantity && {
         quantity: {
           value: Number(deviation.quantity),
@@ -476,49 +875,61 @@ export async function updateDraftDeviation(
 ) {
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    return { error: 'unauthorized' };
   }
   try {
     const collection = await dbc('deviations');
     const deviationToUpdate = await collection.findOne({
       _id: new ObjectId(id),
+      owner: session.user?.email,
+      status: 'draft',
     });
+
     if (!deviationToUpdate) {
       return { error: 'not found' };
-    }
-    if (session.user?.email !== deviationToUpdate.owner) {
-      return { error: 'not authorized' };
-    }
-    if (deviationToUpdate.status !== 'draft') {
-      return { error: 'not draft' };
     }
 
     const updateData: Partial<DeviationType> = {
       status: 'draft',
-      ...(deviation.articleName && { articleName: deviation.articleName }),
-      ...(deviation.articleNumber && {
+      edited: {
+        at: new Date(),
+        by: session.user?.email,
+      },
+      ...(deviation.articleName !== undefined && {
+        articleName: deviation.articleName,
+      }),
+      ...(deviation.articleNumber !== undefined && {
         articleNumber: deviation.articleNumber,
       }),
-      ...(deviation.workplace && { workplace: deviation.workplace }),
-      ...(deviation.drawingNumber && {
-        drawingNumber: deviation.drawingNumber,
+      ...(deviation.customerNumber !== undefined && {
+        customerNumber: deviation.customerNumber,
       }),
-      ...(deviation.quantity && {
-        quantity: {
-          value: Number(deviation.quantity),
-          unit: deviation.unit && deviation.unit,
-        },
+      ...(deviation.customerName !== undefined && {
+        customerName: deviation.customerName,
       }),
-      ...(deviation.unit && { unit: deviation.unit }),
-      ...(deviation.charge && { charge: deviation.charge }),
-      ...(deviation.reason && { reason: deviation.reason }),
-      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
-      ...(deviation.area && { area: deviation.area }),
-      ...(deviation.description && { description: deviation.description }),
-      ...(deviation.processSpecification && {
+      ...(deviation.workplace !== undefined && {
+        workplace: deviation.workplace,
+      }),
+      quantity:
+        deviation.quantity !== undefined
+          ? {
+              value: Number(deviation.quantity),
+              unit: deviation.unit || deviationToUpdate.quantity?.unit || 'pcs',
+            }
+          : deviationToUpdate.quantity,
+      ...(deviation.charge !== undefined && { charge: deviation.charge }),
+      ...(deviation.description !== undefined && {
+        description: deviation.description,
+      }),
+      ...(deviation.reason !== undefined && { reason: deviation.reason }),
+      timePeriod: {
+        from: deviation.periodFrom,
+        to: deviation.periodTo,
+      },
+      ...(deviation.area !== undefined && { area: deviation.area }),
+      ...(deviation.processSpecification !== undefined && {
         processSpecification: deviation.processSpecification,
       }),
-
       customerAuthorization: deviation.customerAuthorization,
     };
 
@@ -528,18 +939,124 @@ export async function updateDraftDeviation(
     );
 
     if (res.matchedCount === 0) {
-      return { error: 'not found' };
+      return { error: 'not found during update' };
+    }
+    if (res.modifiedCount === 0) {
     }
 
-    revalidateTag('deviations');
+    revalidateDeviationsAndDeviation();
     return { success: 'updated' };
   } catch (error) {
-    console.error(error);
+    console.error('updateDraftDeviation server action error:', error);
     return { error: 'updateDraftDeviation server action error' };
   }
 }
 
-// Update insertDeviationFromDraft to include internalId
+// NEW function to update non-draft deviations
+export async function updateDeviation(
+  id: string,
+  deviation: AddDeviationType, // Assuming payload is similar to creation
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+  try {
+    const collection = await dbc('deviations');
+    const deviationObjectId = new ObjectId(id);
+    const originalDeviation = await collection.findOne({
+      _id: deviationObjectId,
+    });
+
+    if (!originalDeviation) {
+      return { error: 'not found' };
+    }
+
+    // Ensure it's not a draft
+    if (originalDeviation.status === 'draft') {
+      return { error: 'cannot update draft using this function' };
+    }
+
+    // Authorization check (e.g., only owner can edit)
+    if (session.user?.email !== originalDeviation.owner) {
+      // Add more complex role checks if needed (e.g., admin, plant manager)
+      return { error: 'not authorized' };
+    }
+
+    // Prepare update data using atomic operators
+    const updateOperation: { $set: Partial<DeviationType>; $unset?: any } = {
+      $set: {
+        // Update fields from the payload
+        articleName: deviation.articleName,
+        articleNumber: deviation.articleNumber,
+        ...(deviation.workplace && { workplace: deviation.workplace }),
+        ...(deviation.quantity && {
+          quantity: {
+            value: Number(deviation.quantity),
+            unit: deviation.unit && deviation.unit,
+          },
+        }),
+        ...(deviation.charge && { charge: deviation.charge }),
+        reason: deviation.reason,
+        timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+        ...(deviation.area && { area: deviation.area }),
+        ...(deviation.description && { description: deviation.description }),
+        ...(deviation.processSpecification && {
+          processSpecification: deviation.processSpecification,
+        }),
+        ...(deviation.customerNumber && {
+          customerNumber: deviation.customerNumber,
+        }),
+        customerAuthorization: deviation.customerAuthorization,
+        // Add edited info
+        edited: {
+          at: new Date(),
+          by: session.user?.email,
+        },
+        // Reset status
+        status: 'in approval',
+      },
+      // Use $unset to remove approval fields entirely, ensuring they are re-evaluated
+      $unset: {
+        groupLeaderApproval: '',
+        qualityManagerApproval: '',
+        productionManagerApproval: '',
+        plantManagerApproval: '',
+      },
+    };
+
+    // Perform the update
+    const res = await collection.updateOne(
+      { _id: deviationObjectId },
+      updateOperation, // Use the correctly structured update operation
+    );
+
+    if (res.matchedCount === 0) {
+      return { error: 'not found during update' };
+    }
+
+    // Fetch the updated deviation to pass to notifications
+    const updatedDeviation = await collection.findOne({
+      _id: deviationObjectId,
+    });
+
+    if (updatedDeviation) {
+      // Trigger notifications for the edit
+      await handleNotifications(
+        updatedDeviation as DeviationType,
+        deviationObjectId,
+        'edit',
+      ); // Pass 'edit' context
+    }
+
+    revalidateDeviationsAndDeviation();
+    return { success: 'updated' };
+  } catch (error) {
+    console.error('updateDeviation server action error:', error);
+    return { error: 'updateDeviation server action error' };
+  }
+}
+
 export async function insertDeviationFromDraft(
   id: string,
   deviation: AddDeviationType,
@@ -550,25 +1067,15 @@ export async function insertDeviationFromDraft(
   }
   try {
     const collection = await dbc('deviations');
-    const draftDeviation = await collection.findOne({
-      _id: new ObjectId(id),
-    });
+    const draftDeviation = await collection.findOne({ _id: new ObjectId(id) });
 
-    if (!draftDeviation) {
-      return { error: 'draft not found' };
-    }
-
-    if (session.user?.email !== draftDeviation.owner) {
+    if (!draftDeviation) return { error: 'draft not found' };
+    if (session.user?.email !== draftDeviation.owner)
       return { error: 'not authorized' };
-    }
-
-    if (draftDeviation.status !== 'draft') {
+    if (draftDeviation.status !== 'draft')
       return { error: 'source is not a draft' };
-    }
 
-    // Generate internal ID when converting from draft to active deviation
     const internalId = await generateNextInternalId();
-
     const deviationToInsert: DeviationType = {
       internalId,
       status: 'in approval',
@@ -589,13 +1096,14 @@ export async function insertDeviationFromDraft(
       ...(deviation.processSpecification && {
         processSpecification: deviation.processSpecification,
       }),
-      createdAt: new Date(),
+      createdAt: new Date(), // Use new creation date
       ...(deviation.customerNumber && {
         customerNumber: deviation.customerNumber,
       }),
       customerAuthorization: deviation.customerAuthorization,
       owner: session.user?.email,
-      correctiveActions: [],
+      correctiveActions: [], // Start with empty corrective actions
+      notificationLogs: [], // Initialize notificationLogs
     };
 
     const insertRes = await collection.insertOne(deviationToInsert);
@@ -603,11 +1111,11 @@ export async function insertDeviationFromDraft(
       return { error: 'failed to insert new deviation' };
     }
 
-    // Delete the draft after successful creation of the deviation
-    const deleteRes = await collection.deleteOne({ _id: new ObjectId(id) });
+    // Delete the original draft
+    await collection.deleteOne({ _id: new ObjectId(id) });
 
     revalidateDeviationsAndDeviation();
-    return { success: 'inserted' };
+    return { success: 'inserted', insertedId: insertRes.insertedId.toString() };
   } catch (error) {
     console.error(error);
     return { error: 'insertDeviationFromDraft server action error' };

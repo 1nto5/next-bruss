@@ -63,19 +63,21 @@ export default function AddDeviationForm({
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
     defaultValues: {
-      // articleNumber: '',
-      // articleName: '',
-      // workplace: '',
-      // drawingNumber: '',
-      // quantity: '',
-      // charge: '',
-      // description: '',
-      // reason: '',
+      articleNumber: '',
+      articleName: '',
+      workplace: '',
+      // drawingNumber: '', // Assuming this might be added later or is optional
+      quantity: '',
+      unit: 'pcs', // Set a default unit
+      charge: '',
+      description: '',
+      reason: undefined, // Explicitly undefined for radio group
       periodFrom: undefined,
       periodTo: undefined,
-      // area: '',
-      // processSpecification: '',
-      // customerNumber: '',
+      area: undefined, // Explicitly undefined for radio group
+      processSpecification: '',
+      customerNumber: '',
+      customerName: '', // Added customerName default
       customerAuthorization: false,
     },
   });
@@ -335,7 +337,6 @@ export default function AddDeviationForm({
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />

@@ -14,9 +14,7 @@ TODO: all dialogs formatting as in failures lv
 
 
 TODO: odchylenia: 
-- edycja odchylenia autor i osoby zatwierdzające
 - po dokonaniu zmiany po uprzednim odrzuceniu przez jedno z stanowisk powiadomienie do akceptacji
-- jeśli zamiana z odrzucił na zaakceptował to spr czy nie ma innych odrzuconych i zmień status na in approval / in progress 
 - akcje korygujące zalogowanej osoby - oddzielna tabela
 - wyszukiwanie rozszerzyć o Quarry
 - dodatkowe zabezpieczenie przed drukowaniem oraz zmianami w actions / route 

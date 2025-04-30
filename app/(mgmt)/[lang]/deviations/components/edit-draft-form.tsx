@@ -5,7 +5,10 @@ import {
   DeviationReasonType,
   DeviationType,
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
-import { addDeviationSchema } from '@/app/(mgmt)/[lang]/deviations/lib/zod';
+import {
+  addDeviationDraftSchema,
+  addDeviationSchema,
+} from '@/app/(mgmt)/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,19 +34,21 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Locale } from '@/i18n.config';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeftFromLine, Plus, Search } from 'lucide-react';
+import { Eraser, Pencil, Plus, Search, Table, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
+  deleteDraftDeviation,
   findArticleName,
-  redirectToDeviation,
-  updateDeviation,
+  insertDeviation, // Import insertDeviation
+  redirectToDeviations,
+  updateDraftDeviation,
 } from '../actions';
 
-export default function EditForm({
+export default function EditDraftForm({
   reasonOptions,
   areaOptions,
   deviation,
@@ -56,7 +61,9 @@ export default function EditForm({
   id: string;
   lang: Locale;
 }) {
-  const [isPendingUpdate, setIsPendingUpdate] = useState(false); // Renamed state for clarity
+  const [isPendingInsert, setIsPendingInserting] = useState(false);
+  const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
+  const [isPendingDeleteDraft, setIsPendingDeleteDraft] = useState(false);
   const [isPendingFindArticleName, startFindArticleNameTransition] =
     useTransition();
 
@@ -114,29 +121,77 @@ export default function EditForm({
   };
 
   const onSubmit = async (data: z.infer<typeof addDeviationSchema>) => {
-    setIsPendingUpdate(true); // Use the renamed state setter
+    setIsPendingInserting(true);
     try {
-      // 1. Update the deviation using the validated data and the deviation ID
-      const updateRes = await updateDeviation(id, data); // Call updateDeviation with id and data
+      // 1. Insert the deviation using the validated data
+      const insertRes = await insertDeviation(data);
 
-      if (updateRes.success) {
-        toast.success('Odchylenie zaktualizowane!'); // Updated success message
-        redirectToDeviation(id);
-      } else if (updateRes.error === 'not authorized') {
-        toast.error('Nie masz uprawnień do edycji tego odchylenia.');
-      } else if (updateRes.error === 'not found') {
-        toast.error('Nie znaleziono odchylenia do aktualizacji.');
-      } else if (updateRes.error) {
-        console.error('onSubmit - updateDeviation error:', updateRes.error);
-        toast.error(
-          'Błąd podczas aktualizacji odchylenia. Skontaktuj się z IT!', // Updated error message
-        );
+      if (insertRes.success) {
+        // 2. If insertion is successful, DO NOT delete the original draft
+        // const deleteRes = await deleteDraftDeviation(id); // Removed deletion
+        toast.success('Odchylenie dodane ze szkicu!'); // Updated message
+        redirectToDeviations();
+      } else if (insertRes.error) {
+        console.error('onSubmit - insertDeviation error:', insertRes.error);
+        toast.error('Błąd podczas dodawania odchylenia. Skontaktuj się z IT!');
       }
     } catch (error) {
       console.error('onSubmit error:', error);
       toast.error('Wystąpił nieoczekiwany błąd. Skontaktuj się z IT!');
     } finally {
-      setIsPendingUpdate(false); // Use the renamed state setter
+      setIsPendingInserting(false); // Ensure loading state is always reset
+    }
+  };
+
+  const handleDraftUpdate = async (
+    data: z.infer<typeof addDeviationDraftSchema>,
+  ) => {
+    setIsPendingUpdatingDraft(true);
+    try {
+      // Validate against the draft schema before sending
+      const validatedData = addDeviationDraftSchema.parse(data);
+      const res = await updateDraftDeviation(id, validatedData);
+      if (res.success) {
+        toast.success('Szkic zapisany!');
+        // form.reset(); // Consider if resetting is desired after saving draft
+        // redirectToDeviations(); // Removed redirection
+      } else if (res.error) {
+        console.error('handleDraftUpdate', res.error);
+        // Provide more specific error messages if possible
+        if (res.error === 'not found') {
+          toast.error('Nie znaleziono szkicu do zaktualizowania.');
+        } else if (res.error === 'not authorized') {
+          toast.error('Nie masz uprawnień do edycji tego szkicu.');
+        } else if (res.error === 'not draft') {
+          toast.error('Ten element nie jest już szkicem.');
+        } else {
+          toast.error('Błąd podczas zapisywania szkicu. Skontaktuj się z IT!');
+        }
+      }
+    } catch (error) {
+      console.error('handleDraftUpdate error:', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingUpdatingDraft(false);
+    }
+  };
+
+  const handleDeleteDraft = async () => {
+    setIsPendingDeleteDraft(true);
+    try {
+      const res = await deleteDraftDeviation(id);
+      if (res.success) {
+        toast.success('Szkic usunięty!');
+        redirectToDeviations();
+      } else if (res.error) {
+        console.error('handleDeleteDraft', res.error);
+        toast.error('Skontaktuj się z IT!');
+      }
+    } catch (error) {
+      console.error('handleDeleteDraft', error);
+      toast.error('Skontaktuj się z IT!');
+    } finally {
+      setIsPendingDeleteDraft(false);
     }
   };
 
@@ -148,9 +203,9 @@ export default function EditForm({
           <CardTitle>Edytowanie szkicu odchylenia</CardTitle>
           {/* <CardDescription>ID: {deviation?._id}</CardDescription> */}
           {/* </div> */}
-          <Link href={`/deviations/${id}`}>
+          <Link href='/deviations'>
             <Button variant='outline'>
-              <ArrowLeftFromLine /> <span>Odchylenie</span>
+              <Table /> <span>Tabela odchyleń</span>
             </Button>
           </Link>
         </div>
@@ -325,7 +380,6 @@ export default function EditForm({
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -357,6 +411,7 @@ export default function EditForm({
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -509,20 +564,53 @@ export default function EditForm({
           </CardContent>
           <Separator className='mb-4' />
 
-          <CardFooter className='flex justify-end'>
-            {' '}
-            {/* Changed justify-between to justify-end */}
-            {/* Removed the div containing "Wyczyść" and "Usuń szkic" buttons */}
+          <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              {/* Removed "Zapisz szkic" button */}
               <Button
-                disabled={isPendingUpdate} // Updated disabled condition with renamed state
+                variant='destructive'
+                type='button'
+                onClick={() => form.reset()}
+                className='w-full sm:w-auto'
+              >
+                <Eraser className='' />
+                Wyczyść
+              </Button>
+              <Button
+                variant='destructive'
+                type='button'
+                onClick={handleDeleteDraft}
+                disabled={isPendingDeleteDraft}
+                className='w-full sm:w-auto'
+              >
+                <Trash className={isPendingDeleteDraft ? 'animate-spin' : ''} />
+                Usuń szkic
+              </Button>
+            </div>
+            <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
+              <Button
+                variant='secondary'
+                type='button'
+                onClick={() => handleDraftUpdate(form.getValues())}
+                disabled={isPendingUpdateDraft}
+                className='w-full sm:w-auto'
+              >
+                <Pencil
+                  className={isPendingUpdateDraft ? 'animate-spin' : ''}
+                />
+                Zapisz szkic
+              </Button>
+
+              <Button
+                disabled={
+                  isPendingInsert ||
+                  isPendingUpdateDraft ||
+                  isPendingDeleteDraft
+                } // Disable if any action is pending
                 type='submit'
                 className='w-full sm:w-auto'
               >
-                <Plus className={isPendingUpdate ? 'animate-spin' : ''} />{' '}
-                {/* Use renamed state */}
-                Zapisz zmiany {/* Renamed button */}
+                <Plus className={isPendingInsert ? 'animate-spin' : ''} />
+                Dodaj odchylenie
               </Button>
             </div>
           </CardFooter>

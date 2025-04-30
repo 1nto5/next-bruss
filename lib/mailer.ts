@@ -25,9 +25,14 @@ const FOOTER_TEXT =
 
 const mailer = async (mailOptions: any) => {
   // Add the default "from" address to the options
+  let to = mailOptions.to;
+  if (process.env.NODE_ENV === 'development') {
+    to = 'adrian.antosiak@bruss-group.com';
+  }
   const completeMailOptions = {
     from: 'no-reply@bruss-group.com',
     ...mailOptions,
+    to,
   };
 
   // Append footer to text version if exists, otherwise, create it.

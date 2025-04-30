@@ -1,76 +1,136 @@
 import * as z from 'zod';
 
-export const addDeviationSchema = z.object({
-  articleNumber: z
-    .string({ message: 'Wprowadź numer artykułu!' })
-    .min(5, { message: 'Wprowadź poprawny numer artykułu!' }),
-  articleName: z
-    .string({ message: 'Wprowadź nazwę artykułu!' })
-    .min(5, { message: 'Wprowadź poprawną nazwę artykułu!' }),
-  customerNumber: z.string().optional(),
-  customerName: z.string().optional(),
-  workplace: z
-    .string()
-    .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
-    .optional(),
-  quantity: z
-    .string() // .string({ message: 'Podaj ilość!' })
-    .min(1, { message: 'Podaj ilość!' })
-    .refine((value) => !isNaN(Number(value)), {
-      message: 'Podaj poprawną liczbę!',
-    })
-    .optional(),
-  unit: z.string().optional(),
-  charge: z.string().optional(),
-  description: z
-    .string({ message: 'Wprowadź opis odchylenia!' })
-    .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' }),
-  reason: z.string({ message: 'Wybierz powód!' }),
-  periodFrom: z.date({ message: 'Wybierz datę!' }),
-  periodTo: z.date({ message: 'Wybierz datę!' }),
-  area: z.string({ message: 'Wybierz obszar!' }),
-  processSpecification: z.string().optional(),
-  customerAuthorization: z.boolean(),
-});
+export const addDeviationSchema = z
+  .object({
+    articleNumber: z
+      .string({ message: 'Wprowadź numer artykułu!' })
+      .min(5, { message: 'Wprowadź poprawny numer artykułu!' }),
+    articleName: z
+      .string({ message: 'Wprowadź nazwę artykułu!' })
+      .min(5, { message: 'Wprowadź poprawną nazwę artykułu!' }),
+    customerNumber: z.string().optional(),
+    customerName: z.string().optional(),
+    workplace: z.string().optional(),
+    quantity: z
+      .string() // Keep as string for input, refine for number
+      .min(1, { message: 'Podaj ilość!' }) // Required for final submission
+      .refine((value) => !isNaN(Number(value)) && Number(value) > 0, {
+        message: 'Podaj poprawną, dodatnią liczbę!',
+      }),
+    unit: z.string().min(1, { message: 'Podaj jednostkę!' }), // Required if quantity is given
+    charge: z.string().optional(),
+    description: z
+      .string({ message: 'Wprowadź opis odchylenia!' })
+      .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' }),
+    reason: z.string({ message: 'Wybierz powód!' }),
+    periodFrom: z
+      .date({ message: 'Wybierz datę!' })
+      .min(
+        (() => {
+          const today = new Date();
+          today.setDate(today.getDate() - 7); // Allow starting up to 7 days ago
+          today.setHours(0, 0, 0, 0); // Set time to start of the day
+          return today;
+        })(),
+        { message: 'Data rozpoczęcia nie może być starsza niż 7 dni!' },
+      )
+      .max(
+        (() => {
+          const today = new Date();
+          today.setDate(today.getDate() + 7); // Allow starting up to 7 days in the future
+          today.setHours(23, 59, 59, 999); // Set time to end of the day
+          return today;
+        })(),
+        { message: 'Data rozpoczęcia nie może być późniejsza niż 7 dni!' },
+      ),
+    periodTo: z.date({ message: 'Wybierz datę!' }).max(
+      (() => {
+        const today = new Date();
+        today.setDate(today.getDate() + 30); // Allow ending up to 30 days in the future
+        today.setHours(23, 59, 59, 999); // Set time to end of the day
+        return today;
+      })(),
+      { message: 'Data zakończenia nie może być późniejsza niż 30 dni!' },
+    ),
+    area: z.string({ message: 'Wybierz obszar!' }),
+    processSpecification: z.string().optional(),
+    customerAuthorization: z.boolean(),
+  })
+  .refine((data) => data.periodTo >= data.periodFrom, {
+    message: 'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia!',
+    path: ['periodTo'], // Assign the error to the periodTo field
+  });
 
 export type AddDeviationType = z.infer<typeof addDeviationSchema>;
 
-export const addDeviationDraftSchema = z.object({
-  articleNumber: z.string().optional(),
-  articleName: z.string().optional(),
-  customerNumber: z.string().optional(),
-  customerName: z.string().optional(),
-  workplace: z
-    .string()
-    .min(5, { message: 'Wprowadź poprawną nazwę stanowiska!' })
-    .optional(),
-  drawingNumber: z
-    .string() // { message: 'Wprowadź numer rysunku!' }
-    .min(5, { message: 'Wprowadź poprawny numer rysunku!' })
-    .optional(),
-  quantity: z
-    .string() // .string({ message: 'Podaj ilość!' })
-    .min(1, { message: 'Podaj ilość!' })
-    .refine((value) => !isNaN(Number(value)), {
-      message: 'Podaj poprawną liczbę!',
-    })
-    .optional(),
-  unit: z.string().optional(),
-  charge: z.string().optional(),
-  description: z
-    .string()
-    .min(10, { message: 'Opis musi mieć długość min. 10 znaków!' })
-    .optional(),
-  reason: z.string().optional(),
-  periodFrom: z.date({ message: 'Wybierz datę!' }),
-  periodTo: z.date({ message: 'Wybierz datę!' }),
-  area: z
-    .string()
-    .min(2, { message: 'Wprowadź poprawną nazwę obszaru!' })
-    .optional(),
-  processSpecification: z.string().optional(),
-  customerAuthorization: z.boolean(),
-});
+export const addDeviationDraftSchema = z
+  .object({
+    articleNumber: z.string().optional(),
+    articleName: z.string().optional(),
+    customerNumber: z.string().optional(),
+    customerName: z.string().optional(),
+    workplace: z.string().optional(),
+    quantity: z
+      .string()
+      .optional() // Optional for draft
+      .nullable() // Allow null
+      .refine(
+        (value) => !value || (!isNaN(Number(value)) && Number(value) >= 0), // Allow empty, null, or non-negative number string
+        {
+          message: 'Podaj poprawną liczbę (lub pozostaw puste)!',
+        },
+      ),
+    unit: z.string().optional(), // Optional for draft, but linked to quantity below
+    charge: z.string().optional(),
+    description: z
+      .string()
+      .optional() // Optional for draft
+      .refine(
+        (value) => !value || value.length === 0 || value.length >= 10, // Allow empty or min 10 chars
+        {
+          message: 'Opis musi mieć długość min. 10 znaków (lub być pusty)!',
+        },
+      ),
+    reason: z.string().optional(), // Optional for draft
+    periodFrom: z.date().optional().nullable(), // Optional for draft
+    periodTo: z.date().optional().nullable(), // Optional for draft
+    area: z.string().optional(), // Optional for draft
+    processSpecification: z.string().optional(),
+    customerAuthorization: z.boolean().optional(), // Optional for draft
+  })
+  .refine(
+    (data) => {
+      // If quantity is provided (not null, not undefined, not empty string, and > 0), unit must also be provided
+      const quantityValue = data.quantity ? Number(data.quantity) : NaN;
+      if (
+        data.quantity &&
+        data.quantity.trim() !== '' &&
+        !isNaN(quantityValue) &&
+        quantityValue > 0
+      ) {
+        return data.unit && data.unit.trim() !== '';
+      }
+      return true; // Otherwise (quantity empty, 0, or invalid), validation passes regarding unit
+    },
+    {
+      message: 'Podaj jednostkę, jeśli podałeś ilość większą od 0!',
+      path: ['unit'], // Assign the error to the unit field
+    },
+  )
+  .refine(
+    (data) => {
+      // If both dates are provided, periodTo must be >= periodFrom
+      if (data.periodFrom && data.periodTo) {
+        return data.periodTo >= data.periodFrom;
+      }
+      return true; // Pass if one or both dates are missing
+    },
+    {
+      message:
+        'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia!',
+      path: ['periodTo'],
+    },
+  );
 
 export type AddDeviationDraftType = z.infer<typeof addDeviationDraftSchema>;
 

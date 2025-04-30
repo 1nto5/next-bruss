@@ -25,7 +25,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { FileDown, Hammer, Printer, Table as TableIcon } from 'lucide-react';
+import {
+  CheckCheck, // Import CheckCheck
+  Cog,
+  FileDown,
+  Hammer,
+  LayoutList, // Import LayoutList
+  MailCheck,
+  Paperclip, // Import Paperclip
+  Printer,
+  Table as TableIcon,
+  Wrench, // Import Wrench
+} from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useTransition } from 'react';
@@ -293,6 +304,15 @@ export default function DeviationView({
                 <TableIcon /> Odchylenia
               </Button>
             </Link>
+            {/* Add Edit Link for eligible deviations */}
+            {['in approval', 'rejected'].includes(deviation?.status || '') && (
+              <Link href={`/deviations/${deviation?._id}/edit`}>
+                <Button variant='outline'>
+                  <Cog />
+                  Edytuj
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
         <CardDescription className='flex flex-col'>
@@ -306,7 +326,9 @@ export default function DeviationView({
           <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             <Card className='lg:w-2/5'>
               <CardHeader>
-                <CardTitle>Szczegóły</CardTitle>
+                <CardTitle className='flex items-center'>
+                  <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -442,7 +464,9 @@ export default function DeviationView({
               <Card>
                 <CardHeader>
                   <div className='flex justify-between'>
-                    <CardTitle>Akcje korygujące</CardTitle>
+                    <CardTitle className='flex items-center'>
+                      <Wrench className='mr-2 h-5 w-5' /> Akcje korygujące
+                    </CardTitle>
                     {(session?.user?.roles?.some((role) =>
                       [
                         'quality',
@@ -500,7 +524,9 @@ export default function DeviationView({
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle>Zatwierdzenia</CardTitle>
+                  <CardTitle className='flex items-center'>
+                    <CheckCheck className='mr-2 h-5 w-5' /> Zatwierdzenia
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
@@ -528,7 +554,6 @@ export default function DeviationView({
                           by={deviation?.groupLeaderApproval?.by}
                           at={deviation?.groupLeaderApproval?.at?.toString()}
                           lang={lang}
-                          isPendingApproval={isPendingApproval}
                           reason={deviation?.groupLeaderApproval?.reason}
                           history={deviation?.groupLeaderApproval?.history}
                         />
@@ -549,7 +574,6 @@ export default function DeviationView({
                           by={deviation?.qualityManagerApproval?.by}
                           at={deviation?.qualityManagerApproval?.at?.toString()}
                           lang={lang}
-                          isPendingApproval={isPendingApproval}
                           reason={deviation?.qualityManagerApproval?.reason}
                           history={deviation?.qualityManagerApproval?.history}
                         />
@@ -573,7 +597,6 @@ export default function DeviationView({
                           by={deviation?.productionManagerApproval?.by}
                           at={deviation?.productionManagerApproval?.at?.toString()}
                           lang={lang}
-                          isPendingApproval={isPendingApproval}
                           reason={deviation?.productionManagerApproval?.reason}
                           history={
                             deviation?.productionManagerApproval?.history
@@ -592,11 +615,60 @@ export default function DeviationView({
                           by={deviation?.plantManagerApproval?.by}
                           at={deviation?.plantManagerApproval?.at?.toString()}
                           lang={lang}
-                          isPendingApproval={isPendingApproval}
                           reason={deviation?.plantManagerApproval?.reason}
                           history={deviation?.plantManagerApproval?.history}
                         />
                       </TableRow>
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center'>
+                    <MailCheck className='mr-2 h-5 w-5' /> Wysłane powiadomienia
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Do</TableHead>
+                        <TableHead>Data wysłania</TableHead>
+                        <TableHead>Typ</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {deviation?.notificationLogs &&
+                      deviation.notificationLogs.length > 0 ? (
+                        [...deviation.notificationLogs] // Create a shallow copy to avoid mutating the original array
+                          .sort(
+                            (a, b) =>
+                              new Date(b.sentAt).getTime() -
+                              new Date(a.sentAt).getTime(),
+                          ) // Sort by date descending
+                          .slice(0, 10) // Take the top 10 most recent logs
+                          .map((log, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                {extractNameFromEmail(log.to)}
+                              </TableCell>
+                              <TableCell>
+                                {new Date(log.sentAt).toLocaleString(lang)}
+                              </TableCell>
+                              <TableCell>{log.type}</TableCell>
+                            </TableRow>
+                          ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={3}
+                            className='text-muted-foreground text-center'
+                          >
+                            Brak zarejestrowanych powiadomień.
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -607,7 +679,9 @@ export default function DeviationView({
             <Card>
               <CardHeader>
                 <div className='flex justify-between'>
-                  <CardTitle>Załączniki</CardTitle>
+                  <CardTitle className='flex items-center'>
+                    <Paperclip className='mr-2 h-5 w-5' /> Załączniki
+                  </CardTitle>
                   {deviation?._id && (
                     <AddAttachmentDialog
                       deviationId={deviation._id.toString()}

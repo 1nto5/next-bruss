@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import EditDraftForm from '../../components/edit-draft-form';
+import EditForm from '../../components/edit-form';
 import {
   getConfigAreaOptions,
   getConfigReasonOptions,
@@ -19,7 +19,7 @@ export default async function EditDeviationPage(props: {
   const areaOptions = await getConfigAreaOptions();
   const deviationData = await getDeviation(id);
   return (
-    <EditDraftForm
+    <EditForm
       reasonOptions={reasonOptions}
       areaOptions={areaOptions}
       deviation={deviationData.deviation}
