@@ -5,7 +5,7 @@ import AddCorrectiveActionForm from '../../../components/add-corrective-action-f
 
 async function getUsers(): Promise<UsersListType> {
   const res = await fetch(`${process.env.API}/users`, {
-    next: { revalidate: 0, tags: ['users'] },
+    next: { revalidate: 60 * 60 * 24, tags: ['users'] },
   });
 
   if (!res.ok) {

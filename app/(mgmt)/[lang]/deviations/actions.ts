@@ -198,7 +198,7 @@ async function sendNoGroupLeaderNotification(
   if (uniqueEmails.length > 0) {
     const actionText =
       notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
-    const requirementText = 'zatwierdzenie';
+    const requirementText = 'zatwierdzenia';
 
     // Standardized subject for no GL
     const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat Group Leader)`;
@@ -206,8 +206,7 @@ async function sendNoGroupLeaderNotification(
     const html = `
       <div style="font-family: sans-serif;">
         <p>${actionText} odchylenie [${internalId}] w obszarze ${deviationArea?.toUpperCase()}, które wymaga ${requirementText}.</p>
-        <p style="color: orange; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu braku przypisanego Group Leader dla obszaru ${deviationArea?.toUpperCase}.</p>
-        <p>Proszę o podjęcie odpowiednich działań lub zapewnienie zastępstwa.</p>
+        <p style="color: orange; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu braku przypisanego: Group Leadera (${deviationArea?.toUpperCase()}).</p>
         <p>
           <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
         </p>
