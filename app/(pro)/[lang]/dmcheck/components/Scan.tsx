@@ -147,10 +147,10 @@ export function Scan({
         playNok();
         toast.error('Nie znaleziono w bazie SMART!');
         break;
-      case 'smart unknown':
-        playNok();
-        toast.error('SMART: Część nieprzeprocesowana na wszystkich stacjach!');
-        break;
+      // case 'smart unknown':
+      //   playNok();
+      //   toast.error('SMART: Część nieprzeprocesowana na wszystkich stacjach!');
+      //   break;
       case 'smart nok':
         playNok();
         toast.error('SMART: Część otrzymała status NOK na jednej ze stacji!'); // can we determine which station in the future?
@@ -171,6 +171,17 @@ export function Scan({
         playOk();
         toast.success(cDict.toast.reworkDmcSaved);
         // console.log(state.dmc, state.time);
+        state.dmc &&
+          state.time &&
+          router.push(
+            pathname + '?' + createQueryString(state.dmc, state.time),
+          );
+        break;
+      case 'dmc saved smart unknown':
+        playOk();
+        toast.warning(
+          'SMART: Część nieprzeprocesowana na wszystkich stacjach!',
+        );
         state.dmc &&
           state.time &&
           router.push(

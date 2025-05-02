@@ -277,6 +277,8 @@ export async function saveDmc(
       }
     }
 
+    let smartStatus = 'ok'; // Flag for SMART status
+
     // EOL810/EOL488 check in external SMART API
     if (
       articleConfig.workplace === 'eol810' ||
@@ -293,7 +295,8 @@ export async function saveDmc(
         case 'NOT_FOUND':
           return { message: 'smart not found' };
         case 'UNKNOWN':
-          return { message: 'smart unknown' };
+          smartStatus = 'unknown'; // Set flag instead of returning
+          break; // Continue execution to save DMC
         case 'NOK':
           return { message: 'smart nok' };
         case 'PATTERN':
@@ -326,6 +329,14 @@ export async function saveDmc(
           `http://10.27.90.4:8090/api/turn-on-ok-indicator/${variant}`,
         );
         // console.log(`Lamp response status: ${res.status}`);
+      }
+      // Return different message based on smartStatus flag
+      if (smartStatus === 'unknown') {
+        return {
+          message: 'dmc saved smart unknown',
+          dmc: dmc,
+          time: new Date().toISOString(),
+        };
       }
       return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
     }
