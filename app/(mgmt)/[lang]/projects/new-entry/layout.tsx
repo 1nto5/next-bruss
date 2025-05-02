@@ -27,7 +27,7 @@ export default async function Layout(props: {
     session.user?.roles.includes('plant-manager') ||
     false;
   if (access === false) {
-    redirect('/production-overtime');
+    redirect('/projects');
   }
 
   return <div className='flex justify-center'>{children}</div>;
