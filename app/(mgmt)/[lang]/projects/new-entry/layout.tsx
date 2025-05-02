@@ -19,15 +19,12 @@ export default async function Layout(props: {
   // const dict = await getDictionary(lang);
 
   const session = await auth();
-  if (!session) {
+  if (!session || !session.user || !session.user.email) {
     redirect('/auth');
   }
-  const access =
-    session.user?.roles.includes('group-leader') ||
-    session.user?.roles.includes('plant-manager') ||
-    false;
+  const access = session.user.email === 'adrian.antosiak@bruss-group.com';
   if (access === false) {
-    redirect('/projects');
+    redirect(`/projects`);
   }
 
   return <div className='flex justify-center'>{children}</div>;

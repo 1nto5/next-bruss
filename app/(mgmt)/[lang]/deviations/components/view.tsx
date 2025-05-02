@@ -397,12 +397,16 @@ export default function DeviationView({
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Numer:</TableCell>
+                      <TableCell className='font-medium'>
+                        Numer artykułu.:
+                      </TableCell>
                       <TableCell>{deviation?.articleNumber || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Artykuł:</TableCell>
+                      <TableCell className='font-medium'>
+                        Nazwa artykułu.:
+                      </TableCell>
                       <TableCell>{deviation?.articleName || '-'}</TableCell>
                     </TableRow>
 

@@ -793,11 +793,16 @@ export async function approveDeviation(
       return { error: 'already approved' };
     }
 
-    // 2. Only allow rejecting if not already decided (undefined)
-    // Check if currentApproval exists and its approved status is not undefined
-    if (!isApproved && currentApproval?.approved !== undefined) {
-      return { error: 'cannot reject after decision has been made' };
+    // 2. Prevent rejecting if already rejected by the same role
+    if (!isApproved && currentApproval?.approved === false) {
+      return { error: 'already rejected' };
     }
+
+    // 3. Allow rejecting if approved (overriding previous approval)
+    // No explicit check needed here, the logic below handles it.
+
+    // 4. Allow approving if rejected (overriding previous rejection)
+    // No explicit check needed here, the logic below handles it.
 
     // const currentApproval = deviation[approvalField] as // <-- Moved up
     //   | ApprovalType
@@ -835,34 +840,60 @@ export async function approveDeviation(
       [approvalField]: newApprovalRecord,
     };
 
-    // If rejection, set status to rejected
+    // Determine the new status
     if (!isApproved) {
+      // If rejecting, always set status to rejected
       updateField.status = 'rejected';
     } else {
-      // Only check for all approvals if this is an approval (not rejection)
-      // Use the casted type for checking approvals
-      const hasAllApprovals = Object.values(approvalFieldMap).every(
-        (field) =>
-          field === approvalField
-            ? true // The current approval being set is considered approved for this check
-            : (deviation[field] as ApprovalType | undefined)?.approved === true, // Check other fields explicitly for true
-      );
+      // If approving:
+      // Check if this approval reverses a previous rejection by this role
+      const wasPreviouslyRejectedByThisRole =
+        currentApproval?.approved === false;
 
-      if (hasAllApprovals) {
-        const now = new Date();
-        // Ensure timePeriod and its properties exist before creating Date objects
-        const periodFrom = deviation.timePeriod?.from
-          ? new Date(deviation.timePeriod.from)
-          : null;
-        const periodTo = deviation.timePeriod?.to
-          ? new Date(deviation.timePeriod.to)
-          : null;
+      // Check if any *other* roles have rejected it
+      const otherRolesRejected = Object.entries(approvalFieldMap)
+        .filter(([role, field]) => field !== approvalField) // Exclude the current role
+        .some(
+          ([role, field]) =>
+            (deviation[field] as ApprovalType | undefined)?.approved === false,
+        );
 
-        // Check if periodFrom and periodTo are valid dates before comparison
-        updateField.status =
-          periodFrom && periodTo && now >= periodFrom && now <= periodTo
-            ? 'in progress'
-            : 'approved';
+      if (wasPreviouslyRejectedByThisRole && !otherRolesRejected) {
+        // If reversing a rejection and no other rejections exist, set back to 'in approval'
+        updateField.status = 'in approval';
+      } else {
+        // Otherwise, check if all approvals are now met
+        const hasAllApprovals = Object.values(approvalFieldMap).every(
+          (field) =>
+            field === approvalField
+              ? true // The current approval being set is considered approved for this check
+              : (deviation[field] as ApprovalType | undefined)?.approved ===
+                true, // Check other fields explicitly for true
+        );
+
+        if (hasAllApprovals) {
+          const now = new Date();
+          // Ensure timePeriod and its properties exist before creating Date objects
+          const periodFrom = deviation.timePeriod?.from
+            ? new Date(deviation.timePeriod.from)
+            : null;
+          const periodTo = deviation.timePeriod?.to
+            ? new Date(deviation.timePeriod.to)
+            : null;
+
+          // Check if periodFrom and periodTo are valid dates before comparison
+          updateField.status =
+            periodFrom && periodTo && now >= periodFrom && now <= periodTo
+              ? 'in progress'
+              : 'approved';
+        } else if (!otherRolesRejected) {
+          // If not all approvals met, but no rejections exist (including the one potentially just reversed),
+          // ensure status is 'in approval'. This covers cases where it might have been 'rejected' before.
+          updateField.status = 'in approval';
+        }
+        // If other roles still have rejections, the status remains 'rejected' (handled by the initial state or previous updates)
+        // or will be set to 'rejected' if another role rejects later. We don't explicitly set it back to 'rejected' here
+        // unless the current action *is* a rejection.
       }
     }
 

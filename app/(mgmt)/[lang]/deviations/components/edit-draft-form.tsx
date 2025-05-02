@@ -219,7 +219,7 @@ export default function EditDraftForm({
               name='articleNumber'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Artykuł</FormLabel>
+                  <FormLabel>Numer artykułu</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -233,7 +233,7 @@ export default function EditDraftForm({
               name='articleName'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Nazwa</FormLabel>
+                  <FormLabel>Nazwa artykułu</FormLabel>
                   <div className='flex items-center space-x-2'>
                     <FormControl>
                       <Input {...field} />
