@@ -4,7 +4,6 @@ FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which i
 FIXME: duplicate mongodb errors in pm2 logs
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
-PLAN: synchronizacja userów z domeną (synchronizuj nowych, nie zmieniaj istniejących, usuwaj tych co nie ma już w domenie)
 
 TODO: EOL136153 migration to new version
 TODO: dmcheck english version
