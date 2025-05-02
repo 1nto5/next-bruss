@@ -178,107 +178,110 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
       <TableCell>{getStatusBadge()}</TableCell>
       <TableCell className='text-nowrap'>{roleText}</TableCell>
 
-      <TableCell className='flex gap-2'>
-        {hasRolePrivilege && (
-          <>
-            {/* Allow approval when not already approved (either undefined or rejected) */}
-            {approved !== true && (
-              <Dialog open={openApprove} onOpenChange={setOpenApprove}>
-                <DialogTrigger asChild>
-                  <Button
-                    size='icon'
-                    type='button'
-                    variant='outline'
-                    className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
-                  >
-                    <ThumbsUp color='green' />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Zatwierdzenie odchylenia</DialogTitle>
-                    <DialogDescription>
-                      Czy na pewno chcesz zatwierdzić to odchylenie?
-                    </DialogDescription>
-                  </DialogHeader>
+      <TableCell>
+        <div className='flex items-center gap-2'>
+          {hasRolePrivilege && (
+            <>
+              {/* Allow approval when not already approved (either undefined or rejected) */}
+              {approved !== true && (
+                <Dialog open={openApprove} onOpenChange={setOpenApprove}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size='icon'
+                      type='button'
+                      variant='outline'
+                      className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
+                    >
+                      <ThumbsUp color='green' />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Zatwierdzenie odchylenia</DialogTitle>
+                      <DialogDescription>
+                        Czy na pewno chcesz zatwierdzić to odchylenie?
+                      </DialogDescription>
+                    </DialogHeader>
 
-                  <Form {...approvalForm}>
-                    <div className='grid gap-2'>
-                      <FormField
-                        control={approvalForm.control}
-                        name='comment'
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Komentarz</FormLabel>
-                            <FormControl>
-                              <Textarea {...field} />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <DialogFooter className='pt-4'>
-                      <Button onClick={handleApproveWithComment}>
-                        <Check />
-                        Zatwierdzam
-                      </Button>
-                    </DialogFooter>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-            )}
-
-            {/* Only show reject button when not already decided (undefined) */}
-            {approved === undefined && (
-              <Dialog open={openReject} onOpenChange={setOpenReject}>
-                <DialogTrigger asChild>
-                  <Button
-                    size='icon'
-                    type='button'
-                    variant='outline'
-                    className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
-                  >
-                    <ThumbsDown color='red' />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Odrzuć odchylenie</DialogTitle>
-                  </DialogHeader>
-
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
+                    <Form {...approvalForm}>
                       <div className='grid gap-2'>
                         <FormField
-                          control={form.control}
-                          name='reason'
+                          control={approvalForm.control}
+                          name='comment'
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Komentarz</FormLabel>
                               <FormControl>
                                 <Textarea {...field} />
                               </FormControl>
-                              <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
+
                       <DialogFooter className='pt-4'>
-                        <Button type='submit'>
+                        <Button onClick={handleApproveWithComment}>
                           <Check />
-                          Odrzuć
+                          Zatwierdzam
                         </Button>
                       </DialogFooter>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-            )}
-          </>
-        )}
-        {(!hasRolePrivilege || (approved === true && approved !== undefined)) &&
-          '-'}
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {/* Only show reject button when not already decided (undefined) */}
+              {approved === undefined && (
+                <Dialog open={openReject} onOpenChange={setOpenReject}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size='icon'
+                      type='button'
+                      variant='outline'
+                      className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
+                    >
+                      <ThumbsDown color='red' />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                      <DialogTitle>Odrzuć odchylenie</DialogTitle>
+                    </DialogHeader>
+
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <div className='grid gap-2'>
+                          <FormField
+                            control={form.control}
+                            name='reason'
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Komentarz</FormLabel>
+                                <FormControl>
+                                  <Textarea {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                        <DialogFooter className='flex items-center justify-end pt-4'>
+                          <Button type='submit'>
+                            <Check />
+                            Odrzuć
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </>
+          )}
+          {(!hasRolePrivilege ||
+            (approved === true && approved !== undefined)) &&
+            '-'}
+        </div>
       </TableCell>
       <TableCell className='whitespace-nowrap'>
         {(by && extractNameFromEmail(by)) || '-'}

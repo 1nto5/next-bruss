@@ -77,8 +77,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   await usersCollection.insertOne({
                     email: email.toLowerCase(),
                     roles: ['user'],
-                    firstLogin: new Date(),
-                    rolesLastRefreshed: new Date(),
                   });
                 } catch (error) {
                   await ldapClient.unbind();
@@ -87,13 +85,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 return {
                   email,
                   roles: ['user'],
-                  rolesLastRefreshed: new Date(),
                 } as User;
               } else {
                 return {
                   email,
                   roles: user.roles,
-                  rolesLastRefreshed: new Date(),
                 } as User;
               }
             } catch (error) {

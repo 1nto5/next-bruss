@@ -5,6 +5,8 @@ import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+// NEW: Import the notification action
+import { notifyRejectorsAfterAttachment } from '@/app/(mgmt)/[lang]/deviations/actions';
 
 export const config = {
   api: {
@@ -139,6 +141,15 @@ export async function POST(req: NextRequest) {
 
       // Odświeżenie cache'u
       revalidateTag('deviation');
+
+      // NEW: Trigger notification for rejectors (fire and forget, errors handled within the action)
+      notifyRejectorsAfterAttachment(deviationId).catch((err) => {
+        console.error(
+          `Error triggering notification after attachment upload for deviation ${deviationId}:`,
+          err,
+        );
+        // Optionally log this failure more formally if needed
+      });
 
       return NextResponse.json({
         success: true,

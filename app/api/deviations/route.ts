@@ -32,6 +32,15 @@ export async function GET(req: NextRequest) {
     if (key === 'status') {
       query.status = value;
     }
+
+    // Add handling for 'area' and 'reason'
+    if (key === 'area') {
+      query.area = value;
+    }
+
+    if (key === 'reason') {
+      query.reason = value;
+    }
   });
 
   if (searchParams.has('createdAt')) {

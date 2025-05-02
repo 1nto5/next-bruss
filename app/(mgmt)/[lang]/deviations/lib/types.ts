@@ -47,17 +47,29 @@ export type NotificationLogType = {
   type: string; // Add this line
 };
 
+// RENAME: Define EditLogEntryType
+export type EditLogEntryType = {
+  changedAt: Date | string;
+  changedBy: string;
+  fieldName: string;
+  oldValue: any; // Use 'any' for flexibility, or define more specific types if possible
+  newValue: any;
+};
+
+// Define and export DeviationStatus type
+export type DeviationStatus =
+  | 'rejected'
+  | 'approved'
+  | 'in approval'
+  | 'in progress'
+  | 'closed'
+  | 'draft'
+  | 'to approve';
+
 export type DeviationType = {
   _id?: ObjectId;
   internalId?: string; // Format: "N/YYYY", e.g. "1/2023" - Optional as drafts don't have it
-  status:
-    | 'rejected'
-    | 'approved'
-    | 'in approval'
-    | 'in progress'
-    | 'closed'
-    | 'draft' // Status for drafts
-    | 'to approve';
+  status: DeviationStatus; // Use the defined type here
   articleNumber?: string; // Optional for draft
   articleName?: string; // Optional for draft
   workplace?: string; // Optional for draft
@@ -74,7 +86,6 @@ export type DeviationType = {
   customerAuthorization?: boolean; // Optional for draft
   owner: string; // Required
   createdAt: Date | string; // Required
-  edited?: { at: Date | string; by: string }; // Optional
   // Approvals are optional by nature until set
   groupLeaderApproval?: ApprovalType;
   qualityManagerApproval?: ApprovalType;
@@ -85,6 +96,7 @@ export type DeviationType = {
   correctiveActions: correctiveActionType[]; // Required, can be empty array
   attachments?: AttachmentType[]; // Optional
   notificationLogs?: NotificationLogType[]; // Optional
+  editLogs?: EditLogEntryType[]; // RENAMED: from changeHistory
 };
 
 export type DeviationReasonType = {

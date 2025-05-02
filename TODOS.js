@@ -4,6 +4,7 @@ FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which i
 FIXME: duplicate mongodb errors in pm2 logs
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
+PLAN: synchronizacja userów z domeną (synchronizuj nowych, nie zmieniaj istniejących, usuwaj tych co nie ma już w domenie)
 
 TODO: EOL136153 migration to new version
 TODO: dmcheck english version
@@ -14,11 +15,12 @@ TODO: all dialogs formatting as in failures lv
 
 
 TODO: odchylenia: 
-- po dokonaniu zmiany po uprzednim odrzuceniu przez jedno z stanowisk powiadomienie do akceptacji
 - akcje korygujące zalogowanej osoby - oddzielna tabela
 - wyszukiwanie rozszerzyć o Quarry
 - dodatkowe zabezpieczenie przed drukowaniem oraz zmianami w actions / route 
 - możliwość dodawania notatek do odchylenia
+- optymalizacja actions oraz usunięcie console logów
+- kto może dodawać załączniki?
 
 
 

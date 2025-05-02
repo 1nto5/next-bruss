@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area'; // Import ScrollArea
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -30,6 +31,7 @@ import {
   Cog,
   FileDown,
   Hammer,
+  History, // Import History icon
   LayoutList, // Import LayoutList
   MailCheck,
   Paperclip, // Import Paperclip
@@ -39,15 +41,26 @@ import {
 } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react'; // Import useState
 import { toast } from 'sonner';
 import { approveDeviation } from '../actions';
 import AddAttachmentDialog from './add-attachment-dialog';
+import EditLogDialog from './edit-log-dialog'; // RENAMED & UNCOMMENTED: Import the dialog component
 import TableCellsApprove from './table-cell-approve-role';
 import TableCellCorrectiveAction from './table-cell-corrective-action';
 
 // Lista dozwolonych ról do zatwierdzania odchyleń
 const APPROVAL_ROLES = [
+  'group-leader',
+  'quality-manager',
+  'production-manager',
+  'plant-manager',
+] as const;
+
+// NEW: Lista dozwolonych ról do dodawania załączników
+const ATTACHMENT_ROLES = [
+  'quality',
+  'team-leader',
   'group-leader',
   'quality-manager',
   'production-manager',
@@ -73,6 +86,7 @@ export default function DeviationView({
 }) {
   const [isPendingApproval, startApprovalTransition] = useTransition();
   const [isPendingPdfExport, startPdfExportTransition] = useTransition();
+  const [isEditLogDialogOpen, setIsEditLogDialogOpen] = useState(false); // RENAMED: State for dialog
 
   // Pobieranie wszystkich ról użytkownika, które są uprawnione do zatwierdzania
   const deviationUserRoles =
@@ -234,6 +248,14 @@ export default function DeviationView({
     ) ||
       session?.user?.email === deviation?.owner);
 
+  // NEW: Check if user can add attachments
+  const canAddAttachment =
+    deviation?.status !== 'closed' &&
+    (session?.user?.roles?.some((role) =>
+      ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
+    ) ||
+      session?.user?.email === deviation?.owner);
+
   const statusCardTitle = () => {
     switch (deviation?.status) {
       case 'approved':
@@ -286,39 +308,50 @@ export default function DeviationView({
   return (
     <Card>
       <CardHeader>
-        <div className='flex justify-between'>
-          <CardTitle>{statusCardTitle()}</CardTitle>
-          <div className='flex space-x-2'>
+        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
+          {' '}
+          {/* Stack vertically on small, row on sm+ */}
+          <CardTitle className='mb-2 sm:mb-0'>
+            {statusCardTitle()}
+          </CardTitle>{' '}
+          {/* Margin bottom only on small screens */}
+          <div className='flex flex-wrap justify-start space-x-2 sm:justify-end'>
+            {' '}
+            {/* Button container */}
             {/* Show PDF export button only for approved, active or closed deviations */}
             {canPrint && (
               <Button
                 variant='outline'
                 onClick={handleExportToPdf}
                 disabled={isPendingPdfExport}
+                className='mb-2 sm:mb-0' // Add margin bottom for stacking/wrapping on small screens
               >
-                <Printer className='mr-2 h-4 w-4' /> Drukuj
+                <Printer /> Drukuj
               </Button>
             )}
             <Link href='/deviations'>
-              <Button variant='outline'>
+              <Button variant='outline' className='mb-2 sm:mb-0'>
+                {' '}
+                {/* Add margin bottom */}
                 <TableIcon /> Odchylenia
               </Button>
             </Link>
             {/* Add Edit Link for eligible deviations */}
-            {['in approval', 'rejected'].includes(deviation?.status || '') && (
-              <Link href={`/deviations/${deviation?._id}/edit`}>
-                <Button variant='outline'>
-                  <Cog />
-                  Edytuj
-                </Button>
-              </Link>
-            )}
+            {['in approval', 'rejected'].includes(deviation?.status || '') &&
+              (session?.user?.email === deviation?.owner ||
+                session?.user?.roles?.includes('admin')) && ( // Check owner or admin
+                <Link href={`/deviations/${deviation?._id}/edit`}>
+                  <Button variant='outline' className='mb-2 sm:mb-0'>
+                    {' '}
+                    {/* Add margin bottom */}
+                    <Cog />
+                    Edytuj
+                  </Button>
+                </Link>
+              )}
           </div>
         </div>
-        <CardDescription className='flex flex-col'>
-          <span>ID: {deviation?.internalId}</span>
-          <span>Ostatnia synchronizacja: {fetchTime.toLocaleString(lang)}</span>
-        </CardDescription>
+        <CardDescription>ID: {deviation?.internalId}</CardDescription>
       </CardHeader>
       <Separator className='mb-4' />
       <CardContent>
@@ -326,9 +359,23 @@ export default function DeviationView({
           <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             <Card className='lg:w-2/5'>
               <CardHeader>
-                <CardTitle className='flex items-center'>
-                  <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
-                </CardTitle>
+                <div className='flex items-center justify-between'>
+                  {' '}
+                  {/* Added justify-between */}
+                  <CardTitle className='flex items-center'>
+                    <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
+                  </CardTitle>
+                  {/* Add History Button */}
+                  {deviation?.editLogs &&
+                    deviation.editLogs.length > 0 && ( // RENAMED: Check editLogs
+                      <Button
+                        variant='outline'
+                        onClick={() => setIsEditLogDialogOpen(true)} // RENAMED: Setter
+                      >
+                        <History /> Historia
+                      </Button>
+                    )}
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -630,47 +677,52 @@ export default function DeviationView({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Do</TableHead>
-                        <TableHead>Data wysłania</TableHead>
-                        <TableHead>Typ</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {deviation?.notificationLogs &&
-                      deviation.notificationLogs.length > 0 ? (
-                        [...deviation.notificationLogs] // Create a shallow copy to avoid mutating the original array
-                          .sort(
-                            (a, b) =>
-                              new Date(b.sentAt).getTime() -
-                              new Date(a.sentAt).getTime(),
-                          ) // Sort by date descending
-                          .slice(0, 10) // Take the top 10 most recent logs
-                          .map((log, index) => (
-                            <TableRow key={index}>
-                              <TableCell>
-                                {extractNameFromEmail(log.to)}
-                              </TableCell>
-                              <TableCell>
-                                {new Date(log.sentAt).toLocaleString(lang)}
-                              </TableCell>
-                              <TableCell>{log.type}</TableCell>
-                            </TableRow>
-                          ))
-                      ) : (
+                  <ScrollArea className='h-60'>
+                    {' '}
+                    {/* Add ScrollArea with height */}
+                    <Table>
+                      <TableHeader>
                         <TableRow>
-                          <TableCell
-                            colSpan={3}
-                            className='text-muted-foreground text-center'
-                          >
-                            Brak zarejestrowanych powiadomień.
-                          </TableCell>
+                          <TableHead>Do</TableHead>
+                          <TableHead>Data wysłania</TableHead>
+                          <TableHead>Typ</TableHead>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {deviation?.notificationLogs &&
+                        deviation.notificationLogs.length > 0 ? (
+                          [...deviation.notificationLogs] // Create a shallow copy to avoid mutating the original array
+                            .sort(
+                              (a, b) =>
+                                new Date(b.sentAt).getTime() -
+                                new Date(a.sentAt).getTime(),
+                            ) // Sort by date descending
+                            // .slice(0, 10) // Remove slice to show all logs
+                            .map((log, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  {extractNameFromEmail(log.to)}
+                                </TableCell>
+                                <TableCell>
+                                  {new Date(log.sentAt).toLocaleString(lang)}
+                                </TableCell>
+                                <TableCell>{log.type}</TableCell>
+                              </TableRow>
+                            ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={3}
+                              className='text-muted-foreground text-center'
+                            >
+                              Brak zarejestrowanych powiadomień.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>{' '}
+                  {/* Close ScrollArea */}
                 </CardContent>
               </Card>
             </div>
@@ -682,11 +734,15 @@ export default function DeviationView({
                   <CardTitle className='flex items-center'>
                     <Paperclip className='mr-2 h-5 w-5' /> Załączniki
                   </CardTitle>
-                  {deviation?._id && (
-                    <AddAttachmentDialog
-                      deviationId={deviation._id.toString()}
-                    />
-                  )}
+                  {deviation?._id &&
+                    canAddAttachment && ( // Use the new check here
+                      <AddAttachmentDialog
+                        deviationId={deviation._id.toString()}
+                        deviationStatus={deviation.status} // Pass status
+                        deviationOwner={deviation.owner} // Pass owner
+                        session={session} // Pass session
+                      />
+                    )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -754,6 +810,16 @@ export default function DeviationView({
           </div>
         </div>
       </CardContent>
+      {/* Render the Edit Log Dialog (conditionally) */}
+
+      <EditLogDialog // RENAMED & UNCOMMENTED: Component
+        isOpen={isEditLogDialogOpen} // RENAMED: State variable
+        onClose={() => setIsEditLogDialogOpen(false)} // RENAMED: Setter
+        logs={deviation?.editLogs || []} // RENAMED: Prop name and source
+        lang={lang}
+      />
+
+      {/* You need to create the EditLogDialog component */}
     </Card>
   );
 }

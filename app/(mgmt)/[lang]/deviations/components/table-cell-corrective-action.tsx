@@ -24,7 +24,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -354,7 +353,8 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
             <DialogHeader>
               <DialogTitle>Historia</DialogTitle>
             </DialogHeader>
-            <ScrollArea className='my-4 h-[300px]'>
+            {/* <ScrollArea className='h-[300px]'> */}
+            <div className='h-[300px] overflow-auto'>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -362,7 +362,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     <TableHead>Data</TableHead>
                     <TableHead>Komentarz</TableHead>
                     <TableHead>Osoba</TableHead>
-                    <TableHead className='text-right'>Czas</TableHead>
+                    <TableHead>Czas</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -409,8 +409,8 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     ))}
                 </TableBody>
               </Table>
-            </ScrollArea>
-
+              {/* </ScrollArea> */}
+            </div>
             {/* 
               <DialogFooter className='pt-4'>
                 <Button type='submit'>Potwierdź</Button>

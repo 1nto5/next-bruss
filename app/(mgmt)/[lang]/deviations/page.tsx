@@ -3,14 +3,16 @@ import {
   DeviationType,
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
+import { Button } from '@/components/ui/button'; // Import Button
 import {
-  Card,
-  CardDescription,
+  Card, // Keep CardDescription import if used elsewhere, otherwise remove
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { Plus } from 'lucide-react'; // Import Plus icon
 import { Session } from 'next-auth';
+import Link from 'next/link'; // Import Link
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -18,6 +20,7 @@ import {
   getConfigAreaOptions,
   getConfigReasonOptions,
 } from './lib/get-configs';
+import { DeviationAreaType, DeviationReasonType } from './lib/types'; // Import ConfigOption
 
 async function getAllDeviations(
   lang: string,
@@ -34,12 +37,9 @@ async function getAllDeviations(
   );
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const res = await fetch(
-    `${process.env.API}/deviations/deviations?${queryParams}`,
-    {
-      next: { revalidate: 30, tags: ['deviations'] },
-    },
-  );
+  const res = await fetch(`${process.env.API}/deviations/?${queryParams}`, {
+    next: { revalidate: 30, tags: ['deviations'] },
+  });
 
   if (!res.ok) {
     const json = await res.json();
@@ -89,12 +89,9 @@ async function getUserDeviations(
   );
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const res = await fetch(
-    `${process.env.API}/deviations/deviations?${queryParams}`,
-    {
-      next: { revalidate: 30, tags: ['deviations'] },
-    },
-  );
+  const res = await fetch(`${process.env.API}/deviations/?${queryParams}`, {
+    next: { revalidate: 30, tags: ['deviations'] },
+  });
 
   if (!res.ok) {
     const json = await res.json();
@@ -201,8 +198,8 @@ export default async function DeviationsPage(props: {
 
   let fetchTime, fetchTimeLocaleString, deviations;
   const session = await auth();
-  const reasonOptions = await getConfigReasonOptions();
-  const areaOptions = await getConfigAreaOptions();
+  const reasonOptions: DeviationReasonType[] = await getConfigReasonOptions(); // Ensure type
+  const areaOptions: DeviationAreaType[] = await getConfigAreaOptions(); // Ensure type
   const searchParams = await props.searchParams;
 
   if (!session) {
@@ -221,20 +218,35 @@ export default async function DeviationsPage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Odchylenia</CardTitle>
-        <CardDescription>
+        <div className='mb-4 flex items-center justify-between'>
+          {' '}
+          {/* Add flex container */}
+          <CardTitle>Odchylenia w procesie produkcyjnym</CardTitle>
+          {/* Add the "Add Deviation" button here, conditionally rendered */}
+          {session && (
+            <Link href='/deviations/add'>
+              <Button variant={'outline'}>
+                <Plus /> <span>Nowe odchylenie</span>
+              </Button>
+            </Link>
+          )}
+        </div>
+        {/* Remove CardDescription with sync time */}
+        {/* <CardDescription>
           Ostatnia synchronizacja: {fetchTimeLocaleString}
-        </CardDescription>
+        </CardDescription> */}
         <TableFilteringAndOptions
-          fetchTime={fetchTime}
+          fetchTime={fetchTime} // Pass fetchTime for useEffect dependency
           isLogged={!!session}
           userEmail={session?.user?.email || undefined}
+          areaOptions={areaOptions} // Pass areaOptions
+          reasonOptions={reasonOptions} // Pass reasonOptions
         />
       </CardHeader>
       <DataTable
         columns={columns}
         data={deviations}
-        fetchTimeLocaleString={fetchTimeLocaleString}
+        fetchTimeLocaleString={fetchTimeLocaleString} // Keep prop if DataTable needs it
         lang={lang}
         reasonOptions={reasonOptions}
         areaOptions={areaOptions}

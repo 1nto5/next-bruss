@@ -4,12 +4,14 @@ import {
   ApprovalHistoryType,
   ApprovalType,
   correctiveActionType,
-  DeviationType,
+  DeviationType, // Import NotificationLogType
+  EditLogEntryType,
   NotificationLogType, // Import NotificationLogType
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
 import mailer from '@/lib/mailer'; // Import the mailer utility
 import { dbc } from '@/lib/mongo';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Collection, ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -17,7 +19,7 @@ import {
   AddCorrectiveActionType,
   AddDeviationDraftType,
   AddDeviationType,
-} from './lib/zod';
+} from './lib/zod'; // Assuming EditLogEntryType is defined in types.ts, not zod
 // import { redirect } from 'next/navigation';
 
 // Define a simple user type for annotation
@@ -155,7 +157,7 @@ async function sendVacancyNotificationToPlantManager(
           sentAt: new Date(),
           type:
             notificationContext === 'creation'
-              ? `vacant-role-${vacantRole}` // More specific type
+              ? `creation-vacant-role-${vacantRole}` // More specific type
               : `edit-vacant-role-${vacantRole}`,
         });
       } catch (e) {
@@ -322,7 +324,7 @@ async function handleNotifications(
     );
     allNotificationLogs.push(...glLogs);
 
-    // If no specific GL found for the area, notify Plant Manager
+    // If no specific GL found for the area, notify Plant Manager (as fallback)
     if (glLogs.length === 0 && deviation.area) {
       const noGlLogs = await sendNoGroupLeaderNotification(
         deviationId,
@@ -393,13 +395,41 @@ async function handleNotifications(
       allNotificationLogs.push(...vacancyPmLogs);
     }
 
-    // 4. Update Deviation with All Logs
+    // 4. Plant Manager Notification (Standard)
+    // Always attempt to notify the Plant Manager directly, regardless of vacancies.
+    // The sendRoleNotification function handles cases where no Plant Manager exists.
+    const plantManagerLogs = await sendRoleNotification(
+      deviationId,
+      internalId,
+      'plant-manager',
+      notificationContext,
+      usersColl,
+      deviationUrl,
+    );
+    allNotificationLogs.push(...plantManagerLogs);
+
+    // 5. Update Deviation with All Logs
     if (allNotificationLogs.length > 0) {
       try {
+        // Deduplicate logs based on 'to' and 'type' to avoid redundant entries if notified multiple ways
+        const uniqueLogs = allNotificationLogs.reduce(
+          (acc: NotificationLogType[], current) => {
+            const x = acc.find(
+              (item) => item.to === current.to && item.type === current.type,
+            );
+            if (!x) {
+              return acc.concat([current]);
+            } else {
+              return acc;
+            }
+          },
+          [],
+        );
+
         const updateOperation =
           notificationContext === 'creation'
-            ? { $set: { notificationLogs: allNotificationLogs } }
-            : { $push: { notificationLogs: { $each: allNotificationLogs } } };
+            ? { $set: { notificationLogs: uniqueLogs } } // Use uniqueLogs for creation
+            : { $push: { notificationLogs: { $each: uniqueLogs } } }; // Use uniqueLogs for edit
 
         await deviationsColl.updateOne({ _id: deviationId }, updateOperation);
         console.log(
@@ -414,7 +444,159 @@ async function handleNotifications(
   }
 }
 
+// NEW function to notify the responsible person for a corrective action
+async function sendCorrectiveActionAssignmentNotification(
+  deviationId: ObjectId,
+  internalId: string,
+  correctiveAction: AddCorrectiveActionType, // Use the Zod type for input
+  responsibleUserEmail: string, // Email of the person responsible
+  deviationUrl: string,
+): Promise<NotificationLogType | null> {
+  const subject = `Przypisano akcję korygującą w odchyleniu [${internalId}]`;
+  const html = `
+      <div style="font-family: sans-serif;">
+        <p>Zostałeś/aś wyznaczony/a jako osoba odpowiedzialna za wykonanie akcji korygującej w odchyleniu [${internalId}].</p>
+        <p><strong>Opis akcji:</strong> ${correctiveAction.description}</p>
+        <p><strong>Termin wykonania:</strong> ${new Date(correctiveAction.deadline).toLocaleDateString('pl')}</p>
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+  try {
+    await mailer({ to: responsibleUserEmail, subject, html });
+    console.log(
+      `Sent Corrective Action assignment notification for [${internalId}] to ${responsibleUserEmail}.`,
+    );
+    return {
+      to: responsibleUserEmail,
+      sentAt: new Date(),
+      type: 'corrective-action-assigned', // New notification type
+    };
+  } catch (e) {
+    console.error(
+      `Failed Corrective Action assignment mail to ${responsibleUserEmail}:`,
+      e,
+    );
+    return null; // Return null on failure
+  }
+}
+
+// NEW function to notify users who rejected the deviation about updates
+async function sendRejectionReevaluationNotification(
+  deviation: DeviationType,
+  deviationId: ObjectId,
+  reason: 'corrective_action' | 'attachment', // Why re-evaluation is needed
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+  const rejectors = new Set<string>(); // Use a Set to store unique emails
+
+  const approvalFields: (keyof DeviationType)[] = [
+    'groupLeaderApproval',
+    'qualityManagerApproval',
+    'productionManagerApproval',
+    'plantManagerApproval',
+  ];
+
+  // Identify users who rejected
+  approvalFields.forEach((field) => {
+    const approval = deviation[field] as ApprovalType | undefined;
+    // Find users where 'approved' is explicitly false and 'by' exists
+    if (approval?.approved === false && approval.by) {
+      rejectors.add(approval.by); // Add the email of the user who rejected
+    }
+  });
+
+  if (rejectors.size === 0) {
+    console.log(
+      `No rejectors found for [${deviation.internalId}] to notify about ${reason}.`,
+    );
+    return logs; // No one to notify
+  }
+
+  const reasonText =
+    reason === 'corrective_action'
+      ? 'dodano nową akcję korygującą'
+      : 'dodano nowy załącznik';
+  const subject = `Odchylenie [${deviation.internalId}] - aktualizacja (wymaga ponownej weryfikacji)`;
+  const html = `
+      <div style="font-family: sans-serif;">
+        <p>W odchyleniu [${deviation.internalId}], które wcześniej odrzuciłeś/aś, ${reasonText}.</p>
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+  // Loop through the identified rejectors and send email
+  for (const email of Array.from(rejectors)) {
+    try {
+      await mailer({ to: email, subject, html }); // Send email to the rejector
+      logs.push({
+        to: email,
+        sentAt: new Date(),
+        type: `reevaluation-${reason}`, // e.g., reevaluation-attachment
+      });
+    } catch (e) {
+      console.error(`Failed Re-evaluation mail (${reason}) to ${email}:`, e);
+    }
+  }
+
+  console.log(
+    `Sent Re-evaluation (${reason}) notifications for [${deviation.internalId}] to ${logs.length} rejectors.`,
+  );
+  return logs;
+}
+
 // --- End Notification Helper Functions ---
+
+// NEW function to notify the deviation owner about an approval decision
+async function sendApprovalDecisionNotificationToOwner(
+  deviation: DeviationType,
+  deviationId: ObjectId,
+  decision: 'approved' | 'rejected',
+  approverEmail: string,
+  approverRole: string, // The role under which the decision was made
+  deviationUrl: string,
+  comment?: string, // Add comment parameter
+): Promise<NotificationLogType | null> {
+  if (!deviation.owner) {
+    console.error(
+      `Cannot send approval decision notification for [${deviation.internalId}]: Owner email is missing.`,
+    );
+    return null;
+  }
+
+  const decisionText = decision === 'approved' ? 'zatwierdzone' : 'odrzucone';
+  const roleTranslated = ROLE_TRANSLATIONS[approverRole] || approverRole;
+  const subject = `Odchylenie [${deviation.internalId}] zostało ${decisionText}`;
+  const html = `
+      <div style="font-family: sans-serif;">
+        <p>Twoje odchylenie [${deviation.internalId}] zostało ${decisionText} przez ${extractNameFromEmail(approverEmail)} (${roleTranslated}).</p>
+        ${decision === 'rejected' && comment ? `<p><strong>Komentarz:</strong> ${comment}</p>` : ''}
+        <p>
+          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+        </p>
+      </div>`;
+
+  try {
+    await mailer({ to: deviation.owner, subject, html });
+    console.log(
+      `Sent Approval Decision (${decision}) notification for [${deviation.internalId}] to owner ${deviation.owner}.`,
+    );
+    return {
+      to: deviation.owner,
+      sentAt: new Date(),
+      type: `owner-decision-${decision}`, // e.g., owner-decision-approved
+    };
+  } catch (e) {
+    console.error(
+      `Failed Approval Decision mail (${decision}) to owner ${deviation.owner}:`,
+      e,
+    );
+    return null; // Return null on failure
+  }
+}
 
 export async function revalidateDeviations() {
   revalidateTag('deviations');
@@ -430,53 +612,109 @@ export async function updateCorrectiveAction(
   }
   try {
     const collection = await dbc('deviations');
-    console.log(id);
-    const deviationToUpdate = await collection.findOne({
-      _id: new ObjectId(id),
-    });
+    const deviationObjectId = new ObjectId(id); // Use consistent naming
+    let deviationToUpdate = (await collection.findOne({
+      _id: deviationObjectId,
+    })) as DeviationType | null; // Cast to DeviationType
+
     if (!deviationToUpdate) {
       return { error: 'not found' };
     }
-    if (session.user?.email !== deviationToUpdate.owner) {
-      return { error: 'not authorized' };
+
+    // NEW: Prevent adding corrective actions if deviation is closed
+    if (deviationToUpdate.status === 'closed') {
+      return { error: 'deviation closed' };
     }
 
-    const status = {
-      value: 'open',
-      executedAt: new Date(),
-      changed: {
+    // Authorization check can remain or be adjusted based on who can add actions
+    // For now, assuming owner can add. Add more checks if needed.
+    // if (session.user?.email !== deviationToUpdate.owner) {
+    //   return { error: 'not authorized' };
+    // }
+
+    const newCorrectiveAction = {
+      ...correctiveAction,
+      created: {
         at: new Date(),
         by: session.user?.email,
       },
+      status: {
+        // Default status when created
+        value: 'open',
+        executedAt: null, // Not executed yet
+        changed: {
+          at: new Date(),
+          by: session.user?.email,
+        },
+      },
+      history: [], // Initialize history
     };
 
     const res = await collection.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: deviationObjectId },
       {
-        $set: {
-          correctiveActions: [
-            ...(deviationToUpdate.correctiveActions || []),
-            {
-              ...correctiveAction,
-              created: {
-                at: new Date(),
-                by: session.user?.email,
-              },
-              status,
-            },
-          ],
+        $push: {
+          correctiveActions: newCorrectiveAction,
         },
       },
     );
 
-    if (res) {
-      revalidateTag('deviation');
+    if (res.modifiedCount > 0) {
+      // Fetch the updated deviation *after* adding the action
+      deviationToUpdate = (await collection.findOne({
+        _id: deviationObjectId,
+      })) as DeviationType | null;
+
+      if (!deviationToUpdate) {
+        // Should not happen, but handle defensively
+        console.error(
+          `Failed to fetch deviation [${id}] after adding corrective action.`,
+        );
+        revalidateTag('deviation'); // Still revalidate
+        return { success: 'updated', warning: 'notification_failed' };
+      }
+
+      const deviationUrl = `${process.env.BASE_URL}/deviations/${id}`;
+      const allNewLogs: NotificationLogType[] = [];
+
+      // 1. Send assignment notification
+      const assignmentLog = await sendCorrectiveActionAssignmentNotification(
+        deviationObjectId,
+        deviationToUpdate.internalId || `ID:${id}`,
+        correctiveAction,
+        correctiveAction.responsible,
+        deviationUrl,
+      );
+      if (assignmentLog) {
+        allNewLogs.push(assignmentLog);
+      }
+
+      // 2. Send re-evaluation notification to rejectors
+      const reevaluationLogs = await sendRejectionReevaluationNotification(
+        deviationToUpdate,
+        deviationObjectId,
+        'corrective_action',
+        deviationUrl,
+      );
+      allNewLogs.push(...reevaluationLogs);
+
+      // Add all new notification logs to the deviation if any were generated
+      if (allNewLogs.length > 0) {
+        await collection.updateOne(
+          { _id: deviationObjectId },
+          { $push: { notificationLogs: { $each: allNewLogs } } },
+        );
+      }
+
+      revalidateTag('deviation'); // Revalidate the specific deviation page
       return { success: 'updated' };
     } else {
+      // Handle case where the update didn't modify (e.g., concurrent update)
+      // Check if the action might already exist if needed
       return { error: 'not updated' };
     }
   } catch (error) {
-    console.error(error);
+    console.error('updateCorrectiveAction server action error:', error); // Log the specific error
     return { error: 'updateCorrectiveAction server action error' };
   }
 }
@@ -537,25 +775,34 @@ export async function approveDeviation(
 
   try {
     const coll = await dbc('deviations');
-    const deviation = await coll.findOne({ _id: new ObjectId(id) });
+    const deviationObjectId = new ObjectId(id); // Use ObjectId
+    let deviation = (await coll.findOne({
+      _id: deviationObjectId,
+    })) as DeviationType | null; // Cast to DeviationType
     if (!deviation) {
       return { error: 'not found' };
     }
 
+    // Cast the specific approval field to ApprovalType | undefined
+    const currentApproval = deviation[approvalField] as
+      | ApprovalType
+      | undefined;
+
     // Add validation for approval/rejection rules similar to UI:
     // 1. Prevent approving if already approved
-    if (isApproved && deviation[approvalField]?.approved === true) {
+    if (isApproved && currentApproval?.approved === true) {
       return { error: 'already approved' };
     }
 
     // 2. Only allow rejecting if not already decided (undefined)
-    if (!isApproved && deviation[approvalField]?.approved !== undefined) {
+    // Check if currentApproval exists and its approved status is not undefined
+    if (!isApproved && currentApproval?.approved !== undefined) {
       return { error: 'cannot reject after decision has been made' };
     }
 
-    const currentApproval = deviation[approvalField] as
-      | ApprovalType
-      | undefined;
+    // const currentApproval = deviation[approvalField] as // <-- Moved up
+    //   | ApprovalType
+    //   | undefined;
     const newApprovalRecord: ApprovalType = {
       approved: isApproved,
       by: session.user?.email,
@@ -594,22 +841,34 @@ export async function approveDeviation(
       updateField.status = 'rejected';
     } else {
       // Only check for all approvals if this is an approval (not rejection)
-      const hasAllApprovals = Object.values(approvalFieldMap).every((field) =>
-        field === approvalField ? true : deviation[field]?.approved,
+      // Use the casted type for checking approvals
+      const hasAllApprovals = Object.values(approvalFieldMap).every(
+        (field) =>
+          field === approvalField
+            ? true // The current approval being set is considered approved for this check
+            : (deviation[field] as ApprovalType | undefined)?.approved === true, // Check other fields explicitly for true
       );
 
       if (hasAllApprovals) {
         const now = new Date();
-        const periodFrom = new Date(deviation.timePeriod.from);
-        const periodTo = new Date(deviation.timePeriod.to);
+        // Ensure timePeriod and its properties exist before creating Date objects
+        const periodFrom = deviation.timePeriod?.from
+          ? new Date(deviation.timePeriod.from)
+          : null;
+        const periodTo = deviation.timePeriod?.to
+          ? new Date(deviation.timePeriod.to)
+          : null;
 
+        // Check if periodFrom and periodTo are valid dates before comparison
         updateField.status =
-          now >= periodFrom && now <= periodTo ? 'in progress' : 'approved';
+          periodFrom && periodTo && now >= periodFrom && now <= periodTo
+            ? 'in progress'
+            : 'approved';
       }
     }
 
     const update = await coll.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: deviationObjectId }, // Use ObjectId
       {
         $set: updateField,
       },
@@ -618,6 +877,45 @@ export async function approveDeviation(
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
+
+    // --- Start Notification Logic ---
+    // Fetch the updated deviation to ensure we have the latest state for notification content
+    const updatedDeviation = (await coll.findOne({
+      _id: deviationObjectId,
+    })) as DeviationType | null;
+
+    if (updatedDeviation && session.user?.email) {
+      const deviationUrl = `${process.env.BASE_URL}/deviations/${id}`;
+      const decision: 'approved' | 'rejected' = isApproved
+        ? 'approved'
+        : 'rejected';
+
+      // Send notification to the owner
+      const ownerNotificationLog =
+        await sendApprovalDecisionNotificationToOwner(
+          updatedDeviation,
+          deviationObjectId,
+          decision,
+          session.user.email, // Approver's email
+          userRole, // Role used for approval
+          deviationUrl,
+          comment, // Pass the comment
+        );
+
+      // Add the log to the deviation if generated
+      if (ownerNotificationLog) {
+        await coll.updateOne(
+          { _id: deviationObjectId },
+          { $push: { notificationLogs: ownerNotificationLog } },
+        );
+      }
+    } else {
+      console.error(
+        `Could not send owner notification for [${id}]: Updated deviation not found or session user email missing.`,
+      );
+    }
+    // --- End Notification Logic ---
+
     revalidateDeviationsAndDeviation();
     return { success: isApproved ? 'approved' : 'rejected' };
   } catch (error) {
@@ -641,16 +939,40 @@ export async function changeCorrectiveActionStatus(
     if (!deviation) {
       return { error: 'not found' };
     }
-    if (deviation.owner !== session.user?.email) {
-      return { error: 'unauthorized' };
-    }
 
     const correctiveActions = deviation.correctiveActions || [];
     if (index < 0 || index >= correctiveActions.length) {
       return { error: 'invalid index' };
     }
-    const currentStatus = correctiveActions[index].status;
-    const history = correctiveActions[index].history || [];
+
+    const correctiveActionToUpdate = correctiveActions[index];
+    const userEmail = session.user.email;
+    const userRoles = session.user.roles || [];
+
+    // Authorization Check:
+    const isOwner = deviation.owner === userEmail;
+    const isCreator = correctiveActionToUpdate.created.by === userEmail;
+    const isResponsible = correctiveActionToUpdate.responsible === userEmail;
+    const hasRequiredRole = userRoles.some((role) =>
+      [
+        'group-leader',
+        'quality-manager',
+        'production-manager',
+        'plant-manager',
+      ].includes(role),
+    );
+
+    if (!isOwner && !isCreator && !isResponsible && !hasRequiredRole) {
+      return { error: 'unauthorized' }; // User doesn't have permission
+    }
+
+    // Remove the old owner-only check:
+    // if (deviation.owner !== session.user?.email) {
+    //   return { error: 'unauthorized' };
+    // }
+
+    const currentStatus = correctiveActionToUpdate.status;
+    const history = correctiveActionToUpdate.history || [];
 
     history.unshift(currentStatus);
 
@@ -672,7 +994,7 @@ export async function changeCorrectiveActionStatus(
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
-    return { error: 'confirmCorrectiveActionExecution server action error' };
+    return { error: 'changeCorrectiveActionStatus server action error' }; // Changed error message slightly for clarity
   }
 }
 
@@ -891,10 +1213,11 @@ export async function updateDraftDeviation(
 
     const updateData: Partial<DeviationType> = {
       status: 'draft',
-      edited: {
-        at: new Date(),
-        by: session.user?.email,
-      },
+      // REMOVED: edited field
+      // edited: {
+      //   at: new Date(),
+      //   by: session.user?.email,
+      // },
       ...(deviation.articleName !== undefined && {
         articleName: deviation.articleName,
       }),
@@ -952,6 +1275,83 @@ export async function updateDraftDeviation(
   }
 }
 
+// RENAMED function to compare fields and generate log entries
+function generateEditLogs(
+  original: DeviationType,
+  updated: AddDeviationType, // Use the Zod type for incoming data
+  userEmail: string,
+): EditLogEntryType[] {
+  // RENAMED: return type
+  const logs: EditLogEntryType[] = []; // RENAMED: type
+  const now = new Date();
+
+  const fieldsToCompare: (keyof AddDeviationType)[] = [
+    'articleNumber',
+    'articleName',
+    'workplace',
+    'customerNumber',
+    'customerName',
+    'quantity', // Compare quantity value
+    'unit', // Compare quantity unit
+    'charge',
+    'reason',
+    'periodFrom', // Compare timePeriod.from
+    'periodTo', // Compare timePeriod.to
+    'area',
+    'description',
+    'processSpecification',
+    'customerAuthorization',
+  ];
+
+  fieldsToCompare.forEach((key) => {
+    let originalValue: any;
+    let updatedValue: any;
+
+    // Handle nested fields or transformations
+    if (key === 'quantity') {
+      originalValue = original.quantity?.value;
+      updatedValue = updated.quantity ? Number(updated.quantity) : undefined;
+    } else if (key === 'unit') {
+      originalValue = original.quantity?.unit;
+      updatedValue = updated.unit;
+    } else if (key === 'periodFrom') {
+      originalValue = original.timePeriod?.from
+        ? new Date(original.timePeriod.from).toISOString()
+        : null; // Normalize to ISO string or null
+      updatedValue = updated.periodFrom
+        ? new Date(updated.periodFrom).toISOString()
+        : null;
+    } else if (key === 'periodTo') {
+      originalValue = original.timePeriod?.to
+        ? new Date(original.timePeriod.to).toISOString()
+        : null; // Normalize to ISO string or null
+      updatedValue = updated.periodTo
+        ? new Date(updated.periodTo).toISOString()
+        : null;
+    } else {
+      originalValue = original[key as keyof DeviationType];
+      updatedValue = updated[key];
+    }
+
+    // Ensure consistent comparison (e.g., treat undefined/null/empty string similarly if needed)
+    const originalComp = originalValue ?? null;
+    const updatedComp = updatedValue ?? null;
+
+    if (JSON.stringify(originalComp) !== JSON.stringify(updatedComp)) {
+      logs.push({
+        // RENAMED: variable name
+        changedAt: now,
+        changedBy: userEmail,
+        fieldName: key, // Use the key from AddDeviationType
+        oldValue: originalValue, // Store original representation
+        newValue: updatedValue, // Store new representation
+      });
+    }
+  });
+
+  return logs; // RENAMED: variable name
+}
+
 // NEW function to update non-draft deviations
 export async function updateDeviation(
   id: string,
@@ -964,9 +1364,9 @@ export async function updateDeviation(
   try {
     const collection = await dbc('deviations');
     const deviationObjectId = new ObjectId(id);
-    const originalDeviation = await collection.findOne({
+    const originalDeviation = (await collection.findOne({
       _id: deviationObjectId,
-    });
+    })) as DeviationType | null; // Cast to DeviationType
 
     if (!originalDeviation) {
       return { error: 'not found' };
@@ -983,38 +1383,48 @@ export async function updateDeviation(
       return { error: 'not authorized' };
     }
 
+    // Generate edit logs BEFORE preparing the update data
+    const newLogEntries = generateEditLogs(
+      // RENAMED: function call and variable
+      originalDeviation,
+      deviation,
+      session.user.email,
+    );
+    const existingLogs = originalDeviation.editLogs || []; // RENAMED: field and variable
+    const combinedLogs = [...existingLogs, ...newLogEntries]; // RENAMED: variable
+
     // Prepare update data using atomic operators
     const updateOperation: { $set: Partial<DeviationType>; $unset?: any } = {
       $set: {
         // Update fields from the payload
         articleName: deviation.articleName,
         articleNumber: deviation.articleNumber,
-        ...(deviation.workplace && { workplace: deviation.workplace }),
-        ...(deviation.quantity && {
-          quantity: {
-            value: Number(deviation.quantity),
-            unit: deviation.unit && deviation.unit,
-          },
-        }),
-        ...(deviation.charge && { charge: deviation.charge }),
+        workplace: deviation.workplace || undefined, // Ensure undefined if empty
+        quantity:
+          deviation.quantity !== undefined && deviation.quantity !== undefined
+            ? {
+                value: Number(deviation.quantity),
+                unit: deviation.unit || originalDeviation.quantity?.unit, // Keep original unit if new one not provided
+              }
+            : undefined, // Set quantity to undefined if not provided
+        charge: deviation.charge || undefined,
         reason: deviation.reason,
         timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
-        ...(deviation.area && { area: deviation.area }),
-        ...(deviation.description && { description: deviation.description }),
-        ...(deviation.processSpecification && {
-          processSpecification: deviation.processSpecification,
-        }),
-        ...(deviation.customerNumber && {
-          customerNumber: deviation.customerNumber,
-        }),
+        area: deviation.area || undefined,
+        description: deviation.description || undefined,
+        processSpecification: deviation.processSpecification || undefined,
+        customerNumber: deviation.customerNumber || undefined,
+        customerName: deviation.customerName || undefined, // Add customerName update
         customerAuthorization: deviation.customerAuthorization,
-        // Add edited info
-        edited: {
-          at: new Date(),
-          by: session.user?.email,
-        },
+        // REMOVED: edited field
+        // edited: {
+        //   at: new Date(),
+        //   by: session.user?.email,
+        // },
         // Reset status
         status: 'in approval',
+        // Add the combined edit logs
+        editLogs: combinedLogs, // RENAMED: field and variable
       },
       // Use $unset to remove approval fields entirely, ensuring they are re-evaluated
       $unset: {
@@ -1024,6 +1434,32 @@ export async function updateDeviation(
         plantManagerApproval: '',
       },
     };
+
+    // Remove fields from $set if they are explicitly null/undefined in the payload
+    // to avoid overwriting existing data with null unless intended.
+    // (Adjust logic based on whether empty strings/nulls should clear fields)
+    if (deviation.workplace === undefined || deviation.workplace === null)
+      delete updateOperation.$set.workplace;
+    if (deviation.charge === undefined || deviation.charge === null)
+      delete updateOperation.$set.charge;
+    if (deviation.area === undefined || deviation.area === null)
+      delete updateOperation.$set.area;
+    if (deviation.description === undefined || deviation.description === null)
+      delete updateOperation.$set.description;
+    if (
+      deviation.processSpecification === undefined ||
+      deviation.processSpecification === null
+    )
+      delete updateOperation.$set.processSpecification;
+    if (
+      deviation.customerNumber === undefined ||
+      deviation.customerNumber === null
+    )
+      delete updateOperation.$set.customerNumber;
+    if (deviation.customerName === undefined || deviation.customerName === null)
+      delete updateOperation.$set.customerName;
+    if (deviation.quantity === undefined || deviation.quantity === null)
+      delete updateOperation.$set.quantity; // Remove quantity if not provided
 
     // Perform the update
     const res = await collection.updateOne(
@@ -1119,5 +1555,57 @@ export async function insertDeviationFromDraft(
   } catch (error) {
     console.error(error);
     return { error: 'insertDeviationFromDraft server action error' };
+  }
+}
+
+// NEW Server Action to handle notifications after attachment upload
+export async function notifyRejectorsAfterAttachment(deviationId: string) {
+  // No session check needed here if called internally by trusted backend code (API route)
+  // If called directly from client, add session/auth checks.
+  try {
+    const collection = await dbc('deviations');
+    const deviationObjectId = new ObjectId(deviationId);
+    const deviation = (await collection.findOne({
+      _id: deviationObjectId,
+    })) as DeviationType | null;
+
+    if (!deviation) {
+      console.error(
+        `notifyRejectorsAfterAttachment: Deviation not found [${deviationId}]`,
+      );
+      return { error: 'not found' };
+    }
+
+    // Prevent notifications if deviation is closed
+    if (deviation.status === 'closed') {
+      console.log(
+        `notifyRejectorsAfterAttachment: Deviation [${deviationId}] is closed, skipping notifications.`,
+      );
+      return { success: 'skipped_closed' };
+    }
+
+    const deviationUrl = `${process.env.BASE_URL}/deviations/${deviationId}`;
+
+    // Send re-evaluation notification to rejectors
+    const reevaluationLogs = await sendRejectionReevaluationNotification(
+      deviation,
+      deviationObjectId,
+      'attachment', // Specify reason
+      deviationUrl,
+    );
+
+    // Add the notification logs to the deviation if any were generated
+    if (reevaluationLogs.length > 0) {
+      await collection.updateOne(
+        { _id: deviationObjectId },
+        { $push: { notificationLogs: { $each: reevaluationLogs } } },
+      );
+    }
+
+    revalidateTag('deviation'); // Revalidate the specific deviation page
+    return { success: 'notified' };
+  } catch (error) {
+    console.error('notifyRejectorsAfterAttachment server action error:', error);
+    return { error: 'notifyRejectorsAfterAttachment server action error' };
   }
 }

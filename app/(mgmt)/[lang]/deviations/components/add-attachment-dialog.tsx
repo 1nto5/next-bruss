@@ -21,18 +21,36 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Paperclip, Upload } from 'lucide-react';
+import { Session } from 'next-auth'; // Import Session
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateDeviation } from '../actions';
+import { DeviationStatus } from '../lib/types'; // Import DeviationStatus
 import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
+
+// Define attachment roles (can be imported from view.tsx or defined here)
+const ATTACHMENT_ROLES = [
+  'quality',
+  'team-leader',
+  'group-leader',
+  'quality-manager',
+  'production-manager',
+  'plant-manager',
+] as const;
 
 interface AddAttachmentDialogProps {
   deviationId: string;
+  deviationStatus: DeviationStatus | undefined; // Add deviation status
+  deviationOwner: string | undefined | null; // Add deviation owner
+  session: Session | null; // Add session
 }
 
 export default function AddAttachmentDialog({
   deviationId,
+  deviationStatus, // Destructure new props
+  deviationOwner,
+  session,
 }: AddAttachmentDialogProps) {
   const [open, setOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -58,6 +76,25 @@ export default function AddAttachmentDialog({
   };
 
   const onSubmit = async (data: AttachmentFormType) => {
+    // --- Permission Check Start ---
+    const userRoles = session?.user?.roles || [];
+    const userEmail = session?.user?.email;
+
+    const canAddAttachment =
+      deviationStatus !== 'closed' &&
+      (userRoles.some((role) =>
+        ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
+      ) ||
+        userEmail === deviationOwner);
+
+    if (!canAddAttachment) {
+      toast.error(
+        'Nie masz uprawnień do dodawania załączników do tego odchylenia lub odchylenie jest zamknięte.',
+      );
+      return; // Abort submission
+    }
+    // --- Permission Check End ---
+
     if (!deviationId) {
       toast.error('Błąd ID odchylenia. Skontaktuj się z IT!');
       return;
