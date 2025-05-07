@@ -47,6 +47,12 @@ export type NotificationLogType = {
   type: string; // Add this line
 };
 
+// NEW: Define PrintLogType
+export type PrintLogType = {
+  printedBy: string;
+  printedAt: Date | string;
+};
+
 // RENAME: Define EditLogEntryType
 export type EditLogEntryType = {
   changedAt: Date | string;
@@ -65,6 +71,13 @@ export type DeviationStatus =
   | 'closed'
   | 'draft'
   | 'to approve';
+
+// Add a new type for notes
+export type NoteType = {
+  content: string;
+  createdBy: string;
+  createdAt: Date | string;
+};
 
 export type DeviationType = {
   _id?: ObjectId;
@@ -97,6 +110,8 @@ export type DeviationType = {
   attachments?: AttachmentType[]; // Optional
   notificationLogs?: NotificationLogType[]; // Optional
   editLogs?: EditLogEntryType[]; // RENAMED: from changeHistory
+  printLogs?: PrintLogType[]; // NEW: Optional print logs
+  notes?: NoteType[]; // NEW: Optional notes
 };
 
 export type DeviationReasonType = {

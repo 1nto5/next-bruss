@@ -47,6 +47,7 @@ type TableCellApproveRoleProps = {
   lang: string;
   reason?: string;
   history?: ApprovalHistoryType[];
+  deviationStatus?: string; // Add deviation status prop
 };
 
 // Define valid approval roles
@@ -59,11 +60,11 @@ type ApprovalRole =
 // Role elevation mapping - use type to ensure keys are valid roles
 const ROLE_ELEVATIONS: Record<ApprovalRole, ApprovalRole[]> = {
   'plant-manager': [
+    'plant-manager',
     'group-leader',
     'quality-manager',
     'production-manager',
-    'plant-manager',
-  ],
+  ], // Plant managers can approve as any role
   'production-manager': ['group-leader', 'production-manager'],
   'group-leader': ['group-leader'],
   'quality-manager': ['quality-manager'],
@@ -77,6 +78,9 @@ const ROLE_DISPLAY_NAMES: Record<string, string> = {
   'plant-manager': 'Dyrektor Zakładu',
 };
 
+// List of statuses where approval actions should be disabled
+const DISABLED_APPROVAL_STATUSES = ['in progress', 'approved', 'closed'];
+
 const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   roleText,
   deviationUserRoles,
@@ -88,6 +92,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   lang,
   reason,
   history,
+  deviationStatus,
 }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
@@ -108,6 +113,12 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
 
   // Get all roles the user can approve as (including elevated roles)
   const getElevatedRoles = (): string[] => {
+    // If user has 'plant-manager' role, allow them to approve as any role
+    // (actual vacancy check will happen in the server action)
+    if (deviationUserRoles.includes('plant-manager')) {
+      return [role]; // Return the current role being rendered
+    }
+
     // Start with the current role if the user has it directly
     let availableRoles = deviationUserRoles.includes(role) ? [role] : [];
 
@@ -129,6 +140,11 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   // Check if user has role or elevated privileges
   const availableRoles = getElevatedRoles();
   const hasRolePrivilege = availableRoles.length > 0;
+
+  // Check if approval actions should be disabled based on deviation status
+  const isApprovalDisabled = DISABLED_APPROVAL_STATUSES.includes(
+    deviationStatus || '',
+  );
 
   const onSubmit = (data: z.infer<typeof rejectDeviationSchema>) => {
     handleApproval(false, data.reason);
@@ -180,7 +196,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
 
       <TableCell>
         <div className='flex items-center gap-2'>
-          {hasRolePrivilege && (
+          {hasRolePrivilege && !isApprovalDisabled && (
             <>
               {/* Allow approval when not already approved (either undefined or rejected) */}
               {approved !== true && (
@@ -191,6 +207,18 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='outline'
                       className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
+                      disabled={
+                        role !== 'plant-manager' &&
+                        deviationUserRoles.includes('plant-manager-approval') &&
+                        !deviationUserRoles.includes('plant-manager')
+                      }
+                      title={
+                        role !== 'plant-manager' &&
+                        deviationUserRoles.includes('plant-manager-approval') &&
+                        !deviationUserRoles.includes('plant-manager')
+                          ? 'Decyzja niemożliwa - odchylenie zostało już zatwierdzone przez Dyrektora Zakładu'
+                          : 'Zatwierdź odchylenie'
+                      }
                     >
                       <ThumbsUp color='green' />
                     </Button>
@@ -199,7 +227,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     <DialogHeader>
                       <DialogTitle>Zatwierdzenie odchylenia</DialogTitle>
                       <DialogDescription>
-                        Czy na pewno chcesz zatwierdzić to odchylenie?
+                        Czy na pewno chcesz zatwierdzić to odchylenie jako{' '}
+                        {roleText}?
                       </DialogDescription>
                     </DialogHeader>
 
@@ -239,6 +268,18 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='outline'
                       className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
+                      disabled={
+                        role !== 'plant-manager' &&
+                        deviationUserRoles.includes('plant-manager-approval') &&
+                        !deviationUserRoles.includes('plant-manager')
+                      }
+                      title={
+                        role !== 'plant-manager' &&
+                        deviationUserRoles.includes('plant-manager-approval') &&
+                        !deviationUserRoles.includes('plant-manager')
+                          ? 'Decyzja niemożliwa - odchylenie zostało już zatwierdzone przez Dyrektora Zakładu'
+                          : 'Odrzuć odchylenie'
+                      }
                     >
                       <ThumbsDown color='red' />
                     </Button>
@@ -246,6 +287,12 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                   <DialogContent className='sm:max-w-[425px]'>
                     <DialogHeader>
                       <DialogTitle>Odrzuć odchylenie</DialogTitle>
+                      {deviationUserRoles.includes('plant-manager') &&
+                        role !== 'plant-manager' && (
+                          <DialogDescription className='font-semibold text-yellow-600'>
+                            Odrzucasz jako Dyrektor Zakładu w roli: {roleText}
+                          </DialogDescription>
+                        )}
                     </DialogHeader>
 
                     <Form {...form}>
@@ -279,7 +326,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
             </>
           )}
           {(!hasRolePrivilege ||
-            (approved === true && approved !== undefined)) &&
+            (approved === true && approved !== undefined) ||
+            isApprovalDisabled) &&
             '-'}
         </div>
       </TableCell>

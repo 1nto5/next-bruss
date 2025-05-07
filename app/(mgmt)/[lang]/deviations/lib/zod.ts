@@ -13,11 +13,14 @@ export const addDeviationSchema = z
     workplace: z.string().optional(),
     quantity: z
       .string() // Keep as string for input, refine for number
-      .min(1, { message: 'Podaj ilość!' }) // Required for final submission
-      .refine((value) => !isNaN(Number(value)) && Number(value) > 0, {
-        message: 'Podaj poprawną, dodatnią liczbę!',
-      }),
-    unit: z.string().min(1, { message: 'Podaj jednostkę!' }), // Required if quantity is given
+      .optional() // Making quantity optional
+      .refine(
+        (value) => !value || (!isNaN(Number(value)) && Number(value) > 0),
+        {
+          message: 'Podaj poprawną, dodatnią liczbę!',
+        },
+      ),
+    unit: z.string().min(1, { message: 'Podaj jednostkę!' }).optional(), // Making unit optional
     charge: z.string().optional(),
     description: z
       .string({ message: 'Wprowadź opis odchylenia!' })
@@ -59,7 +62,26 @@ export const addDeviationSchema = z
   .refine((data) => data.periodTo >= data.periodFrom, {
     message: 'Data zakończenia nie może być wcześniejsza niż data rozpoczęcia!',
     path: ['periodTo'], // Assign the error to the periodTo field
-  });
+  })
+  .refine(
+    (data) => {
+      // If quantity is provided (not undefined, not empty string, and > 0), unit must also be provided
+      const quantityValue = data.quantity ? Number(data.quantity) : NaN;
+      if (
+        data.quantity &&
+        data.quantity.trim() !== '' &&
+        !isNaN(quantityValue) &&
+        quantityValue > 0
+      ) {
+        return data.unit && data.unit.trim() !== '';
+      }
+      return true; // Otherwise (quantity empty or invalid), validation passes regarding unit
+    },
+    {
+      message: 'Podaj jednostkę, jeśli podałeś ilość większą od 0!',
+      path: ['unit'], // Assign the error to the unit field
+    },
+  );
 
 export type AddDeviationType = z.infer<typeof addDeviationSchema>;
 
@@ -177,3 +199,13 @@ export const rejectDeviationSchema = z.object({
 });
 
 export type RejectDeviationType = z.infer<typeof rejectDeviationSchema>;
+
+// Add note schema
+export const NoteFormSchema = z.object({
+  content: z
+    .string()
+    .min(1, 'Notatka nie może być pusta')
+    .max(1000, 'Notatka nie może przekraczać 1000 znaków'),
+});
+
+export type NoteFormType = z.infer<typeof NoteFormSchema>;

@@ -36,6 +36,8 @@ import {
   MailCheck,
   Paperclip, // Import Paperclip
   Printer,
+  PrinterIcon, // NEW: Import PrinterIcon
+  StickyNote, // Add StickyNote import
   Table as TableIcon,
   Wrench, // Import Wrench
 } from 'lucide-react';
@@ -45,7 +47,9 @@ import { useState, useTransition } from 'react'; // Import useState
 import { toast } from 'sonner';
 import { approveDeviation } from '../actions';
 import AddAttachmentDialog from './add-attachment-dialog';
+import AddNoteDialog from './add-note-dialog'; // Import the new component
 import EditLogDialog from './edit-log-dialog'; // RENAMED & UNCOMMENTED: Import the dialog component
+import PrintLogDialog from './print-log-dialog'; // NEW: Import PrintLogDialog
 import TableCellsApprove from './table-cell-approve-role';
 import TableCellCorrectiveAction from './table-cell-corrective-action';
 
@@ -87,12 +91,18 @@ export default function DeviationView({
   const [isPendingApproval, startApprovalTransition] = useTransition();
   const [isPendingPdfExport, startPdfExportTransition] = useTransition();
   const [isEditLogDialogOpen, setIsEditLogDialogOpen] = useState(false); // RENAMED: State for dialog
+  const [isPrintLogDialogOpen, setIsPrintLogDialogOpen] = useState(false); // NEW: State for print log dialog
 
   // Pobieranie wszystkich ról użytkownika, które są uprawnione do zatwierdzania
   const deviationUserRoles =
-    session?.user?.roles?.filter((role) =>
-      APPROVAL_ROLES.includes(role as ApprovalRole),
-    ) || [];
+    session?.user?.roles?.filter((role) => {
+      // If user is a plant-manager, only allow plant-manager role for approvals
+      if (session?.user?.roles?.includes('plant-manager')) {
+        return role === 'plant-manager';
+      }
+      // Otherwise allow all approval roles
+      return APPROVAL_ROLES.includes(role as ApprovalRole);
+    }) || [];
 
   const handleApproval = async (
     approvalRole: string,
@@ -123,6 +133,13 @@ export default function DeviationView({
               );
               if (res.success) {
                 resolve();
+              } else if (res.error === 'vacancy_required') {
+                // New error type for plant manager trying to approve as non-vacant role
+                reject(
+                  new Error(
+                    'Zatwierdzenie możliwe tylko dla wakatu na stanowisku!',
+                  ),
+                );
               } else if (res.error) {
                 reject(new Error('Skontaktuj się z IT!'));
               }
@@ -153,24 +170,17 @@ export default function DeviationView({
     userRoles: string[],
     targetRole: string,
   ): boolean => {
+    // If user is a plant-manager, they can approve as any role (vacancy check happens in server action)
+    if (userRoles.includes('plant-manager')) {
+      return true;
+    }
+
     // Direct role check
     if (userRoles.includes(targetRole)) {
       return true;
     }
 
-    // Elevation check
-    if (
-      userRoles.includes('plant-manager') &&
-      [
-        'group-leader',
-        'quality-manager',
-        'production-manager',
-        'plant-manager',
-      ].includes(targetRole)
-    ) {
-      return true;
-    }
-
+    // Elevation check for production-manager
     if (
       userRoles.includes('production-manager') &&
       targetRole === 'group-leader'
@@ -336,19 +346,7 @@ export default function DeviationView({
                 <TableIcon /> Odchylenia
               </Button>
             </Link>
-            {/* Add Edit Link for eligible deviations */}
-            {['in approval', 'rejected'].includes(deviation?.status || '') &&
-              (session?.user?.email === deviation?.owner ||
-                session?.user?.roles?.includes('admin')) && ( // Check owner or admin
-                <Link href={`/deviations/${deviation?._id}/edit`}>
-                  <Button variant='outline' className='mb-2 sm:mb-0'>
-                    {' '}
-                    {/* Add margin bottom */}
-                    <Cog />
-                    Edytuj
-                  </Button>
-                </Link>
-              )}
+            {/* REMOVED: Edit button from here - moved to Details card */}
           </div>
         </div>
         <CardDescription>ID: {deviation?.internalId}</CardDescription>
@@ -359,22 +357,45 @@ export default function DeviationView({
           <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             <Card className='lg:w-2/5'>
               <CardHeader>
-                <div className='flex items-center justify-between'>
-                  {' '}
-                  {/* Added justify-between */}
-                  <CardTitle className='flex items-center'>
+                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
+                  <CardTitle className='mb-2 flex items-center sm:mb-0'>
                     <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
                   </CardTitle>
-                  {/* Add History Button */}
-                  {deviation?.editLogs &&
-                    deviation.editLogs.length > 0 && ( // RENAMED: Check editLogs
+                  <div className='flex flex-wrap space-x-2'>
+                    {/* Add Print Log Button */}
+                    {deviation?.printLogs && deviation.printLogs.length > 0 && (
                       <Button
                         variant='outline'
-                        onClick={() => setIsEditLogDialogOpen(true)} // RENAMED: Setter
+                        onClick={() => setIsPrintLogDialogOpen(true)}
+                        className='mb-2 sm:mb-0'
                       >
-                        <History /> Historia
+                        <PrinterIcon className='mr-1 h-4 w-4' /> Historia
+                        wydruków
                       </Button>
                     )}
+                    {/* Edit History Button */}
+                    {deviation?.editLogs && deviation.editLogs.length > 0 && (
+                      <Button
+                        variant='outline'
+                        onClick={() => setIsEditLogDialogOpen(true)}
+                        className='mb-2 sm:mb-0'
+                      >
+                        <History className='mr-1 h-4 w-4' /> Historia zmian
+                      </Button>
+                    )}
+                    {/* MOVED: Edit button to here */}
+                    {['in approval', 'rejected'].includes(
+                      deviation?.status || '',
+                    ) &&
+                      (session?.user?.email === deviation?.owner ||
+                        session?.user?.roles?.includes('admin')) && ( // Check owner or admin
+                        <Link href={`/deviations/${deviation?._id}/edit`}>
+                          <Button variant='outline' className='mb-2 sm:mb-0'>
+                            <Cog className='mr-1 h-4 w-4' /> Edytuj
+                          </Button>
+                        </Link>
+                      )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -593,83 +614,128 @@ export default function DeviationView({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Group Leader'
-                          deviationUserRoles={deviationUserRoles}
-                          role='group-leader'
-                          approved={deviation?.groupLeaderApproval?.approved}
-                          handleApproval={(isApproved, reason) =>
-                            handleApproval('group-leader', isApproved, reason)
-                          }
-                          by={deviation?.groupLeaderApproval?.by}
-                          at={deviation?.groupLeaderApproval?.at?.toString()}
-                          lang={lang}
-                          reason={deviation?.groupLeaderApproval?.reason}
-                          history={deviation?.groupLeaderApproval?.history}
-                        />
-                      </TableRow>
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Kierownik Jakości'
-                          deviationUserRoles={deviationUserRoles}
-                          role='quality-manager'
-                          approved={deviation?.qualityManagerApproval?.approved}
-                          handleApproval={(isApproved, reason) =>
-                            handleApproval(
-                              'quality-manager',
-                              isApproved,
-                              reason,
-                            )
-                          }
-                          by={deviation?.qualityManagerApproval?.by}
-                          at={deviation?.qualityManagerApproval?.at?.toString()}
-                          lang={lang}
-                          reason={deviation?.qualityManagerApproval?.reason}
-                          history={deviation?.qualityManagerApproval?.history}
-                        />
-                      </TableRow>
+                      {/* NEW: Check if Plant Manager has already approved and pass that to all cells */}
+                      {/* Create an array to pass to all cells based on Plant Manager approval status */}
+                      {(() => {
+                        // Check if Plant Manager has approved
+                        const plantManagerApproved =
+                          deviation?.plantManagerApproval?.approved === true;
+                        // Create a modified array of user roles to pass to approval cells
+                        const effectiveUserRoles = plantManagerApproved
+                          ? [...deviationUserRoles, 'plant-manager-approval'] // Add a marker role when PM approved
+                          : deviationUserRoles;
 
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Kierownik Produkcji'
-                          deviationUserRoles={deviationUserRoles}
-                          role='production-manager'
-                          approved={
-                            deviation?.productionManagerApproval?.approved
-                          }
-                          handleApproval={(isApproved, reason) =>
-                            handleApproval(
-                              'production-manager',
-                              isApproved,
-                              reason,
-                            )
-                          }
-                          by={deviation?.productionManagerApproval?.by}
-                          at={deviation?.productionManagerApproval?.at?.toString()}
-                          lang={lang}
-                          reason={deviation?.productionManagerApproval?.reason}
-                          history={
-                            deviation?.productionManagerApproval?.history
-                          }
-                        />
-                      </TableRow>
-                      <TableRow>
-                        <TableCellsApprove
-                          roleText='Dyrektor Zakładu'
-                          deviationUserRoles={deviationUserRoles}
-                          role='plant-manager'
-                          approved={deviation?.plantManagerApproval?.approved}
-                          handleApproval={(isApproved, reason) =>
-                            handleApproval('plant-manager', isApproved, reason)
-                          }
-                          by={deviation?.plantManagerApproval?.by}
-                          at={deviation?.plantManagerApproval?.at?.toString()}
-                          lang={lang}
-                          reason={deviation?.plantManagerApproval?.reason}
-                          history={deviation?.plantManagerApproval?.history}
-                        />
-                      </TableRow>
+                        // Continue with existing JSX but use effectiveUserRoles
+                        return (
+                          <>
+                            <TableRow>
+                              <TableCellsApprove
+                                roleText='Group Leader'
+                                deviationUserRoles={effectiveUserRoles}
+                                role='group-leader'
+                                approved={
+                                  deviation?.groupLeaderApproval?.approved
+                                }
+                                handleApproval={(isApproved, reason) =>
+                                  handleApproval(
+                                    'group-leader',
+                                    isApproved,
+                                    reason,
+                                  )
+                                }
+                                by={deviation?.groupLeaderApproval?.by}
+                                at={deviation?.groupLeaderApproval?.at?.toString()}
+                                lang={lang}
+                                reason={deviation?.groupLeaderApproval?.reason}
+                                history={
+                                  deviation?.groupLeaderApproval?.history
+                                }
+                                deviationStatus={deviation?.status} // Add deviation status
+                              />
+                            </TableRow>
+                            <TableRow>
+                              <TableCellsApprove
+                                roleText='Kierownik Jakości'
+                                deviationUserRoles={effectiveUserRoles}
+                                role='quality-manager'
+                                approved={
+                                  deviation?.qualityManagerApproval?.approved
+                                }
+                                handleApproval={(isApproved, reason) =>
+                                  handleApproval(
+                                    'quality-manager',
+                                    isApproved,
+                                    reason,
+                                  )
+                                }
+                                by={deviation?.qualityManagerApproval?.by}
+                                at={deviation?.qualityManagerApproval?.at?.toString()}
+                                lang={lang}
+                                reason={
+                                  deviation?.qualityManagerApproval?.reason
+                                }
+                                history={
+                                  deviation?.qualityManagerApproval?.history
+                                }
+                                deviationStatus={deviation?.status} // Add deviation status
+                              />
+                            </TableRow>
+
+                            <TableRow>
+                              <TableCellsApprove
+                                roleText='Kierownik Produkcji'
+                                deviationUserRoles={effectiveUserRoles}
+                                role='production-manager'
+                                approved={
+                                  deviation?.productionManagerApproval?.approved
+                                }
+                                handleApproval={(isApproved, reason) =>
+                                  handleApproval(
+                                    'production-manager',
+                                    isApproved,
+                                    reason,
+                                  )
+                                }
+                                by={deviation?.productionManagerApproval?.by}
+                                at={deviation?.productionManagerApproval?.at?.toString()}
+                                lang={lang}
+                                reason={
+                                  deviation?.productionManagerApproval?.reason
+                                }
+                                history={
+                                  deviation?.productionManagerApproval?.history
+                                }
+                                deviationStatus={deviation?.status} // Add deviation status
+                              />
+                            </TableRow>
+                            <TableRow>
+                              <TableCellsApprove
+                                roleText='Dyrektor Zakładu'
+                                deviationUserRoles={effectiveUserRoles}
+                                role='plant-manager'
+                                approved={
+                                  deviation?.plantManagerApproval?.approved
+                                }
+                                handleApproval={(isApproved, reason) =>
+                                  handleApproval(
+                                    'plant-manager',
+                                    isApproved,
+                                    reason,
+                                  )
+                                }
+                                by={deviation?.plantManagerApproval?.by}
+                                at={deviation?.plantManagerApproval?.at?.toString()}
+                                lang={lang}
+                                reason={deviation?.plantManagerApproval?.reason}
+                                history={
+                                  deviation?.plantManagerApproval?.history
+                                }
+                                deviationStatus={deviation?.status} // Add deviation status
+                              />
+                            </TableRow>
+                          </>
+                        );
+                      })()}
                     </TableBody>
                   </Table>
                 </CardContent>
@@ -812,6 +878,65 @@ export default function DeviationView({
               </CardContent>
             </Card>
           </div>
+
+          {/* Add new card for notes */}
+          <div>
+            <Card>
+              <CardHeader>
+                <div className='flex justify-between'>
+                  <CardTitle className='flex items-center'>
+                    <StickyNote className='mr-2 h-5 w-5' /> Notatki
+                  </CardTitle>
+                  {deviation?._id && session && (
+                    <AddNoteDialog deviationId={deviation._id.toString()} />
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Osoba</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Notatka</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {deviation?.notes && deviation.notes.length > 0 ? (
+                      [...deviation.notes]
+                        .sort(
+                          (a, b) =>
+                            new Date(b.createdAt).getTime() -
+                            new Date(a.createdAt).getTime(),
+                        )
+                        .map((note, index) => (
+                          <TableRow key={index}>
+                            <TableCell className='whitespace-nowrap'>
+                              {extractNameFromEmail(note.createdBy)}
+                            </TableCell>
+                            <TableCell>
+                              {new Date(note.createdAt).toLocaleString(lang)}
+                            </TableCell>
+                            <TableCell className='whitespace-pre-line'>
+                              {note.content}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          className='text-muted-foreground text-center'
+                        >
+                          Brak notatek
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </CardContent>
       {/* Render the Edit Log Dialog (conditionally) */}
@@ -823,7 +948,13 @@ export default function DeviationView({
         lang={lang}
       />
 
-      {/* You need to create the EditLogDialog component */}
+      {/* NEW: Print Log Dialog */}
+      <PrintLogDialog
+        isOpen={isPrintLogDialogOpen}
+        onClose={() => setIsPrintLogDialogOpen(false)}
+        logs={deviation?.printLogs || []}
+        lang={lang}
+      />
     </Card>
   );
 }

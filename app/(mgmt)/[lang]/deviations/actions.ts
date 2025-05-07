@@ -6,6 +6,7 @@ import {
   correctiveActionType,
   DeviationType, // Import NotificationLogType
   EditLogEntryType,
+  NoteType,
   NotificationLogType, // Import NotificationLogType
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
@@ -103,13 +104,7 @@ async function sendGroupLeaderNotification(
         console.error(`Failed GL mail to ${email}:`, e);
       }
     }
-    console.log(
-      `Sent GL notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} users.`,
-    );
   } else {
-    console.log(
-      `No specific GL found for area ${deviationArea || 'N/A'} for [${internalId}].`,
-    );
     // Return empty logs, handle notification to Plant Manager in handleNotifications
   }
   return logs;
@@ -167,9 +162,6 @@ async function sendVacancyNotificationToPlantManager(
         );
       }
     }
-    console.log(
-      `Sent Vacancy (${vacantRole}) notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} Plant Managers.`,
-    );
   } else {
     console.error(
       `Vacancy detected for role (${vacantRole}) in [${internalId}], but no Plant Manager found!`,
@@ -227,9 +219,6 @@ async function sendNoGroupLeaderNotification(
         console.error(`Failed No-GL mail to Plant Manager ${email}:`, e);
       }
     }
-    console.log(
-      `Sent No-GL notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} Plant Managers.`,
-    );
   } else {
     console.error(
       `No GL found for area ${deviationArea || 'N/A'} in [${internalId}], and no Plant Manager found to notify!`,
@@ -288,11 +277,7 @@ async function sendRoleNotification(
         console.error(`Failed ${role} mail to ${email}:`, e);
       }
     }
-    console.log(
-      `Sent ${role} notifications (${notificationContext}) for [${internalId}] to ${uniqueEmails.length} users.`,
-    );
   } else {
-    console.log(`No users found with role ${role} for [${internalId}].`);
     // Return empty logs, handle vacancy notification in handleNotifications
   }
   return logs;
@@ -351,9 +336,6 @@ async function handleNotifications(
       );
       allNotificationLogs.push(...qmLogs);
     } else {
-      console.log(
-        `No Quality Manager found for [${internalId}], notifying Plant Manager.`,
-      );
       const vacancyQmLogs = await sendVacancyNotificationToPlantManager(
         deviationId,
         internalId,
@@ -380,9 +362,6 @@ async function handleNotifications(
       );
       allNotificationLogs.push(...pmLogs);
     } else {
-      console.log(
-        `No Production Manager found for [${internalId}], notifying Plant Manager.`,
-      );
       const vacancyPmLogs = await sendVacancyNotificationToPlantManager(
         deviationId,
         internalId,
@@ -394,18 +373,38 @@ async function handleNotifications(
       allNotificationLogs.push(...vacancyPmLogs);
     }
 
-    // 4. Plant Manager Notification (Standard)
-    // Always attempt to notify the Plant Manager directly, regardless of vacancies.
-    // The sendRoleNotification function handles cases where no Plant Manager exists.
-    const plantManagerLogs = await sendRoleNotification(
-      deviationId,
-      internalId,
-      'plant-manager',
-      notificationContext,
-      usersColl,
-      deviationUrl,
-    );
-    allNotificationLogs.push(...plantManagerLogs);
+    // 4. Plant Manager Notification - MODIFIED to only notify when:
+    // a) There are vacancies (already handled above)
+    // b) All other roles have already approved
+    // Check if all other approvals are in place
+    const allOtherRolesApproved = [
+      'group-leader',
+      'quality-manager',
+      'production-manager',
+    ].every((role) => {
+      const approvalFieldMap: { [key: string]: keyof DeviationType } = {
+        'group-leader': 'groupLeaderApproval',
+        'quality-manager': 'qualityManagerApproval',
+        'production-manager': 'productionManagerApproval',
+      };
+      const fieldName = approvalFieldMap[role];
+      return (
+        (deviation[fieldName] as ApprovalType | undefined)?.approved === true
+      );
+    });
+
+    // If all other roles approved, notify Plant Manager
+    if (allOtherRolesApproved) {
+      const plantManagerLogs = await sendRoleNotification(
+        deviationId,
+        internalId,
+        'plant-manager',
+        notificationContext,
+        usersColl,
+        deviationUrl,
+      );
+      allNotificationLogs.push(...plantManagerLogs);
+    }
 
     // 5. Update Deviation with All Logs
     if (allNotificationLogs.length > 0) {
@@ -431,9 +430,6 @@ async function handleNotifications(
             : { $push: { notificationLogs: { $each: uniqueLogs } } }; // Use uniqueLogs for edit
 
         await deviationsColl.updateOne({ _id: deviationId }, updateOperation);
-        console.log(
-          `Successfully updated notification logs for [${internalId}].`,
-        );
       } catch (e) {
         console.error(`Failed to update logs for [${internalId}]:`, e);
       }
@@ -464,9 +460,6 @@ async function sendCorrectiveActionAssignmentNotification(
 
   try {
     await mailer({ to: responsibleUserEmail, subject, html });
-    console.log(
-      `Sent Corrective Action assignment notification for [${internalId}] to ${responsibleUserEmail}.`,
-    );
     return {
       to: responsibleUserEmail,
       sentAt: new Date(),
@@ -508,9 +501,6 @@ async function sendRejectionReevaluationNotification(
   });
 
   if (rejectors.size === 0) {
-    console.log(
-      `No rejectors found for [${deviation.internalId}] to notify about ${reason}.`,
-    );
     return logs; // No one to notify
   }
 
@@ -541,9 +531,6 @@ async function sendRejectionReevaluationNotification(
     }
   }
 
-  console.log(
-    `Sent Re-evaluation (${reason}) notifications for [${deviation.internalId}] to ${logs.length} rejectors.`,
-  );
   return logs;
 }
 
@@ -580,9 +567,6 @@ async function sendApprovalDecisionNotificationToOwner(
 
   try {
     await mailer({ to: deviation.owner, subject, html });
-    console.log(
-      `Sent Approval Decision (${decision}) notification for [${deviation.internalId}] to owner ${deviation.owner}.`,
-    );
     return {
       to: deviation.owner,
       sentAt: new Date(),
@@ -597,8 +581,66 @@ async function sendApprovalDecisionNotificationToOwner(
   }
 }
 
+// NEW function to notify team leaders when deviation is approved
+async function sendTeamLeaderNotificationForPrint(
+  deviation: DeviationType,
+  deviationId: ObjectId,
+  usersColl: Collection,
+  deviationUrl: string,
+): Promise<NotificationLogType[]> {
+  const logs: NotificationLogType[] = [];
+
+  const targetRole = `team-leader-${deviation.area}`;
+  const teamLeaders = (await usersColl
+    .find({ roles: targetRole })
+    .toArray()) as unknown as UserWithRoles[];
+
+  const uniqueEmails = Array.from(
+    new Set(teamLeaders.map((user) => user.email).filter(Boolean)),
+  );
+
+  if (uniqueEmails.length > 0) {
+    const subject = `Odchylenie [${deviation.internalId}] wymaga wydruku i wdrożenia`;
+
+    // HTML body with clear instructions
+    const html = `
+      <div style="font-family: sans-serif;">
+      <p>Odchylenie [${deviation.internalId}] zostało zatwierdzone - wymaga wydruku i wdrożenia na: ${deviation.area === 'coating' ? 'POWLEKANIE' : deviation.area?.toUpperCase()} </p>
+      <p>
+        <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+      </p>
+      </div>`;
+
+    for (const email of uniqueEmails) {
+      try {
+        await mailer({ to: email, subject, html });
+        logs.push({
+          to: email,
+          sentAt: new Date(),
+          type: 'team-leader-implementation',
+        });
+      } catch (e) {
+        console.error(`Failed Team Leader implementation mail to ${email}:`, e);
+      }
+    }
+  } else {
+  }
+
+  return logs;
+}
+
 export async function revalidateDeviations() {
   revalidateTag('deviations');
+}
+
+// Helper function to add 12 hours to a date
+function addTwelveHours(
+  date: Date | string | undefined | null,
+): Date | undefined | null {
+  if (!date) return date as null | undefined; // Explicit type cast for null/undefined
+  const newDate = new Date(date);
+  newDate.setHours(12, 0, 0, 0); // Set to noon (12:00:00.000)
+  return newDate;
 }
 
 export async function updateCorrectiveAction(
@@ -633,6 +675,8 @@ export async function updateCorrectiveAction(
 
     const newCorrectiveAction = {
       ...correctiveAction,
+      // Add 12 hours to deadline date
+      deadline: addTwelveHours(correctiveAction.deadline),
       created: {
         at: new Date(),
         by: session.user?.email,
@@ -744,27 +788,37 @@ export async function approveDeviation(
     'plant-manager': 'plantManagerApproval',
   };
 
-  // Check if user has permission to approve as the specified role
-  const hasDirectRole = (session.user?.roles ?? []).includes(userRole);
+  // If user is a plant-manager, they can approve as any role (but we'll check for vacancies)
   const isPlantManager = (session.user?.roles ?? []).includes('plant-manager');
-  const isProductionManager = (session.user?.roles ?? []).includes(
-    'production-manager',
-  );
 
-  // Role elevation rules
-  const canElevateToRole =
-    (isPlantManager &&
-      [
-        'group-leader',
-        'quality-manager',
-        'production-manager',
-        'plant-manager',
-      ].includes(userRole)) ||
-    (isProductionManager && userRole === 'group-leader');
+  // If plant manager tries to approve as another role, check if that role exists in the system
+  if (isPlantManager && userRole !== 'plant-manager') {
+    const usersColl = await dbc('users');
 
-  // If user doesn't have direct role or elevated permission, reject
-  if (!hasDirectRole && !canElevateToRole) {
-    return { error: 'unauthorized role' };
+    // Check if users with the target role exist
+    const usersWithRole = await usersColl.countDocuments({ roles: userRole });
+
+    // If users with this role exist, plant manager cannot approve as this role
+    if (usersWithRole > 0) {
+      return { error: 'vacancy_required' };
+    }
+
+    // If no users with this role exist, continue with approval as the vacant role
+  } else if (!isPlantManager) {
+    // If not a plant manager, apply standard permission checks
+    // Check if user has permission to approve as the specified role
+    const hasDirectRole = (session.user?.roles ?? []).includes(userRole);
+    const isProductionManager = (session.user?.roles ?? []).includes(
+      'production-manager',
+    );
+
+    // Role elevation rules
+    const canElevateToRole = isProductionManager && userRole === 'group-leader';
+
+    // If user doesn't have direct role or elevated permission, reject
+    if (!hasDirectRole && !canElevateToRole) {
+      return { error: 'unauthorized role' };
+    }
   }
 
   const approvalField = approvalFieldMap[userRole];
@@ -780,6 +834,11 @@ export async function approveDeviation(
     })) as DeviationType | null; // Cast to DeviationType
     if (!deviation) {
       return { error: 'not found' };
+    }
+
+    // NEW: Check if Plant Manager has already approved - if so, prevent further changes
+    if (deviation.plantManagerApproval?.approved === true) {
+      return { error: 'already approved by plant manager' };
     }
 
     // Cast the specific approval field to ApprovalType | undefined
@@ -804,9 +863,6 @@ export async function approveDeviation(
     // 4. Allow approving if rejected (overriding previous rejection)
     // No explicit check needed here, the logic below handles it.
 
-    // const currentApproval = deviation[approvalField] as // <-- Moved up
-    //   | ApprovalType
-    //   | undefined;
     const newApprovalRecord: ApprovalType = {
       approved: isApproved,
       by: session.user?.email,
@@ -840,60 +896,76 @@ export async function approveDeviation(
       [approvalField]: newApprovalRecord,
     };
 
-    // Determine the new status
+    // MODIFIED: Determine the new status
     if (!isApproved) {
       // If rejecting, always set status to rejected
       updateField.status = 'rejected';
     } else {
-      // If approving:
-      // Check if this approval reverses a previous rejection by this role
-      const wasPreviouslyRejectedByThisRole =
-        currentApproval?.approved === false;
+      // NEW LOGIC: If Plant Manager approves, always set to approved
+      if (userRole === 'plant-manager') {
+        const now = new Date();
+        // Ensure timePeriod and its properties exist before creating Date objects
+        const periodFrom = deviation.timePeriod?.from
+          ? new Date(deviation.timePeriod.from)
+          : null;
+        const periodTo = deviation.timePeriod?.to
+          ? new Date(deviation.timePeriod.to)
+          : null;
 
-      // Check if any *other* roles have rejected it
-      const otherRolesRejected = Object.entries(approvalFieldMap)
-        .filter(([role, field]) => field !== approvalField) // Exclude the current role
-        .some(
-          ([role, field]) =>
-            (deviation[field] as ApprovalType | undefined)?.approved === false,
-        );
-
-      if (wasPreviouslyRejectedByThisRole && !otherRolesRejected) {
-        // If reversing a rejection and no other rejections exist, set back to 'in approval'
-        updateField.status = 'in approval';
+        // Check if periodFrom and periodTo are valid dates before comparison
+        updateField.status =
+          periodFrom && periodTo && now >= periodFrom && now <= periodTo
+            ? 'in progress'
+            : 'approved';
       } else {
-        // Otherwise, check if all approvals are now met
-        const hasAllApprovals = Object.values(approvalFieldMap).every(
-          (field) =>
-            field === approvalField
-              ? true // The current approval being set is considered approved for this check
-              : (deviation[field] as ApprovalType | undefined)?.approved ===
-                true, // Check other fields explicitly for true
-        );
+        // If not Plant Manager, check other roles as before:
+        // Check if this approval reverses a previous rejection by this role
+        const wasPreviouslyRejectedByThisRole =
+          currentApproval?.approved === false;
 
-        if (hasAllApprovals) {
-          const now = new Date();
-          // Ensure timePeriod and its properties exist before creating Date objects
-          const periodFrom = deviation.timePeriod?.from
-            ? new Date(deviation.timePeriod.from)
-            : null;
-          const periodTo = deviation.timePeriod?.to
-            ? new Date(deviation.timePeriod.to)
-            : null;
+        // Check if any *other* roles have rejected it
+        const otherRolesRejected = Object.entries(approvalFieldMap)
+          .filter(([role, field]) => field !== approvalField) // Exclude the current role
+          .some(
+            ([role, field]) =>
+              (deviation[field] as ApprovalType | undefined)?.approved ===
+              false,
+          );
 
-          // Check if periodFrom and periodTo are valid dates before comparison
-          updateField.status =
-            periodFrom && periodTo && now >= periodFrom && now <= periodTo
-              ? 'in progress'
-              : 'approved';
-        } else if (!otherRolesRejected) {
-          // If not all approvals met, but no rejections exist (including the one potentially just reversed),
-          // ensure status is 'in approval'. This covers cases where it might have been 'rejected' before.
+        if (wasPreviouslyRejectedByThisRole && !otherRolesRejected) {
+          // If reversing a rejection and no other rejections exist, set back to 'in approval'
           updateField.status = 'in approval';
+        } else {
+          // Otherwise, check if all approvals are now met
+          const hasAllApprovals = Object.values(approvalFieldMap).every(
+            (field) =>
+              field === approvalField
+                ? true // The current approval being set is considered approved for this check
+                : (deviation[field] as ApprovalType | undefined)?.approved ===
+                  true, // Check other fields explicitly for true
+          );
+
+          if (hasAllApprovals) {
+            const now = new Date();
+            // Ensure timePeriod and its properties exist before creating Date objects
+            const periodFrom = deviation.timePeriod?.from
+              ? new Date(deviation.timePeriod.from)
+              : null;
+            const periodTo = deviation.timePeriod?.to
+              ? new Date(deviation.timePeriod.to)
+              : null;
+
+            // Check if periodFrom and periodTo are valid dates before comparison
+            updateField.status =
+              periodFrom && periodTo && now >= periodFrom && now <= periodTo
+                ? 'in progress'
+                : 'approved';
+          } else if (!otherRolesRejected) {
+            // If not all approvals met, but no rejections exist (including the one potentially just reversed),
+            // ensure status is 'in approval'. This covers cases where it might have been 'rejected' before.
+            updateField.status = 'in approval';
+          }
         }
-        // If other roles still have rejections, the status remains 'rejected' (handled by the initial state or previous updates)
-        // or will be set to 'rejected' if another role rejects later. We don't explicitly set it back to 'rejected' here
-        // unless the current action *is* a rejection.
       }
     }
 
@@ -938,6 +1010,31 @@ export async function approveDeviation(
           { _id: deviationObjectId },
           { $push: { notificationLogs: ownerNotificationLog } },
         );
+      }
+
+      // NEW: If fully approved by plant manager, notify team leaders for implementation
+      if (
+        isApproved &&
+        userRole === 'plant-manager' &&
+        (updatedDeviation.status === 'approved' ||
+          updatedDeviation.status === 'in progress')
+      ) {
+        // Get users collection for finding team leaders
+        const usersColl = await dbc('users');
+        const teamLeaderLogs = await sendTeamLeaderNotificationForPrint(
+          updatedDeviation,
+          deviationObjectId,
+          usersColl,
+          deviationUrl,
+        );
+
+        // Add team leader notification logs if any
+        if (teamLeaderLogs.length > 0) {
+          await coll.updateOne(
+            { _id: deviationObjectId },
+            { $push: { notificationLogs: { $each: teamLeaderLogs } } },
+          );
+        }
       }
     } else {
       console.error(
@@ -1095,7 +1192,10 @@ export async function insertDeviation(deviation: AddDeviationType) {
       }),
       ...(deviation.charge && { charge: deviation.charge }),
       reason: deviation.reason,
-      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+      timePeriod: {
+        from: addTwelveHours(deviation.periodFrom),
+        to: addTwelveHours(deviation.periodTo),
+      },
       ...(deviation.area && { area: deviation.area }),
       ...(deviation.description && { description: deviation.description }),
       ...(deviation.processSpecification && {
@@ -1154,7 +1254,10 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
       ...(deviation.unit && { unit: deviation.unit }),
       ...(deviation.charge && { charge: deviation.charge }),
       ...(deviation.reason && { reason: deviation.reason }),
-      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+      timePeriod: {
+        from: addTwelveHours(deviation.periodFrom),
+        to: addTwelveHours(deviation.periodTo),
+      },
       ...(deviation.area && { area: deviation.area }),
       ...(deviation.description && { description: deviation.description }),
       ...(deviation.processSpecification && {
@@ -1276,8 +1379,8 @@ export async function updateDraftDeviation(
       }),
       ...(deviation.reason !== undefined && { reason: deviation.reason }),
       timePeriod: {
-        from: deviation.periodFrom,
-        to: deviation.periodTo,
+        from: addTwelveHours(deviation.periodFrom),
+        to: addTwelveHours(deviation.periodTo),
       },
       ...(deviation.area !== undefined && { area: deviation.area }),
       ...(deviation.processSpecification !== undefined && {
@@ -1439,7 +1542,10 @@ export async function updateDeviation(
             : undefined, // Set quantity to undefined if not provided
         charge: deviation.charge || undefined,
         reason: deviation.reason,
-        timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+        timePeriod: {
+          from: addTwelveHours(deviation.periodFrom),
+          to: addTwelveHours(deviation.periodTo),
+        },
         area: deviation.area || undefined,
         description: deviation.description || undefined,
         processSpecification: deviation.processSpecification || undefined,
@@ -1556,7 +1662,10 @@ export async function insertDeviationFromDraft(
       }),
       ...(deviation.charge && { charge: deviation.charge }),
       reason: deviation.reason,
-      timePeriod: { from: deviation.periodFrom, to: deviation.periodTo },
+      timePeriod: {
+        from: addTwelveHours(deviation.periodFrom),
+        to: addTwelveHours(deviation.periodTo),
+      },
       ...(deviation.area && { area: deviation.area }),
       ...(deviation.description && { description: deviation.description }),
       ...(deviation.processSpecification && {
@@ -1608,9 +1717,6 @@ export async function notifyRejectorsAfterAttachment(deviationId: string) {
 
     // Prevent notifications if deviation is closed
     if (deviation.status === 'closed') {
-      console.log(
-        `notifyRejectorsAfterAttachment: Deviation [${deviationId}] is closed, skipping notifications.`,
-      );
       return { success: 'skipped_closed' };
     }
 
@@ -1637,5 +1743,46 @@ export async function notifyRejectorsAfterAttachment(deviationId: string) {
   } catch (error) {
     console.error('notifyRejectorsAfterAttachment server action error:', error);
     return { error: 'notifyRejectorsAfterAttachment server action error' };
+  }
+}
+
+export async function addNote(deviationId: string, content: string) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const collection = await dbc('deviations');
+    const deviationObjectId = new ObjectId(deviationId);
+
+    // Check if deviation exists
+    const deviation = await collection.findOne({ _id: deviationObjectId });
+    if (!deviation) {
+      return { error: 'not found' };
+    }
+
+    // Create new note
+    const newNote: NoteType = {
+      content,
+      createdBy: session.user.email,
+      createdAt: new Date(),
+    };
+
+    // Add note to deviation
+    const result = await collection.updateOne(
+      { _id: deviationObjectId },
+      { $push: { notes: newNote } },
+    );
+
+    if (result.modifiedCount === 0) {
+      return { error: 'not updated' };
+    }
+
+    revalidateDeviation();
+    return { success: 'added' };
+  } catch (error) {
+    console.error('addNote server action error:', error);
+    return { error: 'addNote server action error' };
   }
 }

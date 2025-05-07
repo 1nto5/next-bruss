@@ -68,7 +68,7 @@ export default function AddDeviationForm({
       workplace: '',
       // drawingNumber: '', // Assuming this might be added later or is optional
       quantity: '',
-      unit: 'pcs', // Set a default unit
+      unit: undefined, // Set a default unit
       charge: '',
       description: '',
       reason: undefined, // Explicitly undefined for radio group
