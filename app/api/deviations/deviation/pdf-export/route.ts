@@ -2,6 +2,7 @@ import {
   DeviationAreaType,
   DeviationReasonType,
   DeviationType,
+  PrintLogType,
 } from '@/app/(mgmt)/[lang]/deviations/lib/types';
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
@@ -379,17 +380,17 @@ async function generateDeviationPdf({
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
-    doc.setFont('OpenSans', 'italic').setFontSize(8);
+    doc.setFont('OpenSans', 'normal').setFontSize(8);
+    // Page numbers higher up with x/y format
+    doc.text(`${i}/${pageCount}`, width - margin, height - 15, {
+      align: 'right',
+    });
+    // Static footer text
+    doc.setFont('OpenSans', 'normal').setFontSize(6);
+
     const foot =
-      `${translations.footer.generated.pl}: ${new Date().toLocaleString(lang)}, przez: ${generatedBy}` +
-      ` / ${translations.footer.generated.en}: ${new Date().toLocaleString(lang)}, by: ${generatedBy}`;
+      'Name: CL70 PR 003 Odchylenie w procesie prod._V4 Issued/data: 2025/04/29 Release/zwolnił: A. Macełko Plant: MRG, Dept./dział: PROD Lang./język: pl/en Classification: Internal';
     doc.text(foot, margin, height - 10);
-    doc.text(
-      `Strona ${i} z ${pageCount} / Page ${i} of ${pageCount}`,
-      width - margin,
-      height - 10,
-      { align: 'right' },
-    );
   }
 
   return Buffer.from(await doc.output('arraybuffer'));
@@ -423,6 +424,18 @@ export async function POST(request: Request) {
       lang: 'pl',
       generatedBy: extractNameFromEmail(session.user.email),
     });
+
+    // NEW: Log printing event
+    const printLog: PrintLogType = {
+      printedBy: session.user.email,
+      printedAt: new Date(),
+    };
+
+    // Add print log to the deviation
+    await devCol.updateOne(
+      { _id: new ObjectId(deviationId) },
+      { $push: { printLogs: printLog } },
+    );
 
     return new NextResponse(pdfBuffer, {
       status: 200,
