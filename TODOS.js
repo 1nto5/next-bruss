@@ -14,13 +14,10 @@ TODO: all dialogs formatting as in failures lv
 
 
 TODO: odchylenia: 
-- akcje korygujące zalogowanej osoby - oddzielna tabela
-- wyszukiwanie rozszerzyć o Quarry
-- dodatkowe zabezpieczenie przed drukowaniem oraz zmianami w actions / route 
-- możliwość dodawania notatek do odchylenia
-- optymalizacja actions oraz usunięcie console logów
-- kto może dodawać załączniki?
-
+- [ ] Stopka w eksporcie do pliku zgodnie z standardem
+Backend
+- Zmiana statusu odchylenia na ‘in progress’ oraz ‘closed’ backend
+- Powiadomienia mailowe gdy brak akcji backend
 
 
 TODO: MARIOLA WNIOSKI - poprawki po spotkaniu
