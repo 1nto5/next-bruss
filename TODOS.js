@@ -14,7 +14,6 @@ TODO: all dialogs formatting as in failures lv
 
 
 TODO: odchylenia: 
-- [ ] Stopka w eksporcie do pliku zgodnie z standardem
 Backend
 - Zmiana statusu odchylenia na ‘in progress’ oraz ‘closed’ backend
 - Powiadomienia mailowe gdy brak akcji backend
