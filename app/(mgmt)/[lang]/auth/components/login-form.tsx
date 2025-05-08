@@ -26,13 +26,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function LoginForm({ cDict }: { cDict: any }) {
   const router = useRouter();
-
   const [isPending, setIsPending] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams?.get('callbackUrl') || '/';
 
   const formSchema = z.object({
     email: z
@@ -74,8 +75,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       }
       if (res.success) {
         toast.success(cDict.toasts.loginSuccess);
-        // router.back();
-        router.push('/');
+        router.push(callbackUrl); // Redirect to home after successful login
       }
     } catch (error) {
       toast.error(cDict.toasts.pleaseContactIt);
