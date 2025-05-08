@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { Plus } from 'lucide-react'; // Import Plus icon
+import { KeyRound, Plus } from 'lucide-react'; // Import Plus icon
 import { Session } from 'next-auth';
 import Link from 'next/link'; // Import Link
 import TableFilteringAndOptions from './components/table-filtering-and-options';
@@ -223,10 +223,16 @@ export default async function DeviationsPage(props: {
           {/* Add flex container */}
           <CardTitle>Odchylenia w procesie produkcyjnym</CardTitle>
           {/* Add the "Add Deviation" button here, conditionally rendered */}
-          {session && (
+          {session ? (
             <Link href='/deviations/add'>
               <Button variant={'outline'}>
                 <Plus /> <span>Nowe odchylenie</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link href='/auth'>
+              <Button variant={'outline'}>
+                <KeyRound /> <span>Zaloguj by dodać odchylenie</span>
               </Button>
             </Link>
           )}

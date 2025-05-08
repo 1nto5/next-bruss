@@ -38,7 +38,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
       },
       {
         href: ROUTE_PATHS.deviations,
-        title: 'Odchylenia - test',
+        title: 'Odchylenia',
         description: 'Zarządzanie odchyleniami produkcji.',
       },
       {
