@@ -230,9 +230,9 @@ export default async function DeviationsPage(props: {
               </Button>
             </Link>
           ) : (
-            <Link href='/auth'>
+            <Link href={`/auth?callbackUrl=/deviations`}>
               <Button variant={'outline'}>
-                <KeyRound /> <span>Zaloguj by dodać odchylenie</span>
+                <KeyRound /> <span>Zaloguj się</span>
               </Button>
             </Link>
           )}

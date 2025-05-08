@@ -21,7 +21,6 @@ import {
   AddDeviationDraftType,
   AddDeviationType,
 } from './lib/zod'; // Assuming EditLogEntryType is defined in types.ts, not zod
-// import { redirect } from 'next/navigation';
 
 // Define a simple user type for annotation
 interface UserWithRoles {
@@ -649,7 +648,7 @@ export async function updateCorrectiveAction(
 ) {
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    redirect(`/auth`);
   }
   try {
     const collection = await dbc('deviations');
