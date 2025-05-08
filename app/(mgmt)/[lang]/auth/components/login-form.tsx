@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
+import { KeyRound } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -129,14 +129,10 @@ export default function LoginForm({ cDict }: { cDict: any }) {
             />
           </CardContent>
           <CardFooter className='flex justify-end'>
-            {isPending ? (
-              <Button disabled>
-                <Loader2 className='animate-spin' />
-                {cDict.loggingButton}
-              </Button>
-            ) : (
-              <Button type='submit'>{cDict.loginButton}</Button>
-            )}
+            <Button type='submit' disabled={isPending}>
+              <KeyRound className={isPending ? 'animate-spin' : ''} />
+              {cDict.loginButton}
+            </Button>
           </CardFooter>
         </form>
       </Form>
