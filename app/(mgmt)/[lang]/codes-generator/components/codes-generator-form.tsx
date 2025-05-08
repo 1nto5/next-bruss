@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { FileScan } from 'lucide-react';
-import { generateQrCodePdf } from '../lib/pdf-generator';
+import { codesPdfGenerator } from '../lib/codes-pdf-generator';
 
 const formSchema = z.object({
   listItems: z
@@ -45,9 +45,11 @@ const formSchema = z.object({
     }),
   title: z.string().optional(),
   pageSize: z.enum(['standard', 'a4', 'a3']).default('standard'),
-  qrSize: z.number().int().default(85),
+  codeSize: z.number().int().default(85),
   fontSize: z.number().int().default(48),
   spacing: z.number().int().default(22),
+  codeType: z.enum(['qr', 'barcode']).default('qr'),
+  orientation: z.enum(['portrait', 'landscape']).default('portrait'),
 });
 
 export default function QrGeneratorForm() {
@@ -59,9 +61,11 @@ export default function QrGeneratorForm() {
       listItems: '',
       title: '',
       pageSize: 'standard',
-      qrSize: 85,
+      codeSize: 85,
       fontSize: 48,
       spacing: 22,
+      codeType: 'qr',
+      orientation: 'portrait',
     },
   });
 
@@ -69,15 +73,15 @@ export default function QrGeneratorForm() {
 
   useEffect(() => {
     if (selectedPageSize === 'standard') {
-      form.setValue('qrSize', 85);
+      form.setValue('codeSize', 85);
       form.setValue('fontSize', 48);
       form.setValue('spacing', 22);
     } else if (selectedPageSize === 'a4') {
-      form.setValue('qrSize', 190);
+      form.setValue('codeSize', 190);
       form.setValue('fontSize', 105);
       form.setValue('spacing', 80);
     } else if (selectedPageSize === 'a3') {
-      form.setValue('qrSize', 270);
+      form.setValue('codeSize', 270);
       form.setValue('fontSize', 150);
       form.setValue('spacing', 120);
     }
@@ -103,13 +107,15 @@ export default function QrGeneratorForm() {
         // Force a UI update before proceeding with the heavy operation
         await new Promise((resolve) => setTimeout(resolve, 50));
 
-        await generateQrCodePdf({
+        await codesPdfGenerator({
           items,
           title: values.title || 'QR Codes',
           pageSize: values.pageSize,
-          qrSize: values.qrSize,
+          codeSize: values.codeSize,
           fontSize: values.fontSize,
           spacing: values.spacing,
+          codeType: values.codeType,
+          orientation: values.orientation,
         });
 
         toast.success('PDF generated successfully!');
@@ -126,9 +132,9 @@ export default function QrGeneratorForm() {
   return (
     <Card className='sm:w-[768px]'>
       <CardHeader>
-        <CardTitle>QR Code Generator</CardTitle>
+        <CardTitle>Code Generator</CardTitle>
         <CardDescription>
-          Enter a list of items (one per line) to generate QR codes
+          Enter a list of items (one per line) to generate QR codes or barcodes
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -179,13 +185,67 @@ export default function QrGeneratorForm() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name='codeType'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Code Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select code type' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='qr'>QR Code</SelectItem>
+                      <SelectItem value='barcode'>Barcode</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Choose between QR code or barcode
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='orientation'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Orientation</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select orientation' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='portrait'>Portrait</SelectItem>
+                      <SelectItem value='landscape'>Landscape</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>Choose page orientation</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
               <FormField
                 control={form.control}
-                name='qrSize'
+                name='codeSize'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>QR Code Size (mm)</FormLabel>
+                    <FormLabel>Code Size (mm)</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
@@ -196,7 +256,7 @@ export default function QrGeneratorForm() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Size of QR code in millimeters
+                      Size of code in millimeters
                     </FormDescription>
                   </FormItem>
                 )}
@@ -269,7 +329,8 @@ export default function QrGeneratorForm() {
           <CardFooter>
             <Button type='submit' className='w-full' disabled={isGenerating}>
               <FileScan className={isGenerating ? 'animate-spin' : ''} />{' '}
-              Generate QR Code PDF
+              Generate {form.watch('codeType') === 'qr' ? 'QR Code' : 'Barcode'}{' '}
+              PDF
             </Button>
           </CardFooter>
         </form>

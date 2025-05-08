@@ -23,7 +23,7 @@ export const ROUTE_PATHS = {
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
   productionOvertime: '/production-overtime',
-  qrGenerator: '/qr-generator',
+  codesGenerator: '/codes-generator',
 };
 
 export const plHeaderRoutes: HeaderRoute[] = [
@@ -75,9 +75,10 @@ export const plHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.qrGenerator,
-        title: 'QR Code Generator',
-        description: 'Generowanie kodów QR.',
+        href: ROUTE_PATHS.codesGenerator,
+        title: 'Generator QR/Barcode',
+        description:
+          'Generowanie plików PDF dla kodów QR oraz kodów kreskowych.',
       },
     ],
   },

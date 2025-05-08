@@ -51,6 +51,7 @@
     "eslint-config-next": "15.2.3",
     "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
+    "jsbarcode": "^3.11.6",
     "jspdf": "^3.0.1",
     "ldapjs-client": "^0.1.2",
     "lucide-react": "^0.475.0",
