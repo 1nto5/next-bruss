@@ -357,17 +357,16 @@ export default function DeviationView({
           <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             <Card className='lg:w-2/5'>
               <CardHeader>
-                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
-                  <CardTitle className='mb-2 flex items-center sm:mb-0'>
+                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-start'>
+                  <CardTitle className='mb-2 flex items-center sm:mb-0 lg:mb-2'>
                     <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
                   </CardTitle>
-                  <div className='flex flex-wrap space-x-2'>
+                  <div className='flex flex-wrap gap-2 sm:gap-0 lg:gap-2'>
                     {/* Add Print Log Button */}
                     {deviation?.printLogs && deviation.printLogs.length > 0 && (
                       <Button
                         variant='outline'
                         onClick={() => setIsPrintLogDialogOpen(true)}
-                        className='mb-2 sm:mb-0'
                       >
                         <PrinterIcon className='mr-1 h-4 w-4' /> Historia
                         wydruków
@@ -378,7 +377,6 @@ export default function DeviationView({
                       <Button
                         variant='outline'
                         onClick={() => setIsEditLogDialogOpen(true)}
-                        className='mb-2 sm:mb-0'
                       >
                         <History className='mr-1 h-4 w-4' /> Historia zmian
                       </Button>
@@ -390,7 +388,7 @@ export default function DeviationView({
                       (session?.user?.email === deviation?.owner ||
                         session?.user?.roles?.includes('admin')) && ( // Check owner or admin
                         <Link href={`/deviations/${deviation?._id}/edit`}>
-                          <Button variant='outline' className='mb-2 sm:mb-0'>
+                          <Button variant='outline'>
                             <Cog className='mr-1 h-4 w-4' /> Edytuj
                           </Button>
                         </Link>
