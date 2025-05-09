@@ -36,10 +36,10 @@ import {
   MailCheck,
   Paperclip, // Import Paperclip
   Printer,
-  PrinterIcon, // NEW: Import PrinterIcon
+  PrinterCheck, // NEW: Import PrinterIcon
   StickyNote, // Add StickyNote import
   Table as TableIcon,
-  Wrench, // Import Wrench
+  Wrench,
 } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
@@ -339,6 +339,16 @@ export default function DeviationView({
                 <Printer /> Drukuj
               </Button>
             )}
+            {/* Add Print Log Button */}
+            {deviation?.printLogs && deviation.printLogs.length > 0 && (
+              <Button
+                variant='outline'
+                onClick={() => setIsPrintLogDialogOpen(true)}
+                className='mb-2 sm:mb-0'
+              >
+                <PrinterCheck /> Historia wydruków
+              </Button>
+            )}
             <Link href='/deviations'>
               <Button variant='outline' className='mb-2 sm:mb-0'>
                 {' '}
@@ -355,30 +365,20 @@ export default function DeviationView({
       <CardContent>
         <div className='flex-col space-y-4'>
           <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
-            <Card className='lg:w-2/5'>
+            <Card className='lg:w-5/12'>
               <CardHeader>
-                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-start'>
-                  <CardTitle className='mb-2 flex items-center sm:mb-0 lg:mb-2'>
+                <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
+                  <CardTitle className='mb-2 flex items-center sm:mb-0'>
                     <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
                   </CardTitle>
-                  <div className='flex flex-wrap gap-2 sm:gap-0 lg:gap-2'>
-                    {/* Add Print Log Button */}
-                    {deviation?.printLogs && deviation.printLogs.length > 0 && (
-                      <Button
-                        variant='outline'
-                        onClick={() => setIsPrintLogDialogOpen(true)}
-                      >
-                        <PrinterIcon className='mr-1 h-4 w-4' /> Historia
-                        wydruków
-                      </Button>
-                    )}
+                  <div className='flex flex-wrap gap-2'>
                     {/* Edit History Button */}
                     {deviation?.editLogs && deviation.editLogs.length > 0 && (
                       <Button
                         variant='outline'
                         onClick={() => setIsEditLogDialogOpen(true)}
                       >
-                        <History className='mr-1 h-4 w-4' /> Historia zmian
+                        <History /> Historia
                       </Button>
                     )}
                     {/* MOVED: Edit button to here */}
@@ -386,10 +386,18 @@ export default function DeviationView({
                       deviation?.status || '',
                     ) &&
                       (session?.user?.email === deviation?.owner ||
-                        session?.user?.roles?.includes('admin')) && ( // Check owner or admin
+                        session?.user?.roles?.some((role) =>
+                          [
+                            'admin',
+                            'group-leader',
+                            'production-manager',
+                            'quality-manager',
+                            'plant-manager',
+                          ].includes(role),
+                        )) && (
                         <Link href={`/deviations/${deviation?._id}/edit`}>
                           <Button variant='outline'>
-                            <Cog className='mr-1 h-4 w-4' /> Edytuj
+                            <Cog /> Edytuj
                           </Button>
                         </Link>
                       )}
@@ -530,7 +538,7 @@ export default function DeviationView({
                 </Table>
               </CardContent>
             </Card>
-            <div className='flex-col space-y-4 lg:w-3/5'>
+            <div className='flex-col space-y-4 lg:w-7/12'>
               <Card>
                 <CardHeader>
                   <div className='flex justify-between'>
