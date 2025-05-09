@@ -4,6 +4,7 @@ FIXME: shadcn calendar is not compatible with: "react-day-picker": "^9", which i
 FIXME: duplicate mongodb errors in pm2 logs
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
+PLAN: change to cache='no-store' in fetches where data must be always fresh
 
 TODO: EOL136153 migration to new version
 TODO: dmcheck english version
@@ -11,6 +12,8 @@ TODO: BRI migrate to employees collection
 TODO: DMCheck v3 - zustand + react-query
 TODO: users admin rebuild
 TODO: all dialogs formatting as in failures lv
+
+
 
 
 TODO: odchylenia: 
