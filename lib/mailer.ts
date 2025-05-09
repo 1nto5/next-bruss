@@ -41,7 +41,7 @@ const mailer = async (mailOptions: any) => {
   }
 
   const completeMailOptions = {
-    from: 'no-reply@bruss-group.com',
+    from: 'no.reply@bruss-group.com',
     ...mailOptions,
     to,
     subject,
