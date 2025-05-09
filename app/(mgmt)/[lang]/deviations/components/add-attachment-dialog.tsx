@@ -21,12 +21,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Paperclip, Upload } from 'lucide-react';
-import { Session } from 'next-auth'; // Import Session
+import { Session } from 'next-auth';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateDeviation } from '../actions';
-import { DeviationStatus } from '../lib/types'; // Import DeviationStatus
+import { DeviationStatus } from '../lib/types';
 import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
 
 // Define attachment roles (can be imported from view.tsx or defined here)
@@ -41,14 +41,14 @@ const ATTACHMENT_ROLES = [
 
 interface AddAttachmentDialogProps {
   deviationId: string;
-  deviationStatus: DeviationStatus | undefined; // Add deviation status
-  deviationOwner: string | undefined | null; // Add deviation owner
-  session: Session | null; // Add session
+  deviationStatus: DeviationStatus | undefined;
+  deviationOwner: string | undefined | null;
+  session: Session | null;
 }
 
 export default function AddAttachmentDialog({
   deviationId,
-  deviationStatus, // Destructure new props
+  deviationStatus,
   deviationOwner,
   session,
 }: AddAttachmentDialogProps) {
@@ -68,7 +68,6 @@ export default function AddAttachmentDialog({
     if (event.target.files && event.target.files.length > 0) {
       form.setValue('file', event.target.files[0], { shouldValidate: true });
 
-      // Pre-fill custom name with the original filename (without extension)
       const filename = event.target.files[0].name;
       const nameWithoutExtension = filename.split('.').slice(0, -1).join('.');
       form.setValue('name', nameWithoutExtension || filename);
@@ -76,7 +75,6 @@ export default function AddAttachmentDialog({
   };
 
   const onSubmit = async (data: AttachmentFormType) => {
-    // --- Permission Check Start ---
     const userRoles = session?.user?.roles || [];
     const userEmail = session?.user?.email;
 
@@ -88,32 +86,27 @@ export default function AddAttachmentDialog({
         userEmail === deviationOwner);
 
     if (!canAddAttachment) {
-      toast.error(
-        'Nie masz uprawnień do dodawania załączników do tego odchylenia lub odchylenie jest zamknięte.',
-      );
-      return; // Abort submission
-    }
-    // --- Permission Check End ---
-
-    if (!deviationId) {
-      toast.error('Błąd ID odchylenia. Skontaktuj się z IT!');
+      toast.error('Nie masz uprawnień lub odchylenie jest zamknięte.');
       return;
     }
 
-    // Close dialog immediately
+    if (!deviationId) {
+      toast.error('Skontaktuj się z IT!');
+      console.error('no deviationId');
+      return;
+    }
+
     setOpen(false);
 
     toast.promise(
       new Promise<void>(async (resolve, reject) => {
         try {
-          // Przygotowanie danych FormData do wysyłki
           const formData = new FormData();
           formData.append('file', data.file);
           formData.append('deviationId', deviationId);
           if (data.name) formData.append('name', data.name);
           if (data.note) formData.append('note', data.note);
 
-          // Wywołanie API zamiast server action
           const response = await fetch('/api/deviations/upload', {
             method: 'POST',
             body: formData,
@@ -126,11 +119,10 @@ export default function AddAttachmentDialog({
             if (fileInputRef.current) {
               fileInputRef.current.value = '';
             }
-            // Odświeżenie danych
+
             revalidateDeviation();
             resolve();
           } else {
-            // Mapowanie angielskich błędów API na polskie komunikaty dla użytkownika
             const errorMap: { [key: string]: string } = {
               'Unauthorized': 'Brak autoryzacji',
               'No file': 'Nie wybrano pliku',
@@ -145,14 +137,11 @@ export default function AddAttachmentDialog({
               'File upload failed': 'Błąd podczas przesyłania pliku',
             };
 
-            // Obsługa konkretnych błędów na podstawie statusu
             if (response.status === 409) {
               reject(new Error('Ten plik już istnieje'));
             } else if (result.error && errorMap[result.error]) {
-              // Wyświetl przetłumaczony komunikat błędu
               reject(new Error(errorMap[result.error]));
             } else if (result.error) {
-              // Wyświetl oryginalny komunikat błędu, gdy nie ma tłumaczenia
               console.warn('Nieprzetłumaczony błąd:', result.error);
               reject(new Error('Wystąpił błąd podczas dodawania załącznika'));
             } else {

@@ -6,7 +6,9 @@ export async function getDeviation(id: string): Promise<{
   deviation: DeviationType;
 }> {
   const res = await fetch(`${process.env.API}/deviations/deviation?id=${id}`, {
-    next: { revalidate: 15, tags: ['deviation'] },
+    // next: { revalidate: 15, tags: ['deviation'] },
+    next: { tags: ['deviation'] },
+    cache: 'no-store',
   });
 
   if (res.status === 404) {

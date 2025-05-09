@@ -2,7 +2,6 @@ import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import fs from 'fs';
 import { ObjectId } from 'mongodb';
-import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 // NEW: Import the notification action
@@ -138,9 +137,6 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         );
       }
-
-      // Odświeżenie cache'u
-      revalidateTag('deviation');
 
       // NEW: Trigger notification for rejectors (fire and forget, errors handled within the action)
       notifyRejectorsAfterAttachment(deviationId).catch((err) => {

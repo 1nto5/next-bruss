@@ -1273,7 +1273,7 @@ export async function insertDraftDeviation(deviation: AddDeviationDraftType) {
 
     const res = await collection.insertOne(deviationDraftToInsert);
     if (res) {
-      revalidateTag('deviations');
+      // revalidateTag('deviations');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
@@ -1778,7 +1778,7 @@ export async function addNote(deviationId: string, content: string) {
       return { error: 'not updated' };
     }
 
-    revalidateDeviation();
+    revalidateTag('deviation');
     return { success: 'added' };
   } catch (error) {
     console.error('addNote server action error:', error);

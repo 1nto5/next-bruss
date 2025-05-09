@@ -38,7 +38,9 @@ async function getAllDeviations(
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(`${process.env.API}/deviations/?${queryParams}`, {
-    next: { revalidate: 30, tags: ['deviations'] },
+    // next: { revalidate: 30, tags: ['deviations'] },
+    // next: { tags: ['deviations'] },
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -90,7 +92,9 @@ async function getUserDeviations(
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(`${process.env.API}/deviations/?${queryParams}`, {
-    next: { revalidate: 30, tags: ['deviations'] },
+    // next: { revalidate: 30, tags: ['deviations'] },
+    // next: { tags: ['deviations'] },
+    cache: 'no-store',
   });
 
   if (!res.ok) {

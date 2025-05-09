@@ -23,7 +23,7 @@ import { StickyNote } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { addNote, revalidateDeviation } from '../actions';
+import { addNote } from '../actions';
 import { NoteFormSchema, NoteFormType } from '../lib/zod';
 
 interface AddNoteDialogProps {
@@ -59,18 +59,16 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
 
           if (result.success) {
             form.reset();
-            revalidateDeviation();
             resolve();
           } else {
-            reject(
-              new Error(
-                result.error || 'Wystąpił błąd podczas dodawania notatki',
-              ),
-            );
+            if (result.error) {
+              console.error('Note submission error:', result.error);
+            }
+            reject(new Error('Skontaktuj się z IT!'));
           }
         } catch (error) {
           console.error('Note submission error:', error);
-          reject(new Error('Wystąpił nieznany błąd'));
+          reject(new Error('Skontaktuj się z IT!'));
         } finally {
           setIsSubmitting(false);
         }
