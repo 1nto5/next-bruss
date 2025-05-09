@@ -11,6 +11,15 @@ import Link from 'next/link';
 
 export const columns: ColumnDef<DeviationType>[] = [
   {
+    accessorKey: 'internalId',
+    header: 'ID',
+    cell: ({ row }) => {
+      const id = row.original.internalId?.toString();
+
+      return id ? id : '-';
+    },
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
@@ -216,15 +225,6 @@ export const columns: ColumnDef<DeviationType>[] = [
           {createdAt ? new Date(createdAt).toLocaleString(lang) : ''}
         </span>
       );
-    },
-  },
-  {
-    accessorKey: '_id',
-    header: 'ID',
-    cell: ({ row }) => {
-      const id = row.original._id?.toString();
-
-      return id ? id.toUpperCase() : 'Brak';
     },
   },
 ];
