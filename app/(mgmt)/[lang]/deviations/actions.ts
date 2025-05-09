@@ -835,10 +835,8 @@ export async function approveDeviation(
       return { error: 'not found' };
     }
 
-    // NEW: Check if Plant Manager has already approved - if so, prevent further changes
-    if (deviation.plantManagerApproval?.approved === true) {
-      return { error: 'already approved by plant manager' };
-    }
+    // Remove the Plant Manager approval check to allow all roles to approve
+    // even after Plant Manager approval
 
     // Cast the specific approval field to ApprovalType | undefined
     const currentApproval = deviation[approvalField] as
@@ -856,11 +854,10 @@ export async function approveDeviation(
       return { error: 'already rejected' };
     }
 
-    // 3. Allow rejecting if approved (overriding previous approval)
-    // No explicit check needed here, the logic below handles it.
-
-    // 4. Allow approving if rejected (overriding previous rejection)
-    // No explicit check needed here, the logic below handles it.
+    // Only prevent actions if the deviation is closed
+    if (deviation.status === 'closed') {
+      return { error: 'deviation closed' };
+    }
 
     const newApprovalRecord: ApprovalType = {
       approved: isApproved,
@@ -899,74 +896,22 @@ export async function approveDeviation(
     if (!isApproved) {
       // If rejecting, always set status to rejected
       updateField.status = 'rejected';
-    } else {
-      // NEW LOGIC: If Plant Manager approves, always set to approved
-      if (userRole === 'plant-manager') {
-        const now = new Date();
-        // Ensure timePeriod and its properties exist before creating Date objects
-        const periodFrom = deviation.timePeriod?.from
-          ? new Date(deviation.timePeriod.from)
-          : null;
-        const periodTo = deviation.timePeriod?.to
-          ? new Date(deviation.timePeriod.to)
-          : null;
+    } else if (userRole === 'plant-manager') {
+      // If Plant Manager approves, set to approved or in progress as before
+      const now = new Date();
+      const periodFrom = deviation.timePeriod?.from
+        ? new Date(deviation.timePeriod.from)
+        : null;
+      const periodTo = deviation.timePeriod?.to
+        ? new Date(deviation.timePeriod.to)
+        : null;
 
-        // Check if periodFrom and periodTo are valid dates before comparison
-        updateField.status =
-          periodFrom && periodTo && now >= periodFrom && now <= periodTo
-            ? 'in progress'
-            : 'approved';
-      } else {
-        // If not Plant Manager, check other roles as before:
-        // Check if this approval reverses a previous rejection by this role
-        const wasPreviouslyRejectedByThisRole =
-          currentApproval?.approved === false;
-
-        // Check if any *other* roles have rejected it
-        const otherRolesRejected = Object.entries(approvalFieldMap)
-          .filter(([role, field]) => field !== approvalField) // Exclude the current role
-          .some(
-            ([role, field]) =>
-              (deviation[field] as ApprovalType | undefined)?.approved ===
-              false,
-          );
-
-        if (wasPreviouslyRejectedByThisRole && !otherRolesRejected) {
-          // If reversing a rejection and no other rejections exist, set back to 'in approval'
-          updateField.status = 'in approval';
-        } else {
-          // Otherwise, check if all approvals are now met
-          const hasAllApprovals = Object.values(approvalFieldMap).every(
-            (field) =>
-              field === approvalField
-                ? true // The current approval being set is considered approved for this check
-                : (deviation[field] as ApprovalType | undefined)?.approved ===
-                  true, // Check other fields explicitly for true
-          );
-
-          if (hasAllApprovals) {
-            const now = new Date();
-            // Ensure timePeriod and its properties exist before creating Date objects
-            const periodFrom = deviation.timePeriod?.from
-              ? new Date(deviation.timePeriod.from)
-              : null;
-            const periodTo = deviation.timePeriod?.to
-              ? new Date(deviation.timePeriod.to)
-              : null;
-
-            // Check if periodFrom and periodTo are valid dates before comparison
-            updateField.status =
-              periodFrom && periodTo && now >= periodFrom && now <= periodTo
-                ? 'in progress'
-                : 'approved';
-          } else if (!otherRolesRejected) {
-            // If not all approvals met, but no rejections exist (including the one potentially just reversed),
-            // ensure status is 'in approval'. This covers cases where it might have been 'rejected' before.
-            updateField.status = 'in approval';
-          }
-        }
-      }
+      updateField.status =
+        periodFrom && periodTo && now >= periodFrom && now <= periodTo
+          ? 'in progress'
+          : 'approved';
     }
+    // Don't change status for other role approvals - keep current status
 
     const update = await coll.updateOne(
       { _id: deviationObjectId }, // Use ObjectId

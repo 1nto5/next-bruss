@@ -632,128 +632,87 @@ export default function DeviationView({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {/* NEW: Check if Plant Manager has already approved and pass that to all cells */}
-                      {/* Create an array to pass to all cells based on Plant Manager approval status */}
-                      {(() => {
-                        // Check if Plant Manager has approved
-                        const plantManagerApproved =
-                          deviation?.plantManagerApproval?.approved === true;
-                        // Create a modified array of user roles to pass to approval cells
-                        const effectiveUserRoles = plantManagerApproved
-                          ? [...deviationUserRoles, 'plant-manager-approval'] // Add a marker role when PM approved
-                          : deviationUserRoles;
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Group Leader'
+                          deviationUserRoles={deviationUserRoles}
+                          role='group-leader'
+                          approved={deviation?.groupLeaderApproval?.approved}
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval('group-leader', isApproved, reason)
+                          }
+                          by={deviation?.groupLeaderApproval?.by}
+                          at={deviation?.groupLeaderApproval?.at?.toString()}
+                          lang={lang}
+                          reason={deviation?.groupLeaderApproval?.reason}
+                          history={deviation?.groupLeaderApproval?.history}
+                          deviationStatus={deviation?.status}
+                        />
+                      </TableRow>
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Kierownik Jakości'
+                          deviationUserRoles={deviationUserRoles}
+                          role='quality-manager'
+                          approved={deviation?.qualityManagerApproval?.approved}
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval(
+                              'quality-manager',
+                              isApproved,
+                              reason,
+                            )
+                          }
+                          by={deviation?.qualityManagerApproval?.by}
+                          at={deviation?.qualityManagerApproval?.at?.toString()}
+                          lang={lang}
+                          reason={deviation?.qualityManagerApproval?.reason}
+                          history={deviation?.qualityManagerApproval?.history}
+                          deviationStatus={deviation?.status}
+                        />
+                      </TableRow>
 
-                        // Continue with existing JSX but use effectiveUserRoles
-                        return (
-                          <>
-                            <TableRow>
-                              <TableCellsApprove
-                                roleText='Group Leader'
-                                deviationUserRoles={effectiveUserRoles}
-                                role='group-leader'
-                                approved={
-                                  deviation?.groupLeaderApproval?.approved
-                                }
-                                handleApproval={(isApproved, reason) =>
-                                  handleApproval(
-                                    'group-leader',
-                                    isApproved,
-                                    reason,
-                                  )
-                                }
-                                by={deviation?.groupLeaderApproval?.by}
-                                at={deviation?.groupLeaderApproval?.at?.toString()}
-                                lang={lang}
-                                reason={deviation?.groupLeaderApproval?.reason}
-                                history={
-                                  deviation?.groupLeaderApproval?.history
-                                }
-                                deviationStatus={deviation?.status} // Add deviation status
-                              />
-                            </TableRow>
-                            <TableRow>
-                              <TableCellsApprove
-                                roleText='Kierownik Jakości'
-                                deviationUserRoles={effectiveUserRoles}
-                                role='quality-manager'
-                                approved={
-                                  deviation?.qualityManagerApproval?.approved
-                                }
-                                handleApproval={(isApproved, reason) =>
-                                  handleApproval(
-                                    'quality-manager',
-                                    isApproved,
-                                    reason,
-                                  )
-                                }
-                                by={deviation?.qualityManagerApproval?.by}
-                                at={deviation?.qualityManagerApproval?.at?.toString()}
-                                lang={lang}
-                                reason={
-                                  deviation?.qualityManagerApproval?.reason
-                                }
-                                history={
-                                  deviation?.qualityManagerApproval?.history
-                                }
-                                deviationStatus={deviation?.status} // Add deviation status
-                              />
-                            </TableRow>
-
-                            <TableRow>
-                              <TableCellsApprove
-                                roleText='Kierownik Produkcji'
-                                deviationUserRoles={effectiveUserRoles}
-                                role='production-manager'
-                                approved={
-                                  deviation?.productionManagerApproval?.approved
-                                }
-                                handleApproval={(isApproved, reason) =>
-                                  handleApproval(
-                                    'production-manager',
-                                    isApproved,
-                                    reason,
-                                  )
-                                }
-                                by={deviation?.productionManagerApproval?.by}
-                                at={deviation?.productionManagerApproval?.at?.toString()}
-                                lang={lang}
-                                reason={
-                                  deviation?.productionManagerApproval?.reason
-                                }
-                                history={
-                                  deviation?.productionManagerApproval?.history
-                                }
-                                deviationStatus={deviation?.status} // Add deviation status
-                              />
-                            </TableRow>
-                            <TableRow>
-                              <TableCellsApprove
-                                roleText='Dyrektor Zakładu'
-                                deviationUserRoles={effectiveUserRoles}
-                                role='plant-manager'
-                                approved={
-                                  deviation?.plantManagerApproval?.approved
-                                }
-                                handleApproval={(isApproved, reason) =>
-                                  handleApproval(
-                                    'plant-manager',
-                                    isApproved,
-                                    reason,
-                                  )
-                                }
-                                by={deviation?.plantManagerApproval?.by}
-                                at={deviation?.plantManagerApproval?.at?.toString()}
-                                lang={lang}
-                                reason={deviation?.plantManagerApproval?.reason}
-                                history={
-                                  deviation?.plantManagerApproval?.history
-                                }
-                                deviationStatus={deviation?.status} // Add deviation status
-                              />
-                            </TableRow>
-                          </>
-                        );
-                      })()}
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Kierownik Produkcji'
+                          deviationUserRoles={deviationUserRoles}
+                          role='production-manager'
+                          approved={
+                            deviation?.productionManagerApproval?.approved
+                          }
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval(
+                              'production-manager',
+                              isApproved,
+                              reason,
+                            )
+                          }
+                          by={deviation?.productionManagerApproval?.by}
+                          at={deviation?.productionManagerApproval?.at?.toString()}
+                          lang={lang}
+                          reason={deviation?.productionManagerApproval?.reason}
+                          history={
+                            deviation?.productionManagerApproval?.history
+                          }
+                          deviationStatus={deviation?.status}
+                        />
+                      </TableRow>
+                      <TableRow>
+                        <TableCellsApprove
+                          roleText='Dyrektor Zakładu'
+                          deviationUserRoles={deviationUserRoles}
+                          role='plant-manager'
+                          approved={deviation?.plantManagerApproval?.approved}
+                          handleApproval={(isApproved, reason) =>
+                            handleApproval('plant-manager', isApproved, reason)
+                          }
+                          by={deviation?.plantManagerApproval?.by}
+                          at={deviation?.plantManagerApproval?.at?.toString()}
+                          lang={lang}
+                          reason={deviation?.plantManagerApproval?.reason}
+                          history={deviation?.plantManagerApproval?.history}
+                          deviationStatus={deviation?.status}
+                        />
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </CardContent>

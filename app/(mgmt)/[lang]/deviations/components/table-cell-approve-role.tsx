@@ -79,7 +79,7 @@ const ROLE_DISPLAY_NAMES: Record<string, string> = {
 };
 
 // List of statuses where approval actions should be disabled
-const DISABLED_APPROVAL_STATUSES = ['in progress', 'approved', 'closed'];
+const DISABLED_APPROVAL_STATUSES = ['closed']; // Remove 'in progress' and 'approved' from this list
 
 const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   roleText,
@@ -207,18 +207,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='outline'
                       className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
-                      disabled={
-                        role !== 'plant-manager' &&
-                        deviationUserRoles.includes('plant-manager-approval') &&
-                        !deviationUserRoles.includes('plant-manager')
-                      }
-                      title={
-                        role !== 'plant-manager' &&
-                        deviationUserRoles.includes('plant-manager-approval') &&
-                        !deviationUserRoles.includes('plant-manager')
-                          ? 'Decyzja niemożliwa - odchylenie zostało już zatwierdzone przez Dyrektora Zakładu'
-                          : 'Zatwierdź odchylenie'
-                      }
+                      disabled={false} // Remove the condition that checks for Plant Manager approval
+                      title='Zatwierdź odchylenie'
                     >
                       <ThumbsUp color='green' />
                     </Button>
@@ -268,18 +258,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='outline'
                       className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
-                      disabled={
-                        role !== 'plant-manager' &&
-                        deviationUserRoles.includes('plant-manager-approval') &&
-                        !deviationUserRoles.includes('plant-manager')
-                      }
-                      title={
-                        role !== 'plant-manager' &&
-                        deviationUserRoles.includes('plant-manager-approval') &&
-                        !deviationUserRoles.includes('plant-manager')
-                          ? 'Decyzja niemożliwa - odchylenie zostało już zatwierdzone przez Dyrektora Zakładu'
-                          : 'Odrzuć odchylenie'
-                      }
+                      disabled={false} // Remove the condition that checks for Plant Manager approval
+                      title='Odrzuć odchylenie'
                     >
                       <ThumbsDown color='red' />
                     </Button>
