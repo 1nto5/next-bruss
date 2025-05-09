@@ -575,20 +575,32 @@ export default function DeviationView({
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {deviation?.correctiveActions?.map(
-                        (correctiveAction, index) => (
-                          <TableRow key={index}>
-                            <TableCellCorrectiveAction
-                              correctiveAction={correctiveAction}
-                              correctiveActionIndex={index}
-                              deviationId={deviation?._id?.toString() || ''}
-                              lang={lang}
-                              user={session?.user?.email}
-                              userRoles={session?.user?.roles}
-                              deviationOwner={deviation?.owner}
-                            />
-                          </TableRow>
-                        ),
+                      {deviation?.correctiveActions &&
+                      deviation.correctiveActions.length > 0 ? (
+                        deviation.correctiveActions.map(
+                          (correctiveAction, index) => (
+                            <TableRow key={index}>
+                              <TableCellCorrectiveAction
+                                correctiveAction={correctiveAction}
+                                correctiveActionIndex={index}
+                                deviationId={deviation?._id?.toString() || ''}
+                                lang={lang}
+                                user={session?.user?.email}
+                                userRoles={session?.user?.roles}
+                                deviationOwner={deviation?.owner}
+                              />
+                            </TableRow>
+                          ),
+                        )
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={7}
+                            className='text-muted-foreground text-center'
+                          >
+                            Brak akcji korygujących
+                          </TableCell>
+                        </TableRow>
                       )}
                     </TableBody>
                   </Table>
