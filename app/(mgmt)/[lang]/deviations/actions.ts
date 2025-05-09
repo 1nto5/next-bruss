@@ -80,7 +80,7 @@ async function sendGroupLeaderNotification(
     const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
     // Standardized HTML body
     const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
         <p>Obszar: ${deviationArea?.toUpperCase() || 'Ogólny'}</p>
         <p>
@@ -135,7 +135,7 @@ async function sendVacancyNotificationToPlantManager(
     const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat - ${vacantRoleTranslated})`;
     // Standardized HTML body for vacancy
     const html = `
-        <div style="font-family: sans-serif;">
+        <div>
           <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText}.</p>
           <p style="color: red; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu wakatu na stanowisku: ${vacantRoleTranslated}.</p>
           <p>
@@ -195,7 +195,7 @@ async function sendNoGroupLeaderNotification(
     const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat Group Leader)`;
     // Standardized HTML body for no GL
     const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>${actionText} odchylenie [${internalId}] w obszarze ${deviationArea?.toUpperCase()}, które wymaga ${requirementText}.</p>
         <p style="color: orange; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu braku przypisanego: Group Leadera (${deviationArea?.toUpperCase()}).</p>
         <p>
@@ -254,7 +254,7 @@ async function sendRoleNotification(
     const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
     // Standardized HTML body
     const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
         <p>
           <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
@@ -448,7 +448,7 @@ async function sendCorrectiveActionAssignmentNotification(
 ): Promise<NotificationLogType | null> {
   const subject = `Przypisano akcję korygującą w odchyleniu [${internalId}]`;
   const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>Zostałeś/aś wyznaczony/a jako osoba odpowiedzialna za wykonanie akcji korygującej w odchyleniu [${internalId}].</p>
         <p><strong>Opis akcji:</strong> ${correctiveAction.description}</p>
         <p><strong>Termin wykonania:</strong> ${new Date(correctiveAction.deadline).toLocaleDateString('pl')}</p>
@@ -509,7 +509,7 @@ async function sendRejectionReevaluationNotification(
       : 'dodano nowy załącznik';
   const subject = `Odchylenie [${deviation.internalId}] - aktualizacja (wymaga ponownej weryfikacji)`;
   const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>W odchyleniu [${deviation.internalId}], które wcześniej odrzuciłeś/aś, ${reasonText}.</p>
         <p>
           <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
@@ -556,7 +556,7 @@ async function sendApprovalDecisionNotificationToOwner(
   const roleTranslated = ROLE_TRANSLATIONS[approverRole] || approverRole;
   const subject = `Odchylenie [${deviation.internalId}] zostało ${decisionText}`;
   const html = `
-      <div style="font-family: sans-serif;">
+      <div>
         <p>Twoje odchylenie [${deviation.internalId}] zostało ${decisionText} przez ${extractNameFromEmail(approverEmail)} (${roleTranslated}).</p>
         ${decision === 'rejected' && comment ? `<p><strong>Komentarz:</strong> ${comment}</p>` : ''}
         <p>
@@ -603,7 +603,7 @@ async function sendTeamLeaderNotificationForPrint(
 
     // HTML body with clear instructions
     const html = `
-      <div style="font-family: sans-serif;">
+      <div>
       <p>Odchylenie [${deviation.internalId}] zostało zatwierdzone - wymaga wydruku i wdrożenia na: ${deviation.area === 'coating' ? 'POWLEKANIE' : deviation.area?.toUpperCase()} </p>
       <p>
         <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
