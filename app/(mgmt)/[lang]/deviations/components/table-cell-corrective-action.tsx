@@ -89,47 +89,15 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   const getStatusBadge = (statusValue: string) => {
     switch (statusValue) {
       case 'open':
-        return (
-          <Badge variant='outline' className='text-nowrap'>
-            Otwarta
-          </Badge>
-        );
+        return <Badge variant='statusOpen'>Otwarta</Badge>; // Changed to statusOpen
       case 'closed':
-        return (
-          <Badge
-            variant='default'
-            className='bg-green-100 text-nowrap text-green-800 hover:bg-green-100'
-          >
-            Zakończona
-          </Badge>
-        );
+        return <Badge variant='statusApproved'>Zakończona</Badge>;
       case 'overdue':
-        return (
-          <Badge
-            variant='destructive'
-            className='bg-orange-100 text-nowrap text-orange-800 hover:bg-orange-100'
-          >
-            Zaległa
-          </Badge>
-        );
+        return <Badge variant='statusOverdue'>Zaległa</Badge>; // Changed to statusOverdue
       case 'in progress':
-        return (
-          <Badge
-            variant='default'
-            className='bg-blue-100 text-nowrap text-blue-800 hover:bg-blue-100'
-          >
-            W trakcie
-          </Badge>
-        );
+        return <Badge variant='statusInProgress'>W trakcie</Badge>; // Changed to statusInProgress
       case 'rejected':
-        return (
-          <Badge
-            variant='destructive'
-            className='bg-red-100 text-nowrap text-red-800 hover:bg-red-100'
-          >
-            Odrzucona
-          </Badge>
-        );
+        return <Badge variant='statusRejected'>Odrzucona</Badge>;
       default:
         return (
           <Badge variant='outline' className='text-nowrap'>
