@@ -193,8 +193,14 @@ export function DateTimePicker({
         d.setHours(max.getHours(), max.getMinutes(), max.getSeconds());
       }
       setDate(d);
+
+      // Automatically submit the date when a day is selected
+      if (hideTime) {
+        onChange(new Date(d));
+        setOpen(false);
+      }
     },
-    [setDate, setMonth],
+    [setDate, onChange, hideTime, setOpen, min, max],
   );
   const onSubmit = useCallback(() => {
     onChange(new Date(date));
@@ -409,15 +415,18 @@ export function DateTimePicker({
               max={maxDate}
             />
           )}
-          <div className='flex flex-row-reverse items-center justify-between'>
-            <Button className='w-full px-2' onClick={onSubmit}>
-              <CheckIcon />
-            </Button>
+          <div className='flex items-center justify-between'>
             {timezone && (
               <div className='text-sm'>
                 <span>Timezone:</span>
                 <span className='ms-1 font-semibold'>{timezone}</span>
               </div>
+            )}
+            {/* Only show the submit button when time picker is visible */}
+            {!hideTime && (
+              <Button className='ml-auto w-full px-2' onClick={onSubmit}>
+                <CheckIcon />
+              </Button>
             )}
           </div>
         </div>
