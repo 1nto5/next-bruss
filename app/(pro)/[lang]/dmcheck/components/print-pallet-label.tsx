@@ -1,10 +1,10 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import html2canvas from 'html2canvas-pro';
+import { Printer } from 'lucide-react';
 import QRCode from 'qrcode.react';
 import { useRef } from 'react';
-import html2canvas from 'html2canvas';
-import { Button } from '@/components/ui/button';
-import { Printer } from 'lucide-react';
 
 type PrintPalletLabelProps = {
   cDict: any;
@@ -88,10 +88,12 @@ export function PrintPalletLabel({
     if (!qrCodeRef.current) return; // Zabezpieczenie dla początkowego stanu ref
 
     const qrCodeCanvas = qrCodeRef.current.querySelector('canvas');
-    html2canvas(qrCodeCanvas!, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      generatePrintWindow(imgData);
-    });
+    html2canvas(qrCodeCanvas!, { scale: 2, backgroundColor: '#ffffff' }).then(
+      (canvas: HTMLCanvasElement) => {
+        const imgData = canvas.toDataURL('image/png');
+        generatePrintWindow(imgData);
+      },
+    );
   };
 
   return (

@@ -1,9 +1,9 @@
-import { useRef, useEffect, useState } from 'react';
-import QRCode from 'qrcode.react';
-import html2canvas from 'html2canvas';
 import Button from '@/app/(pro-old)/[lang]/pro/components/Button';
-import { getPalletQr, countQuantityOnPallet } from '../actions';
+import html2canvas from 'html2canvas-pro';
+import QRCode from 'qrcode.react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { countQuantityOnPallet, getPalletQr } from '../actions';
 
 type Props = {
   workplace: string;
@@ -105,11 +105,11 @@ const PrintPalletLabel = (props: Props) => {
   const handlePrint = () => {
     const qrCodeCanvas = qrCodeRef.current!.querySelector('canvas');
     html2canvas(qrCodeCanvas!, { scale: 2 })
-      .then((canvas) => {
+      .then((canvas: HTMLCanvasElement) => {
         const imgData = canvas.toDataURL('image/png');
         generatePrintWindow(imgData);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.error('Error generating canvas from QR code:', error);
       });
   };
