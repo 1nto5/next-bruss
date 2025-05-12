@@ -5,6 +5,7 @@ FIXME: duplicate mongodb errors in pm2 logs
 
 PLAN: synchronize articles with SFMS SQL / SAP / HYDRA? 
 PLAN: change to cache='no-store' in fetches where data must be always fresh
+PLAN: toast formatting 
 
 TODO: EOL136153 migration to new version
 TODO: dmcheck english version
