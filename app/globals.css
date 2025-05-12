@@ -2,13 +2,13 @@
 /*
   ---break---
 */
-@plugin 'tailwindcss-animate';
+/* @plugin 'tailwindcss-animate'; */
 /*
   ---break---
 */
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *)); */
 
-@config '../tailwind.config.js';
+/* @config '../tailwind.config.js'; */
 
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
