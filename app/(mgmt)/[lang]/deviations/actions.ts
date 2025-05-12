@@ -894,24 +894,20 @@ export async function approveDeviation(
 
     // MODIFIED: Determine the new status
     if (!isApproved) {
-      // If rejecting, always set status to rejected
-      updateField.status = 'rejected';
-    } else if (userRole === 'plant-manager') {
-      // If Plant Manager approves, set to approved or in progress as before
-      const now = new Date();
-      const periodFrom = deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from)
-        : null;
-      const periodTo = deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to)
-        : null;
-
-      updateField.status =
-        periodFrom && periodTo && now >= periodFrom && now <= periodTo
-          ? 'in progress'
-          : 'approved';
+      // Current action is a rejection
+      // If plant manager has NOT already approved this deviation, then a rejection changes status to 'rejected'.
+      if (!(deviation.plantManagerApproval?.approved === true)) {
+        updateField.status = 'rejected';
+      }
+      // If plant manager HAD already approved, a rejection by another role does NOT change the status.
+      // The status would remain as it was (likely 'approved').
+    } else {
+      // Current action is an approval
+      if (userRole === 'plant-manager') {
+        updateField.status = 'approved';
+      }
+      // If it's an approval by another role, the status does not change from its current state.
     }
-    // Don't change status for other role approvals - keep current status
 
     const update = await coll.updateOne(
       { _id: deviationObjectId }, // Use ObjectId
