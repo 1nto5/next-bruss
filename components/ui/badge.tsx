@@ -21,7 +21,7 @@ const badgeVariants = cva(
         statusApproved:
           'border-transparent bg-[#92b34e] text-white hover:bg-[#92b34e] dark:bg-green-700 dark:text-green-100 dark:hover:bg-green-600',
         statusInProgress:
-          'border-transparent bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700',
+          'border-transparent bg-blue-100 text-blue-800 hover:bg-blue-100 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700 whitespace-nowrap',
         statusClosed:
           'border-transparent bg-gray-100 text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700',
         statusRejected:
