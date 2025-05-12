@@ -18,11 +18,44 @@ import {
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 
 // Helper to format values for display
-const formatValue = (value: any): string => {
+const formatValue = (value: any, lang?: string): string => {
   if (value === null || value === undefined) return '-';
   if (typeof value === 'boolean') return value ? 'Tak' : 'Nie';
-  if (value instanceof Date) return value.toLocaleString(); // Adjust locale/format as needed
-  if (typeof value === 'object') return JSON.stringify(value); // Simple object display
+
+  // Handle Date objects
+  if (value instanceof Date) return value.toLocaleDateString(lang);
+
+  // Handle date strings - try to detect date format
+  if (typeof value === 'string') {
+    // Check if it's a date string (ISO format)
+    if (/^\d{4}-\d{2}-\d{2}(T|\s)\d{2}:\d{2}/.test(value)) {
+      try {
+        const date = new Date(value);
+        // Validate that it's a valid date
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleDateString(lang);
+        }
+      } catch {
+        // Fall through to default handling
+      }
+    }
+  }
+
+  // Special handling for date objects that might not be instanceof Date
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'getMonth' in value &&
+    typeof value.getMonth === 'function'
+  ) {
+    try {
+      return value.toLocaleDateString(lang);
+    } catch {
+      // Fall through to default handling
+    }
+  }
+
+  if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
 };
 
@@ -96,8 +129,8 @@ export default function EditLogDialog({
                     <TableCell>
                       {fieldNameTranslations[log.fieldName] || log.fieldName}
                     </TableCell>
-                    <TableCell>{formatValue(log.oldValue)}</TableCell>
-                    <TableCell>{formatValue(log.newValue)}</TableCell>
+                    <TableCell>{formatValue(log.oldValue, lang)}</TableCell>
+                    <TableCell>{formatValue(log.newValue, lang)}</TableCell>
                   </TableRow>
                 ))
               ) : (
