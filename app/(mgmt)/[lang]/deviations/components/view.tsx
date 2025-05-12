@@ -270,43 +270,35 @@ export default function DeviationView({
     switch (deviation?.status) {
       case 'approved':
         return (
-          <Badge
-            variant='default'
-            className='bg-green-100 text-lg text-green-800 hover:bg-green-100'
-          >
+          <Badge variant='statusApproved' size='lg' className='text-lg'>
             Odchylenie zatwierdzone
           </Badge>
         );
       case 'rejected':
         return (
-          <Badge
-            variant='destructive'
-            className='bg-red-100 text-lg text-red-800 hover:bg-red-100'
-          >
+          <Badge variant='statusRejected' size='lg' className='text-lg'>
             Odchylenie odrzucone
           </Badge>
         );
       case 'in approval':
         return (
-          <Badge variant='outline' className='text-lg text-nowrap'>
+          <Badge
+            variant='statusPending'
+            size='lg'
+            className='text-lg text-nowrap'
+          >
             Odchylenie w trakcie zatwierdzania
           </Badge>
         );
       case 'in progress':
         return (
-          <Badge
-            variant='default'
-            className='bg-blue-100 text-lg text-blue-800 hover:bg-blue-100'
-          >
+          <Badge variant='statusInProgress' size='lg' className='text-lg'>
             Odchylenie obowiązuje
           </Badge>
         );
       case 'closed':
         return (
-          <Badge
-            variant='default'
-            className='bg-gray-100 text-lg text-gray-800 hover:bg-gray-100'
-          >
+          <Badge variant='statusClosed' size='lg' className='text-lg'>
             Odchylenie zamknięte
           </Badge>
         );

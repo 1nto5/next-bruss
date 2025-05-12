@@ -29,70 +29,32 @@ export const columns: ColumnDef<DeviationType>[] = [
       switch (status) {
         case 'in approval':
           statusLabel = (
-            <Badge variant='outline' className='text-nowrap'>
+            <Badge variant='statusPending' className='text-nowrap'>
               Oczekujące
             </Badge>
           );
           break;
         case 'approved':
-          statusLabel = (
-            <Badge
-              variant='default'
-              className='bg-green-100 text-green-800 hover:bg-green-100'
-            >
-              Zatwierdzone
-            </Badge>
-          );
+          statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
           break;
         case 'in progress':
-          statusLabel = (
-            <Badge
-              variant='default'
-              className='bg-blue-100 text-blue-800 hover:bg-blue-100'
-            >
-              Obowiązuje
-            </Badge>
-          );
+          statusLabel = <Badge variant='statusInProgress'>Obowiązuje</Badge>;
           break;
         case 'closed':
-          statusLabel = (
-            <Badge
-              variant='default'
-              className='bg-gray-100 text-gray-800 hover:bg-gray-100'
-            >
-              Zamknięte
-            </Badge>
-          );
+          statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
           break;
         case 'rejected':
-          statusLabel = (
-            <Badge
-              variant='destructive'
-              className='bg-red-100 text-red-800 hover:bg-red-100'
-            >
-              Odrzucone
-            </Badge>
-          );
+          statusLabel = <Badge variant='statusRejected'>Odrzucone</Badge>;
           break;
         case 'to approve':
           statusLabel = (
-            <Badge
-              variant='outline'
-              className='bg-yellow-100 text-nowrap text-yellow-800 hover:bg-yellow-100'
-            >
+            <Badge variant='statusToApprove' className='text-nowrap'>
               Do zatwierdzenia
             </Badge>
           );
           break;
         case 'draft':
-          statusLabel = (
-            <Badge
-              variant='outline'
-              className='bg-purple-100 text-purple-800 hover:bg-purple-100'
-            >
-              Szkic
-            </Badge>
-          );
+          statusLabel = <Badge variant='statusDraft'>Szkic</Badge>;
           break;
         default:
           statusLabel = <Badge variant='outline'>{status}</Badge>;

@@ -29,7 +29,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, History, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Check, CircleX, History, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -169,23 +169,9 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         </Badge>
       );
     } else if (approved) {
-      return (
-        <Badge
-          variant='default'
-          className='bg-green-100 text-green-800 hover:bg-green-100'
-        >
-          Zatwierdził
-        </Badge>
-      );
+      return <Badge variant='statusApproved'>Zatwierdził</Badge>;
     } else {
-      return (
-        <Badge
-          variant='destructive'
-          className='bg-red-100 text-red-800 hover:bg-red-100'
-        >
-          Odrzucił
-        </Badge>
-      );
+      return <Badge variant='statusRejected'>Odrzucił</Badge>;
     }
   };
 
@@ -205,20 +191,18 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     <Button
                       size='icon'
                       type='button'
-                      variant='outline'
-                      className='bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800'
+                      variant='approve'
                       disabled={false} // Remove the condition that checks for Plant Manager approval
                       title='Zatwierdź odchylenie'
                     >
-                      <ThumbsUp color='green' />
+                      <ThumbsUp />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className='sm:max-w-[425px]'>
                     <DialogHeader>
-                      <DialogTitle>Zatwierdzenie odchylenia</DialogTitle>
+                      <DialogTitle>Zatwierdź odchylenie</DialogTitle>
                       <DialogDescription>
-                        Czy na pewno chcesz zatwierdzić to odchylenie jako{' '}
-                        {roleText}?
+                        Stanowisko: {roleText}
                       </DialogDescription>
                     </DialogHeader>
 
@@ -256,12 +240,11 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                     <Button
                       size='icon'
                       type='button'
-                      variant='outline'
-                      className='bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800'
+                      variant='reject'
                       disabled={false} // Remove the condition that checks for Plant Manager approval
                       title='Odrzuć odchylenie'
                     >
-                      <ThumbsDown color='red' />
+                      <ThumbsDown />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className='sm:max-w-[425px]'>
@@ -269,8 +252,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       <DialogTitle>Odrzuć odchylenie</DialogTitle>
                       {deviationUserRoles.includes('plant-manager') &&
                         role !== 'plant-manager' && (
-                          <DialogDescription className='font-semibold text-yellow-600'>
-                            Odrzucasz jako Dyrektor Zakładu w roli: {roleText}
+                          <DialogDescription className='font-semibold'>
+                            Stanowisko: {roleText}
                           </DialogDescription>
                         )}
                     </DialogHeader>
@@ -293,9 +276,9 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                           />
                         </div>
                         <DialogFooter className='flex items-center justify-end pt-4'>
-                          <Button type='submit'>
-                            <Check />
-                            Odrzuć
+                          <Button variant={'destructive'} type='submit'>
+                            <CircleX />
+                            Odrzucam
                           </Button>
                         </DialogFooter>
                       </form>
@@ -346,19 +329,9 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       <TableRow key={index}>
                         <TableCell className='font-medium'>
                           {item.approved ? (
-                            <Badge
-                              variant='default'
-                              className='bg-green-100 text-green-800 hover:bg-green-100'
-                            >
-                              Zatwierdził
-                            </Badge>
+                            <Badge variant='statusApproved'>Zatwierdził</Badge>
                           ) : (
-                            <Badge
-                              variant='destructive'
-                              className='bg-red-100 text-red-800 hover:bg-red-100'
-                            >
-                              Odrzucił
-                            </Badge>
+                            <Badge variant='statusRejected'>Odrzucił</Badge>
                           )}
                         </TableCell>
                         <TableCell>
