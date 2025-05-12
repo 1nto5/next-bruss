@@ -1362,6 +1362,26 @@ function generateEditLogs(
   const logs: EditLogEntryType[] = []; // RENAMED: type
   const now = new Date();
 
+  // Helper function to format dates consistently for comparison
+  const formatDateForComparison = (
+    date: Date | string | null | undefined,
+  ): string | null => {
+    if (!date) return null;
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
+  // Helper function to create a date at noon in the local timezone
+  // This ensures the stored date in logs matches what's stored in the database
+  const normalizeDate = (
+    date: Date | string | null | undefined,
+  ): Date | null => {
+    if (!date) return null;
+    const d = new Date(date);
+    d.setHours(12, 0, 0, 0); // Set to noon (12:00:00.000)
+    return d;
+  };
+
   const fieldsToCompare: (keyof AddDeviationType)[] = [
     'articleNumber',
     'articleName',
@@ -1383,6 +1403,7 @@ function generateEditLogs(
   fieldsToCompare.forEach((key) => {
     let originalValue: any;
     let updatedValue: any;
+    let shouldAddLog = true; // Flag to determine if we should add this change to logs
 
     // Handle nested fields or transformations
     if (key === 'quantity') {
@@ -1392,41 +1413,69 @@ function generateEditLogs(
       originalValue = original.quantity?.unit;
       updatedValue = updated.unit;
     } else if (key === 'periodFrom') {
-      originalValue = original.timePeriod?.from
-        ? new Date(original.timePeriod.from).toISOString()
-        : null; // Normalize to ISO string or null
-      updatedValue = updated.periodFrom
-        ? new Date(updated.periodFrom).toISOString()
-        : null;
+      // Get normalized versions of dates for comparison
+      const originalNormalized = normalizeDate(original.timePeriod?.from);
+      const updatedNormalized = normalizeDate(updated.periodFrom);
+
+      // Get string versions for comparison
+      const originalComp = formatDateForComparison(originalNormalized);
+      const updatedComp = formatDateForComparison(updatedNormalized);
+
+      // Store the normalized dates in the logs to ensure consistency
+      originalValue = originalNormalized;
+      updatedValue = updatedNormalized;
+
+      // Don't add to logs if dates are the same after normalization
+      if (originalComp === updatedComp) {
+        shouldAddLog = false;
+      }
     } else if (key === 'periodTo') {
-      originalValue = original.timePeriod?.to
-        ? new Date(original.timePeriod.to).toISOString()
-        : null; // Normalize to ISO string or null
-      updatedValue = updated.periodTo
-        ? new Date(updated.periodTo).toISOString()
-        : null;
+      // Get normalized versions of dates for comparison
+      const originalNormalized = normalizeDate(original.timePeriod?.to);
+      const updatedNormalized = normalizeDate(updated.periodTo);
+
+      // Get string versions for comparison
+      const originalComp = formatDateForComparison(originalNormalized);
+      const updatedComp = formatDateForComparison(updatedNormalized);
+
+      // Store the normalized dates in the logs to ensure consistency
+      originalValue = originalNormalized;
+      updatedValue = updatedNormalized;
+
+      // Don't add to logs if dates are the same after normalization
+      if (originalComp === updatedComp) {
+        shouldAddLog = false;
+      }
     } else {
       originalValue = original[key as keyof DeviationType];
       updatedValue = updated[key];
     }
 
-    // Ensure consistent comparison (e.g., treat undefined/null/empty string similarly if needed)
-    const originalComp = originalValue ?? null;
-    const updatedComp = updatedValue ?? null;
+    // For all fields except dates which have their own comparison logic above
+    if (key !== 'periodFrom' && key !== 'periodTo') {
+      // Ensure consistent comparison (e.g., treat undefined/null/empty string similarly if needed)
+      const originalComp = originalValue ?? null;
+      const updatedComp = updatedValue ?? null;
 
-    if (JSON.stringify(originalComp) !== JSON.stringify(updatedComp)) {
+      // Only add to logs if values are different
+      if (JSON.stringify(originalComp) === JSON.stringify(updatedComp)) {
+        shouldAddLog = false;
+      }
+    }
+
+    // Add to logs if we determined there was a change
+    if (shouldAddLog) {
       logs.push({
-        // RENAMED: variable name
         changedAt: now,
         changedBy: userEmail,
         fieldName: key, // Use the key from AddDeviationType
-        oldValue: originalValue, // Store original representation
-        newValue: updatedValue, // Store new representation
+        oldValue: originalValue, // Store normalized representation
+        newValue: updatedValue, // Store normalized representation
       });
     }
   });
 
-  return logs; // RENAMED: variable name
+  return logs;
 }
 
 // NEW function to update non-draft deviations
@@ -1467,6 +1516,12 @@ export async function updateDeviation(
       deviation,
       session.user.email,
     );
+
+    // Check if any changes were actually made
+    if (newLogEntries.length === 0) {
+      return { error: 'no changes' };
+    }
+
     const existingLogs = originalDeviation.editLogs || []; // RENAMED: field and variable
     const combinedLogs = [...existingLogs, ...newLogEntries]; // RENAMED: variable
 
