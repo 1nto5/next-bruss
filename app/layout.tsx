@@ -2,7 +2,8 @@ import '@/app/globals.css';
 import { Locale } from '@/i18n.config';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
-import { Toaster } from 'sonner';
+// import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'BRUSS',
@@ -35,8 +36,8 @@ export default async function RootLayout(props: {
           // disableTransitionOnChange
         >
           {children}
+          <Toaster position='bottom-center' richColors />
         </ThemeProvider>
-        <Toaster position='bottom-center' richColors />
       </body>
     </html>
   );
