@@ -15,7 +15,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/cn';
@@ -25,7 +24,7 @@ import {
   plHeaderRoutes,
 } from '@/lib/header-routes';
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+// import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { LogIn, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -59,9 +58,9 @@ export default async function Header({ dict, lang }: HeaderProps) {
               </Button>
             </SheetTrigger>
             <SheetContent side='left' className='w-[250px] sm:w-[300px]'>
-              <VisuallyHidden asChild>
+              {/* <VisuallyHidden asChild>
                 <SheetTitle>Navigation Menu</SheetTitle>
-              </VisuallyHidden>
+              </VisuallyHidden> */}
               <nav className='flex flex-col gap-4'>
                 {routes.map((route, i) => (
                   <div key={i}>

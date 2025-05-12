@@ -18,6 +18,11 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
+        // New action-specific variants
+        approve:
+          'border border-input bg-[#92b34e]/10 text-[#92b34e] hover:bg-[#92b34e]/20 [&_svg]:text-[#92b34e]',
+        reject:
+          'border border-input bg-red-100 text-red-800 hover:bg-red-200 hover:border-red-300 [&_svg]:text-red-800',
       },
       size: {
         default: 'h-10 px-4 py-2',
