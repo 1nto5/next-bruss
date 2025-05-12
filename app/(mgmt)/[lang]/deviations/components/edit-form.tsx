@@ -123,9 +123,11 @@ export default function EditForm({
         toast.success('Odchylenie zaktualizowane!'); // Updated success message
         redirectToDeviation(id);
       } else if (updateRes.error === 'not authorized') {
-        toast.error('Nie masz uprawnień do edycji tego odchylenia.');
+        toast.error('Nie masz uprawnień do edycji tego odchylenia!');
       } else if (updateRes.error === 'not found') {
-        toast.error('Nie znaleziono odchylenia do aktualizacji.');
+        toast.error('Nie znaleziono odchylenia do aktualizacji!');
+      } else if (updateRes.error === 'no changes') {
+        toast.warning('Nie dokonałeś żadnych zmian w odchyleniu!');
       } else if (updateRes.error) {
         console.error('onSubmit - updateDeviation error:', updateRes.error);
         toast.error(
@@ -145,7 +147,7 @@ export default function EditForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           {/* <div> */}
-          <CardTitle>Edytowanie szkicu odchylenia</CardTitle>
+          <CardTitle>Edytowanie odchylenia</CardTitle>
           {/* <CardDescription>ID: {deviation?._id}</CardDescription> */}
           {/* </div> */}
           <Link href={`/deviations/${id}`}>
