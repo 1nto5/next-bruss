@@ -1010,7 +1010,7 @@ export async function approveDeviation(
 
           if (uniqueEmails.length > 0) {
             // Special subject and message for when all other roles have approved
-            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji Dyrektora Zakładu`;
+            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji (Dyrektor Zakładu)`;
             const html = `
               <div>
                 <p>Wszystkie stanowiska zatwierdziły odchylenie [${updatedDeviation.internalId}], czeka na decyzję Dyrektora Zakładu.</p>
