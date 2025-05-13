@@ -231,7 +231,7 @@ async function sendRoleNotification(
   deviationId: ObjectId,
   internalId: string,
   role: string, // Role to notify (e.g., 'quality-manager')
-  notificationContext: 'creation' | 'edit',
+  notificationContext: 'creation' | 'edit', // Added context
   usersColl: Collection,
   deviationUrl: string,
 ): Promise<NotificationLogType[]> {
@@ -974,6 +974,80 @@ export async function approveDeviation(
             { _id: deviationObjectId },
             { $push: { notificationLogs: { $each: teamLeaderLogs } } },
           );
+        }
+      }
+
+      // Check if current approval completes the condition for notifying Plant Manager
+      // Only check if this is an approval (not a rejection) and the current role is not plant-manager
+      if (isApproved && userRole !== 'plant-manager') {
+        // Check if all three other roles (except plant-manager) have approved
+        const allOtherRolesApproved = [
+          'group-leader',
+          'quality-manager',
+          'production-manager',
+        ].every((role) => {
+          if (role === userRole) {
+            // For the current role being approved, check the new state (which is approved)
+            return true;
+          }
+          // For other roles, check if they were previously approved
+          const fieldName = approvalFieldMap[role];
+          return (
+            (updatedDeviation[fieldName] as ApprovalType | undefined)
+              ?.approved === true
+          );
+        });
+
+        // If all other roles have approved, notify Plant Manager
+        if (allOtherRolesApproved) {
+          const usersColl = await dbc('users');
+          const plantManagers = (await usersColl
+            .find({ roles: 'plant-manager' })
+            .toArray()) as unknown as UserWithRoles[];
+          const uniqueEmails = Array.from(
+            new Set(plantManagers.map((user) => user.email).filter(Boolean)),
+          );
+
+          if (uniqueEmails.length > 0) {
+            // Special subject and message for when all other roles have approved
+            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji Dyrektora Zakładu`;
+            const html = `
+              <div>
+                <p>Wszystkie stanowiska zatwierdziły odchylenie [${updatedDeviation.internalId}], czeka na decyzję Dyrektora Zakładu.</p>
+                <p>
+                  <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
+                </p>
+              </div>`;
+
+            const plantManagerNotificationLogs: NotificationLogType[] = [];
+            for (const email of uniqueEmails) {
+              try {
+                await mailer({ to: email, subject, html });
+                plantManagerNotificationLogs.push({
+                  to: email,
+                  sentAt: new Date(),
+                  type: 'all-approved-awaiting-plant-manager',
+                });
+              } catch (e) {
+                console.error(
+                  `Failed to send plant manager notification to ${email}:`,
+                  e,
+                );
+              }
+            }
+
+            // Add plant manager notification logs if any
+            if (plantManagerNotificationLogs.length > 0) {
+              await coll.updateOne(
+                { _id: deviationObjectId },
+                {
+                  $push: {
+                    notificationLogs: { $each: plantManagerNotificationLogs },
+                  },
+                },
+              );
+            }
+          }
         }
       }
     } else {
