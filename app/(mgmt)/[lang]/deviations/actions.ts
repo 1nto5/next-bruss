@@ -904,7 +904,36 @@ export async function approveDeviation(
     } else {
       // Current action is an approval
       if (userRole === 'plant-manager') {
-        updateField.status = 'approved';
+        // NEW: If Plant Manager is approving, determine the status based on the time period
+        const currentDate = new Date(); // Today's date
+        currentDate.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
+
+        // Ensure from and to dates exist and convert to Date objects if they're strings
+        let fromDate = deviation.timePeriod?.from
+          ? new Date(deviation.timePeriod.from)
+          : null;
+
+        let toDate = deviation.timePeriod?.to
+          ? new Date(deviation.timePeriod.to)
+          : null;
+
+        if (fromDate) fromDate.setHours(0, 0, 0, 0); // Normalize to start of day
+        if (toDate) toDate.setHours(23, 59, 59, 999); // Normalize to end of day
+
+        // Determine status based on the date ranges
+        if (!fromDate || !toDate) {
+          // If dates are missing, default to 'approved'
+          updateField.status = 'approved';
+        } else if (currentDate < fromDate) {
+          // Current date is before the time period
+          updateField.status = 'approved';
+        } else if (currentDate > toDate) {
+          // Current date is after the time period
+          updateField.status = 'closed';
+        } else {
+          // Current date is within the time period
+          updateField.status = 'in progress';
+        }
       }
       // If it's an approval by another role, the status does not change from its current state.
     }
@@ -1010,7 +1039,7 @@ export async function approveDeviation(
 
           if (uniqueEmails.length > 0) {
             // Special subject and message for when all other roles have approved
-            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji (Dyrektor Zakładu)`;
+            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji Dyrektora Zakładu`;
             const html = `
               <div>
                 <p>Wszystkie stanowiska zatwierdziły odchylenie [${updatedDeviation.internalId}], czeka na decyzję Dyrektora Zakładu.</p>
