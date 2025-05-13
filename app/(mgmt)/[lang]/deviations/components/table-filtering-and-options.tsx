@@ -256,7 +256,7 @@ export default function TableFilteringAndOptions({
                   onValueChange={(value) => handleSelectChange('area', value)} // Use simplified handler
                   value={areaFilter}
                 >
-                  <SelectTrigger className='w-[180px]'>
+                  <SelectTrigger className='w-[150px]'>
                     {' '}
                     {/* Adjust width as needed */}
                     <SelectValue placeholder='wybierz' />
@@ -315,7 +315,7 @@ export default function TableFilteringAndOptions({
                       format='dd/MM/yyyy'
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
-                      className='w-[150px]' // Set width
+                      // className='w-[150px]' // Set width
                     />
                   )}
                 />
@@ -336,7 +336,7 @@ export default function TableFilteringAndOptions({
                       format='dd/MM/yyyy'
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
-                      className='w-[150px]' // Set width
+                      // className='w-[150px]' // Set width
                     />
                   )}
                 />
