@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     const coll = await dbc('deviations');
     const deviations = await coll
       .find(query)
-      .sort({ internalId: -1 })
+      .sort({ _id: -1 })
       .limit(1000)
       .toArray();
     return new NextResponse(JSON.stringify(deviations));
