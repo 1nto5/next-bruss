@@ -286,7 +286,12 @@
         "batchExists": "Batch istnieje w bazie!"
       },
       "palletScanInputPlaceholder": "skanuj kod QR z wydrukowanej etykiety na paletę...",
-      "printPalletButton": "Wydruk etykiety na paletę"
+      "printPalletButton": "Wydruk etykiety na paletę",
+      "printHydraLabelButton": "Wydruk etykiety Hydra",
+      "printHydraLabelPrinting": "Drukowanie...",
+      "printHydraLabelSuccess": "Etykieta Hydra wydrukowana!",
+      "printHydraLabelError": "Błąd drukowania etykiety Hydra",
+      "printHydraLabelErrorNoConfig": "Brak konfiguracji drukowania etykiety Hydra"
     }
   }
 }

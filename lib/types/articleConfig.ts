@@ -14,4 +14,6 @@ export type ArticleConfigType = {
   hydraProcess: string;
   ford?: boolean;
   bmw?: boolean;
+  printHydraLabelAipIp?: string;
+  printHydraLabelAipWorkplacePosition?: number;
 };

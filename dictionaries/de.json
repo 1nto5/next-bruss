@@ -286,7 +286,12 @@
         "batchExists": "Batch existiert bereits in der Datenbank!"
       },
       "palletScanInputPlaceholder": "QR-Code von gedrucktem Palette-Label scannen...",
-      "printPalletButton": "Palette-Label drucken"
+      "printPalletButton": "Palette-Label drucken",
+      "printHydraLabelButton": "Hydra-Etikett drucken",
+      "printHydraLabelPrinting": "Drucken...",
+      "printHydraLabelSuccess": "Hydra-Etikett gedruckt!",
+      "printHydraLabelError": "Fehler beim Drucken des Hydra-Etiketts",
+      "printHydraLabelErrorNoConfig": "Keine Konfiguration für den Druck des Hydra-Etiketts"
     }
   }
 }

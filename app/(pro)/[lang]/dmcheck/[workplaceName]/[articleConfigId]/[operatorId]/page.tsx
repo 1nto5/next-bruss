@@ -12,6 +12,7 @@ import {
   getPalletQr,
 } from '../../../actions';
 import { LastFiveTable } from '../../../components/last-five-table';
+import { PrintHydraLabel } from '../../../components/print-hydra-label';
 import { PrintPalletLabel } from '../../../components/print-pallet-label';
 
 export default async function ScanPage(props: {
@@ -48,20 +49,28 @@ export default async function ScanPage(props: {
       redirect(`/${lang}/dmcheck/${workplaceName}`);
     }
     if (article?.pallet === true) {
-      redirect(
-        `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`,
-      );
+      const redirectUrl = article?.printHydraLabelAipIp
+        ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&volume=0.75`
+        : `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`;
+      redirect(redirectUrl);
     }
-    redirect(
-      `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`,
-    );
+    const redirectUrl = article?.printHydraLabelAipIp
+      ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&volume=0.75`
+      : `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`;
+    redirect(redirectUrl);
   }
 
   let boxStatus;
   let palletStatus;
+  let articleConfig;
 
   if (articleConfigId.length !== 24) {
     redirect(`/${lang}/dmcheck/${workplaceName}`);
+  }
+
+  // Only fetch article config if printHydraLabelAipIp is not in searchParams but might be needed
+  if (!searchParams.printHydraLabelAipIp) {
+    articleConfig = await getArticleConfigById(articleConfigId);
   }
 
   async function getBoxStatus(articleConfigId: string) {
@@ -155,7 +164,6 @@ export default async function ScanPage(props: {
         operatorPersonalNumber={searchParams.operatorPersonalNumber.toString()}
         article={`${searchParams.articleNumber} - ${searchParams.articleName}`}
         boxIsFull={boxStatus?.boxIsFull ? true : false}
-        // boxIsFull={false}
         boxStatus={`${boxStatus?.piecesInBox.toString()} / ${searchParams.piecesPerBox}`}
         pallet={searchParams.pallet === 'true' ? true : false}
         palletIsFull={palletStatus?.palletIsFull}
@@ -183,6 +191,19 @@ export default async function ScanPage(props: {
                 Number(searchParams.piecesPerBox)
               }
               qrCode={palletQr}
+            />
+          )}
+          {boxStatus?.boxIsFull && searchParams.printHydraLabelAipIp && (
+            <PrintHydraLabel
+              cDict={dict.dmcheck.scan}
+              articleNumber={searchParams.articleNumber.toString()}
+              printHydraLabelAipIp={searchParams.printHydraLabelAipIp.toString()}
+              identifier={searchParams.operatorPersonalNumber.toString()}
+              printHydraLabelAipWorkplacePosition={
+                articleConfig?.printHydraLabelAipWorkplacePosition ||
+                Number(searchParams.printHydraLabelAipWorkplacePosition) ||
+                1
+              }
             />
           )}
         </CardHeader>
