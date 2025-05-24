@@ -18,13 +18,6 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    console.log('printHydraLabelAipIp', printHydraLabelAipIp);
-    console.log('identifier', identifier);
-    console.log(
-      'printHydraLabelAipWorkplacePosition',
-      printHydraLabelAipWorkplacePosition,
-    );
-    console.log(JSON.stringify({ identifier }));
 
     // Forward the request to the actual API endpoint
     const response = await fetch(

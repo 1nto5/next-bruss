@@ -50,12 +50,12 @@ export default async function ScanPage(props: {
     }
     if (article?.pallet === true) {
       const redirectUrl = article?.printHydraLabelAipIp
-        ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&volume=0.75`
+        ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&printHydraLabelAipWorkplacePosition=${article.printHydraLabelAipWorkplacePosition || 1}&volume=0.75`
         : `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&boxesPerPallet=${article?.boxesPerPallet}&volume=0.75`;
       redirect(redirectUrl);
     }
     const redirectUrl = article?.printHydraLabelAipIp
-      ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&volume=0.75`
+      ? `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&printHydraLabelAipIp=${article.printHydraLabelAipIp}&printHydraLabelAipWorkplacePosition=${article.printHydraLabelAipWorkplacePosition || 1}&volume=0.75`
       : `?operatorName=${operator.firstName + ' ' + operator.lastName}&operatorPersonalNumber=${operator.identifier}&articleNumber=${article?.articleNumber}&articleName=${article?.articleName}&piecesPerBox=${article?.piecesPerBox}&pallet=${article?.pallet}&volume=0.75`;
     redirect(redirectUrl);
   }
