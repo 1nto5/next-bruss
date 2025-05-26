@@ -603,8 +603,9 @@ export default function PositionEdit() {
                                   <Input
                                     className=''
                                     placeholder={'wpisz aby wyszukać...'}
-                                    {...field}
+                                    value={field.value || ''}
                                     onChange={(e) => {
+                                      field.onChange(e);
                                       handleFindBin(e);
                                     }}
                                   />
