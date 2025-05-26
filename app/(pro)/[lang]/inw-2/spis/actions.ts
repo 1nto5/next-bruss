@@ -1,10 +1,16 @@
 'use server';
 
-// import clientPromise from '@/lib/mongo';
+// Database connection import - using custom dbc wrapper for MongoDB
 import { dbc } from '@/lib/mongo';
 
+// Type definitions
 import { loginInventoryType } from './lib/zod';
 
+/**
+ * Authenticates users for inventory access
+ * @param data - Login credentials including personal numbers and PINs
+ * @returns Success status or error message
+ */
 export async function login(data: loginInventoryType) {
   try {
     const collection = await dbc('employees');
@@ -51,6 +57,13 @@ export async function login(data: loginInventoryType) {
   }
 }
 
+/**
+ * Creates a new inventory card with the next available number
+ * @param persons - Array of person identifiers who are creating the card
+ * @param warehouse - Warehouse identifier
+ * @param sector - Sector within the warehouse
+ * @returns Success status with new card number or error message
+ */
 export async function createNewCard(
   persons: string[],
   warehouse: string,
@@ -94,6 +107,11 @@ export async function createNewCard(
   }
 }
 
+/**
+ * Retrieves all inventory cards created by specific persons
+ * @param persons - Array of person identifiers to filter cards by
+ * @returns Array of cards or error message
+ */
 export async function fetchCards(persons: string[]) {
   try {
     // const timeout = (ms: number) =>
@@ -118,6 +136,12 @@ export async function fetchCards(persons: string[]) {
   }
 }
 
+/**
+ * Fetches all positions for a specific inventory card
+ * @param persons - Array of person identifiers for authorization
+ * @param cardNumber - The card number to fetch positions for
+ * @returns Array of positions or error message
+ */
 export async function fetchCardPositions(
   persons: string[],
   cardNumber: number,
@@ -149,6 +173,13 @@ export async function fetchCardPositions(
   }
 }
 
+/**
+ * Fetches a specific position from an inventory card
+ * @param persons - Array of person identifiers for authorization
+ * @param cardNumber - The card number containing the position
+ * @param position - The position number to fetch (1-25)
+ * @returns Position details or error message
+ */
 export async function fetchPosition(
   persons: string[],
   cardNumber: number,
@@ -192,6 +223,11 @@ export async function fetchPosition(
   }
 }
 
+/**
+ * Retrieves basic information about a specific inventory card
+ * @param cardNumber - The card number to get info for
+ * @returns Card information or error if not found
+ */
 export async function getCardInfo(cardNumber: string) {
   try {
     const coll = await dbc('inventory_cards');
@@ -211,6 +247,11 @@ export async function getCardInfo(cardNumber: string) {
   }
 }
 
+/**
+ * Searches for inventory articles by number or name
+ * @param search - Search term to match against article numbers or names
+ * @returns Matching articles (max 5) or error message
+ */
 export async function findArticles(search: string) {
   try {
     const coll = await dbc('inventory_articles');
@@ -223,7 +264,6 @@ export async function findArticles(search: string) {
       })
       .toArray();
 
-    // Sprawdzenie liczby wyników
     if (results.length === 0) {
       return { error: 'no articles' };
     }
@@ -239,6 +279,11 @@ export async function findArticles(search: string) {
   }
 }
 
+/**
+ * Searches for bin locations in the warehouse
+ * @param search - Search term to match against bin values
+ * @returns Matching bins (max 5) or error message
+ */
 export async function findBins(search: string) {
   try {
     const coll = await dbc('inventory_bin_options');
@@ -248,7 +293,6 @@ export async function findBins(search: string) {
       })
       .toArray();
 
-    // Check number of results
     if (results.length === 0) {
       return { error: 'no bins' };
     }
@@ -264,6 +308,19 @@ export async function findBins(search: string) {
   }
 }
 
+/**
+ * Saves or updates an inventory position
+ * @param card - Card number
+ * @param position - Position number on the card (1-25)
+ * @param articleNumber - Article identifier
+ * @param articleName - Article display name
+ * @param quantity - Item quantity (must be integer if unit is 'st')
+ * @param unit - Measurement unit
+ * @param wip - Work in progress flag
+ * @param bin - Optional bin location
+ * @param deliveryDate - Optional delivery date
+ * @returns Success/error status with operation details
+ */
 export async function savePosition(
   card: number,
   position: number,
@@ -272,14 +329,10 @@ export async function savePosition(
   quantity: number,
   unit: string,
   wip: boolean,
-  bin?: string, // New parameter for BIN
-  deliveryDate?: Date, // New parameter for delivery date
+  bin?: string,
+  deliveryDate?: Date,
 ) {
   try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
-
     const collection = await dbc('inventory_cards');
 
     const identifier = `${card}/${position}`;
