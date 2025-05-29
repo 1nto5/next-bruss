@@ -48,7 +48,7 @@ const formSchema = z.object({
   codeSize: z.number().int().default(85),
   fontSize: z.number().int().default(48),
   spacing: z.number().int().default(22),
-  codeType: z.enum(['qr', 'barcode']).default('qr'),
+  codeType: z.enum(['qr', 'barcode', 'dmc']).default('qr'),
   orientation: z.enum(['portrait', 'landscape']).default('portrait'),
 });
 
@@ -70,9 +70,17 @@ export default function QrGeneratorForm() {
   });
 
   const selectedPageSize = form.watch('pageSize');
+  const selectedCodeType = form.watch('codeType');
 
   useEffect(() => {
-    if (selectedPageSize === 'standard') {
+    if (selectedCodeType === 'dmc') {
+      // For DMC, force specific settings
+      form.setValue('pageSize', 'standard'); // Will be overridden to 15x15 in generator
+      form.setValue('orientation', 'portrait');
+      form.setValue('codeSize', 10);
+      form.setValue('fontSize', 0); // No text for DMC
+      form.setValue('spacing', 0);
+    } else if (selectedPageSize === 'standard') {
       form.setValue('codeSize', 85);
       form.setValue('fontSize', 48);
       form.setValue('spacing', 22);
@@ -85,7 +93,7 @@ export default function QrGeneratorForm() {
       form.setValue('fontSize', 150);
       form.setValue('spacing', 120);
     }
-  }, [selectedPageSize, form]);
+  }, [selectedPageSize, selectedCodeType, form]);
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
@@ -159,34 +167,6 @@ export default function QrGeneratorForm() {
 
             <FormField
               control={form.control}
-              name='pageSize'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Page Size</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value || 'standard'}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select a verified email to display' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='standard'>
-                        Standard (125x104 mm - production label)
-                      </SelectItem>
-                      <SelectItem value='a4'>A4 (210x297 mm)</SelectItem>
-                      <SelectItem value='a3'>A3 (297x420 mm)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name='codeType'
               render={({ field }) => (
                 <FormItem>
@@ -203,11 +183,48 @@ export default function QrGeneratorForm() {
                     <SelectContent>
                       <SelectItem value='qr'>QR Code</SelectItem>
                       <SelectItem value='barcode'>Barcode</SelectItem>
+                      <SelectItem value='dmc'>DMC (Data Matrix)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Choose between QR code or barcode
+                    Choose between QR code, barcode, or DMC
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='pageSize'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Page Size</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || 'standard'}
+                    disabled={selectedCodeType === 'dmc'}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select a verified email to display' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='standard'>
+                        {selectedCodeType === 'dmc'
+                          ? 'DMC Fixed Size (15x15 mm)'
+                          : 'Standard (125x104 mm - production label)'}
+                      </SelectItem>
+                      <SelectItem value='a4'>A4 (210x297 mm)</SelectItem>
+                      <SelectItem value='a3'>A3 (297x420 mm)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {selectedCodeType === 'dmc' && (
+                    <FormDescription>
+                      DMC uses fixed 15x15 mm paper size
+                    </FormDescription>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -222,6 +239,7 @@ export default function QrGeneratorForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={selectedCodeType === 'dmc'}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -233,7 +251,11 @@ export default function QrGeneratorForm() {
                       <SelectItem value='landscape'>Landscape</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormDescription>Choose page orientation</FormDescription>
+                  <FormDescription>
+                    {selectedCodeType === 'dmc'
+                      ? 'DMC uses fixed orientation'
+                      : 'Choose page orientation'}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -253,10 +275,13 @@ export default function QrGeneratorForm() {
                         onChange={(e) =>
                           field.onChange(parseInt(e.target.value))
                         }
+                        disabled={selectedCodeType === 'dmc'}
                       />
                     </FormControl>
                     <FormDescription>
-                      Size of code in millimeters
+                      {selectedCodeType === 'dmc'
+                        ? 'DMC fixed at 10x10 mm'
+                        : 'Size of code in millimeters'}
                     </FormDescription>
                   </FormItem>
                 )}
@@ -275,10 +300,13 @@ export default function QrGeneratorForm() {
                         onChange={(e) =>
                           field.onChange(parseInt(e.target.value))
                         }
+                        disabled={selectedCodeType === 'dmc'}
                       />
                     </FormControl>
                     <FormDescription>
-                      Size of text below QR code
+                      {selectedCodeType === 'dmc'
+                        ? 'No text for DMC'
+                        : 'Size of text below code'}
                     </FormDescription>
                   </FormItem>
                 )}
@@ -297,9 +325,14 @@ export default function QrGeneratorForm() {
                         onChange={(e) =>
                           field.onChange(parseInt(e.target.value))
                         }
+                        disabled={selectedCodeType === 'dmc'}
                       />
                     </FormControl>
-                    <FormDescription>Space between QR and text</FormDescription>
+                    <FormDescription>
+                      {selectedCodeType === 'dmc'
+                        ? 'No spacing for DMC'
+                        : 'Space between code and text'}
+                    </FormDescription>
                   </FormItem>
                 )}
               />
@@ -329,7 +362,12 @@ export default function QrGeneratorForm() {
           <CardFooter>
             <Button type='submit' className='w-full' disabled={isGenerating}>
               <FileScan className={isGenerating ? 'animate-spin' : ''} />{' '}
-              Generate {form.watch('codeType') === 'qr' ? 'QR Code' : 'Barcode'}{' '}
+              Generate{' '}
+              {form.watch('codeType') === 'qr'
+                ? 'QR Code'
+                : form.watch('codeType') === 'barcode'
+                  ? 'Barcode'
+                  : 'DMC'}{' '}
               PDF
             </Button>
           </CardFooter>

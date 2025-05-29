@@ -1,6 +1,7 @@
 import JsBarcode from 'jsbarcode';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
+import { generateDataMatrix } from './bwip-loader';
 
 interface GeneratePdfOptions {
   items: string[];
@@ -9,7 +10,7 @@ interface GeneratePdfOptions {
   codeSize?: number;
   fontSize?: number;
   spacing?: number;
-  codeType?: 'qr' | 'barcode';
+  codeType?: 'qr' | 'barcode' | 'dmc';
   orientation?: 'portrait' | 'landscape';
 }
 
@@ -24,7 +25,15 @@ export async function codesPdfGenerator({
   orientation = 'portrait',
 }: GeneratePdfOptions): Promise<void> {
   let format: any = pageSize;
-  if (pageSize === 'standard') {
+
+  // Special handling for DMC - fixed 15x15 mm size
+  if (codeType === 'dmc') {
+    format = [15, 15];
+    orientation = 'portrait';
+    codeSize = 10;
+    fontSize = 0;
+    spacing = 0;
+  } else if (pageSize === 'standard') {
     format = orientation === 'portrait' ? [125, 104] : [104, 125];
   }
 
@@ -36,7 +45,12 @@ export async function codesPdfGenerator({
 
   doc.setProperties({
     title: title,
-    subject: codeType === 'qr' ? 'QR Codes' : 'Barcodes',
+    subject:
+      codeType === 'qr'
+        ? 'QR Codes'
+        : codeType === 'barcode'
+          ? 'Barcodes'
+          : 'DMC Codes',
     creator: 'Code Generator',
     author: 'BRUSS',
   });
@@ -121,6 +135,22 @@ export async function codesPdfGenerator({
         const textX = centerX - textWidth / 2;
 
         doc.text(uppercaseText, textX, qrY + actualCodeSize + actualSpacing);
+      } else if (codeType === 'dmc') {
+        // Generate Data Matrix Code
+        const canvas = document.createElement('canvas');
+
+        await generateDataMatrix(cleanedItem, canvas);
+
+        const dmcDataUrl = canvas.toDataURL('image/png');
+
+        // For DMC, center the 10x10 code on 15x15 paper
+        const dmcCodeSize = 10;
+        const dmcX = centerX - dmcCodeSize / 2;
+        const dmcY = (pageHeight - dmcCodeSize) / 2;
+
+        doc.addImage(dmcDataUrl, 'PNG', dmcX, dmcY, dmcCodeSize, dmcCodeSize);
+
+        // No text for DMC codes - only the code is printed
       } else {
         // Generate barcode
         // Create a temporary canvas element to generate the barcode
@@ -187,7 +217,8 @@ export async function codesPdfGenerator({
     }
   }
 
-  const codeTypeText = codeType === 'qr' ? 'QR' : 'Barcode';
+  const codeTypeText =
+    codeType === 'qr' ? 'QR' : codeType === 'barcode' ? 'Barcode' : 'DMC';
   const orientationText = orientation === 'portrait' ? 'P' : 'L';
   const fileName = `${pageSize}-${orientationText}-${codeTypeText}-${title.replace(/\s+/g, '-')}`;
   doc.save(`${fileName}.pdf`);
