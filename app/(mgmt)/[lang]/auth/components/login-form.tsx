@@ -54,15 +54,16 @@ export default function LoginForm({ cDict }: { cDict: any }) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // console.log(values.email, values.password);
     try {
       setIsPending(true);
       const res = await login(values.email, values.password);
-      if (!res || res.error === 'default error') {
-        toast.error(cDict.toasts.pleaseContactIt);
-        return;
-      }
-      if (res.error === 'invalid credentials') {
+
+      // If we get here, login was successful
+      if (res?.success) {
+        toast.success(cDict.toasts.loginSuccess);
+        router.push(callbackUrl); // Redirect to home after successful login
+      } else if (res?.error === 'invalid credentials') {
+        // Handle invalid credentials
         form.setError('email', {
           type: 'manual',
           message: cDict.zod.credentialsError,
@@ -71,15 +72,13 @@ export default function LoginForm({ cDict }: { cDict: any }) {
           type: 'manual',
           message: cDict.zod.credentialsError,
         });
-        return;
-      }
-      if (res.success) {
-        toast.success(cDict.toasts.loginSuccess);
-        router.push(callbackUrl); // Redirect to home after successful login
+      } else {
+        // Handle other errors
+        toast.error(cDict.toasts.pleaseContactIt);
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast.error(cDict.toasts.pleaseContactIt);
-      return;
     } finally {
       setIsPending(false);
     }

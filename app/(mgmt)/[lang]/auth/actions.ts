@@ -12,19 +12,24 @@ export async function login(email: string, password: string) {
     await signIn('credentials', {
       email: email.toLowerCase(),
       password,
-      // redirect: false,
+      redirect: false,
     });
+    // If we get here, login was successful
+    return { success: true };
   } catch (error) {
+    console.error('Login error:', error);
+
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
           return { error: 'invalid credentials' };
         default:
-          console.error(error);
           return { error: 'default error' };
       }
     }
-    return { success: true };
+
+    // For any other type of error
+    return { error: 'default error' };
   }
 }
 
