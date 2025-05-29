@@ -608,9 +608,33 @@ export async function getPalletQr(articleConfigId: string) {
   if (!articleConfig) {
     return null;
   }
-  return `A:${articleConfig.articleNumber}|O:669|Q:${articleConfig.boxesPerPallet * articleConfig.piecesPerBox}|B:AA${uuidv4()
-    .slice(0, 8)
-    .toUpperCase()}|C:G`;
+
+  // Generate unique batch number by checking against existing batches
+  let batch = '';
+  let isUnique = false;
+  const scansCollection = await dbc('scans');
+  const scansArchiveCollection = await dbc('scans_archive');
+
+  while (!isUnique) {
+    batch = `AA${uuidv4().slice(0, 8).toUpperCase()}`;
+
+    // Check if batch exists in scans collection
+    const existingInScans = await scansCollection.findOne({
+      pallet_batch: batch,
+    });
+
+    // Check if batch exists in scans_archive collection
+    const existingInArchive = await scansArchiveCollection.findOne({
+      pallet_batch: batch,
+    });
+
+    // If batch doesn't exist in either collection, it's unique
+    if (!existingInScans && !existingInArchive) {
+      isUnique = true;
+    }
+  }
+
+  return `A:${articleConfig.articleNumber}|O:669|Q:${articleConfig.boxesPerPallet * articleConfig.piecesPerBox}|B:${batch}|C:G`;
 }
 
 export async function savePallet(prevState: any, formData: FormData) {
