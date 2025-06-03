@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
