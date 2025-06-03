@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Forward the request to the actual API endpoint
     const response = await fetch(
-      `http://${printHydraLabelAipIp}:5000/run-automation`,
+      `http://${printHydraLabelAipIp}:5000/run-aip-print-automation`,
       {
         method: 'POST',
         headers: {
