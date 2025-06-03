@@ -30,11 +30,13 @@ export default async function RootLayout(props: {
       disableTransitionOnChange
     >
       {/* <QueryProvider> */}
-      <Header
-        workplaceName={workplaceName}
-        workplaceHref={`/${lang}/dmcheck/${workplaceName}`}
-      />{' '}
-      <main>{children}</main>
+      <div className='mx-4'>
+        <Header
+          workplaceName={workplaceName}
+          workplaceHref={`/${lang}/dmcheck/${workplaceName}`}
+        />{' '}
+        <main>{children}</main>
+      </div>
       {/* <main className='m-2 flex flex-col items-center space-y-8'>
             {children}
           </main> */}
