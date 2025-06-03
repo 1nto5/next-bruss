@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       identifier,
+      quantity,
       printHydraLabelAipIp,
       printHydraLabelAipWorkplacePosition,
     } = body;
@@ -30,7 +31,8 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           identifier,
-          position: printHydraLabelAipWorkplacePosition,
+          quantity,
+          workplace_position: printHydraLabelAipWorkplacePosition,
         }),
       },
     );

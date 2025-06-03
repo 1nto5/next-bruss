@@ -7,18 +7,18 @@ import { toast } from 'sonner';
 
 type PrintHydraLabelProps = {
   cDict: any;
-  articleNumber: string;
   printHydraLabelAipIp: string;
-  identifier: string;
   printHydraLabelAipWorkplacePosition: number;
+  identifier: string;
+  quantity?: string | number;
 };
 
 export function PrintHydraLabel({
   cDict,
-  articleNumber,
   printHydraLabelAipIp,
-  identifier,
   printHydraLabelAipWorkplacePosition,
+  identifier,
+  quantity,
 }: PrintHydraLabelProps) {
   const [isPrinting, setIsPrinting] = useState(false);
 
@@ -33,14 +33,6 @@ export function PrintHydraLabel({
 
     setIsPrinting(true);
     try {
-      console.log('Printing Hydra label for article:', articleNumber);
-      console.log('AIP IP:', printHydraLabelAipIp);
-      console.log('Identifier:', identifier);
-      console.log(
-        'AIP Workplace Position:',
-        printHydraLabelAipWorkplacePosition,
-      );
-
       // Use the proxy API route instead of direct connection to avoid CORS issues
       const response = await fetch('/api/dmcheck/hydra-print', {
         method: 'POST',
@@ -49,7 +41,8 @@ export function PrintHydraLabel({
         },
         body: JSON.stringify({
           identifier,
-          printHydraLabelAipIp, // Pass the IP to the proxy so it knows where to forward the request
+          quantity,
+          printHydraLabelAipIp,
           printHydraLabelAipWorkplacePosition,
         }),
       });

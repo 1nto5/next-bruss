@@ -196,13 +196,13 @@ export default async function ScanPage(props: {
           {boxStatus?.boxIsFull && searchParams.printHydraLabelAipIp && (
             <PrintHydraLabel
               cDict={dict.dmcheck.scan}
-              articleNumber={searchParams.articleNumber.toString()}
-              printHydraLabelAipIp={searchParams.printHydraLabelAipIp.toString()}
               identifier={searchParams.operatorPersonalNumber.toString()}
+              quantity={searchParams.piecesPerBox?.toString()}
+              printHydraLabelAipIp={searchParams.printHydraLabelAipIp.toString()}
               printHydraLabelAipWorkplacePosition={
-                articleConfig?.printHydraLabelAipWorkplacePosition ||
-                Number(searchParams.printHydraLabelAipWorkplacePosition) ||
-                1
+                searchParams.printHydraLabelAipWorkplacePosition
+                  ? Number(searchParams.printHydraLabelAipWorkplacePosition)
+                  : 1
               }
             />
           )}
