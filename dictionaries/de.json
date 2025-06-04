@@ -291,7 +291,11 @@
       "printHydraLabelPrinting": "Drucken...",
       "printHydraLabelSuccess": "Hydra-Etikett gedruckt!",
       "printHydraLabelError": "Fehler beim Drucken des Hydra-Etiketts",
-      "printHydraLabelErrorNoConfig": "Keine Konfiguration für den Druck des Hydra-Etiketts"
+      "printHydraLabelErrorNoConfig": "Keine Konfiguration für den Druck des Hydra-Etiketts",
+      "printHydraLabelConfirmTitle": "Erneuten Druck bestätigen",
+      "printHydraLabelConfirmReprint": "Dieses Etikett wurde bereits gedruckt. Sind Sie sicher, dass Sie es erneut drucken möchten?",
+      "cancel": "Abbrechen",
+      "confirm": "Ja, erneut drucken"
     }
   }
 }
