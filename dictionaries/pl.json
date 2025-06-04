@@ -287,13 +287,14 @@
       },
       "palletScanInputPlaceholder": "skanuj kod QR z wydrukowanej etykiety na paletę...",
       "printPalletButton": "Wydruk etykiety na paletę",
-      "printHydraLabelButton": "Wydruk etykiety Hydra",
+      "printHydraLabelReprint": "Ponowny wydruk etykiety Hydra",
       "printHydraLabelPrinting": "Drukowanie...",
       "printHydraLabelSuccess": "Etykieta Hydra wydrukowana!",
       "printHydraLabelError": "Błąd drukowania etykiety Hydra",
       "printHydraLabelErrorNoConfig": "Brak konfiguracji drukowania etykiety Hydra",
+      "printHydraLabelAutoPrinted": "Etykieta została automatycznie wydrukowana po zapełnieniu boxa",
       "printHydraLabelConfirmTitle": "Potwierdź ponowny wydruk",
-      "printHydraLabelConfirmReprint": "Ta etykieta została już wydrukowana. Czy na pewno chcesz wydrukować ją ponownie?",
+      "printHydraLabelConfirmReprint": "Ta etykieta została już wydrukowana automatycznie. Czy na pewno chcesz wydrukować ją ponownie?",
       "cancel": "Anuluj",
       "confirm": "Tak, wydrukuj ponownie"
     }

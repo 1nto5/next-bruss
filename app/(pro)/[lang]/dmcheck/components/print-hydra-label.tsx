@@ -31,7 +31,8 @@ export function PrintHydraLabel({
   quantity,
 }: PrintHydraLabelProps) {
   const [isPrinting, setIsPrinting] = useState(false);
-  const [hasLabelBeenPrinted, setHasLabelBeenPrinted] = useState(false);
+  // Label was already printed automatically since box is full
+  const [hasLabelBeenPrinted, setHasLabelBeenPrinted] = useState(true);
   const [showReprintDialog, setShowReprintDialog] = useState(false);
 
   const handlePrintClick = () => {
@@ -103,7 +104,7 @@ export function PrintHydraLabel({
         <Printer className='h-4 w-4' />
         {isPrinting
           ? cDict.printHydraLabelPrinting || 'Printing...'
-          : cDict.printHydraLabelButton || 'Print Hydra Label'}
+          : cDict.printHydraLabelReprint || 'Reprint Hydra Label'}
       </Button>
 
       <AlertDialog open={showReprintDialog} onOpenChange={setShowReprintDialog}>

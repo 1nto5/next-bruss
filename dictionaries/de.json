@@ -287,13 +287,14 @@
       },
       "palletScanInputPlaceholder": "QR-Code von gedrucktem Palette-Label scannen...",
       "printPalletButton": "Palette-Label drucken",
-      "printHydraLabelButton": "Hydra-Etikett drucken",
+      "printHydraLabelReprint": "Hydra-Etikett erneut drucken",
       "printHydraLabelPrinting": "Drucken...",
       "printHydraLabelSuccess": "Hydra-Etikett gedruckt!",
       "printHydraLabelError": "Fehler beim Drucken des Hydra-Etiketts",
       "printHydraLabelErrorNoConfig": "Keine Konfiguration für den Druck des Hydra-Etiketts",
+      "printHydraLabelAutoPrinted": "Das Etikett wurde automatisch gedruckt, als die Box voll wurde",
       "printHydraLabelConfirmTitle": "Erneuten Druck bestätigen",
-      "printHydraLabelConfirmReprint": "Dieses Etikett wurde bereits gedruckt. Sind Sie sicher, dass Sie es erneut drucken möchten?",
+      "printHydraLabelConfirmReprint": "Dieses Etikett wurde bereits automatisch gedruckt. Sind Sie sicher, dass Sie es erneut drucken möchten?",
       "cancel": "Abbrechen",
       "confirm": "Ja, erneut drucken"
     }

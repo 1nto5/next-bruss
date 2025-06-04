@@ -75,8 +75,12 @@ export default async function ScanPage(props: {
 
   async function getBoxStatus(articleConfigId: string) {
     try {
+      const printParams = searchParams.printHydraLabelAipIp
+        ? `&identifier=${searchParams.operatorPersonalNumber}&quantity=${searchParams.piecesPerBox}&printHydraLabelAipIp=${searchParams.printHydraLabelAipIp}&printHydraLabelAipWorkplacePosition=${searchParams.printHydraLabelAipWorkplacePosition || 1}`
+        : '';
+
       const boxStatusRes = await fetch(
-        `${process.env.API}/dmcheck/box-status?articleConfigId=${articleConfigId}`,
+        `${process.env.API}/dmcheck/box-status?articleConfigId=${articleConfigId}${printParams}`,
         {
           next: { revalidate: 0, tags: ['box'] },
         },
