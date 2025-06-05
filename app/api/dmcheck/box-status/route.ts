@@ -30,7 +30,7 @@ async function printHydraLabel(
   printHydraLabelAipWorkplacePosition: number,
 ) {
   try {
-    const response = await fetch('/api/dmcheck/hydra-print', {
+    const response = await fetch(`${process.env.API}/dmcheck/hydra-print`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
