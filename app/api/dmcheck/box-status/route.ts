@@ -65,23 +65,23 @@ export async function GET(req: NextRequest) {
       return new NextResponse(JSON.stringify({ message: 'article not found' }));
     }
 
-    // Auto-print Hydra label if box is full and print config is provided
-    if (boxStatus.boxIsFull && printHydraLabelAipIp && identifier && quantity) {
-      await printHydraLabel(
-        identifier,
-        quantity,
-        printHydraLabelAipIp,
-        Number(printHydraLabelAipWorkplacePosition) || 1,
-      );
+    // Create response first
+    const response = new NextResponse(JSON.stringify(boxStatus));
 
-      return new NextResponse(
-        JSON.stringify({
-          ...boxStatus,
-        }),
-      );
+    // Auto-print Hydra label asynchronously after response if box is full and print config is provided
+    if (boxStatus.boxIsFull && printHydraLabelAipIp && identifier && quantity) {
+      // Execute print operation asynchronously without blocking the response
+      setImmediate(() => {
+        printHydraLabel(
+          identifier,
+          quantity,
+          printHydraLabelAipIp,
+          Number(printHydraLabelAipWorkplacePosition) || 1,
+        );
+      });
     }
 
-    return new NextResponse(JSON.stringify(boxStatus));
+    return response;
   } else {
     return new NextResponse(JSON.stringify({ message: 'article not found' }));
   }
