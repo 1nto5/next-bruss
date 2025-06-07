@@ -5,10 +5,9 @@ import { loginOvenType } from './lib/zod';
 
 export async function operatorsLogin(data: loginOvenType) {
   try {
-    const collection = await dbc('persons');
-    console.log(data);
+    const collection = await dbc('employees');
     const operator1 = await collection.findOne({
-      personalNumber: data.code1,
+      identifier: data.code1,
     });
     if (!operator1) {
       return { error: 'wrong code 1' };
@@ -17,7 +16,7 @@ export async function operatorsLogin(data: loginOvenType) {
     let operator2;
     if (data.code2) {
       operator2 = await collection.findOne({
-        personalNumber: data.code2,
+        identifier: data.code2,
       });
       if (!operator2) {
         return { error: 'wrong code 2' };
@@ -27,7 +26,7 @@ export async function operatorsLogin(data: loginOvenType) {
     let operator3;
     if (data.code3) {
       operator3 = await collection.findOne({
-        personalNumber: data.code3,
+        identifier: data.code3,
       });
       if (!operator3) {
         return { error: 'wrong code 3' };
@@ -55,12 +54,16 @@ export async function operatorsLogin(data: loginOvenType) {
 
 export async function fetchOvenProcesses() {
   const collection = await dbc('oven_processes');
-  const processes = await collection
+  const documents = await collection
     .find()
     .sort({ createdAt: -1 })
     .limit(50)
     .toArray();
-  return processes;
+
+  return documents.map((doc) => ({
+    ...doc,
+    _id: doc._id.toString(),
+  }));
 }
 
 export async function fetchOvenConfigs(configFiltr: string) {

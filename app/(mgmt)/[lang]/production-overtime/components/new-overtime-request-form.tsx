@@ -180,9 +180,12 @@ export default function NewOvertimeRequestForm({
                     <Input
                       type='number'
                       min={1}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value) || 1)
-                      }
+                      {...field}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === '' ? 1 : parseInt(e.target.value);
+                        field.onChange(value);
+                      }}
                       value={field.value}
                     />
                   </FormControl>
