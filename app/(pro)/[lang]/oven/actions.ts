@@ -1,6 +1,8 @@
 'use server';
 
 import { dbc } from '@/lib/mongo';
+import { ObjectId } from 'mongodb';
+import { processType } from './lib/types';
 import { loginOvenType } from './lib/zod';
 
 export async function operatorsLogin(data: loginOvenType) {
@@ -52,7 +54,7 @@ export async function operatorsLogin(data: loginOvenType) {
   }
 }
 
-export async function fetchOvenProcesses() {
+export async function fetchOvenProcesses(): Promise<processType[]> {
   const collection = await dbc('oven_processes');
   const documents = await collection
     .find()
@@ -63,7 +65,7 @@ export async function fetchOvenProcesses() {
   return documents.map((doc) => ({
     ...doc,
     _id: doc._id.toString(),
-  }));
+  })) as processType[];
 }
 
 export async function fetchOvenConfigs(configFiltr: string) {
@@ -136,5 +138,28 @@ export async function insertOvenProcess(ovenProcessData: {
   } catch (error) {
     console.error(error);
     return { error: 'insertDeviation server action error' };
+  }
+}
+
+export async function terminateOvenProcess(processId: string) {
+  try {
+    const collection = await dbc('oven_processes');
+    const res = await collection.updateOne(
+      { _id: new ObjectId(processId) },
+      {
+        $set: {
+          terminatedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (res.matchedCount > 0) {
+      return { success: 'terminated' };
+    }
+    return { error: 'not found' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'terminateOvenProcess server action error' };
   }
 }
