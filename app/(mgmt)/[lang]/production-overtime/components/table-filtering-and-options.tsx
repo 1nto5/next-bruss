@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Label } from '@/components/ui/label';
@@ -12,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CircleX, Loader, Plus, RefreshCw, Search } from 'lucide-react';
+import { CircleX, Loader, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -113,139 +114,125 @@ export default function TableFilteringAndOptions({
   };
 
   return (
-    <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-      <div className='flex items-center space-x-2'>
-        <Switch
-          id='show-filters'
-          checked={showFilters}
-          onCheckedChange={setShowFilters}
-        />
-        <Label htmlFor='show-filters'>Pokaż filtry</Label>
-        {isLogged && (
-          <>
+    <Card>
+      <CardHeader className='p-4'>
+        <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
+          <div className='flex items-center space-x-2'>
             <Switch
-              id='only-my-requests'
-              checked={showOnlyMine}
-              onCheckedChange={handleShowOnlyMineChange}
+              id='show-filters'
+              checked={showFilters}
+              onCheckedChange={setShowFilters}
             />
-            <Label htmlFor='only-my-requests'>Tylko moje zlecenia</Label>
-          </>
-        )}
-      </div>
-
-      {showFilters && (
-        <>
-          <div className='flex flex-wrap gap-2'>
-            <div className='flex items-center space-x-2'>
-              <Label>Status</Label>
-              <Select onValueChange={setStatusFilter} value={statusFilter}>
-                <SelectTrigger className='w-[150px]'>
-                  <SelectValue placeholder='wybierz' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='pending'>Oczekuje</SelectItem>
-                  <SelectItem value='approved'>Zatwierdzony</SelectItem>
-                  <SelectItem value='rejected'>Odrzucony</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='flex items-center space-x-2'>
-              <Label>Termin</Label>
-              <DateTimePicker
-                value={dateFilter}
-                onChange={setDateFilter}
-                hideTime
-                renderTrigger={({ value, setOpen, open }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) => !open && setDateFilter(x)}
-                    format='dd/MM/yyyy'
-                    disabled={open}
-                    onCalendarClick={() => setOpen(!open)}
-                  />
-                )}
-              />
-            </div>
-            <div className='flex items-center space-x-2'>
-              <Label>Zlecono dn</Label>
-              <DateTimePicker
-                value={requestedAtFilter}
-                onChange={setRequestedAtFilter}
-                hideTime
-                renderTrigger={({ value, setOpen, open }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) => !open && setRequestedAtFilter(x)}
-                    format='dd/MM/yyyy'
-                    disabled={open}
-                    onCalendarClick={() => setOpen(!open)}
-                  />
-                )}
-              />
-            </div>
+            <Label htmlFor='show-filters'>Pokaż filtry</Label>
+            {isLogged && (
+              <>
+                <Switch
+                  id='only-my-requests'
+                  checked={showOnlyMine}
+                  onCheckedChange={handleShowOnlyMineChange}
+                />
+                <Label htmlFor='only-my-requests'>Tylko moje zlecenia</Label>
+              </>
+            )}
           </div>
-        </>
-      )}
+        </form>
+      </CardHeader>
+      {showFilters && (
+        <CardContent className='p-4 pt-0'>
+          <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+            {/* Row 1: Status and dates */}
+            <div className='flex flex-wrap items-end gap-4'>
+              <div className='flex flex-col space-y-1'>
+                <Label>Status</Label>
+                <Select onValueChange={setStatusFilter} value={statusFilter}>
+                  <SelectTrigger className='w-[150px]'>
+                    <SelectValue placeholder='wybierz' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='pending'>Oczekuje</SelectItem>
+                    <SelectItem value='approved'>Zatwierdzony</SelectItem>
+                    <SelectItem value='rejected'>Odrzucony</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>Termin</Label>
+                <DateTimePicker
+                  value={dateFilter}
+                  onChange={setDateFilter}
+                  hideTime
+                  renderTrigger={({ value, setOpen, open }) => (
+                    <DateTimeInput
+                      value={value}
+                      onChange={(x) => !open && setDateFilter(x)}
+                      format='dd/MM/yyyy'
+                      disabled={open}
+                      onCalendarClick={() => setOpen(!open)}
+                    />
+                  )}
+                />
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>Zlecono dn</Label>
+                <DateTimePicker
+                  value={requestedAtFilter}
+                  onChange={setRequestedAtFilter}
+                  hideTime
+                  renderTrigger={({ value, setOpen, open }) => (
+                    <DateTimeInput
+                      value={value}
+                      onChange={(x) => !open && setRequestedAtFilter(x)}
+                      format='dd/MM/yyyy'
+                      disabled={open}
+                      onCalendarClick={() => setOpen(!open)}
+                    />
+                  )}
+                />
+              </div>
+            </div>
 
-      <div className='flex flex-wrap gap-2'>
-        <Button
-          type='submit'
-          variant='secondary'
-          className='justify-start'
-          disabled={isPendingSearch}
-        >
-          {isPendingSearch ? (
-            <>
-              <Loader className={'animate-spin'} />{' '}
-              <span>{showFilters ? 'Szukaj' : 'Odśwież'}</span>
-            </>
-          ) : (
-            <>
-              {showFilters ? <Search /> : <RefreshCw />}{' '}
-              <span>{showFilters ? 'Szukaj' : 'Odśwież'}</span>
-            </>
-          )}
-        </Button>
-
-        {showFilters && (
-          <>
-            <Button
-              variant='destructive'
-              onClick={handleClearFilters}
-              title='Clear filters'
-            >
-              <CircleX /> <span>Wyczyść</span>
-            </Button>
-
-            {/* TODO: excel export api */}
-            {/* <Link
-              href={`/api/failures/lv/excel?${new URLSearchParams(
-                Object.entries({
-                  date: dateFilter?.toISOString(),
-                  requestedAt: requestedAtFilter?.toISOString(),
-                }).reduce(
-                  (acc, [key, value]) => {
-                    if (value) acc[key] = value;
-                    return acc;
-                  },
-                  {} as Record<string, string>,
-                ),
-              ).toString()}`}
-            >
-              <Button>
-                <Sheet /> <span>Export do Excel</span>
+            {/* Row 2: Action buttons */}
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                type='submit'
+                variant='secondary'
+                className='justify-start'
+                disabled={isPendingSearch}
+              >
+                {isPendingSearch ? (
+                  <>
+                    <Loader className='mr-1 animate-spin' size={16} />{' '}
+                    <span>Szukaj</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                  </>
+                )}
               </Button>
-            </Link> */}
-          </>
-        )}
-        {isGroupLeader && (
-          <Link href='/production-overtime/new-request'>
-            <Button variant={'outline'}>
-              <Plus /> <span>Nowe zlecenie</span>
-            </Button>
-          </Link>
-        )}
-      </div>
-    </form>
+
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleClearFilters}
+                title='Clear filters'
+                disabled={isPendingSearch}
+              >
+                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+              </Button>
+
+              {isGroupLeader && (
+                <Link href='/production-overtime/new-request'>
+                  <Button variant={'outline'}>
+                    <Plus className='mr-1' size={16} />{' '}
+                    <span>Nowe zlecenie</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      )}
+    </Card>
   );
 }

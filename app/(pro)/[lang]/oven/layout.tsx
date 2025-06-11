@@ -28,7 +28,7 @@ export default async function RootLayout(props: {
       // disableTransitionOnChange
     >
       <QueryProvider>
-        <div className='flex min-h-screen flex-col'>
+        <div className='flex min-h-screen flex-col space-y-1'>
           <Header />
           <main className='flex-1'>
             <div className='flex justify-center'>{children}</div>

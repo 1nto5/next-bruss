@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { overtimeRequestEmployeeType } from './lib/production-overtime-types';
-import { NewOvertimeRequestType } from './lib/production-overtime-zod';
+import { NewOvertimeRequestType } from './lib/zod';
 
 export async function revalidateProductionOvertime() {
   revalidateTag('production-overtime');

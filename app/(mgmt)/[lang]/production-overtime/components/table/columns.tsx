@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/cn';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -53,22 +53,30 @@ export const columns: ColumnDef<OvertimeType>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
+      let statusLabel;
 
-      return (
-        <div
-          className={cn(
-            status === 'pending' && 'animate-pulse font-bold text-red-500',
-            status === 'approved' && 'font-bold text-green-500',
-            status === 'rejected' && 'font-bold',
-            status === 'draft' && 'font-bold text-gray-500',
-          )}
-        >
-          {status === 'pending' && 'Oczekuje'}
-          {status === 'approved' && 'Zatwierdzony'}
-          {status === 'rejected' && 'Odrzucony'}
-          {status === 'draft' && 'Szkic'}
-        </div>
-      );
+      switch (status) {
+        case 'pending':
+          statusLabel = (
+            <Badge variant='statusPending' className='text-nowrap'>
+              Oczekuje
+            </Badge>
+          );
+          break;
+        case 'approved':
+          statusLabel = <Badge variant='statusApproved'>Zatwierdzony</Badge>;
+          break;
+        case 'rejected':
+          statusLabel = <Badge variant='statusRejected'>Odrzucony</Badge>;
+          break;
+        case 'draft':
+          statusLabel = <Badge variant='statusDraft'>Szkic</Badge>;
+          break;
+        default:
+          statusLabel = <Badge variant='outline'>{status}</Badge>;
+      }
+
+      return statusLabel;
     },
   },
   {

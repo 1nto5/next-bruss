@@ -38,17 +38,6 @@ export function ProcessesTable() {
     return `${minutes}m ${seconds}s`;
   };
 
-  const formatDateTime = (date: Date) => {
-    return new Intl.DateTimeFormat('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    }).format(date);
-  };
-
   const {
     data: ovenProcesses,
     error: processesError,
@@ -77,8 +66,6 @@ export function ProcessesTable() {
               <TableHead>Baking Time (min)</TableHead>
               <TableHead>Oven Number</TableHead>
               <TableHead>Operator</TableHead>
-              <TableHead>Start Time</TableHead>
-              <TableHead>End Time</TableHead>
               <TableHead>Time Remaining</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -172,28 +159,6 @@ export function ProcessesTable() {
                       : '-'}
                   </TableCell>
                   <TableCell
-                    className={`font-mono text-sm ${
-                      isTerminated
-                        ? 'text-gray-500'
-                        : isFinished
-                          ? 'font-semibold text-red-700'
-                          : ''
-                    }`}
-                  >
-                    {formatDateTime(startTime)}
-                  </TableCell>
-                  <TableCell
-                    className={`font-mono text-sm ${
-                      isTerminated
-                        ? 'text-gray-500'
-                        : isFinished
-                          ? 'font-semibold text-red-700'
-                          : ''
-                    }`}
-                  >
-                    {formatDateTime(endTime)}
-                  </TableCell>
-                  <TableCell
                     className={`font-mono ${
                       isTerminated
                         ? 'text-gray-500'
@@ -220,7 +185,7 @@ export function ProcessesTable() {
             {(!ovenProcesses || ovenProcesses.length === 0) && (
               <TableRow>
                 <TableCell
-                  colSpan={10}
+                  colSpan={8}
                   className='text-muted-foreground text-center'
                 >
                   No oven processes found

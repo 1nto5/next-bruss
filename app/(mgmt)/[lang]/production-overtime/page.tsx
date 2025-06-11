@@ -1,12 +1,10 @@
 // import { auth } from '@/auth';
 import { auth } from '@/auth';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { KeyRound, Plus } from 'lucide-react';
+import Link from 'next/link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -36,7 +34,7 @@ async function getOvertimeRequests(
   const res = await fetch(
     `${process.env.API}/production-overtime?${queryParams}`,
     {
-      next: { revalidate: 60, tags: ['production-overtime'] },
+      next: { revalidate: 0, tags: ['production-overtime'] },
     },
   );
 
@@ -90,12 +88,27 @@ export default async function ProductionOvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
-        </CardTitle>
-        <CardDescription>
-          Ostatnia synchronizacja: {fetchTimeLocaleString}
-        </CardDescription>
+        <div className='mb-4 flex items-center justify-between'>
+          {' '}
+          {/* Add flex container */}
+          <CardTitle>
+            Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
+          </CardTitle>
+          {/* Add the "Add Deviation" button here, conditionally rendered */}
+          {session ? (
+            <Link href='/production-overtime/new-request'>
+              <Button variant={'outline'}>
+                <Plus /> <span>Nowe zlecenie</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link href={`/auth?callbackUrl=/production-overtime`}>
+              <Button variant={'outline'}>
+                <KeyRound /> <span>Zaloguj się</span>
+              </Button>
+            </Link>
+          )}
+        </div>
         <TableFilteringAndOptions
           fetchTime={fetchTime}
           isGroupLeader={isGroupLeader}

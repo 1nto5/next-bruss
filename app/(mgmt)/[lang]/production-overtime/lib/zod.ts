@@ -60,3 +60,18 @@ export const NewOvertimeRequestSchema = z
   );
 
 export type NewOvertimeRequestType = z.infer<typeof NewOvertimeRequestSchema>;
+
+export const AttachmentFormSchema = z.object({
+  file: z
+    .instanceof(File, { message: 'Plik jest wymagany!' })
+    .refine((file) => file.size > 0, { message: 'Plik jest pusty!' })
+    .refine((file) => file.size <= 10 * 1024 * 1024, {
+      message: 'Plik jest za duży (max 10MB)',
+    }),
+  name: z
+    .string({ message: 'Nazwa jest wymagana!' })
+    .min(5, { message: 'Nazwa jest za krótka!' }),
+  note: z.string().optional(),
+});
+
+export type AttachmentFormType = z.infer<typeof AttachmentFormSchema>;

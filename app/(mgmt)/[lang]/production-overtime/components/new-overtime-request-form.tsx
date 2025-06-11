@@ -39,7 +39,7 @@ import {
   redirectToProductionOvertime as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
-import { NewOvertimeRequestSchema } from '../lib/production-overtime-zod';
+import { NewOvertimeRequestSchema } from '../lib/zod';
 
 export default function NewOvertimeRequestForm({
   employees,
