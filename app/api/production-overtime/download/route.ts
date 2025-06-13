@@ -15,13 +15,13 @@ export async function GET(req: NextRequest) {
 
     // Pobranie parametrów z URL
     const { searchParams } = new URL(req.url);
-    const deviationId = searchParams.get('deviationId');
+    const overTimeRequestId = searchParams.get('overTimeRequestId');
     const filename = searchParams.get('filename');
     // Ignorujemy customName, zawsze używając oryginalnej nazwy pliku
     // const customName = searchParams.get('name');
 
     // Walidacja parametrów
-    if (!deviationId || !filename) {
+    if (!overTimeRequestId || !filename) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 },
@@ -29,7 +29,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Konstruowanie ścieżki do pliku
-    const filePath = path.join(BASE_PATH, 'deviations', deviationId, filename);
+    const filePath = path.join(
+      BASE_PATH,
+      'production-overtime',
+      overTimeRequestId,
+      filename,
+    );
 
     // Sprawdzenie czy plik istnieje
     if (!fs.existsSync(filePath)) {

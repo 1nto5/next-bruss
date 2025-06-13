@@ -6,7 +6,7 @@ import { Locale } from '@/i18n.config';
 import { KeyRound, Plus } from 'lucide-react';
 import Link from 'next/link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
-import { columns } from './components/table/columns';
+import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { OvertimeType } from './lib/production-overtime-types';
 
@@ -117,10 +117,11 @@ export default async function ProductionOvertimePage(props: {
         />
       </CardHeader>
       <DataTable
-        columns={columns}
+        columns={createColumns}
         data={overtimeRequestsLocaleString}
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
+        session={session}
       />
     </Card>
   );

@@ -1,8 +1,16 @@
 import { EmployeeType } from '@/lib/types/employee-types';
 
+// Add or update the status options to include 'closed'
+export type OvertimeStatus =
+  | 'draft'
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'closed';
+
 export type OvertimeType = {
   _id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'draft';
+  status: OvertimeStatus;
   numberOfEmployees: number; // Number of employees in the order
   employeesWithScheduledDayOff: overtimeRequestEmployeeType[]; // Employees who want to take time off
   from: Date;
@@ -20,6 +28,17 @@ export type OvertimeType = {
   approvedAt?: Date;
   approvedBy?: string;
   approvedAtLocaleString?: string;
+  closedAt?: Date;
+  closedBy?: string;
+  attachments?: {
+    filename: string;
+    name?: string;
+    note?: string;
+    uploadedBy: string;
+    uploadedAt: Date;
+    size: number;
+    type: string;
+  }[];
 };
 
 export type overtimeRequestEmployeeType = EmployeeType & {

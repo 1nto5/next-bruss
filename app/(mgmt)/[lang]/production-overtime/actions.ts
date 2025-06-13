@@ -10,7 +10,13 @@ import { overtimeRequestEmployeeType } from './lib/production-overtime-types';
 import { NewOvertimeRequestType } from './lib/zod';
 
 export async function revalidateProductionOvertime() {
-  revalidateTag('production-overtime');
+  try {
+    revalidateTag('production-overtime');
+    return { success: true };
+  } catch (error) {
+    console.error('revalidateProductionOvertime error:', error);
+    return { error: (error as Error).message };
+  }
 }
 
 export async function revalidateProductionOvertimeRequest() {

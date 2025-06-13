@@ -7,7 +7,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Form,
@@ -20,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Paperclip, Upload } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { Session } from 'next-auth';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,9 +27,8 @@ import { toast } from 'sonner';
 import { revalidateProductionOvertime as revalidate } from '../actions';
 import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
 
-// Define attachment roles (can be imported from view.tsx or defined here)
+// Update the attachment roles to match the specified requirements
 const ATTACHMENT_ROLES = [
-  'team-leader',
   'group-leader',
   'production-manager',
   'plant-manager',
@@ -41,15 +39,17 @@ interface AddAttachmentDialogProps {
   overTimeRequestStatus: 'open' | 'in-progress' | 'closed';
   overTimeRequestOwner: string | undefined | null;
   session: Session | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export default function AddAttachmentDialog({
   overTimeRequestId,
-  overTimeRequestStatus,
   overTimeRequestOwner,
   session,
+  isOpen,
+  onOpenChange,
 }: AddAttachmentDialogProps) {
-  const [open, setOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,15 +75,14 @@ export default function AddAttachmentDialog({
     const userRoles = session?.user?.roles || [];
     const userEmail = session?.user?.email;
 
+    // Check if user is the request owner or has one of the allowed roles
     const canAddAttachment =
-      overTimeRequestStatus !== 'closed' &&
-      (userRoles.some((role) =>
+      userRoles.some((role) =>
         ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
-      ) ||
-        userEmail === overTimeRequestOwner);
+      ) || userEmail === overTimeRequestOwner;
 
     if (!canAddAttachment) {
-      toast.error('Nie masz uprawnień lub odchylenie jest zamknięte.');
+      toast.error('Nie masz uprawnień do dodania listy obecności.');
       return;
     }
 
@@ -93,7 +92,8 @@ export default function AddAttachmentDialog({
       return;
     }
 
-    setOpen(false);
+    onOpenChange(false);
+    setIsUploading(true);
 
     toast.promise(
       new Promise<void>(async (resolve, reject) => {
@@ -104,12 +104,27 @@ export default function AddAttachmentDialog({
           if (data.name) formData.append('name', data.name);
           if (data.note) formData.append('note', data.note);
 
-          const response = await fetch('/api/overTimeRequests/upload', {
+          console.log('Sending upload request with ID:', overTimeRequestId);
+
+          const response = await fetch('/api/production-overtime/upload', {
             method: 'POST',
             body: formData,
           });
 
-          const result = await response.json();
+          // For debugging, log the full response
+          const responseText = await response.text();
+          console.log('Upload response status:', response.status);
+          console.log('Upload response text:', responseText);
+
+          // Parse the response text as JSON
+          let result;
+          try {
+            result = JSON.parse(responseText);
+          } catch (e) {
+            console.error('Failed to parse response as JSON:', e);
+            reject(new Error('Nieprawidłowa odpowiedź z serwera'));
+            return;
+          }
 
           if (response.ok && result.success) {
             form.reset();
@@ -117,7 +132,8 @@ export default function AddAttachmentDialog({
               fileInputRef.current.value = '';
             }
 
-            revalidate();
+            // Ensure we revalidate the data
+            await revalidate();
             resolve();
           } else {
             const errorMap: { [key: string]: string } = {
@@ -148,32 +164,30 @@ export default function AddAttachmentDialog({
         } catch (error) {
           console.error('Upload error:', error);
           reject(new Error('Wystąpił błąd podczas wysyłania pliku'));
+        } finally {
+          setIsUploading(false);
         }
       }),
       {
-        loading: 'Przesyłanie załącznika...',
-        success: 'Załącznik dodany pomyślnie!',
+        loading: 'Przesyłanie listy obecności...',
+        success:
+          'Lista obecności dodana pomyślnie! Status zlecenia zmieniony na zamknięty.',
         error: (err) => err.message,
       },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant='outline'>
-          <Upload className='' />
-          Dodaj
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
-          <DialogTitle>Dodaj załącznik</DialogTitle>
+          <DialogTitle>Dodaj listę obecności</DialogTitle>
         </DialogHeader>
+        <div className='text-muted-foreground mb-4 text-sm'>
+          Dodanie listy obecności zmieni status zlecenia na zamknięty.
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            {/* <DialogScrollArea> */}
-            {/* <DialogFormWithScroll> */}
             <FormField
               control={form.control}
               name='file'
@@ -223,18 +237,9 @@ export default function AddAttachmentDialog({
                 </FormItem>
               )}
             />
-            {/* </DialogFormWithScroll> */}
-            {/* </DialogScrollArea> */}
             <DialogFooter className='mt-4'>
-              {/* <Button
-                variant='outline'
-                type='button'
-                onClick={() => setOpen(false)}
-              >
-                Anuluj
-              </Button> */}
               <Button type='submit' disabled={isUploading}>
-                <Paperclip className={isUploading ? 'animate-spin' : ''} />
+                <Paperclip className={isUploading ? 'animate-spin' : 'mr-2'} />
                 Dodaj załącznik
               </Button>
             </DialogFooter>

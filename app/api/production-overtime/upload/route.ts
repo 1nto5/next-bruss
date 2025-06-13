@@ -4,8 +4,6 @@ import fs from 'fs';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
-// Import the notification action
-import { notifyRejectorsAfterAttachment } from '@/app/(mgmt)/[lang]/deviations/actions';
 
 export const config = {
   api: {
@@ -54,7 +52,7 @@ export async function POST(req: NextRequest) {
     // Get form data
     const form = await req.formData();
     const file = form.get('file') as File | null;
-    const deviationId = form.get('deviationId') as string | null;
+    const overTimeRequestId = form.get('overTimeRequestId') as string | null;
     const name = form.get('name') as string | null;
     const note = form.get('note') as string | null;
 
@@ -62,8 +60,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No file' }, { status: 400 });
     }
 
-    if (!deviationId) {
-      return NextResponse.json({ error: 'No deviation ID' }, { status: 400 });
+    if (!overTimeRequestId) {
+      return NextResponse.json(
+        { error: 'No overTimeRequest ID' },
+        { status: 400 },
+      );
     }
 
     // Check file size
@@ -89,13 +90,17 @@ export async function POST(req: NextRequest) {
     // File processing
     const buf = Buffer.from(await file.arrayBuffer());
 
-    // Create folder for deviation
-    const deviationFolder = path.join(BASE_PATH, 'deviations', deviationId);
-    fs.mkdirSync(deviationFolder, { recursive: true });
+    // Create folder for overtime request
+    const overTimeRequestFolder = path.join(
+      BASE_PATH,
+      'production_overtime', // Changed from 'production-overtime' to 'production_overtime'
+      overTimeRequestId,
+    );
+    fs.mkdirSync(overTimeRequestFolder, { recursive: true });
 
     // Generate file name
     const fileName = `${file.name}`;
-    const filePath = path.join(deviationFolder, fileName);
+    const filePath = path.join(overTimeRequestFolder, fileName);
 
     // Check if file already exists
     if (fs.existsSync(filePath)) {
@@ -119,37 +124,73 @@ export async function POST(req: NextRequest) {
       type: file.type,
     };
 
-    // Database update
+    // Database update - now also changes status to 'closed'
     try {
-      const collection = await dbc('deviations');
+      const collection = await dbc('production_overtime');
+
+      // Convert the string ID to ObjectId
+      let objectId;
+      try {
+        objectId = new ObjectId(overTimeRequestId);
+      } catch (error) {
+        console.error('Error converting to ObjectId:', error);
+        return NextResponse.json(
+          { error: 'Invalid ObjectId format' },
+          { status: 400 },
+        );
+      }
+
+      // Find the document using ObjectId
+      const order = await collection.findOne({ _id: objectId });
+
+      if (!order) {
+        console.error('Order not found with ObjectId:', objectId.toString());
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      }
+
+      if (order.status !== 'approved') {
+        console.error('Order has incorrect status:', order.status);
+        return NextResponse.json(
+          { error: 'Order must be in approved status to add attachments' },
+          { status: 400 },
+        );
+      }
+
+      // Use ObjectId for the update operation
       const updateResult = await collection.updateOne(
-        { _id: new ObjectId(deviationId) },
+        { _id: objectId },
         {
           $push: {
             attachments: attachment,
           },
+          $set: {
+            status: 'closed',
+            closedAt: new Date(),
+            closedBy: session.user.email,
+          },
         },
       );
 
-      if (updateResult.modifiedCount === 0) {
+      if (updateResult.matchedCount === 0) {
+        console.error('No matching document found for update');
         return NextResponse.json(
-          { error: 'Failed to update deviation with attachment' },
+          { error: 'Order not found for update' },
+          { status: 404 },
+        );
+      }
+
+      if (updateResult.modifiedCount === 0) {
+        console.error('Document matched but not modified');
+        return NextResponse.json(
+          { error: 'Failed to update overTimeRequest with attachment' },
           { status: 500 },
         );
       }
 
-      // Trigger notification for rejectors (fire and forget, errors handled within the action)
-      notifyRejectorsAfterAttachment(deviationId).catch((err) => {
-        console.error(
-          `Error triggering notification after attachment upload for deviation ${deviationId}:`,
-          err,
-        );
-        // Optionally log this failure more formally if needed
-      });
-
       return NextResponse.json({
         success: true,
-        message: 'Attachment added successfully',
+        message:
+          'Attendance list added successfully and order marked as closed',
         attachment,
       });
     } catch (dbError) {

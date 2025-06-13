@@ -23,30 +23,36 @@ import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
-// import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
-// import { useEffect } from 'react';
-// import { revalidateFailures } from '../../actions';
+import { Session } from 'next-auth';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: (session: Session | null) => ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
+  session: Session | null;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  session,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
 
+  // Use the session to create the columns
+  const tableColumns = React.useMemo(
+    () => columns(session),
+    [columns, session],
+  );
+
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
