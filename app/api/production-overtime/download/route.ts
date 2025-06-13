@@ -1,5 +1,7 @@
 import { auth } from '@/auth';
+import { dbc } from '@/lib/mongo';
 import fs from 'fs';
+import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
@@ -7,45 +9,51 @@ const BASE_PATH = process.env.UPLOAD_BASE_PATH || './public';
 
 export async function GET(req: NextRequest) {
   try {
-    // Autoryzacja użytkownika
+    // Authorize user
     const session = await auth();
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Pobranie parametrów z URL
+    // Get parameters from URL
     const { searchParams } = new URL(req.url);
     const overTimeRequestId = searchParams.get('overTimeRequestId');
-    const filename = searchParams.get('filename');
-    // Ignorujemy customName, zawsze używając oryginalnej nazwy pliku
-    // const customName = searchParams.get('name');
 
-    // Walidacja parametrów
-    if (!overTimeRequestId || !filename) {
+    // Validate parameters
+    if (!overTimeRequestId) {
       return NextResponse.json(
         { error: 'Missing required parameters' },
         { status: 400 },
       );
     }
 
-    // Konstruowanie ścieżki do pliku
-    const filePath = path.join(
-      BASE_PATH,
-      'production-overtime',
-      overTimeRequestId,
-      filename,
-    );
+    // Get the attachment filename from the database
+    const collection = await dbc('production_overtime');
+    const objectId = new ObjectId(overTimeRequestId);
+    const order = await collection.findOne({ _id: objectId });
 
-    // Sprawdzenie czy plik istnieje
+    if (!order || !order.hasAttachment || !order.attachmentFilename) {
+      return NextResponse.json(
+        { error: 'No attachment found for this order' },
+        { status: 404 },
+      );
+    }
+
+    const filename = order.attachmentFilename;
+
+    // Construct path to file
+    const filePath = path.join(BASE_PATH, 'production_overtime', filename);
+
+    // Check if file exists
     if (!fs.existsSync(filePath)) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
-    // Odczytanie pliku
+    // Read file
     const fileBuffer = fs.readFileSync(filePath);
     const fileStats = fs.statSync(filePath);
 
-    // Określenie typu MIME na podstawie rozszerzenia pliku
+    // Determine MIME type based on file extension
     const ext = path.extname(filename).toLowerCase();
     const mimeTypes: Record<string, string> = {
       '.jpg': 'image/jpeg',
@@ -70,13 +78,13 @@ export async function GET(req: NextRequest) {
       '.rar': 'application/x-rar-compressed',
     };
 
-    // Użyj application/octet-stream jako domyślnego typu MIME, jeśli rozszerzenie nie jest znane
+    // Use application/octet-stream as default MIME type if extension is unknown
     const contentType = mimeTypes[ext] || 'application/octet-stream';
 
-    // Zawsze używamy oryginalnej nazwy pliku
-    const downloadFilename = filename;
+    // Format a user-friendly download filename
+    const downloadFilename = `lista_obecnosci_${overTimeRequestId}${ext}`;
 
-    // Przygotowanie odpowiedzi
+    // Prepare response
     const headers = new Headers();
     headers.set(
       'Content-Disposition',
@@ -86,7 +94,7 @@ export async function GET(req: NextRequest) {
     headers.set('Content-Length', fileStats.size.toString());
     headers.set('Cache-Control', 'no-cache');
 
-    // Utworzenie odpowiedzi z plikiem jako strumień bajtów
+    // Create response with file as byte stream
     return new NextResponse(fileBuffer, {
       status: 200,
       headers,

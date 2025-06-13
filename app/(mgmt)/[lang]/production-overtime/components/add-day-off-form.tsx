@@ -20,7 +20,7 @@ import {
   addEmployeeDayOff,
   redirectToProductionOvertimeDaysOff as redirect,
 } from '../actions';
-import { overtimeRequestEmployeeType } from '../lib/production-overtime-types';
+import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';
 
 const AddEmployeeSchema = z.object({

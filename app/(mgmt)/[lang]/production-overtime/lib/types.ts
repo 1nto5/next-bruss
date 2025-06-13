@@ -30,15 +30,7 @@ export type OvertimeType = {
   approvedAtLocaleString?: string;
   closedAt?: Date;
   closedBy?: string;
-  attachments?: {
-    filename: string;
-    name?: string;
-    note?: string;
-    uploadedBy: string;
-    uploadedAt: Date;
-    size: number;
-    type: string;
-  }[];
+  hasAttachment?: boolean;
 };
 
 export type overtimeRequestEmployeeType = EmployeeType & {

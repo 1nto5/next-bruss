@@ -1,9 +1,6 @@
 'use server';
 
-import {
-  overtimeRequestEmployeeType,
-  OvertimeType,
-} from './production-overtime-types';
+import { overtimeRequestEmployeeType, OvertimeType } from './types';
 
 export async function getOvertimeRequest(
   lang: string,

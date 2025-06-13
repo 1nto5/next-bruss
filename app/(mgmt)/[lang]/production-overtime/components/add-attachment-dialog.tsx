@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -17,7 +18,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Paperclip } from 'lucide-react';
 import { Session } from 'next-auth';
@@ -55,19 +55,12 @@ export default function AddAttachmentDialog({
 
   const form = useForm<AttachmentFormType>({
     resolver: zodResolver(AttachmentFormSchema),
-    defaultValues: {
-      name: '',
-      note: '',
-    },
+    defaultValues: {},
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       form.setValue('file', event.target.files[0], { shouldValidate: true });
-
-      const filename = event.target.files[0].name;
-      const nameWithoutExtension = filename.split('.').slice(0, -1).join('.');
-      form.setValue('name', nameWithoutExtension || filename);
     }
   };
 
@@ -101,8 +94,6 @@ export default function AddAttachmentDialog({
           const formData = new FormData();
           formData.append('file', data.file);
           formData.append('overTimeRequestId', overTimeRequestId);
-          if (data.name) formData.append('name', data.name);
-          if (data.note) formData.append('note', data.note);
 
           console.log('Sending upload request with ID:', overTimeRequestId);
 
@@ -183,9 +174,10 @@ export default function AddAttachmentDialog({
         <DialogHeader>
           <DialogTitle>Dodaj listę obecności</DialogTitle>
         </DialogHeader>
-        <div className='text-muted-foreground mb-4 text-sm'>
-          Dodanie listy obecności zmieni status zlecenia na zamknięty.
-        </div>
+        <DialogDescription>
+          Dodanie listy obecności jest równoznaczne z potwierdzeniem wykonania
+          zlecenia oraz zmiani jego statusu na zamknięty.
+        </DialogDescription>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -193,7 +185,7 @@ export default function AddAttachmentDialog({
               name='file'
               render={({ field: { onChange, value, ref, ...rest } }) => (
                 <FormItem>
-                  <FormLabel htmlFor='file'>Plik</FormLabel>
+                  <FormLabel htmlFor='file'>Lista obecności</FormLabel>
                   <FormControl>
                     <Input
                       id='file'
@@ -207,40 +199,10 @@ export default function AddAttachmentDialog({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor='name'>Nazwa</FormLabel>
-                  <FormControl>
-                    <Input
-                      id='name'
-                      placeholder='Własna nazwa pliku'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='note'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor='note'>Notatka</FormLabel>
-                  <FormControl>
-                    <Textarea id='note' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogFooter className='mt-4'>
               <Button type='submit' disabled={isUploading}>
                 <Paperclip className={isUploading ? 'animate-spin' : 'mr-2'} />
-                Dodaj załącznik
+                Dodaj listę obecności
               </Button>
             </DialogFooter>
           </form>

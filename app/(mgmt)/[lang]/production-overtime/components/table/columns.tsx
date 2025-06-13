@@ -27,7 +27,7 @@ import {
   approveOvertimeRequest as approve,
   deleteOvertimeRequestDraft as deleteDraft,
 } from '../../actions';
-import { OvertimeType } from '../../lib/production-overtime-types';
+import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
 
 const handleApprove = async (id: string, session: Session | null) => {
@@ -107,9 +107,6 @@ export const createColumns = (
       header: 'Akcje',
       cell: ({ row }) => {
         const request = row.original;
-        const hasAttachments =
-          request.attachments && request.attachments.length > 0;
-
         // State to control the attachment dialog
         const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] =
           useState(false);
@@ -168,24 +165,19 @@ export const createColumns = (
                   </DropdownMenuItem>
                 )}
 
-                {/* Download attachment button - show if attachments exist */}
-                {request._id &&
-                  hasAttachments &&
-                  request.attachments &&
-                  request.attachments[0] && (
-                    <Link
-                      href={`/api/production-overtime/download?overTimeRequestId=${request._id}&filename=${encodeURIComponent(
-                        request.attachments[0].filename,
-                      )}`}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                    >
-                      <DropdownMenuItem>
-                        <Download className='mr-2 h-4 w-4' />
-                        <span>Pobierz listę obecności</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
+                {/* Download attachment button - show if attachment exists */}
+                {request._id && request.hasAttachment && (
+                  <Link
+                    href={`/api/production-overtime/download?overTimeRequestId=${request._id}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    <DropdownMenuItem>
+                      <Download className='mr-2 h-4 w-4' />
+                      <span>Pobierz listę obecności</span>
+                    </DropdownMenuItem>
+                  </Link>
+                )}
 
                 {request.status === 'draft' && (
                   <DropdownMenuItem

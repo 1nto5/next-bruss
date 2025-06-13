@@ -22,7 +22,7 @@ import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { deleteDayOff } from '../../actions';
-import { overtimeRequestEmployeeType } from '../../lib/production-overtime-types';
+import { overtimeRequestEmployeeType } from '../../lib/types';
 
 const handleDeleteDayOff = async (
   overtimeId: string,

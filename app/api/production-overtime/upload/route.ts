@@ -7,7 +7,7 @@ import path from 'path';
 
 export const config = {
   api: {
-    bodyParser: false, // Disable the default body parser
+    bodyParser: false,
   },
 };
 
@@ -53,8 +53,6 @@ export async function POST(req: NextRequest) {
     const form = await req.formData();
     const file = form.get('file') as File | null;
     const overTimeRequestId = form.get('overTimeRequestId') as string | null;
-    const name = form.get('name') as string | null;
-    const note = form.get('note') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file' }, { status: 400 });
@@ -90,17 +88,16 @@ export async function POST(req: NextRequest) {
     // File processing
     const buf = Buffer.from(await file.arrayBuffer());
 
-    // Create folder for overtime request
-    const overTimeRequestFolder = path.join(
-      BASE_PATH,
-      'production_overtime', // Changed from 'production-overtime' to 'production_overtime'
-      overTimeRequestId,
-    );
-    fs.mkdirSync(overTimeRequestFolder, { recursive: true });
+    // Create base directory if it doesn't exist
+    const baseFolder = path.join(BASE_PATH, 'production_overtime');
+    fs.mkdirSync(baseFolder, { recursive: true });
 
-    // Generate file name
-    const fileName = `${file.name}`;
-    const filePath = path.join(overTimeRequestFolder, fileName);
+    // Get file extension
+    const fileExt = path.extname(file.name);
+
+    // Create filename with order ID - this ensures uniqueness
+    const fileName = `${overTimeRequestId}${fileExt}`;
+    const filePath = path.join(baseFolder, fileName);
 
     // Check if file already exists
     if (fs.existsSync(filePath)) {
@@ -113,18 +110,7 @@ export async function POST(req: NextRequest) {
     // Save file to disk
     fs.writeFileSync(filePath, buf);
 
-    // Prepare attachment data for database
-    const attachment = {
-      filename: fileName,
-      name: name,
-      note: note || undefined,
-      uploadedBy: session.user.email,
-      uploadedAt: new Date(),
-      size: file.size,
-      type: file.type,
-    };
-
-    // Database update - now also changes status to 'closed'
+    // Database update - now using a boolean flag instead of an array
     try {
       const collection = await dbc('production_overtime');
 
@@ -156,14 +142,13 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Use ObjectId for the update operation
+      // Update document with simplified properties
       const updateResult = await collection.updateOne(
         { _id: objectId },
         {
-          $push: {
-            attachments: attachment,
-          },
           $set: {
+            hasAttachment: true,
+            attachmentFilename: fileName,
             status: 'closed',
             closedAt: new Date(),
             closedBy: session.user.email,
@@ -191,7 +176,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message:
           'Attendance list added successfully and order marked as closed',
-        attachment,
+        filename: fileName,
       });
     } catch (dbError) {
       console.error('Database error:', dbError);
