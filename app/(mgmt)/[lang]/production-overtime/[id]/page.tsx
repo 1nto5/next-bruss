@@ -1,11 +1,6 @@
 // import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import { Table } from 'lucide-react';
 import Link from 'next/link';
@@ -38,7 +33,7 @@ export default async function ProductionOvertimePage(props: {
           </Link>
         </div>
 
-        <CardDescription>ID: {id}</CardDescription>
+        {/* <CardDescription>ID: {id}</CardDescription> */}
       </CardHeader>
 
       <DataTable
@@ -50,6 +45,7 @@ export default async function ProductionOvertimePage(props: {
           overtimeId: overtimeRequestLocaleString._id,
         }))}
         id={id}
+        status={overtimeRequestLocaleString.status}
       />
     </Card>
   );

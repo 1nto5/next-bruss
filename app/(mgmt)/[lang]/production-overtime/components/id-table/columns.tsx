@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useClientLocaleDateString } from '@/lib/client-date-utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -44,6 +45,8 @@ const handleDeleteDayOff = async (
         if (errorMsg === 'not found') return 'Nie znaleziono!';
         if (errorMsg === 'not found employee')
           return 'Pracownik nie znaleziony!';
+        if (errorMsg === 'invalid status')
+          return 'Status zlecenia nie pozwala na jego edycję!';
         console.error('handleDeleteDayOff', errorMsg);
         return 'Skontaktuj się z IT!';
       },
@@ -157,10 +160,8 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
     header: 'Data odbioru dnia wolnego',
     cell: ({ row }) => {
       const agreedReceivingAt = row.original.agreedReceivingAt;
-      if (!agreedReceivingAt) return <span>-</span>;
-
-      const date = new Date(agreedReceivingAt);
-      return <span>{date.toLocaleDateString()}</span>;
+      const formattedDate = useClientLocaleDateString(agreedReceivingAt);
+      return <span>{formattedDate}</span>;
     },
   },
   {

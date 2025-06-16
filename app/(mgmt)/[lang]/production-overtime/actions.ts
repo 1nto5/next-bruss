@@ -10,13 +10,7 @@ import { overtimeRequestEmployeeType } from './lib/types';
 import { NewOvertimeRequestType } from './lib/zod';
 
 export async function revalidateProductionOvertime() {
-  try {
-    revalidateTag('production-overtime');
-    return { success: true };
-  } catch (error) {
-    console.error('revalidateProductionOvertime error:', error);
-    return { error: (error as Error).message };
-  }
+  revalidateTag('production-overtime');
 }
 
 export async function revalidateProductionOvertimeRequest() {
@@ -169,8 +163,19 @@ export async function deleteDayOff(
       return { error: 'not found' };
     }
 
+    // Check if status allows modifications
+    if (
+      request.status === 'closed' ||
+      request.status === 'draft' ||
+      request.status === 'rejected'
+    ) {
+      return { error: 'invalid status' };
+    }
+
     if (
       request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('production-manager') &&
+      !session.user.roles?.includes('group-leader') &&
       !session.user.roles?.includes('plant-manager') &&
       !session.user.roles?.includes('hr')
     ) {

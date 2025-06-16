@@ -140,7 +140,6 @@ export default function TableFilteringAndOptions({
       {showFilters && (
         <CardContent className='p-4 pt-0'>
           <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
-            {/* Row 1: Status and dates */}
             <div className='flex flex-wrap items-end gap-4'>
               <div className='flex flex-col space-y-1'>
                 <Label>Status</Label>
@@ -152,6 +151,8 @@ export default function TableFilteringAndOptions({
                     <SelectItem value='pending'>Oczekuje</SelectItem>
                     <SelectItem value='approved'>Zatwierdzony</SelectItem>
                     <SelectItem value='rejected'>Odrzucony</SelectItem>
+                    <SelectItem value='closed'>Zamknięty</SelectItem>
+                    <SelectItem value='draft'>Szkic</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -173,7 +174,7 @@ export default function TableFilteringAndOptions({
                 />
               </div>
               <div className='flex flex-col space-y-1'>
-                <Label>Zlecono dn</Label>
+                <Label>Data dodania</Label>
                 <DateTimePicker
                   value={requestedAtFilter}
                   onChange={setRequestedAtFilter}

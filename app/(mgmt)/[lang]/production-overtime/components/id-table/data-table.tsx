@@ -30,21 +30,37 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   id: string;
+  status?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   id,
+  status,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
 
+  const shouldShowActions =
+    status &&
+    status !== 'closed' &&
+    status !== 'draft' &&
+    status !== 'rejected';
+
+  // Filter out the actions column if status doesn't allow it
+  const filteredColumns = React.useMemo(() => {
+    if (shouldShowActions) {
+      return columns;
+    }
+    return columns.filter((column) => column.id !== 'actions');
+  }, [columns, shouldShowActions]);
+
   const table = useReactTable({
     data,
-    columns,
+    columns: filteredColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -70,9 +86,16 @@ export function DataTable<TData, TValue>({
     (table.getColumn('firstName')?.getFilterValue() as string) || '';
   const lastNameFilter =
     (table.getColumn('lastName')?.getFilterValue() as string) || '';
-  const hasActiveFilters = firstNameFilter || lastNameFilter;
   const identifierFilter =
     (table.getColumn('identifier')?.getFilterValue() as string) || '';
+  const hasActiveFilters =
+    firstNameFilter || lastNameFilter || identifierFilter;
+
+  const shouldShowAddButton =
+    status &&
+    status !== 'closed' &&
+    status !== 'draft' &&
+    status !== 'rejected';
 
   return (
     <>
@@ -85,7 +108,7 @@ export function DataTable<TData, TValue>({
               onChange={(event) =>
                 table.getColumn('firstName')?.setFilterValue(event.target.value)
               }
-              className='max-w-sm'
+              className='w-[150px]'
             />
           </div>
           <div>
@@ -95,7 +118,7 @@ export function DataTable<TData, TValue>({
               onChange={(event) =>
                 table.getColumn('lastName')?.setFilterValue(event.target.value)
               }
-              className='max-w-sm'
+              className='w-[150px]'
             />
           </div>
           <div>
@@ -107,7 +130,7 @@ export function DataTable<TData, TValue>({
                   .getColumn('identifier')
                   ?.setFilterValue(event.target.value)
               }
-              className='max-w-sm'
+              className='w-[150px]'
             />
           </div>
           <div>
@@ -120,13 +143,15 @@ export function DataTable<TData, TValue>({
               <CircleX /> <span>Wyczyść</span>
             </Button>
           </div>
-          <div>
-            <Link href={`/production-overtime/${id}/add-day-off`}>
-              <Button variant='outline'>
-                <AlarmClockPlus /> <span>Dodaj odbiór</span>
-              </Button>
-            </Link>
-          </div>
+          {shouldShowAddButton && (
+            <div>
+              <Link href={`/production-overtime/${id}/add-day-off`}>
+                <Button variant='outline'>
+                  <AlarmClockPlus /> <span>Dodaj odbiór</span>
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className='rounded-md border'>

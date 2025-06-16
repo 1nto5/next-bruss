@@ -84,16 +84,16 @@ export const createColumns = (
             );
             break;
           case 'approved':
-            statusLabel = <Badge variant='statusApproved'>Zatwierdzony</Badge>;
+            statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
             break;
           case 'rejected':
-            statusLabel = <Badge variant='statusRejected'>Odrzucony</Badge>;
+            statusLabel = <Badge variant='statusRejected'>Odrzucone</Badge>;
             break;
           case 'draft':
             statusLabel = <Badge variant='statusDraft'>Szkic</Badge>;
             break;
           case 'closed':
-            statusLabel = <Badge variant='statusClosed'>Zamknięty</Badge>;
+            statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
             break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
