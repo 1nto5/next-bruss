@@ -12,6 +12,61 @@ interface GeneratePdfOptions {
   spacing?: number;
   codeType?: 'qr' | 'barcode' | 'dmc';
   orientation?: 'portrait' | 'landscape';
+  isCodeRange?: boolean;
+  rangeStart?: number;
+  rangeEnd?: number;
+}
+
+// Utility function to parse DMC code pattern and extract range
+export function parseDmcCodePattern(pattern: string): {
+  basePattern: string;
+  rangePattern: string;
+  rangeStart: number;
+  rangeEnd: number;
+} | null {
+  // Look for pattern like "P32402738#TPP0000000500#VEXRGA# (od 500 do 850)"
+  const rangeMatch = pattern.match(/\(od\s+(\d+)\s+do\s+(\d+)\)/);
+  const numberMatch = pattern.match(/(\d+)(?=#[^#]*#\s*\(od)/);
+
+  if (!rangeMatch || !numberMatch) {
+    return null;
+  }
+
+  const rangeStart = parseInt(rangeMatch[1]);
+  const rangeEnd = parseInt(rangeMatch[2]);
+  const currentNumber = numberMatch[1];
+
+  // Create base pattern by replacing the number with a placeholder
+  const basePattern = pattern
+    .replace(currentNumber, '{NUMBER}')
+    .replace(/\s*\(od\s+\d+\s+do\s+\d+\)/, '');
+
+  return {
+    basePattern,
+    rangePattern: currentNumber,
+    rangeStart,
+    rangeEnd,
+  };
+}
+
+// Generate all codes in range
+export function generateDmcCodeRange(pattern: string): string[] {
+  const parsed = parseDmcCodePattern(pattern);
+  if (!parsed) {
+    return [pattern]; // Return original if can't parse
+  }
+
+  const codes: string[] = [];
+  const { basePattern, rangeStart, rangeEnd, rangePattern } = parsed;
+  const paddingLength = rangePattern.length;
+
+  for (let i = rangeStart; i <= rangeEnd; i++) {
+    const paddedNumber = i.toString().padStart(paddingLength, '0');
+    const code = basePattern.replace('{NUMBER}', paddedNumber);
+    codes.push(code);
+  }
+
+  return codes;
 }
 
 export async function codesPdfGenerator({
@@ -23,8 +78,17 @@ export async function codesPdfGenerator({
   spacing,
   codeType = 'qr',
   orientation = 'portrait',
+  isCodeRange = false,
+  rangeStart,
+  rangeEnd,
 }: GeneratePdfOptions): Promise<void> {
   let format: any = pageSize;
+  let processedItems = items;
+
+  // Handle DMC code range generation
+  if (codeType === 'dmc' && isCodeRange && items.length === 1) {
+    processedItems = generateDmcCodeRange(items[0]);
+  }
 
   // Special handling for DMC - fixed 15x15 mm size
   if (codeType === 'dmc') {
@@ -44,7 +108,7 @@ export async function codesPdfGenerator({
   });
 
   doc.setProperties({
-    title: title,
+    title: `${title} (${processedItems.length} codes)`,
     subject:
       codeType === 'qr'
         ? 'QR Codes'
@@ -93,8 +157,8 @@ export async function codesPdfGenerator({
 
   const barcodeSize = defaultBarcodeSizes[pageSize];
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
+  for (let i = 0; i < processedItems.length; i++) {
+    const item = processedItems[i];
     const cleanedItem = item.replace(/\s+/g, '').trim();
 
     if (i > 0) {
@@ -220,6 +284,8 @@ export async function codesPdfGenerator({
   const codeTypeText =
     codeType === 'qr' ? 'QR' : codeType === 'barcode' ? 'Barcode' : 'DMC';
   const orientationText = orientation === 'portrait' ? 'P' : 'L';
-  const fileName = `${pageSize}-${orientationText}-${codeTypeText}-${title.replace(/\s+/g, '-')}`;
+  const quantityText =
+    processedItems.length > 1 ? `-${processedItems.length}szt` : '';
+  const fileName = `${pageSize}-${orientationText}-${codeTypeText}-${title.replace(/\s+/g, '-')}${quantityText}`;
   doc.save(`${fileName}.pdf`);
 }

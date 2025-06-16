@@ -76,9 +76,9 @@ export const plHeaderRoutes: HeaderRoute[] = [
     submenu: [
       {
         href: ROUTE_PATHS.codesGenerator,
-        title: 'Generator QR/Barcode',
+        title: 'Generator QR/Barcode/DMC',
         description:
-          'Generowanie plików PDF dla kodów QR oraz kodów kreskowych.',
+          'Generowanie plików PDF dla kodów QR, kodów kreskowych oraz kodów DMC.',
       },
     ],
   },
