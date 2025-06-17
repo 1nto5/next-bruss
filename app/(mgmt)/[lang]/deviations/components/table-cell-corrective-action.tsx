@@ -297,7 +297,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
       </TableCell>
       <TableCell>{correctiveAction.description}</TableCell>
 
-      <TableCell>
+      <TableCell className='whitespace-nowrap'>
         {extractNameFromEmail(correctiveAction.responsible)}
       </TableCell>
       <TableCell>
