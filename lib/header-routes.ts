@@ -24,6 +24,7 @@ export const ROUTE_PATHS = {
   adminReworkMany: '/admin/rework-many',
   productionOvertime: '/production-overtime',
   codesGenerator: '/codes-generator',
+  projects: '/projects',
 };
 
 export const plHeaderRoutes: HeaderRoute[] = [
@@ -127,6 +128,10 @@ export const adminHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.adminReworkMany,
         title: 'DMCheck rework many',
+      },
+      {
+        href: ROUTE_PATHS.projects,
+        title: 'Projects',
       },
     ],
   },
