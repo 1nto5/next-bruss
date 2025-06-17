@@ -8,10 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader, RefreshCw, Search } from 'lucide-react';
+import { Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateProjects as revalidate } from '../../actions';
 
 export default function TableFilteringAndOptions({
   fetchTime,
@@ -71,68 +70,64 @@ export default function TableFilteringAndOptions({
     if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
       router.push(newUrl);
-    } else {
-      setIsPendingSearch(true);
-      revalidate();
     }
   };
 
-  // Determine if filters differ from defaults.
-  const isFiltered = yearFilter !== defaultYear || monthFilter !== defaultMonth;
+  // Check if current filters differ from URL params
+  const currentYearParam = searchParams?.get('year');
+  const currentMonthParam = searchParams?.get('month');
+  const hasFilterChanges =
+    yearFilter.toString() !== (currentYearParam || defaultYear.toString()) ||
+    monthFilter.toString() !== (currentMonthParam || defaultMonth.toString());
 
   return (
     <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-      <div className='flex items-center space-x-2'>
-        <div className='flex gap-2'>
-          <Select
-            value={monthFilter.toString()}
-            onValueChange={(value) => setMonthFilter(parseInt(value, 10))}
-          >
-            <SelectTrigger className='w-[140px]'>
-              <SelectValue placeholder='Select month' />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={month.value.toString()}>
-                  {month.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={yearFilter.toString()}
-            onValueChange={(value) => setYearFilter(parseInt(value, 10))}
-          >
-            <SelectTrigger className='w-[140px]'>
-              <SelectValue placeholder='Select year' />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className='flex flex-wrap gap-2'>
+      <div className='flex items-center gap-2'>
+        <Select
+          value={monthFilter.toString()}
+          onValueChange={(value) => setMonthFilter(parseInt(value, 10))}
+        >
+          <SelectTrigger className='w-[140px]'>
+            <SelectValue placeholder='Select month' />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((month) => (
+              <SelectItem key={month.value} value={month.value.toString()}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={yearFilter.toString()}
+          onValueChange={(value) => setYearFilter(parseInt(value, 10))}
+        >
+          <SelectTrigger className='w-[140px]'>
+            <SelectValue placeholder='Select year' />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Button
           type='submit'
           variant='secondary'
           className='justify-start'
-          disabled={isPendingSearch}
+          disabled={isPendingSearch || !hasFilterChanges}
         >
           {isPendingSearch ? (
             <>
-              <Loader className='animate-spin' />{' '}
-              <span>{isFiltered ? 'Search' : 'Refresh'}</span>
+              <Loader className='animate-spin' />
+              <span>Searching...</span>
             </>
           ) : (
             <>
-              {isFiltered ? <Search /> : <RefreshCw />}{' '}
-              <span>{isFiltered ? 'Search' : 'Refresh'}</span>
+              <Search />
+              <span>Search</span>
             </>
           )}
         </Button>
