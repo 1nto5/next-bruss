@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { ProjectsType } from './lib/projects-zod';
+import { ProjectsType } from './lib/zod';
 
 export async function revalidateProjects() {
   revalidateTag('projects');
