@@ -30,7 +30,7 @@ import {
   insertProjectsEntry as insert,
   redirectToProjects as redirect,
 } from '../../actions';
-import { ProjectsSchema } from '../../lib/projects-zod';
+import { ProjectsSchema } from '../../lib/zod';
 
 export default function NewEntryForm({}: {}) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
