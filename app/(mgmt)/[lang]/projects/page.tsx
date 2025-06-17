@@ -9,8 +9,8 @@ import { Locale } from '@/i18n.config';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { ProjectsLocaleStringType } from './lib/projects-types';
-import { ProjectsType } from './lib/projects-zod';
+import { ProjectsLocaleStringType } from './lib/types';
+import { ProjectsType } from './lib/zod';
 
 async function getProjects(
   lang: string,
