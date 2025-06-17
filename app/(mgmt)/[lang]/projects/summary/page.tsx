@@ -1,16 +1,12 @@
 // import { auth } from '@/auth';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import { Table } from 'lucide-react';
 import Link from 'next/link';
-import { ProjectsLocaleStringType } from '../lib/projects-types';
-import { ProjectsType } from '../lib/projects-zod';
+import { ProjectsLocaleStringType } from '../lib/types';
+import { ProjectsType } from '../lib/zod';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -33,7 +29,7 @@ async function getMonthlyProjectsSummary(
   const res = await fetch(
     `${process.env.API}/projects/summary?${queryParams}`,
     {
-      next: { revalidate: 60, tags: ['projects'] },
+      next: { revalidate: 0, tags: ['projects'] },
     },
   );
 
@@ -71,15 +67,17 @@ export default async function ProductionOvertimePage(props: {
   ({ fetchTime, fetchTimeLocaleString, dataLocaleString } =
     await getMonthlyProjectsSummary(lang, searchParams));
 
+  // Calculate total hours
+  const totalHours = dataLocaleString.reduce((sum, project) => {
+    return sum + (Number(project.time) || 0);
+  }, 0);
+
   return (
     <Card>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <div>
             <CardTitle>Monthly Summary - Adrian&apos;s Projects</CardTitle>
-            <CardDescription>
-              Last synchronization: {fetchTimeLocaleString}
-            </CardDescription>
           </div>
           <Link href='/projects'>
             <Button variant='outline'>
@@ -88,6 +86,9 @@ export default async function ProductionOvertimePage(props: {
           </Link>
         </div>
         <TableFilteringAndOptions fetchTime={fetchTime} />
+        <Alert>
+          <AlertTitle>Total in selected month: {totalHours}h</AlertTitle>
+        </Alert>
       </CardHeader>
       <DataTable
         columns={columns}
