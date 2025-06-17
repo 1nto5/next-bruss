@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 
-import { ProjectsLocaleStringType } from '../../lib/projects-types';
+import { ProjectsLocaleStringType } from '../../lib/types';
 
 export const columns: ColumnDef<ProjectsLocaleStringType>[] = [
   // {
