@@ -236,7 +236,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'approved',
-      header: 'Zatwierdzony',
+      header: 'Data zatwierdzenia',
       cell: ({ row }) => {
         const approvedAtLocaleString = row.original.approvedAtLocaleString;
         return (
@@ -253,6 +253,19 @@ export const createColumns = (
     {
       accessorKey: 'toLocaleString',
       header: 'Do',
+    },
+    {
+      id: 'totalHours',
+      header: 'Liczba godzin',
+      cell: ({ row }) => {
+        const fromDate = new Date(row.original.from);
+        const toDate = new Date(row.original.to);
+        const totalHours =
+          Math.round(
+            ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60)) * 100,
+          ) / 100;
+        return <div>{totalHours > 0 ? `${totalHours}h` : '-'}</div>;
+      },
     },
     {
       accessorKey: 'numberOfEmployees',
@@ -288,11 +301,11 @@ export const createColumns = (
     },
     {
       accessorKey: 'requestedAtLocaleString',
-      header: 'Zlecenie wystawione',
+      header: 'Data wystawienia',
     },
     {
       accessorKey: 'requestedBy',
-      header: 'Wystawił',
+      header: 'Wystawione przez',
       cell: ({ row }) => {
         const requestedBy = row.getValue('requestedBy');
         return (
@@ -303,8 +316,44 @@ export const createColumns = (
       },
     },
     {
+      accessorKey: 'editedBy',
+      header: 'Zmodyfikowane przez',
+      cell: ({ row }) => {
+        const editedBy = row.original.editedBy;
+        return (
+          <div className='whitespace-nowrap'>
+            {editedBy ? extractNameFromEmail(editedBy) : '-'}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: 'editedAtLocaleString',
-      header: 'Ostatnia zmiana',
+      header: 'Data modyfikacji',
+    },
+    {
+      accessorKey: 'canceledBy',
+      header: 'Anulowane przez',
+      cell: ({ row }) => {
+        const canceledBy = row.original.canceledBy;
+        return (
+          <div className='whitespace-nowrap'>
+            {canceledBy ? extractNameFromEmail(canceledBy) : '-'}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'canceledAtLocaleString',
+      header: 'Data anulowania',
+      cell: ({ row }) => {
+        const canceledAtLocaleString = row.original.canceledAtLocaleString;
+        return (
+          <div>
+            {canceledAtLocaleString ? `${canceledAtLocaleString}` : '-'}
+          </div>
+        );
+      },
     },
   ];
 };
