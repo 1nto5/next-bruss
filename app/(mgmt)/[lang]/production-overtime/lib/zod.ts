@@ -57,6 +57,23 @@ export const NewOvertimeRequestSchema = z
         'Liczba pracowników odbierających nie może przekroczyć łącznej liczby pracowników!',
       path: ['employeesWithScheduledDayOff'],
     },
+  )
+  .refine(
+    (data) => {
+      // Calculate duration in hours
+      const durationMs = data.to.getTime() - data.from.getTime();
+      const durationHours = durationMs / (1000 * 60 * 60);
+
+      // Check if it's a whole number or has .5 decimal
+      const isWholeOrHalf = durationHours % 0.5 === 0;
+
+      return isWholeOrHalf;
+    },
+    {
+      message:
+        'Czas pracy musi być wyrażony w pełnych godzinach lub z dokładnością do pół godziny',
+      path: ['to'], // Show error on the 'to' field
+    },
   );
 
 export type NewOvertimeRequestType = z.infer<typeof NewOvertimeRequestSchema>;
