@@ -1,12 +1,7 @@
 import { EmployeeType } from '@/lib/types/employee-types';
 
 // Add or update the status options to include 'closed'
-export type OvertimeStatus =
-  | 'draft'
-  | 'pending'
-  | 'approved'
-  | 'rejected'
-  | 'closed';
+export type OvertimeStatus = 'pending' | 'approved' | 'canceled' | 'closed';
 
 export type OvertimeType = {
   _id: string;

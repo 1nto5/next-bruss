@@ -47,7 +47,6 @@ export default function NewOvertimeRequestForm({
   employees: EmployeeType[];
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
-  const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
 
   const today = new Date();
   const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
@@ -328,16 +327,14 @@ export default function NewOvertimeRequestForm({
               <CircleX className='' />
               Wyczyść
             </Button>
-            <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
-              <Button
-                type='submit'
-                className='w-full sm:w-auto'
-                disabled={isPendingInsert}
-              >
-                <Plus className={isPendingInsert ? 'animate-spin' : ''} />
-                Dodaj zlecenie
-              </Button>
-            </div>
+            <Button
+              type='submit'
+              className='w-full sm:w-auto'
+              disabled={isPendingInsert}
+            >
+              <Plus className={isPendingInsert ? 'animate-spin' : ''} />
+              Dodaj zlecenie
+            </Button>
           </CardFooter>
         </form>
       </Form>

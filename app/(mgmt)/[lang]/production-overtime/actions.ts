@@ -25,56 +25,19 @@ export async function redirectToProductionOvertimeDaysOff(id: string) {
   redirect(`/production-overtime/${id}`);
 }
 
-export async function deleteOvertimeRequestDraft(id: string) {
-  const session = await auth();
-  if (!session || !session.user?.email) {
-    return { error: 'unauthorized' };
-  }
-  console.log('deleteOvertimeRequestDraft', id);
-  try {
-    const coll = await dbc('production_overtime');
-
-    const request = await coll.findOne({ _id: new ObjectId(id) });
-
-    if (!request) {
-      console.log('not found');
-      return { error: 'not found' };
-    }
-
-    if (request.status !== 'draft') {
-      console.log('not draft');
-      return { error: 'not draft' };
-    }
-
-    if (request.requestedBy !== session.user?.email) {
-      console.log('unauthorized');
-      return { error: 'unauthorized' };
-    }
-
-    const res = await coll.deleteOne({ _id: new ObjectId(id) });
-    if (res) {
-      revalidateProductionOvertime();
-      return { success: 'deleted' };
-    }
-  } catch (error) {
-    console.error(error);
-    throw new Error('deleteDraftOvertimeRequest server action error');
-  }
-}
-
 async function sendEmailNotificationToRequestor(email: string, id: string) {
   const mailOptions = {
     to: email,
     subject:
       'Zatwierdzone zlecanie wykonania pracy w godzinach nadliczbowych - produkcja',
     html: `<div style="font-family: sans-serif;">
-          <p style="padding-bottom: 20px;">Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
+          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
+          <p>
           <a href="${process.env.APP_URL}/production-overtime/${id}" 
-             style="background-color: #4CAF50; color: white; padding: 10px 15px; 
-             text-align: center; text-decoration: none; display: inline-block; 
-             border-radius: 4px; font-weight: bold; margin-top: 10px;">
+             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
             Otwórz zlecenie
           </a>
+          </p>
         </div>`,
   };
   await mailer(mailOptions);
@@ -164,11 +127,7 @@ export async function deleteDayOff(
     }
 
     // Check if status allows modifications
-    if (
-      request.status === 'closed' ||
-      request.status === 'draft' ||
-      request.status === 'rejected'
-    ) {
+    if (request.status === 'closed' || request.status === 'rejected') {
       return { error: 'invalid status' };
     }
 
@@ -312,5 +271,63 @@ export async function addEmployeeDayOff(
   } catch (error) {
     console.error(error);
     return { error: 'addEmployeeDayOff server action error' };
+  }
+}
+
+export async function cancelOvertimeRequest(id: string) {
+  console.log('cancelOvertimeRequest', id);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('production_overtime');
+
+    // First check if the request exists and get its current status
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Don't allow canceling if status is completed, closed, or already canceled
+    if (
+      request.status === 'completed' ||
+      request.status === 'closed' ||
+      request.status === 'canceled'
+    ) {
+      return { error: 'cannot cancel' };
+    }
+
+    // Check if user has permission to cancel (requestor or plant manager)
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('plant-manager')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: 'canceled',
+          canceledAt: new Date(),
+          canceledBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateProductionOvertime();
+    return { success: 'canceled' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'cancelOvertimeRequest server action error' };
   }
 }

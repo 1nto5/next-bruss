@@ -16,19 +16,16 @@ import {
   Download,
   MoreHorizontal,
   Paperclip,
-  Pencil,
-  Trash2,
+  X,
 } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import {
-  approveOvertimeRequest as approve,
-  deleteOvertimeRequestDraft as deleteDraft,
-} from '../../actions';
+import { approveOvertimeRequest as approve } from '../../actions';
 import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
+import CancelRequestDialog from '../cancel-request-dialog';
 
 const handleApprove = async (id: string, session: Session | null) => {
   // Check if user has plant-manager role
@@ -86,11 +83,8 @@ export const createColumns = (
           case 'approved':
             statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
             break;
-          case 'rejected':
-            statusLabel = <Badge variant='statusRejected'>Odrzucone</Badge>;
-            break;
-          case 'draft':
-            statusLabel = <Badge variant='statusDraft'>Szkic</Badge>;
+          case 'canceled':
+            statusLabel = <Badge variant='statusRejected'>Anulowane</Badge>;
             break;
           case 'closed':
             statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
@@ -110,6 +104,30 @@ export const createColumns = (
         // State to control the attachment dialog
         const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] =
           useState(false);
+        // State to control the cancel dialog
+        const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+
+        // Check if user can cancel the request
+        const canCancel =
+          request._id &&
+          request.status !== 'closed' &&
+          request.status !== 'canceled' &&
+          (request.requestedBy === session?.user?.email || isPlantManager);
+
+        // Check if there are any actions available
+        const hasOvertimePickupAction = request.status !== 'canceled';
+        const hasApproveAction = isPlantManager && request.status === 'pending'; // Only pending requests can be approved
+        const hasAddAttachmentAction =
+          request._id && request.status === 'approved';
+        const hasDownloadAttachmentAction =
+          request._id && request.hasAttachment;
+
+        const hasActions =
+          hasOvertimePickupAction ||
+          hasApproveAction ||
+          canCancel ||
+          hasAddAttachmentAction ||
+          hasDownloadAttachmentAction;
 
         return (
           <>
@@ -120,15 +138,7 @@ export const createColumns = (
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
-                {request.status === 'draft' && (
-                  <Link href={`/production-overtime/edit/${request._id}`}>
-                    <DropdownMenuItem>
-                      <Pencil className='mr-2 h-4 w-4' />
-                      <span>Edytuj</span>
-                    </DropdownMenuItem>
-                  </Link>
-                )}
-                {request.status !== 'draft' && (
+                {request.status !== 'canceled' && (
                   <>
                     <Link href={`/production-overtime/${request._id}`}>
                       <DropdownMenuItem>
@@ -150,6 +160,20 @@ export const createColumns = (
                         </DropdownMenuItem>
                       )}
                   </>
+                )}
+
+                {/* Cancel button - show for non-completed requests */}
+                {canCancel && (
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsCancelDialogOpen(true);
+                    }}
+                    className='focus:bg-red-400 dark:focus:bg-red-700'
+                  >
+                    <X className='mr-2 h-4 w-4' />
+                    <span>Anuluj zlecenie</span>
+                  </DropdownMenuItem>
                 )}
 
                 {/* Add attachment button - only for approved orders */}
@@ -179,13 +203,10 @@ export const createColumns = (
                   </Link>
                 )}
 
-                {request.status === 'draft' && (
-                  <DropdownMenuItem
-                    onClick={() => request._id && deleteDraft(request._id)}
-                    className='focus:bg-red-400 dark:focus:bg-red-700'
-                  >
-                    <Trash2 className='mr-2 h-4 w-4' />
-                    <span>Usuń</span>
+                {/* Show "No Action" when no actions are available */}
+                {!hasActions && (
+                  <DropdownMenuItem disabled>
+                    <span>Brak akcji</span>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -193,14 +214,21 @@ export const createColumns = (
 
             {/* Dialog outside of DropdownMenuContent */}
             {request._id && (
-              <AddAttachmentDialog
-                overTimeRequestId={request._id}
-                overTimeRequestStatus='open'
-                overTimeRequestOwner={request.requestedBy}
-                session={session}
-                isOpen={isAttachmentDialogOpen}
-                onOpenChange={setIsAttachmentDialogOpen}
-              />
+              <>
+                <AddAttachmentDialog
+                  overTimeRequestId={request._id}
+                  overTimeRequestStatus='open'
+                  overTimeRequestOwner={request.requestedBy}
+                  session={session}
+                  isOpen={isAttachmentDialogOpen}
+                  onOpenChange={setIsAttachmentDialogOpen}
+                />
+                <CancelRequestDialog
+                  isOpen={isCancelDialogOpen}
+                  onOpenChange={setIsCancelDialogOpen}
+                  requestId={request._id}
+                />
+              </>
             )}
           </>
         );
