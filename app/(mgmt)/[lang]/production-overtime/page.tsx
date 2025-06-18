@@ -58,6 +58,9 @@ async function getOvertimeRequests(
         approvedAtLocaleString: overtimeRequest.approvedAt
           ? new Date(overtimeRequest.approvedAt).toLocaleString(lang)
           : undefined,
+        canceledAtLocaleString: overtimeRequest.canceledAt
+          ? new Date(overtimeRequest.canceledAt).toLocaleString(lang)
+          : undefined,
         requestedAtLocaleString: new Date(
           overtimeRequest.requestedAt,
         ).toLocaleString(lang),
