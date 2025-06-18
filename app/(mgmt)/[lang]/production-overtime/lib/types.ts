@@ -23,6 +23,9 @@ export type OvertimeType = {
   approvedAt?: Date;
   approvedBy?: string;
   approvedAtLocaleString?: string;
+  canceledAt?: Date;
+  canceledBy?: string;
+  canceledAtLocaleString?: string;
   closedAt?: Date;
   closedBy?: string;
   hasAttachment?: boolean;
