@@ -74,12 +74,13 @@ export default function PositionEdit() {
   const [selectedArticle, setSelectedArticle] = useState<any>();
   const [selectedBin, setSelectedBin] = useState<any>();
   const [identifier, setIdentifier] = useState('');
-  const isSpecialSector = [
-    'guma',
-    's900',
-    's2-powlekanie',
-    'sedia-granulaty',
-  ].includes(sector);
+  // const isSpecialSector = [
+  //  'guma',
+  //   's900',
+  //   's2-powlekanie',
+  //   'sedia-granulaty',
+  // ].includes(sector);
+  const isSpecialSector = ['s900'].includes(sector);
   const [accordionValue, setAccordionValue] = useState(
     isSpecialSector ? 'storage-delivery' : '',
   );
@@ -129,7 +130,7 @@ export default function PositionEdit() {
           }
 
           // Fix for storage bin display - fetch bin data if available
-          if (data.success.bin) {
+          if (data.success.bin && data.success.bin.trim() !== '') {
             const binRes = await findBins(data.success.bin);
             if (binRes.success && binRes.success.length > 0) {
               setFoundBins(binRes.success);
@@ -140,9 +141,8 @@ export default function PositionEdit() {
               setSelectedBin(matchingBin || binRes.success[0]);
               setFindBinMessage('success');
             }
+            form.setValue('bin', data.success.bin);
           }
-
-          form.setValue('bin', data?.success.bin);
         }
       }
     };
@@ -728,7 +728,7 @@ export default function PositionEdit() {
                 {isPending ? (
                   <Button disabled type='button' className='w-full'>
                     <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                    Zapisywanie
+                    Zapisz
                   </Button>
                 ) : (
                   <Button
