@@ -163,16 +163,19 @@ export function DateTimePicker({
   const [monthYearPicker, setMonthYearPicker] = useState<
     'month' | 'year' | false
   >(false);
+
+  // Only initialize with value if present, otherwise undefined
   const initDate = useMemo(
-    () => new TZDate(value || new Date(), timezone),
+    () => (value ? new TZDate(value, timezone) : undefined),
     [value, timezone],
   );
 
-  const [month, setMonth] = useState<Date>(initDate);
-  const [date, setDate] = useState<Date>(initDate);
+  // If value is undefined, month and date are undefined until user picks
+  const [month, setMonth] = useState<Date | undefined>(initDate);
+  const [date, setDate] = useState<Date | undefined>(initDate);
 
   const endMonth = useMemo(() => {
-    return setYear(month, getYear(month) + 1);
+    return month ? setYear(month, getYear(month) + 1) : undefined;
   }, [month]);
   const minDate = useMemo(
     () => (min ? new TZDate(min, timezone) : undefined),
@@ -185,7 +188,11 @@ export function DateTimePicker({
 
   const onDayChanged = useCallback(
     (d: Date) => {
-      d.setHours(date.getHours(), date.getMinutes(), date.getSeconds());
+      d.setHours(
+        date?.getHours() ?? 0,
+        date?.getMinutes() ?? 0,
+        date?.getSeconds() ?? 0,
+      );
       if (min && d < min) {
         d.setHours(min.getHours(), min.getMinutes(), min.getSeconds());
       }
@@ -200,11 +207,13 @@ export function DateTimePicker({
         setOpen(false);
       }
     },
-    [setDate, onChange, hideTime, setOpen, min, max],
+    [setDate, onChange, hideTime, setOpen, min, max, date],
   );
   const onSubmit = useCallback(() => {
-    onChange(new Date(date));
-    setOpen(false);
+    if (date) {
+      onChange(new Date(date));
+      setOpen(false);
+    }
   }, [date, onChange]);
 
   const onMonthYearChanged = useCallback(
@@ -219,10 +228,10 @@ export function DateTimePicker({
     [setMonth, setMonthYearPicker],
   );
   const onNextMonth = useCallback(() => {
-    setMonth(addMonths(month, 1));
+    if (month) setMonth(addMonths(month, 1));
   }, [month]);
   const onPrevMonth = useCallback(() => {
-    setMonth(subMonths(month, 1));
+    if (month) setMonth(subMonths(month, 1));
   }, [month]);
 
   useEffect(() => {
@@ -233,10 +242,11 @@ export function DateTimePicker({
     }
   }, [open, initDate]);
 
+  // Only show a value if one is selected, otherwise undefined
   const displayValue = useMemo(() => {
-    if (!open && !value) return value;
+    if (!open && !value) return undefined;
     return open ? date : initDate;
-  }, [date, value, open]);
+  }, [date, value, open, initDate]);
 
   const dislayFormat = useMemo(() => {
     if (!displayValue) return 'Pick a date';
@@ -306,7 +316,7 @@ export function DateTimePicker({
                   )
                 }
               >
-                {format(month, 'MMMM')}
+                {month ? format(month, 'MMMM') : ''}
               </span>
               <span
                 className='ms-1'
@@ -316,7 +326,7 @@ export function DateTimePicker({
                   )
                 }
               >
-                {format(month, 'yyyy')}
+                {month ? format(month, 'yyyy') : ''}
               </span>
             </div>
             <Button
@@ -332,10 +342,20 @@ export function DateTimePicker({
           <div
             className={cn('flex space-x-2', monthYearPicker ? 'hidden' : '')}
           >
-            <Button variant='ghost' size='icon' onClick={onPrevMonth}>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={onPrevMonth}
+              disabled={!month}
+            >
               <ChevronLeftIcon />
             </Button>
-            <Button variant='ghost' size='icon' onClick={onNextMonth}>
+            <Button
+              variant='ghost'
+              size='icon'
+              onClick={onNextMonth}
+              disabled={!month}
+            >
               <ChevronRightIcon />
             </Button>
           </div>
@@ -393,7 +413,7 @@ export function DateTimePicker({
             )}
           ></div>
           <MonthYearPicker
-            value={month}
+            value={month ?? new Date()}
             mode={monthYearPicker as any}
             onChange={onMonthYearChanged}
             minDate={minDate}
@@ -408,11 +428,13 @@ export function DateTimePicker({
           {!hideTime && (
             <TimePicker
               timePicker={timePicker}
-              value={date}
+              value={date ?? new Date(0, 0, 1, 0, 0, 0, 0)}
               onChange={setDate}
               use12HourFormat={use12HourFormat}
               min={minDate}
               max={maxDate}
+              // If no date is selected, disable the time picker
+              disabled={!date}
             />
           )}
           <div className='flex items-center justify-between'>
@@ -422,9 +444,12 @@ export function DateTimePicker({
                 <span className='ms-1 font-semibold'>{timezone}</span>
               </div>
             )}
-            {/* Only show the submit button when time picker is visible */}
             {!hideTime && (
-              <Button className='ml-auto w-full px-2' onClick={onSubmit}>
+              <Button
+                className='ml-auto w-full px-2'
+                onClick={onSubmit}
+                disabled={!date}
+              >
                 <CheckIcon />
               </Button>
             )}
@@ -553,6 +578,7 @@ function TimePicker({
   min,
   max,
   timePicker,
+  disabled,
 }: {
   use12HourFormat?: boolean;
   value: Date;
@@ -560,6 +586,7 @@ function TimePicker({
   min?: Date;
   max?: Date;
   timePicker?: DateTimePickerProps['timePicker'];
+  disabled?: boolean;
 }) {
   // hours24h = HH
   // hours12h = hh
@@ -832,6 +859,7 @@ function TimePicker({
           role='combobox'
           aria-expanded={open}
           className='justify-between'
+          disabled={disabled}
         >
           <Clock className='mr-2 size-4' />
           {display}
