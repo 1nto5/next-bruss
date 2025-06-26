@@ -13,8 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { CircleX, Loader, Plus, Search } from 'lucide-react';
-import Link from 'next/link';
+import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateProductionOvertime as revalidate } from '../actions';
@@ -221,15 +220,6 @@ export default function TableFilteringAndOptions({
               >
                 <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
               </Button>
-
-              {isGroupLeader && (
-                <Link href='/production-overtime/new-request'>
-                  <Button variant={'outline'}>
-                    <Plus className='mr-1' size={16} />{' '}
-                    <span>Nowe zlecenie</span>
-                  </Button>
-                </Link>
-              )}
             </div>
           </form>
         </CardContent>
