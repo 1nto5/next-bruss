@@ -151,7 +151,6 @@ export default function TableFilteringAndOptions({
                     <SelectItem value='approved'>Zatwierdzony</SelectItem>
                     <SelectItem value='rejected'>Odrzucony</SelectItem>
                     <SelectItem value='closed'>Zamknięty</SelectItem>
-                    <SelectItem value='draft'>Szkic</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
