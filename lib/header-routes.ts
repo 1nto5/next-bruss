@@ -49,7 +49,8 @@ export const plHeaderRoutes: HeaderRoute[] = [
       },
       {
         href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja - test',
+        title: 'Praca w godzinach nadliczbowych - produkcja',
+
         description:
           'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
       },
