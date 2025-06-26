@@ -82,6 +82,9 @@ export default async function ProductionOvertimePage(props: {
   const searchParams = await props.searchParams;
   const session = await auth();
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
+  const isPlantManager =
+    session?.user?.roles?.includes('plant-manager') || false;
+  const canCreateRequest = isGroupLeader || isPlantManager;
   const userEmail = session?.user?.email || undefined;
 
   let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
@@ -98,19 +101,19 @@ export default async function ProductionOvertimePage(props: {
             Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
           </CardTitle>
           {/* Add the "Add Deviation" button here, conditionally rendered */}
-          {session ? (
+          {session && canCreateRequest ? (
             <Link href='/production-overtime/new-request'>
               <Button variant={'outline'}>
                 <Plus /> <span>Nowe zlecenie</span>
               </Button>
             </Link>
-          ) : (
+          ) : !session ? (
             <Link href={`/auth?callbackUrl=/production-overtime`}>
               <Button variant={'outline'}>
                 <KeyRound /> <span>Zaloguj się</span>
               </Button>
             </Link>
-          )}
+          ) : null}
         </div>
         <TableFilteringAndOptions
           fetchTime={fetchTime}
