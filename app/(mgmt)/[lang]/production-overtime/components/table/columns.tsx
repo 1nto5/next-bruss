@@ -28,11 +28,14 @@ import AddAttachmentDialog from '../add-attachment-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 
 const handleApprove = async (id: string, session: Session | null) => {
-  // Check if user has plant-manager role
+  // Check if user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
+  const isAdmin = session?.user?.roles?.includes('admin');
 
-  if (!isPlantManager) {
-    toast.error('Tylko kierownik zakładu może zatwierdzać zlecenia!');
+  if (!isPlantManager && !isAdmin) {
+    toast.error(
+      'Tylko kierownik zakładu lub administrator może zatwierdzać zlecenia!',
+    );
     return;
   }
 
@@ -61,8 +64,10 @@ const handleApprove = async (id: string, session: Session | null) => {
 export const createColumns = (
   session: Session | null,
 ): ColumnDef<OvertimeType>[] => {
-  // Check if the user has plant-manager role
+  // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
+  const isAdmin = session?.user?.roles?.includes('admin');
+  const canApprove = isPlantManager || isAdmin;
 
   return [
     {
@@ -107,18 +112,40 @@ export const createColumns = (
         // State to control the cancel dialog
         const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
+        // Get user roles and email for permission checks
+        const userRoles = session?.user?.roles || [];
+        const userEmail = session?.user?.email;
+
         // Check if user can cancel the request
         const canCancel =
           request._id &&
           request.status !== 'closed' &&
           request.status !== 'canceled' &&
-          (request.requestedBy === session?.user?.email || isPlantManager);
+          (request.requestedBy === userEmail ||
+            isPlantManager ||
+            isAdmin ||
+            userRoles.includes('group-leader') ||
+            userRoles.includes('production-manager') ||
+            userRoles.includes('hr'));
+
+        // Check if user can add attachment (same logic as in AddAttachmentDialog)
+        const canAddAttachment =
+          userRoles.some((role) =>
+            [
+              'group-leader',
+              'production-manager',
+              'plant-manager',
+              'hr',
+            ].includes(role),
+          ) ||
+          userEmail === request.requestedBy ||
+          userEmail === request.responsibleEmployee;
 
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
-        const hasApproveAction = isPlantManager && request.status === 'pending'; // Only pending requests can be approved
+        const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
         const hasAddAttachmentAction =
-          request._id && request.status === 'approved';
+          request._id && request.status === 'approved' && canAddAttachment;
         const hasDownloadAttachmentAction =
           request._id && request.hasAttachment;
 
@@ -146,8 +173,8 @@ export const createColumns = (
                         <span>Odbiór nadgodzin</span>
                       </DropdownMenuItem>
                     </Link>
-                    {/* Only show approve button if user is plant manager */}
-                    {isPlantManager &&
+                    {/* Only show approve button if user can approve */}
+                    {canApprove &&
                       request.status !== 'approved' &&
                       request.status !== 'closed' && (
                         <DropdownMenuItem
@@ -176,8 +203,8 @@ export const createColumns = (
                   </DropdownMenuItem>
                 )}
 
-                {/* Add attachment button - only for approved orders */}
-                {request._id && request.status === 'approved' && (
+                {/* Add attachment button - only for approved orders and authorized users */}
+                {hasAddAttachmentAction && (
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
@@ -216,9 +243,10 @@ export const createColumns = (
             {request._id && (
               <>
                 <AddAttachmentDialog
-                  overTimeRequestId={request._id}
-                  overTimeRequestStatus='open'
-                  overTimeRequestOwner={request.requestedBy}
+                  id={request._id}
+                  status={request.status}
+                  owner={request.requestedBy}
+                  responsibleEmployee={request.responsibleEmployee}
                   session={session}
                   isOpen={isAttachmentDialogOpen}
                   onOpenChange={setIsAttachmentDialogOpen}

@@ -26,6 +26,7 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -59,9 +60,11 @@ import { NewOvertimeRequestSchema } from '../lib/zod';
 export default function NewOvertimeRequestForm({
   employees,
   users,
+  loggedInUserEmail,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
+  loggedInUserEmail: string;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
@@ -89,7 +92,7 @@ export default function NewOvertimeRequestForm({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
       numberOfEmployees: 1,
-      responsibleEmployee: '',
+      responsibleEmployee: loggedInUserEmail || '',
       employeesWithScheduledDayOff: [],
       from: nextSaturdayFrom,
       to: nextSaturdayTo,
@@ -190,6 +193,77 @@ export default function NewOvertimeRequestForm({
             />
             <FormField
               control={form.control}
+              name='responsibleEmployee'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Odpowiedzialny</FormLabel>
+                  <FormDescription>
+                    Wybierz pracownika nadzorującego pracę w godzinach
+                    nadliczbowych – będzie zobowiązany do przesłania listy
+                    obecności.
+                  </FormDescription>
+                  <Popover
+                    open={responsibleEmployeeOpen}
+                    onOpenChange={setResponsibleEmployeeOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant='outline'
+                          role='combobox'
+                          className={cn(
+                            'w-full justify-between',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value
+                            ? users.find((user) => user.email === field.value)
+                                ?.name
+                            : 'Wybierz odpowiedzialną osobę'}
+                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className='p-0' side='bottom' align='start'>
+                      <Command>
+                        <CommandInput placeholder='Szukaj osoby...' />
+                        <CommandList>
+                          <CommandEmpty>Nie znaleziono osoby.</CommandEmpty>
+                          <CommandGroup className='max-h-48 overflow-y-auto'>
+                            {users.map((user) => (
+                              <CommandItem
+                                value={user.name}
+                                key={user.email}
+                                onSelect={() => {
+                                  form.setValue(
+                                    'responsibleEmployee',
+                                    user.email,
+                                  );
+                                  setResponsibleEmployeeOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    user.email === field.value
+                                      ? 'opacity-100'
+                                      : 'opacity-0',
+                                  )}
+                                />
+                                {user.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name='numberOfEmployees'
               render={({ field }) => (
                 <FormItem>
@@ -264,72 +338,6 @@ export default function NewOvertimeRequestForm({
                   <FormControl>
                     <Textarea className='' {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='responsibleEmployee'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Osoba odpowiedzialna</FormLabel>
-                  <Popover
-                    open={responsibleEmployeeOpen}
-                    onOpenChange={setResponsibleEmployeeOpen}
-                  >
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant='outline'
-                          role='combobox'
-                          className={cn(
-                            'w-full justify-between',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value
-                            ? users.find((user) => user.email === field.value)
-                                ?.name
-                            : 'Wybierz odpowiedzialną osobę'}
-                          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className='p-0' side='bottom' align='start'>
-                      <Command>
-                        <CommandInput placeholder='Szukaj osoby...' />
-                        <CommandList>
-                          <CommandEmpty>Nie znaleziono osoby.</CommandEmpty>
-                          <CommandGroup className='max-h-48 overflow-y-auto'>
-                            {users.map((user) => (
-                              <CommandItem
-                                value={user.name}
-                                key={user.email}
-                                onSelect={() => {
-                                  form.setValue(
-                                    'responsibleEmployee',
-                                    user.email,
-                                  );
-                                  setResponsibleEmployeeOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    'mr-2 h-4 w-4',
-                                    user.email === field.value
-                                      ? 'opacity-100'
-                                      : 'opacity-0',
-                                  )}
-                                />
-                                {user.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

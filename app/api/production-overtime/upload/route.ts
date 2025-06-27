@@ -65,6 +65,47 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Get the overtime request to check permissions
+    const collection = await dbc('production_overtime');
+    let objectId;
+    try {
+      objectId = new ObjectId(overTimeRequestId);
+    } catch (error) {
+      console.error('Error converting to ObjectId:', error);
+      return NextResponse.json(
+        { error: 'Invalid ObjectId format' },
+        { status: 400 },
+      );
+    }
+
+    const order = await collection.findOne({ _id: objectId });
+    if (!order) {
+      console.error('Order not found with ObjectId:', objectId.toString());
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    // Check user permissions (same logic as in AddAttachmentDialog)
+    const userRoles = session.user?.roles || [];
+    const userEmail = session.user?.email;
+    const ATTACHMENT_ROLES = [
+      'group-leader',
+      'production-manager',
+      'plant-manager',
+      'hr',
+    ];
+
+    const canAddAttachment =
+      userRoles.some((role) => ATTACHMENT_ROLES.includes(role)) ||
+      userEmail === order.requestedBy ||
+      userEmail === order.responsibleEmployee;
+
+    if (!canAddAttachment) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions to add attachment' },
+        { status: 403 },
+      );
+    }
+
     // Check file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
@@ -112,28 +153,6 @@ export async function POST(req: NextRequest) {
 
     // Database update - now using a boolean flag instead of an array
     try {
-      const collection = await dbc('production_overtime');
-
-      // Convert the string ID to ObjectId
-      let objectId;
-      try {
-        objectId = new ObjectId(overTimeRequestId);
-      } catch (error) {
-        console.error('Error converting to ObjectId:', error);
-        return NextResponse.json(
-          { error: 'Invalid ObjectId format' },
-          { status: 400 },
-        );
-      }
-
-      // Find the document using ObjectId
-      const order = await collection.findOne({ _id: objectId });
-
-      if (!order) {
-        console.error('Order not found with ObjectId:', objectId.toString());
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-      }
-
       if (order.status !== 'approved') {
         console.error('Order has incorrect status:', order.status);
         return NextResponse.json(

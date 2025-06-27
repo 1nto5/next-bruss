@@ -32,20 +32,23 @@ const ATTACHMENT_ROLES = [
   'group-leader',
   'production-manager',
   'plant-manager',
+  'hr',
 ] as const;
 
 interface AddAttachmentDialogProps {
-  overTimeRequestId: string;
-  overTimeRequestStatus: 'open' | 'in-progress' | 'closed';
-  overTimeRequestOwner: string | undefined | null;
+  id: string;
+  status: 'pending' | 'approved' | 'canceled' | 'closed';
+  owner: string | undefined | null;
+  responsibleEmployee: string | undefined | null;
   session: Session | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export default function AddAttachmentDialog({
-  overTimeRequestId,
-  overTimeRequestOwner,
+  id,
+  owner,
+  responsibleEmployee,
   session,
   isOpen,
   onOpenChange,
@@ -68,18 +71,20 @@ export default function AddAttachmentDialog({
     const userRoles = session?.user?.roles || [];
     const userEmail = session?.user?.email;
 
-    // Check if user is the request owner or has one of the allowed roles
+    // Check if user is the request owner, responsible employee, or has one of the allowed roles
     const canAddAttachment =
       userRoles.some((role) =>
         ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
-      ) || userEmail === overTimeRequestOwner;
+      ) ||
+      userEmail === owner ||
+      userEmail === responsibleEmployee;
 
     if (!canAddAttachment) {
       toast.error('Nie masz uprawnień do dodania listy obecności.');
       return;
     }
 
-    if (!overTimeRequestId) {
+    if (!id) {
       toast.error('Skontaktuj się z IT!');
       console.error('no overTimeRequestId');
       return;
@@ -93,9 +98,9 @@ export default function AddAttachmentDialog({
         try {
           const formData = new FormData();
           formData.append('file', data.file);
-          formData.append('overTimeRequestId', overTimeRequestId);
+          formData.append('overTimeRequestId', id);
 
-          console.log('Sending upload request with ID:', overTimeRequestId);
+          console.log('Sending upload request with ID:', id);
 
           const response = await fetch('/api/production-overtime/upload', {
             method: 'POST',
@@ -129,6 +134,8 @@ export default function AddAttachmentDialog({
           } else {
             const errorMap: { [key: string]: string } = {
               'Unauthorized': 'Brak autoryzacji',
+              'Insufficient permissions to add attachment':
+                'Brak uprawnień do dodania załącznika',
               'No file': 'Nie wybrano pliku',
               'No overTimeRequest ID': 'Brak ID odchylenia',
               'File size exceeds the limit (10MB)':
@@ -143,6 +150,8 @@ export default function AddAttachmentDialog({
 
             if (response.status === 409) {
               reject(new Error('Ten plik już istnieje'));
+            } else if (response.status === 403) {
+              reject(new Error('Brak uprawnień do dodania załącznika'));
             } else if (result.error && errorMap[result.error]) {
               reject(new Error(errorMap[result.error]));
             } else if (result.error) {

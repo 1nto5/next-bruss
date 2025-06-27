@@ -28,11 +28,12 @@ export default function ApproveRequestDialog({
   session,
 }: ApproveRequestDialogProps) {
   const handleApprove = async () => {
-    // Check if user has plant-manager role
+    // Check if user has plant-manager or admin role
     const isPlantManager = session?.user?.roles?.includes('plant-manager');
+    const isAdmin = session?.user?.roles?.includes('admin');
 
-    if (!isPlantManager) {
-      toast.error('Tylko kierownik zakładu może zatwierdzać zlecenia!');
+    if (!isPlantManager && !isAdmin) {
+      toast.error('Tylko plant manager może zatwierdzać zlecenia!');
       onOpenChange(false);
       return;
     }

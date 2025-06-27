@@ -27,12 +27,16 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get the attachment filename from the database
+    // Get the order from database to check permissions
     const collection = await dbc('production_overtime');
     const objectId = new ObjectId(overTimeRequestId);
     const order = await collection.findOne({ _id: objectId });
 
-    if (!order || !order.hasAttachment || !order.attachmentFilename) {
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    if (!order.hasAttachment || !order.attachmentFilename) {
       return NextResponse.json(
         { error: 'No attachment found for this order' },
         { status: 404 },

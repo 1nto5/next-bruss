@@ -49,7 +49,11 @@ export async function approveOvertimeRequest(id: string) {
   if (!session || !session.user?.email) {
     redirect('/auth');
   }
-  if (!(session.user?.roles ?? []).includes('plant-manager')) {
+
+  const isPlantManager = (session.user?.roles ?? []).includes('plant-manager');
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+
+  if (!isPlantManager && !isAdmin) {
     return { error: 'unauthorized' };
   }
 
@@ -299,10 +303,14 @@ export async function cancelOvertimeRequest(id: string) {
       return { error: 'cannot cancel' };
     }
 
-    // Check if user has permission to cancel (requestor or plant manager)
+    // Check if user has permission to cancel (requestor, plant manager, admin, group leader, production manager, or HR)
     if (
       request.requestedBy !== session.user.email &&
-      !session.user.roles?.includes('plant-manager')
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('admin') &&
+      !session.user.roles?.includes('group-leader') &&
+      !session.user.roles?.includes('production-manager') &&
+      !session.user.roles?.includes('hr')
     ) {
       return { error: 'unauthorized' };
     }
