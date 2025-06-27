@@ -6,7 +6,7 @@ import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
-import Header from './components/header-temp';
+import Header from './components/header';
 import QueryProvider from './lib/query-provider';
 
 export const metadata: Metadata = {
