@@ -16,7 +16,8 @@ export function getFirstNameFromEmail(email: string): string {
   return nameParts[0].charAt(0).toUpperCase() + nameParts[0].slice(1);
 }
 
-export function extractNameFromEmail(email: string): string {
+export function extractNameFromEmail(email?: string): string {
+  if (!email) return '';
   let nameParts = email.split('@')[0].split('.');
   const lastName =
     nameParts.length > 1

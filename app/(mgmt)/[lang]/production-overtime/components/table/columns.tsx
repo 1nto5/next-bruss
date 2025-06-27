@@ -316,6 +316,18 @@ export const createColumns = (
       },
     },
     {
+      accessorKey: 'responsibleEmployee',
+      header: 'Osoba odpowiedzialna',
+      cell: ({ row }) => {
+        const responsibleEmployee = row.getValue('responsibleEmployee');
+        return (
+          <div className='whitespace-nowrap'>
+            {extractNameFromEmail(responsibleEmployee as string)}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: 'editedBy',
       header: 'Zmodyfikowane przez',
       cell: ({ row }) => {

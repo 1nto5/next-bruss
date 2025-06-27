@@ -273,7 +273,7 @@ export default function NewOvertimeRequestForm({
               name='responsibleEmployee'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Odpowiedzialna osoba</FormLabel>
+                  <FormLabel>Osoba odpowiedzialna</FormLabel>
                   <Popover
                     open={responsibleEmployeeOpen}
                     onOpenChange={setResponsibleEmployeeOpen}

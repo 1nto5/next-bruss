@@ -87,7 +87,6 @@ export default function CardSelection() {
             toast.error('Skontaktuj się z IT!');
         }
       } else if (res.success && res.cardNumber) {
-        toast.success(`Karta: ${res.cardNumber} utworzona!`);
         setCard(res.cardNumber, data.warehouse, data.sector);
       }
     } catch (error) {
@@ -223,7 +222,6 @@ export default function CardSelection() {
                       key={card.number}
                       onClick={() => {
                         setCard(card.number, card.warehouse, card.sector);
-                        toast.success(`Karta: ${card.number} wybrana!`);
                       }}
                     >
                       <TableCell>{card.number}</TableCell>
