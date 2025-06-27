@@ -75,22 +75,6 @@ export default function PositionEdit() {
   const [selectedBin, setSelectedBin] = useState<any>();
   const [identifier, setIdentifier] = useState('');
   const [showPlusOneMessage, setShowPlusOneMessage] = useState(false);
-  // const isSpecialSector = [
-  //  'guma',
-  //   's900',
-  //   's2-powlekanie',
-  //   'sedia-granulaty',
-  // ].includes(sector);
-  const isSpecialSector = ['s900'].includes(sector);
-  const [accordionValue, setAccordionValue] = useState(
-    isSpecialSector ? 'storage-delivery' : '',
-  );
-
-  useEffect(() => {
-    // Update accordion state when sector changes
-    setAccordionValue(['s900'].includes(sector) ? 'storage-delivery' : '');
-  }, [sector]);
-
   useEffect(() => {
     if (isSuccess && !data?.success?.identifier) {
       setIdentifier('');
@@ -255,18 +239,6 @@ export default function PositionEdit() {
   const unit = form.watch('unit');
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    if (isSpecialSector && !selectedBin) {
-      setFindBinMessage(
-        'Storage Bin jest wymagany dla sektora: ' + sector + '!',
-      );
-      return;
-    }
-    if (isSpecialSector && !form.getValues('deliveryDate')) {
-      form.setError('deliveryDate', {
-        message: 'Data dostawy jest wymagana dla sektora: ' + sector + '!',
-      });
-      return;
-    }
     setIsPending(true);
     try {
       const res = await savePosition(
@@ -421,7 +393,7 @@ export default function PositionEdit() {
                       </FormControl>
                       {showPlusOneMessage && (
                         <FormMessage className=''>
-                          Artykuł zapisany dla poprzedniej pozycji - zweryfikuj
+                          Artykuł zapisany z poprzedniej pozycji - zweryfikuj
                           jego poprawność!
                         </FormMessage>
                       )}
@@ -574,16 +546,10 @@ export default function PositionEdit() {
               )}
 
               {selectedArticle && (
-                <Accordion
-                  type='single'
-                  collapsible
-                  value={accordionValue}
-                  onValueChange={setAccordionValue}
-                >
+                <Accordion type='single' collapsible>
                   <AccordionItem value='storage-delivery'>
                     <AccordionTrigger>
                       Storage Bin i Data Dostawy
-                      {isSpecialSector && ` (wymagane dla sektora: ${sector})`}
                     </AccordionTrigger>
 
                     <AccordionContent>
