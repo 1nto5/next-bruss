@@ -287,26 +287,29 @@ export async function findArticles(search: string) {
 export async function findBins(search: string) {
   try {
     const coll = await dbc('inventory_bin_options');
-    // Use ^ and $ to match the whole value, or adjust as needed for your use case
-    const regex =
-      search.length > 2
-        ? new RegExp(`^${search}$`, 'i') // exact match if search is specific enough
-        : new RegExp(search, 'i'); // fallback to partial match for short searches
 
-    const results = await coll
-      .find({
-        value: { $regex: regex },
-      })
-      .toArray();
+    // Normalize search: remove non-alphanumerics, lowercase
+    const normalize = (str: string) =>
+      str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
 
-    if (results.length === 0) {
+    const normalizedSearch = normalize(search);
+
+    // Fetch all bins, then filter in-memory for normalized match
+    const results = await coll.find({}).toArray();
+
+    const filtered = results.filter((bin) =>
+      normalize(bin.value).includes(normalizedSearch),
+    );
+
+    if (filtered.length === 0) {
       return { error: 'no bins' };
     }
 
-    if (results.length > 10) {
+    if (filtered.length > 10) {
       return { error: 'too many bins' };
     }
-    const sanitizedResults = results.map(({ _id, ...rest }) => rest);
+
+    const sanitizedResults = filtered.map(({ _id, ...rest }) => rest);
     return { success: sanitizedResults };
   } catch (error) {
     console.error(error);
