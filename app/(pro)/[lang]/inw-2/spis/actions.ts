@@ -282,14 +282,20 @@ export async function findArticles(search: string) {
 /**
  * Searches for bin locations in the warehouse
  * @param search - Search term to match against bin values
- * @returns Matching bins (max 5) or error message
+ * @returns Matching bins (max 10) or error message
  */
 export async function findBins(search: string) {
   try {
     const coll = await dbc('inventory_bin_options');
+    // Use ^ and $ to match the whole value, or adjust as needed for your use case
+    const regex =
+      search.length > 2
+        ? new RegExp(`^${search}$`, 'i') // exact match if search is specific enough
+        : new RegExp(search, 'i'); // fallback to partial match for short searches
+
     const results = await coll
       .find({
-        value: { $regex: search, $options: 'i' },
+        value: { $regex: regex },
       })
       .toArray();
 
@@ -297,7 +303,7 @@ export async function findBins(search: string) {
       return { error: 'no bins' };
     }
 
-    if (results.length > 5) {
+    if (results.length > 10) {
       return { error: 'too many bins' };
     }
     const sanitizedResults = results.map(({ _id, ...rest }) => rest);
