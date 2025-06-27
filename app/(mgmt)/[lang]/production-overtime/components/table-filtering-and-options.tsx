@@ -52,6 +52,11 @@ export default function TableFilteringAndOptions({
     return requestedBy === userEmail;
   });
 
+  const [showOnlyResponsible, setShowOnlyResponsible] = useState(() => {
+    const responsibleEmployee = searchParams?.get('responsibleEmployee');
+    return responsibleEmployee === userEmail;
+  });
+
   const [dateFilter, setDateFilter] = useState(() => {
     const dateParam = searchParams?.get('date');
     return dateParam ? new Date(dateParam) : undefined;
@@ -71,6 +76,7 @@ export default function TableFilteringAndOptions({
     setRequestedAtFilter(undefined);
     setStatusFilter('');
     setShowOnlyMine(false);
+    setShowOnlyResponsible(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -85,7 +91,9 @@ export default function TableFilteringAndOptions({
       if (requestedAtFilter)
         params.set('requestedAt', requestedAtFilter.toISOString());
       if (statusFilter) params.set('status', statusFilter);
-      if (showOnlyMine) params.set('requestedBy', 'true');
+      if (showOnlyMine) params.set('requestedBy', userEmail || '');
+      if (showOnlyResponsible)
+        params.set('responsibleEmployee', userEmail || '');
       const newUrl = `${pathname}?${params.toString()}`;
       if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
         setIsPendingSearch(true);
@@ -112,6 +120,18 @@ export default function TableFilteringAndOptions({
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleShowOnlyResponsibleChange = (checked: boolean) => {
+    setShowOnlyResponsible(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('responsibleEmployee', userEmail || '');
+    } else {
+      params.delete('responsibleEmployee');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   return (
     <Card>
       <CardHeader className='p-4'>
@@ -130,7 +150,13 @@ export default function TableFilteringAndOptions({
                   checked={showOnlyMine}
                   onCheckedChange={handleShowOnlyMineChange}
                 />
-                <Label htmlFor='only-my-requests'>Tylko moje zlecenia</Label>
+                <Label htmlFor='only-my-requests'>Moje zlecenia</Label>
+                <Switch
+                  id='only-responsible'
+                  checked={showOnlyResponsible}
+                  onCheckedChange={handleShowOnlyResponsibleChange}
+                />
+                <Label htmlFor='only-responsible'>Jestem odpowiedzialny</Label>
               </>
             )}
           </div>

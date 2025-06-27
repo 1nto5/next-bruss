@@ -12,6 +12,10 @@ export async function GET(req: NextRequest) {
     query.requestedBy = searchParams.get('requestedBy');
   }
 
+  if (searchParams.get('responsibleEmployee')) {
+    query.responsibleEmployee = searchParams.get('responsibleEmployee');
+  }
+
   searchParams.forEach((value, key) => {
     if (key === 'date') {
       // Create date objects for start and end of the specified date
