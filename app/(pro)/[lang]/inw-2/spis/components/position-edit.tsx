@@ -87,11 +87,7 @@ export default function PositionEdit() {
 
   useEffect(() => {
     // Update accordion state when sector changes
-    setAccordionValue(
-      ['guma', 's900', 's2-powlekanie', 'sedia-granulaty'].includes(sector)
-        ? 'storage-delivery'
-        : '',
-    );
+    setAccordionValue(['s900'].includes(sector) ? 'storage-delivery' : '');
   }, [sector]);
 
   useEffect(() => {
@@ -156,7 +152,7 @@ export default function PositionEdit() {
     form.setValue('findArticle', '');
     form.setValue('quantity', '');
     form.setValue('wip', false);
-    form.setValue('unit', '');
+    // form.setValue('unit', '');
     form.setValue('findBin', '');
     form.setValue('deliveryDate', undefined);
     refetch();
