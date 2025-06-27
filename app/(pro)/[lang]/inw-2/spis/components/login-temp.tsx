@@ -117,7 +117,6 @@ export default function Login() {
         setPersonalNumber1(data.personalNumber1);
         setPersonalNumber2(data.personalNumber2 || '');
         setPersonalNumber3(data.personalNumber3 || '');
-        toast.success('Zalogowano pomyślnie!');
       }
     } catch (error) {
       console.error('onSubmit', error);
