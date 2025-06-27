@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/table';
 import clsx from 'clsx';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
 import { PositionType } from '../../../../../../lib/types/inventory';
 import { useGetCardPositions } from '../data/get-card-positions';
 import {
@@ -84,7 +83,6 @@ export default function PositionSelection() {
                   key={position.position}
                   onClick={() => {
                     setPosition(position.position);
-                    toast.success(`Pozycja: ${position.position} wybrana!`);
                   }}
                 >
                   <TableCell>{position.position}</TableCell>
@@ -134,7 +132,6 @@ export default function PositionSelection() {
           <Button
             onClick={() => {
               setPosition(data.success.length + 1);
-              toast.success('Nowa pozycja wybrana!');
             }}
           >
             Nowa pozycja
