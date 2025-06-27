@@ -114,6 +114,7 @@ export default function PositionEdit() {
       if (isSuccess && data.success) {
         const res = await findArticles(data.success.articleNumber);
         if (res.success) {
+          setShowPlusOneMessage(false);
           setFoundArticles(res.success);
           setSelectedArticle(res.success[0]);
           setIdentifier(data?.success.identifier);
