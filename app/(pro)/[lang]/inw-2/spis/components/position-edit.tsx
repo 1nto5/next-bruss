@@ -74,6 +74,7 @@ export default function PositionEdit() {
   const [selectedArticle, setSelectedArticle] = useState<any>();
   const [selectedBin, setSelectedBin] = useState<any>();
   const [identifier, setIdentifier] = useState('');
+  const [showPlusOneMessage, setShowPlusOneMessage] = useState(false);
   // const isSpecialSector = [
   //  'guma',
   //   's900',
@@ -358,14 +359,6 @@ export default function PositionEdit() {
                     <FormLabel>Artykuł</FormLabel>
                     <div className='flex items-center space-x-2'>
                       <FormControl>
-                        {/* <Input
-                        className=''
-                        placeholder={'wpisz numer lub nazwę aby wyszukać...'}
-                        {...field}
-                        onChange={(e) => {
-                          handleFindArticle(e);
-                        }}
-                      /> */}
                         <Input
                           {...field}
                           value={field.value ?? ''}
@@ -373,6 +366,7 @@ export default function PositionEdit() {
                           onChange={(e) => {
                             field.onChange(e);
                             handleFindArticle(e);
+                            setShowPlusOneMessage(false);
                           }}
                           placeholder={'wpisz numer lub nazwę aby wyszukać...'}
                         />
@@ -424,6 +418,12 @@ export default function PositionEdit() {
                           ))}
                         </RadioGroup>
                       </FormControl>
+                      {showPlusOneMessage && (
+                        <FormMessage className=''>
+                          Artykuł zapisany dla poprzedniej pozycji - zweryfikuj
+                          jego poprawność!
+                        </FormMessage>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -700,7 +700,10 @@ export default function PositionEdit() {
             <CardFooter className='flex justify-between gap-2'>
               {position !== 1 ? (
                 <Button
-                  onClick={() => setPosition(position - 1)}
+                  onClick={() => {
+                    setPosition(position - 1);
+                    setShowPlusOneMessage(false);
+                  }}
                   type={'button'}
                   variant={'outline'}
                 >
@@ -740,7 +743,10 @@ export default function PositionEdit() {
               </div>
               {position !== 25 && data?.success ? (
                 <Button
-                  onClick={() => setPosition(position + 1)}
+                  onClick={() => {
+                    setPosition(position + 1);
+                    setShowPlusOneMessage(true);
+                  }}
                   type={'button'}
                   variant={'outline'}
                 >
