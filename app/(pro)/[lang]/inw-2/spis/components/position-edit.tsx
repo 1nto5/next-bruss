@@ -154,7 +154,7 @@ export default function PositionEdit() {
     form.setValue('wip', false);
     // form.setValue('unit', '');
     form.setValue('findBin', '');
-    form.setValue('deliveryDate', undefined);
+    // form.setValue('deliveryDate', undefined);
     refetch();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [position, refetch, card]);
