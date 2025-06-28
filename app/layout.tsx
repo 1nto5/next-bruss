@@ -23,11 +23,7 @@ export default async function RootLayout(props: {
   return (
     <html lang={lang} suppressHydrationWarning>
       <head />
-      {/* Prevents screen from zooming in while typing text (shadcn Input) on mobile devices. */}
-      <meta
-        name='viewport'
-        content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'
-      />
+
       <body className='bg-background min-h-screen font-sans antialiased'>
         <ThemeProvider
           attribute='class'

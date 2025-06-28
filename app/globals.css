@@ -182,3 +182,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Prevent auto-zoom on mobile devices */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1rem) !important;
+  }
+}
