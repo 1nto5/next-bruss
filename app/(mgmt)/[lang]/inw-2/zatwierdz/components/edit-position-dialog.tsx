@@ -51,7 +51,9 @@ export default function EditPositionDialog({
       unit: position.unit,
       comment: position.comment || '',
       bin: position.bin || '',
-      deliveryDate: position.deliveryDate || undefined,
+      deliveryDate: position.deliveryDate
+        ? new Date(position.deliveryDate)
+        : undefined,
       approved: position.approver ? true : false,
     },
   });
