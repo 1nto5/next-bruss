@@ -35,6 +35,7 @@ import {
 import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateCardPositions as revalidate } from '../actions';
+import ExportButton from '../components/export-button';
 import PositionsTableFilteringAndOptions from '../components/positions-table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
@@ -85,10 +86,15 @@ export function PositionsDataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pozycje</CardTitle>
-        {/* <CardDescription className='font-bold'>
-        </CardDescription> */}
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
+        <div className='flex items-center justify-between'>
+          <div>
+            <CardTitle>Pozycje</CardTitle>
+            <CardDescription>
+              Ostatnia synchronizacja: {fetchTime}
+            </CardDescription>
+          </div>
+          <ExportButton />
+        </div>
         <PositionsTableFilteringAndOptions
           setFilter={(columnId, value) =>
             table.getColumn(columnId)?.setFilterValue(value)

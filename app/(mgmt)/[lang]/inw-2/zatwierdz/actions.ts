@@ -4,6 +4,7 @@ import { PositionZodType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/zod';
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import { revalidateTag } from 'next/cache';
+import { generateExcelBuffer } from './lib/excel-export';
 // import { redirect } from 'next/navigation';
 
 export async function revalidateCards() {
@@ -96,5 +97,41 @@ export async function updatePosition(
   } catch (error) {
     console.error(error);
     return { error: 'updatePosition server action error' };
+  }
+}
+
+export async function exportInventoryPositionsToExcel() {
+  try {
+    const session = await auth();
+    if (
+      !session ||
+      !(session.user?.roles ?? []).includes('inventory-approve')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const collection = await dbc('inventory_cards');
+    const inventoryCards = await collection.find().toArray();
+
+    const exportData = inventoryCards.map((card) => ({
+      card: {
+        number: card.number,
+        warehouse: card.warehouse,
+        sector: card.sector,
+        creators: card.creators,
+      },
+      positions: card.positions || [],
+    }));
+
+    const buffer = await generateExcelBuffer(exportData);
+
+    return {
+      success: true,
+      data: buffer.toString('base64'),
+      filename: `inventory_positions_${new Date().toISOString().split('T')[0]}.xlsx`,
+    };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { error: 'export failed' };
   }
 }

@@ -36,6 +36,7 @@ import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateCards as revalidate } from '../actions';
 import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
+import ExportButton from '../components/export-button';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -85,8 +86,15 @@ export function CardsDataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Karty</CardTitle>
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
+        <div className='flex items-center justify-between'>
+          <div>
+            <CardTitle>Karty</CardTitle>
+            <CardDescription>
+              Ostatnia synchronizacja: {fetchTime}
+            </CardDescription>
+          </div>
+          <ExportButton />
+        </div>
         <CardsTableFilteringAndOptions
           setFilter={(columnId, value) =>
             table.getColumn(columnId)?.setFilterValue(value)
