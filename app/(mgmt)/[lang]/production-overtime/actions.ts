@@ -33,7 +33,7 @@ async function sendEmailNotificationToRequestor(email: string, id: string) {
     html: `<div style="font-family: sans-serif;">
           <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
           <p>
-          <a href="${process.env.APP_URL}/production-overtime/${id}" 
+          <a href="${process.env.BASE_URL}/production-overtime/${id}" 
              style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
             Otwórz zlecenie
           </a>
