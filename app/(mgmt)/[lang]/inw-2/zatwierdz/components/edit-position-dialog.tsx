@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Dialog,
   DialogContent,
@@ -21,7 +23,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { PositionType } from '@/lib/types/inventory';
@@ -157,20 +158,6 @@ export default function EditPositionDialog({
 
                 <FormField
                   control={form.control}
-                  name='comment'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Komentarz</FormLabel>
-                      <FormControl>
-                        <Textarea className='' {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Separator className='mb-2' />
-                <FormField
-                  control={form.control}
                   name='approved'
                   render={({ field }) => (
                     <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
@@ -191,6 +178,62 @@ export default function EditPositionDialog({
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='bin'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Storage Bin</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='deliveryDate'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data dostawy</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          modal
+                          hideTime
+                          value={field.value}
+                          onChange={field.onChange}
+                          renderTrigger={({ open, value, setOpen }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={(x) => !open && field.onChange(x)}
+                              format='dd/MM/yyyy'
+                              disabled={open}
+                              onCalendarClick={() => setOpen(!open)}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='comment'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Komentarz</FormLabel>
+                      <FormControl>
+                        <Textarea className='' {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
