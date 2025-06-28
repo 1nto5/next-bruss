@@ -50,7 +50,7 @@ export default function EditPositionDialog({
       unit: position.unit,
       comment: position.comment || '',
       bin: position.bin || '',
-      deliveryDate: position.deliveryDate || '',
+      deliveryDate: position.deliveryDate || undefined,
       approved: position.approver ? true : false,
     },
   });
@@ -58,7 +58,7 @@ export default function EditPositionDialog({
   const onSubmit = async (data: z.infer<typeof UpdatePositionSchema>) => {
     setIsPendingUpdate(true);
     try {
-      console.log('onSubmit', data);
+      // console.log('onSubmit', data);
       const res = await update(position.identifier, data);
       if (res.success) {
         toast.success('Pozycja zapisana!');
