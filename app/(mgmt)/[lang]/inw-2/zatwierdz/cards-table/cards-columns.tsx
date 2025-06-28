@@ -94,8 +94,10 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
     cell: ({ row }) => {
       const approvedPositions = row.original.approvedPositions;
       const totalPositions = row.original.positionsLength;
+      // Jeśli łączna liczba pozycji 3 lub mniej, nie podświetlaj gdy jest zatwierdzona przynajmniej jedna
+      // Gdy więcej niż 3, podświetlaj jeśli zatwierdzonych mniej niż 3
       const shouldHighlight =
-        totalPositions <= 3 ? approvedPositions === 0 : approvedPositions <= 3;
+        totalPositions <= 3 ? approvedPositions === 0 : approvedPositions < 3;
 
       return (
         <div
@@ -103,12 +105,6 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
         >
           {approvedPositions}
         </div>
-        // return (
-        //   <div
-        //     className={`text-center ${approvedPositions < 3 ? 'animate-pulse font-bold text-red-500' : ''}`}
-        //   >
-        //     {approvedPositions}
-        //   </div>
       );
     },
   },
