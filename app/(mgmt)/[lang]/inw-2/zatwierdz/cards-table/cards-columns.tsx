@@ -8,6 +8,13 @@ import Link from 'next/link';
 
 export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   {
+    accessorKey: 'sector',
+    header: 'Sektor',
+    filterFn: (row, columnId, value) => {
+      return row.getValue(columnId) === value;
+    },
+  },
+  {
     accessorKey: 'number',
     header: ({ column }) => {
       return (
@@ -98,13 +105,6 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   {
     accessorKey: 'warehouse',
     header: 'Magazyn',
-    filterFn: (row, columnId, value) => {
-      return row.getValue(columnId) === value;
-    },
-  },
-  {
-    accessorKey: 'sector',
-    header: 'Sektor',
     filterFn: (row, columnId, value) => {
       return row.getValue(columnId) === value;
     },
