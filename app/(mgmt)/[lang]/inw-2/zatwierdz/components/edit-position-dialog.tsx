@@ -90,7 +90,10 @@ export default function EditPositionDialog({
           </Button>
         </div>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[700px]'>
+      <DialogContent
+        className='sm:max-w-[700px]'
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Edycja pozycji {position.identifier}</DialogTitle>
           {/* <DialogDescription>
@@ -107,7 +110,7 @@ export default function EditPositionDialog({
                     <FormItem>
                       <FormLabel>Artykuł</FormLabel>
                       <FormControl>
-                        <Input className='' {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
