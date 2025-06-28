@@ -12,35 +12,36 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
-import { approveOvertimeRequest as approve } from '../actions';
+import { markAsAccountedOvertimeRequest as markAsAccounted } from '../actions';
 
-interface ApproveRequestDialogProps {
+interface MarkAsAccountedDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
   session: Session | null;
 }
 
-export default function ApproveRequestDialog({
+export default function MarkAsAccountedDialog({
   isOpen,
   onOpenChange,
   requestId,
   session,
-}: ApproveRequestDialogProps) {
-  const handleApprove = async () => {
-    // Check if user has plant-manager or admin role
-    const isPlantManager = session?.user?.roles?.includes('plant-manager');
-    const isAdmin = session?.user?.roles?.includes('admin');
+}: MarkAsAccountedDialogProps) {
+  const handleMarkAsAccounted = async () => {
+    // Check if user has HR role
+    const isHR = session?.user?.roles?.includes('hr');
 
-    if (!isPlantManager && !isAdmin) {
-      toast.error('Tylko plant manager może zatwierdzać zlecenia!');
+    if (!isHR) {
+      toast.error(
+        'Tylko pracownicy HR mogą oznaczać zlecenia jako rozliczone!',
+      );
       return;
     }
 
     onOpenChange(false);
 
     toast.promise(
-      approve(requestId).then((res) => {
+      markAsAccounted(requestId).then((res) => {
         if (res.error) {
           throw new Error(res.error);
         }
@@ -48,12 +49,14 @@ export default function ApproveRequestDialog({
       }),
       {
         loading: 'Zapisuję zmiany...',
-        success: 'Zlecenie zatwierdzone!',
+        success: 'Zlecenie oznaczone jako rozliczone!',
         error: (error) => {
           const errorMsg = error.message;
           if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
           if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
-          console.error('handleApprove', errorMsg);
+          if (errorMsg === 'invalid status')
+            return 'Nieprawidłowy status zlecenia!';
+          console.error('handleMarkAsAccounted', errorMsg);
           return 'Skontaktuj się z IT!';
         },
       },
@@ -64,16 +67,17 @@ export default function ApproveRequestDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Zatwierdź zlecenie</AlertDialogTitle>
+          <AlertDialogTitle>Oznacz jako rozliczone</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz zatwierdzić to zlecenie wykonania pracy w
-            godzinach nadliczbowych?
+            Czy na pewno chcesz oznaczyć to zlecenie jako rozliczone? Ta akcja
+            jest nieodwracalna i oznacza, że wszystkie nadgodziny zostały
+            rozliczone w systemie płacowym.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Anuluj</AlertDialogCancel>
-          <AlertDialogAction onClick={handleApprove}>
-            Zatwierdź zlecenie
+          <AlertDialogAction onClick={handleMarkAsAccounted}>
+            Oznacz jako rozliczone
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

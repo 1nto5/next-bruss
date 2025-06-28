@@ -53,20 +53,6 @@ async function getOvertimeRequests(
     (overtimeRequest) => {
       return {
         ...overtimeRequest,
-        fromLocaleString: new Date(overtimeRequest.from).toLocaleString(lang),
-        toLocaleString: new Date(overtimeRequest.to).toLocaleString(lang),
-        approvedAtLocaleString: overtimeRequest.approvedAt
-          ? new Date(overtimeRequest.approvedAt).toLocaleString(lang)
-          : undefined,
-        canceledAtLocaleString: overtimeRequest.canceledAt
-          ? new Date(overtimeRequest.canceledAt).toLocaleString(lang)
-          : undefined,
-        requestedAtLocaleString: new Date(
-          overtimeRequest.requestedAt,
-        ).toLocaleString(lang),
-        editedAtLocaleString: new Date(overtimeRequest.editedAt).toLocaleString(
-          lang,
-        ),
       };
     },
   );

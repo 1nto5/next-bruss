@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useClientLocaleString } from '@/lib/client-date-utils';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -21,44 +22,11 @@ import {
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
-import { toast } from 'sonner';
-import { approveOvertimeRequest as approve } from '../../actions';
 import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
+import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
-
-const handleApprove = async (id: string, session: Session | null) => {
-  // Check if user has plant-manager or admin role
-  const isPlantManager = session?.user?.roles?.includes('plant-manager');
-  const isAdmin = session?.user?.roles?.includes('admin');
-
-  if (!isPlantManager && !isAdmin) {
-    toast.error(
-      'Tylko kierownik zakładu lub administrator może zatwierdzać zlecenia!',
-    );
-    return;
-  }
-
-  toast.promise(
-    approve(id).then((res) => {
-      if (res.error) {
-        throw new Error(res.error);
-      }
-      return res;
-    }),
-    {
-      loading: 'Zapisuję zmiany...',
-      success: 'Zlecenie zatwierdzone!',
-      error: (error) => {
-        const errorMsg = error.message;
-        if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-        if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
-        console.error('handleApprove', errorMsg);
-        return 'Skontaktuj się z IT!';
-      },
-    },
-  );
-};
+import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 
 // Creating a columns factory function that takes the session
 export const createColumns = (
@@ -67,6 +35,7 @@ export const createColumns = (
   // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
   const isAdmin = session?.user?.roles?.includes('admin');
+  const isHR = session?.user?.roles?.includes('hr');
   const canApprove = isPlantManager || isAdmin;
 
   return [
@@ -94,6 +63,9 @@ export const createColumns = (
           case 'closed':
             statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
             break;
+          case 'accounted':
+            statusLabel = <Badge variant='statusAccounted'>Rozliczone</Badge>;
+            break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
         }
@@ -111,6 +83,11 @@ export const createColumns = (
           useState(false);
         // State to control the cancel dialog
         const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+        // State to control the mark as accounted dialog
+        const [isMarkAsAccountedDialogOpen, setIsMarkAsAccountedDialogOpen] =
+          useState(false);
+        // State to control the approve dialog
+        const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
 
         // Get user roles and email for permission checks
         const userRoles = session?.user?.roles || [];
@@ -121,6 +98,7 @@ export const createColumns = (
           request._id &&
           request.status !== 'closed' &&
           request.status !== 'canceled' &&
+          request.status !== 'accounted' &&
           (request.requestedBy === userEmail ||
             isPlantManager ||
             isAdmin ||
@@ -144,6 +122,7 @@ export const createColumns = (
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
         const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
+        const hasMarkAsAccountedAction = isHR && request.status === 'closed'; // Only closed requests can be marked as accounted
         const hasAddAttachmentAction =
           request._id && request.status === 'approved' && canAddAttachment;
         const hasDownloadAttachmentAction =
@@ -152,6 +131,7 @@ export const createColumns = (
         const hasActions =
           hasOvertimePickupAction ||
           hasApproveAction ||
+          hasMarkAsAccountedAction ||
           canCancel ||
           hasAddAttachmentAction ||
           hasDownloadAttachmentAction;
@@ -176,16 +156,30 @@ export const createColumns = (
                     {/* Only show approve button if user can approve */}
                     {canApprove &&
                       request.status !== 'approved' &&
-                      request.status !== 'closed' && (
+                      request.status !== 'closed' &&
+                      request.status !== 'accounted' && (
                         <DropdownMenuItem
-                          onClick={() =>
-                            request._id && handleApprove(request._id, session)
-                          }
+                          onSelect={(e) => {
+                            e.preventDefault();
+                            setIsApproveDialogOpen(true);
+                          }}
                         >
                           <Check className='mr-2 h-4 w-4' />
                           <span>Zatwierdź</span>
                         </DropdownMenuItem>
                       )}
+                    {/* Mark as accounted button - only for HR and approved requests */}
+                    {hasMarkAsAccountedAction && (
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setIsMarkAsAccountedDialogOpen(true);
+                        }}
+                      >
+                        <Check className='mr-2 h-4 w-4' />
+                        <span>Oznacz jako rozliczone</span>
+                      </DropdownMenuItem>
+                    )}
                   </>
                 )}
 
@@ -256,6 +250,18 @@ export const createColumns = (
                   onOpenChange={setIsCancelDialogOpen}
                   requestId={request._id}
                 />
+                <ApproveRequestDialog
+                  isOpen={isApproveDialogOpen}
+                  onOpenChange={setIsApproveDialogOpen}
+                  requestId={request._id}
+                  session={session}
+                />
+                <MarkAsAccountedDialog
+                  isOpen={isMarkAsAccountedDialogOpen}
+                  onOpenChange={setIsMarkAsAccountedDialogOpen}
+                  requestId={request._id}
+                  session={session}
+                />
               </>
             )}
           </>
@@ -266,21 +272,28 @@ export const createColumns = (
       accessorKey: 'approved',
       header: 'Data zatwierdzenia',
       cell: ({ row }) => {
-        const approvedAtLocaleString = row.original.approvedAtLocaleString;
-        return (
-          <div>
-            {approvedAtLocaleString ? `${approvedAtLocaleString}` : '-'}
-          </div>
-        );
+        const approvedAt = row.original.approvedAt;
+        const approvedAtString = useClientLocaleString(approvedAt);
+        return <div>{approvedAtString}</div>;
       },
     },
     {
       accessorKey: 'fromLocaleString',
       header: 'Od',
+      cell: ({ row }) => {
+        const from = row.original.from;
+        const fromString = useClientLocaleString(from);
+        return <div>{fromString}</div>;
+      },
     },
     {
       accessorKey: 'toLocaleString',
       header: 'Do',
+      cell: ({ row }) => {
+        const to = row.original.to;
+        const toString = useClientLocaleString(to);
+        return <div>{toString}</div>;
+      },
     },
     {
       id: 'totalHours',
@@ -330,6 +343,11 @@ export const createColumns = (
     {
       accessorKey: 'requestedAtLocaleString',
       header: 'Data wystawienia',
+      cell: ({ row }) => {
+        const requestedAt = row.original.requestedAt;
+        const requestedAtString = useClientLocaleString(requestedAt);
+        return <div>{requestedAtString}</div>;
+      },
     },
     {
       accessorKey: 'requestedBy',
@@ -370,6 +388,11 @@ export const createColumns = (
     {
       accessorKey: 'editedAtLocaleString',
       header: 'Data modyfikacji',
+      cell: ({ row }) => {
+        const editedAt = row.original.editedAt;
+        const editedAtString = useClientLocaleString(editedAt);
+        return <div>{editedAtString}</div>;
+      },
     },
     {
       accessorKey: 'canceledBy',
@@ -384,15 +407,54 @@ export const createColumns = (
       },
     },
     {
+      accessorKey: 'closedBy',
+      header: 'Zamknięte przez',
+      cell: ({ row }) => {
+        const closedBy = row.original.closedBy;
+        return (
+          <div className='whitespace-nowrap'>
+            {closedBy ? extractNameFromEmail(closedBy) : '-'}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'closedAtLocaleString',
+      header: 'Data zamknięcia',
+      cell: ({ row }) => {
+        const closedAt = row.original.closedAt;
+        const closedAtString = useClientLocaleString(closedAt);
+        return <div>{closedAtString}</div>;
+      },
+    },
+    {
+      accessorKey: 'accountedBy',
+      header: 'Rozliczone przez',
+      cell: ({ row }) => {
+        const accountedBy = row.original.accountedBy;
+        return (
+          <div className='whitespace-nowrap'>
+            {accountedBy ? extractNameFromEmail(accountedBy) : '-'}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'accountedAtLocaleString',
+      header: 'Data rozliczenia',
+      cell: ({ row }) => {
+        const accountedAt = row.original.accountedAt;
+        const accountedAtString = useClientLocaleString(accountedAt);
+        return <div>{accountedAtString}</div>;
+      },
+    },
+    {
       accessorKey: 'canceledAtLocaleString',
       header: 'Data anulowania',
       cell: ({ row }) => {
-        const canceledAtLocaleString = row.original.canceledAtLocaleString;
-        return (
-          <div>
-            {canceledAtLocaleString ? `${canceledAtLocaleString}` : '-'}
-          </div>
-        );
+        const canceledAt = row.original.canceledAt;
+        const canceledAtString = useClientLocaleString(canceledAt);
+        return <div>{canceledAtString}</div>;
       },
     },
   ];

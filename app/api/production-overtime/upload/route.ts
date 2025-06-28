@@ -171,6 +171,8 @@ export async function POST(req: NextRequest) {
             status: 'closed',
             closedAt: new Date(),
             closedBy: session.user.email,
+            editedAt: new Date(),
+            editedBy: session.user.email,
           },
         },
       );

@@ -339,3 +339,55 @@ export async function cancelOvertimeRequest(id: string) {
     return { error: 'cancelOvertimeRequest server action error' };
   }
 }
+
+export async function markAsAccountedOvertimeRequest(id: string) {
+  console.log('markAsAccountedOvertimeRequest', id);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  const isHR = (session.user?.roles ?? []).includes('hr');
+
+  if (!isHR) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('production_overtime');
+
+    // First check if the request exists and get its current status
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Only allow marking as accounted if status is closed
+    if (request.status !== 'closed') {
+      return { error: 'invalid status' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: 'accounted',
+          accountedAt: new Date(),
+          accountedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateProductionOvertime();
+    return { success: 'accounted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'markAsAccountedOvertimeRequest server action error' };
+  }
+}

@@ -25,6 +25,7 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateProductionOvertime as revalidate } from '../actions';
+import { OvertimeStatus } from '../lib/types';
 import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
 
 // Update the attachment roles to match the specified requirements
@@ -37,7 +38,7 @@ const ATTACHMENT_ROLES = [
 
 interface AddAttachmentDialogProps {
   id: string;
-  status: 'pending' | 'approved' | 'canceled' | 'closed';
+  status: OvertimeStatus;
   owner: string | undefined | null;
   responsibleEmployee: string | undefined | null;
   session: Session | null;
@@ -100,8 +101,6 @@ export default function AddAttachmentDialog({
           formData.append('file', data.file);
           formData.append('overTimeRequestId', id);
 
-          console.log('Sending upload request with ID:', id);
-
           const response = await fetch('/api/production-overtime/upload', {
             method: 'POST',
             body: formData,
@@ -109,8 +108,6 @@ export default function AddAttachmentDialog({
 
           // For debugging, log the full response
           const responseText = await response.text();
-          console.log('Upload response status:', response.status);
-          console.log('Upload response text:', responseText);
 
           // Parse the response text as JSON
           let result;
