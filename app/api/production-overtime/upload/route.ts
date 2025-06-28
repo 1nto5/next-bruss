@@ -168,9 +168,9 @@ export async function POST(req: NextRequest) {
           $set: {
             hasAttachment: true,
             attachmentFilename: fileName,
-            status: 'closed',
-            closedAt: new Date(),
-            closedBy: session.user.email,
+            status: 'completed',
+            completedAt: new Date(),
+            completedBy: session.user.email,
             editedAt: new Date(),
             editedBy: session.user.email,
           },
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message:
-          'Attendance list added successfully and order marked as closed',
+          'Attendance list added successfully and order marked as completed',
         filename: fileName,
       });
     } catch (dbError) {

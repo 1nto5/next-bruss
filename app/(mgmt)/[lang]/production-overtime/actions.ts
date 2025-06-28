@@ -131,7 +131,7 @@ export async function deleteDayOff(
     }
 
     // Check if status allows modifications
-    if (request.status === 'closed' || request.status === 'rejected') {
+    if (request.status === 'completed' || request.status === 'rejected') {
       return { error: 'invalid status' };
     }
 
@@ -294,10 +294,10 @@ export async function cancelOvertimeRequest(id: string) {
       return { error: 'not found' };
     }
 
-    // Don't allow canceling if status is completed, closed, or already canceled
+    // Don't allow canceling if status is completed, accounted, or already canceled
     if (
       request.status === 'completed' ||
-      request.status === 'closed' ||
+      request.status === 'accounted' ||
       request.status === 'canceled'
     ) {
       return { error: 'cannot cancel' };
@@ -362,8 +362,8 @@ export async function markAsAccountedOvertimeRequest(id: string) {
       return { error: 'not found' };
     }
 
-    // Only allow marking as accounted if status is closed
-    if (request.status !== 'closed') {
+    // Only allow marking as accounted if status is completed
+    if (request.status !== 'completed') {
       return { error: 'invalid status' };
     }
 

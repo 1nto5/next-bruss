@@ -60,8 +60,8 @@ export const createColumns = (
           case 'canceled':
             statusLabel = <Badge variant='statusRejected'>Anulowane</Badge>;
             break;
-          case 'closed':
-            statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
+          case 'completed':
+            statusLabel = <Badge variant='statusClosed'>Ukończone</Badge>;
             break;
           case 'accounted':
             statusLabel = <Badge variant='statusAccounted'>Rozliczone</Badge>;
@@ -96,7 +96,7 @@ export const createColumns = (
         // Check if user can cancel the request
         const canCancel =
           request._id &&
-          request.status !== 'closed' &&
+          request.status !== 'completed' &&
           request.status !== 'canceled' &&
           request.status !== 'accounted' &&
           (request.requestedBy === userEmail ||
@@ -122,7 +122,7 @@ export const createColumns = (
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
         const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
-        const hasMarkAsAccountedAction = isHR && request.status === 'closed'; // Only closed requests can be marked as accounted
+        const hasMarkAsAccountedAction = isHR && request.status === 'completed'; // Only completed requests can be marked as accounted
         const hasAddAttachmentAction =
           request._id && request.status === 'approved' && canAddAttachment;
         const hasDownloadAttachmentAction =
@@ -156,7 +156,7 @@ export const createColumns = (
                     {/* Only show approve button if user can approve */}
                     {canApprove &&
                       request.status !== 'approved' &&
-                      request.status !== 'closed' &&
+                      request.status !== 'completed' &&
                       request.status !== 'accounted' && (
                         <DropdownMenuItem
                           onSelect={(e) => {
@@ -333,22 +333,18 @@ export const createColumns = (
       },
     },
     {
-      accessorKey: 'note',
-      header: 'Dod. info.',
+      accessorKey: 'responsibleEmployee',
+      header: 'Osoba odpowiedzialna',
       cell: ({ row }) => {
-        const note = row.getValue('note');
-        return <div className='w-[250px] text-justify'>{note as string}</div>;
+        const responsibleEmployee = row.getValue('responsibleEmployee');
+        return (
+          <div className='whitespace-nowrap'>
+            {extractNameFromEmail(responsibleEmployee as string)}
+          </div>
+        );
       },
     },
-    {
-      accessorKey: 'requestedAtLocaleString',
-      header: 'Data wystawienia',
-      cell: ({ row }) => {
-        const requestedAt = row.original.requestedAt;
-        const requestedAtString = useClientLocaleString(requestedAt);
-        return <div>{requestedAtString}</div>;
-      },
-    },
+
     {
       accessorKey: 'requestedBy',
       header: 'Wystawione przez',
@@ -362,20 +358,18 @@ export const createColumns = (
       },
     },
     {
-      accessorKey: 'responsibleEmployee',
-      header: 'Osoba odpowiedzialna',
+      accessorKey: 'requestedAtLocaleString',
+      header: 'Data wystawienia',
       cell: ({ row }) => {
-        const responsibleEmployee = row.getValue('responsibleEmployee');
-        return (
-          <div className='whitespace-nowrap'>
-            {extractNameFromEmail(responsibleEmployee as string)}
-          </div>
-        );
+        const requestedAt = row.original.requestedAt;
+        const requestedAtString = useClientLocaleString(requestedAt);
+        return <div>{requestedAtString}</div>;
       },
     },
+
     {
       accessorKey: 'editedBy',
-      header: 'Zmodyfikowane przez',
+      header: 'Ostatnia modyfikacja przez',
       cell: ({ row }) => {
         const editedBy = row.original.editedBy;
         return (
@@ -394,37 +388,26 @@ export const createColumns = (
         return <div>{editedAtString}</div>;
       },
     },
+
     {
-      accessorKey: 'canceledBy',
-      header: 'Anulowane przez',
+      accessorKey: 'completedBy',
+      header: 'Ukończone przez',
       cell: ({ row }) => {
-        const canceledBy = row.original.canceledBy;
+        const completedBy = row.original.completedBy;
         return (
           <div className='whitespace-nowrap'>
-            {canceledBy ? extractNameFromEmail(canceledBy) : '-'}
+            {completedBy ? extractNameFromEmail(completedBy) : '-'}
           </div>
         );
       },
     },
     {
-      accessorKey: 'closedBy',
-      header: 'Zamknięte przez',
+      accessorKey: 'completedAtLocaleString',
+      header: 'Data ukończenia',
       cell: ({ row }) => {
-        const closedBy = row.original.closedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {closedBy ? extractNameFromEmail(closedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'closedAtLocaleString',
-      header: 'Data zamknięcia',
-      cell: ({ row }) => {
-        const closedAt = row.original.closedAt;
-        const closedAtString = useClientLocaleString(closedAt);
-        return <div>{closedAtString}</div>;
+        const completedAt = row.original.completedAt;
+        const completedAtString = useClientLocaleString(completedAt);
+        return <div>{completedAtString}</div>;
       },
     },
     {
@@ -449,12 +432,32 @@ export const createColumns = (
       },
     },
     {
+      accessorKey: 'canceledBy',
+      header: 'Anulowane przez',
+      cell: ({ row }) => {
+        const canceledBy = row.original.canceledBy;
+        return (
+          <div className='whitespace-nowrap'>
+            {canceledBy ? extractNameFromEmail(canceledBy) : '-'}
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: 'canceledAtLocaleString',
       header: 'Data anulowania',
       cell: ({ row }) => {
         const canceledAt = row.original.canceledAt;
         const canceledAtString = useClientLocaleString(canceledAt);
         return <div>{canceledAtString}</div>;
+      },
+    },
+    {
+      accessorKey: 'note',
+      header: 'Dod. info.',
+      cell: ({ row }) => {
+        const note = row.getValue('note');
+        return <div className='w-[250px] text-justify'>{note as string}</div>;
       },
     },
   ];

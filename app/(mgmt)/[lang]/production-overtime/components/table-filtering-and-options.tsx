@@ -182,9 +182,10 @@ export default function TableFilteringAndOptions({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value='pending'>Oczekuje</SelectItem>
-                    <SelectItem value='approved'>Zatwierdzony</SelectItem>
-                    <SelectItem value='rejected'>Odrzucony</SelectItem>
-                    <SelectItem value='closed'>Zamknięty</SelectItem>
+                    <SelectItem value='approved'>Zatwierdzone</SelectItem>
+                    <SelectItem value='canceled'>Anulowane</SelectItem>
+                    <SelectItem value='completed'>Ukończone</SelectItem>
+                    <SelectItem value='accounted'>Rozliczone</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -168,7 +168,7 @@ export default function AddAttachmentDialog({
       {
         loading: 'Przesyłanie listy obecności...',
         success:
-          'Lista obecności dodana pomyślnie! Status zlecenia zmieniony na zamknięty.',
+          'Lista obecności dodana pomyślnie! Status zlecenia zmieniony na ukończony.',
         error: (err) => err.message,
       },
     );
@@ -182,7 +182,7 @@ export default function AddAttachmentDialog({
         </DialogHeader>
         <DialogDescription>
           Dodanie listy obecności jest równoznaczne z potwierdzeniem wykonania
-          zlecenia oraz zmiani jego statusu na zamknięty.
+          zlecenia oraz zmiani jego statusu na ukończony.
         </DialogDescription>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>

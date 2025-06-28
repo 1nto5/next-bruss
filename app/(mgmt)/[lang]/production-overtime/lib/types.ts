@@ -1,11 +1,11 @@
 import { EmployeeType } from '@/lib/types/employee-types';
 
-// Add or update the status options to include 'accounted'
+// Add or update the status options to include 'completed'
 export type OvertimeStatus =
   | 'pending'
   | 'approved'
   | 'canceled'
-  | 'closed'
+  | 'completed'
   | 'accounted';
 
 export type OvertimeType = {
@@ -26,8 +26,8 @@ export type OvertimeType = {
   approvedBy?: string;
   canceledAt?: Date;
   canceledBy?: string;
-  closedAt?: Date;
-  closedBy?: string;
+  completedAt?: Date;
+  completedBy?: string;
   accountedAt?: Date;
   accountedBy?: string;
   hasAttachment?: boolean;
