@@ -93,12 +93,22 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
     },
     cell: ({ row }) => {
       const approvedPositions = row.original.approvedPositions;
+      const totalPositions = row.original.positionsLength;
+      const shouldHighlight =
+        totalPositions <= 3 ? approvedPositions === 0 : approvedPositions <= 3;
+
       return (
         <div
-          className={`text-center ${approvedPositions < 3 ? 'animate-pulse font-bold text-red-500' : ''}`}
+          className={`text-center ${shouldHighlight ? 'animate-pulse font-bold text-red-500' : ''}`}
         >
           {approvedPositions}
         </div>
+        // return (
+        //   <div
+        //     className={`text-center ${approvedPositions < 3 ? 'animate-pulse font-bold text-red-500' : ''}`}
+        //   >
+        //     {approvedPositions}
+        //   </div>
       );
     },
   },
