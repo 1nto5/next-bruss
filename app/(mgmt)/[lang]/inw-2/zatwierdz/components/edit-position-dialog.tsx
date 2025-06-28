@@ -1,5 +1,7 @@
 'use client';
 
+import { PositionType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
+import { UpdatePositionSchema } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/zod';
 import { Button } from '@/components/ui/button';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
@@ -25,8 +27,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { PositionType } from '@/lib/types/inventory';
-import { UpdatePositionSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Pencil } from 'lucide-react';
 import { useState } from 'react';
@@ -127,12 +127,12 @@ export default function EditPositionDialog({
                       <FormLabel>Ilość {`[${position.unit}]`}</FormLabel>
                       <FormControl>
                         <Input
-                          type='number'
-                          className=''
                           {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            // Replace comma with period
+                            const value = e.target.value.replace(',', '.');
+                            field.onChange(value);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
