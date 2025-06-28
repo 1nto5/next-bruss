@@ -489,7 +489,7 @@ export default function PositionEdit() {
                       {selectedArticle.converter &&
                         form.getValues('unit') === 'kg' && (
                           <FormDescription>
-                            {`10 st = ${selectedArticle.converter} kg, użyj "." (kropka) dla wartości dziesiętnych`}
+                            {`10 st = ${selectedArticle.converter} kg`}
                           </FormDescription>
                         )}
                       <div className='flex items-center space-x-2'>
@@ -498,7 +498,13 @@ export default function PositionEdit() {
                             className=''
                             disabled={data?.success?.approver}
                             placeholder={`podaj ilość w ${form.getValues('unit') || selectedArticle.unit}`}
+                            inputMode='decimal'
                             {...field}
+                            onChange={(e) => {
+                              // Handle comma to period conversion locally for display
+                              const value = e.target.value.replace(/,/g, '.');
+                              field.onChange(value);
+                            }}
                           />
                         </FormControl>
                       </div>
@@ -511,8 +517,9 @@ export default function PositionEdit() {
                           <FormDescription>
                             ={' '}
                             {Math.floor(
-                              Number(form.getValues('quantity')) /
-                                selectedArticle.converter || 0,
+                              Number(
+                                form.getValues('quantity').replace(/,/g, '.'),
+                              ) / selectedArticle.converter || 0,
                             )}{' '}
                             st
                           </FormDescription>

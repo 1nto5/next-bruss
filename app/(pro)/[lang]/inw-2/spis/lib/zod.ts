@@ -74,12 +74,13 @@ export const positionEditSchema = z.object({
   quantity: z
     .string()
     .min(1, { message: 'Wprowadź ilość!' })
+    .transform((value) => value.replace(/,/g, '.'))
     .refine(
       (value) => {
         return /^\d+(\.\d{1,})?$/.test(value);
       },
       {
-        message: 'Wprowadź poprawną wartość używając "." zamiast ","!',
+        message: 'Wprowadź poprawną wartość liczbową!',
       },
     ),
   wip: z.boolean(),
