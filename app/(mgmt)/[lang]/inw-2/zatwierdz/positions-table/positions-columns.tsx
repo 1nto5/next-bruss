@@ -1,7 +1,7 @@
 'use client';
 
+import { PositionType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
 import { Button } from '@/components/ui/button';
-import { PositionType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Check } from 'lucide-react';
 import EditPositionDialog from '../components/edit-position-dialog';

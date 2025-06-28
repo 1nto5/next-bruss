@@ -1,6 +1,6 @@
 import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
-import { ArticleConfigType } from '@/lib/types/articleConfig';
+import { ArticleConfigType } from '@/lib/types/article-config';
 import { columns } from './table/columns';
 import { DataTable } from './table/data-table';
 
@@ -26,16 +26,12 @@ async function getArticleConfigs(
   return { fetchTime, allConfigs };
 }
 
-export default async function ArticleConfigsPage(
-  props: {
-    params: Promise<{ lang: Locale }>;
-  }
-) {
+export default async function ArticleConfigsPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang
-  } = params;
+  const { lang } = params;
 
   const { fetchTime, allConfigs } = await getArticleConfigs(lang);
   return (

@@ -42,7 +42,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { CardType } from '../../../../../../lib/types/inventory';
+import { CardType } from '../../../../../(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
 import { createNewCard } from '../actions';
 import { useGetCards } from '../data/get-cards';
 import { useCardStore, usePersonalNumberStore } from '../lib/stores';

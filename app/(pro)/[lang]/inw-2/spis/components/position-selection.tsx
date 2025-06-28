@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/table';
 import clsx from 'clsx';
 import { useEffect } from 'react';
-import { PositionType } from '../../../../../../lib/types/inventory';
+import { PositionType } from '../../../../../(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
 import { useGetCardPositions } from '../data/get-card-positions';
 import {
   useCardStore,

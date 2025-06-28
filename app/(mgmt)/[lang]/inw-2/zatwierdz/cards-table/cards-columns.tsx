@@ -1,7 +1,7 @@
 'use client';
 
+import { CardTableDataType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
 import { Button } from '@/components/ui/button';
-import { CardTableDataType } from '@/lib/types/inventory';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, List } from 'lucide-react';
 import Link from 'next/link';

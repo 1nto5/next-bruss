@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
-import { ArticleConfigType } from '@/lib/types/articleConfig';
+import { ArticleConfigType } from '@/lib/types/article-config';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';

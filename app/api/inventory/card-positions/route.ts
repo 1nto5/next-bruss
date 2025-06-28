@@ -1,5 +1,4 @@
 import { dbc } from '@/lib/mongo';
-import { PositionType } from '@/lib/types/inventory';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config

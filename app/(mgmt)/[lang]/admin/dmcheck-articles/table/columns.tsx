@@ -14,7 +14,7 @@ import {
   // DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ArticleConfigType } from '@/lib/types/articleConfig';
+import { ArticleConfigType } from '@/lib/types/article-config';
 import { Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -47,7 +47,7 @@ const ActionsCell = ({ row }: { row: any }) => {
             <span>Copy</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className=' focus:bg-red-400 dark:focus:bg-red-700'
+            className='focus:bg-red-400 dark:focus:bg-red-700'
             onClick={() => setIsOpenDeleteDialog(true)}
           >
             <Trash2 className='mr-2 h-4 w-4' />

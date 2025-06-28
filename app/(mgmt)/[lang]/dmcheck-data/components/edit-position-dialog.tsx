@@ -1,10 +1,11 @@
 'use client';
 
+import { PositionType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
+import { UpdatePositionSchema } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   // DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -25,10 +26,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { PositionType } from '@/lib/types/inventory';
-import { UpdatePositionSchema } from '@/lib/z/inventory';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { set } from 'date-fns';
 import { Loader2, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

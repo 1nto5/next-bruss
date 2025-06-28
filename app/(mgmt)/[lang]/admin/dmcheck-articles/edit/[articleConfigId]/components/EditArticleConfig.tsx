@@ -1,8 +1,11 @@
 'use client';
-import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -12,30 +15,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  // CardDescription,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 // import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ArticleConfigType } from '@/lib/types/article-config';
+import { Loader2, Table } from 'lucide-react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { updateArticleConfig } from '../../../actions';
-import Link from 'next/link';
-import { Table } from 'lucide-react';
-import { ArticleConfigType } from '@/lib/types/articleConfig';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -250,7 +241,7 @@ export default function EditArticleConfig({
                   control={form.control}
                   name='pallet'
                   render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                    <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -315,7 +306,7 @@ export default function EditArticleConfig({
               control={form.control}
               name='secondValidation'
               render={({ field }) => (
-                <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -370,7 +361,7 @@ export default function EditArticleConfig({
                   control={form.control}
                   name='ford'
                   render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                    <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -388,7 +379,7 @@ export default function EditArticleConfig({
                   control={form.control}
                   name='bmw'
                   render={({ field }) => (
-                    <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+                    <FormItem className='flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}

@@ -1,9 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Locale } from '@/i18n.config';
 import {
   CardPositionsTableDataType,
   CardTableDataType,
-} from '@/lib/types/inventory';
+} from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Locale } from '@/i18n.config';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { cardsColumns } from './cards-table/cards-columns';
 import { CardsDataTable } from './cards-table/cards-data-table';

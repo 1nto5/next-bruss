@@ -1,5 +1,5 @@
+import { CardPositionsTableDataType } from '@/app/(mgmt)/[lang]/inw-2/zatwierdz/lib/types';
 import { Locale } from '@/i18n.config';
-import { CardPositionsTableDataType } from '@/lib/types/inventory';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { columns } from './card-positions-table/columns';
 import { DataTable } from './card-positions-table/data-table';
