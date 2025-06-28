@@ -136,27 +136,35 @@ export default function TableFilteringAndOptions({
     <Card>
       <CardHeader className='p-4'>
         <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-          <div className='flex items-center space-x-2'>
-            <Switch
-              id='show-filters'
-              checked={showFilters}
-              onCheckedChange={setShowFilters}
-            />
-            <Label htmlFor='show-filters'>Pokaż filtry</Label>
+          <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2'>
+            <div className='flex items-center space-x-2'>
+              <Switch
+                id='show-filters'
+                checked={showFilters}
+                onCheckedChange={setShowFilters}
+              />
+              <Label htmlFor='show-filters'>Pokaż filtry</Label>
+            </div>
             {isLogged && (
               <>
-                <Switch
-                  id='only-my-requests'
-                  checked={showOnlyMine}
-                  onCheckedChange={handleShowOnlyMineChange}
-                />
-                <Label htmlFor='only-my-requests'>Moje zlecenia</Label>
-                <Switch
-                  id='only-responsible'
-                  checked={showOnlyResponsible}
-                  onCheckedChange={handleShowOnlyResponsibleChange}
-                />
-                <Label htmlFor='only-responsible'>Jestem odpowiedzialny</Label>
+                <div className='flex items-center space-x-2'>
+                  <Switch
+                    id='only-my-requests'
+                    checked={showOnlyMine}
+                    onCheckedChange={handleShowOnlyMineChange}
+                  />
+                  <Label htmlFor='only-my-requests'>Moje zlecenia</Label>
+                </div>
+                <div className='flex items-center space-x-2'>
+                  <Switch
+                    id='only-responsible'
+                    checked={showOnlyResponsible}
+                    onCheckedChange={handleShowOnlyResponsibleChange}
+                  />
+                  <Label htmlFor='only-responsible'>
+                    Jestem odpowiedzialny
+                  </Label>
+                </div>
               </>
             )}
           </div>
