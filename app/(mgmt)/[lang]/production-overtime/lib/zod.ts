@@ -42,8 +42,8 @@ export const NewOvertimeRequestSchema = z
     path: ['to'],
   })
   .refine(
-    (data) => data.to.getTime() - data.from.getTime() <= 8 * 60 * 60 * 1000,
-    { message: 'Przepracowany czas nie może przekraczać 8h!', path: ['to'] },
+    (data) => data.to.getTime() - data.from.getTime() <= 24 * 60 * 60 * 1000,
+    { message: 'Czas nie może przekraczać 24h (3 zmiany)!', path: ['to'] },
   )
   .refine(
     (data) => data.to.getTime() - data.from.getTime() >= 1 * 60 * 60 * 1000,
