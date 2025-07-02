@@ -609,6 +609,20 @@ export default function DeviationView({
                   <CardTitle className='flex items-center'>
                     <CheckCheck className='mr-2 h-5 w-5' /> Zatwierdzenia
                   </CardTitle>
+                  <CardDescription>
+                    {!session && (
+                      <span>
+                        Aby uzyskać dostęp do opcji zatwierdzania,{' '}
+                        <Link
+                          href={`/${lang}/auth?callbackUrl=${encodeURIComponent(`/${lang}/deviations/${deviation?._id}`)}`}
+                          className='text-blue-600 underline hover:text-blue-800'
+                        >
+                          zaloguj się
+                        </Link>
+                        .
+                      </span>
+                    )}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
