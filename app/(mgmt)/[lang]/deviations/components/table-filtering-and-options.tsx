@@ -222,9 +222,9 @@ export default function TableFilteringAndOptions({
             {' '}
             {/* Increase gap */}
             {/* Row 1: Status, Area, Reason */}
-            <div className='flex flex-wrap items-end gap-4'>
+            <div className='flex flex-wrap items-start gap-4'>
               {' '}
-              {/* Use items-end for alignment */}
+              {/* Use items-start for alignment */}
               {/* Status Filter */}
               <div className='flex flex-col space-y-1'>
                 {' '}
@@ -296,9 +296,9 @@ export default function TableFilteringAndOptions({
               </div>
             </div>
             {/* Row 2: Dates and Action Buttons */}
-            <div className='flex flex-wrap items-end gap-4'>
+            <div className='flex flex-wrap items-start gap-4'>
               {' '}
-              {/* Use items-end for alignment */}
+              {/* Use items-start for alignment */}
               {/* Date Filter */}
               <div className='flex flex-col space-y-1'>
                 {' '}
