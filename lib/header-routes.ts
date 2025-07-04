@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
   productionOvertime: '/production-overtime',
+  overtime: '/overtime',
   codesGenerator: '/codes-generator',
   projects: '/projects',
 };
@@ -35,52 +36,46 @@ export const plHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
-        description: 'Dane w systemie skanowania kodów DMC.',
       },
       {
         href: ROUTE_PATHS.deviations,
         title: 'Odchylenia',
-        description: 'Zarządzanie odchyleniami produkcji.',
       },
       {
         href: ROUTE_PATHS.failuresLv,
         title: 'Awarie LV',
-        description: 'Raport oraz zgłaszanie awarii LV.',
-      },
-      {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja',
-
-        description:
-          'Zarządzanie nadliczbowymi godzinami pracy pracowników produkcji.',
       },
     ],
   },
   {
-    title: 'Inwentaryzacja',
+    title: 'Pracownik',
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.inw2spis,
-        title: 'Inwentaryzacja - spis',
-        description: 'Aplikacja do wykonywania spisu inwentaryzacyjnego.',
+        href: ROUTE_PATHS.productionOvertime,
+        title: 'Praca w godzinach nadliczbowych - produkcja',
       },
       {
-        href: ROUTE_PATHS.inw2zatwierdz,
-        title: 'Zatwierdzenie inwentaryzacji',
-        description: 'Narzędzie do zatwierdzania zinwentaryzowanych pozycji.',
+        href: ROUTE_PATHS.overtime,
+        title: 'Zgłoszenia nadgodzin',
       },
     ],
   },
   {
-    title: 'Magazyn',
+    title: 'Narzędzia',
     href: '',
     submenu: [
       {
         href: ROUTE_PATHS.codesGenerator,
         title: 'Generator QR/Barcode/DMC',
-        description:
-          'Generowanie plików PDF dla kodów QR, kodów kreskowych oraz kodów DMC.',
+      },
+      {
+        href: ROUTE_PATHS.inw2spis,
+        title: 'Inwentaryzacja - spis',
+      },
+      {
+        href: ROUTE_PATHS.inw2zatwierdz,
+        title: 'Zatwierdzenie inwentaryzacji',
       },
     ],
   },
