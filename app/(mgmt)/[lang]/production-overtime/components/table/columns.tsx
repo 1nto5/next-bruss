@@ -296,24 +296,31 @@ export const createColumns = (
       },
     },
     {
-      id: 'totalHours',
-      header: 'Liczba godzin',
-      cell: ({ row }) => {
-        const fromDate = new Date(row.original.from);
-        const toDate = new Date(row.original.to);
-        const totalHours =
-          Math.round(
-            ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60)) * 100,
-          ) / 100;
-        return <div>{totalHours > 0 ? `${totalHours}h` : '-'}</div>;
-      },
-    },
-    {
       accessorKey: 'numberOfEmployees',
       header: 'Liczba pracowników',
       cell: ({ row }) => {
         const numberOfEmployees = row.getValue('numberOfEmployees') as number;
         return <div>{numberOfEmployees || 0}</div>;
+      },
+    },
+    {
+      id: 'totalHours',
+      header: 'Liczba godzin',
+      cell: ({ row }) => {
+        const fromDate = new Date(row.original.from);
+        const toDate = new Date(row.original.to);
+        const numberOfEmployees = row.original.numberOfEmployees || 0;
+
+        // Calculate hours per employee
+        const hoursPerEmployee =
+          Math.round(
+            ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60)) * 100,
+          ) / 100;
+
+        // Calculate total hours for all employees
+        const totalHours = hoursPerEmployee * numberOfEmployees;
+
+        return <div>{totalHours > 0 ? `${totalHours}h` : '-'}</div>;
       },
     },
     {
