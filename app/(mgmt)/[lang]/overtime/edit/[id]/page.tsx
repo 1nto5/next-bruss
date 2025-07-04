@@ -3,7 +3,7 @@ import { dbc } from '@/lib/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
 import { notFound, redirect } from 'next/navigation';
-import EditOvertimeSubmissionForm from '../../../overtime/components/edit-overtime-request-form';
+import OvertimeRequestForm from '../../../overtime/components/overtime-request-form';
 
 // Get users with manager roles (any role containing "manager")
 async function getManagers() {
@@ -42,8 +42,8 @@ async function getOvertimeSubmission(id: string) {
       _id: submission._id.toString(),
       status: submission.status,
       supervisor: submission.supervisor,
-      workedDate: submission.workedDate,
-      hoursWorked: submission.hoursWorked,
+      date: submission.date,
+      hours: submission.hours,
       reason: submission.reason,
       description: submission.description,
       note: submission.note,
@@ -95,9 +95,10 @@ export default async function EditOvertimeSubmissionPage(props: {
   }
 
   return (
-    <EditOvertimeSubmissionForm
+    <OvertimeRequestForm
       managers={managers}
       loggedInUserEmail={session.user.email ?? ''}
+      mode='edit'
       submission={submission}
     />
   );

@@ -10,20 +10,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
-import {
-  Check,
-  Download,
-  Edit,
-  MoreHorizontal,
-  Paperclip,
-  Trash2,
-  X,
-} from 'lucide-react';
+import { Check, Edit, MoreHorizontal, X } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
 import { OvertimeSubmissionType } from '../../lib/types';
-import AddAttachmentDialog from '../add-attachment-dialog';
 import ApproveSubmissionDialog from '../approve-submission-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -35,12 +26,8 @@ export const createColumns = (
 ): ColumnDef<OvertimeSubmissionType>[] => {
   // Check user roles
   const userRoles = session?.user?.roles || [];
-  const isManager = userRoles.some((role) =>
-    role.toLowerCase().includes('manager'),
-  );
   const isAdmin = userRoles.includes('admin');
   const isHR = userRoles.includes('hr');
-  const canApprove = isManager || isAdmin || isHR;
 
   return [
     {
@@ -67,6 +54,9 @@ export const createColumns = (
           case 'accounted':
             statusLabel = <Badge variant='statusAccounted'>Rozliczone</Badge>;
             break;
+          case 'cancelled':
+            statusLabel = <Badge variant='statusCancelled'>Anulowane</Badge>;
+            break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
         }
@@ -80,46 +70,34 @@ export const createColumns = (
       cell: ({ row }) => {
         const submission = row.original;
         // State to control dialogs
-        const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] =
-          useState(false);
         const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
         const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
         const [isMarkAsAccountedDialogOpen, setIsMarkAsAccountedDialogOpen] =
           useState(false);
         const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
-        // Get user email for permission checks
+        // Get user email and roles for permission checks
         const userEmail = session?.user?.email;
+        const userRoles = session?.user?.roles || [];
         const isAuthor = submission.submittedBy === userEmail;
+
+        // Check if user has HR or admin role for emergency override
+        const isHR = userRoles.includes('hr');
+        const isAdmin = userRoles.includes('admin');
 
         // Check permissions
         const canApproveReject =
-          (submission.supervisor === userEmail || isAdmin) &&
+          (submission.supervisor === userEmail || isHR || isAdmin) &&
           submission.status === 'pending';
 
         const canEdit = isAuthor && submission.status === 'pending';
         const canDelete = isAuthor && submission.status === 'pending';
 
-        const canAddAttachment =
-          userRoles.some(
-            (role) => role.toLowerCase().includes('manager') || role === 'hr',
-          ) ||
-          userEmail === submission.submittedBy ||
-          userEmail === submission.supervisor;
-
         const hasMarkAsAccountedAction =
-          (isHR || isAdmin) && submission.status === 'approved';
-        const hasAddAttachmentAction = submission._id && canAddAttachment;
-        const hasDownloadAttachmentAction =
-          submission._id && submission.hasAttachment;
+          isHR && submission.status === 'approved';
 
         const hasActions =
-          canEdit ||
-          canDelete ||
-          canApproveReject ||
-          hasMarkAsAccountedAction ||
-          hasAddAttachmentAction ||
-          hasDownloadAttachmentAction;
+          canEdit || canDelete || canApproveReject || hasMarkAsAccountedAction;
 
         if (!hasActions) {
           return null;
@@ -144,7 +122,7 @@ export const createColumns = (
                   </Link>
                 )}
 
-                {/* Delete button for authors */}
+                {/* Cancel button for authors */}
                 {canDelete && (
                   <DropdownMenuItem
                     onSelect={(e) => {
@@ -153,8 +131,8 @@ export const createColumns = (
                     }}
                     className='focus:bg-red-400 dark:focus:bg-red-700'
                   >
-                    <Trash2 className='mr-2 h-4 w-4' />
-                    <span>Usuń</span>
+                    <X className='mr-2 h-4 w-4' />
+                    <span>Anuluj</span>
                   </DropdownMenuItem>
                 )}
 
@@ -197,38 +175,10 @@ export const createColumns = (
                     <span>Oznacz jako rozliczone</span>
                   </DropdownMenuItem>
                 )}
-
-                {/* Add attachment button */}
-                {hasAddAttachmentAction && (
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setIsAttachmentDialogOpen(true);
-                    }}
-                  >
-                    <Paperclip className='mr-2 h-4 w-4' />
-                    <span>Dodaj załącznik</span>
-                  </DropdownMenuItem>
-                )}
-
-                {/* Download attachment button */}
-                {hasDownloadAttachmentAction && (
-                  <DropdownMenuItem asChild>
-                    <Link href={`/api/overtime/download?id=${submission._id}`}>
-                      <Download className='mr-2 h-4 w-4' />
-                      <span>Pobierz załącznik</span>
-                    </Link>
-                  </DropdownMenuItem>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* Dialogs */}
-            <AddAttachmentDialog
-              isOpen={isAttachmentDialogOpen}
-              onOpenChange={setIsAttachmentDialogOpen}
-              submissionId={submission._id}
-            />
             <ApproveSubmissionDialog
               isOpen={isApproveDialogOpen}
               onOpenChange={setIsApproveDialogOpen}
@@ -261,7 +211,11 @@ export const createColumns = (
       header: 'Zgłaszający',
       cell: ({ row }) => {
         const email = row.getValue('submittedBy') as string;
-        return <span>{extractNameFromEmail(email)}</span>;
+        return (
+          <span className='whitespace-nowrap'>
+            {extractNameFromEmail(email)}
+          </span>
+        );
       },
     },
     {
@@ -269,23 +223,31 @@ export const createColumns = (
       header: 'Kierownik',
       cell: ({ row }) => {
         const email = row.getValue('supervisor') as string;
-        return <span>{extractNameFromEmail(email)}</span>;
+        return (
+          <span className='whitespace-nowrap'>
+            {extractNameFromEmail(email)}
+          </span>
+        );
       },
     },
     {
-      accessorKey: 'workedDate',
-      header: 'Data pracy',
+      accessorKey: 'date',
+      header: 'Data',
       cell: ({ row }) => {
-        const date = new Date(row.getValue('workedDate') as string);
+        const date = new Date(row.getValue('date') as string);
         return <span>{date.toLocaleDateString('pl-PL')}</span>;
       },
     },
     {
-      accessorKey: 'hoursWorked',
+      accessorKey: 'hours',
       header: 'Godziny',
       cell: ({ row }) => {
-        const hours = row.getValue('hoursWorked') as number;
-        return <span>{hours}h</span>;
+        const hours = row.getValue('hours') as number;
+        return (
+          <span className={hours < 0 ? 'text-red-600 dark:text-red-400' : ''}>
+            {hours}h
+          </span>
+        );
       },
     },
     {
@@ -293,11 +255,7 @@ export const createColumns = (
       header: 'Uzasadnienie',
       cell: ({ row }) => {
         const reason = row.getValue('reason') as string;
-        return (
-          <span className='max-w-[200px] truncate' title={reason}>
-            {reason}
-          </span>
-        );
+        return <div className='w-[250px] text-justify'>{reason}</div>;
       },
     },
     {
@@ -312,6 +270,123 @@ export const createColumns = (
               hour: '2-digit',
               minute: '2-digit',
             })}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'editedAt',
+      header: 'Data edycji',
+      cell: ({ row }) => {
+        const date = row.getValue('editedAt') as Date;
+        if (!date) return <span>-</span>;
+        return (
+          <span>
+            {date.toLocaleDateString('pl-PL')}{' '}
+            {date.toLocaleTimeString('pl-PL', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'editedBy',
+      header: 'Edytował',
+      cell: ({ row }) => {
+        const email = row.getValue('editedBy') as string;
+        if (!email) return <span>-</span>;
+        return (
+          <span className='whitespace-nowrap'>
+            {extractNameFromEmail(email)}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'approvedAt',
+      header: 'Data zatwierdzenia',
+      cell: ({ row }) => {
+        const date = row.getValue('approvedAt') as Date;
+        if (!date) return <span>-</span>;
+        return (
+          <span>
+            {date.toLocaleDateString('pl-PL')}{' '}
+            {date.toLocaleTimeString('pl-PL', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'approvedBy',
+      header: 'Zatwierdził',
+      cell: ({ row }) => {
+        const email = row.getValue('approvedBy') as string;
+        if (!email) return <span>-</span>;
+        return (
+          <span className='whitespace-nowrap'>
+            {extractNameFromEmail(email)}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'rejectedAt',
+      header: 'Data odrzucenia',
+      cell: ({ row }) => {
+        const date = row.getValue('rejectedAt') as Date;
+        if (!date) return <span>-</span>;
+        return (
+          <span>
+            {date.toLocaleDateString('pl-PL')}{' '}
+            {date.toLocaleTimeString('pl-PL', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        );
+      },
+    },
+
+    {
+      accessorKey: 'rejectionReason',
+      header: 'Powód odrzucenia',
+      cell: ({ row }) => {
+        const reason = row.getValue('rejectionReason') as string;
+        if (!reason) return <span>-</span>;
+        return <div className='w-[250px] text-justify'>{reason}</div>;
+      },
+    },
+    {
+      accessorKey: 'accountedAt',
+      header: 'Data rozliczenia',
+      cell: ({ row }) => {
+        const date = row.getValue('accountedAt') as Date;
+        if (!date) return <span>-</span>;
+        return (
+          <span>
+            {date.toLocaleDateString('pl-PL')}{' '}
+            {date.toLocaleTimeString('pl-PL', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: 'accountedBy',
+      header: 'Rozliczył',
+      cell: ({ row }) => {
+        const email = row.getValue('accountedBy') as string;
+        if (!email) return <span>-</span>;
+        return (
+          <span className='whitespace-nowrap'>
+            {extractNameFromEmail(email)}
           </span>
         );
       },

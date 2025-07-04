@@ -29,8 +29,6 @@ import { Session } from 'next-auth';
 interface DataTableProps<TData, TValue> {
   columns: (session: Session | null) => ColumnDef<TData, TValue>[];
   data: TData[];
-  fetchTimeLocaleString: string;
-  fetchTime: Date;
   session: Session | null;
 }
 

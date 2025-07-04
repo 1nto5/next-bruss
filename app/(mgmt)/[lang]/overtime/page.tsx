@@ -3,24 +3,35 @@ import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { getUsers } from '@/lib/get-users';
 import { dbc } from '@/lib/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { KeyRound, Plus } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import OvertimeSummaryDisplay from './components/overtime-summary';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
+import {
+  OvertimeSummary,
+  calculateUnclaimedOvertimeHours,
+} from './lib/calculate-overtime';
 import { OvertimeSubmissionType } from './lib/types';
 
-async function getOvertimeSubmissions(session: Session): Promise<{
+async function getOvertimeSubmissions(
+  session: Session,
+  searchParams: { [key: string]: string | undefined },
+): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
   overtimeSubmissionsLocaleString: OvertimeSubmissionType[];
+  overtimeSummary: OvertimeSummary;
+  pendingApprovalsCount: number;
 }> {
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    redirect('/auth?callbackUrl=/overtime');
   }
 
   try {
@@ -28,35 +39,93 @@ async function getOvertimeSubmissions(session: Session): Promise<{
 
     // Get user roles
     const userRoles = session.user?.roles ?? [];
-    const isManager = userRoles.some((role: string) =>
-      role.toLowerCase().includes('manager'),
+    const isManager = userRoles.some(
+      (role: string) =>
+        role.toLowerCase().includes('manager') ||
+        role.toLowerCase().includes('group-leader'),
     );
     const isAdmin = userRoles.includes('admin');
     const isHR = userRoles.includes('hr');
 
-    let submissions;
+    // Calculate pending approvals count for current user
+    let pendingApprovalsCount = 0;
+    if (isManager || isAdmin || isHR) {
+      const pendingApprovals = await coll
+        .find({
+          status: 'pending',
+          supervisor: session.user.email,
+        })
+        .toArray();
+      pendingApprovalsCount = pendingApprovals.length;
+    }
+
+    // Build base query based on user permissions
+    let baseQuery: any = {};
 
     if (isAdmin || isHR) {
       // Admins and HR can see all submissions
-      submissions = await coll.find({}).sort({ submittedAt: -1 }).toArray();
+      baseQuery = {};
     } else if (isManager) {
       // Managers can see submissions they supervise and their own submissions
-      submissions = await coll
-        .find({
-          $or: [
-            { supervisor: session.user.email },
-            { submittedBy: session.user.email },
-          ],
-        })
-        .sort({ submittedAt: -1 })
-        .toArray();
+      baseQuery = {
+        $or: [
+          { supervisor: session.user.email },
+          { submittedBy: session.user.email },
+        ],
+      };
     } else {
       // Regular employees can only see their own submissions
-      submissions = await coll
-        .find({ submittedBy: session.user.email })
-        .sort({ submittedAt: -1 })
-        .toArray();
+      baseQuery = { submittedBy: session.user.email };
     }
+
+    // Apply filters from search parameters
+    const filters: any = { ...baseQuery };
+
+    // Status filter
+    if (searchParams.status) {
+      filters.status = searchParams.status;
+    }
+
+    // Month filter
+    if (searchParams.month) {
+      const [year, month] = searchParams.month.split('-').map(Number);
+      const startOfMonth = new Date(year, month - 1, 1);
+      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+      filters.date = {
+        $gte: startOfMonth,
+        $lte: endOfMonth,
+      };
+    }
+
+    // Year filter
+    if (searchParams.year) {
+      const year = parseInt(searchParams.year);
+      const startOfYear = new Date(year, 0, 1);
+      const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      filters.date = {
+        $gte: startOfYear,
+        $lte: endOfYear,
+      };
+    }
+
+    // Supervisor (manager) filter
+    if (searchParams.manager) {
+      filters.supervisor = searchParams.manager;
+    }
+
+    // My pending approvals filter
+    if (searchParams.myPendingApprovals === 'true') {
+      // Show only submissions that are pending and where the current user is the supervisor
+      filters.status = 'pending';
+      filters.supervisor = session.user.email;
+    }
+
+    const submissions = await coll
+      .find(filters)
+      .sort({ submittedAt: -1 })
+      .toArray();
 
     // Transform submissions to include display names and convert ObjectId to string
     const transformedSubmissions: OvertimeSubmissionType[] = submissions.map(
@@ -65,11 +134,9 @@ async function getOvertimeSubmissions(session: Session): Promise<{
           _id: submission._id.toString(),
           status: submission.status,
           supervisor: submission.supervisor,
-          workedDate: submission.workedDate,
-          hoursWorked: submission.hoursWorked,
+          date: submission.date,
+          hours: submission.hours,
           reason: submission.reason,
-          description: submission.description,
-          note: submission.note,
           submittedAt: submission.submittedAt,
           submittedBy: submission.submittedBy,
           editedAt: submission.editedAt,
@@ -81,7 +148,6 @@ async function getOvertimeSubmissions(session: Session): Promise<{
           rejectionReason: submission.rejectionReason,
           accountedAt: submission.accountedAt,
           accountedBy: submission.accountedBy,
-          hasAttachment: submission.hasAttachment,
           // Add display names for convenience (not part of the type but useful for table)
           submittedByName: extractNameFromEmail(submission.submittedBy),
           supervisorName: extractNameFromEmail(submission.supervisor),
@@ -94,10 +160,19 @@ async function getOvertimeSubmissions(session: Session): Promise<{
     const fetchTime = new Date();
     const fetchTimeLocaleString = fetchTime.toLocaleString();
 
+    // Calculate overtime summary for the user
+    const selectedMonth = searchParams.month;
+    const overtimeSummary = await calculateUnclaimedOvertimeHours(
+      session.user.email,
+      selectedMonth,
+    );
+
     return {
       fetchTime,
       fetchTimeLocaleString,
       overtimeSubmissionsLocaleString: transformedSubmissions,
+      overtimeSummary,
+      pendingApprovalsCount,
     };
   } catch (error) {
     console.error('Error fetching overtime submissions:', error);
@@ -121,14 +196,21 @@ export default async function OvertimePage(props: {
     redirect('/auth?callbackUrl=/overtime');
   }
 
-  const { fetchTime, fetchTimeLocaleString, overtimeSubmissionsLocaleString } =
-    await getOvertimeSubmissions(session);
+  // Fetch all users for manager filter
+  const users = await getUsers();
+
+  const {
+    fetchTime,
+    overtimeSubmissionsLocaleString,
+    overtimeSummary,
+    pendingApprovalsCount,
+  } = await getOvertimeSubmissions(session, searchParams);
 
   return (
     <Card>
       <CardHeader>
         <div className='mb-4 flex items-center justify-between'>
-          <CardTitle>Zgłoszenia przepracowanych godzin nadliczbowych</CardTitle>
+          <CardTitle>Zgłoszenia nadgodzin</CardTitle>
           {session && canCreateSubmission ? (
             <Link href='/overtime/new-request'>
               <Button variant={'outline'}>
@@ -143,18 +225,19 @@ export default async function OvertimePage(props: {
             </Link>
           ) : null}
         </div>
+        <OvertimeSummaryDisplay overtimeSummary={overtimeSummary} />
+
         <TableFilteringAndOptions
           fetchTime={fetchTime}
-          isGroupLeader={false}
-          isLogged={!!session}
-          userEmail={session?.user?.email || undefined}
+          userRoles={session?.user?.roles || []}
+          users={users}
+          pendingApprovalsCount={pendingApprovalsCount}
         />
       </CardHeader>
+
       <DataTable
         columns={createColumns}
         data={overtimeSubmissionsLocaleString}
-        fetchTimeLocaleString={fetchTimeLocaleString}
-        fetchTime={fetchTime}
         session={session}
       />
     </Card>

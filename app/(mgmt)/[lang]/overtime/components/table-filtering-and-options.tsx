@@ -1,10 +1,21 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { DateTimeInput } from '@/components/ui/datetime-input';
-import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import { Label } from '@/components/ui/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -12,50 +23,127 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CircleX, Loader, Search } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/cn';
+import { UsersListType } from '@/lib/types/user';
+import { Check, ChevronsUpDown, CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateOvertime as revalidate } from '../actions';
 
 export default function TableFilteringAndOptions({
   fetchTime,
-  isGroupLeader,
-  isLogged,
-  userEmail,
+
+  userRoles = [],
+  users = [],
+  pendingApprovalsCount = 0,
 }: {
   fetchTime: Date;
-  isGroupLeader: boolean;
-  isLogged: boolean;
-  userEmail?: string;
+  userRoles?: string[];
+  users: UsersListType;
+  pendingApprovalsCount?: number;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
-
-  useEffect(() => {
-    setIsPendingSearch(false);
-  }, [fetchTime]);
-
-  const [dateFilter, setDateFilter] = useState(() => {
-    const dateParam = searchParams?.get('date');
-    return dateParam ? new Date(dateParam) : undefined;
+  const [openMonth, setOpenMonth] = useState(false);
+  const [openYear, setOpenYear] = useState(false);
+  const [openManager, setOpenManager] = useState(false);
+  const [managerFilter, setManagerFilter] = useState(() => {
+    const managerParam = searchParams?.get('manager');
+    return managerParam || '';
   });
-  const [submittedAtFilter, setSubmittedAtFilter] = useState(() => {
-    const submittedAtFilterParam = searchParams?.get('submittedAtFilter');
-    return submittedAtFilterParam
-      ? new Date(submittedAtFilterParam)
-      : undefined;
+
+  const managerOptions = users;
+
+  const [monthFilter, setMonthFilter] = useState(() => {
+    const monthParam = searchParams?.get('month');
+    return monthParam || '';
+  });
+  const [yearFilter, setYearFilter] = useState(() => {
+    const yearParam = searchParams?.get('year');
+    return yearParam || '';
   });
   const [statusFilter, setStatusFilter] = useState(
     searchParams?.get('status') || '',
   );
 
+  const [onlyMyPendingApprovals, setOnlyMyPendingApprovals] = useState(() => {
+    const param = searchParams?.get('myPendingApprovals');
+    return param === 'true';
+  });
+
+  const handleOnlyMyPendingApprovalsChange = (checked: boolean) => {
+    setOnlyMyPendingApprovals(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('myPendingApprovals', 'true');
+    } else {
+      params.delete('myPendingApprovals');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Generate year options
+  const yearOptions = (() => {
+    const options = [];
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
+    // Start from 2025
+    const startYear = 2025;
+
+    for (let year = startYear; year <= currentYear; year++) {
+      options.push({
+        value: year.toString(),
+        label: year.toString(),
+      });
+    }
+
+    // Reverse to show most recent years first
+    return options.reverse();
+  })();
+
+  // Generate month options
+  const monthOptions = (() => {
+    const options = [];
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+
+    // Start from June 2025
+    const startYear = 2025;
+
+    for (let year = startYear; year <= currentYear; year++) {
+      const monthStart = year === startYear ? 5 : 0; // June (month index 5)
+      const monthEnd = year === currentYear ? currentMonth : 11; // December or current month
+
+      for (let month = monthStart; month <= monthEnd; month++) {
+        const monthStr = (month + 1).toString().padStart(2, '0');
+        const yearStr = year.toString();
+        const value = `${yearStr}-${monthStr}`;
+        const displayText = `${monthStr}.${yearStr}`;
+
+        options.push({
+          value,
+          label: displayText,
+        });
+      }
+    }
+
+    // Reverse to show most recent months first
+    return options.reverse();
+  })();
+
   const handleClearFilters = () => {
-    setDateFilter(undefined);
-    setSubmittedAtFilter(undefined);
+    setMonthFilter('');
+    setYearFilter('');
     setStatusFilter('');
+    setManagerFilter('');
+    setOnlyMyPendingApprovals(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -65,10 +153,11 @@ export default function TableFilteringAndOptions({
   const handleSearchClick = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (dateFilter) params.set('date', dateFilter.toISOString());
-    if (submittedAtFilter)
-      params.set('submittedAt', submittedAtFilter.toISOString());
+    if (monthFilter) params.set('month', monthFilter);
+    if (yearFilter) params.set('year', yearFilter);
     if (statusFilter) params.set('status', statusFilter);
+    if (managerFilter) params.set('manager', managerFilter);
+    if (onlyMyPendingApprovals) params.set('myPendingApprovals', 'true');
     const newUrl = `${pathname}?${params.toString()}`;
     if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
@@ -79,82 +168,283 @@ export default function TableFilteringAndOptions({
     }
   };
 
+  useEffect(() => {
+    setIsPendingSearch(false);
+  }, [fetchTime]);
+
+  // Determine if any filter is active
+  const anyFilterActive = Boolean(
+    monthFilter ||
+      yearFilter ||
+      statusFilter ||
+      managerFilter ||
+      onlyMyPendingApprovals,
+  );
+  const [showFilters, setShowFilters] = useState(anyFilterActive);
+
   return (
     <Card>
-      <CardContent className='p-4'>
-        <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
-          <div className='flex flex-wrap items-start gap-4'>
-            <div className='flex flex-col space-y-1'>
-              <Label>Status</Label>
-              <Select onValueChange={setStatusFilter} value={statusFilter}>
-                <SelectTrigger className='w-[150px]'>
-                  <SelectValue placeholder='wybierz' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='pending'>Oczekuje</SelectItem>
-                  <SelectItem value='approved'>Zatwierdzone</SelectItem>
-                  <SelectItem value='rejected'>Odrzucone</SelectItem>
-                  <SelectItem value='accounted'>Rozliczone</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='flex flex-col space-y-1'>
-              <Label>Data pracy</Label>
-              <DateTimePicker
-                value={dateFilter}
-                onChange={setDateFilter}
-                hideTime
-                renderTrigger={({ value, setOpen, open }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) => !open && setDateFilter(x)}
-                    format='dd/MM/yyyy'
-                    disabled={open}
-                    onCalendarClick={() => setOpen(!open)}
-                  />
-                )}
+      <CardHeader className='p-4'>
+        <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
+          <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2'>
+            <div className='flex items-center space-x-2'>
+              <Switch
+                id='show-filters'
+                checked={showFilters}
+                onCheckedChange={setShowFilters}
               />
+              <Label htmlFor='show-filters'>Pokaż filtry</Label>
             </div>
-            <div className='flex flex-col space-y-1'>
-              <Label>Data zgłoszenia</Label>
-              <DateTimePicker
-                value={submittedAtFilter}
-                onChange={setSubmittedAtFilter}
-                hideTime
-                renderTrigger={({ value, setOpen, open }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) => !open && setSubmittedAtFilter(x)}
-                    format='dd/MM/yyyy'
-                    disabled={open}
-                    onCalendarClick={() => setOpen(!open)}
-                  />
-                )}
-              />
-            </div>
-          </div>
-          <div className='flex space-x-2'>
-            <Button type='submit' size='sm' disabled={isPendingSearch}>
-              {isPendingSearch ? (
-                <Loader className='h-4 w-4 animate-spin' />
-              ) : (
-                <Search className='h-4 w-4' />
-              )}
-              <span>Szukaj</span>
-            </Button>
-            <Button
-              type='button'
-              variant='destructive'
-              size='sm'
-              onClick={handleClearFilters}
-              disabled={isPendingSearch}
-            >
-              <CircleX className='h-4 w-4' />
-              Wyczyść
-            </Button>
+            {(userRoles.some((role) =>
+              role.toLowerCase().includes('manager'),
+            ) ||
+              userRoles.some((role) =>
+                role.toLowerCase().includes('leader'),
+              )) && (
+              <div className='flex items-center space-x-2'>
+                <Switch
+                  id='only-my-pending-approvals'
+                  checked={onlyMyPendingApprovals}
+                  onCheckedChange={handleOnlyMyPendingApprovalsChange}
+                />
+                <Label
+                  htmlFor='only-my-pending-approvals'
+                  className={`${
+                    pendingApprovalsCount > 0
+                      ? 'animate-pulse text-red-600 dark:text-red-400'
+                      : ''
+                  }`}
+                >
+                  Do zatwierdzenia
+                  {pendingApprovalsCount > 0 && ` (${pendingApprovalsCount})`}
+                </Label>
+              </div>
+            )}
           </div>
         </form>
-      </CardContent>
+      </CardHeader>
+      {showFilters && (
+        <CardContent className='p-4 pt-0'>
+          <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
+            <div className='flex flex-wrap items-start gap-2'>
+              <div className='flex flex-col space-y-1'>
+                <Label>Status</Label>
+                <Select onValueChange={setStatusFilter} value={statusFilter}>
+                  <SelectTrigger className='w-[150px]'>
+                    <SelectValue placeholder='wybierz' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='pending'>Oczekuje</SelectItem>
+                    <SelectItem value='approved'>Zatwierdzone</SelectItem>
+                    <SelectItem value='rejected'>Odrzucone</SelectItem>
+                    <SelectItem value='accounted'>Rozliczone</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>Rok</Label>
+                <Popover open={openYear} onOpenChange={setOpenYear}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      className={cn(
+                        'w-[150px] justify-between',
+                        !yearFilter && 'opacity-50',
+                      )}
+                    >
+                      {yearFilter
+                        ? yearOptions.find((year) => year.value === yearFilter)
+                            ?.label
+                        : 'wybierz'}
+                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className='w-[150px] p-0'
+                    side='bottom'
+                    align='start'
+                  >
+                    <Command>
+                      <CommandInput placeholder='szukaj...' />
+                      <CommandList>
+                        <CommandEmpty>nie znaleziono</CommandEmpty>
+                        <CommandGroup>
+                          {yearOptions.map((year) => (
+                            <CommandItem
+                              key={year.value}
+                              value={year.value}
+                              onSelect={(currentValue) => {
+                                setYearFilter(currentValue);
+                                setOpenYear(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  yearFilter === year.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0',
+                                )}
+                              />
+                              {year.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>Miesiąc</Label>
+                <Popover open={openMonth} onOpenChange={setOpenMonth}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant='outline'
+                      role='combobox'
+                      className={cn(
+                        'w-[150px] justify-between',
+                        !monthFilter && 'opacity-50',
+                      )}
+                    >
+                      {monthFilter
+                        ? monthOptions.find(
+                            (month) => month.value === monthFilter,
+                          )?.label
+                        : 'wybierz'}
+                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className='w-[150px] p-0'
+                    side='bottom'
+                    align='start'
+                  >
+                    <Command>
+                      <CommandInput placeholder='szukaj...' />
+                      <CommandList>
+                        <CommandEmpty>nie znaleziono</CommandEmpty>
+                        <CommandGroup>
+                          {monthOptions.map((month) => (
+                            <CommandItem
+                              key={month.value}
+                              value={month.value}
+                              onSelect={(currentValue) => {
+                                setMonthFilter(currentValue);
+                                setOpenMonth(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  monthFilter === month.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0',
+                                )}
+                              />
+                              {month.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {userRoles.includes('admin') || userRoles.includes('hr') ? (
+                <div className='flex flex-col space-y-1'>
+                  <Label>Kierownik</Label>
+                  <Popover open={openManager} onOpenChange={setOpenManager}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='outline'
+                        role='combobox'
+                        className={cn(
+                          'min-w-[150px] justify-between',
+                          !managerFilter && 'opacity-50',
+                        )}
+                      >
+                        {managerFilter
+                          ? managerOptions.find(
+                              (mgr) => mgr.email === managerFilter,
+                            )?.name
+                          : 'wybierz'}
+                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className='min-w-[250px] p-0'
+                      side='bottom'
+                      align='start'
+                    >
+                      <Command>
+                        <CommandInput placeholder='szukaj...' />
+                        <CommandList>
+                          <CommandEmpty>nie znaleziono</CommandEmpty>
+                          <CommandGroup>
+                            {managerOptions.map((mgr) => (
+                              <CommandItem
+                                key={mgr.email}
+                                value={mgr.email}
+                                onSelect={(currentValue) => {
+                                  setManagerFilter(currentValue);
+                                  setOpenManager(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    managerFilter === mgr.email
+                                      ? 'opacity-100'
+                                      : 'opacity-0',
+                                  )}
+                                />
+                                {mgr.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Row 2: Action buttons */}
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                type='submit'
+                variant='secondary'
+                className='justify-start'
+                disabled={isPendingSearch}
+              >
+                {isPendingSearch ? (
+                  <>
+                    <Loader className='mr-1 animate-spin' size={16} />{' '}
+                    <span>Szukaj</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleClearFilters}
+                title='Clear filters'
+                disabled={isPendingSearch}
+              >
+                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      )}
     </Card>
   );
 }

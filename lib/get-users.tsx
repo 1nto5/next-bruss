@@ -1,3 +1,5 @@
+'use server';
+
 import { UsersListType } from './types/user';
 
 export async function getUsers(): Promise<UsersListType> {

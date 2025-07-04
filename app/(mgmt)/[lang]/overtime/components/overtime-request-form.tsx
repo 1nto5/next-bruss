@@ -36,71 +36,122 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { UsersListType } from '@/lib/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ChevronsUpDown, CircleX, Save, Table } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  CircleX,
+  Plus,
+  Save,
+  Table,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
+  insertOvertimeSubmission as insert,
   redirectToOvertime as redirect,
   updateOvertimeSubmission as update,
 } from '../actions';
 import { OvertimeSubmissionType } from '../lib/types';
-import { OvertimeHoursSubmissionSchema } from '../lib/zod';
+import { OvertimeSubmissionSchema } from '../lib/zod';
 
-export default function EditOvertimeSubmissionForm({
-  managers,
-  loggedInUserEmail,
-  submission,
-}: {
+interface OvertimeRequestFormProps {
   managers: UsersListType;
   loggedInUserEmail: string;
-  submission: OvertimeSubmissionType;
-}) {
-  const [isPendingUpdate, setIsPendingUpdate] = useState(false);
+  mode: 'new' | 'edit';
+  submission?: OvertimeSubmissionType;
+}
+
+export default function OvertimeRequestForm({
+  managers,
+  loggedInUserEmail,
+  mode,
+  submission,
+}: OvertimeRequestFormProps) {
+  const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof OvertimeHoursSubmissionSchema>>({
-    resolver: zodResolver(OvertimeHoursSubmissionSchema),
+  const isEditMode = mode === 'edit';
+
+  const form = useForm<z.infer<typeof OvertimeSubmissionSchema>>({
+    resolver: zodResolver(OvertimeSubmissionSchema),
     defaultValues: {
-      supervisor: submission.supervisor,
-      workedDate: new Date(submission.workedDate),
-      hoursWorked: submission.hoursWorked,
-      reason: submission.reason,
-      description: submission.description || '',
-      note: submission.note || '',
+      supervisor: isEditMode ? submission!.supervisor : '',
+      date: isEditMode ? new Date(submission!.date) : new Date(),
+      hours: isEditMode ? submission!.hours : 1,
+      reason: isEditMode ? submission!.reason : '',
     },
   });
 
-  const onSubmit = async (
-    data: z.infer<typeof OvertimeHoursSubmissionSchema>,
-  ) => {
-    setIsPendingUpdate(true);
+  const onSubmit = async (data: z.infer<typeof OvertimeSubmissionSchema>) => {
+    setIsPending(true);
     try {
-      const res = await update(submission._id, data);
+      let res;
+      if (isEditMode) {
+        res = await update(submission!._id, data);
+      } else {
+        res = await insert(data);
+      }
+
       if ('success' in res) {
-        toast.success('Zgłoszenie zostało zaktualizowane!');
+        const successMessage = isEditMode
+          ? 'Zgłoszenie zostało zaktualizowane!'
+          : 'Zgłoszenie dodane!';
+        toast.success(successMessage);
+
+        if (!isEditMode) {
+          form.reset(); // Reset form after successful submission
+        }
         redirect();
       } else if ('error' in res) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        // Handle specific error messages
+        const errorMsg = res.error;
+        if (errorMsg === 'unauthorized') {
+          toast.error('Nie masz uprawnień do wykonania tej akcji!');
+        } else if (errorMsg === 'not found') {
+          toast.error('Nie znaleziono zgłoszenia!');
+        } else if (errorMsg === 'invalid status') {
+          toast.error(
+            'Nie można edytować zatwierdzonego lub odrzuconego zgłoszenia!',
+          );
+        } else if (errorMsg === 'not inserted') {
+          toast.error('Nie udało się dodać zgłoszenia!');
+        } else {
+          toast.error('Skontaktuj się z IT!');
+        }
       }
     } catch (error) {
       console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPendingUpdate(false);
+      setIsPending(false);
     }
   };
+
+  const getTitle = () => {
+    return isEditMode
+      ? 'Edytuj zgłoszenie nadgodzin'
+      : 'Nowe zgłoszenie nadgodzin';
+  };
+
+  const getSubmitButtonText = () => {
+    return isEditMode ? 'Zapisz zmiany' : 'Dodaj zgłoszenie';
+  };
+
+  const getSubmitButtonIcon = () => {
+    return isEditMode ? Save : Plus;
+  };
+
+  const SubmitIcon = getSubmitButtonIcon();
 
   return (
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            Edytuj zgłoszenie przepracowanych godzin nadliczbowych
-          </CardTitle>
+          <CardTitle>{getTitle()}</CardTitle>
           <Link href='/overtime'>
             <Button variant='outline'>
               <Table /> <span>Tabela zgłoszeń</span>
@@ -108,8 +159,8 @@ export default function EditOvertimeSubmissionForm({
           </Link>
         </div>
       </CardHeader>
-      <Separator className='mb-4' />
 
+      <Separator className='mb-4' />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
@@ -119,10 +170,6 @@ export default function EditOvertimeSubmissionForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kierownik</FormLabel>
-                  <FormDescription>
-                    Wybierz kierownika, który zatwierdzi Twoje godziny
-                    nadliczbowe.
-                  </FormDescription>
                   <Popover
                     open={supervisorOpen}
                     onOpenChange={setSupervisorOpen}
@@ -141,14 +188,14 @@ export default function EditOvertimeSubmissionForm({
                             ? managers.find(
                                 (manager) => manager.email === field.value,
                               )?.name
-                            : 'Wybierz kierownika'}
+                            : 'wybierz'}
                           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder='Szukaj kierownika...' />
+                        <CommandInput placeholder='szukaj...' />
                         <CommandList>
                           <CommandEmpty>
                             Nie znaleziono kierownika.
@@ -186,38 +233,59 @@ export default function EditOvertimeSubmissionForm({
 
             <FormField
               control={form.control}
-              name='workedDate'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Data wykonanej pracy</FormLabel>
-                  <FormControl>
-                    <DateTimePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                      hideTime={true}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              name='date'
+              render={({ field }) => {
+                // Calculate min/max dates
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                const firstDayPrevMonth = new Date(year, month - 1, 1);
+                const lastDayNextMonth = new Date(
+                  year,
+                  month + 2,
+                  0,
+                  23,
+                  59,
+                  59,
+                  999,
+                );
+                // Get current hours value from form
+                const hoursValue = form.watch('hours');
+                // Determine max date
+                const maxDate = hoursValue < 0 ? lastDayNextMonth : now;
+                return (
+                  <FormItem>
+                    <FormLabel>Data</FormLabel>
+                    <FormControl>
+                      <DateTimePicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        hideTime={true}
+                        min={firstDayPrevMonth}
+                        max={maxDate}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
 
             <FormField
               control={form.control}
-              name='hoursWorked'
+              name='hours'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Liczba przepracowanych godzin nadliczbowych
-                  </FormLabel>
+                  <FormLabel>Godziny</FormLabel>
                   <FormDescription>
-                    Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5)
+                    Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5).
+                    Użyj wartości ujemnych (np. -2.5) aby odebrać nadgodziny.
                   </FormDescription>
                   <FormControl>
                     <Input
                       type='number'
                       step={0.5}
-                      min={0.5}
+                      min={-16}
                       max={16}
                       {...field}
                       onChange={(e) => {
@@ -240,37 +308,7 @@ export default function EditOvertimeSubmissionForm({
               name='reason'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Uzasadnienie pracy w godzinach nadliczbowych
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Opis wykonanych prac</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='note'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dodatkowe informacje</FormLabel>
+                  <FormLabel>Uzasadnienie</FormLabel>
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
@@ -280,24 +318,38 @@ export default function EditOvertimeSubmissionForm({
             />
           </CardContent>
 
+          <Separator className='mb-4' />
+
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
-            <Link href='/overtime'>
+            {isEditMode ? (
+              <Link href='/overtime'>
+                <Button
+                  variant='destructive'
+                  type='button'
+                  className='w-full sm:w-auto'
+                >
+                  <CircleX />
+                  Anuluj
+                </Button>
+              </Link>
+            ) : (
               <Button
                 variant='destructive'
                 type='button'
+                onClick={() => form.reset()}
                 className='w-full sm:w-auto'
               >
                 <CircleX />
-                Anuluj
+                Wyczyść
               </Button>
-            </Link>
+            )}
             <Button
               type='submit'
               className='w-full sm:w-auto'
-              disabled={isPendingUpdate}
+              disabled={isPending}
             >
-              <Save className={isPendingUpdate ? 'animate-spin' : ''} />
-              Zapisz zmiany
+              <SubmitIcon className={isPending ? 'animate-spin' : ''} />
+              {getSubmitButtonText()}
             </Button>
           </CardFooter>
         </form>

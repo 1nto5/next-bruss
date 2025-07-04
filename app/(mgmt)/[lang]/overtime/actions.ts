@@ -6,7 +6,7 @@ import { dbc } from '@/lib/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { OvertimeHoursSubmissionType } from './lib/zod';
+import { OvertimeSubmissionType } from './lib/zod';
 
 export async function revalidateOvertime() {
   revalidateTag('overtime');
@@ -24,28 +24,20 @@ export async function redirectToOvertimeSubmission(id: string) {
   redirect(`/overtime/${id}`);
 }
 
-async function sendEmailNotificationToEmployee(
+async function sendRejectionEmailToEmployee(
   email: string,
   id: string,
-  status: 'approved' | 'rejected',
   rejectionReason?: string,
 ) {
-  const subject =
-    status === 'approved'
-      ? 'Zatwierdzone godziny nadliczbowe'
-      : 'Odrzucone godziny nadliczbowe';
-
-  const statusText = status === 'approved' ? 'zatwierdzone' : 'odrzucone';
-  const additionalText =
-    status === 'rejected' && rejectionReason
-      ? `<p><strong>Powód odrzucenia:</strong> ${rejectionReason}</p>`
-      : '';
-
+  const subject = 'Odrzucone nadgodziny';
+  const additionalText = rejectionReason
+    ? `<p><strong>Powód odrzucenia:</strong> ${rejectionReason}</p>`
+    : '';
   const mailOptions = {
     to: email,
     subject,
     html: `<div style="font-family: sans-serif;">
-          <p>Twoje zgłoszenie godzin nadliczbowych zostało ${statusText}.</p>
+          <p>Twoje zgłoszenie nadgodzin zostało odrzucone.</p>
           ${additionalText}
           <p>
           <a href="${process.env.BASE_URL}/overtime/${id}" 
@@ -58,25 +50,9 @@ async function sendEmailNotificationToEmployee(
   await mailer(mailOptions);
 }
 
-// Legacy function - no longer used in the new hours tracking system
-export async function deleteDayOff(
-  overtimeId: string,
-  employeeIdentifier: string,
-) {
-  console.log(
-    'deleteDayOff - legacy function called',
-    overtimeId,
-    employeeIdentifier,
-  );
-  return {
-    error:
-      'This function is deprecated. The overtime system now tracks hours worked, not compensatory days off.',
-  };
-}
-
 export async function updateOvertimeSubmission(
   id: string,
-  data: OvertimeHoursSubmissionType,
+  data: OvertimeSubmissionType,
 ): Promise<{ success: 'updated' } | { error: string }> {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -98,7 +74,7 @@ export async function updateOvertimeSubmission(
     }
 
     if (submission.status !== 'pending') {
-      return { error: 'cannot edit approved or rejected submission' };
+      return { error: 'invalid status' };
     }
 
     const update = await coll.updateOne(
@@ -125,6 +101,7 @@ export async function updateOvertimeSubmission(
 }
 
 export async function cancelOvertimeRequest(id: string) {
+  // Log the cancellation attempt for debugging purposes
   console.log('cancelOvertimeRequest', id);
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -134,13 +111,12 @@ export async function cancelOvertimeRequest(id: string) {
   try {
     const coll = await dbc('overtime_submissions');
 
-    // First check if the submission exists and get its details
+    // Check if the submission exists and get its details
     const submission = await coll.findOne({ _id: new ObjectId(id) });
     if (!submission) {
       return { error: 'not found' };
     }
 
-    // Check if user can cancel this submission
     // Only the submitter can cancel their own submission, and only if it's still pending
     if (submission.submittedBy !== session.user.email) {
       return { error: 'unauthorized' };
@@ -150,9 +126,19 @@ export async function cancelOvertimeRequest(id: string) {
       return { error: 'cannot cancel' };
     }
 
-    // Delete the submission
-    const deleteResult = await coll.deleteOne({ _id: new ObjectId(id) });
-    if (deleteResult.deletedCount === 0) {
+    // Mark the submission as canceled instead of deleting it
+    const updateResult = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: 'cancelled',
+          cancelledAt: new Date(),
+          cancelledBy: session.user.email,
+        },
+      },
+    );
+
+    if (updateResult.matchedCount === 0) {
       return { error: 'not found' };
     }
 
@@ -171,29 +157,28 @@ export async function approveOvertimeSubmission(id: string) {
     redirect('/auth');
   }
 
-  // Check if user has manager role (any role containing "manager")
+  // Check if user has HR or admin role for emergency override
   const userRoles = session.user?.roles ?? [];
-  const isManager = userRoles.some((role) =>
-    role.toLowerCase().includes('manager'),
-  );
-  const isAdmin = userRoles.includes('admin');
   const isHR = userRoles.includes('hr');
-
-  if (!isManager && !isAdmin && !isHR) {
-    return { error: 'unauthorized' };
-  }
+  const isAdmin = userRoles.includes('admin');
 
   try {
     const coll = await dbc('overtime_submissions');
 
-    // First check if this user is the assigned supervisor
+    // First check if this submission exists
     const submission = await coll.findOne({ _id: new ObjectId(id) });
     if (!submission) {
       return { error: 'not found' };
     }
 
-    if (submission.supervisor !== session.user.email && !isAdmin) {
-      return { error: 'unauthorized - not assigned supervisor' };
+    // Allow approval if:
+    // 1. User is the assigned supervisor, OR
+    // 2. User has HR role, OR
+    // 3. User has admin role
+    if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
+      return {
+        error: 'unauthorized',
+      };
     }
 
     const update = await coll.updateOne(
@@ -210,11 +195,6 @@ export async function approveOvertimeSubmission(id: string) {
       return { error: 'not found' };
     }
     revalidateOvertime();
-    await sendEmailNotificationToEmployee(
-      submission.submittedBy,
-      id,
-      'approved',
-    );
     return { success: 'approved' };
   } catch (error) {
     console.error(error);
@@ -232,29 +212,28 @@ export async function rejectOvertimeSubmission(
     redirect('/auth');
   }
 
-  // Check if user has manager role (any role containing "manager")
+  // Check if user has HR or admin role for emergency override
   const userRoles = session.user?.roles ?? [];
-  const isManager = userRoles.some((role) =>
-    role.toLowerCase().includes('manager'),
-  );
-  const isAdmin = userRoles.includes('admin');
   const isHR = userRoles.includes('hr');
-
-  if (!isManager && !isAdmin && !isHR) {
-    return { error: 'unauthorized' };
-  }
+  const isAdmin = userRoles.includes('admin');
 
   try {
     const coll = await dbc('overtime_submissions');
 
-    // First check if this user is the assigned supervisor
+    // First check if this submission exists
     const submission = await coll.findOne({ _id: new ObjectId(id) });
     if (!submission) {
       return { error: 'not found' };
     }
 
-    if (submission.supervisor !== session.user.email && !isAdmin) {
-      return { error: 'unauthorized - not assigned supervisor' };
+    // Allow rejection if:
+    // 1. User is the assigned supervisor, OR
+    // 2. User has HR role, OR
+    // 3. User has admin role
+    if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
+      return {
+        error: 'unauthorized',
+      };
     }
 
     const update = await coll.updateOne(
@@ -272,10 +251,9 @@ export async function rejectOvertimeSubmission(
       return { error: 'not found' };
     }
     revalidateOvertime();
-    await sendEmailNotificationToEmployee(
+    await sendRejectionEmailToEmployee(
       submission.submittedBy,
       id,
-      'rejected',
       rejectionReason,
     );
     return { success: 'rejected' };
@@ -286,7 +264,7 @@ export async function rejectOvertimeSubmission(
 }
 
 export async function insertOvertimeSubmission(
-  data: OvertimeHoursSubmissionType,
+  data: OvertimeSubmissionType,
 ): Promise<{ success: 'inserted' } | { error: string }> {
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -351,30 +329,4 @@ export async function markAsAccountedOvertimeSubmission(id: string) {
     console.error(error);
     return { error: 'markAsAccountedOvertimeSubmission server action error' };
   }
-}
-
-// Legacy function exports for backward compatibility
-export async function approveOvertimeRequest(id: string) {
-  return approveOvertimeSubmission(id);
-}
-
-export async function insertOvertimeRequest(data: any) {
-  // This is a legacy function - redirect to new implementation
-  return { error: 'Use insertOvertimeSubmission instead' };
-}
-
-export async function revalidateProductionOvertime() {
-  revalidateOvertime();
-}
-
-export async function revalidateProductionOvertimeRequest() {
-  revalidateOvertimeSubmission();
-}
-
-export async function redirectToProductionOvertime() {
-  redirectToOvertime();
-}
-
-export async function redirectToProductionOvertimeDaysOff(id: string) {
-  redirectToOvertimeSubmission(id);
 }

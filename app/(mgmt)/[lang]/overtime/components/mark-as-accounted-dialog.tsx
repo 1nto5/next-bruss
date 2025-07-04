@@ -33,7 +33,7 @@ export default function MarkAsAccountedDialog({
 
     if (!isHR) {
       toast.error(
-        'Tylko pracownicy HR mogą oznaczać zlecenia jako rozliczone!',
+        'Tylko pracownicy HR mogą oznaczać zgłoszenia jako rozliczone!',
       );
       return;
     }
@@ -48,14 +48,14 @@ export default function MarkAsAccountedDialog({
         return res;
       }),
       {
-        loading: 'Zapisuję zmiany...',
-        success: 'Zlecenie oznaczone jako rozliczone!',
+        loading: 'Oznaczanie jako rozliczone...',
+        success: 'Zgłoszenie oznaczone jako rozliczone!',
         error: (error) => {
           const errorMsg = error.message;
           if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
           if (errorMsg === 'invalid status')
-            return 'Nieprawidłowy status zlecenia!';
+            return 'Nieprawidłowy status zgłoszenia!';
           console.error('handleMarkAsAccounted', errorMsg);
           return 'Skontaktuj się z IT!';
         },
@@ -69,7 +69,7 @@ export default function MarkAsAccountedDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Oznacz jako rozliczone</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz oznaczyć to zlecenie jako rozliczone? Ta akcja
+            Czy na pewno chcesz oznaczyć to zgłoszenie jako rozliczone? Ta akcja
             jest nieodwracalna i oznacza, że wszystkie nadgodziny zostały
             rozliczone w systemie płacowym.
           </AlertDialogDescription>

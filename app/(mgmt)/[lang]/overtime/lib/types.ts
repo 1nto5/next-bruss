@@ -1,17 +1,12 @@
-import { EmployeeType } from '@/lib/types/employee-types';
+import { OvertimeSubmissionType as BaseOvertimeSubmissionType } from './zod';
 
-// Update the status options for overtime hours submissions
+// Update the status options for overtime submissions
 export type OvertimeStatus = 'pending' | 'approved' | 'rejected' | 'accounted';
 
-export type OvertimeSubmissionType = {
+// Extend the Zod schema type with additional fields needed for the complete submission
+export type OvertimeSubmissionType = BaseOvertimeSubmissionType & {
   _id: string;
   status: OvertimeStatus;
-  supervisor: string; // Email of the supervisor who will approve
-  workedDate: Date;
-  hoursWorked: number; // Number of overtime hours worked
-  reason: string; // Reason for overtime work
-  description?: string; // Additional description of work performed
-  note?: string; // Additional notes
   submittedAt: Date;
   submittedBy: string; // Email of the employee who submitted
   editedAt: Date;
@@ -23,14 +18,4 @@ export type OvertimeSubmissionType = {
   rejectionReason?: string;
   accountedAt?: Date;
   accountedBy?: string;
-  hasAttachment?: boolean;
-};
-
-// Legacy type alias for backward compatibility
-export type OvertimeType = OvertimeSubmissionType;
-
-export type overtimeRequestEmployeeType = EmployeeType & {
-  agreedReceivingAt?: Date; // Date of receiving a day off
-  agreedReceivingAtLocaleString?: string;
-  note?: string;
 };

@@ -2,7 +2,7 @@ import { auth } from '@/auth';
 import { dbc } from '@/lib/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { redirect } from 'next/navigation';
-import NewOvertimeSubmissionForm from '../components/new-overtime-request-form';
+import OvertimeRequestForm from '../components/overtime-request-form';
 
 // Get users with manager roles (any role containing "manager")
 async function getManagers() {
@@ -37,9 +37,10 @@ export default async function AddOvertimeSubmissionPage() {
   }
 
   return (
-    <NewOvertimeSubmissionForm
+    <OvertimeRequestForm
       managers={managers}
       loggedInUserEmail={session.user.email ?? ''}
+      mode='new'
     />
   );
 }

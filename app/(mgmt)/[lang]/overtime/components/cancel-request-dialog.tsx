@@ -56,8 +56,7 @@ export default function CancelRequestDialog({
           <AlertDialogTitle>Anulować zgłoszenie?</AlertDialogTitle>
           <AlertDialogDescription>
             Czy na pewno chcesz anulować to zgłoszenie godzin nadliczbowych? Tej
-            akcji nie można cofnąć. Możesz anulować tylko zgłoszenia o statusie
-            "Oczekuje".
+            akcji nie można cofnąć.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

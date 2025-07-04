@@ -20,7 +20,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Session } from 'next-auth';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -48,8 +47,6 @@ export default function RejectSubmissionDialog({
   submissionId,
   session,
 }: RejectSubmissionDialogProps) {
-  const [isPending, setIsPending] = useState(false);
-
   const form = useForm<RejectFormType>({
     resolver: zodResolver(RejectSchema),
     defaultValues: {
@@ -58,26 +55,30 @@ export default function RejectSubmissionDialog({
   });
 
   const onSubmit = async (data: RejectFormType) => {
-    setIsPending(true);
-    try {
-      const res = await rejectOvertimeSubmission(
-        submissionId,
-        data.rejectionReason,
-      );
-      if ('success' in res) {
-        toast.success('Zgłoszenie zostało odrzucone!');
-        form.reset();
-        onOpenChange(false);
-      } else if ('error' in res) {
-        console.error(res.error);
-        toast.error('Wystąpił błąd podczas odrzucania!');
-      }
-    } catch (error) {
-      console.error('Reject submission error:', error);
-      toast.error('Wystąpił błąd podczas odrzucania!');
-    } finally {
-      setIsPending(false);
-    }
+    toast.promise(
+      rejectOvertimeSubmission(submissionId, data.rejectionReason).then(
+        (res) => {
+          if (res.error) {
+            throw new Error(res.error);
+          }
+          return res;
+        },
+      ),
+      {
+        loading: 'Odrzucanie zgłoszenia...',
+        success: 'Zgłoszenie zostało odrzucone!',
+        error: (error) => {
+          const errorMsg = error.message;
+          if (errorMsg === 'unauthorized')
+            return 'Nie masz uprawnień do odrzucania!';
+          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
+          console.error('onSubmit', errorMsg);
+          return 'Skontaktuj się z IT!';
+        },
+      },
+    );
+    form.reset();
+    onOpenChange(false);
   };
 
   const handleCancel = () => {
@@ -91,7 +92,7 @@ export default function RejectSubmissionDialog({
         <DialogHeader>
           <DialogTitle>Odrzuć zgłoszenie</DialogTitle>
           <DialogDescription>
-            Podaj powód odrzucenia zgłoszenia godzin nadliczbowych.
+            Podaj powód odrzucenia zgłoszenia nadgodzin.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -113,16 +114,11 @@ export default function RejectSubmissionDialog({
               )}
             />
             <DialogFooter>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={handleCancel}
-                disabled={isPending}
-              >
+              <Button type='button' variant='outline' onClick={handleCancel}>
                 Anuluj
               </Button>
-              <Button type='submit' variant='destructive' disabled={isPending}>
-                {isPending ? 'Odrzucanie...' : 'Odrzuć zgłoszenie'}
+              <Button type='submit' variant='destructive'>
+                Odrzuć zgłoszenie
               </Button>
             </DialogFooter>
           </form>

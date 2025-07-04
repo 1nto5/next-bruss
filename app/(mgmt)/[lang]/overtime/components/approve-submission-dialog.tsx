@@ -11,7 +11,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Session } from 'next-auth';
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { approveOvertimeSubmission } from '../actions';
 
@@ -28,25 +27,28 @@ export default function ApproveSubmissionDialog({
   submissionId,
   session,
 }: ApproveSubmissionDialogProps) {
-  const [isPending, setIsPending] = useState(false);
-
   const handleApprove = async () => {
-    setIsPending(true);
-    try {
-      const res = await approveOvertimeSubmission(submissionId);
-      if ('success' in res) {
-        toast.success('Zgłoszenie zostało zatwierdzone!');
-        onOpenChange(false);
-      } else if ('error' in res) {
-        console.error(res.error);
-        toast.error('Wystąpił błąd podczas zatwierdzania!');
-      }
-    } catch (error) {
-      console.error('Approve submission error:', error);
-      toast.error('Wystąpił błąd podczas zatwierdzania!');
-    } finally {
-      setIsPending(false);
-    }
+    toast.promise(
+      approveOvertimeSubmission(submissionId).then((res) => {
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        return res;
+      }),
+      {
+        loading: 'Zatwierdzanie zgłoszenia...',
+        success: 'Zgłoszenie zostało zatwierdzone!',
+        error: (error) => {
+          const errorMsg = error.message;
+          if (errorMsg === 'unauthorized')
+            return 'Nie masz uprawnień do zatwierdzania!';
+          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
+          console.error('handleApprove', errorMsg);
+          return 'Skontaktuj się z IT!';
+        },
+      },
+    );
+    onOpenChange(false);
   };
 
   return (
@@ -55,14 +57,13 @@ export default function ApproveSubmissionDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Zatwierdź zgłoszenie</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz zatwierdzić to zgłoszenie godzin nadliczbowych?
-            Ta akcja nie może zostać cofnięta.
+            Czy na pewno chcesz zatwierdzić to zgłoszenie nadgodzin?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Anuluj</AlertDialogCancel>
-          <AlertDialogAction disabled={isPending} onClick={handleApprove}>
-            {isPending ? 'Zatwierdzanie...' : 'Zatwierdź'}
+          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogAction onClick={handleApprove}>
+            Zatwierdź
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
