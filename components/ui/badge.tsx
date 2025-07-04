@@ -39,6 +39,9 @@ const badgeVariants = cva(
         // New variant for 'accounted' status
         statusAccounted:
           'border-transparent bg-indigo-100 text-indigo-800 hover:bg-indigo-100 dark:bg-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-700',
+        // New variant for 'cancelled' status
+        statusCancelled:
+          'border-transparent bg-gray-100 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
       },
       size: {
         default: 'px-2.5 py-0.5 text-xs',
