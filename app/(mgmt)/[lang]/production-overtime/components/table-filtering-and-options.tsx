@@ -172,8 +172,8 @@ export default function TableFilteringAndOptions({
       </CardHeader>
       {showFilters && (
         <CardContent className='p-4 pt-0'>
-          <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
-            <div className='flex flex-wrap items-start gap-4'>
+          <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
+            <div className='flex flex-wrap items-start gap-2'>
               <div className='flex flex-col space-y-1'>
                 <Label>Status</Label>
                 <Select onValueChange={setStatusFilter} value={statusFilter}>
