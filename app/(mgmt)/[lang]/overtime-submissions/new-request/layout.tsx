@@ -3,7 +3,7 @@ import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Zgłoszenie przepracowanych godzin nadliczbowych (BRUSS)',
+  title: 'Zgłoszenie nadgodzin (BRUSS)',
 };
 
 export default async function Layout(props: {

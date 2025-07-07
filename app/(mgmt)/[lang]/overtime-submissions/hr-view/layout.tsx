@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Zgłoszenia nadgodzin (BRUSS)',
+  title: 'Zgłoszenia nadgodzin - HR (BRUSS)',
 };
 
 export default async function Layout({
