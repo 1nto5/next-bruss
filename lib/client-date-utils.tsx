@@ -1,11 +1,12 @@
 'use client';
 
+import { Locale } from '@/i18n.config';
 import { useParams } from 'next/navigation';
 
 export function useClientLocaleDateString(
   date: Date | string | null | undefined,
 ): string {
-  const params = useParams<{ lang: string }>();
+  const params = useParams<{ lang: Locale }>();
 
   if (!date) return '-';
 
