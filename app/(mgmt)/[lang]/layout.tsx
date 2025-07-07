@@ -25,8 +25,11 @@ export default async function RootLayout(props: {
     <>
       <div className='flex min-h-screen flex-col space-y-1'>
         <Header dict={dictionary} lang={lang} />
-        <main className='mx-auto max-w-7xl flex-1'>
+        {/* <main className='mx-auto max-w-7xl flex-1'>
           <div className='max-w-[100vw]'>{children}</div>
+        </main> */}
+        <main className='mx-auto w-full max-w-7xl flex-1'>
+          <div className='w-full'>{children}</div>
         </main>
         <Footer />
       </div>
