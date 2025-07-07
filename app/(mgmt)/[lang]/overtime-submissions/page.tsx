@@ -193,7 +193,7 @@ export default async function OvertimePage(props: {
   const canCreateSubmission = !!session?.user?.email;
 
   if (!session?.user?.email) {
-    redirect('/auth?callbackUrl=/overtime');
+    redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
   // Fetch all users for manager filter

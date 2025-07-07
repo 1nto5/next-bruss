@@ -30,7 +30,7 @@ async function getOvertimeSubmissionsForHR(
   pendingSettlementsCount: number;
 }> {
   if (!session || !session.user?.email) {
-    redirect('/auth?callbackUrl=/overtime');
+    redirect('/auth?callbackUrl=/overtime-submissions/hr-view');
   }
 
   // Check if user has required permissions - only HR and admin
