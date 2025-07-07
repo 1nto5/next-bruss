@@ -3,7 +3,7 @@ import { dbc } from '@/lib/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
 import { notFound, redirect } from 'next/navigation';
-import OvertimeRequestForm from '../../../overtime/components/overtime-request-form';
+import OvertimeRequestForm from '../../../overtime-submissions/components/overtime-request-form';
 
 // Get users with manager roles (any role containing "manager")
 async function getManagers() {
