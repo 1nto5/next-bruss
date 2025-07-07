@@ -212,6 +212,11 @@ export function DateTimePicker({
   const [month, setMonth] = useState<Date | undefined>(initDate);
   const [date, setDate] = useState<Date | undefined>(initDate);
 
+  // Always have a displayable month for navigation (fallback to current date)
+  const displayMonth = useMemo(() => {
+    return month || new Date();
+  }, [month]);
+
   const endMonth = useMemo(() => {
     return month ? setYear(month, getYear(month) + 1) : undefined;
   }, [month]);
@@ -239,9 +244,11 @@ export function DateTimePicker({
       }
       setDate(d);
 
-      // Automatically submit the date when a day is selected
+      // Update the form value immediately when a day is selected
+      onChange(new Date(d));
+
+      // Only close the picker automatically in date-only mode
       if (hideTime) {
-        onChange(new Date(d));
         setOpen(false);
       }
     },
@@ -266,11 +273,11 @@ export function DateTimePicker({
     [setMonth, setMonthYearPicker],
   );
   const onNextMonth = useCallback(() => {
-    if (month) setMonth(addMonths(month, 1));
-  }, [month]);
+    setMonth(addMonths(displayMonth, 1));
+  }, [displayMonth]);
   const onPrevMonth = useCallback(() => {
-    if (month) setMonth(subMonths(month, 1));
-  }, [month]);
+    setMonth(subMonths(displayMonth, 1));
+  }, [displayMonth]);
 
   useEffect(() => {
     if (open) {
@@ -296,6 +303,15 @@ export function DateTimePicker({
     // Capitalize the first letter (month name)
     return capitalizeFirstLetter(formattedDate);
   }, [displayValue, hideTime, use12HourFormat, dateLocale]);
+
+  // Callback to handle time changes - updates both internal state and main form
+  const onTimeChanged = useCallback(
+    (newDate: Date) => {
+      setDate(newDate);
+      onChange(new Date(newDate)); // Update the main form immediately
+    },
+    [setDate, onChange],
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={modal}>
@@ -357,11 +373,9 @@ export function DateTimePicker({
                   )
                 }
               >
-                {month
-                  ? capitalizeFirstLetter(
-                      format(month, 'LLLL', { locale: dateLocale }),
-                    )
-                  : ''}
+                {capitalizeFirstLetter(
+                  format(displayMonth, 'LLLL', { locale: dateLocale }),
+                )}
               </span>
               <span
                 className='ms-1'
@@ -371,7 +385,7 @@ export function DateTimePicker({
                   )
                 }
               >
-                {month ? format(month, 'yyyy') : ''}
+                {format(displayMonth, 'yyyy')}
               </span>
             </div>
             <Button
@@ -387,20 +401,10 @@ export function DateTimePicker({
           <div
             className={cn('flex space-x-2', monthYearPicker ? 'hidden' : '')}
           >
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={onPrevMonth}
-              disabled={!month}
-            >
+            <Button variant='ghost' size='icon' onClick={onPrevMonth}>
               <ChevronLeftIcon />
             </Button>
-            <Button
-              variant='ghost'
-              size='icon'
-              onClick={onNextMonth}
-              disabled={!month}
-            >
+            <Button variant='ghost' size='icon' onClick={onNextMonth}>
               <ChevronRightIcon />
             </Button>
           </div>
@@ -411,7 +415,7 @@ export function DateTimePicker({
             mode='single'
             selected={date}
             onSelect={(d) => d && onDayChanged(d)}
-            month={month}
+            month={displayMonth}
             endMonth={endMonth}
             locale={dateLocale}
             disabled={
@@ -459,7 +463,7 @@ export function DateTimePicker({
             )}
           ></div>
           <MonthYearPicker
-            value={month ?? new Date()}
+            value={displayMonth}
             mode={monthYearPicker as any}
             onChange={onMonthYearChanged}
             minDate={minDate}
@@ -476,7 +480,7 @@ export function DateTimePicker({
             <TimePicker
               timePicker={timePicker}
               value={date ?? new Date(0, 0, 1, 0, 0, 0, 0)}
-              onChange={setDate}
+              onChange={onTimeChanged}
               use12HourFormat={use12HourFormat}
               min={minDate}
               max={maxDate}
@@ -490,15 +494,6 @@ export function DateTimePicker({
                 <span>Timezone:</span>
                 <span className='ms-1 font-semibold'>{timezone}</span>
               </div>
-            )}
-            {!hideTime && (
-              <Button
-                className='ml-auto w-full px-2'
-                onClick={onSubmit}
-                disabled={!date}
-              >
-                <CheckIcon />
-              </Button>
             )}
           </div>
         </div>
