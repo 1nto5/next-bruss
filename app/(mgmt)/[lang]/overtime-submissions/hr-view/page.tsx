@@ -29,10 +29,6 @@ async function getOvertimeSubmissionsForHR(
   hrOvertimeSummary: HROvertimeSummary;
   pendingSettlementsCount: number;
 }> {
-  if (!session || !session.user?.email) {
-    redirect('/auth?callbackUrl=/overtime-submissions/hr-view');
-  }
-
   // Check if user has required permissions - only HR and admin
   const userRoles = session.user?.roles ?? [];
   const isAdmin = userRoles.includes('admin');

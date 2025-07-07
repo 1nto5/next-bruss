@@ -6,7 +6,7 @@ import { Locale } from '@/i18n.config';
 import { getUsers } from '@/lib/get-users';
 import { dbc } from '@/lib/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { KeyRound, Plus, Users } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -226,12 +226,6 @@ export default async function OvertimePage(props: {
               <Link href='/overtime-submissions/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Plus /> <span>Nowe zgłoszenie</span>
-                </Button>
-              </Link>
-            ) : !session ? (
-              <Link href={`/auth?callbackUrl=/overtime`}>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <KeyRound /> <span>Zaloguj się</span>
                 </Button>
               </Link>
             ) : null}
