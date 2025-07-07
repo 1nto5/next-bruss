@@ -26,6 +26,7 @@ export default async function Layout(props: {
   const access =
     session.user?.roles.includes('group-leader') ||
     session.user?.roles.includes('plant-manager') ||
+    session.user?.roles.includes('admin') ||
     false;
   if (access === false) {
     redirect('/production-overtime');
