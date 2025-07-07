@@ -236,7 +236,7 @@ export default function HrViewFilteringAndOptions({
               </div>
 
               <div className='flex flex-col space-y-1'>
-                <Label>Osoba</Label>
+                <Label>Pracownik</Label>
                 <Popover open={openPerson} onOpenChange={setOpenPerson}>
                   <PopoverTrigger asChild>
                     <Button
