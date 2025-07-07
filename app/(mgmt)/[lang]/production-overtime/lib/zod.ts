@@ -5,6 +5,9 @@ export const NewOvertimeRequestSchema = z
     numberOfEmployees: z
       .number()
       .min(1, { message: 'Liczba pracowników musi wynosić co najmniej 1!' }),
+    numberOfShifts: z
+      .number()
+      .min(1, { message: 'Liczba zmian musi wynosić co najmniej 1!' }),
     responsibleEmployee: z
       .string()
       .email({ message: 'Wybierz odpowiedzialną osobę!' })

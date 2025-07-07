@@ -69,6 +69,8 @@ export async function getOvertimeRequest(
       (Array.isArray(overtimeRequest.employees)
         ? overtimeRequest.employees.length
         : 0),
+    // Ensure we have the numberOfShifts field for backward compatibility
+    numberOfShifts: overtimeRequest.numberOfShifts || 1,
     // Set the new employeesWithScheduledDayOff field
     employeesWithScheduledDayOff,
   };

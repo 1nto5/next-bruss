@@ -92,6 +92,7 @@ export default function NewOvertimeRequestForm({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
       numberOfEmployees: 1,
+      numberOfShifts: 1,
       responsibleEmployee: loggedInUserEmail || '',
       employeesWithScheduledDayOff: [],
       from: nextSaturdayFrom,
@@ -145,6 +146,10 @@ export default function NewOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Rozpoczęcie pracy</FormLabel>
+                  <FormDescription>
+                    Początek zmiany lub pierwszej zmiany gdy ilość zmian jest
+                    większa niż 1.
+                  </FormDescription>
                   <FormControl>
                     <DateTimePicker
                       value={field.value}
@@ -171,6 +176,10 @@ export default function NewOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Zakończenie pracy</FormLabel>
+                  <FormDescription>
+                    Koniec zmiany lub ostatniej zmiany gdy ilość zmian jest
+                    większa niż 1.
+                  </FormDescription>
                   <FormControl>
                     <DateTimePicker
                       value={field.value}
@@ -185,6 +194,33 @@ export default function NewOvertimeRequestForm({
                           onCalendarClick={() => setOpen(!open)}
                         />
                       )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='numberOfShifts'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Liczba zmian</FormLabel>
+                  <FormDescription>
+                    Zakładamy, że każda zmiana ma równą długość. Jeśli długość
+                    zmian jest różna, należy dodać kolejne zlecenia.
+                  </FormDescription>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      {...field}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === '' ? 1 : parseInt(e.target.value);
+                        field.onChange(value);
+                      }}
+                      value={field.value}
                     />
                   </FormControl>
                   <FormMessage />
@@ -285,6 +321,7 @@ export default function NewOvertimeRequestForm({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name='employeesWithScheduledDayOff'

@@ -304,12 +304,21 @@ export const createColumns = (
       },
     },
     {
+      accessorKey: 'numberOfShifts',
+      header: 'Liczba zmian',
+      cell: ({ row }) => {
+        const numberOfShifts = row.getValue('numberOfShifts') as number;
+        return <div>{numberOfShifts || 1}</div>;
+      },
+    },
+    {
       id: 'totalHours',
       header: 'Liczba godzin',
       cell: ({ row }) => {
         const fromDate = new Date(row.original.from);
         const toDate = new Date(row.original.to);
         const numberOfEmployees = row.original.numberOfEmployees || 0;
+        const numberOfShifts = row.original.numberOfShifts || 1;
 
         // Calculate hours per employee
         const hoursPerEmployee =
@@ -317,8 +326,9 @@ export const createColumns = (
             ((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60)) * 100,
           ) / 100;
 
-        // Calculate total hours for all employees
-        const totalHours = hoursPerEmployee * numberOfEmployees;
+        // Calculate total hours for all employees divided by number of shifts
+        const totalHours =
+          (hoursPerEmployee * numberOfEmployees) / numberOfShifts;
 
         return <div>{totalHours > 0 ? `${totalHours}h` : '-'}</div>;
       },

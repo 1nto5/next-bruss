@@ -12,6 +12,7 @@ export type OvertimeType = {
   _id: string;
   status: OvertimeStatus;
   numberOfEmployees: number; // Number of employees in the order
+  numberOfShifts: number; // Number of shifts
   responsibleEmployee: string; // Email of the responsible person
   employeesWithScheduledDayOff: overtimeRequestEmployeeType[]; // Employees who want to take time off
   from: Date;
