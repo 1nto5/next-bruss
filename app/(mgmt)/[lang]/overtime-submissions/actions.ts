@@ -17,11 +17,11 @@ export async function revalidateOvertimeSubmission() {
 }
 
 export async function redirectToOvertime() {
-  redirect('/overtime');
+  redirect('/overtime-submissions');
 }
 
 export async function redirectToOvertimeSubmission(id: string) {
-  redirect(`/overtime/${id}`);
+  redirect(`/overtime-submissions/${id}`);
 }
 
 async function sendRejectionEmailToEmployee(

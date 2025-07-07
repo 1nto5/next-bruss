@@ -25,14 +25,16 @@ import {
 } from '@/lib/header-routes';
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
 // import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Locale } from '@/i18n.config';
 import { LogIn, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { ThemeModeToggle } from '../../../../components/theme-mode-toggle';
+
 type HeaderProps = {
   dict: any;
-  lang: string;
+  lang: Locale;
 };
 
 // export const dynamic = 'force-dynamic';

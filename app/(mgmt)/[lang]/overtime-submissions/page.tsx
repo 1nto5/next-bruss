@@ -31,7 +31,7 @@ async function getOvertimeSubmissions(
   pendingApprovalsCount: number;
 }> {
   if (!session || !session.user?.email) {
-    redirect('/auth?callbackUrl=/overtime');
+    redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
   try {
@@ -223,7 +223,7 @@ export default async function OvertimePage(props: {
               </Link>
             )}
             {session && canCreateSubmission ? (
-              <Link href='/overtime/new-request'>
+              <Link href='/overtime-submissions/new-request'>
                 <Button variant={'outline'}>
                   <Plus /> <span>Nowe zgłoszenie</span>
                 </Button>

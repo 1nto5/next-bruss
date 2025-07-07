@@ -39,7 +39,7 @@ async function getOvertimeSubmissionsForHR(
   const isHR = userRoles.includes('hr');
 
   if (!isAdmin && !isHR) {
-    redirect('/overtime');
+    redirect('/overtime-submissions');
   }
 
   try {
@@ -161,7 +161,7 @@ export default async function OvertimeHRViewPage(props: {
   const session = await auth();
 
   if (!session?.user?.email) {
-    redirect('/auth?callbackUrl=/overtime');
+    redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
   // Check if user has required permissions - only HR and admin
@@ -170,7 +170,7 @@ export default async function OvertimeHRViewPage(props: {
   const isHR = userRoles.includes('hr');
 
   if (!isAdmin && !isHR) {
-    redirect('/overtime');
+    redirect('/overtime-submissions');
   }
 
   // Fetch all users for person filter

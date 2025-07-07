@@ -74,7 +74,7 @@ export default async function EditOvertimeSubmissionPage(props: {
 
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth?callbackUrl=/overtime');
+    redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
   const [managers, submission] = await Promise.all([
@@ -91,7 +91,7 @@ export default async function EditOvertimeSubmissionPage(props: {
   const canEdit = isAuthor && submission.status === 'pending';
 
   if (!canEdit) {
-    redirect('/overtime');
+    redirect('/overtime-submissions');
   }
 
   return (

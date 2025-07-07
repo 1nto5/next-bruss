@@ -152,7 +152,7 @@ export default function OvertimeRequestForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{getTitle()}</CardTitle>
-          <Link href='/overtime'>
+          <Link href='/overtime-submissions'>
             <Button variant='outline'>
               <Table /> <span>Tabela zgłoszeń</span>
             </Button>
@@ -322,7 +322,7 @@ export default function OvertimeRequestForm({
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             {isEditMode ? (
-              <Link href='/overtime'>
+              <Link href='/overtime-submissions'>
                 <Button
                   variant='destructive'
                   type='button'
