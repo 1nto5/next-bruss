@@ -295,7 +295,7 @@ export default function TableFilteringAndOptions({
                 </Select>
               </div>
             </div>
-            {/* Row 2: Dates and Action Buttons */}
+            {/* Row 2: Dates */}
             <div className='flex flex-wrap items-start gap-4'>
               {' '}
               {/* Use items-start for alignment */}
@@ -341,37 +341,37 @@ export default function TableFilteringAndOptions({
                   )}
                 />
               </div>
-              {/* Buttons moved here */}
-              <div className='flex gap-2'>
-                <Button
-                  type='submit' // Submits the form, triggering handleSearchClick
-                  variant='secondary'
-                  className='justify-start'
-                  disabled={isPendingSearch}
-                >
-                  {isPendingSearch ? (
-                    <>
-                      <Loader className={'mr-1 animate-spin'} size={16} />{' '}
-                      <span>Szukaj</span>
-                    </>
-                  ) : (
-                    <>
-                      <Search className='mr-1' size={16} /> <span>Szukaj</span>
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type='button' // Does not submit form
-                  variant='destructive'
-                  onClick={handleClearFilters} // Clears filters and navigates
-                  title='Clear filters'
-                  disabled={isPendingSearch} // Disable when searching
-                >
-                  <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
-                </Button>
-              </div>
             </div>
-            {/* Buttons originally here are removed */}
+            {/* Row 3: Action buttons */}
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                type='submit'
+                variant='secondary'
+                className='justify-start'
+                disabled={isPendingSearch}
+              >
+                {isPendingSearch ? (
+                  <>
+                    <Loader className='mr-1 animate-spin' size={16} />{' '}
+                    <span>Szukaj</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleClearFilters}
+                title='Clear filters'
+                disabled={isPendingSearch}
+              >
+                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+              </Button>
+            </div>
           </form>
         </CardContent>
       )}
