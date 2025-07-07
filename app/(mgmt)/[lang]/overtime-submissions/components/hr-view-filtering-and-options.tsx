@@ -35,10 +35,12 @@ export default function HrViewFilteringAndOptions({
   fetchTime,
   userRoles = [],
   users = [],
+  pendingSettlementsCount = 0,
 }: {
   fetchTime: Date;
   userRoles?: string[];
   users: UsersListType;
+  pendingSettlementsCount?: number;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -67,6 +69,11 @@ export default function HrViewFilteringAndOptions({
   const [statusFilter, setStatusFilter] = useState(
     searchParams?.get('status') || '',
   );
+
+  const [onlyPendingSettlements, setOnlyPendingSettlements] = useState(() => {
+    const param = searchParams?.get('pendingSettlements');
+    return param === 'true';
+  });
 
   // Generate year options
   const yearOptions = (() => {
@@ -119,11 +126,24 @@ export default function HrViewFilteringAndOptions({
     return options.reverse();
   })();
 
+  const handleOnlyPendingSettlementsChange = (checked: boolean) => {
+    setOnlyPendingSettlements(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('pendingSettlements', 'true');
+    } else {
+      params.delete('pendingSettlements');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const handleClearFilters = () => {
     setMonthFilter('');
     setYearFilter('');
     setStatusFilter('');
     setPersonFilter('');
+    setOnlyPendingSettlements(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -137,6 +157,7 @@ export default function HrViewFilteringAndOptions({
     if (yearFilter) params.set('year', yearFilter);
     if (statusFilter) params.set('status', statusFilter);
     if (personFilter) params.set('person', personFilter);
+    if (onlyPendingSettlements) params.set('pendingSettlements', 'true');
     const newUrl = `${pathname}?${params.toString()}`;
     if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
@@ -153,7 +174,11 @@ export default function HrViewFilteringAndOptions({
 
   // Determine if any filter is active
   const anyFilterActive = Boolean(
-    monthFilter || yearFilter || statusFilter || personFilter,
+    monthFilter ||
+      yearFilter ||
+      statusFilter ||
+      personFilter ||
+      onlyPendingSettlements,
   );
   const [showFilters, setShowFilters] = useState(anyFilterActive);
 
@@ -169,6 +194,24 @@ export default function HrViewFilteringAndOptions({
                 onCheckedChange={setShowFilters}
               />
               <Label htmlFor='show-filters'>Pokaż filtry</Label>
+            </div>
+            <div className='flex items-center space-x-2'>
+              <Switch
+                id='only-pending-settlements'
+                checked={onlyPendingSettlements}
+                onCheckedChange={handleOnlyPendingSettlementsChange}
+              />
+              <Label
+                htmlFor='only-pending-settlements'
+                className={`${
+                  pendingSettlementsCount > 0
+                    ? 'animate-pulse text-red-600 dark:text-red-400'
+                    : ''
+                }`}
+              >
+                Do rozliczenia
+                {pendingSettlementsCount > 0 && ` (${pendingSettlementsCount})`}
+              </Label>
             </div>
           </div>
         </form>

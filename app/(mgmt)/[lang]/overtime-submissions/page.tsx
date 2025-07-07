@@ -6,7 +6,7 @@ import { Locale } from '@/i18n.config';
 import { getUsers } from '@/lib/get-users';
 import { dbc } from '@/lib/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { KeyRound, Plus } from 'lucide-react';
+import { KeyRound, Plus, Users } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -217,6 +217,7 @@ export default async function OvertimePage(props: {
               session?.user?.roles?.includes('hr')) && (
               <Link href='/overtime-submissions/hr-view'>
                 <Button variant={'outline'}>
+                  <Users />
                   <span>Widok HR</span>
                 </Button>
               </Link>

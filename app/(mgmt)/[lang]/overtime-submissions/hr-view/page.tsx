@@ -9,9 +9,14 @@ import { ArrowLeft } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import HROvertimeSummaryDisplay from '../components/hr-overtime-summary';
 import HrViewFilteringAndOptions from '../components/hr-view-filtering-and-options';
 import { createColumns } from '../components/table/columns';
 import { DataTable } from '../components/table/data-table';
+import {
+  calculateOrganizationOvertimeHours,
+  HROvertimeSummary,
+} from '../lib/calculate-overtime';
 import { OvertimeSubmissionType } from '../lib/types';
 
 async function getOvertimeSubmissionsForHR(
@@ -21,6 +26,8 @@ async function getOvertimeSubmissionsForHR(
   fetchTime: Date;
   fetchTimeLocaleString: string;
   overtimeSubmissionsLocaleString: OvertimeSubmissionType[];
+  hrOvertimeSummary: HROvertimeSummary;
+  pendingSettlementsCount: number;
 }> {
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime');
@@ -38,41 +45,54 @@ async function getOvertimeSubmissionsForHR(
   try {
     const coll = await dbc('overtime_submissions');
 
+    // Calculate pending settlements count (approved but not accounted)
+    const pendingSettlements = await coll
+      .find({
+        status: 'approved',
+      })
+      .toArray();
+    const pendingSettlementsCount = pendingSettlements.length;
+
     // Build query based on filters
     const filters: any = {};
 
-    // Person filter
-    if (searchParams.person) {
-      filters.submittedBy = searchParams.person;
-    }
+    // Pending settlements filter
+    if (searchParams.pendingSettlements === 'true') {
+      filters.status = 'approved';
+    } else {
+      // Person filter
+      if (searchParams.person) {
+        filters.submittedBy = searchParams.person;
+      }
 
-    // Month filter
-    if (searchParams.month) {
-      const [year, month] = searchParams.month.split('-').map(Number);
-      const startOfMonth = new Date(year, month - 1, 1);
-      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+      // Month filter
+      if (searchParams.month) {
+        const [year, month] = searchParams.month.split('-').map(Number);
+        const startOfMonth = new Date(year, month - 1, 1);
+        const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
 
-      filters.date = {
-        $gte: startOfMonth,
-        $lte: endOfMonth,
-      };
-    }
+        filters.date = {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        };
+      }
 
-    // Year filter
-    if (searchParams.year) {
-      const year = parseInt(searchParams.year);
-      const startOfYear = new Date(year, 0, 1);
-      const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+      // Year filter
+      if (searchParams.year) {
+        const year = parseInt(searchParams.year);
+        const startOfYear = new Date(year, 0, 1);
+        const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
 
-      filters.date = {
-        $gte: startOfYear,
-        $lte: endOfYear,
-      };
-    }
+        filters.date = {
+          $gte: startOfYear,
+          $lte: endOfYear,
+        };
+      }
 
-    // Status filter
-    if (searchParams.status) {
-      filters.status = searchParams.status;
+      // Status filter
+      if (searchParams.status) {
+        filters.status = searchParams.status;
+      }
     }
 
     const submissions = await coll
@@ -113,10 +133,17 @@ async function getOvertimeSubmissionsForHR(
     const fetchTime = new Date();
     const fetchTimeLocaleString = fetchTime.toLocaleString();
 
+    // Calculate overtime summary for HR view
+    const selectedMonth = searchParams.month;
+    const hrOvertimeSummary =
+      await calculateOrganizationOvertimeHours(selectedMonth);
+
     return {
       fetchTime,
       fetchTimeLocaleString,
       overtimeSubmissionsLocaleString: transformedSubmissions,
+      hrOvertimeSummary,
+      pendingSettlementsCount,
     };
   } catch (error) {
     console.error('Error fetching overtime submissions for HR:', error);
@@ -149,8 +176,12 @@ export default async function OvertimeHRViewPage(props: {
   // Fetch all users for person filter
   const users = await getUsers();
 
-  const { fetchTime, overtimeSubmissionsLocaleString } =
-    await getOvertimeSubmissionsForHR(session, searchParams);
+  const {
+    fetchTime,
+    overtimeSubmissionsLocaleString,
+    hrOvertimeSummary,
+    pendingSettlementsCount,
+  } = await getOvertimeSubmissionsForHR(session, searchParams);
 
   return (
     <Card>
@@ -165,10 +196,13 @@ export default async function OvertimeHRViewPage(props: {
           </Link>
         </div>
 
+        <HROvertimeSummaryDisplay hrOvertimeSummary={hrOvertimeSummary} />
+
         <HrViewFilteringAndOptions
           fetchTime={fetchTime}
           userRoles={session?.user?.roles || []}
           users={users}
+          pendingSettlementsCount={pendingSettlementsCount}
         />
       </CardHeader>
 
