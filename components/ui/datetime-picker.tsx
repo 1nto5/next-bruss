@@ -2,6 +2,19 @@
  * Shadcn Datetime Picker with support for timezone, date and time selection, minimum and maximum date limits, and 12-hour format...
  * Check out the live demo at https://shadcn-datetime-picker-pro.vercel.app/
  * Find the latest source code at https://github.com/huybuidac/shadcn-datetime-picker
+ *
+ * UNIVERSAL LOCALIZATION:
+ * This component automatically adapts to the language parameter from the URL (/[lang]/...).
+ * Currently supports:
+ * - Polish (pl) - default
+ * - German (de)
+ * - English (en)
+ *
+ * The locale is applied to:
+ * - Month names in the calendar
+ * - Day names (weekdays)
+ * - Date format display
+ * - Month/Year picker
  */
 'use client';
 
@@ -32,6 +45,9 @@ import {
   subHours,
   subMonths,
 } from 'date-fns';
+import de from 'date-fns/locale/de';
+import enUS from 'date-fns/locale/en-US';
+import pl from 'date-fns/locale/pl';
 import {
   Calendar as CalendarIcon,
   CheckIcon,
@@ -42,6 +58,7 @@ import {
   Clock,
   XCircle,
 } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DayPicker, Matcher, TZDate } from 'react-day-picker';
@@ -54,6 +71,18 @@ import {
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/cn';
+
+// Locale mapping for date-fns
+const localeMap = {
+  pl: pl,
+  de: de,
+  en: enUS,
+} as const;
+
+// Helper function to capitalize first letter
+const capitalizeFirstLetter = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 
 export type CalendarProps = Omit<
   React.ComponentProps<typeof DayPicker>,
@@ -164,6 +193,15 @@ export function DateTimePicker({
     'month' | 'year' | false
   >(false);
 
+  // Get locale from URL params
+  const params = useParams<{ lang: string }>();
+
+  // Get the appropriate date-fns locale
+  const dateLocale = useMemo(() => {
+    const lang = params?.lang || 'pl';
+    return localeMap[lang as keyof typeof localeMap] || localeMap.pl;
+  }, [params?.lang]);
+
   // Only initialize with value if present, otherwise undefined
   const initDate = useMemo(
     () => (value ? new TZDate(value, timezone) : undefined),
@@ -250,11 +288,14 @@ export function DateTimePicker({
 
   const dislayFormat = useMemo(() => {
     if (!displayValue) return 'Pick a date';
-    return format(
+    const formattedDate = format(
       displayValue,
-      `${!hideTime ? 'MMM' : 'MMMM'} d, yyyy${!hideTime ? (use12HourFormat ? ' hh:mm:ss a' : ' HH:mm:ss') : ''}`,
+      `${!hideTime ? 'LLL' : 'LLLL'} d, yyyy${!hideTime ? (use12HourFormat ? ' hh:mm:ss a' : ' HH:mm:ss') : ''}`,
+      { locale: dateLocale },
     );
-  }, [displayValue, hideTime, use12HourFormat]);
+    // Capitalize the first letter (month name)
+    return capitalizeFirstLetter(formattedDate);
+  }, [displayValue, hideTime, use12HourFormat, dateLocale]);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={modal}>
@@ -316,7 +357,11 @@ export function DateTimePicker({
                   )
                 }
               >
-                {month ? format(month, 'MMMM') : ''}
+                {month
+                  ? capitalizeFirstLetter(
+                      format(month, 'LLLL', { locale: dateLocale }),
+                    )
+                  : ''}
               </span>
               <span
                 className='ms-1'
@@ -368,6 +413,7 @@ export function DateTimePicker({
             onSelect={(d) => d && onDayChanged(d)}
             month={month}
             endMonth={endMonth}
+            locale={dateLocale}
             disabled={
               [
                 max ? { after: max } : null,
@@ -418,6 +464,7 @@ export function DateTimePicker({
             onChange={onMonthYearChanged}
             minDate={minDate}
             maxDate={maxDate}
+            dateLocale={dateLocale}
             className={cn(
               'absolute top-0 right-0 bottom-0 left-0',
               monthYearPicker ? '' : 'hidden',
@@ -466,6 +513,7 @@ function MonthYearPicker({
   maxDate,
   mode = 'month',
   onChange,
+  dateLocale,
   className,
 }: {
   value: Date;
@@ -473,6 +521,7 @@ function MonthYearPicker({
   minDate?: Date;
   maxDate?: Date;
   onChange: (value: Date, mode: 'month' | 'year') => void;
+  dateLocale?: any;
   className?: string;
 }) {
   const yearRef = useRef<HTMLDivElement>(null);
@@ -487,7 +536,7 @@ function MonthYearPicker({
       years.push({ value: i, label: i.toString(), disabled });
     }
     return years;
-  }, [value]);
+  }, [value, minDate, maxDate]);
   const months = useMemo(() => {
     const months: TimeOption[] = [];
     for (let i = 0; i < 12; i++) {
@@ -496,10 +545,16 @@ function MonthYearPicker({
       const endM = endOfMonth(setMonthFns(value, i));
       if (minDate && endM < minDate) disabled = true;
       if (maxDate && startM > maxDate) disabled = true;
-      months.push({ value: i, label: format(new Date(0, i), 'MMM'), disabled });
+      months.push({
+        value: i,
+        label: capitalizeFirstLetter(
+          format(new Date(0, i), 'LLL', { locale: dateLocale }),
+        ),
+        disabled,
+      });
     }
     return months;
-  }, [value]);
+  }, [value, minDate, maxDate, dateLocale]);
 
   const onYearChange = useCallback(
     (v: TimeOption) => {
