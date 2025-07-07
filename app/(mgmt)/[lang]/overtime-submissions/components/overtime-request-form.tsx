@@ -169,7 +169,7 @@ export default function OvertimeRequestForm({
               name='supervisor'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kierownik</FormLabel>
+                  <FormLabel>Przełożony</FormLabel>
                   <Popover
                     open={supervisorOpen}
                     onOpenChange={setSupervisorOpen}
