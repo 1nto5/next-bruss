@@ -15,6 +15,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Form,
@@ -258,11 +259,21 @@ export default function OvertimeRequestForm({
                     <FormLabel>Data</FormLabel>
                     <FormControl>
                       <DateTimePicker
+                        modal
+                        hideTime
                         value={field.value}
                         onChange={field.onChange}
-                        hideTime={true}
                         min={firstDayPrevMonth}
                         max={maxDate}
+                        renderTrigger={({ open, value, setOpen }) => (
+                          <DateTimeInput
+                            value={value}
+                            onChange={(x) => !open && field.onChange(x)}
+                            format='dd/MM/yyyy'
+                            disabled={open}
+                            onCalendarClick={() => setOpen(!open)}
+                          />
+                        )}
                       />
                     </FormControl>
                     <FormMessage />
@@ -285,8 +296,6 @@ export default function OvertimeRequestForm({
                     <Input
                       type='number'
                       step={0.5}
-                      min={-16}
-                      max={16}
                       {...field}
                       onChange={(e) => {
                         const value =

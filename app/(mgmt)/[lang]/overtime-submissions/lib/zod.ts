@@ -34,7 +34,7 @@ export const OvertimeSubmissionSchema = z
     },
     {
       message:
-        'Data musi być nie starsza niż początek poprzedniego miesiąca i nie późniejsza niż dziś (lub koniec następnego miesiąca przy odbiorze nadgodzin)!',
+        'Data nie może być starsza niż początek poprzedniego miesiąca i późniejsza dzień bieżący (lub koniec następnego miesiąca przy odbiorze nadgodzin)!',
       path: ['date'],
     },
   )
@@ -60,7 +60,7 @@ export const OvertimeSubmissionSchema = z
       return true;
     },
     {
-      message: 'Uzasadnienie jest wymagane dla dodatnich godzin!',
+      message: 'Uzasadnienie jest wymagane!',
       path: ['reason'],
     },
   );
