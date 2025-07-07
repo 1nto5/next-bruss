@@ -23,7 +23,7 @@ export const ROUTE_PATHS = {
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
   productionOvertime: '/production-overtime',
-  overtime: '/overtime',
+  overtimeSubmissions: '/overtime-submissions',
   codesGenerator: '/codes-generator',
   projects: '/projects',
 };
@@ -56,7 +56,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
         title: 'Praca w godzinach nadliczbowych - produkcja',
       },
       {
-        href: ROUTE_PATHS.overtime,
+        href: ROUTE_PATHS.overtimeSubmissions,
         title: 'Zgłoszenia nadgodzin',
       },
     ],
