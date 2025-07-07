@@ -209,14 +209,14 @@ export default async function OvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='mb-4 flex items-center justify-between'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>Zgłoszenia nadgodzin</CardTitle>
-          <div className='flex items-center gap-2'>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* HR View Link for HR and admin only */}
             {(session?.user?.roles?.includes('admin') ||
               session?.user?.roles?.includes('hr')) && (
               <Link href='/overtime-submissions/hr-view'>
-                <Button variant={'outline'}>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Users />
                   <span>Widok HR</span>
                 </Button>
@@ -224,13 +224,13 @@ export default async function OvertimePage(props: {
             )}
             {session && canCreateSubmission ? (
               <Link href='/overtime-submissions/new-request'>
-                <Button variant={'outline'}>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Plus /> <span>Nowe zgłoszenie</span>
                 </Button>
               </Link>
             ) : !session ? (
               <Link href={`/auth?callbackUrl=/overtime`}>
-                <Button variant={'outline'}>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
                   <KeyRound /> <span>Zaloguj się</span>
                 </Button>
               </Link>

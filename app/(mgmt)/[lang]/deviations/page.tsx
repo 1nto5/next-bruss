@@ -222,24 +222,23 @@ export default async function DeviationsPage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='mb-4 flex items-center justify-between'>
-          {' '}
-          {/* Add flex container */}
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>Odchylenia w procesie produkcyjnym</CardTitle>
-          {/* Add the "Add Deviation" button here, conditionally rendered */}
-          {session ? (
-            <Link href='/deviations/add'>
-              <Button variant={'outline'}>
-                <Plus /> <span>Nowe odchylenie</span>
-              </Button>
-            </Link>
-          ) : (
-            <Link href={`/auth?callbackUrl=/deviations`}>
-              <Button variant={'outline'}>
-                <KeyRound /> <span>Zaloguj się</span>
-              </Button>
-            </Link>
-          )}
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            {session ? (
+              <Link href='/deviations/add'>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
+                  <Plus /> <span>Nowe odchylenie</span>
+                </Button>
+              </Link>
+            ) : (
+              <Link href={`/auth?callbackUrl=/deviations`}>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
+                  <KeyRound /> <span>Zaloguj się</span>
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
         {/* Remove CardDescription with sync time */}
         {/* <CardDescription>

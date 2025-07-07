@@ -81,26 +81,25 @@ export default async function ProductionOvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='mb-4 flex items-center justify-between'>
-          {' '}
-          {/* Add flex container */}
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>
             Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
           </CardTitle>
-          {/* Add the "Add Deviation" button here, conditionally rendered */}
-          {session && canCreateRequest ? (
-            <Link href='/production-overtime/new-request'>
-              <Button variant={'outline'}>
-                <Plus /> <span>Nowe zlecenie</span>
-              </Button>
-            </Link>
-          ) : !session ? (
-            <Link href={`/auth?callbackUrl=/production-overtime`}>
-              <Button variant={'outline'}>
-                <KeyRound /> <span>Zaloguj się</span>
-              </Button>
-            </Link>
-          ) : null}
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            {session && canCreateRequest ? (
+              <Link href='/production-overtime/new-request'>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
+                  <Plus /> <span>Nowe zlecenie</span>
+                </Button>
+              </Link>
+            ) : !session ? (
+              <Link href={`/auth?callbackUrl=/production-overtime`}>
+                <Button variant={'outline'} className='w-full sm:w-auto'>
+                  <KeyRound /> <span>Zaloguj się</span>
+                </Button>
+              </Link>
+            ) : null}
+          </div>
         </div>
         <TableFilteringAndOptions
           fetchTime={fetchTime}

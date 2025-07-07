@@ -86,14 +86,16 @@ export function CardsDataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <CardTitle>Karty</CardTitle>
             <CardDescription>
               Ostatnia synchronizacja: {fetchTime}
             </CardDescription>
           </div>
-          <ExportButton />
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <ExportButton />
+          </div>
         </div>
         <CardsTableFilteringAndOptions
           setFilter={(columnId, value) =>

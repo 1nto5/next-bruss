@@ -186,14 +186,16 @@ export default async function OvertimeHRViewPage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='mb-4 flex items-center justify-between'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>Widok HR - Zgłoszenia nadgodzin</CardTitle>
-          <Link href='/overtime-submissions'>
-            <Button variant={'outline'}>
-              <ArrowLeft />
-              <span>Powrót do zgłoszeń</span>
-            </Button>
-          </Link>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <Link href='/overtime-submissions'>
+              <Button variant={'outline'} className='w-full sm:w-auto'>
+                <ArrowLeft />
+                <span>Powrót do zgłoszeń</span>
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <HROvertimeSummaryDisplay hrOvertimeSummary={hrOvertimeSummary} />
