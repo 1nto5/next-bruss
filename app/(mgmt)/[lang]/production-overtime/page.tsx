@@ -70,7 +70,8 @@ export default async function ProductionOvertimePage(props: {
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
   const isPlantManager =
     session?.user?.roles?.includes('plant-manager') || false;
-  const canCreateRequest = isGroupLeader || isPlantManager;
+  const isAdmin = session?.user?.roles?.includes('admin') || false;
+  const canCreateRequest = isGroupLeader || isPlantManager || isAdmin;
   const userEmail = session?.user?.email || undefined;
 
   let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
