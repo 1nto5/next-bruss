@@ -141,7 +141,7 @@ export const createColumns = (
         const canDelete = isAuthor && submission.status === 'pending';
 
         const hasMarkAsAccountedAction =
-          isHR && submission.status === 'approved';
+          (isHR || isAdmin) && submission.status === 'approved';
 
         const hasActions =
           canEdit || canDelete || canApproveReject || hasMarkAsAccountedAction;
