@@ -234,6 +234,36 @@ export default function OvertimeRequestForm({
 
             <FormField
               control={form.control}
+              name='hours'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Godziny</FormLabel>
+                  <FormDescription>
+                    Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5).
+                    Użyj wartości ujemnych (np. -2.5) aby odebrać nadgodziny.
+                  </FormDescription>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      step={0.5}
+                      {...field}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === ''
+                            ? 0.5
+                            : parseFloat(e.target.value);
+                        field.onChange(value);
+                      }}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name='date'
               render={({ field }) => {
                 // Calculate min/max dates
@@ -280,36 +310,6 @@ export default function OvertimeRequestForm({
                   </FormItem>
                 );
               }}
-            />
-
-            <FormField
-              control={form.control}
-              name='hours'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Godziny</FormLabel>
-                  <FormDescription>
-                    Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5).
-                    Użyj wartości ujemnych (np. -2.5) aby odebrać nadgodziny.
-                  </FormDescription>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      step={0.5}
-                      {...field}
-                      onChange={(e) => {
-                        const value =
-                          e.target.value === ''
-                            ? 0.5
-                            : parseFloat(e.target.value);
-                        field.onChange(value);
-                      }}
-                      value={field.value}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
             />
 
             <FormField

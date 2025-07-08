@@ -208,7 +208,7 @@ export default async function OvertimePage(props: {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>Zgłoszenia nadgodzin</CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>

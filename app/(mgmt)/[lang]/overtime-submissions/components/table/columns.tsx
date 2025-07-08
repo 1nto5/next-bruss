@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,12 +25,58 @@ import RejectSubmissionDialog from '../reject-submission-dialog';
 export const createColumns = (
   session: Session | null,
 ): ColumnDef<OvertimeSubmissionType>[] => {
-  // Check user roles
-  const userRoles = session?.user?.roles || [];
-  const isAdmin = userRoles.includes('admin');
-  const isHR = userRoles.includes('hr');
-
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <div className='flex h-full items-center justify-center'>
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label='Select all'
+          />
+        </div>
+      ),
+      cell: ({ row, table }) => {
+        // Determine if the row can be selected for any bulk action
+        const session = (table.options.meta as any)?.session;
+        const userRoles = session?.user?.roles || [];
+        const isAdmin = userRoles.includes('admin');
+        const isHR = userRoles.includes('hr');
+        const userEmail = session?.user?.email;
+        const submission = row.original;
+        const canApprove =
+          (submission.supervisor === userEmail || isHR || isAdmin) &&
+          submission.status === 'pending';
+        const canReject =
+          (submission.supervisor === userEmail || isHR || isAdmin) &&
+          submission.status === 'pending';
+        const canMarkAsAccounted =
+          (isHR || isAdmin) && submission.status === 'approved';
+        const canCancel =
+          submission.submittedBy === userEmail &&
+          submission.status === 'pending';
+        const canSelect =
+          canApprove || canReject || canMarkAsAccounted || canCancel;
+        return (
+          <div className='flex h-full items-center justify-center'>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label='Select row'
+              disabled={!canSelect}
+            />
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'status',
       header: 'Status',

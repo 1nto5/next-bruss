@@ -134,6 +134,8 @@ export async function cancelOvertimeRequest(id: string) {
           status: 'cancelled',
           cancelledAt: new Date(),
           cancelledBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -188,6 +190,8 @@ export async function approveOvertimeSubmission(id: string) {
           status: 'approved',
           approvedAt: new Date(),
           approvedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -244,6 +248,8 @@ export async function rejectOvertimeSubmission(
           rejectedAt: new Date(),
           rejectedBy: session.user.email,
           rejectionReason: rejectionReason,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -317,6 +323,8 @@ export async function markAsAccountedOvertimeSubmission(id: string) {
           status: 'accounted',
           accountedAt: new Date(),
           accountedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
       },
     );
@@ -328,5 +336,218 @@ export async function markAsAccountedOvertimeSubmission(id: string) {
   } catch (error) {
     console.error(error);
     return { error: 'markAsAccountedOvertimeSubmission server action error' };
+  }
+}
+
+// Bulk actions
+export async function bulkApproveOvertimeSubmissions(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  const userRoles = session.user?.roles ?? [];
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
+
+  try {
+    const coll = await dbc('overtime_submissions');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    // First, check permissions for each submission
+    const submissions = await coll.find({ _id: { $in: objectIds } }).toArray();
+
+    const allowedIds = submissions
+      .filter((submission) => {
+        // Allow approval if user is supervisor, HR, or admin
+        return (
+          (submission.supervisor === session.user.email || isHR || isAdmin) &&
+          submission.status === 'pending'
+        );
+      })
+      .map((submission) => submission._id);
+
+    if (allowedIds.length === 0) {
+      return { error: 'no valid submissions' };
+    }
+
+    const updateResult = await coll.updateMany(
+      { _id: { $in: allowedIds } },
+      {
+        $set: {
+          status: 'approved',
+          approvedAt: new Date(),
+          approvedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertime();
+    return {
+      success: 'approved',
+      count: updateResult.modifiedCount,
+      total: ids.length,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkApproveOvertimeSubmissions server action error' };
+  }
+}
+
+export async function bulkRejectOvertimeSubmissions(
+  ids: string[],
+  rejectionReason: string,
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  const userRoles = session.user?.roles ?? [];
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
+
+  try {
+    const coll = await dbc('overtime_submissions');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    // First, check permissions for each submission
+    const submissions = await coll.find({ _id: { $in: objectIds } }).toArray();
+
+    const allowedSubmissions = submissions.filter((submission) => {
+      // Allow rejection if user is supervisor, HR, or admin
+      return (
+        (submission.supervisor === session.user.email || isHR || isAdmin) &&
+        submission.status === 'pending'
+      );
+    });
+
+    if (allowedSubmissions.length === 0) {
+      return { error: 'no valid submissions' };
+    }
+
+    const allowedIds = allowedSubmissions.map((submission) => submission._id);
+
+    const updateResult = await coll.updateMany(
+      { _id: { $in: allowedIds } },
+      {
+        $set: {
+          status: 'rejected',
+          rejectedAt: new Date(),
+          rejectedBy: session.user.email,
+          rejectionReason: rejectionReason,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    // Send rejection emails
+    for (const submission of allowedSubmissions) {
+      await sendRejectionEmailToEmployee(
+        submission.submittedBy,
+        submission._id.toString(),
+        rejectionReason,
+      );
+    }
+
+    revalidateOvertime();
+    return {
+      success: 'rejected',
+      count: updateResult.modifiedCount,
+      total: ids.length,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkRejectOvertimeSubmissions server action error' };
+  }
+}
+
+export async function bulkMarkAsAccountedOvertimeSubmissions(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  const isHR = (session.user?.roles ?? []).includes('hr');
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+
+  if (!isHR && !isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_submissions');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    const updateResult = await coll.updateMany(
+      {
+        _id: { $in: objectIds },
+        status: 'approved', // Only approved submissions can be marked as accounted
+      },
+      {
+        $set: {
+          status: 'accounted',
+          accountedAt: new Date(),
+          accountedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertime();
+    return {
+      success: 'accounted',
+      count: updateResult.modifiedCount,
+      total: ids.length,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      error: 'bulkMarkAsAccountedOvertimeSubmissions server action error',
+    };
+  }
+}
+
+export async function bulkCancelOvertimeRequests(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  try {
+    const coll = await dbc('overtime_submissions');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    // Only allow cancellation of own pending submissions
+    const updateResult = await coll.updateMany(
+      {
+        _id: { $in: objectIds },
+        submittedBy: session.user.email,
+        status: 'pending',
+      },
+      {
+        $set: {
+          status: 'cancelled',
+          cancelledAt: new Date(),
+          cancelledBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertime();
+    return {
+      success: 'cancelled',
+      count: updateResult.modifiedCount,
+      total: ids.length,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkCancelOvertimeRequests server action error' };
   }
 }
