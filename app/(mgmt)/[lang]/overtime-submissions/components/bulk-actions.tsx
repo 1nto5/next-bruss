@@ -203,14 +203,13 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
             <AlertDialogTitle>Potwierdź operację</AlertDialogTitle>
             <AlertDialogDescription>
               Czy na pewno chcesz wykonać tę operację na {selectedCount}{' '}
-              zgłoszeniu
               {selectedCount === 1
-                ? ''
+                ? 'zgłoszeniu'
                 : selectedCount % 10 >= 2 &&
                     selectedCount % 10 <= 4 &&
                     ![12, 13, 14].includes(selectedCount % 100)
-                  ? 'ach'
-                  : 'ach'}
+                  ? 'zgłoszeniach'
+                  : 'zgłoszeniach'}
               ?
             </AlertDialogDescription>
           </AlertDialogHeader>
