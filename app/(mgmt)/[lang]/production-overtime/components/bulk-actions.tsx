@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader } from '@/components/ui/card';
 import { Table } from '@tanstack/react-table';
 import { Check, X } from 'lucide-react';
 import { Session } from 'next-auth';
@@ -179,53 +179,53 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
       </AlertDialog>
 
       <Card>
-        {hasAnyAction ? (
-          <>
-            <CardHeader className='p-4'>
-              <CardTitle>
-                Wybrano {selectedCount} {getPlural(selectedCount)}
-              </CardTitle>
-              <div className='flex flex-wrap gap-2'>
-                {canApprove && (
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => openConfirmDialog('approve')}
-                  >
-                    <Check className='' />
-                    Zatwierdź
-                  </Button>
-                )}
-                {canCancel && (
-                  <Button
-                    variant='destructive'
-                    size='sm'
-                    onClick={() => openConfirmDialog('cancel')}
-                  >
-                    <X className='' />
-                    Anuluj
-                  </Button>
-                )}
-                {canMarkAsAccounted && (
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    onClick={() => openConfirmDialog('account')}
-                  >
-                    <Check className='' />
-                    Rozlicz
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-          </>
-        ) : (
-          <div className='p-4'>
-            <div className='text-muted-foreground py-2'>
-              Brak wspólnych akcji dla zaznaczonych zleceń.
+        <CardHeader className='p-4'>
+          <CardDescription>
+            Wybrano {selectedCount} {getPlural(selectedCount)}
+            {!hasAnyAction && (
+              <>
+                <br />
+                <span className='text-muted-foreground'>
+                  Brak wspólnych akcji dla zaznaczonych zleceń.
+                </span>
+              </>
+            )}
+          </CardDescription>
+          {hasAnyAction && (
+            <div className='flex flex-wrap gap-2'>
+              {canApprove && (
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => openConfirmDialog('approve')}
+                >
+                  <Check className='' />
+                  Zatwierdź
+                </Button>
+              )}
+              {canCancel && (
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  onClick={() => openConfirmDialog('cancel')}
+                >
+                  <X className='' />
+                  Anuluj
+                </Button>
+              )}
+              {canMarkAsAccounted && (
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => openConfirmDialog('account')}
+                >
+                  <Check className='' />
+                  Rozlicz
+                </Button>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </CardHeader>
       </Card>
     </>
   );

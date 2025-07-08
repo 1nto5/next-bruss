@@ -161,7 +161,7 @@ export const createColumns = (
               <DropdownMenuContent align='end'>
                 {/* Edit button for authors */}
                 {canEdit && (
-                  <Link href={`/overtime/edit/${submission._id}`}>
+                  <Link href={`/overtime-submissions/edit/${submission._id}`}>
                     <DropdownMenuItem>
                       <Edit className='mr-2 h-4 w-4' />
                       <span>Edytuj</span>

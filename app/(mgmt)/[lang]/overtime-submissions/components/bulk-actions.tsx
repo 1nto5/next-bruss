@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -202,7 +202,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Potwierdź operację</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz wykonać tę operację na {selectedCount}{' '}
+              Czy na pewno chcesz wykonać operację na {selectedCount}{' '}
               {selectedCount === 1
                 ? 'zgłoszeniu'
                 : selectedCount % 10 >= 2 &&
@@ -224,121 +224,110 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
         </AlertDialogContent>
       </AlertDialog>
       <Card>
-        {hasAnyAction ? (
-          <>
-            <CardHeader className='p-4'>
-              <CardTitle>
-                {(() => {
-                  if (selectedCount === 1) return 'Wybrałeś 1 zgłoszenie:';
-                  if (
-                    [2, 3, 4].includes(selectedCount % 10) &&
-                    ![12, 13, 14].includes(selectedCount % 100)
-                  ) {
-                    return `Wybrałeś ${selectedCount} zgłoszenia:`;
-                  }
-                  return `Wybrałeś ${selectedCount} zgłoszeń:`;
-                })()}
-              </CardTitle>
-            </CardHeader>
-            <div className='flex flex-wrap gap-2 px-4 pb-4'>
-              {hasAnyAction ? (
-                <>
-                  {allCanApprove && (
-                    <Button
-                      variant='default'
-                      size='sm'
-                      onClick={() => openConfirmDialog('approve')}
-                    >
-                      <Check className='' />
-                      Zatwierdź
-                    </Button>
-                  )}
-                  {allCanReject && (
-                    <Button
-                      variant='destructive'
-                      size='sm'
-                      onClick={() => openConfirmDialog('reject')}
-                    >
-                      <X className='' />
-                      Odrzuć
-                    </Button>
-                  )}
-                  {allCanMarkAsAccounted && (
-                    <Button
-                      variant='secondary'
-                      size='sm'
-                      onClick={() => openConfirmDialog('settle')}
-                    >
-                      <Check className='' />
-                      Rozlicz
-                    </Button>
-                  )}
-                  {allCanCancel && (
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() => openConfirmDialog('cancel')}
-                    >
-                      <X className='' />
-                      Anuluj
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <div className='text-muted-foreground py-2'>
+        <CardHeader className='p-4'>
+          <CardDescription>
+            {(() => {
+              if (selectedCount === 1) return 'Wybrałeś 1 zgłoszenie:';
+              if (
+                [2, 3, 4].includes(selectedCount % 10) &&
+                ![12, 13, 14].includes(selectedCount % 100)
+              ) {
+                return `Wybrałeś ${selectedCount} zgłoszenia:`;
+              }
+              return `Wybrałeś ${selectedCount} zgłoszeń:`;
+            })()}
+            {!hasAnyAction && (
+              <>
+                <br />
+                <span className='text-muted-foreground'>
                   Brak wspólnych akcji dla zaznaczonych zgłoszeń.
-                </div>
-              )}
-            </div>
-            <Dialog
-              open={isRejectDialogOpen}
-              onOpenChange={setIsRejectDialogOpen}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Odrzuć wybrane zgłoszenia</DialogTitle>
-                  <DialogDescription>
-                    Czy na pewno chcesz odrzucić {selectedCount} wybranych
-                    zgłoszeń? Podaj powód odrzucenia.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className='space-y-4'>
-                  <Textarea
-                    placeholder='Powód odrzucenia...'
-                    value={rejectionReason}
-                    onChange={(e) => setRejectionReason(e.target.value)}
-                    className='min-h-[100px]'
-                  />
-                </div>
-                <DialogFooter>
-                  <Button
-                    variant='outline'
-                    onClick={() => {
-                      setIsRejectDialogOpen(false);
-                      setRejectionReason('');
-                    }}
-                  >
-                    Anuluj
-                  </Button>
-                  <Button
-                    variant='destructive'
-                    onClick={handleBulkReject}
-                    disabled={!rejectionReason.trim()}
-                  >
-                    <X className='' />
-                    Odrzuć
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </>
-        ) : (
-          <div className='p-4'>
-            <div className='text-muted-foreground py-2'>
-              Brak wspólnych akcji dla zaznaczonych zgłoszeń.
-            </div>
+                </span>
+              </>
+            )}
+          </CardDescription>
+        </CardHeader>
+        {hasAnyAction && (
+          <div className='flex flex-wrap gap-2 px-4 pb-4'>
+            {allCanApprove && (
+              <Button
+                variant='default'
+                size='sm'
+                onClick={() => openConfirmDialog('approve')}
+              >
+                <Check className='' />
+                Zatwierdź
+              </Button>
+            )}
+            {allCanReject && (
+              <Button
+                variant='destructive'
+                size='sm'
+                onClick={() => openConfirmDialog('reject')}
+              >
+                <X className='' />
+                Odrzuć
+              </Button>
+            )}
+            {allCanMarkAsAccounted && (
+              <Button
+                variant='secondary'
+                size='sm'
+                onClick={() => openConfirmDialog('settle')}
+              >
+                <Check className='' />
+                Rozlicz
+              </Button>
+            )}
+            {allCanCancel && (
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => openConfirmDialog('cancel')}
+              >
+                <X className='' />
+                Anuluj
+              </Button>
+            )}
           </div>
         )}
+        <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Odrzuć wybrane zgłoszenia</DialogTitle>
+              <DialogDescription>
+                Czy na pewno chcesz odrzucić {selectedCount} wybranych zgłoszeń?
+                Podaj powód odrzucenia.
+              </DialogDescription>
+            </DialogHeader>
+            <div className='space-y-4'>
+              <Textarea
+                placeholder='Powód odrzucenia...'
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className='min-h-[100px]'
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant='outline'
+                onClick={() => {
+                  setIsRejectDialogOpen(false);
+                  setRejectionReason('');
+                }}
+              >
+                Anuluj
+              </Button>
+              <Button
+                variant='destructive'
+                onClick={handleBulkReject}
+                disabled={!rejectionReason.trim()}
+              >
+                <X className='' />
+                Odrzuć
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
     </>
   );
