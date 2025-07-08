@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,63 @@ export const createColumns = (
   const canApprove = isPlantManager || isAdmin;
 
   return [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <div className='flex h-full items-center justify-center'>
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label='Select all'
+          />
+        </div>
+      ),
+      cell: ({ row, table }) => {
+        // Determine if the row can be selected for any bulk action
+        const session = (table.options.meta as any)?.session;
+        const userRoles = session?.user?.roles || [];
+        const isAdmin = userRoles.includes('admin');
+        const isPlantManager = userRoles.includes('plant-manager');
+        const isHR = userRoles.includes('hr');
+        const userEmail = session?.user?.email;
+        const request = row.original;
+
+        const canApprove =
+          (isPlantManager || isAdmin) && request.status === 'pending';
+        const canMarkAsAccounted = isHR && request.status === 'completed';
+        const canCancel =
+          request._id &&
+          request.status !== 'completed' &&
+          request.status !== 'canceled' &&
+          request.status !== 'accounted' &&
+          (request.requestedBy === userEmail ||
+            isPlantManager ||
+            isAdmin ||
+            userRoles.includes('group-leader') ||
+            userRoles.includes('production-manager') ||
+            userRoles.includes('hr'));
+
+        const canSelect = canApprove || canMarkAsAccounted || canCancel;
+
+        return (
+          <div className='flex h-full items-center justify-center'>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label='Select row'
+              disabled={!canSelect}
+            />
+          </div>
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       accessorKey: 'status',
       header: 'Status',

@@ -11,6 +11,7 @@ import {
 import {
   ColumnDef,
   ColumnFiltersState,
+  RowSelectionState,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -25,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Session } from 'next-auth';
+import BulkActions from '../bulk-actions';
 
 interface DataTableProps<TData, TValue> {
   columns: (session: Session | null) => ColumnDef<TData, TValue>[];
@@ -43,6 +45,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   // Use the session to create the columns
   const tableColumns = React.useMemo(
@@ -59,20 +62,27 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
+      rowSelection,
     },
     initialState: {
       pagination: {
         pageSize: 20,
       },
     },
+    meta: {
+      session,
+    } as any,
   });
 
   return (
     <>
-      <CardContent>
+      <CardContent className='space-y-4'>
+        <BulkActions table={table as any} session={session} />
+
         <div className='rounded-md border'>
           <Table>
             <TableHeader>
