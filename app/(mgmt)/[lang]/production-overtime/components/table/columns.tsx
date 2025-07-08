@@ -172,6 +172,7 @@ export const createColumns = (
               'production-manager',
               'plant-manager',
               'hr',
+              'admin',
             ].includes(role),
           ) ||
           userEmail === request.requestedBy ||
