@@ -41,6 +41,7 @@ import {
   Check,
   ChevronsUpDown,
   CircleX,
+  Copy,
   Plus,
   Save,
   Table,
@@ -73,6 +74,9 @@ export default function OvertimeRequestForm({
 }: OvertimeRequestFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
+  const [actionType, setActionType] = useState<'save' | 'save-and-add-another'>(
+    'save',
+  );
 
   const isEditMode = mode === 'edit';
 
@@ -86,7 +90,10 @@ export default function OvertimeRequestForm({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof OvertimeSubmissionSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof OvertimeSubmissionSchema>,
+    currentActionType: 'save' | 'save-and-add-another' = actionType,
+  ) => {
     setIsPending(true);
     try {
       let res;
@@ -100,12 +107,20 @@ export default function OvertimeRequestForm({
         const successMessage = isEditMode
           ? 'Zgłoszenie zostało zaktualizowane!'
           : 'Zgłoszenie dodane!';
-        toast.success(successMessage);
 
         if (!isEditMode) {
-          form.reset(); // Reset form after successful submission
+          if (currentActionType === 'save-and-add-another') {
+            // Show only one toast for add another
+            toast.success('Zgłoszenie zapisane!');
+          } else {
+            toast.success(successMessage);
+            form.reset(); // Reset form after successful submission
+            redirect();
+          }
+        } else {
+          toast.success(successMessage);
+          redirect();
         }
-        redirect();
       } else if ('error' in res) {
         console.error(res.error);
         // Handle specific error messages
@@ -130,6 +145,16 @@ export default function OvertimeRequestForm({
     } finally {
       setIsPending(false);
     }
+  };
+
+  const handleSaveAndAddAnother = () => {
+    setActionType('save-and-add-another');
+    form.handleSubmit((data) => onSubmit(data, 'save-and-add-another'))();
+  };
+
+  const handleRegularSave = () => {
+    setActionType('save');
+    form.handleSubmit((data) => onSubmit(data, 'save'))();
   };
 
   const getTitle = () => {
@@ -163,7 +188,13 @@ export default function OvertimeRequestForm({
 
       <Separator className='mb-4' />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            // Default to regular save when Enter is pressed
+            handleRegularSave();
+          }}
+        >
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
@@ -352,14 +383,41 @@ export default function OvertimeRequestForm({
                 Wyczyść
               </Button>
             )}
-            <Button
-              type='submit'
-              className='w-full sm:w-auto'
-              disabled={isPending}
-            >
-              <SubmitIcon className={isPending ? 'animate-spin' : ''} />
-              {getSubmitButtonText()}
-            </Button>
+
+            <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row'>
+              {!isEditMode && (
+                <Button
+                  type='button'
+                  variant='secondary'
+                  onClick={handleSaveAndAddAnother}
+                  disabled={isPending}
+                  className='w-full sm:w-auto'
+                >
+                  <Copy
+                    className={
+                      isPending && actionType === 'save-and-add-another'
+                        ? 'animate-spin'
+                        : ''
+                    }
+                  />
+                  Zapisz i dodaj kolejne
+                </Button>
+              )}
+
+              <Button
+                type='button'
+                onClick={handleRegularSave}
+                className='w-full sm:w-auto'
+                disabled={isPending}
+              >
+                <SubmitIcon
+                  className={
+                    isPending && actionType === 'save' ? 'animate-spin' : ''
+                  }
+                />
+                {getSubmitButtonText()}
+              </Button>
+            </div>
           </CardFooter>
         </form>
       </Form>

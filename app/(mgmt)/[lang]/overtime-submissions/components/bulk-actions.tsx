@@ -230,15 +230,14 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
             <CardHeader className='p-4'>
               <CardTitle>
                 {(() => {
-                  if (selectedCount === 1)
-                    return 'Wybrałeś 1 zgłoszenie, wybierz akcję do wykonania:';
+                  if (selectedCount === 1) return 'Wybrałeś 1 zgłoszenie:';
                   if (
                     [2, 3, 4].includes(selectedCount % 10) &&
                     ![12, 13, 14].includes(selectedCount % 100)
                   ) {
-                    return `Wybrałeś ${selectedCount} zgłoszenia, wybierz akcję do wykonania:`;
+                    return `Wybrałeś ${selectedCount} zgłoszenia:`;
                   }
-                  return `Wybrałeś ${selectedCount} zgłoszeń, wybierz akcję do wykonania:`;
+                  return `Wybrałeś ${selectedCount} zgłoszeń:`;
                 })()}
               </CardTitle>
             </CardHeader>
