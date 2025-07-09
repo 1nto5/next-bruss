@@ -20,9 +20,6 @@ const config =
 
 const transporter = createTransport(config);
 
-const FOOTER_TEXT =
-  '\n\n--\nWiadomość wysłana automatycznie. Nie odpowiadaj. / Message sent automatically. Do not reply. / Nachricht automatisch gesendet. Bitte nicht antworten.';
-
 const HTML_FOOTER = `<br/><br/><hr/>Wiadomość wysłana automatycznie. Nie odpowiadaj. / Message sent automatically. Do not reply. / Nachricht automatisch gesendet. Bitte nicht antworten.`;
 
 const mailer = async (mailOptions: any) => {
