@@ -51,7 +51,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
     <header
       className={`bg-background sticky top-0 z-50 w-full border-b px-2 py-4 transition-all`}
     >
-      <div className='relative mx-auto flex h-4 w-full max-w-7xl items-center justify-between'>
+      <div className='relative mx-auto flex h-4 w-full items-center justify-between'>
         <div className='flex items-center'>
           <Sheet>
             <SheetTrigger asChild>
