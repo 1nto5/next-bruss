@@ -162,7 +162,8 @@ export const createColumns = (
             isAdmin ||
             userRoles.includes('group-leader') ||
             userRoles.includes('production-manager') ||
-            userRoles.includes('hr'));
+            userRoles.includes('hr') ||
+            userRoles.includes('admin'));
 
         // Check if user can add attachment (same logic as in AddAttachmentDialog)
         const canAddAttachment =
@@ -194,6 +195,10 @@ export const createColumns = (
           canCancel ||
           hasAddAttachmentAction ||
           hasDownloadAttachmentAction;
+
+        if (!hasActions) {
+          return null;
+        }
 
         return (
           <>
@@ -281,13 +286,6 @@ export const createColumns = (
                       <span>Pobierz listę obecności</span>
                     </DropdownMenuItem>
                   </Link>
-                )}
-
-                {/* Show "No Action" when no actions are available */}
-                {!hasActions && (
-                  <DropdownMenuItem disabled>
-                    <span>Brak akcji</span>
-                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
