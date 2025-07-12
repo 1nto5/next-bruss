@@ -29,6 +29,8 @@ export function middleware(request: NextRequest) {
       '/logo.png',
       '/ok.wav',
       '/nok.mp3',
+      '/oven-in.wav',
+      '/oven-out.wav',
       // Your other files in `public`
     ].includes(pathname)
   )
