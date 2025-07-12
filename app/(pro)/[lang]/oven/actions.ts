@@ -4,14 +4,15 @@
 import { dbc } from '@/lib/mongo';
 
 // Type definitions
-import { loginInventoryType } from './lib/zod';
+import { OvenProcessType } from './lib/types';
+import { loginType } from './lib/zod';
 
 /**
  * Authenticates users for inventory access
  * @param data - Login credentials including personal numbers only
  * @returns Success status with employee data or error message
  */
-export async function login(data: loginInventoryType) {
+export async function login(data: loginType) {
   try {
     const collection = await dbc('employees');
     const operators: Array<{
@@ -71,366 +72,29 @@ export async function login(data: loginInventoryType) {
 }
 
 /**
- * Creates a new inventory card with the next available number
- * @param persons - Array of person identifiers who are creating the card
- * @param warehouse - Warehouse identifier
- * @param sector - Sector within the warehouse
- * @returns Success status with new card number or error message
- */
-export async function createNewCard(
-  persons: string[],
-  warehouse: string,
-  sector: string,
-) {
-  try {
-    const coll = await dbc('inventory_cards');
-
-    // Pobierz wszystkie istniejące numery kart
-    const existingCards = await coll
-      .find({}, { projection: { number: 1 } })
-      .sort({ number: 1 })
-      .toArray();
-    const existingNumbers = existingCards.map((card) => card.number);
-
-    // Znajdź najniższy wolny numer
-    let newCardNumber = 1;
-    for (let i = 0; i < existingNumbers.length; i++) {
-      if (existingNumbers[i] !== newCardNumber) {
-        break; // Znaleziono wolny numer
-      }
-      newCardNumber++;
-    }
-
-    // Tworzenie nowej karty z najniższym wolnym numerem
-    const result = await coll.insertOne({
-      number: newCardNumber,
-      creators: persons,
-      warehouse: warehouse,
-      sector: sector,
-      time: new Date(),
-    });
-
-    if (result.insertedId) {
-      return { success: true, cardNumber: newCardNumber };
-    }
-    return { error: 'not created' };
-  } catch (error) {
-    console.error(error);
-    return { error: 'createNewCard server action error' };
-  }
-}
-
-/**
- * Retrieves all inventory cards created by specific persons
- * @param persons - Array of person identifiers to filter cards by
- * @returns Array of cards or error message
- */
-export async function fetchCards(persons: string[]) {
-  try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
-    const coll = await dbc('inventory_cards');
-    const cards = await coll
-      .find({
-        creators: {
-          $all: persons,
-        },
-      })
-      .toArray();
-    if (cards.length === 0) {
-      return { message: 'no cards' };
-    }
-    const sanitizedCards = cards.map(({ _id, ...rest }) => rest);
-    return { success: sanitizedCards };
-  } catch (error) {
-    console.error(error);
-    return { error: 'fetchCards server action error' };
-  }
-}
-
-/**
- * Fetches all positions for a specific inventory card
- * @param persons - Array of person identifiers for authorization
- * @param cardNumber - The card number to fetch positions for
- * @returns Array of positions or error message
- */
-export async function fetchCardPositions(
-  persons: string[],
-  cardNumber: number,
-) {
-  try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(2000);
-    const coll = await dbc('inventory_cards');
-    const card = await coll.findOne({
-      number: Number(cardNumber),
-    });
-    if (!card) {
-      return { error: 'no card' };
-    }
-    if (
-      !card.creators ||
-      !card.creators.some((c: string) => persons.includes(c))
-    ) {
-      return { error: 'not authorized' };
-    }
-    if (!card.positions) {
-      return { message: 'no positions' };
-    }
-    return { success: card.positions };
-  } catch (error) {
-    console.error(error);
-    return { error: 'fetchCardPositions server action error' };
-  }
-}
-
-/**
- * Fetches a specific position from an inventory card
- * @param persons - Array of person identifiers for authorization
- * @param cardNumber - The card number containing the position
- * @param position - The position number to fetch (1-25)
- * @returns Position details or error message
- */
-export async function fetchPosition(
-  persons: string[],
-  cardNumber: number,
-  position: number,
-) {
-  try {
-    // const timeout = (ms: number) =>
-    //   new Promise((resolve) => setTimeout(resolve, ms));
-    // await timeout(1000);
-
-    const coll = await dbc('inventory_cards');
-    const existingCard = await coll.findOne({
-      number: cardNumber,
-    });
-    if (!existingCard) {
-      return { error: 'no card' };
-    }
-    if (position < 1 || position > 25) {
-      return { error: 'wrong position' };
-    }
-    if (
-      !existingCard.creators ||
-      !existingCard.creators.some((c: string) => persons.includes(c))
-    ) {
-      return { error: 'not authorized' };
-    }
-    if (!existingCard.positions) {
-      return { message: 'no positions' };
-    }
-    const positionOnCard = existingCard.positions.find(
-      (pos: { position: number }) => pos.position === position,
-    );
-
-    if (!positionOnCard) {
-      return { message: 'no position' };
-    }
-    return { success: positionOnCard };
-  } catch (error) {
-    console.error(error);
-    return { error: 'fetchPosition server action error' };
-  }
-}
-
-/**
- * Retrieves basic information about a specific inventory card
- * @param cardNumber - The card number to get info for
- * @returns Card information or error if not found
- */
-export async function getCardInfo(cardNumber: string) {
-  try {
-    const coll = await dbc('inventory_cards');
-    const res = await coll.findOne({ number: Number(cardNumber) });
-    if (!res) {
-      return { error: 'no card' };
-    }
-    return {
-      number: res.number,
-      warehouse: res.warehouse,
-      sector: res.sector,
-      creators: res.creators,
-    };
-  } catch (error) {
-    console.error(error);
-    throw new Error('getCardInfo server action error');
-  }
-}
-
-/**
- * Searches for inventory articles by number or name
- * @param search - Search term to match against article numbers or names
- * @returns Matching articles (max 5) or error message
- */
-export async function findArticles(search: string) {
-  try {
-    const coll = await dbc('inventory_articles');
-    const results = await coll
-      .find({
-        $or: [
-          { number: { $regex: search, $options: 'i' } },
-          { name: { $regex: search, $options: 'i' } },
-        ],
-      })
-      .toArray();
-
-    if (results.length === 0) {
-      return { error: 'no articles' };
-    }
-
-    if (results.length > 5) {
-      return { error: 'too many articles' };
-    }
-    const sanitizedResults = results.map(({ _id, ...rest }) => rest);
-    return { success: sanitizedResults };
-  } catch (error) {
-    console.error(error);
-    return { error: 'findArticles server action error' };
-  }
-}
-
-/**
- * Searches for bin locations in the warehouse
- * @param search - Search term to match against bin values
- * @returns Matching bins (max 10) or error message
- */
-export async function findBins(search: string) {
-  try {
-    const coll = await dbc('inventory_bin_options');
-
-    // Normalize search: remove non-alphanumerics, lowercase
-    const normalize = (str: string) =>
-      str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-
-    const normalizedSearch = normalize(search);
-
-    // Fetch all bins, then filter in-memory for normalized match
-    const results = await coll.find({}).toArray();
-
-    const filtered = results.filter((bin) =>
-      normalize(bin.value).includes(normalizedSearch),
-    );
-
-    if (filtered.length === 0) {
-      return { error: 'no bins' };
-    }
-
-    if (filtered.length > 10) {
-      return { error: 'too many bins' };
-    }
-
-    const sanitizedResults = filtered.map(({ _id, ...rest }) => rest);
-    return { success: sanitizedResults };
-  } catch (error) {
-    console.error(error);
-    return { error: 'findBins server action error' };
-  }
-}
-
-/**
- * Saves or updates an inventory position
- * @param card - Card number
- * @param position - Position number on the card (1-25)
- * @param articleNumber - Article identifier
- * @param articleName - Article display name
- * @param quantity - Item quantity (must be integer if unit is 'st')
- * @param unit - Measurement unit
- * @param wip - Work in progress flag
- * @param bin - Optional bin location
- * @param deliveryDate - Optional delivery date
- * @returns Success/error status with operation details
- */
-export async function savePosition(
-  card: number,
-  position: number,
-  articleNumber: number,
-  articleName: string,
-  quantity: number,
-  unit: string,
-  wip: boolean,
-  bin?: string,
-  deliveryDate?: Date,
-) {
-  try {
-    const collection = await dbc('inventory_cards');
-
-    const identifier = `${card}/${position}`;
-
-    if (!quantity) {
-      return { error: 'wrong quantity' };
-    }
-
-    if (unit === 'st' && !Number.isInteger(quantity)) {
-      return { error: 'wrong quantity' };
-    }
-
-    const positionData = {
-      position: position,
-      identifier: identifier,
-      time: new Date(),
-      articleNumber: articleNumber,
-      articleName: articleName,
-      quantity: quantity,
-      unit: unit,
-      wip: wip,
-      bin: bin, // Add bin field
-      deliveryDate: deliveryDate, // Add delivery date field
-    };
-    const updateResult = await collection.updateOne(
-      {
-        'number': card,
-        'positions.position': position,
-      },
-      {
-        $set: { 'positions.$': positionData },
-      },
-    );
-    if (updateResult.matchedCount === 0) {
-      const insertResult = await collection.updateOne(
-        { number: card },
-        {
-          $push: { positions: positionData },
-        },
-      );
-      if (insertResult.modifiedCount > 0) {
-        return { success: 'added', identifier };
-      } else {
-        return { error: 'not added' };
-      }
-    } else {
-      if (updateResult.modifiedCount > 0) {
-        return { success: 'updated', identifier };
-      } else {
-        return { error: 'not updated' };
-      }
-    }
-  } catch (error) {
-    console.error(error);
-    return { error: 'savePosition server action error' };
-  }
-}
-
-// OVEN PROCESS MANAGEMENT ACTIONS
-
-/**
  * Retrieves all oven processes for a specific oven
- * @param ovenId - The oven identifier (TEM2, TEM10-17)
+ * @param oven - The oven identifier (tem2, tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
  * @returns Array of processes or error message
  */
-export async function fetchOvenProcesses(ovenId: string) {
+export async function fetchOvenProcesses(
+  oven: string,
+): Promise<{ success: OvenProcessType[] } | { error: string }> {
   try {
     const collection = await dbc('oven_processes');
     const processes = await collection
-      .find({ ovenId })
+      .find({ oven })
       .sort({ createdAt: -1 })
       .toArray();
 
-    const sanitizedProcesses = processes.map(({ _id, ...rest }) => ({
-      ...rest,
-      id: _id.toString(),
+    const sanitizedProcesses = processes.map((doc) => ({
+      id: doc._id.toString(),
+      oven: doc.oven ?? '',
+      hydraBatch: doc.hydraBatch ?? '',
+      operator: doc.operator ?? [],
+      status: doc.status ?? 'running',
+      startTime: doc.startTime ?? null,
+      endTime: doc.endTime ?? null,
+      temperatureLogs: doc.temperatureLogs ?? [],
     }));
 
     return { success: sanitizedProcesses };
@@ -441,86 +105,69 @@ export async function fetchOvenProcesses(ovenId: string) {
 }
 
 /**
- * Creates a new oven process
- * @param ovenId - The oven identifier
- * @param batchNumber - Batch number from scan
- * @param operators - Array of operator identifiers
- * @returns Success status with new process ID or error message
+ * Starts (creates if needed) an oven process
+ * @param oven - The oven string (e.g., 'tem10')
+ * @param hydraBatch - Batch number from scan
+ * @param operator - Array of operator identifiers
+ * @returns Success status or error message
  */
-export async function createOvenProcess(
-  ovenId: string,
-  batchNumber: string,
-  operators: string[],
+export async function startOvenProcess(
+  oven: string,
+  hydraBatch: string,
+  operator: string[],
 ) {
   try {
     const collection = await dbc('oven_processes');
 
-    // Check if batch number already exists for this oven
-    const existingProcess = await collection.findOne({
-      ovenId,
-      batchNumber,
-      status: { $in: ['pending', 'running'] },
-    });
-
-    if (existingProcess) {
-      return { error: 'batch_already_exists' };
+    // Prevent duplicate batch for the same oven
+    const duplicate = await collection.findOne({ oven, hydraBatch });
+    if (duplicate) {
+      return { error: 'duplicate batch' };
     }
 
+    // Check if a process already exists for this oven and batch
+    // (This block is now unreachable, but kept for clarity)
+    // let process = await collection.findOne({
+    //   oven,
+    //   hydra_batch,
+    //   status: { $in: ['pending', 'running'] },
+    // });
+
+    // let processId;
+    // if (!process) {
+    // Create the process if it doesn't exist
     const newProcess = {
-      ovenId,
-      batchNumber,
-      operators,
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      startTime: null,
+      oven,
+      hydraBatch,
+      operator: operator,
+      status: 'running',
+      startTime: new Date(),
       endTime: null,
-      temperature: null,
-      duration: null,
-      notes: '',
     };
-
     const result = await collection.insertOne(newProcess);
-
-    if (result.insertedId) {
-      return { success: true, processId: result.insertedId.toString() };
+    if (!result.insertedId) {
+      return { error: 'not created' };
     }
-
-    return { error: 'not created' };
-  } catch (error) {
-    console.error(error);
-    return { error: 'createOvenProcess server action error' };
-  }
-}
-
-/**
- * Starts an oven process
- * @param processId - The process ID to start
- * @param temperature - Process temperature
- * @returns Success status or error message
- */
-export async function startOvenProcess(processId: string, temperature: number) {
-  try {
-    const collection = await dbc('oven_processes');
-    const { ObjectId } = await import('mongodb');
-
-    const result = await collection.updateOne(
-      { _id: new ObjectId(processId) },
-      {
-        $set: {
-          status: 'running',
-          startTime: new Date(),
-          temperature,
-          updatedAt: new Date(),
-        },
-      },
-    );
-
-    if (result.modifiedCount > 0) {
-      return { success: true };
-    }
-
-    return { error: 'not started' };
+    const processId = result.insertedId;
+    return { success: true, processId: processId.toString() };
+    // } else {
+    //   // If process exists, update it to running
+    //   processId = process._id;
+    //   const updateResult = await collection.updateOne(
+    //     { _id: processId },
+    //     {
+    //       $set: {
+    //         status: 'running',
+    //         startTime: new Date(),
+    //         updatedAt: new Date(),
+    //       },
+    //     },
+    //   );
+    //   if (updateResult.modifiedCount === 0) {
+    //     return { error: 'not started' };
+    //   }
+    // }
+    // return { success: true, processId: processId.toString() };
   } catch (error) {
     console.error(error);
     return { error: 'startOvenProcess server action error' };
@@ -542,10 +189,9 @@ export async function completeOvenProcess(processId: string, notes?: string) {
       { _id: new ObjectId(processId) },
       {
         $set: {
-          status: 'completed',
+          status: 'finished', // match OvenProcessType
           endTime: new Date(),
           updatedAt: new Date(),
-          notes: notes || '',
         },
       },
     );
@@ -558,60 +204,5 @@ export async function completeOvenProcess(processId: string, notes?: string) {
   } catch (error) {
     console.error(error);
     return { error: 'completeOvenProcess server action error' };
-  }
-}
-
-/**
- * Validates a batch number by checking if it exists in the system
- * @param batchNumber - The batch number to validate
- * @returns Validation result with batch info or error
- */
-export async function validateBatchNumber(batchNumber: string) {
-  try {
-    // For now, we'll accept any non-empty batch number
-    // In a real system, this would check against a batch database
-    if (!batchNumber || batchNumber.trim().length === 0) {
-      return { error: 'invalid_batch' };
-    }
-
-    if (batchNumber.length < 3) {
-      return { error: 'batch_too_short' };
-    }
-
-    // Simulate batch validation - in reality this would check a database
-    return {
-      success: true,
-      batchInfo: {
-        batchNumber: batchNumber.trim().toUpperCase(),
-        valid: true,
-      },
-    };
-  } catch (error) {
-    console.error(error);
-    return { error: 'validateBatchNumber server action error' };
-  }
-}
-
-/**
- * Fetches operator names by their personal numbers
- * @param personalNumbers - Array of personal numbers (identifiers)
- * @returns Array of operator names with first name and last name initial
- */
-export async function getOperatorNames(personalNumbers: string[]) {
-  try {
-    const collection = await dbc('employees');
-    const operators = await collection
-      .find({
-        identifier: { $in: personalNumbers },
-      })
-      .toArray();
-
-    return operators.map((operator) => ({
-      personalNumber: operator.identifier,
-      displayName: `${operator.firstName} ${operator.lastName.charAt(0).toUpperCase()}.`,
-    }));
-  } catch (error) {
-    console.error(error);
-    return [];
   }
 }

@@ -9,7 +9,6 @@ export default function OvenSelection() {
   const { setSelectedOven } = useOvenStore();
 
   const ovens = [
-    { id: 'tem2', name: 'TEM2' },
     { id: 'tem10', name: 'TEM10' },
     { id: 'tem11', name: 'TEM11' },
     { id: 'tem12', name: 'TEM12' },

@@ -14,14 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -32,47 +24,50 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Plus, QrCode, ScanLine } from 'lucide-react';
+import { Locale } from '@/i18n.config';
+import { Play, ScanLine, StopCircle } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
-import {
-  completeOvenProcess,
-  createOvenProcess,
-  startOvenProcess,
-  validateBatchNumber,
-} from '../actions';
+import useSound from 'use-sound';
+import { completeOvenProcess, startOvenProcess } from '../actions';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
-
-const newProcessSchema = z.object({
-  batchNumber: z
-    .string()
-    .min(3, { message: 'Numer partii musi mieć minimum 3 znaki!' }),
-});
-
-interface ProcessType {
-  id: string;
-  ovenId: string;
-  batchNumber: string;
-  operators: string[];
-  status: 'pending' | 'running' | 'completed';
-  createdAt: Date;
-  startTime?: Date;
-  endTime?: Date;
-  temperature?: number;
-  notes?: string;
-}
+import type { OvenProcessType } from '../lib/types';
 
 export default function ProcessList() {
   const { selectedOven } = useOvenStore();
   const { personalNumber1, personalNumber2, personalNumber3 } =
     usePersonalNumberStore();
-  const [showNewProcessDialog, setShowNewProcessDialog] = useState(false);
-  const [showKeypad, setShowKeypad] = useState(false);
-  const [isPending, setIsPending] = useState(false);
+
+  // Move hook calls to top level
+  const params = useParams<{ lang: Locale }>();
+
+  // Helper function to format dates
+  const formatDate = (date: Date | string | null | undefined): string => {
+    if (!date) return '-';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '-';
+    return dateObj.toLocaleDateString(params?.lang || 'pl');
+  };
+
+  const formatDateTime = (date: Date | string | null | undefined): string => {
+    if (!date) return '-';
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    if (isNaN(dateObj.getTime())) return '-';
+    return dateObj.toLocaleString(params?.lang || 'pl');
+  };
+
+  // Dialog states for start/end
+  const [startDialogOpen, setStartDialogOpen] = useState(false);
+  const [endDialogOpen, setEndDialogOpen] = useState(false);
+  const [scannedStartBatch, setScannedStartBatch] = useState('');
+  const [scannedEndBatch, setScannedEndBatch] = useState('');
+
+  // Sound effects
+  const [playOvenIn] = useSound('/oven-in.wav', { volume: 0.75 });
+  const [playOvenOut] = useSound('/oven-out.wav', { volume: 0.75 });
+  const [playNok] = useSound('/nok.mp3', { volume: 0.75 });
 
   const operators = [personalNumber1, personalNumber2, personalNumber3].filter(
     (person) => person,
@@ -81,136 +76,97 @@ export default function ProcessList() {
   const { data, error, refetch, isFetching } =
     useGetOvenProcesses(selectedOven);
 
-  const form = useForm<z.infer<typeof newProcessSchema>>({
-    resolver: zodResolver(newProcessSchema),
-    defaultValues: {
-      batchNumber: '',
-    },
-  });
+  function isSuccess(
+    data: { success: OvenProcessType[] } | { error: string } | undefined,
+  ): data is { success: OvenProcessType[] } {
+    return !!data && 'success' in data;
+  }
 
-  const handleKeypadNumber = (character: string) => {
-    const currentValue = form.getValues('batchNumber') || '';
-    form.setValue('batchNumber', currentValue + character);
+  // Helper: check if batch is running in this oven
+  function isBatchRunningHere(batch: string) {
+    if (!isSuccess(data)) return false;
+    return data.success.some(
+      (process) => process.hydraBatch === batch && process.status === 'running',
+    );
+  }
+
+  // Start process handler
+  const handleStartBatch = async () => {
+    if (!scannedStartBatch) return;
+    if (!isSuccess(data)) return;
+
+    if (isBatchRunningHere(scannedStartBatch)) {
+      toast.error('HYDRA batch jest już w piecu');
+      playNok();
+      return;
+    }
+
+    toast.promise(
+      startOvenProcess(selectedOven, scannedStartBatch, operators),
+      {
+        loading: 'Rozpoczynanie procesu...',
+        success: (result) => {
+          if (result.success) {
+            playOvenIn();
+            refetch();
+            setScannedStartBatch('');
+            setStartDialogOpen(false);
+            return 'Proces uruchomiony!';
+          }
+          if (result.error === 'duplicate batch') {
+            playNok();
+            throw new Error('HYDRA batch istnieje w bazie danych');
+          }
+          playNok();
+          throw new Error('Nie można uruchomić procesu!');
+        },
+        error: (error) => {
+          playNok();
+          return error.message || 'Skontaktuj się z IT!';
+        },
+      },
+    );
   };
 
-  const handleKeypadBackspace = () => {
-    const currentValue = form.getValues('batchNumber') || '';
-    form.setValue('batchNumber', currentValue.slice(0, -1));
-  };
-
-  const handleKeypadClear = () => {
-    form.setValue('batchNumber', '');
-  };
-
-  const onSubmitNewProcess = async (data: z.infer<typeof newProcessSchema>) => {
-    setIsPending(true);
-    try {
-      // Validate batch number first
-      const validationResult = await validateBatchNumber(data.batchNumber);
-      if (validationResult.error) {
-        switch (validationResult.error) {
-          case 'invalid_batch':
-            form.setError('batchNumber', {
-              message: 'Nieprawidłowy numer partii!',
-            });
-            break;
-          case 'batch_too_short':
-            form.setError('batchNumber', {
-              message: 'Numer partii jest za krótki!',
-            });
-            break;
-          default:
-            toast.error('Błąd walidacji numeru partii!');
+  // End process handler
+  const handleEndBatch = async () => {
+    if (!scannedEndBatch) return;
+    if (!isSuccess(data)) return;
+    const existingProcess = data.success.find(
+      (process) =>
+        process.hydraBatch === scannedEndBatch && process.status === 'running',
+    );
+    if (!existingProcess) {
+      toast.error('Brak aktywnego procesu dla HYDRA batch');
+      playNok();
+      return;
+    }
+    toast.promise(completeOvenProcess(existingProcess.id), {
+      loading: 'Kończenie procesu...',
+      success: (result) => {
+        if (result.success) {
+          playOvenOut();
+          refetch();
+          setScannedEndBatch('');
+          setEndDialogOpen(false);
+          return 'Proces zakończony!';
         }
-        return;
-      }
-
-      // Create process
-      const result = await createOvenProcess(
-        selectedOven,
-        validationResult.batchInfo!.batchNumber,
-        operators,
-      );
-
-      if (result.error) {
-        switch (result.error) {
-          case 'batch_already_exists':
-            form.setError('batchNumber', {
-              message: 'Proces dla tej partii już istnieje!',
-            });
-            break;
-          default:
-            toast.error('Nie udało się utworzyć procesu!');
-        }
-      } else if (result.success) {
-        toast.success('Proces został utworzony!');
-        setShowNewProcessDialog(false);
-        form.reset();
-        refetch();
-      }
-    } catch (error) {
-      console.error('onSubmitNewProcess', error);
-      toast.error('Skontaktuj się z IT!');
-    } finally {
-      setIsPending(false);
-    }
-  };
-
-  const handleStartProcess = async (processId: string) => {
-    // For demo, using default temperature of 180°C
-    const result = await startOvenProcess(processId, 180);
-    if (result.success) {
-      toast.success('Proces został uruchomiony!');
-      refetch();
-    } else {
-      toast.error('Nie udało się uruchomić procesu!');
-    }
-  };
-
-  const handleCompleteProcess = async (processId: string) => {
-    const result = await completeOvenProcess(processId);
-    if (result.success) {
-      toast.success('Proces został zakończony!');
-      refetch();
-    } else {
-      toast.error('Nie udało się zakończyć procesu!');
-    }
-  };
-
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'running':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'Oczekuje';
-      case 'running':
-        return 'W trakcie';
-      case 'completed':
-        return 'Zakończony';
-      default:
-        return status;
-    }
+        playNok();
+        throw new Error('Nie można zakończyć procesu!');
+      },
+      error: (error) => {
+        playNok();
+        return error.message || 'Skontaktuj się z IT!';
+      },
+    });
   };
 
   if (error) {
     return (
       <Card className='w-full'>
         <CardHeader>
-          <CardTitle>Błąd</CardTitle>
-          <CardDescription>
-            Wystąpił błąd podczas ładowania procesów.
-          </CardDescription>
+          <CardTitle>Błąd ładowania procesów</CardTitle>
+          <CardDescription>Skontaktuj się z IT!</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -221,98 +177,88 @@ export default function ProcessList() {
       <div className='space-y-6'>
         <Card>
           <CardHeader>
-            <div className='flex items-center justify-between'>
+            <div className='flex items-center justify-between gap-2'>
               <div>
-                <CardTitle className='text-2xl'>
-                  Procesy pieca {selectedOven}
-                </CardTitle>
-                <CardDescription>
-                  Operatorzy: {operators.join(', ')}
-                </CardDescription>
+                <CardTitle>Procesy wygrzewania</CardTitle>
               </div>
-              <Button
-                onClick={() => setShowNewProcessDialog(true)}
-                size='lg'
-                className='gap-2'
-              >
-                <Plus className='h-5 w-5' />
-                Nowy proces
-              </Button>
+              <div className='flex gap-2'>
+                <Button onClick={() => setStartDialogOpen(true)}>
+                  <Play className='mr-2 h-4 w-4' />
+                  Nowy proces
+                </Button>
+                <Button
+                  onClick={() => setEndDialogOpen(true)}
+                  variant='secondary'
+                >
+                  <StopCircle className='mr-2 h-4 w-4' />
+                  Zakończ proces
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            {isFetching && !data?.success ? (
+            {isFetching && !isSuccess(data) ? (
               <Skeleton className='h-96 w-full' />
-            ) : data?.success && data.success.length > 0 ? (
+            ) : isSuccess(data) &&
+              data.success.filter((process) => process.status === 'running')
+                .length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Numer partii</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Utworzono</TableHead>
-                    <TableHead>Czas rozpoczęcia</TableHead>
+                    <TableHead>Data rozpoczęcia</TableHead>
+                    <TableHead>Godzina rozpoczęcia</TableHead>
                     <TableHead>Temperatura</TableHead>
-                    <TableHead>Akcje</TableHead>
+                    <TableHead>HYDRA batch</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(data.success as ProcessType[]).map((process) => (
-                    <TableRow key={process.id}>
-                      <TableCell className='font-mono font-medium'>
-                        {process.batchNumber}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`rounded-full px-2 py-1 text-xs font-medium ${getStatusBadgeColor(process.status)}`}
-                        >
-                          {getStatusText(process.status)}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(process.createdAt).toLocaleString('pl-PL')}
-                      </TableCell>
-                      <TableCell>
-                        {process.startTime
-                          ? new Date(process.startTime).toLocaleString('pl-PL')
-                          : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {process.temperature ? `${process.temperature}°C` : '-'}
-                      </TableCell>
-                      <TableCell>
-                        <div className='flex gap-2'>
-                          {process.status === 'pending' && (
-                            <Button
-                              onClick={() => handleStartProcess(process.id)}
-                              size='sm'
-                              variant='outline'
-                            >
-                              Uruchom
-                            </Button>
-                          )}
-                          {process.status === 'running' && (
-                            <Button
-                              onClick={() => handleCompleteProcess(process.id)}
-                              size='sm'
-                              variant='outline'
-                            >
-                              Zakończ
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {data.success
+                    .filter((process) => process.status === 'running')
+                    .map((process) => {
+                      const dateString = formatDate(process.startTime);
+                      const fullString = formatDateTime(process.startTime);
+                      const timeString =
+                        fullString !== '-'
+                          ? fullString.split(', ')[1] || '-'
+                          : '-';
+
+                      // Calculate average temperature from the most recent temperature log
+                      let avgTemp: string | number = '-';
+                      if (
+                        process.temperatureLogs &&
+                        process.temperatureLogs.length > 0
+                      ) {
+                        const latestLog =
+                          process.temperatureLogs[
+                            process.temperatureLogs.length - 1
+                          ];
+                        const values = Object.values(
+                          latestLog.sensorData ?? {},
+                        );
+                        if (values.length > 0) {
+                          const sum = values.reduce((acc, val) => acc + val, 0);
+                          avgTemp = (sum / values.length).toFixed(1); // 1 decimal place
+                        }
+                      }
+
+                      return (
+                        <TableRow key={process.id}>
+                          <TableCell>{dateString}</TableCell>
+                          <TableCell>{timeString}</TableCell>
+                          <TableCell>{avgTemp}</TableCell>
+                          <TableCell className='font-mono font-medium'>
+                            {process.hydraBatch}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                 </TableBody>
               </Table>
             ) : (
-              <div className='py-8 text-center'>
+              <div className='text-center'>
                 <ScanLine className='text-muted-foreground mx-auto mb-4 h-12 w-12' />
                 <p className='text-muted-foreground text-lg'>
-                  Brak procesów dla tego pieca
-                </p>
-                <p className='text-muted-foreground text-sm'>
-                  Kliknij "Nowy proces" aby rozpocząć
+                  Brak rozpoczętych procesów
                 </p>
               </div>
             )}
@@ -320,93 +266,100 @@ export default function ProcessList() {
         </Card>
       </div>
 
-      {/* New Process Dialog */}
+      {/* Start HYDRA Batch Dialog */}
       <Dialog
-        open={showNewProcessDialog}
-        onOpenChange={setShowNewProcessDialog}
+        open={startDialogOpen}
+        onOpenChange={(open) => {
+          setStartDialogOpen(open);
+          setScannedStartBatch('');
+        }}
       >
         <DialogContent className='max-w-md'>
           <DialogHeader>
-            <DialogTitle className='flex items-center gap-2'>
-              <QrCode className='h-5 w-5' />
-              Nowy proces termiczny
-            </DialogTitle>
+            <DialogTitle>Nowy proces</DialogTitle>
           </DialogHeader>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmitNewProcess)}
-              className='space-y-4'
-            >
-              <FormField
-                control={form.control}
-                name='batchNumber'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Numer partii</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder='Dotknij aby wprowadzić'
-                        onFocus={() => setShowKeypad(true)}
-                        readOnly
-                        className='text-center font-mono text-lg'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className='flex justify-between gap-2'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => {
-                    setShowNewProcessDialog(false);
-                    form.reset();
-                  }}
-                  className='flex-1'
-                >
-                  Anuluj
-                </Button>
-                {isPending ? (
-                  <Button disabled className='flex-1'>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Tworzenie
-                  </Button>
-                ) : (
-                  <Button type='submit' className='flex-1'>
-                    Utwórz proces
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Form>
+          <div className='space-y-4'>
+            <Input
+              value={scannedStartBatch}
+              onChange={(e) => setScannedStartBatch(e.target.value)}
+              className='text-center'
+              placeholder='Zeskanuj HYDRA batch...'
+              autoFocus
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  await handleStartBatch();
+                }
+              }}
+            />
+            <div className='flex gap-2'>
+              <Button
+                onClick={() => {
+                  setStartDialogOpen(false);
+                  setScannedStartBatch('');
+                }}
+                className='flex-1'
+                variant='outline'
+              >
+                Anuluj
+              </Button>
+              <Button
+                onClick={handleStartBatch}
+                className='flex-1'
+                disabled={!scannedStartBatch}
+              >
+                Rozpocznij
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Numeric Keypad Dialog */}
-      <Dialog open={showKeypad} onOpenChange={setShowKeypad}>
+      {/* End HYDRA Batch Dialog */}
+      <Dialog
+        open={endDialogOpen}
+        onOpenChange={(open) => {
+          setEndDialogOpen(open);
+          setScannedEndBatch('');
+        }}
+      >
         <DialogContent className='max-w-md'>
           <DialogHeader>
-            <DialogTitle>Wprowadź numer partii</DialogTitle>
+            <DialogTitle>Zakończ proces</DialogTitle>
           </DialogHeader>
           <div className='space-y-4'>
-            <div className='text-center'>
-              <Input
-                value={form.getValues('batchNumber') || ''}
-                readOnly
-                className='text-center font-mono text-2xl'
-                placeholder='Numer partii'
-              />
+            <Input
+              value={scannedEndBatch}
+              onChange={(e) => setScannedEndBatch(e.target.value)}
+              className='text-center'
+              placeholder='Zeskanuj HYDRA batch...'
+              autoFocus
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  await handleEndBatch();
+                }
+              }}
+            />
+            <div className='flex gap-2'>
+              <Button
+                onClick={() => {
+                  setEndDialogOpen(false);
+                  setScannedEndBatch('');
+                }}
+                className='flex-1'
+                variant='outline'
+              >
+                Anuluj
+              </Button>
+              <Button
+                onClick={handleEndBatch}
+                className='flex-1'
+                disabled={!scannedEndBatch}
+              >
+                Zakończ
+              </Button>
             </div>
-
-            <Button
-              onClick={() => setShowKeypad(false)}
-              className='w-full'
-              variant='outline'
-            >
-              Zamknij
-            </Button>
           </div>
         </DialogContent>
       </Dialog>

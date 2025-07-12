@@ -82,18 +82,7 @@ export default function Header() {
 
           <div className='flex items-center space-x-1'>
             {selectedOven && (
-              <Button
-                onClick={() =>
-                  handleConfirmAction(
-                    'oven',
-                    'Zmiana pieca',
-                    'Czy na pewno chcesz zmienić piec?',
-                    clearOven,
-                  )
-                }
-                variant='ghost'
-                size='icon'
-              >
+              <Button onClick={clearOven} variant='ghost' size='icon'>
                 <Flame className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
@@ -121,7 +110,11 @@ export default function Header() {
         </div>
       </header>
 
-      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+      {/* Remove AlertDialog for oven change, keep only for logout */}
+      <AlertDialog
+        open={alertOpen && pendingAction?.type === 'logout'}
+        onOpenChange={setAlertOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{pendingAction?.title}</AlertDialogTitle>

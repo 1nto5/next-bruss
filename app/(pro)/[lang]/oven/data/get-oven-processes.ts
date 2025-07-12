@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchOvenProcesses } from '../actions';
 
-export function useGetOvenProcesses(ovenId: string) {
+export function useGetOvenProcesses(oven: string) {
   return useQuery({
-    queryFn: async () => fetchOvenProcesses(ovenId),
-    queryKey: ['oven-processes', ovenId],
-    enabled: !!ovenId,
+    queryFn: async () => fetchOvenProcesses(oven),
+    queryKey: ['oven-processes', oven],
+    enabled: !!oven,
   });
 }
