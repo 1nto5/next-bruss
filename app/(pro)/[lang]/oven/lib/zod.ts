@@ -2,42 +2,40 @@ import * as z from 'zod';
 
 export const loginSchema = z
   .object({
-    personalNumber1: z
-      .string()
-      .min(1, { message: 'Wprowadź numer personalny!' }),
-    personalNumber2: z
+    identifier1: z.string().min(1, { message: 'Wprowadź numer personalny!' }),
+    identifier2: z
       .string()
       .min(1, { message: 'Wprowadź numer personalny!' })
       .optional(),
-    personalNumber3: z
+    identifier3: z
       .string()
       .min(1, { message: 'Wprowadź numer personalny!' })
       .optional(),
   })
   .superRefine((data, ctx) => {
-    const { personalNumber1, personalNumber2, personalNumber3 } = data;
-    if (personalNumber2) {
-      if (personalNumber1 === personalNumber2) {
+    const { identifier1, identifier2, identifier3 } = data;
+    if (identifier2) {
+      if (identifier1 === identifier2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber2'], // Error assigned to personalNumber2
+          message: 'Nie można zalogować na dwa takie same numery personalne!',
+          path: ['identifier2'],
         });
       }
     }
-    if (personalNumber3) {
-      if (personalNumber1 === personalNumber3) {
+    if (identifier3) {
+      if (identifier1 === identifier3) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Nie można zalogować na dwa takie same nr personalne!',
-          path: ['personalNumber3'], // Error assigned to personalNumber3
+          message: 'Nie można zalogować na dwa takie same numery personalne!',
+          path: ['identifier3'],
         });
       }
-      if (personalNumber2 === personalNumber3) {
+      if (identifier2 === identifier3) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'Nie można zalogować na dwo takie same nr personalne!',
-          path: ['personalNumber3'], // Error assigned to personalNumber3
+          message: 'Nie można zalogować na dwa takie same numery personalne!',
+          path: ['identifier3'],
         });
       }
     }

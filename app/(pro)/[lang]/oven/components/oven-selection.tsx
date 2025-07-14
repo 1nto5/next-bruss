@@ -3,21 +3,42 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Flame } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useOvenStore } from '../lib/stores';
 
 export default function OvenSelection() {
   const { setSelectedOven } = useOvenStore();
+  // Get search params from the URL
+  const searchParams = useSearchParams();
+  // Read the 'ovens' query parameter (comma-separated list of oven IDs)
+  const ovensParam = searchParams.get('ovens');
+  // Parse the parameter into an array of IDs (if present)
+  const ovenIds = ovensParam
+    ? ovensParam
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean)
+    : [];
 
-  const ovens = [
-    { id: 'tem10', name: 'TEM10' },
-    { id: 'tem11', name: 'TEM11' },
-    { id: 'tem12', name: 'TEM12' },
-    { id: 'tem13', name: 'TEM13' },
-    { id: 'tem14', name: 'TEM14' },
-    { id: 'tem15', name: 'TEM15' },
-    { id: 'tem16', name: 'TEM16' },
-    { id: 'tem17', name: 'TEM17' },
-  ];
+  // Map oven IDs to objects with id and name (name is uppercase version of id)
+  const ovens = ovenIds.map((id) => ({ id, name: id.toUpperCase() }));
+
+  // If no ovens are provided, show a message
+  if (ovens.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Wybór pieca</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='text-muted-foreground text-center'>
+            Nie określono listy pieców w parametrach wyszukiwania (search params
+            ovens).
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

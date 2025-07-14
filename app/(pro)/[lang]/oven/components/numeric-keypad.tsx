@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Delete } from 'lucide-react';
+import { memo } from 'react';
 
 interface NumericKeypadProps {
   onNumberClick: (number: string) => void;
@@ -11,12 +12,14 @@ interface NumericKeypadProps {
   className?: string;
 }
 
-export default function NumericKeypad({
+// Memoized numeric keypad to prevent re-renders when parent state changes
+// Only re-renders when props actually change
+export default memo<NumericKeypadProps>(function NumericKeypad({
   onNumberClick,
   onBackspace,
   onClear,
   className = '',
-}: NumericKeypadProps) {
+}) {
   const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   return (
@@ -62,4 +65,4 @@ export default function NumericKeypad({
       </CardContent>
     </Card>
   );
-}
+});

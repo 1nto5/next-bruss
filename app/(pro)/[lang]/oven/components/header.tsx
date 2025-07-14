@@ -14,11 +14,54 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Flame, UserPen } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 
+// Utility to get the next shift end after a given date
+function getNextShiftEnd(after: Date): Date {
+  const hours = [6, 14, 22];
+  const d = new Date(after);
+  d.setSeconds(0, 0);
+  for (let h of hours) {
+    const shiftEnd = new Date(d);
+    shiftEnd.setHours(h, 0, 0, 0);
+    if (shiftEnd > after) return shiftEnd;
+  }
+  // If after 22:00, next is 6:00 next day
+  const nextDay = new Date(d);
+  nextDay.setDate(d.getDate() + 1);
+  nextDay.setHours(6, 0, 0, 0);
+  return nextDay;
+}
+
+function ShiftLogoutWatcher() {
+  const { operator1, operator2, operator3, logout, lastActivity } =
+    usePersonalNumberStore();
+
+  useEffect(() => {
+    if (!operator1 || !lastActivity) return;
+    const check = () => {
+      const last = new Date(lastActivity);
+      const nextShiftEnd = getNextShiftEnd(last);
+      if (new Date() > nextShiftEnd) {
+        logout();
+        toast.info('Koniec zmiany - wylogowano!');
+      }
+    };
+    const interval = setInterval(check, 60 * 1000); // check every minute
+    check(); // check immediately on mount
+    return () => clearInterval(interval);
+  }, [operator1, lastActivity, logout]);
+
+  // Optionally, update lastActivity on user action for more accuracy
+  // (not required for basic shift logout)
+
+  return null;
+}
+
 export default function Header() {
-  const { operator1, operator2, operator3, personalNumber1, logout } =
+  const { operator1, operator2, operator3, logout, lastActivity } =
     usePersonalNumberStore();
   const { selectedOven, clearOven } = useOvenStore();
   const [alertOpen, setAlertOpen] = useState(false);
@@ -54,6 +97,7 @@ export default function Header() {
 
   return (
     <>
+      <ShiftLogoutWatcher />
       <header
         className={`bg-background sticky top-0 z-50 w-full border-b px-2 py-4 transition-all`}
       >
@@ -68,7 +112,7 @@ export default function Header() {
               <div className='flex items-center gap-1'>
                 {loggedInOperators.map((operator) => (
                   <Badge
-                    key={operator.personalNumber}
+                    key={operator.identifier}
                     variant='secondary'
                     size='sm'
                   >
@@ -86,7 +130,7 @@ export default function Header() {
                 <Flame className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
-            {personalNumber1 && (
+            {loggedInOperators.length > 0 && (
               <Button
                 onClick={() =>
                   handleConfirmAction(

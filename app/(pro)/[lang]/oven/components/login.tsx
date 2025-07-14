@@ -50,22 +50,22 @@ export default function Login() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      personalNumber1: '',
-      personalNumber2: '',
-      personalNumber3: '',
+      identifier1: '',
+      identifier2: '',
+      identifier3: '',
     },
     shouldFocusError: false, // Prevent auto-focusing fields on validation error
   });
 
   useEffect(() => {
     if (!personalNumber2Form) {
-      form.setValue('personalNumber2', undefined);
+      form.setValue('identifier2', undefined);
     }
   }, [personalNumber2Form]);
 
   useEffect(() => {
     if (!personalNumber3Form) {
-      form.setValue('personalNumber3', undefined);
+      form.setValue('identifier3', undefined);
     }
   }, [personalNumber3Form]);
 
@@ -85,19 +85,19 @@ export default function Login() {
         setShowKeypad(false); // Close keypad dialog on error
         switch (res.error) {
           case 'wrong number 1':
-            form.setError('personalNumber1', {
+            form.setError('identifier1', {
               type: 'manual',
               message: 'Nieprawidłowy nr personalny!',
             });
             break;
           case 'wrong number 2':
-            form.setError('personalNumber2', {
+            form.setError('identifier2', {
               type: 'manual',
               message: 'Nieprawidłowy nr personalny!',
             });
             break;
           case 'wrong number 3':
-            form.setError('personalNumber3', {
+            form.setError('identifier3', {
               type: 'manual',
               message: 'Nieprawidłowy nr personalny!',
             });
@@ -105,17 +105,10 @@ export default function Login() {
           default:
             toast.error('Skontaktuj się z IT!');
         }
-      } else if (res.success && res.operators) {
-        // Set operators in store with their full data
-        if (res.operators[0]) {
-          setOperator1(res.operators[0]);
-        }
-        if (res.operators[1]) {
-          setOperator2(res.operators[1]);
-        }
-        if (res.operators[2]) {
-          setOperator3(res.operators[2]);
-        }
+      } else if (res.success) {
+        setOperator1(res.operator1 || null);
+        setOperator2(res.operator2 || null);
+        setOperator3(res.operator3 || null);
       }
     } catch (error) {
       console.error('onSubmit', error);
@@ -138,23 +131,23 @@ export default function Login() {
   // Handle keypad reset
   const handleKeypadReset = () => {
     setKeypadValue('');
-    if (activeField === 'personalNumber1') {
-      form.setValue('personalNumber1', '');
-    } else if (activeField === 'personalNumber2') {
-      form.setValue('personalNumber2', '');
-    } else if (activeField === 'personalNumber3') {
-      form.setValue('personalNumber3', '');
+    if (activeField === 'identifier1') {
+      form.setValue('identifier1', '');
+    } else if (activeField === 'identifier2') {
+      form.setValue('identifier2', '');
+    } else if (activeField === 'identifier3') {
+      form.setValue('identifier3', '');
     }
   };
 
   // Handle keypad confirm (Login button)
   const handleKeypadConfirm = () => {
-    if (activeField === 'personalNumber1') {
-      form.setValue('personalNumber1', keypadValue);
-    } else if (activeField === 'personalNumber2') {
-      form.setValue('personalNumber2', keypadValue);
-    } else if (activeField === 'personalNumber3') {
-      form.setValue('personalNumber3', keypadValue);
+    if (activeField === 'identifier1') {
+      form.setValue('identifier1', keypadValue);
+    } else if (activeField === 'identifier2') {
+      form.setValue('identifier2', keypadValue);
+    } else if (activeField === 'identifier3') {
+      form.setValue('identifier3', keypadValue);
     }
     setShowKeypad(false);
   };
@@ -165,35 +158,35 @@ export default function Login() {
   };
 
   const handleKeypadBackspace = () => {
-    if (activeField === 'personalNumber1') {
-      const currentValue = form.getValues('personalNumber1') || '';
-      form.setValue('personalNumber1', currentValue.slice(0, -1));
-    } else if (activeField === 'personalNumber2') {
-      const currentValue = form.getValues('personalNumber2') || '';
-      form.setValue('personalNumber2', currentValue.slice(0, -1));
-    } else if (activeField === 'personalNumber3') {
-      const currentValue = form.getValues('personalNumber3') || '';
-      form.setValue('personalNumber3', currentValue.slice(0, -1));
+    if (activeField === 'identifier1') {
+      const currentValue = form.getValues('identifier1') || '';
+      form.setValue('identifier1', currentValue.slice(0, -1));
+    } else if (activeField === 'identifier2') {
+      const currentValue = form.getValues('identifier2') || '';
+      form.setValue('identifier2', currentValue.slice(0, -1));
+    } else if (activeField === 'identifier3') {
+      const currentValue = form.getValues('identifier3') || '';
+      form.setValue('identifier3', currentValue.slice(0, -1));
     }
   };
 
   const handleKeypadClear = () => {
-    if (activeField === 'personalNumber1') {
-      form.setValue('personalNumber1', '');
-    } else if (activeField === 'personalNumber2') {
-      form.setValue('personalNumber2', '');
-    } else if (activeField === 'personalNumber3') {
-      form.setValue('personalNumber3', '');
+    if (activeField === 'identifier1') {
+      form.setValue('identifier1', '');
+    } else if (activeField === 'identifier2') {
+      form.setValue('identifier2', '');
+    } else if (activeField === 'identifier3') {
+      form.setValue('identifier3', '');
     }
   };
 
   const getCurrentFieldValue = () => {
-    if (activeField === 'personalNumber1') {
-      return form.getValues('personalNumber1') || '';
-    } else if (activeField === 'personalNumber2') {
-      return form.getValues('personalNumber2') || '';
-    } else if (activeField === 'personalNumber3') {
-      return form.getValues('personalNumber3') || '';
+    if (activeField === 'identifier1') {
+      return form.getValues('identifier1') || '';
+    } else if (activeField === 'identifier2') {
+      return form.getValues('identifier2') || '';
+    } else if (activeField === 'identifier3') {
+      return form.getValues('identifier3') || '';
     }
     return '';
   };
@@ -210,7 +203,7 @@ export default function Login() {
             <CardContent className='grid w-full items-center gap-4'>
               <FormField
                 control={form.control}
-                name='personalNumber1'
+                name='identifier1'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nr personalny 1</FormLabel>
@@ -219,7 +212,7 @@ export default function Login() {
                         autoComplete='off'
                         placeholder='dotknij aby wprowadzić...'
                         {...field}
-                        onFocus={() => handleFieldFocus('personalNumber1')}
+                        onFocus={() => handleFieldFocus('identifier1')}
                         readOnly
                         className='text-center'
                       />
@@ -244,7 +237,7 @@ export default function Login() {
               {personalNumber2Form && (
                 <FormField
                   control={form.control}
-                  name='personalNumber2'
+                  name='identifier2'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Numer personalny 2</FormLabel>
@@ -253,7 +246,7 @@ export default function Login() {
                           autoComplete='off'
                           placeholder='dotknij aby wprowadzić...'
                           {...field}
-                          onFocus={() => handleFieldFocus('personalNumber2')}
+                          onFocus={() => handleFieldFocus('identifier2')}
                           readOnly
                           className='text-center'
                         />
@@ -279,7 +272,7 @@ export default function Login() {
               {personalNumber3Form && (
                 <FormField
                   control={form.control}
-                  name='personalNumber3'
+                  name='identifier3'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Numer personalny 3</FormLabel>
@@ -288,7 +281,7 @@ export default function Login() {
                           autoComplete='off'
                           placeholder='dotknij aby wprowadzić...'
                           {...field}
-                          onFocus={() => handleFieldFocus('personalNumber3')}
+                          onFocus={() => handleFieldFocus('identifier3')}
                           readOnly
                           className='text-center'
                         />

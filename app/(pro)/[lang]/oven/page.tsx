@@ -5,10 +5,10 @@ import ProcessList from './components/process-list';
 import { useOvenStore, usePersonalNumberStore } from './lib/stores';
 
 export default function App() {
-  const { personalNumber1 } = usePersonalNumberStore();
+  const { operator1, operator2, operator3 } = usePersonalNumberStore();
   const { selectedOven } = useOvenStore();
 
-  if (!personalNumber1) {
+  if (!operator1 && !operator2 && !operator3) {
     return <Login />;
   } else if (!selectedOven) {
     return <OvenSelection />;

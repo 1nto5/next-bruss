@@ -15,55 +15,55 @@ import { loginType } from './lib/zod';
 export async function login(data: loginType) {
   try {
     const collection = await dbc('employees');
-    const operators: Array<{
-      personalNumber: string;
-      firstName: string;
-      lastName: string;
-    }> = [];
+    let operator1 = null;
+    let operator2 = null;
+    let operator3 = null;
 
     const person1 = await collection.findOne({
-      identifier: data.personalNumber1,
+      identifier: data.identifier1,
     });
     if (!person1) {
       return { error: 'wrong number 1' };
     }
-    operators.push({
-      personalNumber: person1.identifier,
+    operator1 = {
+      identifier: person1.identifier,
       firstName: person1.firstName,
       lastName: person1.lastName,
-    });
+    };
 
-    if (data.personalNumber2) {
+    if (data.identifier2) {
       const person2 = await collection.findOne({
-        identifier: data.personalNumber2,
+        identifier: data.identifier2,
       });
       if (!person2) {
         return { error: 'wrong number 2' };
       }
-      operators.push({
-        personalNumber: person2.identifier,
+      operator2 = {
+        identifier: person2.identifier,
         firstName: person2.firstName,
         lastName: person2.lastName,
-      });
+      };
     }
 
-    if (data.personalNumber3) {
+    if (data.identifier3) {
       const person3 = await collection.findOne({
-        identifier: data.personalNumber3,
+        identifier: data.identifier3,
       });
       if (!person3) {
         return { error: 'wrong number 3' };
       }
-      operators.push({
-        personalNumber: person3.identifier,
+      operator3 = {
+        identifier: person3.identifier,
         firstName: person3.firstName,
         lastName: person3.lastName,
-      });
+      };
     }
 
     return {
       success: true,
-      operators,
+      operator1,
+      operator2,
+      operator3,
     };
   } catch (error) {
     console.error(error);
@@ -83,7 +83,7 @@ export async function fetchOvenProcesses(
     const collection = await dbc('oven_processes');
     const processes = await collection
       .find({ oven })
-      .sort({ createdAt: -1 })
+      .sort({ startTime: -1 }) // Sort by startTime (existing field)
       .toArray();
 
     const sanitizedProcesses = processes.map((doc) => ({
@@ -115,59 +115,65 @@ export async function startOvenProcess(
   oven: string,
   hydraBatch: string,
   operator: string[],
-) {
+): Promise<{ error: string } | { success: boolean; processId: string }> {
   try {
     const collection = await dbc('oven_processes');
 
-    // Prevent duplicate batch for the same oven
-    const duplicate = await collection.findOne({ oven, hydraBatch });
-    if (duplicate) {
-      return { error: 'duplicate batch' };
-    }
-
-    // Check if a process already exists for this oven and batch
-    // (This block is now unreachable, but kept for clarity)
-    // let process = await collection.findOne({
-    //   oven,
-    //   hydra_batch,
-    //   status: { $in: ['pending', 'running'] },
-    // });
-
-    // let processId;
-    // if (!process) {
-    // Create the process if it doesn't exist
+    // Option A: Atomic insert with unique index (recommended)
+    // The unique index on {oven: 1, hydraBatch: 1} will prevent duplicates
     const newProcess = {
       oven,
       hydraBatch,
       operator: operator,
-      status: 'running',
+      status: 'running' as const,
       startTime: new Date(),
       endTime: null,
     };
-    const result = await collection.insertOne(newProcess);
-    if (!result.insertedId) {
+
+    try {
+      const result = await collection.insertOne(newProcess);
+      if (!result.insertedId) {
+        return { error: 'not created' };
+      }
+      return { success: true, processId: result.insertedId.toString() };
+    } catch (error: any) {
+      // MongoDB duplicate key error code
+      if (error.code === 11000) {
+        return { error: 'duplicate batch' };
+      }
+      throw error; // Re-throw other errors
+    }
+
+    // Option B: Using upsert with specific conditions (alternative)
+    // Uncomment this section if you prefer upsert approach:
+    /*
+    const result = await collection.updateOne(
+      { 
+        oven, 
+        hydraBatch,
+        status: { $ne: 'finished' } // Only upsert if no active process exists
+      },
+      {
+                 $setOnInsert: {
+           oven,
+           hydraBatch,
+           operator: operator,
+           status: 'running',
+           startTime: new Date(),
+           endTime: null,
+         }
+      },
+      { upsert: true }
+    );
+
+    if (result.upsertedId) {
+      return { success: true, processId: result.upsertedId.toString() };
+    } else if (result.matchedCount > 0) {
+      return { error: 'duplicate batch' };
+    } else {
       return { error: 'not created' };
     }
-    const processId = result.insertedId;
-    return { success: true, processId: processId.toString() };
-    // } else {
-    //   // If process exists, update it to running
-    //   processId = process._id;
-    //   const updateResult = await collection.updateOne(
-    //     { _id: processId },
-    //     {
-    //       $set: {
-    //         status: 'running',
-    //         startTime: new Date(),
-    //         updatedAt: new Date(),
-    //       },
-    //     },
-    //   );
-    //   if (updateResult.modifiedCount === 0) {
-    //     return { error: 'not started' };
-    //   }
-    // }
-    // return { success: true, processId: processId.toString() };
+    */
   } catch (error) {
     console.error(error);
     return { error: 'startOvenProcess server action error' };
@@ -180,7 +186,10 @@ export async function startOvenProcess(
  * @param notes - Optional completion notes
  * @returns Success status or error message
  */
-export async function completeOvenProcess(processId: string, notes?: string) {
+export async function completeOvenProcess(
+  processId: string,
+  notes?: string,
+): Promise<{ error: string } | { success: boolean }> {
   try {
     const collection = await dbc('oven_processes');
     const { ObjectId } = await import('mongodb');

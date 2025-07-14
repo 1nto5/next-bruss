@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type OperatorType = {
-  personalNumber: string;
+  identifier: string;
   firstName: string;
   lastName: string;
 };
@@ -11,17 +11,11 @@ type PersonalNumbersStateType = {
   operator1: OperatorType | null;
   operator2: OperatorType | null;
   operator3: OperatorType | null;
-  // Keep backward compatibility
-  personalNumber1: string;
-  personalNumber2: string;
-  personalNumber3: string;
-  setOperator1: (operator: OperatorType) => void;
-  setOperator2: (operator: OperatorType) => void;
-  setOperator3: (operator: OperatorType) => void;
-  // Keep backward compatibility methods
-  setPersonalNumber1: (personalNumber1: string) => void;
-  setPersonalNumber2: (personalNumber2: string) => void;
-  setPersonalNumber3: (personalNumber3: string) => void;
+  lastActivity: string | null; // ISO string
+  setOperator1: (operator: OperatorType | null) => void;
+  setOperator2: (operator: OperatorType | null) => void;
+  setOperator3: (operator: OperatorType | null) => void;
+  setLastActivity: (isoString: string) => void;
   logout: () => void;
 };
 
@@ -31,36 +25,29 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
       operator1: null,
       operator2: null,
       operator3: null,
-      personalNumber1: '',
-      personalNumber2: '',
-      personalNumber3: '',
+      lastActivity: null,
       setOperator1: (operator) =>
         set({
           operator1: operator,
-          personalNumber1: operator.personalNumber,
+          lastActivity: new Date().toISOString(),
         }),
       setOperator2: (operator) =>
         set({
           operator2: operator,
-          personalNumber2: operator.personalNumber,
+          lastActivity: new Date().toISOString(),
         }),
       setOperator3: (operator) =>
         set({
           operator3: operator,
-          personalNumber3: operator.personalNumber,
+          lastActivity: new Date().toISOString(),
         }),
-      // Keep backward compatibility
-      setPersonalNumber1: (personalNumber1) => set({ personalNumber1 }),
-      setPersonalNumber2: (personalNumber2) => set({ personalNumber2 }),
-      setPersonalNumber3: (personalNumber3) => set({ personalNumber3 }),
+      setLastActivity: (isoString) => set({ lastActivity: isoString }),
       logout: () =>
         set({
           operator1: null,
           operator2: null,
           operator3: null,
-          personalNumber1: '',
-          personalNumber2: '',
-          personalNumber3: '',
+          lastActivity: null,
         }),
     }),
     { name: 'personal-numbers' },
