@@ -6,6 +6,6 @@ export function useOvenLastAvgTemp(oven: string) {
     queryFn: async () => fetchOvenLastAvgTemp(oven),
     queryKey: ['oven-last-avg-temp', oven],
     enabled: !!oven,
-    refetchInterval: 2 * 1000, // 15 minutes
+    refetchInterval: 15 * 60 * 1000, // 15 minutes
   });
 }

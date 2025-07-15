@@ -173,6 +173,7 @@ export async function startOvenProcess(
     } catch (error: any) {
       // MongoDB duplicate key error code
       if (error.code === 11000) {
+        console.log('duplicate batch');
         return { error: 'duplicate batch' };
       }
       throw error; // Re-throw other errors

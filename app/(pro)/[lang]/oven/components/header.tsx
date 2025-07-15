@@ -113,7 +113,7 @@ export default function Header() {
             {/* Show last average temperature if available */}
             {selectedOven && (
               <Badge
-                variant='outline'
+                variant='destructive'
                 size='default'
                 className='flex items-center gap-1'
               >

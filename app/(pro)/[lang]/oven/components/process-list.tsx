@@ -117,46 +117,60 @@ export default function ProcessList() {
       return;
     }
 
-    toast.promise(
-      startOvenProcess(selectedOven, scannedStartBatch, operators),
-      {
-        loading: 'Rozpoczynanie procesu...',
-        success: (result) => {
-          if ('success' in result && result.success) {
-            playOvenIn();
-            refetch();
-            setScannedStartBatch('');
-            setStartError(null); // Clear error on success
-            // Focus input for next scan
-            setTimeout(() => {
-              startInputRef.current?.focus();
-            }, 0);
-            return 'Proces uruchomiony!';
-          }
-          if ('error' in result && result.error === 'duplicate batch') {
-            playNok();
-            const errorMessage = 'HYDRA batch istnieje w bazie danych!';
-            setStartError(errorMessage);
-            throw new Error(errorMessage);
-          }
-          playNok();
-          const errorMessage = 'Skontaktuj się z IT!';
-          setStartError(errorMessage);
-          throw new Error(errorMessage);
-        },
-        error: (error) => {
-          console.error(error);
-          playNok();
-          const errorMessage = 'Skontaktuj się z IT!';
-          setStartError(errorMessage);
-          setScannedStartBatch('');
-          setTimeout(() => {
-            startInputRef.current?.focus();
-          }, 0);
-          return errorMessage;
-        },
-      },
-    );
+    // Show loading toast
+    const loadingToast = toast.loading('Rozpoczynanie procesu...');
+    // Add artificial delay to simulate loading for testing purposes
+
+    try {
+      const result = await startOvenProcess(
+        selectedOven,
+        scannedStartBatch,
+        operators,
+      );
+
+      if ('success' in result && result.success) {
+        playOvenIn();
+        refetch();
+        setScannedStartBatch('');
+        setStartError(null);
+        setTimeout(() => {
+          startInputRef.current?.focus();
+        }, 0);
+        toast.success('Proces uruchomiony!', { id: loadingToast });
+        return;
+      }
+
+      if ('error' in result && result.error === 'duplicate batch') {
+        playNok();
+        const errorMessage = 'HYDRA batch istnieje w bazie danych!';
+        setStartError(errorMessage);
+        setScannedStartBatch('');
+        setTimeout(() => {
+          startInputRef.current?.focus();
+        }, 0);
+        toast.error(errorMessage, { id: loadingToast });
+        return;
+      }
+
+      playNok();
+      const errorMessage = 'Skontaktuj się z IT!';
+      setStartError(errorMessage);
+      setScannedStartBatch('');
+      setTimeout(() => {
+        startInputRef.current?.focus();
+      }, 0);
+      toast.error(errorMessage, { id: loadingToast });
+    } catch (error) {
+      playNok();
+      const errorMessage = 'Skontaktuj się z IT!';
+      setStartError(errorMessage);
+      setScannedStartBatch('');
+      setTimeout(() => {
+        startInputRef.current?.focus();
+      }, 0);
+      console.error(error);
+      toast.error(errorMessage, { id: loadingToast });
+    }
   }, [
     scannedStartBatch,
     data,
@@ -190,37 +204,44 @@ export default function ProcessList() {
       playNok();
       return;
     }
-    toast.promise(completeOvenProcess(existingProcess.id), {
-      loading: 'Kończenie procesu...',
-      success: (result) => {
-        if ('success' in result && result.success) {
-          playOvenOut();
-          refetch();
-          setScannedEndBatch('');
-          setEndError(null); // Clear error on success
-          // Focus input for next scan
-          setTimeout(() => {
-            endInputRef.current?.focus();
-          }, 0);
-          return 'Proces zakończony!';
-        }
-        playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
-        setEndError(errorMessage);
-        throw new Error(errorMessage);
-      },
-      error: (error) => {
-        playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
-        setEndError(errorMessage);
+
+    // Show loading toast
+    const loadingToast = toast.loading('Kończenie procesu...');
+
+    try {
+      const result = await completeOvenProcess(existingProcess.id);
+
+      if ('success' in result && result.success) {
+        playOvenOut();
+        refetch();
         setScannedEndBatch('');
+        setEndError(null);
         setTimeout(() => {
           endInputRef.current?.focus();
         }, 0);
-        console.error(error);
-        return errorMessage;
-      },
-    });
+        toast.success('Proces zakończony!', { id: loadingToast });
+        return;
+      }
+
+      playNok();
+      const errorMessage = 'Skontaktuj się z IT!';
+      setEndError(errorMessage);
+      setScannedEndBatch('');
+      setTimeout(() => {
+        endInputRef.current?.focus();
+      }, 0);
+      toast.error(errorMessage, { id: loadingToast });
+    } catch (error) {
+      playNok();
+      const errorMessage = 'Skontaktuj się z IT!';
+      setEndError(errorMessage);
+      setScannedEndBatch('');
+      setTimeout(() => {
+        endInputRef.current?.focus();
+      }, 0);
+      console.error(error);
+      toast.error(errorMessage, { id: loadingToast });
+    }
   }, [scannedEndBatch, data, refetch, playNok, playOvenOut]);
 
   // Error clear handlers
