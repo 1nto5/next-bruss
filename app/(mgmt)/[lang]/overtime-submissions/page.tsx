@@ -1,7 +1,12 @@
 // import { auth } from '@/auth';
 import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import { getUsers } from '@/lib/get-users';
 import { dbc } from '@/lib/mongo';
@@ -211,6 +216,9 @@ export default async function OvertimePage(props: {
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>Zgłoszenia nadgodzin</CardTitle>
+          <CardDescription>
+            Aplikacja w fazie testów - wpisy nie są oficjalne
+          </CardDescription>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* HR View Link for HR and admin only */}
             {(session?.user?.roles?.includes('admin') ||

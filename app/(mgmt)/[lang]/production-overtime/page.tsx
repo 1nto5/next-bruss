@@ -1,12 +1,7 @@
 // import { auth } from '@/auth';
 import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import { KeyRound, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -91,9 +86,7 @@ export default async function ProductionOvertimePage(props: {
           <CardTitle>
             Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
           </CardTitle>
-          <CardDescription>
-            Aplikacja w fazie testów - nie wpisy nie są oficjalne
-          </CardDescription>
+
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
               <Link href='/production-overtime/new-request'>
