@@ -6,27 +6,21 @@ import { Info } from '../components/info';
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import Link from 'next/link';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Link from 'next/link';
 
-export default async function ArticleSelectionPage(
-  props: {
-    params: Promise<{ lang: Locale; workplaceName: string }>;
-  }
-) {
+export default async function ArticleSelectionPage(props: {
+  params: Promise<{ lang: Locale; workplaceName: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    lang,
-    workplaceName
-  } = params;
+  const { lang, workplaceName } = params;
 
   const dict = await getDictionary(lang);
   const cDict = dict.dmcheck.articleSelection;
@@ -96,13 +90,11 @@ export default async function ArticleSelectionPage(
           <TableBody>
             {workplaceArticles.map((a) => (
               <Link
-                legacyBehavior
                 key={a.articleNumber}
-                href={{
-                  pathname: `${workplaceName}/${a._id.toString()}`,
-                }}
+                href={`${workplaceName}/${a._id.toString()}`}
+                className='contents'
               >
-                <TableRow>
+                <TableRow className='hover:bg-muted/50 cursor-pointer'>
                   <TableCell className='font-bold'>{a.articleNumber}</TableCell>
                   <TableCell>{a.articleName}</TableCell>
                   <TableCell>{a.piecesPerBox}</TableCell>
