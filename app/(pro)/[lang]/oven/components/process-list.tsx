@@ -1,13 +1,8 @@
 'use client';
 
+import ErrorComponent from '@/components/error-component';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -145,13 +140,14 @@ export default function ProcessList() {
             throw new Error(errorMessage);
           }
           playNok();
-          const errorMessage = 'Nie można uruchomić procesu!';
+          const errorMessage = 'Skontaktuj się z IT!';
           setStartError(errorMessage);
           throw new Error(errorMessage);
         },
         error: (error) => {
+          console.error(error);
           playNok();
-          const errorMessage = error.message || 'Skontaktuj się z IT!';
+          const errorMessage = 'Skontaktuj się z IT!';
           setStartError(errorMessage);
           setScannedStartBatch('');
           setTimeout(() => {
@@ -237,14 +233,7 @@ export default function ProcessList() {
   }, []);
 
   if (error) {
-    return (
-      <Card className='w-full'>
-        <CardHeader>
-          <CardTitle>Błąd ładowania procesów</CardTitle>
-          <CardDescription>Skontaktuj się z IT!</CardDescription>
-        </CardHeader>
-      </Card>
-    );
+    return <ErrorComponent error={error} reset={() => refetch()} />;
   }
 
   return (
@@ -282,7 +271,7 @@ export default function ProcessList() {
                   <TableRow>
                     <TableHead>Data rozpoczęcia</TableHead>
                     <TableHead>Godzina rozpoczęcia</TableHead>
-                    <TableHead>Temperatura</TableHead>
+                    {/* Removed average temperature column */}
                     <TableHead>HYDRA batch</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -296,31 +285,11 @@ export default function ProcessList() {
                         fullString !== '-'
                           ? fullString.split(', ')[1] || '-'
                           : '-';
-
-                      // Calculate average temperature from the most recent temperature log
-                      let avgTemp: string | number = '-';
-                      if (
-                        process.temperatureLogs &&
-                        process.temperatureLogs.length > 0
-                      ) {
-                        const latestLog =
-                          process.temperatureLogs[
-                            process.temperatureLogs.length - 1
-                          ];
-                        const values = Object.values(
-                          latestLog.sensorData ?? {},
-                        );
-                        if (values.length > 0) {
-                          const sum = values.reduce((acc, val) => acc + val, 0);
-                          avgTemp = (sum / values.length).toFixed(1); // 1 decimal place
-                        }
-                      }
-
                       return (
                         <TableRow key={process.id}>
                           <TableCell>{dateString}</TableCell>
                           <TableCell>{timeString}</TableCell>
-                          <TableCell>{avgTemp}</TableCell>
+                          {/* Removed average temperature cell */}
                           <TableCell className='font-mono font-medium'>
                             {process.hydraBatch}
                           </TableCell>

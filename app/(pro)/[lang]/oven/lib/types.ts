@@ -6,8 +6,4 @@ export type OvenProcessType = {
   status: 'running' | 'finished';
   startTime: Date;
   endTime: Date;
-  temperatureLogs?: Array<{
-    timestamp: Date;
-    sensorData: Record<string, number>;
-  }>;
 };

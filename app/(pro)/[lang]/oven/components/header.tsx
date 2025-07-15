@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Flame, UserPen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 
 // Utility to get the next shift end after a given date
@@ -64,6 +65,7 @@ export default function Header() {
   const { operator1, operator2, operator3, logout, lastActivity } =
     usePersonalNumberStore();
   const { selectedOven, clearOven } = useOvenStore();
+  const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const [alertOpen, setAlertOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
     type: 'oven' | 'logout';
@@ -106,6 +108,21 @@ export default function Header() {
             {selectedOven && (
               <Badge variant='default' size='default'>
                 {selectedOven.toUpperCase()}
+              </Badge>
+            )}
+            {/* Show last average temperature if available */}
+            {selectedOven && (
+              <Badge
+                variant='outline'
+                size='default'
+                className='flex items-center gap-1'
+              >
+                {tempData &&
+                'avgTemp' in tempData &&
+                typeof tempData.avgTemp === 'number' &&
+                !isNaN(tempData.avgTemp)
+                  ? `${tempData.avgTemp}°C`
+                  : '-'}
               </Badge>
             )}
             {loggedInOperators.length > 0 && (

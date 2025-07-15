@@ -4,6 +4,7 @@
 import { dbc } from '@/lib/mongo';
 
 // Type definitions
+import { ObjectId } from 'mongodb';
 import { OvenProcessType } from './lib/types';
 import { loginType } from './lib/zod';
 
@@ -86,16 +87,49 @@ export async function fetchOvenProcesses(
       .sort({ startTime: -1 }) // Sort by startTime (existing field)
       .toArray();
 
-    const sanitizedProcesses = processes.map((doc) => ({
-      id: doc._id.toString(),
-      oven: doc.oven ?? '',
-      hydraBatch: doc.hydraBatch ?? '',
-      operator: doc.operator ?? [],
-      status: doc.status ?? 'running',
-      startTime: doc.startTime ?? null,
-      endTime: doc.endTime ?? null,
-      temperatureLogs: doc.temperatureLogs ?? [],
-    }));
+    // Calculate lastAvgTemp for each process
+    const sanitizedProcesses = await Promise.all(
+      processes.map(async (doc) => {
+        let lastAvgTemp = null;
+
+        try {
+          // Get the last temperature log for this process
+          const tempLogsCollection = await dbc('oven_temperature_logs');
+
+          const lastTempLog = await tempLogsCollection
+            .find({ processIds: new ObjectId(doc._id.toString()) })
+            .sort({ timestamp: -1 })
+            .limit(1)
+            .next();
+
+          if (lastTempLog && lastTempLog.sensorData) {
+            // Calculate average temperature from sensor data
+            const sensorValues = Object.values(lastTempLog.sensorData).filter(
+              (value) => typeof value === 'number',
+            );
+
+            if (sensorValues.length > 0) {
+              const sum = sensorValues.reduce((acc, val) => acc + val, 0);
+              lastAvgTemp = Math.round((sum / sensorValues.length) * 10) / 10; // Round to 1 decimal place
+            }
+          }
+        } catch (tempError) {
+          console.error('Error calculating lastAvgTemp:', tempError);
+          // Continue with null value if calculation fails
+        }
+
+        return {
+          id: doc._id.toString(),
+          oven: doc.oven,
+          hydraBatch: doc.hydraBatch,
+          operator: doc.operator,
+          status: doc.status,
+          startTime: doc.startTime,
+          endTime: doc.endTime,
+          lastAvgTemp,
+        };
+      }),
+    );
 
     return { success: sanitizedProcesses };
   } catch (error) {
@@ -192,7 +226,6 @@ export async function completeOvenProcess(
 ): Promise<{ error: string } | { success: boolean }> {
   try {
     const collection = await dbc('oven_processes');
-    const { ObjectId } = await import('mongodb');
 
     const result = await collection.updateOne(
       { _id: new ObjectId(processId) },
@@ -213,5 +246,49 @@ export async function completeOvenProcess(
   } catch (error) {
     console.error(error);
     return { error: 'completeOvenProcess server action error' };
+  }
+}
+
+/**
+ * Fetches the latest average temperature for the currently running process in a given oven
+ * @param oven - The oven identifier
+ * @returns { avgTemp: number | null } or { error: string }
+ */
+export async function fetchOvenLastAvgTemp(
+  oven: string,
+): Promise<{ avgTemp: number | null } | { error: string }> {
+  try {
+    const processCollection = await dbc('oven_processes');
+    // Find the latest running process for the oven
+    const runningProcess = await processCollection
+      .find({ oven, status: 'running' })
+      .sort({ startTime: -1 })
+      .limit(1)
+      .next();
+    if (!runningProcess) {
+      return { avgTemp: null };
+    }
+    const tempLogsCollection = await dbc('oven_temperature_logs');
+    // Find the latest temperature log for this process
+    const lastTempLog = await tempLogsCollection
+      .find({ processIds: new ObjectId(runningProcess._id.toString()) })
+      .sort({ timestamp: -1 })
+      .limit(1)
+      .next();
+    if (!lastTempLog || !lastTempLog.sensorData) {
+      return { avgTemp: null };
+    }
+    const sensorValues = Object.values(lastTempLog.sensorData).filter(
+      (value) => typeof value === 'number',
+    );
+    if (sensorValues.length === 0) {
+      return { avgTemp: null };
+    }
+    const sum = sensorValues.reduce((acc, val) => acc + val, 0);
+    const avgTemp = Math.round((sum / sensorValues.length) * 10) / 10;
+    return { avgTemp };
+  } catch (error) {
+    console.error('fetchOvenLastAvgTemp error:', error);
+    return { error: 'fetchOvenLastAvgTemp server action error' };
   }
 }
