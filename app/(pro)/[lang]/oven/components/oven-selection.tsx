@@ -1,5 +1,6 @@
 'use client';
 
+import ErrorComponent from '@/components/error-component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Flame } from 'lucide-react';
@@ -23,20 +24,17 @@ export default function OvenSelection() {
   // Map oven IDs to objects with id and name (name is uppercase version of id)
   const ovens = ovenIds.map((id) => ({ id, name: id.toUpperCase() }));
 
-  // If no ovens are provided, show a message
+  // If no ovens are provided, show error component
   if (ovens.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Wybór pieca</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='text-muted-foreground text-center'>
-            Nie określono listy pieców w parametrach wyszukiwania (search params
-            ovens).
-          </div>
-        </CardContent>
-      </Card>
+      <ErrorComponent
+        error={
+          new Error(
+            'No ovens specified in search parameters (example: ?ovens=tem2,tem12).',
+          )
+        }
+        reset={() => window.location.reload()}
+      />
     );
   }
 
