@@ -31,27 +31,29 @@ export default function ErrorComponent({
   };
 
   return (
-    <Alert className='mt-24 w-[450px]'>
-      <Terminal className='h-4 w-4' />
-      <AlertTitle>Something went wrong!</AlertTitle>
-      <AlertDescription className='space-y-4'>
-        <div>{error.message}</div>
-        <div className='flex justify-end'>
-          <Button onClick={reload} disabled={isPending}>
-            {isPending ? (
-              <span className='flex items-center'>
-                <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                Try again
-              </span>
-            ) : (
-              <span className='flex items-center'>
-                <RefreshCcw className='mr-2 h-4 w-4' />
-                Try again
-              </span>
-            )}
-          </Button>
-        </div>
-      </AlertDescription>
-    </Alert>
+    <div className='flex items-center justify-center'>
+      <Alert className='w-[550px]'>
+        <Terminal className='h-4 w-4' />
+        <AlertTitle>Something went wrong!</AlertTitle>
+        <AlertDescription className='space-y-4'>
+          <div>{error.message}</div>
+          <div className='flex justify-end'>
+            <Button onClick={reload} disabled={isPending}>
+              {isPending ? (
+                <span className='flex items-center'>
+                  <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
+                  Try again
+                </span>
+              ) : (
+                <span className='flex items-center'>
+                  <RefreshCcw className='mr-2 h-4 w-4' />
+                  Try again
+                </span>
+              )}
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
+    </div>
   );
 }
