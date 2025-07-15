@@ -57,7 +57,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
-        title: 'Zgłoszenia nadgodzin',
+        title: 'Zgłoszenia nadgodzin - test',
       },
     ],
   },
