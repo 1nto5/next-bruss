@@ -92,9 +92,8 @@ export default async function ArticleSelectionPage(props: {
               <Link
                 key={a.articleNumber}
                 href={`${workplaceName}/${a._id.toString()}`}
-                className='contents'
               >
-                <TableRow className='hover:bg-muted/50 cursor-pointer'>
+                <TableRow>
                   <TableCell className='font-bold'>{a.articleNumber}</TableCell>
                   <TableCell>{a.articleName}</TableCell>
                   <TableCell>{a.piecesPerBox}</TableCell>
