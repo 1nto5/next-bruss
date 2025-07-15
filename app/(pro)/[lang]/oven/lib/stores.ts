@@ -11,11 +11,9 @@ type PersonalNumbersStateType = {
   operator1: OperatorType | null;
   operator2: OperatorType | null;
   operator3: OperatorType | null;
-  lastActivity: string | null; // ISO string
   setOperator1: (operator: OperatorType | null) => void;
   setOperator2: (operator: OperatorType | null) => void;
   setOperator3: (operator: OperatorType | null) => void;
-  setLastActivity: (isoString: string) => void;
   logout: () => void;
 };
 
@@ -25,30 +23,10 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
       operator1: null,
       operator2: null,
       operator3: null,
-      lastActivity: null,
-      setOperator1: (operator) =>
-        set({
-          operator1: operator,
-          lastActivity: new Date().toISOString(),
-        }),
-      setOperator2: (operator) =>
-        set({
-          operator2: operator,
-          lastActivity: new Date().toISOString(),
-        }),
-      setOperator3: (operator) =>
-        set({
-          operator3: operator,
-          lastActivity: new Date().toISOString(),
-        }),
-      setLastActivity: (isoString) => set({ lastActivity: isoString }),
-      logout: () =>
-        set({
-          operator1: null,
-          operator2: null,
-          operator3: null,
-          lastActivity: null,
-        }),
+      setOperator1: (operator) => set({ operator1: operator }),
+      setOperator2: (operator) => set({ operator2: operator }),
+      setOperator3: (operator) => set({ operator3: operator }),
+      logout: () => set({ operator1: null, operator2: null, operator3: null }),
     }),
     { name: 'personal-numbers' },
   ),
