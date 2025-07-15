@@ -23,12 +23,15 @@ export default async function Layout(props: {
   if (!session) {
     redirect('/auth');
   }
-  const access =
-    session.user?.roles.includes('group-leader') ||
-    session.user?.roles.includes('plant-manager') ||
-    session.user?.roles.includes('admin') ||
-    false;
-  if (access === false) {
+  // Determine access based on user roles: group-leader, any manager, or admin
+  const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
+  // Users with any role containing 'manager' (e.g., plant manager, logistics manager, etc.) can create requests
+  const isManager =
+    session?.user?.roles?.some((role) => role.includes('manager')) || false;
+  const isAdmin = session?.user?.roles?.includes('admin') || false;
+  const canCreateRequest = isGroupLeader || isManager || isAdmin;
+
+  if (!canCreateRequest) {
     redirect('/production-overtime');
   }
 

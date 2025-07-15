@@ -68,10 +68,11 @@ export default async function ProductionOvertimePage(props: {
   const searchParams = await props.searchParams;
   const session = await auth();
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
-  const isPlantManager =
-    session?.user?.roles?.includes('plant-manager') || false;
+  // Users with any role containing 'manager' (e.g., plant manager, logistics manager, etc.) can create requests
+  const isManager =
+    session?.user?.roles?.some((role) => role.includes('manager')) || false;
   const isAdmin = session?.user?.roles?.includes('admin') || false;
-  const canCreateRequest = isGroupLeader || isPlantManager || isAdmin;
+  const canCreateRequest = isGroupLeader || isManager || isAdmin;
   const userEmail = session?.user?.email || undefined;
 
   let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
