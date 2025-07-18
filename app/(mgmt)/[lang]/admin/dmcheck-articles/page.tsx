@@ -1,4 +1,6 @@
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
+import { redirect } from 'next/navigation';
 // import { getDictionary } from '@/lib/dictionary';
 import { ArticleConfigType } from '@/lib/types/article-config';
 import { columns } from './table/columns';
@@ -29,6 +31,13 @@ async function getArticleConfigs(
 export default async function ArticleConfigsPage(props: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
+  if (!session?.user?.roles?.includes('admin')) {
+    redirect('/');
+  }
   const params = await props.params;
 
   const { lang } = params;

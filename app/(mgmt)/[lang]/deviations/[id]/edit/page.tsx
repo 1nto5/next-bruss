@@ -1,4 +1,6 @@
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
+import { redirect } from 'next/navigation';
 // import { getDictionary } from '@/lib/dictionary';
 import EditForm from '../../components/edit-form';
 import {
@@ -10,6 +12,10 @@ import { getDeviation } from '../../lib/get-deviation';
 export default async function EditDeviationPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
 }) {
+  const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
   const params = await props.params;
 
   const { lang, id } = params;

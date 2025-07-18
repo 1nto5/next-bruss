@@ -64,13 +64,13 @@ export async function calculateUnclaimedOvertimeHours(
       })
       .toArray();
 
-    // Main summary: exclude 'pending'
+    // Main summary: exclude 'pending' and 'pending-director'
     const mainSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status !== 'pending',
+      (s) => s.status !== 'pending' && s.status !== 'pending-director',
     );
     // Pending summary
     const pendingSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'pending',
+      (s) => s.status === 'pending' || s.status === 'pending-director',
     );
 
     // Calculate total hours (excluding pending)
@@ -175,7 +175,7 @@ export async function calculateOrganizationOvertimeHours(
       (s) => s.status === 'approved' || s.status === 'accounted',
     );
     const pendingSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'pending',
+      (s) => s.status === 'pending' || s.status === 'pending-director',
     );
 
     // Calculate current month hours (approved/accounted)

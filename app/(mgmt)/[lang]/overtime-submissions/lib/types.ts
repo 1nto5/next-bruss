@@ -11,11 +11,14 @@ export type OvertimeSubmissionType = BaseOvertimeSubmissionType & {
   submittedBy: string; // Email of the employee who submitted
   editedAt: Date;
   editedBy: string;
-  approvedAt?: Date;
-  approvedBy?: string;
   rejectedAt?: Date;
   rejectedBy?: string;
   rejectionReason?: string;
   accountedAt?: Date;
   accountedBy?: string;
+  payment: boolean;
+  approvedAt?: Date;
+  approvedBy?: string;
+  directorApprovedAt?: Date;
+  directorApprovedBy?: string;
 };

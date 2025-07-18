@@ -33,6 +33,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/cn';
 import { UsersListType } from '@/lib/types/user';
@@ -87,6 +88,15 @@ export default function OvertimeRequestForm({
       date: isEditMode ? new Date(submission!.date) : new Date(),
       hours: isEditMode ? submission!.hours : 1,
       reason: isEditMode ? submission!.reason : '',
+      overtimeRequest: isEditMode
+        ? (submission!.overtimeRequest ?? false)
+        : false,
+      payment: isEditMode ? submission!.payment : undefined,
+      scheduledDayOff: isEditMode
+        ? submission!.scheduledDayOff
+          ? new Date(submission!.scheduledDayOff)
+          : undefined
+        : undefined,
     },
   });
 
@@ -297,24 +307,25 @@ export default function OvertimeRequestForm({
               control={form.control}
               name='date'
               render={({ field }) => {
-                // Calculate min/max dates
                 const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                const firstDayPrevMonth = new Date(year, month - 1, 1);
-                const lastDayNextMonth = new Date(
-                  year,
-                  month + 2,
-                  0,
-                  23,
-                  59,
-                  59,
-                  999,
-                );
-                // Get current hours value from form
+                now.setHours(23, 59, 59, 999);
+
+                // 7 days ago
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+                sevenDaysAgo.setDate(now.getDate() - 7);
+
                 const hoursValue = form.watch('hours');
-                // Determine max date
-                const maxDate = hoursValue < 0 ? lastDayNextMonth : now;
+                let minDate, maxDate;
+                if (hoursValue < 0) {
+                  // Overtime pickup: any time after now
+                  minDate = now;
+                  maxDate = undefined;
+                } else {
+                  minDate = sevenDaysAgo;
+                  maxDate = now;
+                }
+
                 return (
                   <FormItem>
                     <FormLabel>Data</FormLabel>
@@ -324,7 +335,7 @@ export default function OvertimeRequestForm({
                         hideTime
                         value={field.value}
                         onChange={field.onChange}
-                        min={firstDayPrevMonth}
+                        min={minDate}
                         max={maxDate}
                         renderTrigger={({ open, value, setOpen }) => (
                           <DateTimeInput
@@ -356,6 +367,87 @@ export default function OvertimeRequestForm({
                 </FormItem>
               )}
             />
+
+            {/* Overtime Request Switch */}
+            <FormField
+              control={form.control}
+              name='overtimeRequest'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Zlecenie godzin nadliczbowych</FormLabel>
+                  <FormDescription>
+                    Planowana praca w godzinach nadliczbowych wymaga zgody
+                    przełożonego oraz dyrektora.
+                  </FormDescription>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      id='overtimeRequest-switch'
+                      disabled={isEditMode && submission?.status !== 'pending'}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Payment Switch, only if overtimeRequest is true */}
+            {form.watch('overtimeRequest') && (
+              <FormField
+                control={form.control}
+                name='payment'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Wypłata</FormLabel>
+                    <FormControl>
+                      <div className='flex items-center gap-2'>
+                        <Switch
+                          checked={!!field.value}
+                          onCheckedChange={field.onChange}
+                          id='payment-switch'
+                          disabled={
+                            isEditMode && submission?.status !== 'pending'
+                          }
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {/* Pickup Date, only if overtimeRequest is true and payment is false */}
+            {form.watch('overtimeRequest') &&
+              form.watch('payment') === false && (
+                <FormField
+                  control={form.control}
+                  name='scheduledDayOff'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data odbioru godzin nadliczbowych</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          modal
+                          hideTime
+                          value={field.value}
+                          onChange={field.onChange}
+                          min={new Date()}
+                          renderTrigger={({ open, value, setOpen }) => (
+                            <DateTimeInput
+                              value={value}
+                              onChange={(x) => !open && field.onChange(x)}
+                              format='dd/MM/yyyy'
+                              disabled={open}
+                              onCalendarClick={() => setOpen(!open)}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
           </CardContent>
 
           <Separator className='mb-4' />

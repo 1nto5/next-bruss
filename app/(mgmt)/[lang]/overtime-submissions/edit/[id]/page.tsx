@@ -59,6 +59,11 @@ async function getOvertimeSubmission(id: string) {
       accountedAt: submission.accountedAt,
       accountedBy: submission.accountedBy,
       hasAttachment: submission.hasAttachment,
+      payment: submission.payment,
+      overtimeRequest: submission.overtimeRequest ?? false,
+      scheduledDayOff: submission.scheduledDayOff ?? undefined,
+      directorApprovedAt: submission.directorApprovedAt,
+      directorApprovedBy: submission.directorApprovedBy,
     };
   } catch (error) {
     console.error('Error fetching overtime submission:', error);
@@ -88,7 +93,12 @@ export default async function EditOvertimeSubmissionPage(props: {
 
   // Check if user can edit this submission
   const isAuthor = submission.submittedBy === session.user.email;
-  const canEdit = isAuthor && submission.status === 'pending';
+  const isHR = session.user.roles.includes('hr');
+  const isAdmin = session.user.roles.includes('admin');
+  const canEdit =
+    isAuthor &&
+    submission.status === 'pending' &&
+    (isHR || isAdmin || submission.supervisor === session.user.email);
 
   if (!canEdit) {
     redirect('/overtime-submissions');

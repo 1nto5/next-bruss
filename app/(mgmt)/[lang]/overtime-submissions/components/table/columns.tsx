@@ -92,6 +92,16 @@ export const createColumns = (
               </Badge>
             );
             break;
+          case 'pending-director':
+            statusLabel = (
+              <Badge
+                variant='statusPending'
+                className='bg-yellow-400 text-nowrap text-black'
+              >
+                Oczekuje
+              </Badge>
+            );
+            break;
           case 'approved':
             statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
             break;
@@ -109,6 +119,23 @@ export const createColumns = (
         }
 
         return statusLabel;
+      },
+    },
+    // Payment column
+    {
+      accessorKey: 'payment',
+      header: 'Wypłata',
+      cell: ({ row }) => {
+        const payment = row.getValue('payment') as boolean;
+        return (
+          <div className='flex h-full items-center justify-center'>
+            {payment ? (
+              <Check className='h-4 w-4' />
+            ) : (
+              <X className='h-4 w-4' />
+            )}
+          </div>
+        );
       },
     },
     {
@@ -136,6 +163,9 @@ export const createColumns = (
         const canApproveReject =
           (submission.supervisor === userEmail || isHR || isAdmin) &&
           submission.status === 'pending';
+        const canApproveDirector =
+          (userRoles.includes('director') || isAdmin) &&
+          (submission.status as string) === 'pending-director';
 
         const canEdit = isAuthor && submission.status === 'pending';
         const canDelete = isAuthor && submission.status === 'pending';
@@ -144,7 +174,11 @@ export const createColumns = (
           (isHR || isAdmin) && submission.status === 'approved';
 
         const hasActions =
-          canEdit || canDelete || canApproveReject || hasMarkAsAccountedAction;
+          canEdit ||
+          canDelete ||
+          canApproveReject ||
+          canApproveDirector ||
+          hasMarkAsAccountedAction;
 
         if (!hasActions) {
           return null;
@@ -193,6 +227,18 @@ export const createColumns = (
                   >
                     <Check className='mr-2 h-4 w-4' />
                     <span>Zatwierdź</span>
+                  </DropdownMenuItem>
+                )}
+                {/* Director Approve button */}
+                {canApproveDirector && (
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsApproveDialogOpen(true);
+                    }}
+                  >
+                    <Check className='mr-2 h-4 w-4' />
+                    <span>Zatwierdź (Dyrektor)</span>
                   </DropdownMenuItem>
                 )}
 

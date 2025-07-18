@@ -77,11 +77,14 @@ export async function updateOvertimeSubmission(
       return { error: 'invalid status' };
     }
 
+    // Prevent editing the payment field after submission
+    const updateData = { ...data, payment: submission.payment };
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...data,
+          ...updateData,
           editedAt: new Date(),
           editedBy: session.user.email,
         },
@@ -163,6 +166,7 @@ export async function approveOvertimeSubmission(id: string) {
   const userRoles = session.user?.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
+  const isDirector = userRoles.includes('director');
 
   try {
     const coll = await dbc('overtime_submissions');
@@ -173,6 +177,59 @@ export async function approveOvertimeSubmission(id: string) {
       return { error: 'not found' };
     }
 
+    // Dual approval logic for payment requests
+    if (submission.payment) {
+      if (submission.status === 'pending') {
+        // Supervisor approval: move to pending-director
+        if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
+          return { error: 'unauthorized' };
+        }
+        const update = await coll.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              status: 'pending-director',
+              supervisorApprovedAt: new Date(),
+              supervisorApprovedBy: session.user.email,
+              editedAt: new Date(),
+              editedBy: session.user.email,
+            },
+          },
+        );
+        if (update.matchedCount === 0) {
+          return { error: 'not found' };
+        }
+        revalidateTag('overtime');
+        return { success: 'supervisor-approved' };
+      } else if (submission.status === 'pending-director') {
+        // Only director can approve
+        if (!isDirector && !isAdmin) {
+          return { error: 'unauthorized' };
+        }
+        const update = await coll.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              status: 'approved',
+              directorApprovedAt: new Date(),
+              directorApprovedBy: session.user.email,
+              approvedAt: new Date(),
+              approvedBy: session.user.email,
+              editedAt: new Date(),
+              editedBy: session.user.email,
+            },
+          },
+        );
+        if (update.matchedCount === 0) {
+          return { error: 'not found' };
+        }
+        revalidateTag('overtime');
+        return { success: 'director-approved' };
+      } else {
+        return { error: 'invalid status' };
+      }
+    }
+    // Non-payment or fallback to old logic
     // Allow approval if:
     // 1. User is the assigned supervisor, OR
     // 2. User has HR role, OR
@@ -182,7 +239,6 @@ export async function approveOvertimeSubmission(id: string) {
         error: 'unauthorized',
       };
     }
-
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -198,7 +254,7 @@ export async function approveOvertimeSubmission(id: string) {
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
-    revalidateOvertime();
+    revalidateTag('overtime');
     return { success: 'approved' };
   } catch (error) {
     console.error(error);
@@ -282,6 +338,7 @@ export async function insertOvertimeSubmission(
     const overtimeSubmissionToInsert = {
       status: 'pending',
       ...data,
+      payment: data.payment ?? false,
       submittedAt: new Date(),
       submittedBy: session.user.email,
       editedAt: new Date(),

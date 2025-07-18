@@ -1,4 +1,6 @@
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
+import { redirect } from 'next/navigation';
 // import { getDictionary } from '@/lib/dictionary';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { columns } from './table/columns';
@@ -29,6 +31,13 @@ async function getEmployees(
 export default async function AdminEmployeesPage(props: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const session = await auth();
+  if (!session) {
+    redirect('/auth');
+  }
+  if (!session?.user?.roles?.includes('admin')) {
+    redirect('/');
+  }
   const params = await props.params;
 
   const { lang } = params;

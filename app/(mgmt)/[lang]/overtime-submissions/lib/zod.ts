@@ -12,29 +12,41 @@ export const OvertimeSubmissionSchema = z
       .min(-8, { message: 'Podaj wartość z zakresu -8 do 16!' })
       .max(16, { message: 'Podaj wartość z zakresu -8 do 16!' }),
     reason: z.string().optional(),
+    overtimeRequest: z.boolean().default(false),
+    payment: z.boolean().optional(),
+    scheduledDayOff: z.date().optional(),
   })
   .refine(
     (data) => {
-      // Calculate date boundaries
+      // If overtimeRequest is true and payment is false, scheduledDayOff is required
+      if (data.overtimeRequest && data.payment === false) {
+        return !!data.scheduledDayOff;
+      }
+      return true;
+    },
+    {
+      message: 'Wybierz dzień odbioru, jeśli nadgodziny nie są do wypłaty!',
+      path: ['scheduledDayOff'],
+    },
+  )
+  .refine(
+    (data) => {
       const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      // First day of previous month
-      const firstDayPrevMonth = new Date(year, month - 1, 1);
-      // Last day of next month
-      const lastDayNextMonth = new Date(year, month + 2, 0, 23, 59, 59, 999);
+      // 7 days ago
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+      sevenDaysAgo.setDate(now.getDate() - 7);
 
       if (data.hours < 0) {
-        // Collecting overtime: date >= first day of previous month, date <= last day of next month
-        return data.date >= firstDayPrevMonth && data.date <= lastDayNextMonth;
+        // Overtime pickup: any time after now (including later today)
+        return data.date > now;
       } else {
-        // Adding overtime: date >= first day of previous month, date <= today
-        return data.date >= firstDayPrevMonth && data.date <= now;
+        // Adding overtime: date >= 7 days ago, date <= today
+        return data.date >= sevenDaysAgo && data.date <= now;
       }
     },
     {
-      message:
-        'Data nie może być starsza niż początek poprzedniego miesiąca i późniejsza dzień bieżący (lub koniec następnego miesiąca przy odbiorze nadgodzin)!',
+      message: 'Możesz dodać nadgodziny tylko z ostatnich 7 dni.',
       path: ['date'],
     },
   )

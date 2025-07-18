@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Locale } from '@/i18n.config';
 import { getUsers } from '@/lib/get-users';
 import { dbc } from '@/lib/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
@@ -186,18 +185,15 @@ async function getOvertimeSubmissions(
 }
 
 export default async function OvertimePage(props: {
-  params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const params = await props.params;
-  const { lang } = params;
   const searchParams = await props.searchParams;
   const session = await auth();
 
   // Anyone logged in can submit overtime hours
   const canCreateSubmission = !!session?.user?.email;
 
-  if (!session?.user?.email) {
+  if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
