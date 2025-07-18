@@ -15,7 +15,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           queries: {
             // With SSR, we usually want to set some default staleTime
             // above 0 to avoid refetching immediately on the client
-            staleTime: 30 * 1000, // 30 seconds
+            staleTime: 1000 * 60 * 5, // 5 minutes
             refetchInterval: false, // Only refetch on focus/manual trigger
             refetchOnWindowFocus: true, // Refetch when user returns to tab
           },

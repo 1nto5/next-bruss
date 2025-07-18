@@ -42,3 +42,11 @@ export const loginSchema = z
   });
 
 export type loginType = z.infer<typeof loginSchema>;
+
+export const startOvenProcessSchema = z.object({
+  article: z.string().min(1, { message: 'Wprowadź numer artykułu!' }),
+  hydraBatch: z.string().min(1, { message: 'Wprowadź numer HYDRA batch!' }),
+  operator: z.array(z.string().min(1)).min(1),
+});
+
+export type StartOvenProcessType = z.infer<typeof startOvenProcessSchema>;

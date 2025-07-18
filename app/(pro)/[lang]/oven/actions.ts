@@ -5,7 +5,7 @@ import { dbc } from '@/lib/mongo';
 
 // Type definitions
 import { ObjectId } from 'mongodb';
-import { OvenProcessType } from './lib/types';
+import { OvenProcessConfigType, OvenProcessType } from './lib/types';
 import { loginType } from './lib/zod';
 
 /**
@@ -73,12 +73,47 @@ export async function login(data: loginType) {
 }
 
 /**
- * Retrieves all oven processes for a specific oven
+ * Fetches oven process configuration for a specific article
+ * @param article - The article number to lookup
+ * @returns Configuration data or null if not found
+ */
+export async function fetchOvenProcessConfig(
+  article: string,
+): Promise<
+  { success: OvenProcessConfigType } | { error: string } | { success: null }
+> {
+  try {
+    const collection = await dbc('oven_process_configs');
+    const config = await collection.findOne({ article });
+
+    if (!config) {
+      return { success: null };
+    }
+
+    return {
+      success: {
+        id: config._id.toString(),
+        article: config.article,
+        temp: config.temp,
+        tempTolerance: config.tempTolerance,
+        duration: config.duration,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'fetchOvenProcessConfig server action error' };
+  }
+}
+
+/**
+ * Retrieves all oven processes for a specific oven with optional config data
  * @param oven - The oven identifier (tem2, tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
+ * @param includeConfig - Whether to include configuration data from oven_process_configs
  * @returns Array of processes or error message
  */
 export async function fetchOvenProcesses(
   oven: string,
+  includeConfig = false,
 ): Promise<{ success: OvenProcessType[] } | { error: string }> {
   try {
     const collection = await dbc('oven_processes');
@@ -91,36 +126,30 @@ export async function fetchOvenProcesses(
     const sanitizedProcesses = await Promise.all(
       processes.map(async (doc) => {
         let lastAvgTemp = null;
-
         try {
-          // Get the last temperature log for this process
           const tempLogsCollection = await dbc('oven_temperature_logs');
-
           const lastTempLog = await tempLogsCollection
             .find({ processIds: new ObjectId(doc._id.toString()) })
             .sort({ timestamp: -1 })
             .limit(1)
             .next();
-
           if (lastTempLog && lastTempLog.sensorData) {
-            // Calculate average temperature from sensor data
             const sensorValues = Object.values(lastTempLog.sensorData).filter(
               (value) => typeof value === 'number',
             );
-
             if (sensorValues.length > 0) {
               const sum = sensorValues.reduce((acc, val) => acc + val, 0);
-              lastAvgTemp = Math.round((sum / sensorValues.length) * 10) / 10; // Round to 1 decimal place
+              lastAvgTemp = Math.round((sum / sensorValues.length) * 10) / 10;
             }
           }
         } catch (tempError) {
           console.error('Error calculating lastAvgTemp:', tempError);
-          // Continue with null value if calculation fails
         }
 
-        return {
+        const baseProcess = {
           id: doc._id.toString(),
           oven: doc.oven,
+          article: doc.article || '', // Add article to returned process
           hydraBatch: doc.hydraBatch,
           operator: doc.operator,
           status: doc.status,
@@ -128,9 +157,39 @@ export async function fetchOvenProcesses(
           endTime: doc.endTime,
           lastAvgTemp,
         };
+
+        // Optionally fetch and include config data
+        if (includeConfig && doc.article) {
+          try {
+            const configResult = await fetchOvenProcessConfig(doc.article);
+            if ('success' in configResult && configResult.success) {
+              const config = configResult.success;
+              const expectedCompletion = new Date(
+                doc.startTime.getTime() + config.duration * 1000,
+              );
+
+              return {
+                ...baseProcess,
+                config: {
+                  temp: config.temp,
+                  tempTolerance: config.tempTolerance,
+                  duration: config.duration,
+                  expectedCompletion,
+                },
+              };
+            }
+          } catch (configError) {
+            console.error(
+              'Error fetching config for article:',
+              doc.article,
+              configError,
+            );
+          }
+        }
+
+        return baseProcess;
       }),
     );
-
     return { success: sanitizedProcesses };
   } catch (error) {
     console.error(error);
@@ -141,12 +200,14 @@ export async function fetchOvenProcesses(
 /**
  * Starts (creates if needed) an oven process
  * @param oven - The oven string (e.g., 'tem10')
+ * @param article - Article number from scan
  * @param hydraBatch - Batch number from scan
  * @param operator - Array of operator identifiers
  * @returns Success status or error message
  */
 export async function startOvenProcess(
   oven: string,
+  article: string,
   hydraBatch: string,
   operator: string[],
 ): Promise<{ error: string } | { success: boolean; processId: string }> {
@@ -157,6 +218,7 @@ export async function startOvenProcess(
     // The unique index on {oven: 1, hydraBatch: 1} will prevent duplicates
     const newProcess = {
       oven,
+      article, // Store article
       hydraBatch,
       operator: operator,
       status: 'running' as const,
@@ -277,6 +339,7 @@ export async function fetchOvenLastAvgTemp(
       .limit(1)
       .next();
     if (!lastTempLog || !lastTempLog.sensorData) {
+      console.log('no last temp log');
       return { avgTemp: null };
     }
     const sensorValues = Object.values(lastTempLog.sensorData).filter(

@@ -15,10 +15,11 @@ import {
 import { Locale } from '@/i18n.config';
 import { Play, ScanLine, StopCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import { completeOvenProcess, startOvenProcess } from '../actions';
+import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
@@ -31,6 +32,28 @@ export default function ProcessList() {
 
   // Move hook calls to top level
   const params = useParams<{ lang: Locale }>();
+
+  // Get current oven temperature for monitoring
+  const { data: tempData } = useOvenLastAvgTemp(selectedOven);
+  const currentTemp =
+    tempData &&
+    'avgTemp' in tempData &&
+    typeof tempData.avgTemp === 'number' &&
+    !isNaN(tempData.avgTemp)
+      ? tempData.avgTemp
+      : null;
+
+  // State for forcing re-renders to update time calculations
+  const [, setRefreshTrigger] = useState(0);
+
+  // Auto-refresh estimated completion times every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshTrigger((prev) => prev + 1);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Helper function to format dates
   const formatDate = (date: Date | string | null | undefined): string => {
@@ -50,6 +73,8 @@ export default function ProcessList() {
   // Dialog states for start/end
   const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [endDialogOpen, setEndDialogOpen] = useState(false);
+  // Two-step scan state
+  const [scannedArticle, setScannedArticle] = useState('');
   const [scannedStartBatch, setScannedStartBatch] = useState('');
   const [scannedEndBatch, setScannedEndBatch] = useState('');
 
@@ -58,8 +83,8 @@ export default function ProcessList() {
   const [endError, setEndError] = useState<string | null>(null);
 
   // Input refs for focusing after success
-  // The non-null assertion is safe because the ref is always attached to an <Input> element
-  const startInputRef = useRef<HTMLInputElement>(null!);
+  const articleInputRef = useRef<HTMLInputElement>(null!);
+  const batchInputRef = useRef<HTMLInputElement>(null!);
   const endInputRef = useRef<HTMLInputElement>(null!);
 
   // Loading states for dialogs (optional, currently not used)
@@ -80,8 +105,10 @@ export default function ProcessList() {
     [operator1, operator2, operator3],
   );
 
-  const { data, error, refetch, isFetching } =
-    useGetOvenProcesses(selectedOven);
+  const { data, error, refetch, isFetching } = useGetOvenProcesses(
+    selectedOven,
+    true,
+  ); // Include config data
 
   function isSuccess(
     data: { success: OvenProcessType[] } | { error: string } | undefined,
@@ -97,9 +124,91 @@ export default function ProcessList() {
     );
   }
 
+  // Helper function to format temperature with tolerance
+  const formatTempWithTolerance = (
+    temp?: number,
+    tolerance?: number,
+  ): string => {
+    if (!temp || !tolerance) return '-';
+    return `${temp}°C ±${tolerance}°C`;
+  };
+
+  // Helper function to format expected completion
+  const formatExpectedCompletion = (expectedCompletion?: Date): string => {
+    if (!expectedCompletion) return '-';
+    const now = new Date();
+    const timeLeft = expectedCompletion.getTime() - now.getTime();
+
+    const absTime = Math.abs(timeLeft);
+    const hours = Math.floor(absTime / (1000 * 60 * 60));
+    const minutes = Math.floor((absTime % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (timeLeft < 0) {
+      // Overdue: show negative value
+      if (hours > 0) {
+        return `-${hours}h ${minutes}m`;
+      } else {
+        return `-${minutes}m`;
+      }
+    } else {
+      if (hours > 0) {
+        return `~${hours}h ${minutes}m`;
+      } else {
+        return `~${minutes}m`;
+      }
+    }
+  };
+
+  // Helper function to determine temperature status
+  const getTempStatus = (
+    processTemp?: number,
+    processTolerance?: number,
+    currentTemp?: number | null,
+  ): 'good' | 'danger' | 'unknown' => {
+    if (
+      !processTemp ||
+      !processTolerance ||
+      currentTemp === null ||
+      currentTemp === undefined
+    ) {
+      return 'unknown';
+    }
+
+    const minTemp = processTemp - processTolerance;
+    const maxTemp = processTemp + processTolerance;
+
+    if (currentTemp >= minTemp && currentTemp <= maxTemp) {
+      return 'good'; // Within tolerance - green
+    } else {
+      return 'danger'; // Out of range - red
+    }
+  };
+
+  // Helper function to get temperature display with color coding
+  const formatTempWithStatus = (
+    temp?: number,
+    tolerance?: number,
+    currentTemp?: number | null,
+  ) => {
+    const tempString = formatTempWithTolerance(temp, tolerance);
+    const status = getTempStatus(temp, tolerance, currentTemp);
+
+    const classes = {
+      good: 'text-green-600 dark:text-green-400 font-bold',
+      danger: 'text-red-600 dark:text-red-400 animate-pulse font-bold',
+      unknown: 'text-muted-foreground',
+    };
+
+    return {
+      text: tempString,
+      className: classes[status],
+      status,
+    };
+  };
+
   // Memoized callback functions to prevent unnecessary dialog re-renders
   const handleStartProcess = useCallback(async () => {
-    if (!scannedStartBatch) return;
+    if (!scannedArticle || !scannedStartBatch) return;
     if (!isSuccess(data)) return;
 
     // Clear any previous error
@@ -111,7 +220,7 @@ export default function ProcessList() {
       toast.error(errorMessage);
       setScannedStartBatch('');
       setTimeout(() => {
-        startInputRef.current?.focus();
+        batchInputRef.current?.focus();
       }, 0);
       playNok();
       return;
@@ -124,6 +233,7 @@ export default function ProcessList() {
     try {
       const result = await startOvenProcess(
         selectedOven,
+        scannedArticle,
         scannedStartBatch,
         operators,
       );
@@ -131,10 +241,11 @@ export default function ProcessList() {
       if ('success' in result && result.success) {
         playOvenIn();
         refetch();
+        setScannedArticle('');
         setScannedStartBatch('');
         setStartError(null);
         setTimeout(() => {
-          startInputRef.current?.focus();
+          articleInputRef.current?.focus();
         }, 0);
         toast.success('Proces uruchomiony!', { id: loadingToast });
         return;
@@ -146,7 +257,7 @@ export default function ProcessList() {
         setStartError(errorMessage);
         setScannedStartBatch('');
         setTimeout(() => {
-          startInputRef.current?.focus();
+          batchInputRef.current?.focus();
         }, 0);
         toast.error(errorMessage, { id: loadingToast });
         return;
@@ -157,7 +268,7 @@ export default function ProcessList() {
       setStartError(errorMessage);
       setScannedStartBatch('');
       setTimeout(() => {
-        startInputRef.current?.focus();
+        batchInputRef.current?.focus();
       }, 0);
       toast.error(errorMessage, { id: loadingToast });
     } catch (error) {
@@ -166,12 +277,13 @@ export default function ProcessList() {
       setStartError(errorMessage);
       setScannedStartBatch('');
       setTimeout(() => {
-        startInputRef.current?.focus();
+        batchInputRef.current?.focus();
       }, 0);
       console.error(error);
       toast.error(errorMessage, { id: loadingToast });
     }
   }, [
+    scannedArticle,
     scannedStartBatch,
     data,
     selectedOven,
@@ -263,9 +375,7 @@ export default function ProcessList() {
         <Card>
           <CardHeader>
             <div className='flex items-center justify-between gap-2'>
-              <div>
-                <CardTitle>Procesy wygrzewania</CardTitle>
-              </div>
+              <CardTitle>Procesy wygrzewania</CardTitle>
               <div className='flex gap-2'>
                 <Button onClick={() => setStartDialogOpen(true)}>
                   <Play className='mr-2 h-4 w-4' />
@@ -290,29 +400,52 @@ export default function ProcessList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Data rozpoczęcia</TableHead>
-                    <TableHead>Godzina rozpoczęcia</TableHead>
-                    {/* Removed average temperature column */}
+                    <TableHead>Start</TableHead>
+                    <TableHead>Artykuł</TableHead>
                     <TableHead>HYDRA batch</TableHead>
+                    <TableHead>Oczekiwana temperatura</TableHead>
+                    <TableHead>Przewidywane zakończenie</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data.success
                     .filter((process) => process.status === 'running')
                     .map((process) => {
-                      const dateString = formatDate(process.startTime);
-                      const fullString = formatDateTime(process.startTime);
-                      const timeString =
-                        fullString !== '-'
-                          ? fullString.split(', ')[1] || '-'
-                          : '-';
+                      const startString = formatDateTime(process.startTime);
+                      const tempDisplay = formatTempWithStatus(
+                        process.config?.temp,
+                        process.config?.tempTolerance,
+                        currentTemp,
+                      );
+
                       return (
                         <TableRow key={process.id}>
-                          <TableCell>{dateString}</TableCell>
-                          <TableCell>{timeString}</TableCell>
-                          {/* Removed average temperature cell */}
-                          <TableCell className='font-mono font-medium'>
-                            {process.hydraBatch}
+                          <TableCell>{startString}</TableCell>
+                          <TableCell>{process.article}</TableCell>
+                          <TableCell>{process.hydraBatch}</TableCell>
+                          <TableCell className={tempDisplay.className}>
+                            {tempDisplay.text}
+                          </TableCell>
+                          <TableCell
+                            className={(() => {
+                              const expected =
+                                process.config?.expectedCompletion;
+                              if (!expected) return undefined;
+                              const now = new Date();
+                              const end = new Date(expected);
+                              const timeLeft = end.getTime() - now.getTime();
+                              if (timeLeft < 0) {
+                                return 'animate-pulse font-bold text-red-600 dark:text-red-400';
+                              } else if (timeLeft <= 1000 * 60 * 60) {
+                                // Less than 1 hour left
+                                return 'animate-pulse font-bold';
+                              }
+                              return undefined;
+                            })()}
+                          >
+                            {formatExpectedCompletion(
+                              process.config?.expectedCompletion,
+                            )}
                           </TableCell>
                         </TableRow>
                       );
@@ -335,9 +468,12 @@ export default function ProcessList() {
       <StartBatchDialog
         open={startDialogOpen}
         onOpenChange={setStartDialogOpen}
+        scannedArticle={scannedArticle}
+        setScannedArticle={setScannedArticle}
         scannedBatch={scannedStartBatch}
         setScannedBatch={setScannedStartBatch}
-        inputRef={startInputRef}
+        articleInputRef={articleInputRef}
+        batchInputRef={batchInputRef}
         onStart={handleStartProcess}
         error={startError}
         onErrorClear={handleStartErrorClear}
