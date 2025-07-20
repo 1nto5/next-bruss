@@ -1,8 +1,9 @@
 import { auth } from '@/auth';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Info from '../../components/welcome-alert';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Inventory approve (Next BRUSS)',
   // description: 'Company helper applications',
 };

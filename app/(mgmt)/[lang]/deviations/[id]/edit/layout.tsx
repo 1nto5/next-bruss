@@ -1,8 +1,9 @@
 import { Locale } from '@/i18n.config';
+import { Metadata } from 'next';
 // import { getDictionary } from '@/lib/dictionary';
 // import Info from '../../components/Info';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Edytowanie odchylenia (BRUSS)',
 };
 

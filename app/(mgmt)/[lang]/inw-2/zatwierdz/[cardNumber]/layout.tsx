@@ -1,9 +1,10 @@
 // import { redirect } from 'next/navigation';
 // import { auth } from '@/auth';
+import { Metadata } from 'next';
 
 // import Container from '@/components/ui/container';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Inwentaryzacja (BRUSS)',
 };
 

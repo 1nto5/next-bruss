@@ -412,7 +412,10 @@ export default function ProcessList() {
                     <Alert variant='destructive'>
                       <AlertTriangle className='h-4 w-4' />
                       <AlertTitle>Błąd odczytu temperatury</AlertTitle>
-                      <AlertDescription>Skontaktuj się z IT!</AlertDescription>
+                      <AlertDescription>
+                        System nie uzyskał poprawnych danych z czujników
+                        temperatur. Skontaktuj się z IT!
+                      </AlertDescription>
                     </Alert>
                   )}
                 {/* Process Table */}

@@ -1,7 +1,8 @@
 import { auth } from '@/auth';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Login (Next BRUSS)',
 };
 

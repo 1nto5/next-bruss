@@ -1,6 +1,7 @@
 import { Locale } from '@/i18n.config';
+import { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title:
     'Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja (BRUSS)',
 };

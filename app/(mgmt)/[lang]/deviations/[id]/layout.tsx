@@ -1,10 +1,10 @@
-// import { auth } from '@/auth';
+import { auth } from '@/auth';
 import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
-// import { redirect } from 'next/navigation';
-// import Info from '../../components/Info';
+import { getDictionary } from '@/lib/dictionary';
+import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Odchylenie (BRUSS)',
 };
 
