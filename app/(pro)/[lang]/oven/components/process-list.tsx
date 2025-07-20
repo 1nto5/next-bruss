@@ -1,6 +1,7 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,7 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
-import { Play, ScanLine, StopCircle } from 'lucide-react';
+import { AlertTriangle, Play, ScanLine, StopCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -397,61 +398,80 @@ export default function ProcessList() {
             ) : isSuccess(data) &&
               data.success.filter((process) => process.status === 'running')
                 .length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Start</TableHead>
-                    <TableHead>Artykuł</TableHead>
-                    <TableHead>HYDRA batch</TableHead>
-                    <TableHead>Oczekiwana temperatura</TableHead>
-                    <TableHead>Przewidywane zakończenie</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.success
+              <div className='space-y-4'>
+                {/* Temperature Alert */}
+                {currentTemp === null &&
+                  data.success
                     .filter((process) => process.status === 'running')
-                    .map((process) => {
-                      const startString = formatDateTime(process.startTime);
-                      const tempDisplay = formatTempWithStatus(
-                        process.config?.temp,
-                        process.config?.tempTolerance,
-                        currentTemp,
-                      );
+                    .some((process) => {
+                      const startTime = new Date(process.startTime);
+                      const now = new Date();
+                      const fiveMinutesAgo = now.getTime() - 5 * 60 * 1000;
+                      return startTime.getTime() < fiveMinutesAgo;
+                    }) && (
+                    <Alert variant='destructive'>
+                      <AlertTriangle className='h-4 w-4' />
+                      <AlertTitle>Błąd odczytu temperatury</AlertTitle>
+                      <AlertDescription>Skontaktuj się z IT!</AlertDescription>
+                    </Alert>
+                  )}
+                {/* Process Table */}
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Start</TableHead>
+                      <TableHead>Artykuł</TableHead>
+                      <TableHead>HYDRA batch</TableHead>
+                      <TableHead>Oczekiwana temperatura</TableHead>
+                      <TableHead>Przewidywane zakończenie</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.success
+                      .filter((process) => process.status === 'running')
+                      .map((process) => {
+                        const startString = formatDateTime(process.startTime);
+                        const tempDisplay = formatTempWithStatus(
+                          process.config?.temp,
+                          process.config?.tempTolerance,
+                          currentTemp,
+                        );
 
-                      return (
-                        <TableRow key={process.id}>
-                          <TableCell>{startString}</TableCell>
-                          <TableCell>{process.article}</TableCell>
-                          <TableCell>{process.hydraBatch}</TableCell>
-                          <TableCell className={tempDisplay.className}>
-                            {tempDisplay.text}
-                          </TableCell>
-                          <TableCell
-                            className={(() => {
-                              const expected =
-                                process.config?.expectedCompletion;
-                              if (!expected) return undefined;
-                              const now = new Date();
-                              const end = new Date(expected);
-                              const timeLeft = end.getTime() - now.getTime();
-                              if (timeLeft < 0) {
-                                return 'animate-pulse font-bold text-red-600 dark:text-red-400';
-                              } else if (timeLeft <= 1000 * 60 * 60) {
-                                // Less than 1 hour left
-                                return 'animate-pulse font-bold';
-                              }
-                              return undefined;
-                            })()}
-                          >
-                            {formatExpectedCompletion(
-                              process.config?.expectedCompletion,
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
+                        return (
+                          <TableRow key={process.id}>
+                            <TableCell>{startString}</TableCell>
+                            <TableCell>{process.article}</TableCell>
+                            <TableCell>{process.hydraBatch}</TableCell>
+                            <TableCell className={tempDisplay.className}>
+                              {tempDisplay.text}
+                            </TableCell>
+                            <TableCell
+                              className={(() => {
+                                const expected =
+                                  process.config?.expectedCompletion;
+                                if (!expected) return undefined;
+                                const now = new Date();
+                                const end = new Date(expected);
+                                const timeLeft = end.getTime() - now.getTime();
+                                if (timeLeft < 0) {
+                                  return 'animate-pulse font-bold text-red-600 dark:text-red-400';
+                                } else if (timeLeft <= 1000 * 60 * 60) {
+                                  // Less than 1 hour left
+                                  return 'animate-pulse font-bold';
+                                }
+                                return undefined;
+                              })()}
+                            >
+                              {formatExpectedCompletion(
+                                process.config?.expectedCompletion,
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </div>
             ) : (
               <div className='py-14 text-center'>
                 <ScanLine className='text-muted-foreground mx-auto mb-4 h-12 w-12' />

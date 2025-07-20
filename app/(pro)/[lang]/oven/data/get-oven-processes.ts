@@ -6,6 +6,6 @@ export function useGetOvenProcesses(oven: string, includeConfig = false) {
     queryFn: async () => fetchOvenProcesses(oven, includeConfig),
     queryKey: ['oven-processes', oven, includeConfig],
     enabled: !!oven,
-    refetchInterval: 1000 * 60 * 60, // 60     minutes
+    refetchInterval: 1000 * 60 * 60, // 60 minutes
   });
 }

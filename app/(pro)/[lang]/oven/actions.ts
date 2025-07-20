@@ -245,8 +245,8 @@ export async function startOvenProcess(
     // Uncomment this section if you prefer upsert approach:
     /*
     const result = await collection.updateOne(
-      { 
-        oven, 
+      {
+        oven,
         hydraBatch,
         status: { $ne: 'finished' } // Only upsert if no active process exists
       },
@@ -338,8 +338,13 @@ export async function fetchOvenLastAvgTemp(
       .sort({ timestamp: -1 })
       .limit(1)
       .next();
-    if (!lastTempLog || !lastTempLog.sensorData) {
-      console.log('no last temp log');
+
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    if (
+      !lastTempLog ||
+      !lastTempLog.sensorData ||
+      lastTempLog.timestamp < fiveMinutesAgo
+    ) {
       return { avgTemp: null };
     }
     const sensorValues = Object.values(lastTempLog.sensorData).filter(
