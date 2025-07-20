@@ -16,7 +16,7 @@ import {
 import { Locale } from '@/i18n.config';
 import { AlertTriangle, Play, ScanLine, StopCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import { completeOvenProcess, startOvenProcess } from '../actions';
@@ -43,18 +43,6 @@ export default function ProcessList() {
     !isNaN(tempData.avgTemp)
       ? tempData.avgTemp
       : null;
-
-  // State for forcing re-renders to update time calculations
-  const [, setRefreshTrigger] = useState(0);
-
-  // Auto-refresh estimated completion times every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRefreshTrigger((prev) => prev + 1);
-    }, 30000); // 30 seconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Helper function to format dates
   const formatDate = (date: Date | string | null | undefined): string => {
