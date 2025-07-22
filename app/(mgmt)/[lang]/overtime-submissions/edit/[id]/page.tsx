@@ -81,6 +81,14 @@ export default async function EditOvertimeSubmissionPage(props: {
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
+  // Tester role check
+  const userRoles = session.user?.roles || [];
+  const isTester = userRoles.includes('tester');
+  if (!isTester) {
+    throw new Error(
+      'Access is not possible. Only testers can access this application.',
+    );
+  }
 
   const [managers, submission] = await Promise.all([
     getManagers(),

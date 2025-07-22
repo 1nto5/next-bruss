@@ -9,6 +9,14 @@ export default async function AddOvertimeSubmissionPage() {
   if (!session || !session.user?.email) {
     redirect('/auth');
   }
+  // Tester role check
+  const userRoles = session.user?.roles || [];
+  const isTester = userRoles.includes('tester');
+  if (!isTester) {
+    throw new Error(
+      'Access is not possible. Only testers can access this application.',
+    );
+  }
   return (
     <OvertimeRequestForm
       managers={managers}

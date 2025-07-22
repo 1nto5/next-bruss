@@ -160,13 +160,13 @@ export default async function OvertimeHRViewPage(props: {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
-  // Check if user has required permissions - only HR and admin
-  const userRoles = session.user?.roles ?? [];
-  const isAdmin = userRoles.includes('admin');
-  const isHR = userRoles.includes('hr');
-
-  if (!isAdmin && !isHR) {
-    redirect('/overtime-submissions');
+  // Tester role check
+  const userRoles = session.user?.roles || [];
+  const isTester = userRoles.includes('tester');
+  if (!isTester) {
+    throw new Error(
+      'Access is not possible. Only testers can access this application.',
+    );
   }
 
   // Fetch all users for person filter

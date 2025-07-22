@@ -190,12 +190,21 @@ export default async function OvertimePage(props: {
   const searchParams = await props.searchParams;
   const session = await auth();
 
-  // Anyone logged in can submit overtime hours
-  const canCreateSubmission = !!session?.user?.email;
-
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
+
+  // Tester role check
+  const userRoles = session.user?.roles || [];
+  const isTester = userRoles.includes('tester');
+  if (!isTester) {
+    throw new Error(
+      'Access is not possible. Only testers can access this application.',
+    );
+  }
+
+  // Anyone logged in can submit overtime hours
+  const canCreateSubmission = !!session?.user?.email;
 
   // Fetch all users for manager filter
   const users = await getUsers();
