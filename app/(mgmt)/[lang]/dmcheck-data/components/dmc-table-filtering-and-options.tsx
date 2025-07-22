@@ -48,11 +48,23 @@ export default function DmcTableFilteringAndOptions({
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
 
+  // Determine if any filter is active in the URL
+  const hasAnyFilter =
+    !!searchParams?.get('status') ||
+    !!searchParams?.get('from') ||
+    !!searchParams?.get('to') ||
+    !!searchParams?.get('dmc') ||
+    !!searchParams?.get('hydra_batch') ||
+    !!searchParams?.get('pallet_batch') ||
+    !!searchParams?.get('workplace') ||
+    !!searchParams?.get('article');
+
+  // Initialize showFilters to true if any filter is present
+  const [showFilters, setShowFilters] = useState(hasAnyFilter);
+
   useEffect(() => {
     setIsPendingSearch(false);
   }, [fetchTime]);
-
-  const [showFilters, setShowFilters] = useState(false);
 
   const [statusFilter, setStatusFilter] = useState(searchParams?.get('status'));
   const [fromFilter, setFromFilter] = useState(() => {
