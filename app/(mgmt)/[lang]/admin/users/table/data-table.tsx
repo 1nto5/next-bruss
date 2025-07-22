@@ -25,7 +25,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -81,7 +80,6 @@ export function DataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <CardTitle>Users management</CardTitle>
-        <CardDescription>Last synchronization: {fetchTime}</CardDescription>
         <div className='flex items-center justify-between'>
           <div className='flex flex-row space-x-1'>
             <Input

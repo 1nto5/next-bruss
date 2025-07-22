@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { Locale } from '@/i18n.config';
 import { useEffect, useState } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { OvenProcessDataType, OvenTemperatureLogType } from '../lib/types';
@@ -22,31 +23,32 @@ import { OvenProcessDataType, OvenTemperatureLogType } from '../lib/types';
 interface OvenTemperatureChartProps {
   searchParams: { [key: string]: string | undefined };
   selectedProcess?: OvenProcessDataType | null;
+  lang: Locale;
 }
 
 const chartConfig = {
   z0: {
-    label: 'Top Left',
+    label: 'TL', // Top Left
     color: '#3b82f6', // Blue
   },
   z1: {
-    label: 'Top Right',
+    label: 'TR', // Top Right
     color: '#ef4444', // Red
   },
   z2: {
-    label: 'Bottom Left',
+    label: 'BL', // Bottom Left
     color: '#10b981', // Green
   },
   z3: {
-    label: 'Bottom Right',
+    label: 'BR', // Bottom Right
     color: '#f59e0b', // Orange
   },
   avgTemp: {
-    label: 'Average Temperature',
+    label: 'Avg',
     color: '#8b5cf6', // Purple
   },
   targetTemp: {
-    label: 'Target Temperature',
+    label: 'Tgt',
     color: '#6b7280', // Gray (dashed line)
   },
 } satisfies ChartConfig;
@@ -54,6 +56,7 @@ const chartConfig = {
 export default function OvenTemperatureChart({
   searchParams,
   selectedProcess,
+  lang,
 }: OvenTemperatureChartProps) {
   const [temperatureData, setTemperatureData] = useState<
     OvenTemperatureLogType[]
@@ -110,14 +113,31 @@ export default function OvenTemperatureChart({
     fetchTemperatureData();
   }, [searchParams, selectedProcess]);
 
+  // Determine if all data is from a single day
+  const allDates = temperatureData.map((log) => new Date(log.timestamp));
+  const isSingleDay =
+    allDates.length > 0 &&
+    allDates.every(
+      (date) =>
+        date.getFullYear() === allDates[0].getFullYear() &&
+        date.getMonth() === allDates[0].getMonth() &&
+        date.getDate() === allDates[0].getDate(),
+    );
+
   // Process data for chart
   const chartData = temperatureData.map((log) => ({
-    timestamp: new Date(log.timestamp).toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }),
+    timestamp: isSingleDay
+      ? new Date(log.timestamp).toLocaleTimeString(lang, {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : new Date(log.timestamp).toLocaleString(lang, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
     z0: log.sensorData?.z0 || null,
     z1: log.sensorData?.z1 || null,
     z2: log.sensorData?.z2 || null,
@@ -198,45 +218,44 @@ export default function OvenTemperatureChart({
     );
   }
 
+  // Calculate min/max for Y-axis from actual sensor/average data (not target)
+  const yValues = chartData.flatMap((d) =>
+    [d.z0, d.z1, d.z2, d.z3, d.avgTemp].filter((v) => typeof v === 'number'),
+  );
+  const minY = yValues.length ? Math.min(...yValues) : 0;
+  const maxY = yValues.length ? Math.max(...yValues) : 100;
+  const yDomain = [Math.floor(minY), Math.ceil(maxY)];
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Temperature Trend</CardTitle>
         <CardDescription>
-          Process {selectedProcess.id} - {selectedProcess.article} on{' '}
-          {selectedProcess.oven.toUpperCase()}
-          {selectedProcess.config && (
-            <span className='ml-2'>
-              (Target: {selectedProcess.config.temp}°C ±
-              {selectedProcess.config.tempTolerance}°C)
-            </span>
+          {selectedProcess && (
+            <>
+              {selectedProcess.hydraBatch} ({selectedProcess.article}) on{' '}
+              {selectedProcess.oven.toUpperCase()} (Target:{' '}
+              {selectedProcess.config?.temp}°C ±
+              {selectedProcess.config?.tempTolerance}°C)
+            </>
           )}
-          <br />
-          {selectedProcess.startTimeLocaleString} -{' '}
-          {selectedProcess.endTimeLocaleString || 'In progress'}(
-          {chartData.length} readings)
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className='min-h-[300px] w-full'>
+        <ChartContainer config={chartConfig} className='w-full'>
           <LineChart
             data={chartData}
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            margin={{ left: 0, right: 20, top: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray='3 3' className='stroke-muted' />
-            <XAxis
-              dataKey='timestamp'
-              className='text-xs'
-              tick={{ fontSize: 10 }}
-              interval='preserveStartEnd'
-            />
+            <XAxis dataKey='timestamp' interval='preserveStart' />
             <YAxis
-              className='text-xs'
-              tick={{ fontSize: 10 }}
+              domain={yDomain}
               label={{
                 value: 'Temperature (°C)',
                 angle: -90,
                 position: 'insideLeft',
+                style: { textAnchor: 'middle' },
               }}
             />
             <ChartTooltip
@@ -245,14 +264,14 @@ export default function OvenTemperatureChart({
                   labelFormatter={(value) => `Time: ${value}`}
                   formatter={(value, name) => {
                     const labels: { [key: string]: string } = {
-                      z0: 'Top Left',
-                      z1: 'Top Right',
-                      z2: 'Bottom Left',
-                      z3: 'Bottom Right',
-                      avgTemp: 'Average Temperature',
-                      targetTemp: 'Target Temperature',
+                      z0: 'TL',
+                      z1: 'TR',
+                      z2: 'BL',
+                      z3: 'BR',
+                      avgTemp: 'Avg',
+                      targetTemp: 'Tgt',
                     };
-                    return [`${value}°C`, labels[name] || name];
+                    return [`${labels[name] || name}: ${value}°C`, ''];
                   }}
                 />
               }
@@ -264,55 +283,55 @@ export default function OvenTemperatureChart({
               type='monotone'
               dataKey='z0'
               stroke={chartConfig.z0.color}
-              strokeWidth={2}
-              dot={{ r: 1 }}
-              activeDot={{ r: 3 }}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
               connectNulls={false}
             />
             <Line
               type='monotone'
               dataKey='z1'
               stroke={chartConfig.z1.color}
-              strokeWidth={2}
-              dot={{ r: 1 }}
-              activeDot={{ r: 3 }}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
               connectNulls={false}
             />
             <Line
               type='monotone'
               dataKey='z2'
               stroke={chartConfig.z2.color}
-              strokeWidth={2}
-              dot={{ r: 1 }}
-              activeDot={{ r: 3 }}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
               connectNulls={false}
             />
             <Line
               type='monotone'
               dataKey='z3'
               stroke={chartConfig.z3.color}
-              strokeWidth={2}
-              dot={{ r: 1 }}
-              activeDot={{ r: 3 }}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
               connectNulls={false}
             />
 
-            {/* Average temperature - thicker line */}
+            {/* Average temperature - slightly thicker, but still thin */}
             <Line
               type='monotone'
               dataKey='avgTemp'
               stroke={chartConfig.avgTemp.color}
-              strokeWidth={3}
-              dot={{ r: 2 }}
-              activeDot={{ r: 4 }}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
             />
 
-            {/* Target temperature - dashed reference line */}
+            {/* Target temperature - dashed reference line, thin */}
             <Line
               type='monotone'
               dataKey='targetTemp'
               stroke={chartConfig.targetTemp.color}
-              strokeWidth={2}
+              strokeWidth={1}
               strokeDasharray='5 5'
               dot={false}
             />

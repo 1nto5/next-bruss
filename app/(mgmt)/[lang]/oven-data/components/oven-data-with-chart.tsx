@@ -28,7 +28,7 @@ export default function OvenDataWithChart({
     useState<OvenProcessDataType | null>(null);
 
   return (
-    <div className='space-y-6'>
+    <div>
       <OvenDataTable
         columns={ovenColumns}
         data={data}
@@ -41,6 +41,7 @@ export default function OvenDataWithChart({
       <OvenTemperatureChart
         searchParams={searchParams}
         selectedProcess={selectedProcess}
+        lang={lang}
       />
     </div>
   );

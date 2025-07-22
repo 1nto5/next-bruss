@@ -70,7 +70,7 @@ export function OvenDataTable<TData, TValue>({
     },
     initialState: {
       pagination: {
-        pageSize: 25,
+        pageSize: 5,
       },
     },
     enableMultiRowSelection: false, // Only allow single row selection
@@ -90,6 +90,10 @@ export function OvenDataTable<TData, TValue>({
 
   return (
     <div className='w-full'>
+      {/* User instruction for selecting a process */}
+      <div className='text-muted-foreground mb-2 text-sm'>
+        Click a process row to display its temperature data on the chart below.
+      </div>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -148,12 +152,11 @@ export function OvenDataTable<TData, TValue>({
       </div>
       <div className='flex items-center justify-between space-x-2 py-4'>
         <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredRowModel().rows.length} process(es) found.
-          {Object.keys(rowSelection).length > 0 && (
-            <span className='ml-2 font-medium'>
-              1 process selected for temperature chart.
-            </span>
-          )}
+          {table.getFilteredRowModel().rows.length}{' '}
+          {table.getFilteredRowModel().rows.length === 1
+            ? 'process'
+            : 'processes'}{' '}
+          found.
         </div>
         <div className='flex items-center space-x-2'>
           <p className='text-sm font-medium'>
