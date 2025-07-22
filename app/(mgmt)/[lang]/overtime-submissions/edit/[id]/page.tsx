@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import AccessDeniedAlert from '@/components/access-denied-alert';
 import { dbc } from '@/lib/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
@@ -85,9 +86,7 @@ export default async function EditOvertimeSubmissionPage(props: {
   const userRoles = session.user?.roles || [];
   const isTester = userRoles.includes('tester');
   if (!isTester) {
-    throw new Error(
-      'Access is not possible. Only testers can access this application.',
-    );
+    return <AccessDeniedAlert />;
   }
 
   const [managers, submission] = await Promise.all([

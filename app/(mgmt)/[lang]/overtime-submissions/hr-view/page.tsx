@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import AccessDeniedAlert from '@/components/access-denied-alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
@@ -164,9 +165,7 @@ export default async function OvertimeHRViewPage(props: {
   const userRoles = session.user?.roles || [];
   const isTester = userRoles.includes('tester');
   if (!isTester) {
-    throw new Error(
-      'Access is not possible. Only testers can access this application.',
-    );
+    return <AccessDeniedAlert />;
   }
 
   // Fetch all users for person filter

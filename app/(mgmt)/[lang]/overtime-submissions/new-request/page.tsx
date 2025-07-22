@@ -1,4 +1,5 @@
 import { auth } from '@/auth';
+import AccessDeniedAlert from '@/components/access-denied-alert';
 import { getUsers } from '@/lib/get-users';
 import { redirect } from 'next/navigation';
 import OvertimeRequestForm from '../components/overtime-request-form';
@@ -13,9 +14,7 @@ export default async function AddOvertimeSubmissionPage() {
   const userRoles = session.user?.roles || [];
   const isTester = userRoles.includes('tester');
   if (!isTester) {
-    throw new Error(
-      'Access is not possible. Only testers can access this application.',
-    );
+    return <AccessDeniedAlert />;
   }
   return (
     <OvertimeRequestForm

@@ -1,5 +1,6 @@
 // import { auth } from '@/auth';
 import { auth } from '@/auth';
+import AccessDeniedAlert from '@/components/access-denied-alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -198,9 +199,7 @@ export default async function OvertimePage(props: {
   const userRoles = session.user?.roles || [];
   const isTester = userRoles.includes('tester');
   if (!isTester) {
-    throw new Error(
-      'Access is not possible. Only testers can access this application.',
-    );
+    return <AccessDeniedAlert />;
   }
 
   // Anyone logged in can submit overtime hours
