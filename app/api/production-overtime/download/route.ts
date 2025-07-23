@@ -36,14 +36,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    if (!order.hasAttachment || !order.attachmentFilename) {
+    if (!order.hasAttachment) {
       return NextResponse.json(
         { error: 'No attachment found for this order' },
         { status: 404 },
       );
     }
 
-    const filename = order.attachmentFilename;
+    // Use original attachment structure
+    let filename: string;
+    let originalName: string;
+
+    if (order.attachmentFilename) {
+      filename = order.attachmentFilename;
+      const ext = path.extname(filename);
+      originalName = `lista_obecnosci_${overTimeRequestId}${ext}`;
+    } else {
+      return NextResponse.json(
+        { error: 'No attachment filename found' },
+        { status: 404 },
+      );
+    }
 
     // Construct path to file
     const filePath = path.join(BASE_PATH, 'production_overtime', filename);
@@ -85,8 +98,8 @@ export async function GET(req: NextRequest) {
     // Use application/octet-stream as default MIME type if extension is unknown
     const contentType = mimeTypes[ext] || 'application/octet-stream';
 
-    // Format a user-friendly download filename
-    const downloadFilename = `lista_obecnosci_${overTimeRequestId}${ext}`;
+    // Format a user-friendly download filename using original name
+    const downloadFilename = originalName;
 
     // Prepare response
     const headers = new Headers();

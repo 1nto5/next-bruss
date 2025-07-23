@@ -95,3 +95,29 @@ export const AttachmentFormSchema = z.object({
 });
 
 export type AttachmentFormType = z.infer<typeof AttachmentFormSchema>;
+
+export const MultipleAttachmentFormSchema = z.object({
+  files: z
+    .array(
+      z
+        .instanceof(File, { message: 'Nieprawidłowy plik!' })
+        .refine((file) => file.size > 0, { message: 'Plik jest pusty!' })
+        .refine((file) => file.size <= 10 * 1024 * 1024, {
+          message: 'Plik jest za duży (max 10MB)',
+        }),
+    )
+    .min(1, { message: 'Wybierz co najmniej jeden plik!' })
+    .max(10, { message: 'Możesz przesłać maksymalnie 10 plików!' })
+    .refine(
+      (files) => {
+        const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+        return totalSize <= 50 * 1024 * 1024; // 50MB total limit
+      },
+      { message: 'Łączny rozmiar plików przekracza 50MB!' },
+    ),
+  mergeFiles: z.boolean().default(true),
+});
+
+export type MultipleAttachmentFormType = z.infer<
+  typeof MultipleAttachmentFormSchema
+>;

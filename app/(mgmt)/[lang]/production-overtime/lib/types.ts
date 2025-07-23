@@ -32,6 +32,7 @@ export type OvertimeType = {
   accountedAt?: Date;
   accountedBy?: string;
   hasAttachment?: boolean;
+  attachmentFilename?: string;
 };
 
 export type overtimeRequestEmployeeType = EmployeeType & {

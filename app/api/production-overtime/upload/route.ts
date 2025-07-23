@@ -4,6 +4,8 @@ import fs from 'fs';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+import { PDFDocument } from 'pdf-lib';
+import sharp from 'sharp';
 
 export const config = {
   api: {
@@ -12,7 +14,8 @@ export const config = {
 };
 
 const BASE_PATH = process.env.UPLOAD_BASE_PATH || './public';
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit per file
+const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB total limit
 
 // Allowed file types
 const ALLOWED_FILE_TYPES = [
@@ -41,6 +44,58 @@ const ALLOWED_FILE_TYPES = [
   'application/x-rar-compressed',
 ];
 
+const IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+];
+
+// Convert image to PDF page
+async function convertImageToPdf(
+  imageBuffer: Buffer,
+  mimeType: string,
+): Promise<Buffer> {
+  const pdfDoc = await PDFDocument.create();
+
+  let image;
+  if (mimeType === 'image/png') {
+    image = await pdfDoc.embedPng(imageBuffer);
+  } else if (mimeType === 'image/jpeg') {
+    image = await pdfDoc.embedJpg(imageBuffer);
+  } else {
+    // Convert other formats to PNG using sharp, then embed
+    const pngBuffer = await sharp(imageBuffer).png().toBuffer();
+    image = await pdfDoc.embedPng(pngBuffer);
+  }
+
+  // Create a page with appropriate dimensions
+  const { width, height } = image;
+  const page = pdfDoc.addPage([width, height]);
+  page.drawImage(image, {
+    x: 0,
+    y: 0,
+    width,
+    height,
+  });
+
+  return Buffer.from(await pdfDoc.save());
+}
+
+// Merge multiple PDFs into one
+async function mergePdfs(pdfBuffers: Buffer[]): Promise<Buffer> {
+  const mergedPdf = await PDFDocument.create();
+
+  for (const pdfBuffer of pdfBuffers) {
+    const pdf = await PDFDocument.load(pdfBuffer);
+    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach((page) => mergedPdf.addPage(page));
+  }
+
+  return Buffer.from(await mergedPdf.save());
+}
+
 export async function POST(req: NextRequest) {
   try {
     // User authorization
@@ -51,11 +106,12 @@ export async function POST(req: NextRequest) {
 
     // Get form data
     const form = await req.formData();
-    const file = form.get('file') as File | null;
+    const files = form.getAll('files') as File[];
     const overTimeRequestId = form.get('overTimeRequestId') as string | null;
+    const mergeFiles = form.get('mergeFiles') === 'true';
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file' }, { status: 400 });
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: 'No files' }, { status: 400 });
     }
 
     if (!overTimeRequestId) {
@@ -106,52 +162,93 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check file size
-    if (file.size > MAX_FILE_SIZE) {
+    // Validate files
+    let totalSize = 0;
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { error: `File ${file.name} exceeds the limit (10MB)` },
+          { status: 400 },
+        );
+      }
+
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        return NextResponse.json(
+          {
+            error: `Unsupported file type: ${file.type} for file ${file.name}`,
+            allowedTypes: ALLOWED_FILE_TYPES.join(', '),
+          },
+          { status: 400 },
+        );
+      }
+
+      totalSize += file.size;
+    }
+
+    if (totalSize > MAX_TOTAL_SIZE) {
       return NextResponse.json(
-        { error: 'File size exceeds the limit (10MB)' },
+        { error: 'Total file size exceeds the limit (50MB)' },
         { status: 400 },
       );
     }
-
-    // Check file type
-    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        {
-          error: 'Unsupported file type',
-          allowedTypes: ALLOWED_FILE_TYPES.join(', '),
-          receivedType: file.type,
-        },
-        { status: 400 },
-      );
-    }
-
-    // File processing
-    const buf = Buffer.from(await file.arrayBuffer());
 
     // Create base directory if it doesn't exist
     const baseFolder = path.join(BASE_PATH, 'production_overtime');
     fs.mkdirSync(baseFolder, { recursive: true });
 
-    // Get file extension
-    const fileExt = path.extname(file.name);
+    const filesToMerge: Buffer[] = [];
 
-    // Create filename with order ID - this ensures uniqueness
-    const fileName = `${overTimeRequestId}${fileExt}`;
-    const filePath = path.join(baseFolder, fileName);
+    // Process each file for merging only (don't save individual files)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-    // Check if file already exists
-    if (fs.existsSync(filePath)) {
+      // Prepare files for PDF conversion/merging
+      try {
+        if (file.type === 'application/pdf') {
+          // Add PDF as-is
+          filesToMerge.push(fileBuffer);
+        } else if (IMAGE_TYPES.includes(file.type)) {
+          // Convert image to PDF
+          const pdfBuffer = await convertImageToPdf(fileBuffer, file.type);
+          filesToMerge.push(pdfBuffer);
+        } else {
+          // For other file types, we can't merge them into PDF
+          console.warn(
+            `Cannot merge file type ${file.type} into PDF: ${file.name}`,
+          );
+        }
+      } catch (error) {
+        console.error(`Error processing file ${file.name} for merging:`, error);
+        // Continue with other files, but don't include this one in merge
+      }
+    }
+
+    // Create merged PDF (this is now the main output)
+    let mergedFilename: string | null = null;
+    if (filesToMerge.length > 0) {
+      try {
+        const mergedPdfBuffer = await mergePdfs(filesToMerge);
+        const fileName = `lista_obecnosci_${overTimeRequestId}.pdf`;
+        const filePath = path.join(baseFolder, fileName);
+
+        fs.writeFileSync(filePath, mergedPdfBuffer);
+        mergedFilename = fileName;
+      } catch (error) {
+        console.error('Error merging files:', error);
+        return NextResponse.json(
+          { error: 'Failed to merge files into PDF' },
+          { status: 500 },
+        );
+      }
+    } else {
       return NextResponse.json(
-        { error: 'File already exists' },
-        { status: 409 },
+        { error: 'No files could be processed for PDF creation' },
+        { status: 400 },
       );
     }
 
-    // Save file to disk
-    fs.writeFileSync(filePath, buf);
-
-    // Database update - now using a boolean flag instead of an array
+    // Database update
     try {
       if (order.status !== 'approved') {
         console.error('Order has incorrect status:', order.status);
@@ -161,13 +258,13 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Update document with simplified properties
+      // Update document with original attachment structure
       const updateResult = await collection.updateOne(
         { _id: objectId },
         {
           $set: {
             hasAttachment: true,
-            attachmentFilename: fileName,
+            attachmentFilename: mergedFilename,
             status: 'completed',
             completedAt: new Date(),
             completedBy: session.user.email,
@@ -188,7 +285,7 @@ export async function POST(req: NextRequest) {
       if (updateResult.modifiedCount === 0) {
         console.error('Document matched but not modified');
         return NextResponse.json(
-          { error: 'Failed to update overTimeRequest with attachment' },
+          { error: 'Failed to update overTimeRequest with attachments' },
           { status: 500 },
         );
       }
@@ -196,8 +293,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message:
-          'Attendance list added successfully and order marked as completed',
-        filename: fileName,
+          'Pliki zostały scalone w PDF i przesłane pomyślnie! Status zlecenia zmieniony na ukończony.',
+        mergedFile: {
+          filename: mergedFilename,
+        },
       });
     } catch (dbError) {
       console.error('Database error:', dbError);

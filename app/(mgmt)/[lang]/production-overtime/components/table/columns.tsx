@@ -465,7 +465,7 @@ export const createColumns = (
 
     {
       accessorKey: 'completedBy',
-      header: 'Ukończone przez',
+      header: 'Lista obecności dodana przez',
       cell: ({ row }) => {
         const completedBy = row.original.completedBy;
         return (
@@ -477,7 +477,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'completedAtLocaleString',
-      header: 'Data ukończenia',
+      header: 'Data dodania listy obecności',
       cell: ({ row }) => {
         const completedAt = row.original.completedAt;
         const completedAtString = useClientLocaleString(completedAt);
