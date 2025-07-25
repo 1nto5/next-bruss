@@ -208,12 +208,6 @@ export default function CardsTableFilteringAndOptions({
       >
         <RefreshCcw />
       </Button>
-      {/* PLAN: export to stock program compatible file */}
-      {/* <Link href={`/api/failures/lv/excel`}>
-        <Button variant='outline' size='icon' title='export do Excel'>
-          <Sheet />
-        </Button>
-      </Link> */}
     </div>
   );
 }
