@@ -106,9 +106,9 @@ export async function fetchOvenProcessConfig(
 }
 
 /**
- * Retrieves all oven processes for a specific oven with optional config data
+ * Retrieves all oven processes for a specific oven
  * @param oven - The oven identifier (tem2, tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
- * @param includeConfig - Whether to include configuration data from oven_process_configs
+ * @param includeConfig - This parameter is now deprecated - target values are saved directly in process
  * @returns Array of processes or error message
  */
 export async function fetchOvenProcesses(
@@ -146,48 +146,30 @@ export async function fetchOvenProcesses(
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        const baseProcess = {
+        // Calculate expected completion if we have target duration
+        let expectedCompletion: Date | undefined;
+        if (doc.targetDuration) {
+          expectedCompletion = new Date(
+            doc.startTime.getTime() + doc.targetDuration * 1000,
+          );
+        }
+
+        return {
           id: doc._id.toString(),
           oven: doc.oven,
-          article: doc.article || '', // Add article to returned process
+          article: doc.article || '',
           hydraBatch: doc.hydraBatch,
           operator: doc.operator,
           status: doc.status,
           startTime: doc.startTime,
           endTime: doc.endTime,
           lastAvgTemp,
+          // Use saved target values from the process record
+          targetTemp: doc.targetTemp,
+          tempTolerance: doc.tempTolerance,
+          targetDuration: doc.targetDuration,
+          expectedCompletion,
         };
-
-        // Optionally fetch and include config data
-        if (includeConfig && doc.article) {
-          try {
-            const configResult = await fetchOvenProcessConfig(doc.article);
-            if ('success' in configResult && configResult.success) {
-              const config = configResult.success;
-              const expectedCompletion = new Date(
-                doc.startTime.getTime() + config.duration * 1000,
-              );
-
-              return {
-                ...baseProcess,
-                config: {
-                  temp: config.temp,
-                  tempTolerance: config.tempTolerance,
-                  duration: config.duration,
-                  expectedCompletion,
-                },
-              };
-            }
-          } catch (configError) {
-            console.error(
-              'Error fetching config for article:',
-              doc.article,
-              configError,
-            );
-          }
-        }
-
-        return baseProcess;
       }),
     );
     return { success: sanitizedProcesses };
@@ -214,16 +196,37 @@ export async function startOvenProcess(
   try {
     const collection = await dbc('oven_processes');
 
-    // Option A: Atomic insert with unique index (recommended)
-    // The unique index on {oven: 1, hydraBatch: 1} will prevent duplicates
+    // Fetch the configuration to save target values at time of creation
+    let targetTemp: number | undefined;
+    let tempTolerance: number | undefined;
+    let targetDuration: number | undefined;
+
+    try {
+      const configResult = await fetchOvenProcessConfig(article);
+      if ('success' in configResult && configResult.success) {
+        const config = configResult.success;
+        targetTemp = config.temp;
+        tempTolerance = config.tempTolerance;
+        targetDuration = config.duration;
+      }
+    } catch (configError) {
+      console.error('Error fetching config for new process:', configError);
+      // Continue without config - values will be undefined
+    }
+
+    // Create process with saved target values
     const newProcess = {
       oven,
-      article, // Store article
+      article,
       hydraBatch,
       operator: operator,
       status: 'running' as const,
       startTime: new Date(),
       endTime: null,
+      // Save target values from config at time of creation
+      targetTemp,
+      tempTolerance,
+      targetDuration,
     };
 
     try {
@@ -240,37 +243,6 @@ export async function startOvenProcess(
       }
       throw error; // Re-throw other errors
     }
-
-    // Option B: Using upsert with specific conditions (alternative)
-    // Uncomment this section if you prefer upsert approach:
-    /*
-    const result = await collection.updateOne(
-      {
-        oven,
-        hydraBatch,
-        status: { $ne: 'finished' } // Only upsert if no active process exists
-      },
-      {
-                 $setOnInsert: {
-           oven,
-           hydraBatch,
-           operator: operator,
-           status: 'running',
-           startTime: new Date(),
-           endTime: null,
-         }
-      },
-      { upsert: true }
-    );
-
-    if (result.upsertedId) {
-      return { success: true, processId: result.upsertedId.toString() };
-    } else if (result.matchedCount > 0) {
-      return { error: 'duplicate batch' };
-    } else {
-      return { error: 'not created' };
-    }
-    */
   } catch (error) {
     console.error(error);
     return { error: 'startOvenProcess server action error' };
@@ -347,12 +319,16 @@ export async function fetchOvenLastAvgTemp(
     ) {
       return { avgTemp: null };
     }
-    const sensorValues = Object.values(lastTempLog.sensorData).filter(
-      (value) => typeof value === 'number',
-    );
+    // Only use the four main sensors: z0, z1, z2, z3
+    const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
+    const sensorValues = sensorKeys
+      .map((key) => lastTempLog.sensorData?.[key])
+      .filter((value) => typeof value === 'number') as number[];
     if (sensorValues.length === 0) {
       return { avgTemp: null };
     }
+    // Calculate average and round to one decimal place
+    // The division by 10 is for rounding: (avg * 10) rounded, then divided by 10 gives one decimal place
     const sum = sensorValues.reduce((acc, val) => acc + val, 0);
     const avgTemp = Math.round((sum / sensorValues.length) * 10) / 10;
     return { avgTemp };

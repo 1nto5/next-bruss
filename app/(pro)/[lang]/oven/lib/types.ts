@@ -15,11 +15,11 @@ export type OvenProcessType = {
   status: 'running' | 'finished';
   startTime: Date;
   endTime: Date;
-  // Optional config data populated from oven_process_configs
-  config?: {
-    temp: number;
-    tempTolerance: number;
-    duration: number;
-    expectedCompletion: Date;
-  };
+  // Saved target values from config at time of process creation
+  targetTemp?: number;
+  tempTolerance?: number;
+  targetDuration?: number; // Duration in seconds
+  // Optional calculated values
+  expectedCompletion?: Date;
+  lastAvgTemp?: number | null;
 };

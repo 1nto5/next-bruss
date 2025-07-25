@@ -423,8 +423,8 @@ export default function ProcessList() {
                       .map((process) => {
                         const startString = formatDateTime(process.startTime);
                         const tempDisplay = formatTempWithStatus(
-                          process.config?.temp,
-                          process.config?.tempTolerance,
+                          process.targetTemp,
+                          process.tempTolerance,
                           currentTemp,
                         );
 
@@ -438,8 +438,7 @@ export default function ProcessList() {
                             </TableCell>
                             <TableCell
                               className={(() => {
-                                const expected =
-                                  process.config?.expectedCompletion;
+                                const expected = process.expectedCompletion;
                                 if (!expected) return undefined;
                                 const now = new Date();
                                 const end = new Date(expected);
@@ -454,7 +453,7 @@ export default function ProcessList() {
                               })()}
                             >
                               {formatExpectedCompletion(
-                                process.config?.expectedCompletion,
+                                process.expectedCompletion,
                               )}
                             </TableCell>
                           </TableRow>
