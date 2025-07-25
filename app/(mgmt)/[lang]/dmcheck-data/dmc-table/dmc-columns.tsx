@@ -52,4 +52,12 @@ export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
     accessorKey: 'palletTimeLocaleString',
     header: 'Pallet time',
   },
+  {
+    accessorKey: 'rework_reason',
+    header: 'Rework reason',
+  },
+  {
+    accessorKey: 'reworkTimeLocaleString',
+    header: 'Rework time',
+  },
 ];

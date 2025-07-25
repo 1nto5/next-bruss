@@ -10,10 +10,13 @@ export type DmcType = {
   hydra_time?: string;
   pallet_batch?: string;
   pallet_time?: string;
+  rework_reason?: string;
+  rework_time?: string;
 };
 
 export type DmcTableDataType = DmcType & {
   timeLocaleString: string;
+  reworkTimeLocaleString: string;
 };
 
 export type ArticleConfigType = {

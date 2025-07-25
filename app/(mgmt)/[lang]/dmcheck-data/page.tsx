@@ -65,6 +65,9 @@ async function getScans(
     palletTimeLocaleString: item.pallet_time
       ? new Date(item.pallet_time).toLocaleString(lang)
       : '',
+    reworkTimeLocaleString: item.rework_time
+      ? new Date(item.rework_time).toLocaleString(lang)
+      : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };
 }
