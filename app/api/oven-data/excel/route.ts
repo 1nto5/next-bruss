@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     const processes = await collection
       .find(filter)
       .sort({ startTime: -1 })
-      .limit(1000) // Increased limit for export
+      .limit(100) // Limit to 100 processes
       .toArray();
 
     // Process data for Excel export
@@ -85,24 +85,12 @@ export async function GET(request: NextRequest) {
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Get configuration if available
-        let config = null;
-        if (doc.article) {
-          try {
-            const configCollection = await dbc('oven_process_configs');
-            const configDoc = await configCollection.findOne({
-              article: doc.article,
-            });
-            if (configDoc) {
-              config = {
-                temp: configDoc.temp,
-                tempTolerance: configDoc.tempTolerance,
-                duration: configDoc.duration,
-              };
-            }
-          } catch (configError) {
-            console.error('Error fetching config:', configError);
-          }
+        // Calculate expected completion if we have target duration
+        let expectedCompletion: Date | undefined;
+        if (doc.targetDuration) {
+          expectedCompletion = new Date(
+            doc.startTime.getTime() + doc.targetDuration * 1000,
+          );
         }
 
         // Format duration for Excel
@@ -125,9 +113,9 @@ export async function GET(request: NextRequest) {
           'End Time': doc.endTime ? doc.endTime.toLocaleString() : '',
           'Duration': formatDuration(duration),
           'Last Temperature (°C)': lastAvgTemp || '',
-          'Target Temperature (°C)': config?.temp || '',
-          'Temperature Tolerance (°C)': config?.tempTolerance || '',
-          'Expected Duration (s)': config?.duration || '',
+          'Target Temperature (°C)': doc.targetTemp || '',
+          'Temperature Tolerance (°C)': doc.tempTolerance || '',
+          'Expected Duration (s)': doc.targetDuration || '',
         };
       }),
     );

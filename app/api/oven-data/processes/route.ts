@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const processes = await collection
       .find(filter)
       .sort({ startTime: -1 })
-      .limit(500) // Limit to prevent too much data
+      .limit(100) // Limit to 100 processes
       .toArray();
 
     // Calculate lastAvgTemp and duration for each process
@@ -90,27 +90,12 @@ export async function GET(request: NextRequest) {
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Get configuration if available
-        let config = null;
-        if (doc.article) {
-          try {
-            const configCollection = await dbc('oven_process_configs');
-            const configDoc = await configCollection.findOne({
-              article: doc.article,
-            });
-            if (configDoc) {
-              config = {
-                temp: configDoc.temp,
-                tempTolerance: configDoc.tempTolerance,
-                duration: configDoc.duration,
-                expectedCompletion: new Date(
-                  doc.startTime.getTime() + configDoc.duration * 1000,
-                ),
-              };
-            }
-          } catch (configError) {
-            console.error('Error fetching config:', configError);
-          }
+        // Calculate expected completion if we have target duration
+        let expectedCompletion: Date | undefined;
+        if (doc.targetDuration) {
+          expectedCompletion = new Date(
+            doc.startTime.getTime() + doc.targetDuration * 1000,
+          );
         }
 
         return {
@@ -124,7 +109,11 @@ export async function GET(request: NextRequest) {
           endTime: doc.endTime,
           lastAvgTemp,
           duration,
-          config,
+          // Use saved target values from the process record
+          targetTemp: doc.targetTemp,
+          tempTolerance: doc.tempTolerance,
+          targetDuration: doc.targetDuration,
+          expectedCompletion,
         };
       }),
     );

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       const processes = await processCollection
         .find(processFilter)
         .sort({ startTime: -1 })
-        .limit(10) // Limit number of processes for temperature data
+        .limit(10) // Limit number of processes for temperature data (keep lower for performance)
         .toArray();
 
       processIds = processes.map((p: any) => new ObjectId(p._id.toString()));
@@ -60,15 +60,19 @@ export async function GET(request: NextRequest) {
     const temperatureLogs = await tempCollection
       .find(tempFilter)
       .sort({ timestamp: 1 })
-      .limit(1000) // Limit to prevent too much data
+      .limit(1000) // Support for long processes: 12h@1min = 720 readings, with safety margin
       .toArray();
 
     // Process temperature data for charts
     const chartData = temperatureLogs.map((log) => {
-      const sensorValues = Object.values(log.sensorData || {}).filter(
-        (value) => typeof value === 'number',
-      ) as number[];
+      // Only use the four main sensors: z0, z1, z2, z3
+      const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
+      const sensorValues = sensorKeys
+        .map((key) => log.sensorData?.[key])
+        .filter((value) => typeof value === 'number') as number[];
 
+      // Calculate average and round to one decimal place
+      // The division by 10 is for rounding: (avg * 10) rounded, then divided by 10 gives one decimal place
       const avgTemp =
         sensorValues.length > 0
           ? Math.round(
