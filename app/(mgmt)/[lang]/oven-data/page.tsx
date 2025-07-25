@@ -59,11 +59,8 @@ async function getOvenProcesses(
     endTimeLocaleString: item.endTime
       ? new Date(item.endTime).toLocaleString(lang)
       : '',
-    config: item.config
-      ? {
-          ...item.config,
-          expectedCompletion: new Date(item.config.expectedCompletion),
-        }
+    expectedCompletion: item.expectedCompletion
+      ? new Date(item.expectedCompletion)
       : undefined,
   }));
   return { fetchTimeLocaleString, fetchTime, data };
@@ -89,7 +86,11 @@ export default async function OvenDataPage(props: {
     <Card>
       <CardHeader>
         <CardTitle>Oven Data</CardTitle>
-        <OvenTableFilteringAndOptions ovens={ovens} fetchTime={fetchTime} />
+        <OvenTableFilteringAndOptions
+          ovens={ovens}
+          fetchTime={fetchTime}
+          lang={lang}
+        />
       </CardHeader>
       <CardContent>
         <OvenDataWithChart

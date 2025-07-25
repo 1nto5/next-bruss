@@ -11,12 +11,11 @@ export type OvenProcessDataType = {
   endTimeLocaleString: string;
   lastAvgTemp: number | null;
   duration?: number; // Duration in seconds for finished processes
-  config?: {
-    temp: number;
-    tempTolerance: number;
-    duration: number;
-    expectedCompletion: Date;
-  };
+  // Saved target values from config at time of process creation
+  targetTemp?: number;
+  tempTolerance?: number;
+  targetDuration?: number; // Duration in seconds
+  expectedCompletion?: Date;
 };
 
 export type OvenTemperatureLogType = {

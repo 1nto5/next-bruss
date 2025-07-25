@@ -20,24 +20,38 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
+import { Locale } from '@/i18n.config';
 import { cn } from '@/lib/cn';
-import { Check, ChevronsUpDown, CircleX, Loader, Search } from 'lucide-react';
+import {
+  Check,
+  ChevronsUpDown,
+  CircleX,
+  Loader,
+  RefreshCw,
+  Search,
+} from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateOvenTableData as revalidate } from '../actions';
+import {
+  revalidateOvenTableData,
+  revalidateOvenTemperatureData,
+} from '../actions';
 
 export default function OvenTableFilteringAndOptions({
   ovens,
   fetchTime,
+  lang,
 }: {
   ovens: string[];
   fetchTime: Date;
+  lang: Locale;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
+  const [isPendingRefresh, setIsPendingRefresh] = useState(false);
 
   // Determine if any filter is active in the URL
   const hasAnyFilter =
@@ -53,6 +67,7 @@ export default function OvenTableFilteringAndOptions({
 
   useEffect(() => {
     setIsPendingSearch(false);
+    setIsPendingRefresh(false);
   }, [fetchTime]);
 
   const [statusFilter, setStatusFilter] = useState(
@@ -106,7 +121,20 @@ export default function OvenTableFilteringAndOptions({
       router.push(newUrl);
     } else {
       setIsPendingSearch(true);
-      revalidate();
+      revalidateOvenTableData();
+    }
+  };
+
+  const handleRefreshClick = async () => {
+    setIsPendingRefresh(true);
+    try {
+      // Revalidate both table and temperature data
+      await revalidateOvenTableData();
+      await revalidateOvenTemperatureData();
+      // Refresh the current page to get updated data
+      router.refresh();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
     }
   };
 
@@ -132,6 +160,25 @@ export default function OvenTableFilteringAndOptions({
                 onCheckedChange={setShowFilters}
               />
               <Label htmlFor='show-filters'>Show filters</Label>
+            </div>
+            <div className='flex items-center space-x-2 sm:ml-auto'>
+              <span className='text-muted-foreground text-sm'>
+                Last updated: {fetchTime.toLocaleString(lang)}
+              </span>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={handleRefreshClick}
+                disabled={isPendingRefresh || isPendingSearch}
+              >
+                {isPendingRefresh ? (
+                  <Loader className='mr-1 h-4 w-4 animate-spin' />
+                ) : (
+                  <RefreshCw className='mr-1 h-4 w-4' />
+                )}
+                Refresh
+              </Button>
             </div>
           </div>
         </form>
@@ -339,7 +386,7 @@ export default function OvenTableFilteringAndOptions({
                 type='submit'
                 variant='secondary'
                 className='justify-start'
-                disabled={isPendingSearch}
+                disabled={isPendingSearch || isPendingRefresh}
               >
                 {isPendingSearch ? (
                   <>
@@ -357,7 +404,7 @@ export default function OvenTableFilteringAndOptions({
                 variant='destructive'
                 onClick={handleClearFilters}
                 title='Clear filters'
-                disabled={isPendingSearch}
+                disabled={isPendingSearch || isPendingRefresh}
               >
                 <CircleX className='mr-1' size={16} /> <span>Clear</span>
               </Button>

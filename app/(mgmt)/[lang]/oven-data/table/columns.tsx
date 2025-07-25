@@ -115,17 +115,18 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
     },
   },
   {
-    accessorKey: 'config',
+    accessorKey: 'targetTemp',
     header: 'Target Temp',
     cell: ({ row }) => {
-      const config = row.original.config;
-      if (!config) {
+      const targetTemp = row.original.targetTemp;
+      const tempTolerance = row.original.tempTolerance;
+      if (!targetTemp || !tempTolerance) {
         return <span className='text-gray-400'>-</span>;
       }
       return (
         <div>
-          <div>{config.temp}°C</div>
-          <div className='text-xs text-gray-500'>±{config.tempTolerance}°C</div>
+          <div>{targetTemp}°C</div>
+          <div className='text-xs text-gray-500'>±{tempTolerance}°C</div>
         </div>
       );
     },
