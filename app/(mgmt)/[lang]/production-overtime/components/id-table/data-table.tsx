@@ -22,8 +22,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, CircleX } from 'lucide-react';
 import * as React from 'react';
 
 interface DataTableProps<TData, TValue> {
@@ -94,70 +93,60 @@ export function DataTable<TData, TValue>({
   const hasActiveFilters =
     firstNameFilter || lastNameFilter || identifierFilter;
 
-  const shouldShowAddButton =
-    status &&
-    status !== 'closed' &&
-    status !== 'draft' &&
-    status !== 'rejected' &&
-    status !== 'canceled' &&
-    status !== 'completed' &&
-    status !== 'accounted';
-
   return (
     <>
       <CardContent>
-        <div className='mb-4 flex flex-wrap gap-2'>
-          <div>
-            <Input
-              placeholder='imie'
-              value={firstNameFilter}
-              onChange={(event) =>
-                table.getColumn('firstName')?.setFilterValue(event.target.value)
-              }
-              className='w-[150px]'
-            />
-          </div>
-          <div>
-            <Input
-              placeholder='nazwisko'
-              value={lastNameFilter}
-              onChange={(event) =>
-                table.getColumn('lastName')?.setFilterValue(event.target.value)
-              }
-              className='w-[150px]'
-            />
-          </div>
-          <div>
-            <Input
-              placeholder='nr pers.'
-              value={identifierFilter}
-              onChange={(event) =>
-                table
-                  .getColumn('identifier')
-                  ?.setFilterValue(event.target.value)
-              }
-              className='w-[150px]'
-            />
-          </div>
-          <div>
-            <Button
-              variant='destructive'
-              title='Clear filters'
-              onClick={clearFilters}
-              disabled={!hasActiveFilters}
-            >
-              <CircleX /> <span>Wyczyść</span>
-            </Button>
-          </div>
-          {shouldShowAddButton && (
+        <div className='mb-4'>
+          {/* Search fields and clear button in responsive grid */}
+          <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
             <div>
-              <Link href={`/production-overtime/${id}/add-day-off`}>
-                <Button variant='outline'>
-                  <AlarmClockPlus /> <span>Dodaj odbiór</span>
-                </Button>
-              </Link>
+              <Input
+                placeholder='imie'
+                value={firstNameFilter}
+                onChange={(event) =>
+                  table
+                    .getColumn('firstName')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-full'
+              />
             </div>
-          )}
+            <div>
+              <Input
+                placeholder='nazwisko'
+                value={lastNameFilter}
+                onChange={(event) =>
+                  table
+                    .getColumn('lastName')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-full'
+              />
+            </div>
+            <div>
+              <Input
+                placeholder='nr pers.'
+                value={identifierFilter}
+                onChange={(event) =>
+                  table
+                    .getColumn('identifier')
+                    ?.setFilterValue(event.target.value)
+                }
+                className='w-full'
+              />
+            </div>
+            <div>
+              <Button
+                variant='destructive'
+                title='Clear filters'
+                onClick={clearFilters}
+                disabled={!hasActiveFilters}
+                className='w-full'
+              >
+                <CircleX /> <span>Wyczyść</span>
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className='rounded-md border'>

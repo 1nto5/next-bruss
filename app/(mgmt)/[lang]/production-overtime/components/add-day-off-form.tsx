@@ -10,7 +10,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleX, Plus, Table } from 'lucide-react';
+import { ArrowLeft, CircleX, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -100,7 +100,7 @@ export default function AddDayOff({
           <CardTitle>Dodaj odbiór dnia wolnego</CardTitle>
           <Link href={`/production-overtime/${id}/employees`}>
             <Button variant='outline'>
-              <Table /> <span>Powrót do pracowników</span>
+              <ArrowLeft /> <span>Powrót do pracowników</span>
             </Button>
           </Link>
         </div>

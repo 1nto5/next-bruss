@@ -32,7 +32,7 @@ export default async function AddDayOffPage(props: {
   const status = overtimeRequestLocaleString.status;
 
   // Redirect if status is not valid for adding day off
-  if (status !== 'pending' && status !== 'approved') {
+  if (status !== 'pending' && status !== 'approved' && status !== 'forecast') {
     redirect(`/production-overtime/${id}`);
   }
 

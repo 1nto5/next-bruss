@@ -124,33 +124,37 @@ export default async function OvertimeDetailsPage(props: {
           <CardTitle className='mb-2 sm:mb-0'>
             {getStatusBadge(request.status)}
           </CardTitle>
-          <div className='flex flex-wrap justify-start space-x-2 sm:justify-end'>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* Download attachment button */}
             {request.hasAttachment && (
-              <Button variant='outline' asChild className='mb-2 sm:mb-0'>
-                <Link
-                  href={`/api/production-overtime/download?overTimeRequestId=${request._id}`}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
+              <Link
+                href={`/api/production-overtime/download?overTimeRequestId=${request._id}`}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='w-full sm:w-auto'
+              >
+                <Button variant='outline' className='w-full'>
                   <Download /> Lista obecności
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             )}
 
             {/* Manage employees button */}
-            <Button variant='outline' asChild className='mb-2 sm:mb-0'>
-              <Link href={`/production-overtime/${id}/employees`}>
-                <Users /> Pracownicy
-              </Link>
-            </Button>
+            <Link
+              href={`/production-overtime/${id}/employees`}
+              className='w-full sm:w-auto'
+            >
+              <Button variant='outline' className='w-full'>
+                <Users /> Obiór nadgodzin
+              </Button>
+            </Link>
 
             {/* Back to table button */}
-            <Button variant='outline' asChild className='mb-2 sm:mb-0'>
-              <Link href={`/production-overtime`}>
+            <Link href={`/production-overtime`} className='w-full sm:w-auto'>
+              <Button variant='outline' className='w-full'>
                 <TableIcon /> Zlecenia
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
         <CardDescription>ID: {request.internalId}</CardDescription>
@@ -249,6 +253,15 @@ export default async function OvertimeDetailsPage(props: {
                         <TableCell>{request.actualEmployeesWorked}</TableCell>
                       </TableRow>
                     )}
+
+                    <TableRow>
+                      <TableCell className='font-medium'>
+                        Pracownicy odbierający dni wolne:
+                      </TableCell>
+                      <TableCell>
+                        {request.employeesWithScheduledDayOff?.length || 0}
+                      </TableCell>
+                    </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
@@ -386,11 +399,14 @@ export default async function OvertimeDetailsPage(props: {
                           <CalendarClock className='mr-2 h-5 w-5' /> Pracownicy
                           odbierający dni wolne
                         </CardTitle>
-                        <Button variant='outline' asChild>
-                          <Link href={`/production-overtime/${id}/employees`}>
+                        <Link
+                          href={`/production-overtime/${id}/employees`}
+                          className='w-full sm:w-auto'
+                        >
+                          <Button variant='outline' className='w-full'>
                             <Users /> Zarządzaj
-                          </Link>
-                        </Button>
+                          </Button>
+                        </Link>
                       </div>
                     </CardHeader>
                     <CardContent>

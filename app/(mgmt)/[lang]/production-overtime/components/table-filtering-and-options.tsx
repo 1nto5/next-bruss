@@ -178,11 +178,11 @@ export default function TableFilteringAndOptions({
       {showFilters && (
         <CardContent className='p-4 pt-0'>
           <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-            <div className='flex flex-wrap items-start gap-2'>
+            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4'>
               <div className='flex flex-col space-y-1'>
                 <Label>Status</Label>
                 <Select onValueChange={setStatusFilter} value={statusFilter}>
-                  <SelectTrigger className='w-[150px]'>
+                  <SelectTrigger className='w-full'>
                     <SelectValue placeholder='wybierz' />
                   </SelectTrigger>
                   <SelectContent>
@@ -202,11 +202,11 @@ export default function TableFilteringAndOptions({
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setIdFilter(e.target.value)
                   }
-                  className='w-[150px]'
+                  className='w-full'
                 />
               </div>
               <div className='flex flex-col space-y-1'>
-                <Label>Termin</Label>
+                <Label>Termin zlecenia</Label>
                 <DateTimePicker
                   value={dateFilter}
                   onChange={setDateFilter}
@@ -218,6 +218,7 @@ export default function TableFilteringAndOptions({
                       format='dd/MM/yyyy'
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
+                      className='w-full'
                     />
                   )}
                 />
@@ -235,6 +236,7 @@ export default function TableFilteringAndOptions({
                       format='dd/MM/yyyy'
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
+                      className='w-full'
                     />
                   )}
                 />
@@ -242,11 +244,22 @@ export default function TableFilteringAndOptions({
             </div>
 
             {/* Row 2: Action buttons */}
-            <div className='flex flex-wrap gap-2'>
+            <div className='grid grid-cols-2 gap-2'>
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleClearFilters}
+                title='Clear filters'
+                disabled={isPendingSearch}
+                className='w-full justify-center'
+              >
+                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+              </Button>
+
               <Button
                 type='submit'
                 variant='secondary'
-                className='justify-start'
+                className='w-full justify-center'
                 disabled={isPendingSearch}
               >
                 {isPendingSearch ? (
@@ -259,16 +272,6 @@ export default function TableFilteringAndOptions({
                     <Search className='mr-1' size={16} /> <span>Szukaj</span>
                   </>
                 )}
-              </Button>
-
-              <Button
-                type='button'
-                variant='destructive'
-                onClick={handleClearFilters}
-                title='Clear filters'
-                disabled={isPendingSearch}
-              >
-                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
               </Button>
             </div>
           </form>

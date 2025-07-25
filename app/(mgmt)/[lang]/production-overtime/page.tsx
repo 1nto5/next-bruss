@@ -89,14 +89,20 @@ export default async function ProductionOvertimePage(props: {
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
-              <Link href='/production-overtime/new-request'>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
+              <Link
+                href='/production-overtime/new-request'
+                className='w-full sm:w-auto'
+              >
+                <Button variant={'outline'} className='w-full'>
                   <Plus /> <span>Nowe zlecenie</span>
                 </Button>
               </Link>
             ) : !session ? (
-              <Link href={`/auth?callbackUrl=/production-overtime`}>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
+              <Link
+                href={`/auth?callbackUrl=/production-overtime`}
+                className='w-full sm:w-auto'
+              >
+                <Button variant={'outline'} className='w-full'>
                   <KeyRound /> <span>Zaloguj się</span>
                 </Button>
               </Link>

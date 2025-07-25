@@ -1,8 +1,13 @@
 // import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { ArrowLeft, Table } from 'lucide-react';
+import { AlarmClockPlus, ArrowLeft, Table } from 'lucide-react';
 import Link from 'next/link';
 import { columns } from '../../components/id-table/columns';
 import { DataTable } from '../../components/id-table/data-table';
@@ -18,29 +23,48 @@ export default async function ProductionOvertimePage(props: {
   let overtimeRequestLocaleString;
   ({ overtimeRequestLocaleString } = await getOvertimeRequest(lang, id));
 
+  const shouldShowAddButton =
+    overtimeRequestLocaleString.status &&
+    overtimeRequestLocaleString.status !== 'completed' &&
+    overtimeRequestLocaleString.status !== 'canceled' &&
+    overtimeRequestLocaleString.status !== 'accounted';
+
   return (
     <Card>
-      <CardHeader>
-        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            Pracownicy odbierający nadgodziny w zleceniu wykonania pracy w
-            godzinach nadliczbowych - produkcja
-          </CardTitle>
-          <div className='flex flex-wrap gap-2'>
-            <Link href={`/production-overtime/${id}`}>
-              <Button variant='outline'>
+      <CardHeader className='pb-2'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div>
+            <CardTitle>Pracownicy odbierający nadgodziny</CardTitle>
+            <CardDescription>
+              ID zlecenia: {overtimeRequestLocaleString.internalId}
+            </CardDescription>
+          </div>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <Link
+              href={`/production-overtime/${id}`}
+              className='w-full sm:w-auto'
+            >
+              <Button variant='outline' className='w-full'>
                 <ArrowLeft /> <span>Szczegóły zlecenia</span>
               </Button>
             </Link>
-            <Link href={`/production-overtime`}>
-              <Button variant='outline'>
+            {shouldShowAddButton && (
+              <Link
+                href={`/production-overtime/${id}/add-day-off`}
+                className='w-full sm:w-auto'
+              >
+                <Button variant='outline' className='w-full'>
+                  <AlarmClockPlus /> <span>Dodaj odbiór</span>
+                </Button>
+              </Link>
+            )}
+            <Link href={`/production-overtime`} className='w-full sm:w-auto'>
+              <Button variant='outline' className='w-full'>
                 <Table /> <span>Zlecenia</span>
               </Button>
             </Link>
           </div>
         </div>
-
-        {/* <CardDescription>ID: {id}</CardDescription> */}
       </CardHeader>
 
       <DataTable
