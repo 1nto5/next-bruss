@@ -53,7 +53,7 @@ export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
     header: 'Pallet time',
   },
   {
-    accessorKey: 'rework_reason',
+    accessorKey: 'reworkReason',
     header: 'Rework reason',
   },
   {

@@ -10,7 +10,7 @@ export type DmcType = {
   hydra_time?: string;
   pallet_batch?: string;
   pallet_time?: string;
-  rework_reason?: string;
+  reworkReason?: string;
   rework_time?: string;
 };
 
