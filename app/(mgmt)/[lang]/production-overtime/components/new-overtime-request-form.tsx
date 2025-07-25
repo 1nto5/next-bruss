@@ -188,13 +188,45 @@ export default function NewOvertimeRequestForm({
                   <FormControl>
                     <DateTimePicker
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={(date) => {
+                        field.onChange(date);
+                        // Check if start date is later than end date
+                        const currentEndDate = form.getValues('to');
+                        if (date && currentEndDate && date > currentEndDate) {
+                          // Set end date to same day as start date, keeping the time
+                          const newEndDate = new Date(date);
+                          newEndDate.setHours(currentEndDate.getHours());
+                          newEndDate.setMinutes(currentEndDate.getMinutes());
+                          newEndDate.setSeconds(currentEndDate.getSeconds());
+                          form.setValue('to', newEndDate);
+                        }
+                      }}
                       min={new Date(Date.now() + 8 * 3600 * 1000)}
                       timePicker={{ hour: true, minute: true, second: false }}
                       renderTrigger={({ value, setOpen, open }) => (
                         <DateTimeInput
                           value={value}
-                          onChange={field.onChange}
+                          onChange={(date) => {
+                            field.onChange(date);
+                            // Check if start date is later than end date
+                            const currentEndDate = form.getValues('to');
+                            if (
+                              date &&
+                              currentEndDate &&
+                              date > currentEndDate
+                            ) {
+                              // Set end date to same day as start date, keeping the time
+                              const newEndDate = new Date(date);
+                              newEndDate.setHours(currentEndDate.getHours());
+                              newEndDate.setMinutes(
+                                currentEndDate.getMinutes(),
+                              );
+                              newEndDate.setSeconds(
+                                currentEndDate.getSeconds(),
+                              );
+                              form.setValue('to', newEndDate);
+                            }
+                          }}
                           format='dd/MM/yyyy HH:mm'
                           onCalendarClick={() => setOpen(!open)}
                         />
