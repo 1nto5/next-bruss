@@ -109,6 +109,13 @@ export async function POST(req: NextRequest) {
     const files = form.getAll('files') as File[];
     const overTimeRequestId = form.get('overTimeRequestId') as string | null;
     const mergeFiles = form.get('mergeFiles') === 'true';
+    const actualArticlesStr = form.get('actualArticles') as string | null;
+    const actualArticles = actualArticlesStr
+      ? JSON.parse(actualArticlesStr)
+      : undefined;
+    const actualEmployeesWorked = form.get('actualEmployeesWorked')
+      ? parseInt(form.get('actualEmployeesWorked') as string)
+      : undefined;
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: 'No files' }, { status: 400 });
@@ -270,6 +277,10 @@ export async function POST(req: NextRequest) {
             completedBy: session.user.email,
             editedAt: new Date(),
             editedBy: session.user.email,
+            ...(actualArticles !== undefined && { actualArticles }),
+            ...(actualEmployeesWorked !== undefined && {
+              actualEmployeesWorked,
+            }),
           },
         },
       );

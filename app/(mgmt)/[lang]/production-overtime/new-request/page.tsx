@@ -4,7 +4,11 @@ import { getUsers } from '@/lib/get-users';
 import { redirect } from 'next/navigation';
 import NewOvertimeRequestForm from '../components/new-overtime-request-form';
 
-export default async function AddDeviationPage() {
+export default async function AddDeviationPage(props: {
+  params: Promise<{ lang: string }>;
+}) {
+  const params = await props.params;
+  const { lang } = params;
   const employees = await getEmployees();
   const users = await getUsers();
   const session = await auth();

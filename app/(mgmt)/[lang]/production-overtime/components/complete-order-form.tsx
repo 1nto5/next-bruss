@@ -2,13 +2,12 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -19,18 +18,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Paperclip, X } from 'lucide-react';
+import { CheckCircle, Table, X } from 'lucide-react';
 import { Session } from 'next-auth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateProductionOvertime as revalidate } from '../actions';
-import { OvertimeStatus } from '../lib/types';
+import { OvertimeType } from '../lib/types';
 import {
   MultipleAttachmentFormSchema,
   MultipleAttachmentFormType,
 } from '../lib/zod';
+import { MultiArticleManager } from './multi-article-manager';
 
 // Update the attachment roles to match the specified requirements
 const ATTACHMENT_ROLES = [
@@ -40,33 +43,29 @@ const ATTACHMENT_ROLES = [
   'hr',
 ] as const;
 
-interface AddAttachmentDialogProps {
+interface CompleteOrderFormProps {
   id: string;
-  status: OvertimeStatus;
-  owner: string | undefined | null;
-  responsibleEmployee: string | undefined | null;
   session: Session | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  overtimeRequest: OvertimeType;
 }
 
-export default function AddAttachmentDialog({
+export default function CompleteOrderForm({
   id,
-  owner,
-  responsibleEmployee,
   session,
-  isOpen,
-  onOpenChange,
-}: AddAttachmentDialogProps) {
+  overtimeRequest,
+}: CompleteOrderFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const form = useForm<MultipleAttachmentFormType>({
     resolver: zodResolver(MultipleAttachmentFormSchema),
     defaultValues: {
       files: [],
       mergeFiles: true,
+      actualArticles: overtimeRequest.plannedArticles || [],
+      actualEmployeesWorked: undefined,
     },
   });
 
@@ -103,11 +102,11 @@ export default function AddAttachmentDialog({
 
     // Check if user is the request owner, responsible employee, or has one of the allowed roles
     const canAddAttachment =
-      userRoles.some((role) =>
+      userRoles.some((role: string) =>
         ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
       ) ||
-      userEmail === owner ||
-      userEmail === responsibleEmployee;
+      userEmail === overtimeRequest.requestedBy ||
+      userEmail === overtimeRequest.responsibleEmployee;
 
     if (!canAddAttachment) {
       toast.error('Nie masz uprawnień do dodania listy obecności.');
@@ -120,7 +119,6 @@ export default function AddAttachmentDialog({
       return;
     }
 
-    onOpenChange(false);
     setIsUploading(true);
 
     toast.promise(
@@ -135,6 +133,20 @@ export default function AddAttachmentDialog({
 
           formData.append('overTimeRequestId', id);
           formData.append('mergeFiles', data.mergeFiles.toString());
+
+          // Add the actual articles data
+          if (data.actualArticles && data.actualArticles.length > 0) {
+            formData.append(
+              'actualArticles',
+              JSON.stringify(data.actualArticles),
+            );
+          }
+          if (data.actualEmployeesWorked !== undefined) {
+            formData.append(
+              'actualEmployeesWorked',
+              data.actualEmployeesWorked.toString(),
+            );
+          }
 
           const response = await fetch('/api/production-overtime/upload', {
             method: 'POST',
@@ -163,6 +175,9 @@ export default function AddAttachmentDialog({
 
             // Ensure we revalidate the data
             await revalidate();
+
+            // Navigate back to the production overtime list
+            router.push(`/production-overtime`);
             resolve();
           } else {
             const errorMap: { [key: string]: string } = {
@@ -207,7 +222,7 @@ export default function AddAttachmentDialog({
         loading: 'Przesyłanie plików...',
         success: (data) => {
           const count = selectedFiles.length;
-          return `${count} ${count === 1 ? 'plik przesłany oraz przekonwertowany do PDF' : 'pliki przesłane oraz scalone do pliku PDF'} pomyślnie! Status zlecenia zmieniony na ukończony.`;
+          return `Zlecenie zamknięte pomyślnie! ${count} ${count === 1 ? 'plik przesłany oraz przekonwertowany do PDF' : 'pliki przesłane oraz scalone do pliku PDF'}. Status zlecenia zmieniony na ukończony.`;
         },
         error: (err) => err.message,
       },
@@ -215,18 +230,28 @@ export default function AddAttachmentDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
-        <DialogHeader>
-          <DialogTitle>Dodaj listę obecności</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          Dodanie listy obecności jest równoznaczne z potwierdzeniem wykonania
-          zlecenia oraz zmieni jego status na ukończony. Możesz przesłać wiele
-          plików jednocześnie.
-        </DialogDescription>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+    <Card className='sm:w-[768px]'>
+      <CardHeader>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
+          <CardTitle>Zamykanie zlecenia</CardTitle>
+          <Link href={`/production-overtime`}>
+            <Button variant='outline'>
+              <Table /> <span>Powrót do listy zleceń</span>
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <Separator className='mb-4' />
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className='space-y-6'>
+            <p className='text-muted-foreground text-sm'>
+              Zamykanie zlecenia obejmuje przesłanie listy obecności oraz
+              podanie rzeczywistej liczby pracowników i wyprodukowanych
+              artykułów. Po zamknięciu status zlecenia zmieni się na ukończony.
+            </p>
+
             <FormField
               control={form.control}
               name='files'
@@ -282,18 +307,67 @@ export default function AddAttachmentDialog({
               </div>
             )}
 
-            <DialogFooter className='mt-4'>
-              <Button
-                type='submit'
-                disabled={isUploading || selectedFiles.length === 0}
-              >
-                <Paperclip className={isUploading ? 'animate-spin' : 'mr-2'} />
-                Dodaj {selectedFiles.length === 1 ? 'plik' : 'pliki'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+            {/* Actual results fields */}
+            <FormField
+              control={form.control}
+              name='actualArticles'
+              render={({ field }) => (
+                <>
+                  <MultiArticleManager
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    label='Zrealizowana produkcja'
+                    initialValues={overtimeRequest.plannedArticles || []}
+                  />
+                  <FormMessage />
+                </>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='actualEmployeesWorked'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Rzeczywista liczba pracowników (planowano:{' '}
+                    {overtimeRequest.numberOfEmployees})
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={0}
+                      step={1}
+                      {...field}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === ''
+                            ? undefined
+                            : parseInt(e.target.value);
+                        field.onChange(value);
+                      }}
+                      value={field.value || ''}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <Separator className='mb-4' />
+
+          <CardFooter className='flex justify-end'>
+            <Button
+              type='submit'
+              disabled={isUploading || selectedFiles.length === 0}
+              className='w-full sm:w-auto'
+            >
+              <CheckCircle className={isUploading ? 'animate-spin' : ''} />
+              Zamknij zlecenie
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
   );
 }

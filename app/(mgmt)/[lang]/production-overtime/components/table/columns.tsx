@@ -9,29 +9,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useClientLocaleString } from '@/lib/client-date-utils';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import {
+  ArrowUpDown,
   CalendarClock,
   Check,
+  CheckCircle,
   Download,
+  FileText,
   MoreHorizontal,
-  Paperclip,
   X,
 } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
 import { OvertimeType } from '../../lib/types';
-import AddAttachmentDialog from '../add-attachment-dialog';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 
-// Creating a columns factory function that takes the session
+// Creating a columns factory function that takes the session and language
 export const createColumns = (
   session: Session | null,
+  lang?: string,
 ): ColumnDef<OvertimeType>[] => {
   // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
@@ -98,6 +99,42 @@ export const createColumns = (
       enableHiding: false,
     },
     {
+      accessorKey: 'internalId',
+      header: ({ column }) => (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          ID
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const internalId = row.getValue('internalId') as string;
+        return <div>{internalId}</div>;
+      },
+      enableSorting: true,
+      sortingFn: (rowA, rowB, columnId) => {
+        const aValue = rowA.getValue(columnId) as string;
+        const bValue = rowB.getValue(columnId) as string;
+
+        if (!aValue || !bValue) return 0;
+
+        // Extract number part from ID format "N/YY"
+        const aMatch = aValue.match(/^(\d+)\//);
+        const bMatch = bValue.match(/^(\d+)\//);
+
+        if (aMatch && bMatch) {
+          const aNum = parseInt(aMatch[1], 10);
+          const bNum = parseInt(bMatch[1], 10);
+          return aNum - bNum;
+        }
+
+        // Fallback to string comparison
+        return aValue.localeCompare(bValue);
+      },
+    },
+    {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
@@ -105,6 +142,13 @@ export const createColumns = (
         let statusLabel;
 
         switch (status) {
+          case 'forecast':
+            statusLabel = (
+              <Badge variant='statusForecast' className='text-nowrap'>
+                Forecast
+              </Badge>
+            );
+            break;
           case 'pending':
             statusLabel = (
               <Badge variant='statusPending' className='text-nowrap'>
@@ -137,8 +181,7 @@ export const createColumns = (
       cell: ({ row }) => {
         const request = row.original;
         // State to control the attachment dialog
-        const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] =
-          useState(false);
+
         // State to control the cancel dialog
         const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
         // State to control the mark as accounted dialog
@@ -209,9 +252,19 @@ export const createColumns = (
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
+                {/* View Details - always available */}
+                <Link href={`/production-overtime/${request._id}`}>
+                  <DropdownMenuItem>
+                    <FileText className='mr-2 h-4 w-4' />
+                    <span>Szczegóły zlecenia</span>
+                  </DropdownMenuItem>
+                </Link>
+
                 {request.status !== 'canceled' && (
                   <>
-                    <Link href={`/production-overtime/${request._id}`}>
+                    <Link
+                      href={`/production-overtime/${request._id}/employees`}
+                    >
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
                         <span>Odbiór nadgodzin</span>
@@ -263,15 +316,12 @@ export const createColumns = (
 
                 {/* Add attachment button - only for approved orders and authorized users */}
                 {hasAddAttachmentAction && (
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setIsAttachmentDialogOpen(true);
-                    }}
-                  >
-                    <Paperclip className='mr-2 h-4 w-4' />
-                    <span>Dodaj listę obecności</span>
-                  </DropdownMenuItem>
+                  <Link href={`/production-overtime/${request._id}/complete`}>
+                    <DropdownMenuItem>
+                      <CheckCircle className='mr-2 h-4 w-4' />
+                      <span>Zamknij zlecenie</span>
+                    </DropdownMenuItem>
+                  </Link>
                 )}
 
                 {/* Download attachment button - show if attachment exists */}
@@ -293,15 +343,6 @@ export const createColumns = (
             {/* Dialog outside of DropdownMenuContent */}
             {request._id && (
               <>
-                <AddAttachmentDialog
-                  id={request._id}
-                  status={request.status}
-                  owner={request.requestedBy}
-                  responsibleEmployee={request.responsibleEmployee}
-                  session={session}
-                  isOpen={isAttachmentDialogOpen}
-                  onOpenChange={setIsAttachmentDialogOpen}
-                />
                 <CancelRequestDialog
                   isOpen={isCancelDialogOpen}
                   onOpenChange={setIsCancelDialogOpen}
@@ -326,30 +367,44 @@ export const createColumns = (
       },
     },
     {
-      accessorKey: 'approved',
-      header: 'Data zatwierdzenia',
+      id: 'period',
+      header: 'Data',
       cell: ({ row }) => {
-        const approvedAt = row.original.approvedAt;
-        const approvedAtString = useClientLocaleString(approvedAt);
-        return <div>{approvedAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'fromLocaleString',
-      header: 'Od',
-      cell: ({ row }) => {
-        const from = row.original.from;
-        const fromString = useClientLocaleString(from);
-        return <div>{fromString}</div>;
-      },
-    },
-    {
-      accessorKey: 'toLocaleString',
-      header: 'Do',
-      cell: ({ row }) => {
-        const to = row.original.to;
-        const toString = useClientLocaleString(to);
-        return <div>{toString}</div>;
+        const from = new Date(row.original.from);
+        const to = new Date(row.original.to);
+
+        const fromDate = from.toLocaleDateString('pl-PL');
+        const toDate = to.toLocaleDateString('pl-PL');
+
+        // Check if it's the same day
+        if (fromDate === toDate) {
+          return <div className='text-sm'>{fromDate}</div>;
+        }
+
+        // Check if it's consecutive days in the same month/year
+        const fromDay = from.getDate();
+        const toDay = to.getDate();
+        const sameMonth =
+          from.getMonth() === to.getMonth() &&
+          from.getFullYear() === to.getFullYear();
+
+        if (sameMonth && toDay === fromDay + 1) {
+          const month = (from.getMonth() + 1).toString().padStart(2, '0');
+          const year = from.getFullYear();
+          return (
+            <div className='text-sm'>
+              {fromDay}-{toDay}.{month}.{year}
+            </div>
+          );
+        }
+
+        // Different dates, show full range with hyphen
+        return (
+          <div className='text-sm'>
+            <div>{fromDate}</div>
+            <div className='text-muted-foreground'>- {toDate}</div>
+          </div>
+        );
       },
     },
     {
@@ -358,14 +413,6 @@ export const createColumns = (
       cell: ({ row }) => {
         const numberOfEmployees = row.getValue('numberOfEmployees') as number;
         return <div>{numberOfEmployees || 0}</div>;
-      },
-    },
-    {
-      accessorKey: 'numberOfShifts',
-      header: 'Liczba zmian',
-      cell: ({ row }) => {
-        const numberOfShifts = row.getValue('numberOfShifts') as number;
-        return <div>{numberOfShifts || 1}</div>;
       },
     },
     {
@@ -391,19 +438,13 @@ export const createColumns = (
       },
     },
     {
-      accessorKey: 'employeesWithScheduledDayOff',
-      header: 'Odbiór dnia wolnego',
-      cell: ({ row }) => {
-        const employees = row.getValue('employeesWithScheduledDayOff');
-        return <div>{Array.isArray(employees) ? employees.length : 0}</div>;
-      },
-    },
-    {
       accessorKey: 'reason',
       header: 'Uzasadnienie',
       cell: ({ row }) => {
-        const reason = row.getValue('reason');
-        return <div className='w-[250px] text-justify'>{reason as string}</div>;
+        const reason = row.getValue('reason') as string;
+        const truncated =
+          reason.length > 80 ? reason.substring(0, 80) + '...' : reason;
+        return <div className='w-[200px] text-justify'>{truncated}</div>;
       },
     },
     {
@@ -429,109 +470,6 @@ export const createColumns = (
             {extractNameFromEmail(requestedBy as string)}
           </div>
         );
-      },
-    },
-    {
-      accessorKey: 'requestedAtLocaleString',
-      header: 'Data wystawienia',
-      cell: ({ row }) => {
-        const requestedAt = row.original.requestedAt;
-        const requestedAtString = useClientLocaleString(requestedAt);
-        return <div>{requestedAtString}</div>;
-      },
-    },
-
-    {
-      accessorKey: 'editedBy',
-      header: 'Ostatnia modyfikacja przez',
-      cell: ({ row }) => {
-        const editedBy = row.original.editedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {editedBy ? extractNameFromEmail(editedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'editedAtLocaleString',
-      header: 'Data modyfikacji',
-      cell: ({ row }) => {
-        const editedAt = row.original.editedAt;
-        const editedAtString = useClientLocaleString(editedAt);
-        return <div>{editedAtString}</div>;
-      },
-    },
-
-    {
-      accessorKey: 'completedBy',
-      header: 'Lista obecności dodana przez',
-      cell: ({ row }) => {
-        const completedBy = row.original.completedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {completedBy ? extractNameFromEmail(completedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'completedAtLocaleString',
-      header: 'Data dodania listy obecności',
-      cell: ({ row }) => {
-        const completedAt = row.original.completedAt;
-        const completedAtString = useClientLocaleString(completedAt);
-        return <div>{completedAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'accountedBy',
-      header: 'Rozliczone przez',
-      cell: ({ row }) => {
-        const accountedBy = row.original.accountedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {accountedBy ? extractNameFromEmail(accountedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'accountedAtLocaleString',
-      header: 'Data rozliczenia',
-      cell: ({ row }) => {
-        const accountedAt = row.original.accountedAt;
-        const accountedAtString = useClientLocaleString(accountedAt);
-        return <div>{accountedAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'canceledBy',
-      header: 'Anulowane przez',
-      cell: ({ row }) => {
-        const canceledBy = row.original.canceledBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {canceledBy ? extractNameFromEmail(canceledBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'canceledAtLocaleString',
-      header: 'Data anulowania',
-      cell: ({ row }) => {
-        const canceledAt = row.original.canceledAt;
-        const canceledAtString = useClientLocaleString(canceledAt);
-        return <div>{canceledAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'note',
-      header: 'Dod. info.',
-      cell: ({ row }) => {
-        const note = row.getValue('note');
-        return <div className='w-[250px] text-justify'>{note as string}</div>;
       },
     },
   ];

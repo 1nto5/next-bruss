@@ -33,6 +33,11 @@ export async function GET(req: NextRequest) {
     if (key === 'status') {
       query.status = value;
     }
+
+    if (key === 'id') {
+      // Search for internalId that contains the search term (case insensitive)
+      query.internalId = { $regex: value, $options: 'i' };
+    }
   });
 
   if (searchParams.has('requestedAt')) {

@@ -42,6 +42,9 @@ const badgeVariants = cva(
         // New variant for 'cancelled' status
         statusCancelled:
           'border-transparent bg-gray-100 text-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
+        // New variant for 'forecast' status
+        statusForecast:
+          'border-transparent bg-sky-100 text-sky-800 hover:bg-sky-100 dark:bg-sky-800 dark:text-sky-200 dark:hover:bg-sky-700',
       },
       size: {
         default: 'px-2.5 py-0.5 text-xs',

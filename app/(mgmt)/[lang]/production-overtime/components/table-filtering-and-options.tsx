@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -43,7 +44,8 @@ export default function TableFilteringAndOptions({
     return !!(
       searchParams?.get('date') ||
       searchParams?.get('requestedAtFilter') ||
-      searchParams?.get('status')
+      searchParams?.get('status') ||
+      searchParams?.get('id')
     );
   });
 
@@ -70,11 +72,13 @@ export default function TableFilteringAndOptions({
   const [statusFilter, setStatusFilter] = useState(
     searchParams?.get('status') || '',
   );
+  const [idFilter, setIdFilter] = useState(searchParams?.get('id') || '');
 
   const handleClearFilters = () => {
     setDateFilter(undefined);
     setRequestedAtFilter(undefined);
     setStatusFilter('');
+    setIdFilter('');
     setShowOnlyMine(false);
     setShowOnlyResponsible(false);
     if (searchParams?.toString()) {
@@ -91,6 +95,7 @@ export default function TableFilteringAndOptions({
       if (requestedAtFilter)
         params.set('requestedAt', requestedAtFilter.toISOString());
       if (statusFilter) params.set('status', statusFilter);
+      if (idFilter) params.set('id', idFilter);
       if (showOnlyMine) params.set('requestedBy', userEmail || '');
       if (showOnlyResponsible)
         params.set('responsibleEmployee', userEmail || '');
@@ -181,6 +186,7 @@ export default function TableFilteringAndOptions({
                     <SelectValue placeholder='wybierz' />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value='forecast'>Forecast</SelectItem>
                     <SelectItem value='pending'>Oczekuje</SelectItem>
                     <SelectItem value='approved'>Zatwierdzone</SelectItem>
                     <SelectItem value='canceled'>Anulowane</SelectItem>
@@ -188,6 +194,16 @@ export default function TableFilteringAndOptions({
                     <SelectItem value='accounted'>Rozliczone</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>ID</Label>
+                <Input
+                  value={idFilter}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setIdFilter(e.target.value)
+                  }
+                  className='w-[150px]'
+                />
               </div>
               <div className='flex flex-col space-y-1'>
                 <Label>Termin</Label>

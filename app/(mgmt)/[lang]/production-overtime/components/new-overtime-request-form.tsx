@@ -63,6 +63,7 @@ import {
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { NewOvertimeRequestSchema } from '../lib/zod';
+import { MultiArticleManager } from './multi-article-manager';
 
 export default function NewOvertimeRequestForm({
   employees,
@@ -108,6 +109,7 @@ export default function NewOvertimeRequestForm({
       from: nextSaturdayFrom,
       to: nextSaturdayTo,
       reason: '',
+      plannedArticles: [],
     },
   });
 
@@ -158,7 +160,7 @@ export default function NewOvertimeRequestForm({
           </CardTitle>
           <Link href='/production-overtime'>
             <Button variant='outline'>
-              <Table /> <span>Tabela zleceń</span>
+              <Table /> <span>Zlecenia</span>
             </Button>
           </Link>
         </div>
@@ -410,6 +412,21 @@ export default function NewOvertimeRequestForm({
                   </FormControl>
                   <FormMessage />
                 </FormItem>
+              )}
+            />
+
+            {/* New forecasting fields */}
+            <FormField
+              control={form.control}
+              name='plannedArticles'
+              render={({ field }) => (
+                <>
+                  <MultiArticleManager
+                    value={field.value || []}
+                    onChange={field.onChange}
+                  />
+                  <FormMessage />
+                </>
               )}
             />
 

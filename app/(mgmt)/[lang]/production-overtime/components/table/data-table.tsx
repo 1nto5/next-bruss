@@ -29,17 +29,22 @@ import { Session } from 'next-auth';
 import BulkActions from '../bulk-actions';
 
 interface DataTableProps<TData, TValue> {
-  columns: (session: Session | null) => ColumnDef<TData, TValue>[];
+  columns: (
+    session: Session | null,
+    lang?: string,
+  ) => ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
   session: Session | null;
+  lang?: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   session,
+  lang,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -47,10 +52,10 @@ export function DataTable<TData, TValue>({
   );
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
-  // Use the session to create the columns
+  // Use the session and lang to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session),
-    [columns, session],
+    () => columns(session, lang),
+    [columns, session, lang],
   );
 
   const table = useReactTable({

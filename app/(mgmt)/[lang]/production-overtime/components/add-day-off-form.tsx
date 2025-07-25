@@ -98,9 +98,9 @@ export default function AddDayOff({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>Dodaj odbiór dnia wolnego</CardTitle>
-          <Link href={`/production-overtime/${id}`}>
+          <Link href={`/production-overtime/${id}/employees`}>
             <Button variant='outline'>
-              <Table /> <span>Powrót do zlecenia</span>
+              <Table /> <span>Powrót do pracowników</span>
             </Button>
           </Link>
         </div>

@@ -116,6 +116,7 @@ export default async function ProductionOvertimePage(props: {
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
         session={session}
+        lang={lang}
       />
     </Card>
   );

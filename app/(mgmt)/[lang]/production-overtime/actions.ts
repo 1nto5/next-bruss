@@ -17,12 +17,53 @@ export async function revalidateProductionOvertimeRequest() {
   revalidateTag('production-overtime-request');
 }
 
+// Helper function to generate the next internal ID
+async function generateNextInternalId(): Promise<string> {
+  try {
+    const collection = await dbc('production_overtime');
+    const currentYear = new Date().getFullYear();
+    const shortYear = currentYear.toString().slice(-2);
+
+    // Regex to match and extract the numeric part of IDs like "123/25"
+    const yearRegex = new RegExp(`^(\\d+)\/${shortYear}$`);
+
+    // Fetch all overtime internalIds for the current year.
+    // We only need the internalId field for this operation.
+    const overtimeThisYear = await collection
+      .find(
+        { internalId: { $regex: `\/${shortYear}$` } }, // Filter for IDs ending with "/YY"
+        { projection: { internalId: 1 } }, // Only fetch the internalId field
+      )
+      .toArray();
+
+    let maxNumber = 0;
+    for (const doc of overtimeThisYear) {
+      if (doc.internalId) {
+        const match = doc.internalId.match(yearRegex);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      }
+    }
+
+    const nextNumber = maxNumber + 1;
+    return `${nextNumber}/${shortYear}`;
+  } catch (error) {
+    console.error('Failed to generate internal ID:', error);
+    // Fallback to a timestamp-based ID if there's an error.
+    return `${Date.now()}/${new Date().getFullYear().toString().slice(-2)}`;
+  }
+}
+
 export async function redirectToProductionOvertime() {
   redirect('/production-overtime');
 }
 
 export async function redirectToProductionOvertimeDaysOff(id: string) {
-  redirect(`/production-overtime/${id}`);
+  redirect(`/production-overtime/${id}/employees`);
 }
 
 async function sendEmailNotificationToRequestor(email: string, id: string) {
@@ -91,8 +132,19 @@ export async function insertOvertimeRequest(
   try {
     const coll = await dbc('production_overtime');
 
+    // Generate internal ID
+    const internalId = await generateNextInternalId();
+
+    // Determine status based on date
+    const today = new Date();
+    const sevenDaysFromNow = new Date(
+      today.getTime() + 7 * 24 * 60 * 60 * 1000,
+    );
+    const status = data.from > sevenDaysFromNow ? 'forecast' : 'pending';
+
     const overtimeRequestToInsert = {
-      status: 'pending',
+      internalId,
+      status,
       ...data,
       requestedAt: new Date(),
       requestedBy: session.user.email,

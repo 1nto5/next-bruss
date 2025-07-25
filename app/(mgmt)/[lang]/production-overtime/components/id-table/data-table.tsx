@@ -48,7 +48,10 @@ export function DataTable<TData, TValue>({
     status &&
     status !== 'closed' &&
     status !== 'draft' &&
-    status !== 'rejected';
+    status !== 'rejected' &&
+    status !== 'canceled' &&
+    status !== 'completed' &&
+    status !== 'accounted';
 
   // Filter out the actions column if status doesn't allow it
   const filteredColumns = React.useMemo(() => {
@@ -95,7 +98,10 @@ export function DataTable<TData, TValue>({
     status &&
     status !== 'closed' &&
     status !== 'draft' &&
-    status !== 'rejected';
+    status !== 'rejected' &&
+    status !== 'canceled' &&
+    status !== 'completed' &&
+    status !== 'accounted';
 
   return (
     <>

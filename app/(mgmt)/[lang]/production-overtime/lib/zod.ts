@@ -1,5 +1,15 @@
 import * as z from 'zod';
 
+const ArticleQuantitySchema = z.object({
+  articleNumber: z
+    .string()
+    .nonempty({ message: 'Numer artykułu jest wymagany!' }),
+  quantity: z
+    .number()
+    .int({ message: 'Ilość musi być liczbą całkowitą!' })
+    .min(1, { message: 'Ilość musi być większa od 0!' }),
+});
+
 export const NewOvertimeRequestSchema = z
   .object({
     numberOfEmployees: z
@@ -31,6 +41,8 @@ export const NewOvertimeRequestSchema = z
     to: z.date({ message: 'Wybierz datę zakończenia!' }),
     reason: z.string().nonempty({ message: 'Nie wprowadzono uzasadnienia!' }),
     note: z.string().optional(),
+    // New field for multiple articles
+    plannedArticles: z.array(ArticleQuantitySchema).optional().default([]),
   })
   .refine((data) => data.from >= new Date(), {
     message: 'Rozpoczęcie nie może być w przeszłości!',
@@ -85,6 +97,20 @@ export const NewOvertimeRequestSchema = z
 
 export type NewOvertimeRequestType = z.infer<typeof NewOvertimeRequestSchema>;
 
+// Schema for completion/attendance upload with new fields
+export const AttendanceCompletionSchema = z.object({
+  actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
+  actualEmployeesWorked: z
+    .number()
+    .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
+    .min(0, { message: 'Liczba pracowników nie może być ujemna!' })
+    .optional(),
+});
+
+export type AttendanceCompletionType = z.infer<
+  typeof AttendanceCompletionSchema
+>;
+
 export const AttachmentFormSchema = z.object({
   file: z
     .instanceof(File, { message: 'Plik jest wymagany!' })
@@ -116,6 +142,12 @@ export const MultipleAttachmentFormSchema = z.object({
       { message: 'Łączny rozmiar plików przekracza 50MB!' },
     ),
   mergeFiles: z.boolean().default(true),
+  actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
+  actualEmployeesWorked: z
+    .number()
+    .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
+    .min(0, { message: 'Liczba pracowników nie może być ujemna!' })
+    .optional(),
 });
 
 export type MultipleAttachmentFormType = z.infer<
