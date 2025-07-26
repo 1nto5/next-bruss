@@ -1,0 +1,91 @@
+# API Routes & Server Actions
+
+## API Route Organization
+
+- Organize API routes by feature under `app/api/`
+- Use RESTful conventions for route naming
+- Group related endpoints in folders
+
+```
+api/
+├── feature-name/
+│   ├── route.ts           # Main CRUD operations
+│   ├── config/
+│   │   └── route.ts       # Configuration endpoints
+│   └── [id]/
+│       └── route.ts       # Dynamic route operations
+```
+
+## Route Handler Structure
+
+```tsx
+// app/api/example/route.ts
+export async function GET(request: Request) {
+  try {
+    // Implementation
+    return Response.json(data)
+  } catch (error) {
+    return Response.json({ error: 'Message' }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    // Validate with Zod schema
+    const validated = schema.parse(body)
+    // Implementation
+    return Response.json(result)
+  } catch (error) {
+    return Response.json({ error: 'Message' }, { status: 400 })
+  }
+}
+```
+
+## Server Actions
+
+- Place server actions in `actions.ts` files within feature directories
+- Use `"use server"` directive
+- Always validate input with Zod schemas
+- Return consistent result objects
+
+```tsx
+// Feature actions.ts pattern
+"use server"
+
+export async function createItem(data: FormData) {
+  try {
+    const validated = schema.parse({
+      // Extract and validate form data
+    })
+
+    // Database operation
+    const result = await db.collection('items').insertOne(validated)
+
+    revalidatePath('/path')
+    return { success: true, data: result }
+  } catch (error) {
+    return { success: false, error: 'Error message' }
+  }
+}
+```
+
+## Database Operations
+
+- Use MongoDB with direct driver access via `lib/mongo`
+- Use underscore naming for collection names
+- Implement proper error handling and validation
+- Use transactions for multi-collection operations
+
+## File Handling
+
+- Upload endpoints go in `upload/route.ts`
+- Download endpoints go in `download/route.ts`
+- Store files in organized `public/uploads/` structure
+- Validate file types and sizes
+
+description:
+globs:
+alwaysApply: false
+
+---

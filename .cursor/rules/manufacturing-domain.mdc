@@ -1,0 +1,74 @@
+# Manufacturing Domain Patterns
+
+## Business Context
+
+This application manages manufacturing operations for Bruss automotive parts, including:
+
+- Employee management and production overtime tracking
+- Quality deviations and corrective actions (CAPA)
+- DMC (Data Matrix Code) tracking for parts
+- Oven temperature monitoring for production processes
+- Inventory management and article configurations
+
+## Key Domain Entities
+
+### Employees
+
+- Tracked with employee numbers, departments, and roles
+- Production overtime requests with approval workflows
+- Linked to production data and quality records
+
+### Deviations & CAPA
+
+- Quality deviations with severity levels and corrective actions
+- File attachments for documentation
+- Status tracking through workflow states
+- Area and reason categorization for analysis
+
+### Production Data
+
+- DMC tracking for part traceability
+- Oven process monitoring with temperature data
+- Article configurations and process parameters
+- Box and pallet status tracking
+
+## Manufacturing-Specific UI Patterns
+
+### Data Tables
+
+- Use sortable columns for production data
+- Include export functionality for compliance reporting
+- Implement filtering by date ranges, departments, and status
+- Display critical information prominently (NOK status, overdue items)
+
+### Forms
+
+- Multi-step forms for complex processes (deviation reporting)
+- File upload capabilities for documentation
+- Validation for manufacturing-specific fields (employee numbers, article codes)
+- Real-time status updates
+
+### Dashboards
+
+- Production metrics and KPI displays
+- Alert systems for critical issues
+- Charts for trend analysis
+- Real-time status indicators
+
+## Audio Feedback
+
+- Use audio files (`ok.wav`, `nok.mp3`) for production floor feedback
+- Implement sound notifications for critical alerts
+- Consider industrial environment noise levels
+
+## Data Validation Patterns
+
+- Validate employee numbers against active employee database
+- Check article configurations against current production specs
+- Validate date ranges for shift schedules and overtime
+- Ensure DMC format compliance for traceability
+  description:
+  globs:
+  alwaysApply: false
+
+---

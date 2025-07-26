@@ -1,0 +1,81 @@
+# Data Models & Type Definitions
+
+## Type Organization
+
+- Global types go in `lib/types/`
+- Feature-specific types go in feature `lib/` folders
+- Export types alongside their related functions
+
+## Type Definition Patterns
+
+```tsx
+// Use descriptive type names
+export type Employee = {
+  _id?: ObjectId
+  firstName: string
+  lastName: string
+  employeeNumber: string
+  department: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Use union types for status/enum values
+export type DeviationStatus = 'open' | 'in_progress' | 'closed' | 'cancelled'
+
+// Create result types for API responses
+export type ApiResponse<T> = {
+  success: boolean
+  data?: T
+  error?: string
+}
+```
+
+## Zod Schema Patterns
+
+- Create schemas alongside type definitions
+- Use consistent validation patterns
+- Export both schema and inferred types
+
+```tsx
+export const employeeSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  employeeNumber: z.string().min(1, 'Employee number is required'),
+  department: z.string().min(1, 'Department is required')
+})
+
+export type EmployeeFormData = z.infer<typeof employeeSchema>
+```
+
+## Database Collection Naming
+
+- Use underscore_case for MongoDB collection names
+- Use descriptive, plural names
+- Examples: `employees`, `article_configs`, `production_overtime_requests`
+
+## Data Validation
+
+- Always validate data at API boundaries
+- Use Zod for runtime validation
+- Validate both input and output when necessary
+- Create reusable validation utilities in `lib/` folders
+
+## Date Handling
+
+- Use `Date` objects for TypeScript types
+- Store dates as ISO strings in MongoDB
+- Use `client-date-utils.tsx` for client-side date formatting
+- Handle timezone considerations appropriately
+
+## ID Patterns
+
+- Use MongoDB ObjectId for document IDs
+- Include optional `_id?: ObjectId` in type definitions
+- Use string IDs for client-side operations
+- Convert between ObjectId and string as needed
+  description:
+  globs:
+  alwaysApply: false
+
+---
