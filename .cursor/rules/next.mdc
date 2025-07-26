@@ -1,39 +1,39 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-General Code Style & Formatting
+# General Code Style & Formatting
 
 - Use kebab-case for React component file names (e.g., user-card.tsx, not UserCard.tsx).
 - Prefer named exports for components.
 
-Project Structure & Architecture
+# Project Structure & Architecture
 
 - Follow Next.js App Router conventions (not the Pages Router).
 - Clearly distinguish between server and client components and use each appropriately.
 
-Styling & UI
+# Styling & UI
 
 - Use Tailwind CSS for styling.
 - Use Shadcn UI components for consistent UI design.
 
-Data Fetching & Forms
+# Data Fetching & Forms
 
 - Use TanStack Query (react-query) for frontend data fetching.
 - Use React Hook Form for form handling.
 - Use Zod for schema validation.
 
-State Management & Logic
+# State Management & Logic
 
 - Use Zustand for global or shared state.
 
-Backend & Database
+# Backend & Database
 
 - Use direct MongoDB access, e.g., with the official MongoDB Node.js driver.
-- Use underscores (_) for MongoDB collection names.
+- Use underscores (\_) for MongoDB collection names.
 
-Runtime & Package Management
+# Runtime & Package Management
 
 - Use Bun for running, installing, or managing dependencies in this project.
   Do not use npm or yarn. Bun is required for consistency and performance.
+  description:
+  globs:
+  alwaysApply: false
+
+---

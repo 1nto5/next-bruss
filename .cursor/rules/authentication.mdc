@@ -1,0 +1,75 @@
+# Authentication & Authorization
+
+## Authentication Setup
+
+- Use NextAuth.js for authentication (configured in `auth.ts`)
+- Middleware handles route protection (`middleware.ts`)
+- Auth configuration supports multiple languages via `[lang]` routes
+
+## Route Protection
+
+- Protected routes are under `(mgmt)/[lang]/` route group
+- Use middleware to redirect unauthenticated users
+- Different access levels for different route groups:
+  - `(mgmt)` - Management/admin access
+  - `(pro)` - Production floor access
+
+## Session Management
+
+```tsx
+// Use getServerSession in server components
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/auth'
+
+export default async function ProtectedPage() {
+  const session = await getServerSession(authOptions)
+
+  if (!session) {
+    redirect('/auth')
+  }
+
+  return <div>Protected content</div>
+}
+```
+
+## User Types & Roles
+
+- User types are defined in `lib/types/user.ts`
+- Implement role-based access control based on user properties
+- Check permissions in both server actions and API routes
+
+## Auth Components
+
+- Login form component: `components/login-form.tsx`
+- User avatar component: `components/user-avatar.tsx`
+- Access denied alerts: `components/access-denied-alert.tsx`
+
+## Auth Pages Structure
+
+```
+auth/
+├── layout.tsx         # Auth layout wrapper
+├── page.tsx          # Login page
+├── actions.ts        # Auth-related server actions
+└── components/
+    └── login-form.tsx # Login form component
+```
+
+## Authorization Patterns
+
+- Check user permissions in server actions
+- Use session data to filter data access
+- Implement feature-specific authorization in actions.ts files
+- Return appropriate error responses for unauthorized access
+
+## Security Considerations
+
+- Always validate session on server-side
+- Implement CSRF protection via NextAuth
+- Use secure session configuration
+- Validate user permissions for data modifications
+  description:
+  globs:
+  alwaysApply: false
+
+---

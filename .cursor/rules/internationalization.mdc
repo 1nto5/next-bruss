@@ -1,0 +1,86 @@
+# Internationalization (i18n)
+
+## Language Support
+
+- Supported languages: English (en), German (de), Polish (pl)
+- Language dictionaries are in `dictionaries/` folder
+- Configuration is in `i18n.config.ts`
+
+## Route Structure
+
+- All internationalized routes are under `[lang]/` dynamic segments
+- Language parameter is passed to all page components
+- Default language handling in middleware
+
+## Dictionary Usage
+
+```tsx
+// In server components
+import { getDictionary } from '@/lib/dictionary'
+
+export default async function Page({ params }: { params: { lang: string } }) {
+  const dict = await getDictionary(params.lang)
+
+  return (
+    <div>
+      <h1>{dict.pageTitle}</h1>
+      <p>{dict.description}</p>
+    </div>
+  )
+}
+```
+
+## Dictionary Structure
+
+- Organize translations by feature/page
+- Use nested objects for logical grouping
+- Keep consistent key naming across languages
+
+```json
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "employees": {
+    "title": "Employees",
+    "addNew": "Add New Employee",
+    "table": {
+      "name": "Name",
+      "department": "Department"
+    }
+  }
+}
+```
+
+## Translation Patterns
+
+- Use descriptive key names that indicate context
+- Group related translations under common parent keys
+- Include pluralization when needed
+- Provide fallback text for missing translations
+
+## Language Switching
+
+- Language preference should persist across sessions
+- Update URL to reflect current language
+- Validate language parameter in middleware
+
+## Date and Number Formatting
+
+- Use locale-appropriate formatting for dates
+- Consider cultural differences in number formats
+- Use `client-date-utils.tsx` for consistent date formatting
+
+## Accessibility
+
+- Set appropriate `lang` attribute on HTML elements
+- Ensure proper text direction (LTR for supported languages)
+- Consider text expansion/contraction between languages
+
+description:
+globs:
+alwaysApply: false
+
+---

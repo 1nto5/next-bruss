@@ -1,0 +1,55 @@
+# Project Structure & Organization
+
+## Route Groups
+
+- Use route groups to organize different application areas:
+  - `(mgmt)` - Management/admin interfaces
+  - `(pro)` - Production interfaces
+  - `(pro-old)` - Legacy production interfaces
+
+## Component Organization
+
+- Components should be organized in dedicated `components/` folders within feature directories
+- Shared components go in the root `components/` directory
+- UI primitives from Shadcn go in `components/ui/`
+
+## Feature Module Structure
+
+Each feature module should follow this pattern:
+
+```
+feature-name/
+├── actions.ts          # Server actions
+├── components/         # Feature-specific components
+├── lib/               # Feature-specific utilities
+├── layout.tsx         # Feature layout
+├── page.tsx           # Main feature page
+├── error.tsx          # Error boundary (optional)
+└── loading.tsx        # Loading UI (optional)
+```
+
+## File Naming Conventions
+
+- Use kebab-case for all file and folder names
+- TypeScript files use `.ts` extension
+- React components use `.tsx` extension
+- Server actions are named `actions.ts`
+- Page components are named `page.tsx`
+
+## Language Support
+
+- All routes under `[lang]/` support internationalization
+- Language dictionaries are in `dictionaries/` (en.json, de.json, pl.json)
+- Use the `getDictionary()` function for translations
+
+## Asset Organization
+
+- Static assets go in `public/`
+- Fonts are in `public/fonts/`
+- Audio files for UI feedback are in `public/` root
+- Upload directories are organized by feature: `public/uploads/feature-name/`
+  description:
+  globs:
+  alwaysApply: false
+
+---
