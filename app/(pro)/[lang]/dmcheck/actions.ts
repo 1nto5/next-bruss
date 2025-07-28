@@ -219,6 +219,38 @@ export async function saveDmc(
       return { message: 'article not found' };
     }
 
+    // Special handling for quality workplace - check specific DMC codes without saving
+    if (articleConfig.workplace === 'quality') {
+      const qualityDmcCodes = [
+        '7952875101895021025070400377',
+        '7952875101895021025070400371',
+        '7952875101895021025070400374',
+        '7952875101895021025070400378',
+        '7952875101895021025070400380',
+        '7952875101895021025070400381',
+        '7952875101895021025070400383',
+      ];
+
+      const scannedDmc = formData?.get('dmc')?.toString();
+      if (!scannedDmc) {
+        return { message: 'dmc not provided' };
+      }
+
+      if (qualityDmcCodes.includes(scannedDmc)) {
+        return {
+          message: 'quality dmc found',
+          dmc: scannedDmc,
+          time: new Date().toISOString(),
+        };
+      } else {
+        return {
+          message: 'quality dmc not found',
+          dmc: scannedDmc,
+          time: new Date().toISOString(),
+        };
+      }
+    }
+
     const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({
       dmc: formData?.get('dmc')?.toString(),

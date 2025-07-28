@@ -1,39 +1,55 @@
-# General Code Style & Formatting
-
-- Use kebab-case for React component file names (e.g., user-card.tsx, not UserCard.tsx).
-- Prefer named exports for components.
-
-# Project Structure & Architecture
-
-- Follow Next.js App Router conventions (not the Pages Router).
-- Clearly distinguish between server and client components and use each appropriately.
-
-# Styling & UI
-
-- Use Tailwind CSS for styling.
-- Use Shadcn UI components for consistent UI design.
-
-# Data Fetching & Forms
-
-- Use TanStack Query (react-query) for frontend data fetching.
-- Use React Hook Form for form handling.
-- Use Zod for schema validation.
-
-# State Management & Logic
-
-- Use Zustand for global or shared state.
-
-# Backend & Database
-
-- Use direct MongoDB access, e.g., with the official MongoDB Node.js driver.
-- Use underscores (\_) for MongoDB collection names.
-
-# Runtime & Package Management
-
-- Use Bun for running, installing, or managing dependencies in this project.
-  Do not use npm or yarn. Bun is required for consistency and performance.
-  description:
-  globs:
-  alwaysApply: false
-
 ---
+description:
+globs:
+alwaysApply: true
+---
+
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI and Tailwind.
+
+Code Style and Structure
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: exported component, subcomponents, helpers, static content, types.
+
+Naming Conventions
+
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+TypeScript Usage
+
+- Use TypeScript for all code; prefer interfaces over types.
+- Avoid enums; use maps instead.
+- Use functional components with TypeScript interfaces.
+
+Syntax and Formatting
+
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative JSX.
+
+UI and Styling
+
+- Use Shadcn UI and Tailwind for components and styling.
+- Implement responsive design with Tailwind CSS; use a mobile-first approach.
+
+Performance Optimization
+
+- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC).
+- Wrap client components in Suspense with fallback.
+- Use dynamic loading for non-critical components.
+- Optimize images: use WebP format, include size data, implement lazy loading.
+
+Key Conventions
+
+- Use 'nuqs' for URL search parameter state management.
+- Optimize Web Vitals (LCP, CLS, FID).
+- Limit 'use client':
+  - Favor server components and Next.js SSR.
+  - Use only for Web API access in small components.
+  - Avoid for data fetching or state management.
+
+Follow Next.js docs for Data Fetching, Rendering, and Routing.

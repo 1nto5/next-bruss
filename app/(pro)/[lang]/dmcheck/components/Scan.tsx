@@ -188,6 +188,19 @@ export function Scan({
             pathname + '?' + createQueryString(state.dmc, state.time),
           );
         break;
+      case 'quality dmc found':
+        playNok();
+        toast.success('Znalazłeś poszukiwaną część!');
+        state.dmc &&
+          state.time &&
+          router.push(
+            pathname + '?' + createQueryString(state.dmc, state.time),
+          );
+        break;
+      case 'quality dmc not found':
+        playOk();
+        toast.warning('Nie tym razem!');
+        break;
       default:
         break;
     }
