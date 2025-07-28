@@ -12,12 +12,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -38,7 +33,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
-import clsx from 'clsx';
 import { Box, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -113,7 +107,7 @@ export function BoxCardDialog({
         <Button
           size={'icon'}
           variant={'secondary'}
-          className='absolute right-2 top-2'
+          className='absolute top-2 right-2'
         >
           <Box className='animate-spin' />
         </Button>
@@ -162,7 +156,7 @@ export function BoxCardDialog({
               <Button
                 size={'icon'}
                 variant={'outline'}
-                className='absolute right-2 top-2'
+                className='absolute top-2 right-2'
               >
                 <Box />
               </Button>

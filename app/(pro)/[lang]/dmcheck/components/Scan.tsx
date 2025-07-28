@@ -199,7 +199,7 @@ export function Scan({
         break;
       case 'quality dmc not found':
         playOk();
-        toast.success('Nie tym razem!');
+        toast.warning('Nie tym razem!');
         break;
       default:
         break;
