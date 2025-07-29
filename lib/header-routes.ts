@@ -12,6 +12,7 @@ export interface HeaderRoute {
 
 export const ROUTE_PATHS = {
   dmcheckData: '/dmcheck-data',
+  ovenData: '/oven-data',
   deviations: '/deviations',
   failuresLv: '/failures/lv',
   inw2spis: '/inw-2/spis',
@@ -38,6 +39,10 @@ export const plHeaderRoutes: HeaderRoute[] = [
         title: 'DMCheck Data',
       },
       {
+        href: ROUTE_PATHS.ovenData,
+        title: 'Śledzenie wygrzewania',
+      },
+      {
         href: ROUTE_PATHS.deviations,
         title: 'Odchylenia',
       },
@@ -53,7 +58,7 @@ export const plHeaderRoutes: HeaderRoute[] = [
     submenu: [
       {
         href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja',
+        title: 'Godziny nadliczbowe - produkcja',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
