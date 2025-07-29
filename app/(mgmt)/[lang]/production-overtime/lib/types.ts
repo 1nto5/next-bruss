@@ -51,3 +51,48 @@ export type overtimeRequestEmployeeType = EmployeeType & {
   agreedReceivingAtLocaleString?: string;
   note?: string;
 };
+
+// Forecast types
+export type ForecastFilterType = 'week' | 'month' | 'year';
+
+export type ForecastRequestDetail = {
+  _id: string;
+  internalId?: string;
+  status: OvertimeStatus;
+  from: Date;
+  to: Date;
+  numberOfEmployees: number;
+  actualEmployeesWorked?: number;
+  responsibleEmployee: string;
+  reason: string;
+};
+
+export type ForecastPeriodData = {
+  period: string;
+  forecastCount: number;
+  historicalCount: number;
+  forecastHours: number;
+  historicalHours: number;
+  totalHours: number;
+  totalCount: number;
+  details: {
+    forecast: ForecastRequestDetail[];
+    historical: ForecastRequestDetail[];
+  };
+};
+
+export type ForecastSummary = {
+  totalForecastHours: number;
+  totalHistoricalHours: number;
+  totalForecastCount: number;
+  totalHistoricalCount: number;
+  filterType: ForecastFilterType;
+  year: number;
+  startValue: number;
+  endValue: number;
+};
+
+export type ForecastResponse = {
+  data: ForecastPeriodData[];
+  summary: ForecastSummary;
+};

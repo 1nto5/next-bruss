@@ -13,11 +13,27 @@ const ArticleQuantitySchema = z.object({
 export const NewOvertimeRequestSchema = z
   .object({
     numberOfEmployees: z
-      .number()
-      .min(1, { message: 'Liczba pracowników musi wynosić co najmniej 1!' }),
+      .union([z.number(), z.string()])
+      .transform((val) =>
+        val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
+      )
+      .pipe(
+        z
+          .number()
+          .min(1, {
+            message: 'Liczba pracowników musi wynosić co najmniej 1!',
+          }),
+      ),
     numberOfShifts: z
-      .number()
-      .min(1, { message: 'Liczba zmian musi wynosić co najmniej 1!' }),
+      .union([z.number(), z.string()])
+      .transform((val) =>
+        val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
+      )
+      .pipe(
+        z
+          .number()
+          .min(1, { message: 'Liczba zmian musi wynosić co najmniej 1!' }),
+      ),
     responsibleEmployee: z
       .string()
       .email({ message: 'Wybierz odpowiedzialną osobę!' })

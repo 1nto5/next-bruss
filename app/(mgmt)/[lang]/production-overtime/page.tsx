@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { KeyRound, Plus } from 'lucide-react';
+import { KeyRound, Plus, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
@@ -83,11 +83,19 @@ export default async function ProductionOvertimePage(props: {
     <Card>
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>
-            Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
-          </CardTitle>
+          <CardTitle>Godziny nadliczbowe - produkcja</CardTitle>
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            {session && (
+              <Link
+                href='/production-overtime/forecast'
+                className='w-full sm:w-auto'
+              >
+                <Button variant={'outline'} className='w-full'>
+                  <TrendingUp /> <span>Forecast</span>
+                </Button>
+              </Link>
+            )}
             {session && canCreateRequest ? (
               <Link
                 href='/production-overtime/new-request'

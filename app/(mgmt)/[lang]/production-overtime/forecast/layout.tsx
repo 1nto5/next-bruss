@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Godziny nadliczbowe - produkcja (BRUSS)',
+  title: 'Forecast nadgodzin - produkcja (BRUSS)',
 };
 
 export default async function Layout({

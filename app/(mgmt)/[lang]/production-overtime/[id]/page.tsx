@@ -26,6 +26,7 @@ import {
   LayoutList,
   Package,
   Table as TableIcon,
+  TrendingUp,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -146,6 +147,16 @@ export default async function OvertimeDetailsPage(props: {
             >
               <Button variant='outline' className='w-full'>
                 <Users /> Obiór nadgodzin
+              </Button>
+            </Link>
+
+            {/* Analytics button */}
+            <Link
+              href={`/production-overtime/forecast`}
+              className='w-full sm:w-auto'
+            >
+              <Button variant='outline' className='w-full'>
+                <TrendingUp /> Forecast
               </Button>
             </Link>
 

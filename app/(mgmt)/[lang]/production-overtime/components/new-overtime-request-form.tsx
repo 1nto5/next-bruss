@@ -155,9 +155,7 @@ export default function NewOvertimeRequestForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            Nowe zlecenie wykonania pracy w godzinach nadliczbowych - produkcja
-          </CardTitle>
+          <CardTitle>Nowe zlecenie godz. nadliczbowych - produkcja</CardTitle>
           <Link href='/production-overtime'>
             <Button variant='outline'>
               <Table /> <span>Zlecenia</span>
@@ -284,7 +282,7 @@ export default function NewOvertimeRequestForm({
                       {...field}
                       onChange={(e) => {
                         const value =
-                          e.target.value === '' ? 1 : parseInt(e.target.value);
+                          e.target.value === '' ? '' : parseInt(e.target.value);
                         field.onChange(value);
                       }}
                       value={field.value}
@@ -378,7 +376,7 @@ export default function NewOvertimeRequestForm({
                       {...field}
                       onChange={(e) => {
                         const value =
-                          e.target.value === '' ? 1 : parseInt(e.target.value);
+                          e.target.value === '' ? '' : parseInt(e.target.value);
                         field.onChange(value);
                       }}
                       value={field.value}
