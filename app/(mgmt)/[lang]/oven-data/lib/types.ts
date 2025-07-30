@@ -15,7 +15,6 @@ export type OvenProcessDataType = {
   targetTemp?: number;
   tempTolerance?: number;
   targetDuration?: number; // Duration in seconds
-  expectedCompletion?: Date;
 };
 
 export type OvenTemperatureLogType = {
@@ -32,5 +31,5 @@ export type OvenConfigType = {
   article: string;
   temp: number;
   tempTolerance: number;
-  duration: number;
+  duration: number; // Duration in seconds
 };

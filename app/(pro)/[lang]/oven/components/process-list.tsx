@@ -131,8 +131,17 @@ export default function ProcessList() {
     return `${temp}°C ±${tolerance}°C`;
   };
 
-  const formatExpectedCompletion = (expectedCompletion?: Date): string => {
-    if (!expectedCompletion) return '-';
+  const formatExpectedCompletion = (
+    startTime?: Date,
+    targetDuration?: number,
+  ): string => {
+    if (!startTime || !targetDuration) return '-';
+
+    // Calculate expected completion in local timezone
+    const expectedCompletion = new Date(
+      startTime.getTime() + targetDuration * 1000,
+    );
+
     const now = new Date();
     const timeLeft = expectedCompletion.getTime() - now.getTime();
 
@@ -439,11 +448,15 @@ export default function ProcessList() {
                           </TableCell>
                           <TableCell
                             className={(() => {
-                              const expected = process.expectedCompletion;
-                              if (!expected) return undefined;
+                              if (!process.startTime || !process.targetDuration)
+                                return undefined;
+                              const expectedCompletion = new Date(
+                                process.startTime.getTime() +
+                                  process.targetDuration * 1000,
+                              );
                               const now = new Date();
-                              const end = new Date(expected);
-                              const timeLeft = end.getTime() - now.getTime();
+                              const timeLeft =
+                                expectedCompletion.getTime() - now.getTime();
                               if (timeLeft < 0) {
                                 return 'animate-pulse font-bold text-red-600 dark:text-red-400';
                               } else if (timeLeft <= 1000 * 60 * 60) {
@@ -453,7 +466,8 @@ export default function ProcessList() {
                             })()}
                           >
                             {formatExpectedCompletion(
-                              process.expectedCompletion,
+                              process.startTime,
+                              process.targetDuration,
                             )}
                           </TableCell>
                           <TableCell>

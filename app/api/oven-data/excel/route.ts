@@ -85,13 +85,7 @@ export async function GET(request: NextRequest) {
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Calculate expected completion if we have target duration
-        let expectedCompletion: Date | undefined;
-        if (doc.targetDuration) {
-          expectedCompletion = new Date(
-            doc.startTime.getTime() + doc.targetDuration * 1000,
-          );
-        }
+        // Note: expectedCompletion is now calculated on the frontend to handle timezone correctly
 
         // Format duration for Excel
         const formatDuration = (seconds: number | null) => {

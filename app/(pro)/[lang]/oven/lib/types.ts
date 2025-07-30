@@ -20,6 +20,4 @@ export type OvenProcessType = {
   tempTolerance?: number;
   targetDuration?: number; // Duration in seconds
   // Optional calculated values
-  expectedCompletion?: Date;
-  lastAvgTemp?: number | null;
 };
