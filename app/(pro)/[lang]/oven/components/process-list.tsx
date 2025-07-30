@@ -2,6 +2,16 @@
 
 import ErrorComponent from '@/components/error-component';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,27 +24,51 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
-import { AlertTriangle, Play, ScanLine, StopCircle } from 'lucide-react';
+import { AlertTriangle, Play, ScanLine, StopCircle, X } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { completeOvenProcess, startOvenProcess } from '../actions';
+import {
+  completeOvenProcess,
+  deleteOvenProcess,
+  startOvenProcess,
+} from '../actions';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
+import type { EndBatchType, StartBatchType } from '../lib/zod';
 import { EndBatchDialog } from './end-batch-dialog';
 import { StartBatchDialog } from './start-batch-dialog';
+
+const errorMessageMap: Record<string, string> = {
+  'duplicate batch': 'HYDRA batch istnieje w bazie danych!',
+  'no operator': 'Co najmniej jeden operator jest wymagany',
+  'not created': 'Nie udało się utworzyć procesu',
+  'not completed': 'Nie udało się zakończyć procesu',
+  'not deleted': 'Nie udało się usunąć procesu',
+  'wrong number 1': 'Nieprawidłowy numer personalny',
+  'wrong number 2': 'Nieprawidłowy numer personalny',
+  'wrong number 3': 'Nieprawidłowy numer personalny',
+  'login error': 'Błąd logowania - skontaktuj się z IT',
+  'config error': 'Błąd konfiguracji pieca - skontaktuj się z IT',
+  'fetch error': 'Błąd pobierania procesów - skontaktuj się z IT',
+  'start error': 'Błąd uruchamiania procesu - skontaktuj się z IT',
+  'complete error': 'Błąd kończenia procesu - skontaktuj się z IT',
+  'delete error': 'Błąd usuwania procesu - skontaktuj się z IT',
+  'temp error': 'Błąd temperatury pieca - skontaktuj się z IT',
+  'validation failed': 'Skontaktuj się z IT!',
+};
+
+const translateError = (serverError: string): string => {
+  return errorMessageMap[serverError] || 'Skontaktuj się z IT!';
+};
 
 export default function ProcessList() {
   const { selectedOven } = useOvenStore();
   const { operator1, operator2, operator3 } = usePersonalNumberStore();
-
-  // Move hook calls to top level
   const params = useParams<{ lang: Locale }>();
-
-  // Get current oven temperature for monitoring
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const currentTemp =
     tempData &&
@@ -44,14 +78,6 @@ export default function ProcessList() {
       ? tempData.avgTemp
       : null;
 
-  // Helper function to format dates
-  const formatDate = (date: Date | string | null | undefined): string => {
-    if (!date) return '-';
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    if (isNaN(dateObj.getTime())) return '-';
-    return dateObj.toLocaleDateString(params?.lang || 'pl');
-  };
-
   const formatDateTime = (date: Date | string | null | undefined): string => {
     if (!date) return '-';
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -59,33 +85,18 @@ export default function ProcessList() {
     return dateObj.toLocaleString(params?.lang || 'pl');
   };
 
-  // Dialog states for start/end
   const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [endDialogOpen, setEndDialogOpen] = useState(false);
-  // Two-step scan state
-  const [scannedArticle, setScannedArticle] = useState('');
-  const [scannedStartBatch, setScannedStartBatch] = useState('');
-  const [scannedEndBatch, setScannedEndBatch] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [processToDelete, setProcessToDelete] = useState<string | null>(null);
 
-  // Error states for persistent error display in dialogs
-  const [startError, setStartError] = useState<string | null>(null);
-  const [endError, setEndError] = useState<string | null>(null);
-
-  // Input refs for focusing after success
   const articleInputRef = useRef<HTMLInputElement>(null!);
   const batchInputRef = useRef<HTMLInputElement>(null!);
   const endInputRef = useRef<HTMLInputElement>(null!);
 
-  // Loading states for dialogs (optional, currently not used)
-  // const [startLoading, setStartLoading] = useState(false);
-  // const [endLoading, setEndLoading] = useState(false);
-
-  // Sound effects
   const [playOvenIn] = useSound('/oven-in.wav', { volume: 0.75 });
   const [playOvenOut] = useSound('/oven-out.wav', { volume: 0.75 });
   const [playNok] = useSound('/nok.mp3', { volume: 0.75 });
-
-  // Memoize operators array to avoid unnecessary recalculations
   const operators = useMemo(
     () =>
       [operator1, operator2, operator3]
@@ -97,7 +108,7 @@ export default function ProcessList() {
   const { data, error, refetch, isFetching } = useGetOvenProcesses(
     selectedOven,
     true,
-  ); // Include config data
+  );
 
   function isSuccess(
     data: { success: OvenProcessType[] } | { error: string } | undefined,
@@ -105,7 +116,6 @@ export default function ProcessList() {
     return !!data && 'success' in data;
   }
 
-  // Helper: check if batch is running in this oven
   function isBatchRunningHere(batch: string) {
     if (!isSuccess(data)) return false;
     return data.success.some(
@@ -113,7 +123,6 @@ export default function ProcessList() {
     );
   }
 
-  // Helper function to format temperature with tolerance
   const formatTempWithTolerance = (
     temp?: number,
     tolerance?: number,
@@ -122,7 +131,6 @@ export default function ProcessList() {
     return `${temp}°C ±${tolerance}°C`;
   };
 
-  // Helper function to format expected completion
   const formatExpectedCompletion = (expectedCompletion?: Date): string => {
     if (!expectedCompletion) return '-';
     const now = new Date();
@@ -133,22 +141,12 @@ export default function ProcessList() {
     const minutes = Math.floor((absTime % (1000 * 60 * 60)) / (1000 * 60));
 
     if (timeLeft < 0) {
-      // Overdue: show negative value
-      if (hours > 0) {
-        return `-${hours}h ${minutes}m`;
-      } else {
-        return `-${minutes}m`;
-      }
+      return hours > 0 ? `-${hours}h ${minutes}m` : `-${minutes}m`;
     } else {
-      if (hours > 0) {
-        return `~${hours}h ${minutes}m`;
-      } else {
-        return `~${minutes}m`;
-      }
+      return hours > 0 ? `~${hours}h ${minutes}m` : `~${minutes}m`;
     }
   };
 
-  // Helper function to determine temperature status
   const getTempStatus = (
     processTemp?: number,
     processTolerance?: number,
@@ -166,14 +164,9 @@ export default function ProcessList() {
     const minTemp = processTemp - processTolerance;
     const maxTemp = processTemp + processTolerance;
 
-    if (currentTemp >= minTemp && currentTemp <= maxTemp) {
-      return 'good'; // Within tolerance - green
-    } else {
-      return 'danger'; // Out of range - red
-    }
+    return currentTemp >= minTemp && currentTemp <= maxTemp ? 'good' : 'danger';
   };
 
-  // Helper function to get temperature display with color coding
   const formatTempWithStatus = (
     temp?: number,
     tolerance?: number,
@@ -195,163 +188,178 @@ export default function ProcessList() {
     };
   };
 
-  // Memoized callback functions to prevent unnecessary dialog re-renders
-  const handleStartProcess = useCallback(async () => {
-    if (!scannedArticle || !scannedStartBatch) return;
-    if (!isSuccess(data)) return;
+  const handleStartProcess = useCallback(
+    async (formData: StartBatchType) => {
+      const { scannedArticle, scannedBatch } = formData;
+      if (!isSuccess(data)) return;
 
-    // Clear any previous error
-    setStartError(null);
-
-    if (isBatchRunningHere(scannedStartBatch)) {
-      const errorMessage = 'HYDRA batch jest już w piecu!';
-      setStartError(errorMessage);
-      toast.error(errorMessage);
-      setScannedStartBatch('');
-      setTimeout(() => {
-        batchInputRef.current?.focus();
-      }, 0);
-      playNok();
-      return;
-    }
-
-    // Show loading toast
-    const loadingToast = toast.loading('Rozpoczynanie procesu...');
-    // Add artificial delay to simulate loading for testing purposes
-
-    try {
-      const result = await startOvenProcess(
-        selectedOven,
-        scannedArticle,
-        scannedStartBatch,
-        operators,
-      );
-
-      if ('success' in result && result.success) {
-        playOvenIn();
-        refetch();
-        setScannedArticle('');
-        setScannedStartBatch('');
-        setStartError(null);
+      if (isBatchRunningHere(scannedBatch)) {
+        const errorMessage = 'HYDRA batch jest już w piecu!';
+        toast.error(errorMessage);
         setTimeout(() => {
-          articleInputRef.current?.focus();
+          batchInputRef.current?.focus();
         }, 0);
-        toast.success('Proces uruchomiony!', { id: loadingToast });
-        return;
+        playNok();
+        throw new Error(errorMessage);
       }
 
-      if ('error' in result && result.error === 'duplicate batch') {
+      const loadingToast = toast.loading('Rozpoczynanie procesu...');
+
+      try {
+        const result = await startOvenProcess(
+          selectedOven,
+          scannedArticle,
+          scannedBatch,
+          operators,
+        );
+
+        if ('success' in result && result.success) {
+          playOvenIn();
+          refetch();
+          setTimeout(() => {
+            articleInputRef.current?.focus();
+          }, 0);
+          toast.success('Proces uruchomiony!', { id: loadingToast });
+          return;
+        }
+
+        if ('error' in result && result.error) {
+          playNok();
+          const errorMessage = translateError(result.error);
+          setTimeout(() => {
+            batchInputRef.current?.focus();
+          }, 0);
+          toast.error(errorMessage, { id: loadingToast });
+          throw new Error(errorMessage);
+        }
+
         playNok();
-        const errorMessage = 'HYDRA batch istnieje w bazie danych!';
-        setStartError(errorMessage);
-        setScannedStartBatch('');
+        const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
           batchInputRef.current?.focus();
         }, 0);
         toast.error(errorMessage, { id: loadingToast });
-        return;
+        throw new Error(errorMessage);
+      } catch (error) {
+        playNok();
+        const errorMessage = 'Skontaktuj się z IT!';
+        setTimeout(() => {
+          batchInputRef.current?.focus();
+        }, 0);
+        console.error(error);
+        toast.error(errorMessage, { id: loadingToast });
+        throw error;
       }
+    },
+    [data, selectedOven, operators, refetch, playNok, playOvenIn],
+  );
 
-      playNok();
-      const errorMessage = 'Skontaktuj się z IT!';
-      setStartError(errorMessage);
-      setScannedStartBatch('');
-      setTimeout(() => {
-        batchInputRef.current?.focus();
-      }, 0);
-      toast.error(errorMessage, { id: loadingToast });
-    } catch (error) {
-      playNok();
-      const errorMessage = 'Skontaktuj się z IT!';
-      setStartError(errorMessage);
-      setScannedStartBatch('');
-      setTimeout(() => {
-        batchInputRef.current?.focus();
-      }, 0);
-      console.error(error);
-      toast.error(errorMessage, { id: loadingToast });
-    }
-  }, [
-    scannedArticle,
-    scannedStartBatch,
-    data,
-    selectedOven,
-    operators,
-    refetch,
-    playNok,
-    playOvenIn,
-  ]);
+  const handleEndProcess = useCallback(
+    async (formData: EndBatchType) => {
+      const { scannedBatch } = formData;
+      if (!isSuccess(data)) return;
 
-  // End process handler
-  const handleEndProcess = useCallback(async () => {
-    if (!scannedEndBatch) return;
-    if (!isSuccess(data)) return;
-
-    // Clear any previous error
-    setEndError(null);
-
-    const existingProcess = data.success.find(
-      (process) =>
-        process.hydraBatch === scannedEndBatch && process.status === 'running',
-    );
-    if (!existingProcess) {
-      const errorMessage = 'Brak aktywnego procesu dla HYDRA batch!';
-      setEndError(errorMessage);
-      toast.error(errorMessage);
-      setScannedEndBatch('');
-      setTimeout(() => {
-        endInputRef.current?.focus();
-      }, 0);
-      playNok();
-      return;
-    }
-
-    // Show loading toast
-    const loadingToast = toast.loading('Kończenie procesu...');
-
-    try {
-      const result = await completeOvenProcess(existingProcess.id);
-
-      if ('success' in result && result.success) {
-        playOvenOut();
-        refetch();
-        setScannedEndBatch('');
-        setEndError(null);
+      const existingProcess = data.success.find(
+        (process) =>
+          process.hydraBatch === scannedBatch && process.status === 'running',
+      );
+      if (!existingProcess) {
+        const errorMessage = 'Brak aktywnego procesu dla HYDRA batch!';
+        toast.error(errorMessage);
         setTimeout(() => {
           endInputRef.current?.focus();
         }, 0);
-        toast.success('Proces zakończony!', { id: loadingToast });
+        playNok();
+        throw new Error(errorMessage);
+      }
+
+      const loadingToast = toast.loading('Kończenie procesu...');
+
+      try {
+        const result = await completeOvenProcess(existingProcess.id);
+
+        if ('success' in result && result.success) {
+          playOvenOut();
+          refetch();
+          setTimeout(() => {
+            endInputRef.current?.focus();
+          }, 0);
+          toast.success('Proces zakończony!', { id: loadingToast });
+          return;
+        }
+
+        if ('error' in result && result.error) {
+          playNok();
+          const errorMessage = translateError(result.error);
+          setTimeout(() => {
+            endInputRef.current?.focus();
+          }, 0);
+          toast.error(errorMessage, { id: loadingToast });
+          throw new Error(errorMessage);
+        }
+
+        playNok();
+        const errorMessage = 'Skontaktuj się z IT!';
+        setTimeout(() => {
+          endInputRef.current?.focus();
+        }, 0);
+        toast.error(errorMessage, { id: loadingToast });
+        throw new Error(errorMessage);
+      } catch (error) {
+        playNok();
+        const errorMessage = 'Skontaktuj się z IT!';
+        setTimeout(() => {
+          endInputRef.current?.focus();
+        }, 0);
+        console.error(error);
+        toast.error(errorMessage, { id: loadingToast });
+        throw error;
+      }
+    },
+    [data, refetch, playNok, playOvenOut],
+  );
+
+  const handleDeleteClick = useCallback((processId: string) => {
+    setProcessToDelete(processId);
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!processToDelete) return;
+
+    setDeleteDialogOpen(false);
+
+    const loadingToast = toast.loading('Usuwanie procesu...');
+
+    try {
+      const result = await deleteOvenProcess(processToDelete);
+
+      if ('success' in result && result.success) {
+        refetch();
+        toast.success('Proces usunięty!', { id: loadingToast });
+        setProcessToDelete(null);
         return;
       }
 
-      playNok();
-      const errorMessage = 'Skontaktuj się z IT!';
-      setEndError(errorMessage);
-      setScannedEndBatch('');
-      setTimeout(() => {
-        endInputRef.current?.focus();
-      }, 0);
-      toast.error(errorMessage, { id: loadingToast });
+      if ('error' in result && result.error) {
+        const errorMessage = translateError(result.error);
+        toast.error(errorMessage, { id: loadingToast });
+        setProcessToDelete(null);
+        return;
+      }
+
+      toast.error('Skontaktuj się z IT!', { id: loadingToast });
+      setProcessToDelete(null);
     } catch (error) {
-      playNok();
-      const errorMessage = 'Skontaktuj się z IT!';
-      setEndError(errorMessage);
-      setScannedEndBatch('');
-      setTimeout(() => {
-        endInputRef.current?.focus();
-      }, 0);
       console.error(error);
-      toast.error(errorMessage, { id: loadingToast });
+      toast.error('Skontaktuj się z IT!', { id: loadingToast });
+      setProcessToDelete(null);
     }
-  }, [scannedEndBatch, data, refetch, playNok, playOvenOut]);
+  }, [processToDelete, refetch]);
 
-  // Error clear handlers
-  const handleStartErrorClear = useCallback(() => {
-    setStartError(null);
-  }, []);
-
-  const handleEndErrorClear = useCallback(() => {
-    setEndError(null);
+  const handleCancelDelete = useCallback(() => {
+    setDeleteDialogOpen(false);
+    setProcessToDelete(null);
   }, []);
 
   if (error) {
@@ -383,20 +391,15 @@ export default function ProcessList() {
           <CardContent>
             {isFetching && !isSuccess(data) ? (
               <Skeleton className='h-96 w-full' />
-            ) : isSuccess(data) &&
-              data.success.filter((process) => process.status === 'running')
-                .length > 0 ? (
+            ) : isSuccess(data) && data.success.length > 0 ? (
               <div className='space-y-4'>
-                {/* Temperature Alert */}
                 {currentTemp === null &&
-                  data.success
-                    .filter((process) => process.status === 'running')
-                    .some((process) => {
-                      const startTime = new Date(process.startTime);
-                      const now = new Date();
-                      const fiveMinutesAgo = now.getTime() - 5 * 60 * 1000;
-                      return startTime.getTime() < fiveMinutesAgo;
-                    }) && (
+                  data.success.some((process) => {
+                    const startTime = new Date(process.startTime);
+                    const now = new Date();
+                    const fiveMinutesAgo = now.getTime() - 5 * 60 * 1000;
+                    return startTime.getTime() < fiveMinutesAgo;
+                  }) && (
                     <Alert variant='destructive'>
                       <AlertTriangle className='h-4 w-4' />
                       <AlertTitle>Błąd odczytu temperatury</AlertTitle>
@@ -406,7 +409,6 @@ export default function ProcessList() {
                       </AlertDescription>
                     </Alert>
                   )}
-                {/* Process Table */}
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -415,50 +417,59 @@ export default function ProcessList() {
                       <TableHead>HYDRA batch</TableHead>
                       <TableHead>Oczekiwana temperatura</TableHead>
                       <TableHead>Przewidywane zakończenie</TableHead>
+                      <TableHead className='w-16'></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.success
-                      .filter((process) => process.status === 'running')
-                      .map((process) => {
-                        const startString = formatDateTime(process.startTime);
-                        const tempDisplay = formatTempWithStatus(
-                          process.targetTemp,
-                          process.tempTolerance,
-                          currentTemp,
-                        );
+                    {data.success.map((process) => {
+                      const startString = formatDateTime(process.startTime);
+                      const tempDisplay = formatTempWithStatus(
+                        process.targetTemp,
+                        process.tempTolerance,
+                        currentTemp,
+                      );
 
-                        return (
-                          <TableRow key={process.id}>
-                            <TableCell>{startString}</TableCell>
-                            <TableCell>{process.article}</TableCell>
-                            <TableCell>{process.hydraBatch}</TableCell>
-                            <TableCell className={tempDisplay.className}>
-                              {tempDisplay.text}
-                            </TableCell>
-                            <TableCell
-                              className={(() => {
-                                const expected = process.expectedCompletion;
-                                if (!expected) return undefined;
-                                const now = new Date();
-                                const end = new Date(expected);
-                                const timeLeft = end.getTime() - now.getTime();
-                                if (timeLeft < 0) {
-                                  return 'animate-pulse font-bold text-red-600 dark:text-red-400';
-                                } else if (timeLeft <= 1000 * 60 * 60) {
-                                  // Less than 1 hour left
-                                  return 'animate-pulse font-bold';
-                                }
-                                return undefined;
-                              })()}
+                      return (
+                        <TableRow key={process.id}>
+                          <TableCell>{startString}</TableCell>
+                          <TableCell>{process.article}</TableCell>
+                          <TableCell>{process.hydraBatch}</TableCell>
+                          <TableCell className={tempDisplay.className}>
+                            {tempDisplay.text}
+                          </TableCell>
+                          <TableCell
+                            className={(() => {
+                              const expected = process.expectedCompletion;
+                              if (!expected) return undefined;
+                              const now = new Date();
+                              const end = new Date(expected);
+                              const timeLeft = end.getTime() - now.getTime();
+                              if (timeLeft < 0) {
+                                return 'animate-pulse font-bold text-red-600 dark:text-red-400';
+                              } else if (timeLeft <= 1000 * 60 * 60) {
+                                return 'animate-pulse font-bold';
+                              }
+                              return undefined;
+                            })()}
+                          >
+                            {formatExpectedCompletion(
+                              process.expectedCompletion,
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => handleDeleteClick(process.id)}
+                              className='h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300'
+                              title='Usuń proces'
                             >
-                              {formatExpectedCompletion(
-                                process.expectedCompletion,
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
+                              <X className='h-4 w-4' />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -474,34 +485,40 @@ export default function ProcessList() {
         </Card>
       </div>
 
-      {/* Start HYDRA Batch Dialog */}
       <StartBatchDialog
         open={startDialogOpen}
         onOpenChange={setStartDialogOpen}
-        scannedArticle={scannedArticle}
-        setScannedArticle={setScannedArticle}
-        scannedBatch={scannedStartBatch}
-        setScannedBatch={setScannedStartBatch}
         articleInputRef={articleInputRef}
         batchInputRef={batchInputRef}
         onStart={handleStartProcess}
-        error={startError}
-        onErrorClear={handleStartErrorClear}
-        // loading={startLoading}
       />
 
-      {/* End HYDRA Batch Dialog */}
       <EndBatchDialog
         open={endDialogOpen}
         onOpenChange={setEndDialogOpen}
-        scannedBatch={scannedEndBatch}
-        setScannedBatch={setScannedEndBatch}
         inputRef={endInputRef}
         onEnd={handleEndProcess}
-        error={endError}
-        onErrorClear={handleEndErrorClear}
-        // loading={endLoading}
       />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Usuń proces</AlertDialogTitle>
+            <AlertDialogDescription>
+              Czy na pewno chcesz usunąć ten proces? Ta akcja nie może zostać
+              cofnięta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDelete}>
+              Anuluj
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>
+              Usuń
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

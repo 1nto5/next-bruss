@@ -6,7 +6,11 @@ import { dbc } from '@/lib/mongo';
 // Type definitions
 import { ObjectId } from 'mongodb';
 import { OvenProcessConfigType, OvenProcessType } from './lib/types';
-import { loginType } from './lib/zod';
+import {
+  completeProcessSchema,
+  loginType,
+  startBatchSchemaServer,
+} from './lib/zod';
 
 /**
  * Authenticates users for inventory access
@@ -15,6 +19,8 @@ import { loginType } from './lib/zod';
  */
 export async function login(data: loginType) {
   try {
+    // Note: loginType is already validated by the client using zodResolver
+    // but we could add server-side validation here as well if needed
     const collection = await dbc('employees');
     let operator1 = null;
     let operator2 = null;
@@ -68,7 +74,7 @@ export async function login(data: loginType) {
     };
   } catch (error) {
     console.error(error);
-    return { error: 'login server action error' };
+    return { error: 'login error' };
   }
 }
 
@@ -101,7 +107,7 @@ export async function fetchOvenProcessConfig(
     };
   } catch (error) {
     console.error(error);
-    return { error: 'fetchOvenProcessConfig server action error' };
+    return { error: 'config error' };
   }
 }
 
@@ -118,7 +124,7 @@ export async function fetchOvenProcesses(
   try {
     const collection = await dbc('oven_processes');
     const processes = await collection
-      .find({ oven })
+      .find({ oven, status: 'running' }) // Only return running processes
       .sort({ startTime: -1 }) // Sort by startTime (existing field)
       .toArray();
 
@@ -175,17 +181,17 @@ export async function fetchOvenProcesses(
     return { success: sanitizedProcesses };
   } catch (error) {
     console.error(error);
-    return { error: 'fetchOvenProcesses server action error' };
+    return { error: 'fetch error' };
   }
 }
 
 /**
  * Starts (creates if needed) an oven process
  * @param oven - The oven string (e.g., 'tem10')
- * @param article - Article number from scan
- * @param hydraBatch - Batch number from scan
- * @param operator - Array of operator identifiers
- * @returns Success status or error message
+ * @param article - Article number from scan (validated: exactly 5 digits)
+ * @param hydraBatch - Batch number from scan (validated: exactly 10 characters)
+ * @param operator - Array of operator identifiers (validated: at least one required)
+ * @returns Success status or error message (includes validation errors)
  */
 export async function startOvenProcess(
   oven: string,
@@ -194,6 +200,24 @@ export async function startOvenProcess(
   operator: string[],
 ): Promise<{ error: string } | { success: boolean; processId: string }> {
   try {
+    // Validate input data using ZOD schema
+    const validationResult = startBatchSchemaServer.safeParse({
+      scannedArticle: article,
+      scannedBatch: hydraBatch,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
+    // Additional validation for operators array
+    if (!operator || operator.length === 0) {
+      return { error: 'no operator' };
+    }
+
     const collection = await dbc('oven_processes');
 
     // Fetch the configuration to save target values at time of creation
@@ -245,21 +269,80 @@ export async function startOvenProcess(
     }
   } catch (error) {
     console.error(error);
-    return { error: 'startOvenProcess server action error' };
+    return { error: 'start error' };
+  }
+}
+
+/**
+ * Deletes an oven process by changing status to 'deleted'
+ * @param processId - The process ID to delete (validated: 24-character hex string)
+ * @returns Success status or error message (includes validation errors)
+ */
+export async function deleteOvenProcess(
+  processId: string,
+): Promise<{ error: string } | { success: boolean }> {
+  try {
+    // Validate input data using ZOD schema
+    const validationResult = completeProcessSchema.safeParse({
+      processId,
+      notes: undefined,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
+    const collection = await dbc('oven_processes');
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(processId) },
+      {
+        $set: {
+          status: 'deleted',
+          deletedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.modifiedCount > 0) {
+      return { success: true };
+    }
+
+    return { error: 'not deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'delete error' };
   }
 }
 
 /**
  * Completes an oven process
- * @param processId - The process ID to complete
+ * @param processId - The process ID to complete (validated: 24-character hex string)
  * @param notes - Optional completion notes
- * @returns Success status or error message
+ * @returns Success status or error message (includes validation errors)
  */
 export async function completeOvenProcess(
   processId: string,
   notes?: string,
 ): Promise<{ error: string } | { success: boolean }> {
   try {
+    // Validate input data using ZOD schema
+    const validationResult = completeProcessSchema.safeParse({
+      processId,
+      notes,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
     const collection = await dbc('oven_processes');
 
     const result = await collection.updateOne(
@@ -280,7 +363,7 @@ export async function completeOvenProcess(
     return { error: 'not completed' };
   } catch (error) {
     console.error(error);
-    return { error: 'completeOvenProcess server action error' };
+    return { error: 'complete error' };
   }
 }
 
@@ -334,6 +417,6 @@ export async function fetchOvenLastAvgTemp(
     return { avgTemp };
   } catch (error) {
     console.error('fetchOvenLastAvgTemp error:', error);
-    return { error: 'fetchOvenLastAvgTemp server action error' };
+    return { error: 'temp error' };
   }
 }

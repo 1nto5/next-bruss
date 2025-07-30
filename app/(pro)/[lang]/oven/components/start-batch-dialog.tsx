@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -6,131 +5,147 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { AlertCircle } from 'lucide-react';
-import { RefObject, memo, useEffect } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { memo, RefObject, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { startBatchSchema, StartBatchType } from '../lib/zod';
 
 interface StartBatchDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  scannedArticle: string;
-  setScannedArticle: (val: string) => void;
-  scannedBatch: string;
-  setScannedBatch: (val: string) => void;
   articleInputRef: RefObject<HTMLInputElement>;
   batchInputRef: RefObject<HTMLInputElement>;
-  onStart: () => Promise<void>;
-  loading?: boolean;
-  error?: string | null;
-  onErrorClear?: () => void;
+  onStart: (data: StartBatchType) => Promise<void>;
 }
 
-// Dialog for starting a new HYDRA batch process
-// Memoized to prevent unnecessary re-renders when parent state changes
 export const StartBatchDialog = memo<StartBatchDialogProps>(
   function StartBatchDialog({
     open,
     onOpenChange,
-    scannedArticle,
-    setScannedArticle,
-    scannedBatch,
-    setScannedBatch,
     articleInputRef,
     batchInputRef,
     onStart,
-    loading,
-    error,
-    onErrorClear,
   }) {
-    // When dialog opens, focus article field
+    const form = useForm<StartBatchType>({
+      resolver: zodResolver(startBatchSchema),
+      defaultValues: {
+        scannedArticle: '',
+        scannedBatch: '',
+      },
+      mode: 'onSubmit',
+    });
+
     useEffect(() => {
-      if (open && articleInputRef.current) {
+      if (open) {
         setTimeout(() => articleInputRef.current?.focus(), 50);
       }
     }, [open, articleInputRef]);
 
-    const handleArticleChange = (value: string) => {
-      setScannedArticle(value);
-      if (error && onErrorClear) onErrorClear();
-    };
-    const handleBatchChange = (value: string) => {
-      setScannedBatch(value);
-      if (error && onErrorClear) onErrorClear();
-    };
     const handleDialogClose = (open: boolean) => {
       onOpenChange(open);
-      setScannedArticle('');
-      setScannedBatch('');
-      if (error && onErrorClear) onErrorClear();
+      form.reset();
     };
-    // Helper to start process and refocus article field
-    const handleStartAndRefocus = async () => {
-      await onStart();
-      setTimeout(() => articleInputRef.current?.focus(), 50);
+
+    const handleSubmit = async (data: StartBatchType) => {
+      try {
+        await onStart(data);
+        form.reset();
+        setTimeout(() => articleInputRef.current?.focus(), 50);
+      } catch {
+        // Parent component handles errors
+      }
     };
+
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent className='max-w-md'>
           <DialogHeader>
             <DialogTitle>Nowy proces</DialogTitle>
           </DialogHeader>
-          <div className='space-y-4'>
-            <div className='space-y-2'>
-              <Input
-                value={scannedArticle}
-                onChange={(e) => handleArticleChange(e.target.value)}
-                className='text-center'
-                placeholder='Zeskanuj numer artykułu...'
-                autoFocus
-                ref={articleInputRef}
-                onKeyDown={async (e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (scannedArticle && batchInputRef.current) {
-                      setTimeout(() => batchInputRef.current?.focus(), 50);
-                    }
-                  }
-                }}
-              />
-              <Input
-                value={scannedBatch}
-                onChange={(e) => handleBatchChange(e.target.value)}
-                className='text-center'
-                placeholder='Zeskanuj HYDRA batch...'
-                ref={batchInputRef}
-                disabled={!scannedArticle}
-                onKeyDown={async (e) => {
-                  if (e.key === 'Enter' && scannedArticle && scannedBatch) {
-                    e.preventDefault();
-                    await handleStartAndRefocus();
-                  }
-                }}
-              />
-              {error && (
-                <Alert variant='destructive' className='mt-2'>
-                  <AlertCircle className='h-4 w-4' />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-            </div>
-            <div className='flex gap-2'>
-              <Button
-                onClick={() => handleDialogClose(false)}
-                className='flex-1'
-                variant='outline'
-                disabled={loading}
-              >
-                Anuluj
-              </Button>
-              <Button
-                onClick={handleStartAndRefocus}
-                className='flex-1'
-                disabled={!scannedArticle || !scannedBatch || loading}
-              >
-                {loading ? 'Rozpoczynanie...' : 'Rozpocznij'}
-              </Button>
-            </div>
-          </div>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className='space-y-4'
+            >
+              <div className='space-y-2'>
+                <FormField
+                  control={form.control}
+                  name='scannedArticle'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className='text-center'
+                          placeholder='Zeskanuj numer artykułu...'
+                          autoFocus
+                          ref={articleInputRef}
+                          maxLength={5}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (field.value) {
+                                setTimeout(
+                                  () => batchInputRef.current?.focus(),
+                                  50,
+                                );
+                              }
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name='scannedBatch'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className='text-center'
+                          placeholder='Zeskanuj HYDRA batch...'
+                          ref={batchInputRef}
+                          maxLength={10}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              form.handleSubmit(handleSubmit)();
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className='flex gap-2'>
+                <Button
+                  type='button'
+                  onClick={() => handleDialogClose(false)}
+                  className='flex-1'
+                  variant='outline'
+                >
+                  Anuluj
+                </Button>
+                <Button type='submit' className='flex-1'>
+                  Rozpocznij
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     );
