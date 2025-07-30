@@ -59,9 +59,6 @@ async function getOvenProcesses(
     endTimeLocaleString: item.endTime
       ? new Date(item.endTime).toLocaleString(lang)
       : '',
-    expectedCompletion: item.expectedCompletion
-      ? new Date(item.expectedCompletion)
-      : undefined,
   }));
   return { fetchTimeLocaleString, fetchTime, data };
 }
