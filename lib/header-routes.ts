@@ -12,6 +12,7 @@ export interface HeaderRoute {
 
 export const ROUTE_PATHS = {
   dmcheckData: '/dmcheck-data',
+  ovenData: '/oven-data',
   deviations: '/deviations',
   failuresLv: '/failures/lv',
   inw2spis: '/inw-2/spis',
@@ -36,6 +37,10 @@ export const plHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
+      },
+      {
+        href: ROUTE_PATHS.ovenData,
+        title: 'Oven Data',
       },
       {
         href: ROUTE_PATHS.deviations,
