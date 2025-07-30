@@ -89,6 +89,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                           autoFocus
                           ref={articleInputRef}
                           maxLength={5}
+                          autoComplete='off'
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault();
@@ -118,6 +119,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                           placeholder='Zeskanuj HYDRA batch...'
                           ref={batchInputRef}
                           maxLength={10}
+                          autoComplete='off'
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault();

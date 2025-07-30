@@ -74,6 +74,7 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
                           autoFocus
                           ref={inputRef}
                           maxLength={10}
+                          autoComplete='off'
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               e.preventDefault();
