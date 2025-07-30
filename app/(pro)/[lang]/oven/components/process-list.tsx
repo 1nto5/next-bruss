@@ -137,23 +137,12 @@ export default function ProcessList() {
   ): string => {
     if (!startTime || !targetDuration) return '-';
 
-    // Calculate expected completion in local timezone
+    // Calculate expected completion time
     const expectedCompletion = new Date(
       startTime.getTime() + targetDuration * 1000,
     );
 
-    const now = new Date();
-    const timeLeft = expectedCompletion.getTime() - now.getTime();
-
-    const absTime = Math.abs(timeLeft);
-    const hours = Math.floor(absTime / (1000 * 60 * 60));
-    const minutes = Math.floor((absTime % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (timeLeft < 0) {
-      return hours > 0 ? `-${hours}h ${minutes}m` : `-${minutes}m`;
-    } else {
-      return hours > 0 ? `~${hours}h ${minutes}m` : `~${minutes}m`;
-    }
+    return expectedCompletion.toLocaleString(params?.lang || 'pl');
   };
 
   const getTempStatus = (
@@ -425,7 +414,7 @@ export default function ProcessList() {
                       <TableHead>Artykuł</TableHead>
                       <TableHead>HYDRA batch</TableHead>
                       <TableHead>Oczekiwana temperatura</TableHead>
-                      <TableHead>Przewidywane zakończenie</TableHead>
+                      <TableHead>Planowane zakończenie</TableHead>
                       <TableHead className='w-16'></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -455,12 +444,10 @@ export default function ProcessList() {
                                   process.targetDuration * 1000,
                               );
                               const now = new Date();
-                              const timeLeft =
-                                expectedCompletion.getTime() - now.getTime();
-                              if (timeLeft < 0) {
-                                return 'animate-pulse font-bold text-red-600 dark:text-red-400';
-                              } else if (timeLeft <= 1000 * 60 * 60) {
-                                return 'animate-pulse font-bold';
+                              if (
+                                expectedCompletion.getTime() < now.getTime()
+                              ) {
+                                return 'font-bold text-red-600 dark:text-red-400';
                               }
                               return undefined;
                             })()}
