@@ -127,7 +127,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         return <span className='text-gray-400'>-</span>;
       }
 
-      return <span className='text-gray-400'>In progress</span>;
+      return <span className='text-gray-400'>-</span>;
     },
   },
   {
