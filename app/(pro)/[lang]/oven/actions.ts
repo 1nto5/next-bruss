@@ -80,6 +80,7 @@ export async function login(data: loginType) {
 
 /**
  * Fetches oven process configuration for a specific article
+ * If multiple configurations exist, selects the one with the highest duration
  * @param article - The article number to lookup
  * @returns Configuration data or null if not found
  */
@@ -90,8 +91,11 @@ export async function fetchOvenProcessConfig(
 > {
   try {
     const collection = await dbc('oven_process_configs');
-    const config = await collection.findOne({ article });
-
+    const config = await collection
+      .find({ article })
+      .sort({ duration: -1 })
+      .limit(1)
+      .next();
     if (!config) {
       return { success: null };
     }
@@ -113,7 +117,7 @@ export async function fetchOvenProcessConfig(
 
 /**
  * Retrieves all oven processes for a specific oven
- * @param oven - The oven identifier (tem2, tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
+ * @param oven - The oven identifier (tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
  * @param includeConfig - This parameter is now deprecated - target values are saved directly in process
  * @returns Array of processes or error message
  */

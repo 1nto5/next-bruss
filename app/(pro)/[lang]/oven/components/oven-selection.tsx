@@ -30,7 +30,7 @@ export default function OvenSelection() {
       <ErrorComponent
         error={
           new Error(
-            'No ovens specified in search parameters (example: ?ovens=tem2,tem12).',
+            'No ovens specified in search parameters (example: ?ovens=tem10,tem11).',
           )
         }
         reset={() => window.location.reload()}
