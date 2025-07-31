@@ -3,7 +3,8 @@ export type OvenProcessDataType = {
   oven: string;
   article: string;
   hydraBatch: string;
-  operator: string[];
+  startOperators: string[];
+  endOperators?: string[];
   status: 'running' | 'finished' | 'deleted';
   startTime: Date;
   endTime: Date | null;

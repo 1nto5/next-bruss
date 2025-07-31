@@ -70,14 +70,25 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
     cell: ({ row }) => <div>{row.getValue('hydraBatch')}</div>,
   },
   {
-    accessorKey: 'operator',
-    header: 'Operators',
+    accessorKey: 'startOperators',
+    header: 'Start Operators',
     cell: ({ row }) => {
-      // Render operators as a comma-separated string
-      const operators = row.getValue('operator') as string[];
+      // Render start operators as a comma-separated string
+      const operators = row.getValue('startOperators') as string[];
       return (
-        <div>{Array.isArray(operators) ? operators.join(', ') : operators}</div>
+        <div>
+          {Array.isArray(operators) ? operators.join(', ') : operators || '-'}
+        </div>
       );
+    },
+  },
+  {
+    accessorKey: 'endOperators',
+    header: 'End Operators',
+    cell: ({ row }) => {
+      // Render end operators as a comma-separated string
+      const operators = row.getValue('endOperators') as string[];
+      return <div>{Array.isArray(operators) ? operators.join(', ') : '-'}</div>;
     },
   },
   {

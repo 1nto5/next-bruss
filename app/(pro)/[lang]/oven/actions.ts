@@ -163,7 +163,8 @@ export async function fetchOvenProcesses(
           oven: doc.oven,
           article: doc.article || '',
           hydraBatch: doc.hydraBatch,
-          operator: doc.operator,
+          startOperators: doc.startOperators || doc.operator || [], // Handle legacy data
+          endOperators: doc.endOperators || undefined,
           status: doc.status,
           startTime: doc.startTime,
           endTime: doc.endTime,
@@ -240,7 +241,8 @@ export async function startOvenProcess(
       oven,
       article,
       hydraBatch,
-      operator: operator,
+      startOperators: operator,
+      endOperators: null,
       status: 'running' as const,
       startTime: new Date(),
       endTime: null,
@@ -319,11 +321,13 @@ export async function deleteOvenProcess(
 /**
  * Completes an oven process
  * @param processId - The process ID to complete (validated: 24-character hex string)
+ * @param endOperators - Array of operator identifiers who completed the process
  * @param notes - Optional completion notes
  * @returns Success status or error message (includes validation errors)
  */
 export async function completeOvenProcess(
   processId: string,
+  endOperators: string[],
   notes?: string,
 ): Promise<{ error: string } | { success: boolean }> {
   try {
@@ -340,6 +344,11 @@ export async function completeOvenProcess(
       return { error: 'validation failed' };
     }
 
+    // Additional validation for endOperators array
+    if (!endOperators || endOperators.length === 0) {
+      return { error: 'no operator' };
+    }
+
     const collection = await dbc('oven_processes');
 
     const result = await collection.updateOne(
@@ -348,6 +357,7 @@ export async function completeOvenProcess(
         $set: {
           status: 'finished', // match OvenProcessType
           endTime: new Date(),
+          endOperators: endOperators,
           updatedAt: new Date(),
         },
       },

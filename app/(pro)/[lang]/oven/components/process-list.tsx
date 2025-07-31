@@ -145,6 +145,11 @@ export default function ProcessList() {
     return expectedCompletion.toLocaleString(params?.lang || 'pl');
   };
 
+  const formatOperators = (operators?: string[]): string => {
+    if (!operators || operators.length === 0) return '-';
+    return operators.join(', ');
+  };
+
   const getTempStatus = (
     processTemp?: number,
     processTolerance?: number,
@@ -274,7 +279,7 @@ export default function ProcessList() {
       const loadingToast = toast.loading('Kończenie procesu...');
 
       try {
-        const result = await completeOvenProcess(existingProcess.id);
+        const result = await completeOvenProcess(existingProcess.id, operators);
 
         if ('success' in result && result.success) {
           playOvenOut();

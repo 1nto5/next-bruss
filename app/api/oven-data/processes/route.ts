@@ -97,7 +97,8 @@ export async function GET(request: NextRequest) {
           oven: doc.oven,
           article: doc.article || '',
           hydraBatch: doc.hydraBatch,
-          operator: doc.operator || [],
+          startOperators: doc.startOperators || doc.operator || [], // Handle legacy data
+          endOperators: doc.endOperators || undefined,
           status: doc.status,
           startTime: doc.startTime,
           endTime: doc.endTime,

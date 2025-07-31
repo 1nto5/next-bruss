@@ -100,8 +100,11 @@ export async function GET(request: NextRequest) {
           'Status': doc.status,
           'Article': doc.article || '',
           'Hydra Batch': doc.hydraBatch,
-          'Operators': Array.isArray(doc.operator)
-            ? doc.operator.join(', ')
+          'Start Operators': Array.isArray(doc.startOperators || doc.operator)
+            ? (doc.startOperators || doc.operator).join(', ')
+            : '',
+          'End Operators': Array.isArray(doc.endOperators)
+            ? doc.endOperators.join(', ')
             : '',
           'Start Time': doc.startTime.toLocaleString(),
           'End Time': doc.endTime ? doc.endTime.toLocaleString() : '',
