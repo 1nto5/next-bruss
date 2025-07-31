@@ -141,6 +141,7 @@ export default function OvenTableFilteringAndOptions({
   const statusOptions = [
     { value: 'running', label: 'Running' },
     { value: 'finished', label: 'Finished' },
+    { value: 'deleted', label: 'Deleted' },
   ];
 
   const ovenOptions = ovens.map((oven) => ({

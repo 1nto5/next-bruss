@@ -4,7 +4,7 @@ export type OvenProcessDataType = {
   article: string;
   hydraBatch: string;
   operator: string[];
-  status: 'running' | 'finished';
+  status: 'running' | 'finished' | 'deleted';
   startTime: Date;
   endTime: Date | null;
   startTimeLocaleString: string;
