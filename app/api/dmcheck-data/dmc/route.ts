@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
-  const orConditions: any[] = [];
+  const andConditions: any[] = [];
 
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
@@ -23,39 +23,50 @@ export async function GET(req: NextRequest) {
       key === 'hydra_batch' ||
       key === 'pallet_batch'
     ) {
-      // Handle multiple values separated by commas - each value becomes a separate OR condition
+      // Handle multiple values separated by commas - OR within field, AND between fields
       const values = value
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
-      
-      // Add each individual value as a separate OR condition
-      values.forEach((val) => {
-        orConditions.push({ [key]: { $regex: new RegExp(val, 'i') } });
-      });
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          [key]: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            [key]: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            [key]: { $in: values },
+          });
+        }
+      }
     } else if (key === 'status' || key === 'workplace' || key === 'article') {
-      // Handle multi-select filters - each value becomes a separate OR condition
+      // Handle multi-select filters - OR within field, AND between fields
       const values = value
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
-      
-      // Add each individual value as a separate OR condition
-      values.forEach((val) => {
-        orConditions.push({ [key]: val });
-      });
+
+      if (values.length === 1) {
+        // Single value
+        query[key] = values[0];
+      } else if (values.length > 1) {
+        // Multiple values - use $in for OR within field
+        query[key] = { $in: values };
+      }
     }
   });
 
-  // Build final query with OR logic for filter conditions
-  if (orConditions.length > 0) {
-    if (orConditions.length === 1) {
-      // Single condition - add directly to query
-      Object.assign(query, orConditions[0]);
-    } else {
-      // Multiple conditions - use $or
-      query.$or = orConditions;
-    }
+  // Add $and conditions if any exist
+  if (andConditions.length > 0) {
+    query.$and = andConditions;
   }
 
   try {

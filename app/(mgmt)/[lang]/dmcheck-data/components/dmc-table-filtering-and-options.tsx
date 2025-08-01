@@ -227,7 +227,7 @@ export default function DmcTableFilteringAndOptions({
                 options={workplaceOptions}
                 value={workplaceFilter}
                 onValueChange={setWorkplaceFilter}
-                placeholder='workplace'
+                placeholder='Select...'
                 searchPlaceholder='search...'
                 emptyText='not found'
                 className='w-full'
@@ -240,7 +240,7 @@ export default function DmcTableFilteringAndOptions({
                 options={articleOptions}
                 value={articleFilter}
                 onValueChange={setArticleFilter}
-                placeholder='article'
+                placeholder='Select...'
                 searchPlaceholder='search...'
                 emptyText='not found'
                 className='w-full'
@@ -253,7 +253,7 @@ export default function DmcTableFilteringAndOptions({
                 options={statusOptions}
                 value={statusFilter}
                 onValueChange={setStatusFilter}
-                placeholder='status'
+                placeholder='Select...'
                 searchPlaceholder='search...'
                 emptyText='not found'
                 className='w-full'
@@ -283,7 +283,9 @@ export default function DmcTableFilteringAndOptions({
                       {getValueCount(dmcFilter) !== 1 ? 's' : ''})
                     </span>
                   ) : (
-                    <span className='text-muted-foreground'>DMC</span>
+                    <span className='text-muted-foreground'>
+                      Click to add...
+                    </span>
                   )}
                 </Button>
               </PasteValuesDialog>
@@ -309,7 +311,9 @@ export default function DmcTableFilteringAndOptions({
                       {getValueCount(hydraFilter) !== 1 ? 's' : ''})
                     </span>
                   ) : (
-                    <span className='text-muted-foreground'>HYDRA Batch</span>
+                    <span className='text-muted-foreground'>
+                      Click to add...
+                    </span>
                   )}
                 </Button>
               </PasteValuesDialog>
@@ -335,7 +339,9 @@ export default function DmcTableFilteringAndOptions({
                       {getValueCount(palletFilter) !== 1 ? 's' : ''})
                     </span>
                   ) : (
-                    <span className='text-muted-foreground'>Pallet Batch</span>
+                    <span className='text-muted-foreground'>
+                      Click to add...
+                    </span>
                   )}
                 </Button>
               </PasteValuesDialog>
