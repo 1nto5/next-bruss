@@ -10,9 +10,11 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
+  const orConditions: any[] = [];
 
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
+      // Date filters remain as AND conditions (time range)
       if (!query.time) query.time = {};
       if (key === 'from') query.time.$gte = new Date(value);
       if (key === 'to') query.time.$lte = new Date(value);
@@ -21,11 +23,40 @@ export async function GET(req: NextRequest) {
       key === 'hydra_batch' ||
       key === 'pallet_batch'
     ) {
-      query[key] = { $regex: new RegExp(value, 'i') };
-    } else {
-      query[key] = value;
+      // Handle multiple values separated by commas - each value becomes a separate OR condition
+      const values = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+      
+      // Add each individual value as a separate OR condition
+      values.forEach((val) => {
+        orConditions.push({ [key]: { $regex: new RegExp(val, 'i') } });
+      });
+    } else if (key === 'status' || key === 'workplace' || key === 'article') {
+      // Handle multi-select filters - each value becomes a separate OR condition
+      const values = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+      
+      // Add each individual value as a separate OR condition
+      values.forEach((val) => {
+        orConditions.push({ [key]: val });
+      });
     }
   });
+
+  // Build final query with OR logic for filter conditions
+  if (orConditions.length > 0) {
+    if (orConditions.length === 1) {
+      // Single condition - add directly to query
+      Object.assign(query, orConditions[0]);
+    } else {
+      // Multiple conditions - use $or
+      query.$or = orConditions;
+    }
+  }
 
   try {
     const coll = await dbc('scans');
