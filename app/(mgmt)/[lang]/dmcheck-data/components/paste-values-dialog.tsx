@@ -200,39 +200,37 @@ p32298714#tpp0000212667#vexrga`
               )}
             />
             <DialogFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
-              <div className='flex flex-col gap-2 w-full sm:flex-row sm:justify-between sm:w-full'>
+              <div className='flex flex-col gap-2 sm:flex-row sm:gap-2'>
                 <Button
                   type='button'
                   variant='destructive'
                   onClick={handleClearAll}
                   disabled={isPendingApply}
-                  className='w-full sm:w-auto order-3 sm:order-1'
+                  className='w-full sm:w-auto'
                 >
                   <Trash2 />
                   Clear All
                 </Button>
-                <div className='flex flex-col gap-2 w-full sm:flex-row sm:w-auto'>
-                  <Button
-                    type='button'
-                    variant='secondary'
-                    onClick={() => {
-                      setOpen(false);
-                    }}
-                    className='w-full sm:w-auto order-2'
-                  >
-                    <X />
-                    Cancel
-                  </Button>
-                  <Button type='submit' disabled={isPendingApply} className='w-full sm:w-auto order-1 sm:order-3'>
-                    {isPendingApply ? (
-                      <Loader2 className='animate-spin' />
-                    ) : (
-                      <Check />
-                    )}
-                    Confirm
-                  </Button>
-                </div>
+                <Button
+                  type='button'
+                  variant='secondary'
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  className='w-full sm:w-auto'
+                >
+                  <X />
+                  Cancel
+                </Button>
               </div>
+              <Button type='submit' disabled={isPendingApply} className='w-full sm:w-auto'>
+                {isPendingApply ? (
+                  <Loader2 className='animate-spin' />
+                ) : (
+                  <Check />
+                )}
+                Confirm
+              </Button>
             </DialogFooter>
           </form>
         </Form>
