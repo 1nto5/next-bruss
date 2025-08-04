@@ -2,7 +2,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw, Terminal } from 'lucide-react';
+import { Loader2, RefreshCcw, Terminal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
@@ -39,17 +39,8 @@ export default function ErrorComponent({
           <div>{error.message}</div>
           <div className='flex justify-end'>
             <Button onClick={reload} disabled={isPending}>
-              {isPending ? (
-                <span className='flex items-center'>
-                  <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                  Try again
-                </span>
-              ) : (
-                <span className='flex items-center'>
-                  <RefreshCcw className='mr-2 h-4 w-4' />
-                  Try again
-                </span>
-              )}
+              {isPending ? <Loader2 className='animate-spin' /> : <RefreshCcw />}
+              Try again
             </Button>
           </div>
         </AlertDescription>

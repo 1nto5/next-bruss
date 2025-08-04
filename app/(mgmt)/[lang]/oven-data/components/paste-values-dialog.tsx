@@ -33,7 +33,7 @@ const PasteValuesSchema = z.object({
 type PasteValuesFormData = z.infer<typeof PasteValuesSchema>;
 
 interface PasteValuesDialogProps {
-  fieldType: 'dmc' | 'hydra_batch' | 'pallet_batch';
+  fieldType: 'hydra_batch' | 'article';
   fieldLabel: string;
   currentValue: string;
   currentCount: number;
@@ -92,25 +92,24 @@ export default function PasteValuesDialog({
         const invalidValues: string[] = [];
 
         valuesList.forEach((value) => {
-          if (fieldType === 'hydra_batch') {
+          if (fieldType === 'article') {
+            // Article should be 5 digits
+            if (!/^\d{5}$/.test(value)) {
+              invalidValues.push(value);
+            }
+          } else if (fieldType === 'hydra_batch') {
             // HYDRA Batch should be 10 characters
             if (value.length !== 10) {
               invalidValues.push(value);
             }
-          } else if (fieldType === 'pallet_batch') {
-            // Pallet Batch should be 10 characters
-            if (value.length !== 10) {
-              invalidValues.push(value);
-            }
           }
-          // No validation for DMC field
         });
 
         if (invalidValues.length > 0) {
           const errorMessage =
-            fieldType === 'hydra_batch'
-              ? `Invalid HYDRA Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`
-              : `Invalid Pallet Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`;
+            fieldType === 'article'
+              ? `Invalid article format (must be 5 digits): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`
+              : `Invalid HYDRA Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`;
 
           toast.error(errorMessage);
           return;
@@ -166,30 +165,24 @@ export default function PasteValuesDialog({
                     <Textarea
                       placeholder={
                         currentCount > 0
-                          ? fieldType === 'hydra_batch' ||
-                            fieldType === 'pallet_batch'
+                          ? fieldType === 'article'
                             ? `Current values are shown below. You can edit them or paste new values:
-HH12345678
-AB98765432
-XY11223344`
+30111
+30112
+30113`
                             : `Current values are shown below. You can edit them or paste new values:
-C9E0C25175A12400GK2Q
-6K301 AA 1021310071895021025070710279
-p32298714#tpp0000212667#vexrga`
-                          : fieldType === 'hydra_batch'
-                            ? `Paste your HYDRA Batch values here (10 characters), for example:
 HH12345678
 AB98765432
 XY11223344`
-                            : fieldType === 'pallet_batch'
-                              ? `Paste your Pallet Batch values here (10 characters), for example:
+                          : fieldType === 'article'
+                            ? `Paste your article values here (5 digits), for example:
+30111
+30112
+30113`
+                            : `Paste your HYDRA Batch values here (10 characters), for example:
 HH12345678
 AB98765432
 XY11223344`
-                              : `Paste your DMC values here, for example:
-C9E0C25175A12400GK2Q
-6K301 AA 1021310071895021025070710279
-p32298714#tpp0000212667#vexrga`
                       }
                       className='min-h-[150px]'
                       {...field}

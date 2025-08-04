@@ -9,27 +9,96 @@ export async function GET(request: NextRequest) {
 
     // Build filter object based on search parameters (same as processes API)
     const filter: any = {};
+    const andConditions: any[] = [];
 
+    // Filter by oven (multi-select)
     const oven = searchParams.get('oven');
     if (oven) {
-      filter.oven = oven;
+      const values = oven
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+      
+      if (values.length === 1) {
+        filter.oven = values[0];
+      } else if (values.length > 1) {
+        filter.oven = { $in: values };
+      }
     }
 
+    // Filter by Hydra batch (multi-value with exact match)
     const hydraBatch = searchParams.get('hydra_batch');
     if (hydraBatch) {
-      filter.hydraBatch = { $regex: hydraBatch, $options: 'i' };
+      const values = hydraBatch
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          hydraBatch: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            hydraBatch: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            hydraBatch: { $in: values },
+          });
+        }
+      }
     }
 
+    // Filter by article (multi-value with exact match)
     const article = searchParams.get('article');
     if (article) {
-      filter.article = { $regex: article, $options: 'i' };
+      const values = article
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          article: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            article: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            article: { $in: values },
+          });
+        }
+      }
     }
 
+    // Filter by status (multi-select)
     const status = searchParams.get('status');
-    if (status && (status === 'running' || status === 'finished')) {
-      filter.status = status;
+    if (status) {
+      const values = status
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0)
+        .filter((v) => ['running', 'finished', 'deleted'].includes(v));
+      
+      if (values.length === 1) {
+        filter.status = values[0];
+      } else if (values.length > 1) {
+        filter.status = { $in: values };
+      }
     }
 
+    // Filter by time range
     const from = searchParams.get('from');
     const to = searchParams.get('to');
     if (from || to) {
@@ -40,6 +109,11 @@ export async function GET(request: NextRequest) {
       if (to) {
         filter.startTime.$lte = new Date(to);
       }
+    }
+
+    // Add $and conditions if any exist
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
 
     const collection = await dbc('oven_processes');

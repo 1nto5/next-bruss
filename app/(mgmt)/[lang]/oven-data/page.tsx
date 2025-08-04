@@ -86,7 +86,6 @@ export default async function OvenDataPage(props: {
         <OvenTableFilteringAndOptions
           ovens={ovens}
           fetchTime={fetchTime}
-          lang={lang}
         />
       </CardHeader>
       <CardContent>

@@ -378,14 +378,14 @@ export default function ProcessList() {
               <CardTitle>Procesy wygrzewania</CardTitle>
               <div className='flex gap-2'>
                 <Button onClick={() => setStartDialogOpen(true)}>
-                  <Play className='mr-2 h-4 w-4' />
+                  <Play />
                   Nowy proces
                 </Button>
                 <Button
                   onClick={() => setEndDialogOpen(true)}
                   variant='secondary'
                 >
-                  <StopCircle className='mr-2 h-4 w-4' />
+                  <StopCircle />
                   Zakończ proces
                 </Button>
               </div>

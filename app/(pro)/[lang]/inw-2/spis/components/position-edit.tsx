@@ -698,22 +698,16 @@ export default function PositionEdit() {
                 >
                   Wyczyść
                 </Button>
-                {isPending ? (
-                  <Button disabled type='button' className='w-full'>
-                    <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                    Zapisz
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={
-                      !selectedArticle || isPending || data?.success?.approver
-                    }
-                    type='submit'
-                    className='w-full'
-                  >
-                    Zapisz
-                  </Button>
-                )}
+                <Button
+                  disabled={
+                    !selectedArticle || isPending || data?.success?.approver
+                  }
+                  type='submit'
+                  className='w-full'
+                >
+                  {isPending ? <Loader2 className='animate-spin' /> : <RefreshCcw />}
+                  Zapisz
+                </Button>
               </div>
               {position !== 25 && data?.success ? (
                 <Button
@@ -759,16 +753,10 @@ export default function PositionEdit() {
                 - 1
               </Button>
             )}
-            {isPending ? (
-              <Button disabled type={'button'}>
-                <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-                Zapisywanie
-              </Button>
-            ) : (
-              <Button disabled={!selectedArticle || isPending} type='submit'>
-                Zapisz
-              </Button>
-            )}
+            <Button disabled={!selectedArticle || isPending} type='submit'>
+              {isPending ? <Loader2 className='animate-spin' /> : <RefreshCcw />}
+              Zapisz
+            </Button>
             {position !== 25 && data?.success ? (
               <Button
                 onClick={() => setPosition(position + 1)}

@@ -8,7 +8,7 @@ import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { CircleX, Loader, Search, Sheet } from 'lucide-react';
+import { CircleX, FileSpreadsheet, Loader, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -349,14 +349,14 @@ export default function DmcTableFilteringAndOptions({
           </div>
 
           {/* Row 4: Action buttons - Clear, Export to Excel, Search */}
-          <div className='grid grid-cols-4 gap-4'>
+          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-4 sm:gap-4'>
             <Button
               type='button'
               variant='destructive'
               onClick={handleClearFilters}
               title='Clear filters'
               disabled={isPendingSearch}
-              className='w-full'
+              className='order-3 w-full sm:order-1'
             >
               <CircleX /> <span>Clear</span>
             </Button>
@@ -386,11 +386,11 @@ export default function DmcTableFilteringAndOptions({
                   {} as Record<string, string>,
                 ),
               ).toString()}`}
-              className='w-full'
+              className='order-2 w-full sm:order-2'
             >
               <Button className='w-full'>
-                <Sheet />
-                <span>Export to Excel</span>
+                <FileSpreadsheet />
+                <span>Export</span>
               </Button>
             </Link>
 
@@ -398,17 +398,14 @@ export default function DmcTableFilteringAndOptions({
               type='submit'
               variant='secondary'
               disabled={isPendingSearch}
-              className='col-span-2 w-full'
+              className='order-1 w-full sm:order-3 sm:col-span-2'
             >
               {isPendingSearch ? (
-                <>
-                  <Loader className='animate-spin' /> <span>Search</span>
-                </>
+                <Loader className='animate-spin' />
               ) : (
-                <>
-                  <Search /> <span>Search</span>
-                </>
+                <Search />
               )}
+              <span>Search</span>
             </Button>
           </div>
         </form>

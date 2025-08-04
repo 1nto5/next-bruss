@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { RefreshCcw, Terminal } from 'lucide-react';
+import { Loader2, RefreshCcw, Terminal } from 'lucide-react';
 
 interface ErrorAlertProps {
   refetch: () => void;
@@ -14,17 +14,8 @@ const ErrorAlert: React.FC<ErrorAlertProps> = ({ refetch, isFetching }) => {
       <AlertTitle>Coś poszło nie tak!</AlertTitle>
       <AlertDescription className='mt-8 flex justify-end'>
         <Button onClick={refetch} disabled={isFetching}>
-          {isFetching ? (
-            <span className='flex items-center'>
-              <RefreshCcw className='mr-2 h-4 w-4 animate-spin' />
-              Ładowanie
-            </span>
-          ) : (
-            <span className='flex items-center'>
-              <RefreshCcw className='mr-2 h-4 w-4' />
-              Spróbuj ponownie
-            </span>
-          )}
+          {isFetching ? <Loader2 className='animate-spin' /> : <RefreshCcw />}
+          Spróbuj ponownie
         </Button>
       </AlertDescription>
     </Alert>
