@@ -62,7 +62,7 @@ export async function actionName(data: Type) {
 
 #### Database Access
 - **MongoDB**: Use `dbc()` from `/lib/mongo` - handles connection pooling
-- **PostgreSQL**: Use `query()` from `/lib/pg` - for legacy integrations
+- **PostgreSQL**: Use `pgp` default export from `/lib/pg` - for legacy integrations
 - Always check for archive collections (suffix `_archive`) as fallback
 
 #### Authentication
