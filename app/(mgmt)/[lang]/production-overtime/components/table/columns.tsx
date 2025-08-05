@@ -16,6 +16,7 @@ import {
   CalendarClock,
   Check,
   Download,
+  Edit,
   MoreHorizontal,
   Paperclip,
   X,
@@ -179,6 +180,11 @@ export const createColumns = (
           userEmail === request.requestedBy ||
           userEmail === request.responsibleEmployee;
 
+        // Check if user can edit (only author, and only pending/approved status)
+        const canEdit = 
+          request.requestedBy === userEmail &&
+          (request.status === 'pending' || request.status === 'approved');
+
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
         const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
@@ -193,6 +199,7 @@ export const createColumns = (
           hasApproveAction ||
           hasMarkAsAccountedAction ||
           canCancel ||
+          canEdit ||
           hasAddAttachmentAction ||
           hasDownloadAttachmentAction;
 
@@ -217,6 +224,15 @@ export const createColumns = (
                         <span>Odbiór nadgodzin</span>
                       </DropdownMenuItem>
                     </Link>
+                    {/* Edit button - only for author and pending/approved status */}
+                    {canEdit && (
+                      <Link href={`/production-overtime/${request._id}/edit`}>
+                        <DropdownMenuItem>
+                          <Edit className='mr-2 h-4 w-4' />
+                          <span>Edytuj zlecenie</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
                     {/* Only show approve button if user can approve */}
                     {canApprove &&
                       request.status !== 'approved' &&

@@ -550,3 +550,91 @@ export async function bulkMarkAsAccountedOvertimeRequests(ids: string[]) {
     return { error: 'bulkMarkAsAccountedOvertimeRequests server action error' };
   }
 }
+
+export async function getOvertimeRequestForEdit(id: string) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  try {
+    const coll = await dbc('production_overtime');
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    
+    if (!request) {
+      return null;
+    }
+
+    // Check if user is the author of the request
+    if (request.requestedBy !== session.user.email) {
+      return null;
+    }
+
+    // Only allow editing if status is pending or approved
+    if (request.status !== 'pending' && request.status !== 'approved') {
+      return null;
+    }
+
+    // Convert ObjectId to string for client use
+    return {
+      ...request,
+      _id: request._id.toString(),
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function updateOvertimeRequest(
+  id: string,
+  data: NewOvertimeRequestType,
+): Promise<{ success: 'updated' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  try {
+    const coll = await dbc('production_overtime');
+    
+    // First check if the request exists and get its current data
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Check if user is the author of the request
+    if (request.requestedBy !== session.user.email) {
+      return { error: 'unauthorized' };
+    }
+
+    // Only allow editing if status is pending or approved
+    if (request.status !== 'pending' && request.status !== 'approved') {
+      return { error: 'cannot edit - invalid status' };
+    }
+
+    // Update the request
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...data,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateProductionOvertime();
+    revalidateProductionOvertimeRequest();
+    return { success: 'updated' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'updateOvertimeRequest server action error' };
+  }
+}
