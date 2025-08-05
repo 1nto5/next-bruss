@@ -1,9 +1,16 @@
 export type OvenProcessConfigType = {
   id: string;
   article: string;
+  program: number;
+};
+
+export type OvenProgramConfigType = {
+  id: string;
+  program: number;
   temp: number;
   tempTolerance: number;
   duration: number; // Duration in seconds
+  durationTolerance: number; // Duration tolerance in seconds
 };
 
 export type OvenProcessType = {

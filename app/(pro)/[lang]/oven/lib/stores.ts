@@ -34,12 +34,28 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
 
 type OvenStateType = {
   selectedOven: string;
+  selectedProgram: number | null;
   setSelectedOven: (oven: string) => void;
+  setSelectedProgram: (program: number | null) => void;
   clearOven: () => void;
+  clearProgram: () => void;
 };
 
 export const useOvenStore = create<OvenStateType>((set) => ({
   selectedOven: '',
-  setSelectedOven: (oven: string) => set({ selectedOven: oven }),
-  clearOven: () => set({ selectedOven: '' }),
+  selectedProgram: null,
+  setSelectedOven: async (oven: string) => {
+    set({ selectedOven: oven });
+    
+    // Automatically check for active program when oven is selected
+    const { fetchActiveOvenProgram } = await import('../actions');
+    const result = await fetchActiveOvenProgram(oven);
+    
+    if ('program' in result && result.program !== null) {
+      set({ selectedProgram: result.program });
+    }
+  },
+  setSelectedProgram: (program: number | null) => set({ selectedProgram: program }),
+  clearOven: () => set({ selectedOven: '', selectedProgram: null }),
+  clearProgram: () => set({ selectedProgram: null }),
 }));

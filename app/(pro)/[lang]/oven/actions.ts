@@ -5,7 +5,7 @@ import { dbc } from '@/lib/mongo';
 
 // Type definitions
 import { ObjectId } from 'mongodb';
-import { OvenProcessConfigType, OvenProcessType } from './lib/types';
+import { OvenProcessConfigType, OvenProgramConfigType, OvenProcessType } from './lib/types';
 import {
   completeProcessSchema,
   loginType,
@@ -80,33 +80,44 @@ export async function login(data: loginType) {
 
 /**
  * Fetches oven process configuration for a specific article
- * If multiple configurations exist, selects the one with the highest duration
+ * First fetches the program number from oven_process_configs,
+ * then fetches the actual program details from oven_program_configs
  * @param article - The article number to lookup
- * @returns Configuration data or null if not found
+ * @returns Configuration data with program details or null if not found
  */
 export async function fetchOvenProcessConfig(
   article: string,
 ): Promise<
-  { success: OvenProcessConfigType } | { error: string } | { success: null }
+  { success: OvenProgramConfigType & { article: string } } | { error: string } | { success: null }
 > {
   try {
-    const collection = await dbc('oven_process_configs');
-    const config = await collection
-      .find({ article })
-      .sort({ duration: -1 })
-      .limit(1)
-      .next();
-    if (!config) {
+    // First, get the program number for this article
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection
+      .findOne({ article });
+    
+    if (!processConfig) {
       return { success: null };
+    }
+
+    // Then, get the program details
+    const programConfigCollection = await dbc('oven_program_configs');
+    const programConfig = await programConfigCollection
+      .findOne({ program: processConfig.program });
+    
+    if (!programConfig) {
+      return { error: 'program not found' };
     }
 
     return {
       success: {
-        id: config._id.toString(),
-        article: config.article,
-        temp: config.temp,
-        tempTolerance: config.tempTolerance,
-        duration: config.duration,
+        id: programConfig._id.toString(),
+        article: article,
+        program: programConfig.program,
+        temp: programConfig.temp,
+        tempTolerance: programConfig.tempTolerance,
+        duration: programConfig.duration,
+        durationTolerance: programConfig.durationTolerance,
       },
     };
   } catch (error) {
@@ -189,6 +200,7 @@ export async function fetchOvenProcesses(
  * @param article - Article number from scan (validated: exactly 5 digits)
  * @param hydraBatch - Batch number from scan (validated: exactly 10 characters)
  * @param operator - Array of operator identifiers (validated: at least one required)
+ * @param selectedProgram - The program number selected for this oven
  * @returns Success status or error message (includes validation errors)
  */
 export async function startOvenProcess(
@@ -196,6 +208,7 @@ export async function startOvenProcess(
   article: string,
   hydraBatch: string,
   operator: string[],
+  selectedProgram: number,
 ): Promise<{ error: string } | { success: boolean; processId: string }> {
   try {
     // Validate input data using ZOD schema
@@ -216,12 +229,25 @@ export async function startOvenProcess(
       return { error: 'no operator' };
     }
 
+    // Validate article is configured for the selected program
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection.findOne({ article });
+    
+    if (!processConfig) {
+      return { error: 'article not configured' };
+    }
+    
+    if (processConfig.program !== selectedProgram) {
+      return { error: 'wrong program for article' };
+    }
+
     const collection = await dbc('oven_processes');
 
     // Fetch the configuration to save target values at time of creation
     let targetTemp: number | undefined;
     let tempTolerance: number | undefined;
     let targetDuration: number | undefined;
+    let durationTolerance: number | undefined;
 
     try {
       const configResult = await fetchOvenProcessConfig(article);
@@ -230,6 +256,7 @@ export async function startOvenProcess(
         targetTemp = config.temp;
         tempTolerance = config.tempTolerance;
         targetDuration = config.duration;
+        durationTolerance = config.durationTolerance;
       }
     } catch (configError) {
       console.error('Error fetching config for new process:', configError);
@@ -250,6 +277,7 @@ export async function startOvenProcess(
       targetTemp,
       tempTolerance,
       targetDuration,
+      durationTolerance,
     };
 
     try {
@@ -371,6 +399,63 @@ export async function completeOvenProcess(
   } catch (error) {
     console.error(error);
     return { error: 'complete error' };
+  }
+}
+
+/**
+ * Fetches all available oven programs from the database
+ * @returns Array of program numbers or error message
+ */
+export async function fetchOvenProgram(): Promise<
+  { success: number[] } | { error: string }
+> {
+  try {
+    const collection = await dbc('oven_program_configs');
+    const programs = await collection
+      .find({})
+      .project({ program: 1 })
+      .sort({ program: 1 })
+      .toArray();
+    
+    const programNumbers = programs.map(p => p.program);
+    return { success: programNumbers };
+  } catch (error) {
+    console.error('fetchOvenProgram error:', error);
+    return { error: 'programs fetch error' };
+  }
+}
+
+/**
+ * Fetches the active program for a given oven based on running processes
+ * @param oven - The oven identifier
+ * @returns { program: number | null } or { error: string }
+ */
+export async function fetchActiveOvenProgram(
+  oven: string,
+): Promise<{ program: number | null } | { error: string }> {
+  try {
+    const processCollection = await dbc('oven_processes');
+    // Find running processes for this oven
+    const runningProcess = await processCollection
+      .findOne({ oven, status: 'running' });
+    
+    if (!runningProcess || !runningProcess.article) {
+      return { program: null };
+    }
+
+    // Get the program for this article
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection
+      .findOne({ article: runningProcess.article });
+    
+    if (!processConfig) {
+      return { program: null };
+    }
+
+    return { program: processConfig.program };
+  } catch (error) {
+    console.error('fetchActiveOvenProgram error:', error);
+    return { error: 'program fetch error' };
   }
 }
 

@@ -13,10 +13,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, RefObject, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { startBatchSchema, StartBatchType } from '../lib/zod';
+import { StartBatchType } from '../lib/zod';
 
 interface StartBatchDialogProps {
   open: boolean;
@@ -35,12 +34,11 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
     onStart,
   }) {
     const form = useForm<StartBatchType>({
-      resolver: zodResolver(startBatchSchema),
+      // Remove resolver to prevent FormMessage display
       defaultValues: {
         scannedArticle: '',
         scannedBatch: '',
       },
-      mode: 'onSubmit',
     });
 
     useEffect(() => {
@@ -49,19 +47,18 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
       }
     }, [open, articleInputRef]);
 
+    // Remove client-side validation - let server handle it
+    // This ensures consistent error handling with toast and sound
+
     const handleDialogClose = (open: boolean) => {
       onOpenChange(open);
       form.reset();
     };
 
     const handleSubmit = async (data: StartBatchType) => {
-      try {
-        await onStart(data);
-        form.reset();
-        setTimeout(() => articleInputRef.current?.focus(), 50);
-      } catch {
-        // Parent component handles errors
-      }
+      await onStart(data);
+      form.reset();
+      setTimeout(() => articleInputRef.current?.focus(), 50);
     };
 
     return (
