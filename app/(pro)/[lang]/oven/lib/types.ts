@@ -20,7 +20,7 @@ export type OvenProcessType = {
   hydraBatch: string;
   startOperators: string[];
   endOperators?: string[];
-  status: 'running' | 'finished' | 'deleted';
+  status: 'prepared' | 'running' | 'finished' | 'deleted';
   startTime: Date;
   endTime: Date;
   // Saved target values from config at time of process creation

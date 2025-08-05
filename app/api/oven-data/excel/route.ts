@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0)
-        .filter((v) => ['running', 'finished', 'deleted'].includes(v));
+        .filter((v) => ['prepared', 'running', 'finished', 'deleted'].includes(v));
       
       if (values.length === 1) {
         filter.status = values[0];

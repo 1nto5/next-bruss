@@ -121,6 +121,7 @@ export default function OvenTableFilteringAndOptions({
   };
 
   const statusOptions = [
+    { value: 'prepared', label: 'Prepared' },
     { value: 'running', label: 'Running' },
     { value: 'finished', label: 'Finished' },
     { value: 'deleted', label: 'Deleted' },

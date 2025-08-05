@@ -139,7 +139,7 @@ export async function fetchOvenProcesses(
   try {
     const collection = await dbc('oven_processes');
     const processes = await collection
-      .find({ oven, status: 'running' }) // Only return running processes
+      .find({ oven, status: { $in: ['prepared', 'running'] } }) // Return prepared and running processes
       .sort({ startTime: -1 }) // Sort by startTime (existing field)
       .toArray();
 
@@ -270,7 +270,7 @@ export async function startOvenProcess(
       hydraBatch,
       startOperators: operator,
       endOperators: null,
-      status: 'running' as const,
+      status: 'prepared' as const,
       startTime: new Date(),
       endTime: null,
       // Save target values from config at time of creation

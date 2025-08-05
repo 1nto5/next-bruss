@@ -32,6 +32,11 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
 
       const getStatusStyles = (status: string) => {
         switch (status) {
+          case 'prepared':
+            return {
+              variant: 'outline' as const,
+              className: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+            };
           case 'running':
             return {
               variant: 'default' as const,
