@@ -13,14 +13,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Flame, UserPen } from 'lucide-react';
+import { Flame, UserPen, TimerReset, Thermometer, User } from 'lucide-react';
 import { useState } from 'react';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 
 export default function Header() {
   const { operator1, operator2, operator3, logout } = usePersonalNumberStore();
-  const { selectedOven, clearOven } = useOvenStore();
+  const { selectedOven, selectedProgram, clearOven, clearProgram } = useOvenStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const [alertOpen, setAlertOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
@@ -61,8 +61,15 @@ export default function Header() {
         <div className='relative mx-auto flex h-4 w-full items-center justify-between'>
           <div className='flex items-center gap-2'>
             {selectedOven && (
-              <Badge variant='default' size='default'>
+              <Badge variant='default' size='default' className='flex items-center gap-1'>
+                <Flame className='h-3 w-3' />
                 {selectedOven.toUpperCase()}
+              </Badge>
+            )}
+            {selectedProgram && (
+              <Badge variant='secondary' size='default' className='flex items-center gap-1'>
+                <TimerReset className='h-3 w-3' />
+                {selectedProgram}
               </Badge>
             )}
             {/* Show last average temperature if available */}
@@ -72,6 +79,7 @@ export default function Header() {
                 size='default'
                 className='flex items-center gap-1'
               >
+                <Thermometer className='h-3 w-3' />
                 {tempData &&
                 'avgTemp' in tempData &&
                 typeof tempData.avgTemp === 'number' &&
@@ -87,7 +95,9 @@ export default function Header() {
                     key={operator.identifier}
                     variant='secondary'
                     size='sm'
+                    className='flex items-center gap-1'
                   >
+                    <User className='h-3 w-3' />
                     {operator.firstName}{' '}
                     {operator.lastName.charAt(0).toUpperCase()}.
                   </Badge>
@@ -100,6 +110,11 @@ export default function Header() {
             {selectedOven && (
               <Button onClick={clearOven} variant='ghost' size='icon'>
                 <Flame className='h-[1.2rem] w-[1.2rem]' />
+              </Button>
+            )}
+            {selectedProgram && (
+              <Button onClick={clearProgram} variant='ghost' size='icon'>
+                <TimerReset className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
             {loggedInOperators.length > 0 && (

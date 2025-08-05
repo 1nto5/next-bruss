@@ -13,10 +13,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, RefObject } from 'react';
 import { useForm } from 'react-hook-form';
-import { endBatchSchema, EndBatchType } from '../lib/zod';
+import { EndBatchType } from '../lib/zod';
 
 interface EndBatchDialogProps {
   open: boolean;
@@ -28,11 +27,10 @@ interface EndBatchDialogProps {
 export const EndBatchDialog = memo<EndBatchDialogProps>(
   function EndBatchDialog({ open, onOpenChange, inputRef, onEnd }) {
     const form = useForm<EndBatchType>({
-      resolver: zodResolver(endBatchSchema),
+      // Remove resolver to prevent FormMessage display
       defaultValues: {
         scannedBatch: '',
       },
-      mode: 'onSubmit',
     });
 
     const handleDialogClose = (open: boolean) => {
@@ -41,12 +39,8 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
     };
 
     const handleSubmit = async (data: EndBatchType) => {
-      try {
-        await onEnd(data);
-        form.reset();
-      } catch {
-        // Parent component handles errors
-      }
+      await onEnd(data);
+      form.reset();
     };
 
     return (

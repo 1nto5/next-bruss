@@ -39,6 +39,7 @@ import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
 import type { EndBatchType, StartBatchType } from '../lib/zod';
+import { startBatchSchema, endBatchSchema } from '../lib/zod';
 import { EndBatchDialog } from './end-batch-dialog';
 import { StartBatchDialog } from './start-batch-dialog';
 
@@ -59,6 +60,8 @@ const errorMessageMap: Record<string, string> = {
   'delete error': 'Błąd usuwania procesu - skontaktuj się z IT',
   'temp error': 'Błąd temperatury pieca - skontaktuj się z IT',
   'validation failed': 'Skontaktuj się z IT!',
+  'article not configured': 'Artykuł nie jest skonfigurowany!',
+  'wrong program for article': 'Artykuł nie pasuje do wybranego programu!',
 };
 
 const translateError = (serverError: string): string => {
@@ -66,7 +69,7 @@ const translateError = (serverError: string): string => {
 };
 
 export default function ProcessList() {
-  const { selectedOven } = useOvenStore();
+  const { selectedOven, selectedProgram } = useOvenStore();
   const { operator1, operator2, operator3 } = usePersonalNumberStore();
   const params = useParams<{ lang: Locale }>();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
@@ -193,6 +196,22 @@ export default function ProcessList() {
 
   const handleStartProcess = useCallback(
     async (formData: StartBatchType) => {
+      // Validate form data first
+      const validationResult = startBatchSchema.safeParse(formData);
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        playNok();
+        toast.error(firstError.message);
+        setTimeout(() => {
+          if (firstError.path[0] === 'scannedArticle') {
+            articleInputRef.current?.focus();
+          } else {
+            batchInputRef.current?.focus();
+          }
+        }, 0);
+        return;
+      }
+
       const { scannedArticle, scannedBatch } = formData;
       if (!isSuccess(data)) return;
 
@@ -203,7 +222,7 @@ export default function ProcessList() {
           batchInputRef.current?.focus();
         }, 0);
         playNok();
-        throw new Error(errorMessage);
+        return; // Don't throw
       }
 
       const loadingToast = toast.loading('Rozpoczynanie procesu...');
@@ -214,6 +233,7 @@ export default function ProcessList() {
           scannedArticle,
           scannedBatch,
           operators,
+          selectedProgram!,
         );
 
         if ('success' in result && result.success) {
@@ -233,9 +253,10 @@ export default function ProcessList() {
             batchInputRef.current?.focus();
           }, 0);
           toast.error(errorMessage, { id: loadingToast });
-          throw new Error(errorMessage);
+          return; // Don't throw for expected business errors
         }
 
+        // Only throw for unexpected errors
         playNok();
         const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
@@ -244,6 +265,7 @@ export default function ProcessList() {
         toast.error(errorMessage, { id: loadingToast });
         throw new Error(errorMessage);
       } catch (error) {
+        // Unexpected errors
         playNok();
         const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
@@ -251,14 +273,26 @@ export default function ProcessList() {
         }, 0);
         console.error(error);
         toast.error(errorMessage, { id: loadingToast });
-        throw error;
+        // Don't re-throw, just log
       }
     },
-    [data, selectedOven, operators, refetch, playNok, playOvenIn],
+    [data, selectedOven, selectedProgram, operators, refetch, playNok, playOvenIn],
   );
 
   const handleEndProcess = useCallback(
     async (formData: EndBatchType) => {
+      // Validate form data first
+      const validationResult = endBatchSchema.safeParse(formData);
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        playNok();
+        toast.error(firstError.message);
+        setTimeout(() => {
+          endInputRef.current?.focus();
+        }, 0);
+        return;
+      }
+
       const { scannedBatch } = formData;
       if (!isSuccess(data)) return;
 
@@ -273,7 +307,7 @@ export default function ProcessList() {
           endInputRef.current?.focus();
         }, 0);
         playNok();
-        throw new Error(errorMessage);
+        return; // Don't throw
       }
 
       const loadingToast = toast.loading('Kończenie procesu...');
