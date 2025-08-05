@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const coll = await dbc('employees');
     const employees = await coll
-      .find()
+      .find({ status: { $ne: 'inactive' } })
       .sort({ firstName: 1, lastName: 1 })
       .toArray();
     return new NextResponse(JSON.stringify(employees));
