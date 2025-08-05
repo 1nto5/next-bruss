@@ -249,10 +249,10 @@ export default function NewOvertimeRequestForm({
                       min={1}
                       {...field}
                       onChange={(e) => {
-                        const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                        const value = parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
-                      value={field.value === '' ? '' : field.value}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -342,10 +342,10 @@ export default function NewOvertimeRequestForm({
                       min={1}
                       {...field}
                       onChange={(e) => {
-                        const value = e.target.value === '' ? '' : parseInt(e.target.value);
+                        const value = parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
-                      value={field.value === '' ? '' : field.value}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />

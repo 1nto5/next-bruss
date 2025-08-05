@@ -575,10 +575,32 @@ export async function getOvertimeRequestForEdit(id: string) {
       return null;
     }
 
-    // Convert ObjectId to string for client use
+    // Convert MongoDB document to OvertimeType
     return {
-      ...request,
       _id: request._id.toString(),
+      status: request.status,
+      numberOfEmployees: request.numberOfEmployees,
+      numberOfShifts: request.numberOfShifts,
+      responsibleEmployee: request.responsibleEmployee,
+      employeesWithScheduledDayOff: request.employeesWithScheduledDayOff || [],
+      from: request.from,
+      to: request.to,
+      reason: request.reason,
+      note: request.note || '',
+      requestedAt: request.requestedAt,
+      requestedBy: request.requestedBy,
+      editedAt: request.editedAt,
+      editedBy: request.editedBy,
+      approvedAt: request.approvedAt,
+      approvedBy: request.approvedBy,
+      canceledAt: request.canceledAt,
+      canceledBy: request.canceledBy,
+      completedAt: request.completedAt,
+      completedBy: request.completedBy,
+      accountedAt: request.accountedAt,
+      accountedBy: request.accountedBy,
+      hasAttachment: request.hasAttachment,
+      attachmentFilename: request.attachmentFilename,
     };
   } catch (error) {
     console.error(error);
