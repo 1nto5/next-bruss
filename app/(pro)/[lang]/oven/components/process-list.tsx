@@ -39,7 +39,7 @@ import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
 import type { EndBatchType, StartBatchType } from '../lib/zod';
-import { startBatchSchema, endBatchSchema } from '../lib/zod';
+import { endBatchSchema, startBatchSchema } from '../lib/zod';
 import { EndBatchDialog } from './end-batch-dialog';
 import { StartBatchDialog } from './start-batch-dialog';
 
@@ -126,14 +126,6 @@ export default function ProcessList() {
     );
   }
 
-  const formatTempWithTolerance = (
-    temp?: number,
-    tolerance?: number,
-  ): string => {
-    if (!temp || !tolerance) return '-';
-    return `${temp}°C ±${tolerance}°C`;
-  };
-
   const formatExpectedCompletion = (
     startTime?: Date,
     targetDuration?: number,
@@ -151,47 +143,6 @@ export default function ProcessList() {
   const formatOperators = (operators?: string[]): string => {
     if (!operators || operators.length === 0) return '-';
     return operators.join(', ');
-  };
-
-  const getTempStatus = (
-    processTemp?: number,
-    processTolerance?: number,
-    currentTemp?: number | null,
-  ): 'good' | 'danger' | 'unknown' => {
-    if (
-      !processTemp ||
-      !processTolerance ||
-      currentTemp === null ||
-      currentTemp === undefined
-    ) {
-      return 'unknown';
-    }
-
-    const minTemp = processTemp - processTolerance;
-    const maxTemp = processTemp + processTolerance;
-
-    return currentTemp >= minTemp && currentTemp <= maxTemp ? 'good' : 'danger';
-  };
-
-  const formatTempWithStatus = (
-    temp?: number,
-    tolerance?: number,
-    currentTemp?: number | null,
-  ) => {
-    const tempString = formatTempWithTolerance(temp, tolerance);
-    const status = getTempStatus(temp, tolerance, currentTemp);
-
-    const classes = {
-      good: 'text-green-600 dark:text-green-400 font-bold',
-      danger: 'text-red-600 dark:text-red-400 animate-pulse font-bold',
-      unknown: 'text-muted-foreground',
-    };
-
-    return {
-      text: tempString,
-      className: classes[status],
-      status,
-    };
   };
 
   const handleStartProcess = useCallback(
@@ -276,7 +227,15 @@ export default function ProcessList() {
         // Don't re-throw, just log
       }
     },
-    [data, selectedOven, selectedProgram, operators, refetch, playNok, playOvenIn],
+    [
+      data,
+      selectedOven,
+      selectedProgram,
+      operators,
+      refetch,
+      playNok,
+      playOvenIn,
+    ],
   );
 
   const handleEndProcess = useCallback(
@@ -437,12 +396,12 @@ export default function ProcessList() {
                     const fiveMinutesAgo = now.getTime() - 5 * 60 * 1000;
                     return startTime.getTime() < fiveMinutesAgo;
                   }) && (
-                    <Alert variant='destructive'>
+                    <Alert>
                       <AlertTriangle className='h-4 w-4' />
-                      <AlertTitle>Błąd odczytu temperatury</AlertTitle>
+                      <AlertTitle>Brak odczytu temperatury</AlertTitle>
                       <AlertDescription>
-                        System nie uzyskał poprawnych danych z czujników
-                        temperatur. Skontaktuj się z IT!
+                        System nie uzyskał danych z czujników temperatur. Jeśli
+                        piec jest już uruchomiony, skontaktuj się z IT!
                       </AlertDescription>
                     </Alert>
                   )}
@@ -452,7 +411,6 @@ export default function ProcessList() {
                       <TableHead>Start</TableHead>
                       <TableHead>Artykuł</TableHead>
                       <TableHead>HYDRA batch</TableHead>
-                      <TableHead>Oczekiwana temperatura</TableHead>
                       <TableHead>Planowane zakończenie</TableHead>
                       <TableHead className='w-16'></TableHead>
                     </TableRow>
@@ -460,20 +418,12 @@ export default function ProcessList() {
                   <TableBody>
                     {data.success.map((process) => {
                       const startString = formatDateTime(process.startTime);
-                      const tempDisplay = formatTempWithStatus(
-                        process.targetTemp,
-                        process.tempTolerance,
-                        currentTemp,
-                      );
 
                       return (
                         <TableRow key={process.id}>
                           <TableCell>{startString}</TableCell>
                           <TableCell>{process.article}</TableCell>
                           <TableCell>{process.hydraBatch}</TableCell>
-                          <TableCell className={tempDisplay.className}>
-                            {tempDisplay.text}
-                          </TableCell>
                           <TableCell
                             className={(() => {
                               if (!process.startTime || !process.targetDuration)
