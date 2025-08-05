@@ -1,234 +1,218 @@
 # Next-Bruss
 
-A modern web application built with Next.js 15, featuring a robust authentication system, internationalization support, and a comprehensive UI component library.
+Next-Bruss is an industrial manufacturing web application built with Next.js 15, designed to streamline production floor operations and management tasks in manufacturing environments.
 
-## 📱 Applications Overview
+## 🚀 Overview
 
-The project consists of two main applications designed for different user roles:
+The application serves two primary user groups:
+- **Production Floor Workers** - Real-time tracking, scanning, and monitoring tools
+- **Management & Administration** - Quality control, analytics, and administrative functions
 
-### 1. Production Application (`/pro`)
+## 🛠️ Tech Stack
 
-The production application is designed for daily operations on the production floor.
+- **Framework**: Next.js 15 with App Router and Turbopack
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Authentication**: NextAuth.js with LDAP integration
+- **Databases**: 
+  - MongoDB (primary)
+  - PostgreSQL (legacy integrations)
+- **State Management**:
+  - Zustand (client state with persistence)
+  - React Query/TanStack Query (server state)
+  - nuqs (URL state synchronization)
+- **Forms**: React Hook Form + Zod validation
+- **Internationalization**: Built-in i18n (Polish, German)
+- **Package Manager**: Bun
 
-#### Core Modules
+## 📱 Applications
 
-##### 1. Inventory Management (`/inw-2`)
+### Production Floor (`/pro`)
 
-- **Inventory Operations** (`/spis`)
-  - Records and confirms the current status of products and items in production and warehouse areas
-  - Features:
-    - Real-time inventory tracking
-    - Stock level monitoring
-    - Material movement tracking
-    - Barcode scanning support
-    - Quick stock updates
-    - Inventory alerts
+Minimal layout optimized for production floor terminals:
 
-##### 2. DMCheck System (`/dmcheck`)
+#### 1. DMCheck System (`/dmcheck`)
+- DMC (Data Matrix Code) scanning and validation
+- Real-time quality tracking
+- Box and pallet management
+- Complete traceability chain (part → box → pallet)
+- Integration with SMART API for EOL validation
+- Operator accountability tracking
 
-- **Production Tracking and Traceability**
-  - DMC (Data Matrix Code) scanning and validation for produced parts
-  - Batch tracking and traceability system
-  - Features:
-    - DMC code validation with manufacturer-specific rules
-    - Real-time data entry and validation
-    - Box and pallet management
-    - Quality control integration
-    - Complete traceability chain (part → box → pallet → warehouse)
-    - External system integration (SMART API, quality databases)
-    - Real-time status monitoring
-    - Batch tracking
-    - Operator tracking and accountability
-    - Historical data management
-    - Export and reporting capabilities
+#### 2. Inventory Management (`/inw-2/spis`)
+- Real-time inventory tracking
+- Barcode scanning support
+- Stock level monitoring
+- Material movement tracking
 
-##### 3. Oven Management (`.oven`)
+#### 3. Oven Monitoring (`/oven`)
+- Temperature tracking and monitoring
+- Process parameter management
+- Real-time alerts
+- Historical data analysis
 
-- **Production Monitoring**
-  - Features:
-    - Temperature tracking
-    - Process parameters
-    - Quality control
-    - Real-time monitoring
-    - Alert system
-    - Historical data tracking
+### Management Application (`/mgmt`)
 
-### 2. Management Application (`/mgmt`)
+Full-featured layout with navigation:
 
-The management application is designed for administrative staff.
+#### 1. Administration (`/admin`)
+- User management and roles
+- Article configuration
+- Employee management
+- System settings
 
-#### Core Modules
+#### 2. Quality Management
+- **Deviations** (`/deviations`) - Track and manage quality deviations
+- **Failures** (`/failures`) - Failure analysis and corrective actions
+- **CAPA** (`/capa-old`) - Corrective and Preventive Actions
 
-##### 1. Inventory Management (`/inw-2`)
+#### 3. Production Management
+- **DMCheck Data** (`/dmcheck-data`) - Analytics and data management
+- **Oven Data** (`/oven-data`) - Temperature charts and process data
+- **Projects** (`/projects`) - Project tracking and resource allocation
 
-- **Approval System** (`/zatwierdz`)
-  - Features:
-    - Approval workflow
-    - Approval history tracking
-    - Document verification
-    - Report generation
+#### 4. HR Functions
+- **Production Overtime** (`/production-overtime`) - Overtime tracking and approval
+- **Overtime Submissions** (`/overtime-submissions`) - Employee overtime requests
 
-##### 2. Deviations Management (`/deviations`)
+#### 5. Tools
+- **Codes Generator** (`/codes-generator`) - Generate production codes and labels
+- **Inventory Approval** (`/inw-2/zatwierdz`) - Approve inventory operations
 
-- **Deviation Tracking**
-  - Features:
-    - Create and manage deviations
-    - Document handling
-    - Approval workflows
-    - Root cause analysis
-    - Corrective actions
-    - Email notifications
-    - Analytics dashboard
+## 🚀 Getting Started
 
-##### 3. Codes Generator (`/codes-generator`)
+### Prerequisites
 
-- **Code Generation**
-  - Features:
-    - Custom code formats
+- Node.js 18+
+- Bun package manager
+- MongoDB instance
+- PostgreSQL instance (for legacy features)
+- LDAP server (for authentication)
 
-##### 4. Production Overtime (`/production-overtime`)
+### Environment Variables
 
-- **Overtime Management**
-  - Features:
-    - Overtime tracking
-    - Approval workflows
-    - Resource allocation
-    - Cost tracking
-    - Analytics
+Create a `.env.local` file:
 
-##### 5. Projects Management (`/projects`)
+```bash
+# Database
+MONGODB_URI=mongodb://...
+PG_STRING=postgresql://...
 
-- **Project Tracking**
-  - Features:
-    - Project lifecycle management
-    - Resource allocation
-    - Timeline tracking
-    - Budget tracking
-    - Team management
+# Authentication
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret
 
-##### 6. Failures Management (`/failures`)
+# LDAP Configuration
+LDAP_URL=ldap://...
+LDAP_BIND_DN=...
+LDAP_BIND_PASSWORD=...
 
-- **Failure Tracking**
-  - Features:
-    - Failure reporting
-    - Root cause analysis
-    - Corrective actions
-    - Preventive measures
-    - Trend analysis
-    - Quality metrics
+# External APIs
+SMART_API_URL=...
+```
 
-##### 7. DMCheck Data (`/dmcheck-data`)
+### Installation
 
-- **Data Management**
-  - Features:
-    - Data validation
-    - Data export/import
-    - Analytics
+```bash
+# Install dependencies
+bun install
 
-##### 8. Administration (`/admin`)
+# Run development server
+bun dev
 
-- **System Administration**
-  - Features:
-    - User management
-    - Role configuration
-    - System settings
-    - Access control
-    - Audit logging
-    - System monitoring
+# Build for production
+bun build
 
-##### 9. Authentication (`/auth`)
+# Start production server
+bun start
+```
 
-- **Security Management**
-  - Features:
-    - User authentication
-    - Session management
-    - Access control
-    - Security policies
-    - Audit trails
-    - Compliance monitoring
-
-#### Legacy Modules
-
-- **Pro Old** (`/pro-old`) - Legacy production features
-- **Inw Old** (`/inw-old`) - Legacy inventory system
-- **CAPA Old** (`/capa-old`) - Legacy CAPA system
-
-## 🔧 Technical Implementation
-
-### Core Technologies
-
-- **Frontend**
-  - Next.js 15 with App Router
-  - TypeScript
-  - Tailwind CSS
-  - React Query
-  - Zustand
-
-### Architecture
-
-- **State Management**
-
-  - Zustand for client state
-  - Context API for theme and auth
-
-- **Data Flow**
-
-  - Server actions for mutations
-  - Real-time updates
-  - Optimistic updates
-  - Error handling
-
-- **Security**
-
-  - NextAuth.js integration
-  - LDAP authentication
-  - Role-based access control
-  - Session management
-
-- **Database**
-  - MongoDB
-  - Connection pooling
-  - Transaction management
-
-### UI/UX
-
-- **Components**
-
-  - shadcn/ui components (built on Radix UI primitives)
-  - Theme support
-  - Responsive design
-
-- **Forms**
-  - React Hook Form
-  - Zod validation
-  - Custom validators
-  - Error handling
-
-## 📦 Project Structure
+## 📁 Project Structure
 
 ```
-├── app/                    # Next.js app directory
-│   ├── (pro)/             # Production application
+next-bruss/
+├── app/                    # Next.js App Router
+│   ├── (pro)/             # Production floor apps
 │   │   └── [lang]/        # Internationalized routes
-│   │       ├── inw-2/     # Inventory management
-│   │       ├── dmcheck/   # DMCheck system
-│   │       └── .oven/     # Oven management
-│   └── (mgmt)/            # Management application
-│       └── [lang]/        # Internationalized routes
-│           ├── inw-2/     # Inventory approval
-│           ├── deviations/# Deviations management
-│           └── ...        # Other management modules
-├── components/            # Shared UI components
-├── lib/                  # Shared utilities
-├── public/              # Static assets
-├── styles/             # Global styles
-├── types/             # TypeScript definitions
-└── utils/            # Helper functions
+│   ├── (mgmt)/            # Management apps
+│   │   └── [lang]/        # Internationalized routes
+│   └── api/               # API routes
+├── components/            # Shared components
+│   └── ui/               # shadcn/ui components
+├── lib/                  # Utilities and helpers
+│   ├── mongo/           # MongoDB connection
+│   └── pg/              # PostgreSQL connection
+├── dictionaries/        # i18n translations
+├── public/             # Static assets
+└── types/              # TypeScript definitions
 ```
 
-### Development
+## 🔐 Authentication & Authorization
 
-- Development server: `bun run dev`
-- Production build: `bun run build`
-- Start production: `bun run start`
-- Linting: `bun run lint`
+- LDAP-based authentication via NextAuth.js
+- Role-based access control (RBAC)
+- Roles stored in MongoDB `users` collection
+- Session management with JWT
+
+## 🌍 Internationalization
+
+- Supported languages: Polish (default), German
+- Dictionary-based translations
+- URL-based locale switching (`/pl/...`, `/de/...`)
+
+## 🧪 Development Guidelines
+
+### Server Actions Pattern
+
+```typescript
+'use server';
+import { auth } from '@/auth';
+import { dbc } from '@/lib/mongo';
+import { revalidateTag } from 'next/cache';
+
+export async function actionName(data: Type) {
+  const session = await auth();
+  if (!session?.user?.roles?.includes('required-role')) {
+    return { error: 'unauthorized' };
+  }
+  
+  const collection = await dbc('collection_name');
+  // Perform operation
+  revalidateTag('tag-name');
+  return { success: 'message' };
+}
+```
+
+### Key Conventions
+
+1. **Components**: Server Components by default, use `'use client'` when needed
+2. **Database**: Always check archive collections (`_archive` suffix)
+3. **Forms**: Zod schemas with React Hook Form
+4. **State**: Zustand for client, React Query for server state
+5. **Errors**: Return `{ error: string }` from server actions
+6. **Cache**: Use `revalidateTag()` after mutations
+
+## 📊 External Integrations
+
+- **SMART API**: EOL validation for production parts
+- **LDAP**: Enterprise authentication
+- **Email**: Nodemailer for notifications
+- **Barcode/QR**: bwip-js for code generation
+
+## 🔧 Scripts
+
+```bash
+bun dev        # Development with Turbopack
+bun build      # Production build
+bun start      # Start production server
+bun lint       # Run ESLint
+```
+
+## 📝 License
+
+This is a private, proprietary application.
+
+## 🤝 Contributing
+
+Please refer to internal development guidelines and ensure all changes are tested with both Polish and German locales.
