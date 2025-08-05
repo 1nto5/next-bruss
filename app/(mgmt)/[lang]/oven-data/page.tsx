@@ -1,7 +1,15 @@
 import { OvenProcessDataType } from '@/app/(mgmt)/[lang]/oven-data/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 
+import { RefreshButton } from '@/components/refresh-button';
+import { revalidateOvenTableData } from './actions';
 import OvenDataWithChart from './components/oven-data-with-chart';
 import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
 
@@ -82,11 +90,19 @@ export default async function OvenDataPage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Oven Data</CardTitle>
-        <OvenTableFilteringAndOptions
-          ovens={ovens}
-          fetchTime={fetchTime}
-        />
+        <div className='flex items-center justify-between'>
+          <div>
+            <CardTitle>Oven Data</CardTitle>
+            <CardDescription>
+              Last sync: {fetchTimeLocaleString}
+            </CardDescription>
+          </div>
+          <RefreshButton
+            fetchTime={fetchTime}
+            onRefresh={revalidateOvenTableData}
+          />
+        </div>
+        <OvenTableFilteringAndOptions ovens={ovens} fetchTime={fetchTime} />
       </CardHeader>
       <CardContent>
         <OvenDataWithChart
