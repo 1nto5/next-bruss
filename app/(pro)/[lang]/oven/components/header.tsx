@@ -16,12 +16,14 @@ import { Button } from '@/components/ui/button';
 import { Flame, UserPen, TimerReset, Thermometer, User } from 'lucide-react';
 import { useState } from 'react';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
+import { useGetOvenProcesses } from '../data/get-oven-processes';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 
 export default function Header() {
   const { operator1, operator2, operator3, logout } = usePersonalNumberStore();
   const { selectedOven, selectedProgram, clearOven, clearProgram } = useOvenStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
+  const { data: processesData } = useGetOvenProcesses(selectedOven);
   const [alertOpen, setAlertOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
     type: 'oven' | 'logout';
@@ -29,6 +31,10 @@ export default function Header() {
     description: string;
     action: () => void;
   } | null>(null);
+
+  // Check if there are running processes
+  const hasRunningProcesses = processesData && 'success' in processesData && 
+    processesData.success.some(process => process.status === 'running');
 
   // Get logged-in operators from store
   const loggedInOperators = [operator1, operator2, operator3].filter(
@@ -112,7 +118,7 @@ export default function Header() {
                 <Flame className='h-[1.2rem] w-[1.2rem]' />
               </Button>
             )}
-            {selectedProgram && (
+            {selectedProgram && !hasRunningProcesses && (
               <Button onClick={clearProgram} variant='ghost' size='icon'>
                 <TimerReset className='h-[1.2rem] w-[1.2rem]' />
               </Button>
