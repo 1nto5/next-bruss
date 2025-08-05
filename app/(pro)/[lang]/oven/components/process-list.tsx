@@ -390,6 +390,7 @@ export default function ProcessList() {
             ) : isSuccess(data) && data.success.length > 0 ? (
               <div className='space-y-4'>
                 {currentTemp === null &&
+                  !data.success.every((process) => process.status === 'prepared') &&
                   data.success.some((process) => {
                     const startTime = new Date(process.startTime);
                     const now = new Date();
@@ -421,7 +422,9 @@ export default function ProcessList() {
 
                       return (
                         <TableRow key={process.id}>
-                          <TableCell>{startString}</TableCell>
+                          <TableCell>
+                            {process.status === 'prepared' ? 'oczekuje' : startString}
+                          </TableCell>
                           <TableCell>{process.article}</TableCell>
                           <TableCell>{process.hydraBatch}</TableCell>
                           <TableCell
