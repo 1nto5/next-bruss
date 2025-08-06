@@ -107,7 +107,16 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         <ArrowUpDown className='ml-2 h-4 w-4' />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('startTimeLocaleString')}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      const startTime = row.getValue('startTimeLocaleString') as string;
+      
+      if (status === 'prepared') {
+        return <div>-</div>;
+      }
+      
+      return <div>{startTime}</div>;
+    },
   },
   {
     accessorKey: 'endTimeLocaleString',
