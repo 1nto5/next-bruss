@@ -62,6 +62,7 @@ const errorMessageMap: Record<string, string> = {
   'validation failed': 'Skontaktuj się z IT!',
   'article not configured': 'Artykuł nie jest skonfigurowany!',
   'wrong program for article': 'Artykuł nie pasuje do wybranego programu!',
+  'database error': 'Błąd bazy danych - skontaktuj się z IT',
 };
 
 const translateError = (serverError: string): string => {
@@ -187,27 +188,26 @@ export default function ProcessList() {
             batchInputRef.current?.focus();
           }, 0);
           toast.error(errorMessage, { id: loadingToast });
-          return; // Don't throw for expected business errors
+          return;
         }
 
-        // Only throw for unexpected errors
+        // Unexpected response format
         playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
           batchInputRef.current?.focus();
         }, 0);
-        toast.error(errorMessage, { id: loadingToast });
-        throw new Error(errorMessage);
+        console.error('Unexpected response format:', result);
+        toast.error('Skontaktuj się z IT!', { id: loadingToast });
+        return;
       } catch (error) {
-        // Unexpected errors
+        // Network or other unexpected errors
         playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
           batchInputRef.current?.focus();
         }, 0);
-        console.error(error);
-        toast.error(errorMessage, { id: loadingToast });
-        // Don't re-throw, just log
+        console.error('Start process error:', error);
+        toast.error('Skontaktuj się z IT!', { id: loadingToast });
+        return;
       }
     },
     [
@@ -274,25 +274,26 @@ export default function ProcessList() {
             endInputRef.current?.focus();
           }, 0);
           toast.error(errorMessage, { id: loadingToast });
-          throw new Error(errorMessage);
+          return;
         }
 
+        // Unexpected response format
         playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
           endInputRef.current?.focus();
         }, 0);
-        toast.error(errorMessage, { id: loadingToast });
-        throw new Error(errorMessage);
+        console.error('Unexpected response format:', result);
+        toast.error('Skontaktuj się z IT!', { id: loadingToast });
+        return;
       } catch (error) {
+        // Network or other unexpected errors
         playNok();
-        const errorMessage = 'Skontaktuj się z IT!';
         setTimeout(() => {
           endInputRef.current?.focus();
         }, 0);
-        console.error(error);
-        toast.error(errorMessage, { id: loadingToast });
-        throw error;
+        console.error('End process error:', error);
+        toast.error('Skontaktuj się z IT!', { id: loadingToast });
+        return;
       }
     },
     [data, refetch, playNok, playOvenOut],

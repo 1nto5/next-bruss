@@ -243,16 +243,6 @@ export async function startOvenProcess(
 
     const collection = await dbc('oven_processes');
 
-    // Check if batch already exists with non-deleted status
-    const existingProcess = await collection.findOne({
-      hydraBatch,
-      status: { $ne: 'deleted' }
-    });
-
-    if (existingProcess) {
-      return { error: 'duplicate batch' };
-    }
-
     // Fetch the configuration to save target values at time of creation
     let targetTemp: number | undefined;
     let tempTolerance: number | undefined;
@@ -290,11 +280,21 @@ export async function startOvenProcess(
       durationTolerance,
     };
 
-    const result = await collection.insertOne(newProcess);
-    if (!result.insertedId) {
-      return { error: 'not created' };
+    try {
+      const result = await collection.insertOne(newProcess);
+      if (!result.insertedId) {
+        return { error: 'not created' };
+      }
+      return { success: true, processId: result.insertedId.toString() };
+    } catch (error: any) {
+      // MongoDB duplicate key error code
+      if (error.code === 11000) {
+        return { error: 'duplicate batch' };
+      }
+      // Log error and return generic error message
+      console.error('Database error:', error);
+      return { error: 'database error' };
     }
-    return { success: true, processId: result.insertedId.toString() };
   } catch (error) {
     console.error(error);
     return { error: 'start error' };

@@ -242,8 +242,8 @@ export async function getCardInfo(cardNumber: string) {
       creators: res.creators,
     };
   } catch (error) {
-    console.error(error);
-    throw new Error('getCardInfo server action error');
+    console.error('getCardInfo error:', error);
+    return { error: 'database error' };
   }
 }
 
