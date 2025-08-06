@@ -1,0 +1,89 @@
+{
+  "login": {
+    "title": "Logowanie - DMCheck 2",
+    "operator1Label": "Nr personalny 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Numer personalny 2",
+    "personalNumber3Label": "Numer personalny 3",
+    "placeholder": "dotknij aby wprowadzić...",
+    "loginButton": "Zaloguj",
+    "keypadTitle": "Wprowadź numer personalny operatora",
+    "errors": {
+      "wrongNumber1": "Nieprawidłowy nr personalny!",
+      "wrongNumber2": "Nieprawidłowy nr personalny!",
+      "wrongNumber3": "Nieprawidłowy nr personalny!",
+      "loginError": "Skontaktuj się z IT!"
+    }
+  },
+  "articleSelection": {
+    "title": "Wybór artykułu",
+    "piecesPerBox": "szt/box",
+    "boxesPerPallet": "box/pal"
+  },
+  "scan": {
+    "title": "Skanowanie",
+    "dmcPlaceholder": "Skanuj DMC...",
+    "hydraPlaceholder": "Skanuj kod QR HYDRA...",
+    "palletPlaceholder": "Skanuj kod QR palety...",
+    "savingPlaceholder": "Zapisywanie...",
+    "messages": {
+      "dmcSaved": "DMC zapisany",
+      "batchSaved": "Batch zapisany",
+      "dmcExists": "DMC już istnieje",
+      "batchExists": "Batch już istnieje",
+      "dmcNotValid": "DMC nieprawidłowy",
+      "qrNotValid": "Kod QR nieprawidłowy",
+      "articleNotFound": "Artykuł nie znaleziony",
+      "fordDateNotValid": "Data FORD nieprawidłowa",
+      "bmwDateNotValid": "Data BMW nieprawidłowa",
+      "qrWrongArticle": "Nieprawidłowy artykuł w QR",
+      "qrWrongQuantity": "Nieprawidłowa ilość w QR",
+      "qrWrongProcess": "Nieprawidłowy proces w QR",
+      "40040Nok": "Test BRI NOK",
+      "briPgError": "Błąd połączenia z BRI",
+      "smartNotFound": "Nie znaleziono w bazie SMART",
+      "smartNok": "SMART: Część otrzymała status NOK",
+      "smartPattern": "SMART: Część jest wzornikiem",
+      "smartFetchError": "Problem połączenia z bazą SMART",
+      "smartUnknown": "SMART: Część nieprzeprocesowana na wszystkich stacjach"
+    }
+  },
+  "statusBar": {
+    "logout": "Wyloguj",
+    "box": "BOX",
+    "pallet": "PALETA",
+    "pieces": "szt",
+    "boxes": "box",
+    "full": "PEŁNY",
+    "fullPallet": "PEŁNA"
+  },
+  "lastScans": {
+    "title": "Ostatnie skany",
+    "noScans": "Brak ostatnich skanów",
+    "columns": {
+      "number": "Lp.",
+      "dmc": "DMC",
+      "time": "Czas"
+    }
+  },
+  "errors": {
+    "noWorkplace": "Brak stanowiska!",
+    "noWorkplaceDescription": "Brak parametru workplace w URL (przykład: ?workplace=eol74)",
+    "noConfiguration": "Brak konfiguracji!",
+    "noArticlesDescription": "Brak skonfigurowanych artykułów dla stanowiska",
+    "contactIT": "Skontaktuj się z IT.",
+    "somethingWrong": "Coś poszło nie tak!",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd.",
+    "tryAgain": "Spróbuj ponownie",
+    "loading": "Ładowanie...",
+    "fetchArticlesError": "Błąd pobierania artykułów",
+    "fetchStatusError": "Błąd pobierania statusu"
+  },
+  "language": {
+    "polish": "Polski",
+    "german": "Deutsch",
+    "english": "English",
+    "changeLanguage": "Zmień język"
+  }
+}

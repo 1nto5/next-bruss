@@ -1,0 +1,89 @@
+{
+  "login": {
+    "title": "Anmeldung - DMCheck 2",
+    "operator1Label": "Personalnummer 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personalnummer 2",
+    "personalNumber3Label": "Personalnummer 3",
+    "placeholder": "zum Eingeben berühren...",
+    "loginButton": "Anmelden",
+    "keypadTitle": "Personalnummer des Operators eingeben",
+    "errors": {
+      "wrongNumber1": "Ungültige Personalnummer!",
+      "wrongNumber2": "Ungültige Personalnummer!",
+      "wrongNumber3": "Ungültige Personalnummer!",
+      "loginError": "Kontaktieren Sie die IT!"
+    }
+  },
+  "articleSelection": {
+    "title": "Artikel auswählen",
+    "piecesPerBox": "Stk/Box",
+    "boxesPerPallet": "Box/Pal"
+  },
+  "scan": {
+    "title": "Scannen",
+    "dmcPlaceholder": "DMC scannen...",
+    "hydraPlaceholder": "HYDRA QR-Code scannen...",
+    "palletPlaceholder": "Paletten QR-Code scannen...",
+    "savingPlaceholder": "Speichern...",
+    "messages": {
+      "dmcSaved": "DMC gespeichert",
+      "batchSaved": "Batch gespeichert",
+      "dmcExists": "DMC existiert bereits",
+      "batchExists": "Batch existiert bereits",
+      "dmcNotValid": "DMC ungültig",
+      "qrNotValid": "QR-Code ungültig",
+      "articleNotFound": "Artikel nicht gefunden",
+      "fordDateNotValid": "FORD-Datum ungültig",
+      "bmwDateNotValid": "BMW-Datum ungültig",
+      "qrWrongArticle": "Falscher Artikel im QR",
+      "qrWrongQuantity": "Falsche Menge im QR",
+      "qrWrongProcess": "Falscher Prozess im QR",
+      "40040Nok": "BRI-Test NOK",
+      "briPgError": "BRI-Verbindungsfehler",
+      "smartNotFound": "Nicht in SMART-Datenbank gefunden",
+      "smartNok": "SMART: Teil hat NOK-Status erhalten",
+      "smartPattern": "SMART: Teil ist ein Muster",
+      "smartFetchError": "SMART-Datenbankverbindungsproblem",
+      "smartUnknown": "SMART: Teil nicht auf allen Stationen verarbeitet"
+    }
+  },
+  "statusBar": {
+    "logout": "Abmelden",
+    "box": "BOX",
+    "pallet": "PALETTE",
+    "pieces": "Stk",
+    "boxes": "Box",
+    "full": "VOLL",
+    "fullPallet": "VOLL"
+  },
+  "lastScans": {
+    "title": "Letzte Scans",
+    "noScans": "Keine letzten Scans",
+    "columns": {
+      "number": "Nr.",
+      "dmc": "DMC",
+      "time": "Zeit"
+    }
+  },
+  "errors": {
+    "noWorkplace": "Keine Arbeitsstation!",
+    "noWorkplaceDescription": "Fehlender workplace-Parameter in URL (Beispiel: ?workplace=eol74)",
+    "noConfiguration": "Keine Konfiguration!",
+    "noArticlesDescription": "Keine konfigurierten Artikel für die Arbeitsstation",
+    "contactIT": "Kontaktieren Sie die IT.",
+    "somethingWrong": "Etwas ist schief gelaufen!",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "tryAgain": "Erneut versuchen",
+    "loading": "Laden...",
+    "fetchArticlesError": "Fehler beim Abrufen von Artikeln",
+    "fetchStatusError": "Fehler beim Abrufen des Status"
+  },
+  "language": {
+    "polish": "Polski",
+    "german": "Deutsch",
+    "english": "English",
+    "changeLanguage": "Sprache ändern"
+  }
+}
