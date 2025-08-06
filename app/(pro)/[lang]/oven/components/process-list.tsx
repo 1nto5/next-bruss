@@ -119,13 +119,6 @@ export default function ProcessList() {
     return !!data && 'success' in data;
   }
 
-  function isBatchRunningHere(batch: string) {
-    if (!isSuccess(data)) return false;
-    return data.success.some(
-      (process) => process.hydraBatch === batch && process.status === 'running',
-    );
-  }
-
   const formatExpectedCompletion = (
     startTime?: Date,
     targetDuration?: number,
@@ -165,16 +158,6 @@ export default function ProcessList() {
 
       const { scannedArticle, scannedBatch } = formData;
       if (!isSuccess(data)) return;
-
-      if (isBatchRunningHere(scannedBatch)) {
-        const errorMessage = 'HYDRA batch jest już w piecu!';
-        toast.error(errorMessage);
-        setTimeout(() => {
-          batchInputRef.current?.focus();
-        }, 0);
-        playNok();
-        return; // Don't throw
-      }
 
       const loadingToast = toast.loading('Rozpoczynanie procesu...');
 
