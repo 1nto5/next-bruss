@@ -20,13 +20,6 @@ type ArticleConfigType = {
   piecesPerBox: number;
   boxesPerPallet?: number;
   pallet: boolean;
-  dmcLength: number;
-  dmcFirstValidation: string;
-  dmcSecondValidation?: string;
-  secondValidation: boolean;
-  ford: boolean;
-  bmw: boolean;
-  nonUniqueHydraBatch?: boolean;
 };
 
 type OperatorStoreType = {
@@ -113,5 +106,21 @@ export const useScanStore = create<ScanStoreType>()(
       clearScans: () => set({ lastScans: [] }),
     }),
     { name: 'dmcheck2-scans' },
+  ),
+);
+
+// Volume store
+type VolumeStoreType = {
+  volume: number;
+  setVolume: (volume: number) => void;
+};
+
+export const useVolumeStore = create<VolumeStoreType>()(
+  persist(
+    (set) => ({
+      volume: 0.75,
+      setVolume: (volume) => set({ volume }),
+    }),
+    { name: 'dmcheck2-volume' },
   ),
 );

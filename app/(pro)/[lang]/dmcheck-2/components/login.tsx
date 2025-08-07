@@ -7,6 +7,7 @@ import * as z from 'zod';
 import { login } from '../actions';
 import { useOperatorStore } from '../lib/stores';
 import { loginSchema as formSchema } from '../lib/zod';
+import type { Dictionary } from '../lib/dictionary';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +36,11 @@ import { Switch } from '@/components/ui/switch';
 import { Check, Loader2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function Login() {
+interface LoginProps {
+  dict: Dictionary['login'];
+}
+
+export default function Login({ dict }: LoginProps) {
   const { setOperator1, setOperator2, setOperator3 } = useOperatorStore();
   const [personalNumber2Form, setPersonalNumber2Form] = useState(false);
   const [personalNumber3Form, setPersonalNumber3Form] = useState(false);
@@ -82,23 +87,23 @@ export default function Login() {
           case 'wrong number 1':
             form.setError('identifier1', {
               type: 'manual',
-              message: 'Nieprawidłowy nr personalny!',
+              message: dict.errors.wrongNumber1,
             });
             break;
           case 'wrong number 2':
             form.setError('identifier2', {
               type: 'manual',
-              message: 'Nieprawidłowy nr personalny!',
+              message: dict.errors.wrongNumber2,
             });
             break;
           case 'wrong number 3':
             form.setError('identifier3', {
               type: 'manual',
-              message: 'Nieprawidłowy nr personalny!',
+              message: dict.errors.wrongNumber3,
             });
             break;
           default:
-            toast.error('Skontaktuj się z IT!');
+            toast.error(dict.errors.loginError);
         }
       } else if (res.success) {
         setOperator1(res.operator1 || null);
@@ -107,7 +112,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.errors.loginError);
     } finally {
       setIsPending(false);
     }
@@ -156,7 +161,7 @@ export default function Login() {
     <>
       <Card className='w-full max-w-none'>
         <CardHeader>
-          <CardTitle>Logowanie - DMCheck 2</CardTitle>
+          <CardTitle>{dict.title}</CardTitle>
         </CardHeader>
 
         <Form {...form}>
@@ -167,11 +172,11 @@ export default function Login() {
                 name='identifier1'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nr personalny 1</FormLabel>
+                    <FormLabel>{dict.operator1Label}</FormLabel>
                     <FormControl>
                       <Input
                         autoComplete='off'
-                        placeholder='dotknij aby wprowadzić...'
+                        placeholder={dict.placeholder}
                         {...field}
                         onFocus={() => handleFieldFocus('identifier1')}
                         readOnly
@@ -185,7 +190,7 @@ export default function Login() {
 
               <FormItem className='flex flex-row items-center justify-between'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Operator 2</FormLabel>
+                  <FormLabel className='text-base'>{dict.operator2Label}</FormLabel>
                 </div>
                 <FormControl>
                   <Switch
@@ -201,11 +206,11 @@ export default function Login() {
                   name='identifier2'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Numer personalny 2</FormLabel>
+                      <FormLabel>{dict.personalNumber2Label}</FormLabel>
                       <FormControl>
                         <Input
                           autoComplete='off'
-                          placeholder='dotknij aby wprowadzić...'
+                          placeholder={dict.placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier2')}
                           readOnly
@@ -220,7 +225,7 @@ export default function Login() {
 
               <FormItem className='flex flex-row items-center justify-between'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Operator 3</FormLabel>
+                  <FormLabel className='text-base'>{dict.operator3Label}</FormLabel>
                 </div>
                 <FormControl>
                   <Switch
@@ -236,11 +241,11 @@ export default function Login() {
                   name='identifier3'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Numer personalny 3</FormLabel>
+                      <FormLabel>{dict.personalNumber3Label}</FormLabel>
                       <FormControl>
                         <Input
                           autoComplete='off'
-                          placeholder='dotknij aby wprowadzić...'
+                          placeholder={dict.placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier3')}
                           readOnly
@@ -257,7 +262,7 @@ export default function Login() {
             <CardFooter className='flex justify-end'>
               <Button type='submit' disabled={isPending}>
                 {isPending && <Loader2 className='animate-spin' />}
-                Zaloguj
+                {dict.loginButton}
               </Button>
             </CardFooter>
           </form>
@@ -268,7 +273,7 @@ export default function Login() {
         <DialogContent className='max-w-md'>
           <DialogHeader>
             <DialogTitle>
-              Wprowadź numer personalny operatora {activeField.slice(-1)}
+              {dict.keypadTitle} {activeField.slice(-1)}
             </DialogTitle>
           </DialogHeader>
           <form
@@ -276,48 +281,59 @@ export default function Login() {
               e.preventDefault();
               handleKeypadConfirm();
             }}
-            className='grid grid-cols-3 gap-4'
+            className='space-y-4'
           >
             <Input
               autoFocus
               value={keypadValue}
               onChange={handleKeypadInputChange}
-              className='col-span-3 text-center'
+              className='text-center'
               autoComplete='off'
               inputMode='numeric'
               pattern='[0-9]*'
             />
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+            <div className='grid grid-cols-3 gap-4'>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+                <Button
+                  key={number}
+                  type='button'
+                  size='lg'
+                  variant='outline'
+                  onClick={() => handleKeypadNumberClick(number)}
+                >
+                  {number}
+                </Button>
+              ))}
               <Button
-                key={number}
                 type='button'
                 size='lg'
                 variant='outline'
-                onClick={() => handleKeypadNumberClick(number)}
+                onClick={() => handleKeypadNumberClick(0)}
+                className='col-start-2'
               >
-                {number}
+                0
               </Button>
-            ))}
-            <Button
-              type='button'
-              variant='destructive'
-              onClick={handleKeypadReset}
-              size='lg'
-              aria-label='Reset'
-            >
-              <RotateCcw className='h-6 w-6' />
-            </Button>
-            <Button
-              type='button'
-              size='lg'
-              variant='outline'
-              onClick={() => handleKeypadNumberClick(0)}
-            >
-              0
-            </Button>
-            <Button type='submit' size='lg' aria-label='Save'>
-              <Check className='h-6 w-6' />
-            </Button>
+            </div>
+            <div className='grid grid-cols-4 gap-4'>
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={handleKeypadReset}
+                size='lg'
+                aria-label={dict.keypadReset || 'Resetuj'}
+                className='col-span-1'
+              >
+                <RotateCcw className='h-6 w-6' />
+              </Button>
+              <Button 
+                type='submit' 
+                size='lg' 
+                aria-label={dict.keypadSave || 'Zapisz'}
+                className='col-span-3'
+              >
+                {dict.loginButton}
+              </Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,6 @@
 {
   "login": {
-    "title": "Logowanie - DMCheck 2",
+    "title": "Logowanie",
     "operator1Label": "Nr personalny 1",
     "operator2Label": "Operator 2",
     "operator3Label": "Operator 3",
@@ -9,6 +9,8 @@
     "placeholder": "dotknij aby wprowadzić...",
     "loginButton": "Zaloguj",
     "keypadTitle": "Wprowadź numer personalny operatora",
+    "keypadReset": "Resetuj",
+    "keypadSave": "Zapisz",
     "errors": {
       "wrongNumber1": "Nieprawidłowy nr personalny!",
       "wrongNumber2": "Nieprawidłowy nr personalny!",
@@ -19,7 +21,7 @@
   "articleSelection": {
     "title": "Wybór artykułu",
     "piecesPerBox": "szt/box",
-    "boxesPerPallet": "box/pal"
+    "boxesPerPallet": "box/paleta"
   },
   "scan": {
     "title": "Skanowanie",
@@ -40,13 +42,16 @@
       "qrWrongArticle": "Nieprawidłowy artykuł w QR",
       "qrWrongQuantity": "Nieprawidłowa ilość w QR",
       "qrWrongProcess": "Nieprawidłowy proces w QR",
+      "boxNotFull": "Box nie jest pełny - nie można zapisać HYDRA",
+      "palletNotFull": "Paleta nie jest pełna - nie można zapisać batch palety",
       "40040Nok": "Test BRI NOK",
       "briPgError": "Błąd połączenia z BRI",
       "smartNotFound": "Nie znaleziono w bazie SMART",
       "smartNok": "SMART: Część otrzymała status NOK",
       "smartPattern": "SMART: Część jest wzornikiem",
       "smartFetchError": "Problem połączenia z bazą SMART",
-      "smartUnknown": "SMART: Część nieprzeprocesowana na wszystkich stacjach"
+      "smartUnknown": "SMART: Część nieprzeprocesowana na wszystkich stacjach",
+      "saveError": "Błąd zapisu - skontaktuj się z IT"
     }
   },
   "statusBar": {
@@ -56,11 +61,25 @@
     "pieces": "szt",
     "boxes": "box",
     "full": "PEŁNY",
-    "fullPallet": "PEŁNA"
+    "fullPallet": "PEŁNA",
+    "time": "Czas",
+    "noScans": "Brak",
+    "deleteDmc": "Usuń DMC",
+    "deleteBox": "Usuń box",
+    "deleteDmcConfirm": "Czy na pewno chcesz usunąć ten DMC z boxa?",
+    "deleteBoxConfirm": "Czy na pewno chcesz usunąć ten box z palety?",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "deleting": "Usuwanie...",
+    "deletingDmc": "Usuwanie DMC...",
+    "deletingBox": "Usuwanie boxa...",
+    "dmcDeleted": "DMC został usunięty",
+    "boxDeleted": "Box został usunięty z palety",
+    "dmcNotFound": "Nie znaleziono DMC",
+    "boxNotFound": "Nie znaleziono boxa",
+    "deleteError": "Błąd podczas usuwania"
   },
   "lastScans": {
-    "title": "Ostatnie skany",
-    "noScans": "Brak ostatnich skanów",
     "columns": {
       "number": "Lp.",
       "dmc": "DMC",
@@ -80,10 +99,12 @@
     "fetchArticlesError": "Błąd pobierania artykułów",
     "fetchStatusError": "Błąd pobierania statusu"
   },
-  "language": {
-    "polish": "Polski",
-    "german": "Deutsch",
-    "english": "English",
-    "changeLanguage": "Zmień język"
+  "logout": {
+    "title": "Wylogowanie",
+    "description": "Czy na pewno chcesz wylogować?",
+    "cancel": "Anuluj",
+    "confirm": "Wyloguj",
+    "clearArticle": "Wyloguj artykuł",
+    "logoutOperators": "Wyloguj operatorów"
   }
 }

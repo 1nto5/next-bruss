@@ -69,20 +69,58 @@ export async function login(data: LoginType) {
 export async function getArticlesForWorkplace(workplace: string) {
   try {
     const coll = await dbc('articles_config');
-    return await coll.find({ workplace }).toArray();
+    const articles = await coll.find({ workplace }).toArray();
+    // Convert MongoDB documents to plain objects
+    return articles.map(article => ({
+      id: article._id.toString(),
+      workplace: article.workplace,
+      articleNumber: article.articleNumber,
+      articleName: article.articleName,
+      articleNote: article.articleNote,
+      piecesPerBox: article.piecesPerBox,
+      pallet: article.pallet,
+      boxesPerPallet: article.boxesPerPallet,
+      dmc: article.dmc,
+      dmcFirstValidation: article.dmcFirstValidation,
+      secondValidation: article.secondValidation,
+      dmcSecondValidation: article.dmcSecondValidation,
+      hydraProcess: article.hydraProcess,
+      ford: article.ford,
+      bmw: article.bmw,
+    }));
   } catch (error) {
     console.error(error);
-    throw new Error('getArticlesForWorkplace server action error');
+    return [];
   }
 }
 
 export async function getArticleConfigById(articleConfigId: string) {
   try {
     const collection = await dbc('articles_config');
-    return await collection.findOne({ _id: new ObjectId(articleConfigId) });
+    const article = await collection.findOne({ _id: new ObjectId(articleConfigId) });
+    if (!article) return null;
+    
+    // Convert MongoDB document to plain object
+    return {
+      id: article._id.toString(),
+      workplace: article.workplace,
+      articleNumber: article.articleNumber,
+      articleName: article.articleName,
+      articleNote: article.articleNote,
+      piecesPerBox: article.piecesPerBox,
+      pallet: article.pallet,
+      boxesPerPallet: article.boxesPerPallet,
+      dmc: article.dmc,
+      dmcFirstValidation: article.dmcFirstValidation,
+      secondValidation: article.secondValidation,
+      dmcSecondValidation: article.dmcSecondValidation,
+      hydraProcess: article.hydraProcess,
+      ford: article.ford,
+      bmw: article.bmw,
+    };
   } catch (error) {
     console.error(error);
-    throw new Error('getArticleConfigById server action error');
+    return null;
   }
 }
 
@@ -143,17 +181,14 @@ function createDmcValidationSchema(articleConfig: any) {
 }
 
 export async function saveDmc(
-  _prevState: any,
-  formData: FormData,
-): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
+  dmc: string,
+  articleConfigId: string,
+  operators: string[]
+): Promise<{ message: string; dmc?: string; time?: string }> {
   try {
-    const articleConfigId = formData.get('articleConfigId');
     const articlesConfigCollection = await dbc('articles_config');
-    if (!articleConfigId || articleConfigId.toString().length !== 24) {
-      return { message: 'wrong article config id' };
-    }
     const articleConfig = await articlesConfigCollection.findOne({
-      _id: new ObjectId(articleConfigId.toString()),
+      _id: new ObjectId(articleConfigId),
     });
     if (!articleConfig) {
       return { message: 'article not found' };
@@ -161,22 +196,22 @@ export async function saveDmc(
 
     const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({
-      dmc: formData?.get('dmc')?.toString(),
+      dmc: dmc,
     });
 
     if (!parse.success) {
       return { message: 'dmc not valid' };
     }
-    const dmc = parse.data.dmc;
+    const validatedDmc = parse.data.dmc;
 
     if (articleConfig.bmw) {
-      if (!bmwDateValidation(dmc)) {
+      if (!bmwDateValidation(validatedDmc)) {
         return { message: 'bmw date not valid' };
       }
     }
 
     if (articleConfig.ford) {
-      if (!fordDateValidation(dmc)) {
+      if (!fordDateValidation(validatedDmc)) {
         return { message: 'ford date not valid' };
       }
     }
@@ -185,7 +220,7 @@ export async function saveDmc(
 
     const existingDmc = await scansCollection.findOne(
       {
-        dmc: dmc,
+        dmc: validatedDmc,
         workplace: articleConfig.workplace,
       },
       { sort: { time: -1 } },
@@ -201,7 +236,7 @@ export async function saveDmc(
         const pgc = await pgp.connect();
         await pgc.query('SET statement_timeout TO 3000');
         const res = await pgc.query(
-          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${dmc}'`,
+          `SELECT haube_io FROM stationdichtheitspruefung WHERE id_haube = '${validatedDmc}'`,
         );
         pgc.release();
         if (res.rows.length === 0 || !res.rows[0].haube_io) {
@@ -220,7 +255,7 @@ export async function saveDmc(
       articleConfig.workplace === 'eol810' ||
       articleConfig.workplace === 'eol488'
     ) {
-      const url = `http://10.27.90.4:8025/api/part-status-plain/${dmc}`;
+      const url = `http://10.27.90.4:8025/api/part-status-plain/${validatedDmc}`;
 
       const res = await fetch(url);
       if (!res.ok || res.status === 404) {
@@ -242,10 +277,10 @@ export async function saveDmc(
 
     const insertResult = await scansCollection.insertOne({
       status: 'box',
-      dmc: dmc,
+      dmc: validatedDmc,
       workplace: articleConfig.workplace,
       article: articleConfig.articleNumber,
-      operator: formData.get('operatorPersonalNumber'),
+      operator: operators[0],
       time: new Date(),
     });
 
@@ -264,15 +299,16 @@ export async function saveDmc(
       if (smartStatus === 'unknown') {
         return {
           message: 'dmc saved smart unknown',
-          dmc: dmc,
+          dmc: validatedDmc,
           time: new Date().toISOString(),
         };
       }
-      return { message: 'dmc saved', dmc: dmc, time: new Date().toISOString() };
+      return { message: 'dmc saved', dmc: validatedDmc, time: new Date().toISOString() };
     }
+    return { message: 'save error' };
   } catch (error) {
     console.error(error);
-    throw new Error('saveDmc server action error');
+    return { message: 'save error' };
   }
 }
 
@@ -288,15 +324,15 @@ function extractQrValues(hydra: string) {
   return { qrArticle, qrQuantity, qrBatch };
 }
 
-export async function saveHydra(_prevState: any, formData: FormData) {
+export async function saveHydra(
+  hydra: string,
+  articleConfigId: string,
+  operators: string[]
+): Promise<{ message: string }> {
   try {
-    const articleConfigId = formData.get('articleConfigId');
     const articlesConfigCollection = await dbc('articles_config');
-    if (!articleConfigId || articleConfigId.toString().length !== 24) {
-      return { message: 'wrong article config id' };
-    }
     const articleConfig = await articlesConfigCollection.findOne({
-      _id: new ObjectId(articleConfigId.toString()),
+      _id: new ObjectId(articleConfigId),
     });
     if (!articleConfig) {
       return { message: 'article not found' };
@@ -305,13 +341,11 @@ export async function saveHydra(_prevState: any, formData: FormData) {
     const schema = z.object({
       hydra: z.string(),
     });
-    const parse = schema.safeParse({
-      hydra: formData?.get('hydra')?.toString(),
-    });
+    const parse = schema.safeParse({ hydra });
     if (!parse.success) {
       return { message: 'qr not valid' };
     }
-    const hydra = parse.data.hydra;
+    const validatedHydra = parse.data.hydra;
 
     let qrBatch;
 
@@ -319,7 +353,7 @@ export async function saveHydra(_prevState: any, formData: FormData) {
       qrArticle,
       qrQuantity,
       qrBatch: extractedBatch,
-    } = extractQrValues(hydra.toUpperCase());
+    } = extractQrValues(validatedHydra.toUpperCase());
 
     if (qrArticle !== articleConfig.articleNumber) {
       return { message: 'qr wrong article' };
@@ -336,6 +370,17 @@ export async function saveHydra(_prevState: any, formData: FormData) {
     }
 
     const scansCollection = await dbc('scans');
+
+    // Check if box is full before saving hydra
+    const currentBoxCount = await scansCollection.countDocuments({
+      article: articleConfig.articleNumber,
+      workplace: articleConfig.workplace,
+      status: 'box',
+    });
+
+    if (currentBoxCount !== articleConfig.piecesPerBox) {
+      return { message: 'box not full' };
+    }
 
     if (!articleConfig.nonUniqueHydraBatch) {
       const existingBatch = await scansCollection.findOne({
@@ -357,7 +402,7 @@ export async function saveHydra(_prevState: any, formData: FormData) {
         $set: {
           status: 'pallet',
           hydra_batch: qrBatch,
-          operator: formData.get('operatorPersonalNumber'),
+          operator: operators[0],
           hydra_time: new Date(),
         },
       },
@@ -367,21 +412,22 @@ export async function saveHydra(_prevState: any, formData: FormData) {
       revalidateTag('pallet');
       return { message: 'batch saved' };
     }
+    return { message: 'save error' };
   } catch (error) {
     console.error(error);
-    throw new Error('saveHydra server action error');
+    return { message: 'save error' };
   }
 }
 
-export async function savePallet(_prevState: any, formData: FormData) {
+export async function savePallet(
+  pallet: string,
+  articleConfigId: string,
+  operators: string[]
+): Promise<{ message: string }> {
   try {
-    const articleConfigId = formData.get('articleConfigId');
     const articlesConfigCollection = await dbc('articles_config');
-    if (!articleConfigId || articleConfigId.toString().length !== 24) {
-      return { message: 'wrong article config id' };
-    }
     const articleConfig = await articlesConfigCollection.findOne({
-      _id: new ObjectId(articleConfigId.toString()),
+      _id: new ObjectId(articleConfigId),
     });
     if (!articleConfig) {
       return { message: 'article not found' };
@@ -389,15 +435,13 @@ export async function savePallet(_prevState: any, formData: FormData) {
     const schema = z.object({
       pallet: z.string().min(34),
     });
-    const parse = schema.safeParse({
-      pallet: formData?.get('pallet')?.toString(),
-    });
+    const parse = schema.safeParse({ pallet });
     if (!parse.success) {
       return { message: 'qr not valid' };
     }
-    const pallet = parse.data.pallet.toUpperCase();
+    const validatedPallet = parse.data.pallet.toUpperCase();
 
-    const splitPalletQr = pallet.split('|');
+    const splitPalletQr = validatedPallet.split('|');
 
     const qrArticle =
       splitPalletQr[0].length === 7 && splitPalletQr[0].substring(2);
@@ -428,6 +472,29 @@ export async function savePallet(_prevState: any, formData: FormData) {
     }
 
     const scansCollection = await dbc('scans');
+    
+    // Check if pallet is full before saving pallet batch
+    const currentBoxesOnPallet = await scansCollection
+      .aggregate([
+        {
+          $match: {
+            article: articleConfig.articleNumber,
+            workplace: articleConfig.workplace,
+            status: 'pallet',
+          },
+        },
+        {
+          $group: {
+            _id: '$hydra_batch',
+          },
+        },
+      ])
+      .toArray();
+
+    if (currentBoxesOnPallet.length !== articleConfig.boxesPerPallet) {
+      return { message: 'pallet not full' };
+    }
+
     const existingBatch = await scansCollection.findOne({
       pallet_batch: qrBatch,
     });
@@ -447,7 +514,7 @@ export async function savePallet(_prevState: any, formData: FormData) {
           status: 'warehouse',
           pallet_batch: qrBatch,
           pallet_time: new Date(),
-          pallet_operator: formData.get('operatorPersonalNumber'),
+          pallet_operator: operators[0],
         },
       },
     );
@@ -457,25 +524,42 @@ export async function savePallet(_prevState: any, formData: FormData) {
       revalidateTag('pallet');
       return { message: 'batch saved' };
     }
+    return { message: 'save error' };
   } catch (error) {
     console.error(error);
-    throw new Error('savePallet server action error');
+    return { message: 'save error' };
   }
 }
 
 export async function save(
-  prevState: any,
+  _prevState: any,
   formData: FormData,
 ): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
+  const articleConfigId = formData.get('articleConfigId')?.toString();
+  const operatorIds = formData.get('operatorIds')?.toString();
+  
+  if (!articleConfigId || !operatorIds) {
+    return { message: 'missing data' };
+  }
+  
+  const operators = JSON.parse(operatorIds) as string[];
+  
   if (formData.get('dmc')) {
-    return await saveDmc(prevState, formData);
+    const dmc = formData.get('dmc')?.toString();
+    if (!dmc) return { message: 'missing dmc' };
+    return await saveDmc(dmc, articleConfigId, operators);
   }
   if (formData.get('hydra')) {
-    return await saveHydra(prevState, formData);
+    const hydra = formData.get('hydra')?.toString();
+    if (!hydra) return { message: 'missing hydra' };
+    return await saveHydra(hydra, articleConfigId, operators);
   }
   if (formData.get('pallet')) {
-    return await savePallet(prevState, formData);
+    const pallet = formData.get('pallet')?.toString();
+    if (!pallet) return { message: 'missing pallet' };
+    return await savePallet(pallet, articleConfigId, operators);
   }
+  return { message: 'no action' };
 }
 
 export async function getInBoxTableData(articleConfigId: string) {
@@ -483,7 +567,10 @@ export async function getInBoxTableData(articleConfigId: string) {
     const scansCollection = await dbc('scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
-      throw new Error('getInBoxTableData server action error');
+      return {
+        piecesInBox: 0,
+        boxIsFull: false,
+      };
     }
 
     const count = await scansCollection.countDocuments({
@@ -498,7 +585,10 @@ export async function getInBoxTableData(articleConfigId: string) {
     };
   } catch (error) {
     console.error(error);
-    throw new Error('getInBoxTableData server action error');
+    return {
+      piecesInBox: 0,
+      boxIsFull: false,
+    };
   }
 }
 
@@ -507,7 +597,10 @@ export async function getBoxesOnPalletTableData(articleConfigId: string) {
     const scansCollection = await dbc('scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
-      throw new Error('getBoxesOnPalletTableData server action error');
+      return {
+        boxesOnPallet: 0,
+        palletIsFull: false,
+      };
     }
 
     const boxes = await scansCollection
@@ -531,10 +624,135 @@ export async function getBoxesOnPalletTableData(articleConfigId: string) {
 
     return {
       boxesOnPallet: count,
-      palletIsFull: count >= (articleConfig.boxesPerPallet || 0),
+      palletIsFull: articleConfig.boxesPerPallet ? count >= articleConfig.boxesPerPallet : false,
     };
   } catch (error) {
     console.error(error);
-    throw new Error('getBoxesOnPalletTableData server action error');
+    return {
+      boxesOnPallet: 0,
+      palletIsFull: false,
+    };
+  }
+}
+
+// Get list of DMC scans in box
+export async function getBoxScans(articleConfigId: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const articleConfig = await getArticleConfigById(articleConfigId);
+    if (!articleConfig) {
+      return [];
+    }
+
+    const scans = await scansCollection
+      .find({
+        article: articleConfig.articleNumber,
+        workplace: articleConfig.workplace,
+        status: 'box',
+      })
+      .sort({ time: -1 })
+      .project({ dmc: 1, time: 1, _id: 0 })
+      .toArray();
+
+    return scans as { dmc: string; time: string }[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+// Get list of HYDRA batches (boxes) on pallet
+export async function getPalletBoxes(articleConfigId: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const articleConfig = await getArticleConfigById(articleConfigId);
+    if (!articleConfig) {
+      return [];
+    }
+
+    const hydraScans = await scansCollection
+      .aggregate([
+        {
+          $match: {
+            article: articleConfig.articleNumber,
+            workplace: articleConfig.workplace,
+            status: 'pallet',
+          },
+        },
+        {
+          $group: {
+            _id: '$hydra_batch',
+            time: { $first: '$hydra_time' },
+          },
+        },
+        {
+          $project: {
+            hydra: '$_id',
+            time: 1,
+            _id: 0,
+          },
+        },
+        {
+          $sort: { time: -1 },
+        },
+      ])
+      .toArray();
+
+    return hydraScans as { hydra: string; time: string }[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+// Delete DMC from box (set status to rework)
+export async function deleteDmcFromBox(dmc: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const result = await scansCollection.updateOne(
+      { dmc, status: 'box' },
+      {
+        $set: {
+          status: 'rework',
+          rework_time: new Date(),
+          reworkReason: 'deleted from box by operator',
+        },
+      },
+    );
+    if (result.modifiedCount === 1) {
+      revalidateTag('box-status');
+      revalidateTag('box-scans');
+      return { message: 'deleted' };
+    }
+    return { message: 'not found' };
+  } catch (error) {
+    console.error(error);
+    return { message: 'error' };
+  }
+}
+
+// Delete HYDRA batch from pallet (set status to rework)
+export async function deleteHydraFromPallet(hydra: string) {
+  try {
+    const scansCollection = await dbc('scans');
+    const result = await scansCollection.updateMany(
+      { hydra_batch: hydra, status: 'pallet' },
+      {
+        $set: {
+          status: 'rework',
+          rework_time: new Date(),
+          reworkReason: 'deleted from pallet by operator',
+        },
+      },
+    );
+    if (result.modifiedCount > 0) {
+      revalidateTag('pallet-status');
+      revalidateTag('pallet-boxes');
+      return { message: 'deleted' };
+    }
+    return { message: 'not found' };
+  } catch (error) {
+    console.error(error);
+    return { message: 'error' };
   }
 }

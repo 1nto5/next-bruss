@@ -5,19 +5,19 @@ export type OperatorType = {
 };
 
 export type ArticleConfigType = {
-  _id: string;
+  id: string;
   articleNumber: string;
   articleName: string;
+  articleNote?: string;
   workplace: string;
   piecesPerBox: number;
   boxesPerPallet?: number;
   pallet: boolean;
-  dmc: {
-    length: number;
-  };
+  dmc: any;
   dmcFirstValidation: string;
   dmcSecondValidation?: string;
   secondValidation: boolean;
+  hydraProcess?: boolean;
   ford: boolean;
   bmw: boolean;
   nonUniqueHydraBatch?: boolean;

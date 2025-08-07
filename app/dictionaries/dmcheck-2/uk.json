@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Вхід - DMCheck 2",
+    "operator1Label": "Персональний номер 1",
+    "operator2Label": "Оператор 2",
+    "operator3Label": "Оператор 3",
+    "personalNumber2Label": "Персональний номер 2",
+    "personalNumber3Label": "Персональний номер 3",
+    "placeholder": "торкніться для введення...",
+    "loginButton": "Увійти",
+    "keypadTitle": "Введіть персональний номер оператора",
+    "keypadReset": "Скинути",
+    "keypadSave": "Зберегти",
+    "errors": {
+      "wrongNumber1": "Неправильний персональний номер!",
+      "wrongNumber2": "Неправильний персональний номер!",
+      "wrongNumber3": "Неправильний персональний номер!",
+      "loginError": "Зверніться до IT!"
+    }
+  },
+  "articleSelection": {
+    "title": "Вибір артикулу",
+    "piecesPerBox": "шт/коробка",
+    "boxesPerPallet": "коробка/палета"
+  },
+  "scan": {
+    "title": "Сканування",
+    "dmcPlaceholder": "Скануйте DMC...",
+    "hydraPlaceholder": "Скануйте QR-код HYDRA...",
+    "palletPlaceholder": "Скануйте QR-код палети...",
+    "savingPlaceholder": "Збереження...",
+    "messages": {
+      "dmcSaved": "DMC збережено",
+      "batchSaved": "Партію збережено",
+      "dmcExists": "DMC вже існує",
+      "batchExists": "Партія вже існує",
+      "dmcNotValid": "DMC недійсний",
+      "qrNotValid": "QR-код недійсний",
+      "articleNotFound": "Артикул не знайдено",
+      "fordDateNotValid": "Дата FORD недійсна",
+      "bmwDateNotValid": "Дата BMW недійсна",
+      "qrWrongArticle": "Неправильний артикул у QR",
+      "qrWrongQuantity": "Неправильна кількість у QR",
+      "qrWrongProcess": "Неправильний процес у QR",
+      "boxNotFull": "Коробка не повна - не можна зберегти HYDRA",
+      "palletNotFull": "Палета не повна - не можна зберегти партію палети",
+      "40040Nok": "Тест BRI NOK",
+      "briPgError": "Помилка з'єднання з BRI",
+      "smartNotFound": "Не знайдено в базі SMART",
+      "smartNok": "SMART: Частина отримала статус NOK",
+      "smartPattern": "SMART: Частина є зразком",
+      "smartFetchError": "Проблема з'єднання з базою SMART",
+      "smartUnknown": "SMART: Частина не оброблена на всіх станціях",
+      "saveError": "Save error - contact IT"
+    }
+  },
+  "statusBar": {
+    "logout": "Вийти",
+    "box": "КОРОБКА",
+    "pallet": "ПАЛЕТА",
+    "pieces": "шт",
+    "boxes": "коробка",
+    "full": "ПОВНА",
+    "fullPallet": "ПОВНА",
+    "time": "Час",
+    "noScans": "Немає",
+    "deleteDmc": "Видалити DMC",
+    "deleteBox": "Видалити коробку",
+    "deleteDmcConfirm": "Ви впевнені, що хочете видалити цей DMC з коробки?",
+    "deleteBoxConfirm": "Ви впевнені, що хочете видалити цю коробку з палети?",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "deleting": "Видалення...",
+    "deletingDmc": "Видалення DMC...",
+    "deletingBox": "Видалення коробки...",
+    "dmcDeleted": "DMC видалено",
+    "boxDeleted": "Коробку видалено з палети",
+    "dmcNotFound": "DMC не знайдено",
+    "boxNotFound": "Коробку не знайдено",
+    "deleteError": "Помилка при видаленні"
+  },
+  "lastScans": {
+    "title": "Останні скани",
+    "noScans": "Немає останніх сканів",
+    "columns": {
+      "number": "№",
+      "dmc": "DMC",
+      "time": "Час"
+    }
+  },
+  "errors": {
+    "noWorkplace": "Немає робочого місця!",
+    "noWorkplaceDescription": "Відсутній параметр workplace в URL (приклад: ?workplace=eol74)",
+    "noConfiguration": "Немає конфігурації!",
+    "noArticlesDescription": "Немає налаштованих артикулів для робочого місця",
+    "contactIT": "Зверніться до IT.",
+    "somethingWrong": "Щось пішло не так!",
+    "unexpectedError": "Сталася неочікувана помилка.",
+    "tryAgain": "Спробуйте знову",
+    "loading": "Завантаження...",
+    "fetchArticlesError": "Помилка отримання артикулів",
+    "fetchStatusError": "Помилка отримання статусу"
+  },
+  "logout": {
+    "title": "Вихід",
+    "description": "Ви впевнені, що хочете вийти?",
+    "cancel": "Скасувати",
+    "confirm": "Вийти",
+    "clearArticle": "Вийти з артикулу",
+    "logoutOperators": "Вийти операторів"
+  }
+}

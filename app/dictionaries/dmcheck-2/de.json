@@ -9,6 +9,8 @@
     "placeholder": "zum Eingeben berühren...",
     "loginButton": "Anmelden",
     "keypadTitle": "Personalnummer des Operators eingeben",
+    "keypadReset": "Zurücksetzen",
+    "keypadSave": "Speichern",
     "errors": {
       "wrongNumber1": "Ungültige Personalnummer!",
       "wrongNumber2": "Ungültige Personalnummer!",
@@ -40,13 +42,16 @@
       "qrWrongArticle": "Falscher Artikel im QR",
       "qrWrongQuantity": "Falsche Menge im QR",
       "qrWrongProcess": "Falscher Prozess im QR",
+      "boxNotFull": "Box ist nicht voll - HYDRA kann nicht gespeichert werden",
+      "palletNotFull": "Palette ist nicht voll - Palettenbatch kann nicht gespeichert werden",
       "40040Nok": "BRI-Test NOK",
       "briPgError": "BRI-Verbindungsfehler",
       "smartNotFound": "Nicht in SMART-Datenbank gefunden",
       "smartNok": "SMART: Teil hat NOK-Status erhalten",
       "smartPattern": "SMART: Teil ist ein Muster",
       "smartFetchError": "SMART-Datenbankverbindungsproblem",
-      "smartUnknown": "SMART: Teil nicht auf allen Stationen verarbeitet"
+      "smartUnknown": "SMART: Teil nicht auf allen Stationen verarbeitet",
+      "saveError": "Save error - contact IT"
     }
   },
   "statusBar": {
@@ -56,7 +61,23 @@
     "pieces": "Stk",
     "boxes": "Box",
     "full": "VOLL",
-    "fullPallet": "VOLL"
+    "fullPallet": "VOLL",
+    "time": "Zeit",
+    "noScans": "Keine",
+    "deleteDmc": "DMC löschen",
+    "deleteBox": "Box löschen",
+    "deleteDmcConfirm": "Möchten Sie diesen DMC wirklich aus der Box löschen?",
+    "deleteBoxConfirm": "Möchten Sie diese Box wirklich von der Palette löschen?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "deleting": "Löschen...",
+    "deletingDmc": "DMC wird gelöscht...",
+    "deletingBox": "Box wird gelöscht...",
+    "dmcDeleted": "DMC wurde gelöscht",
+    "boxDeleted": "Box wurde von der Palette entfernt",
+    "dmcNotFound": "DMC nicht gefunden",
+    "boxNotFound": "Box nicht gefunden",
+    "deleteError": "Fehler beim Löschen"
   },
   "lastScans": {
     "title": "Letzte Scans",
@@ -80,10 +101,12 @@
     "fetchArticlesError": "Fehler beim Abrufen von Artikeln",
     "fetchStatusError": "Fehler beim Abrufen des Status"
   },
-  "language": {
-    "polish": "Polski",
-    "german": "Deutsch",
-    "english": "English",
-    "changeLanguage": "Sprache ändern"
+  "logout": {
+    "title": "Abmelden",
+    "description": "Möchten Sie sich wirklich abmelden?",
+    "cancel": "Abbrechen",
+    "confirm": "Abmelden",
+    "clearArticle": "Artikel abmelden",
+    "logoutOperators": "Bediener abmelden"
   }
 }
