@@ -1,5 +1,6 @@
 'use client';
 
+import LanguageSwitcher from '@/app/(pro)/components/language-switcher';
 import { ThemeModeToggle } from '@/components/theme-mode-toggle';
 import {
   AlertDialog,
@@ -13,13 +14,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { Locale } from '@/i18n.config';
 import { Flame, UserPen, TimerReset, Thermometer, User } from 'lucide-react';
 import { useState } from 'react';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
+import type { Dictionary } from '../lib/dictionary';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
 
-export default function Header() {
+interface HeaderProps {
+  dict: Dictionary;
+  lang: Locale;
+}
+
+export default function Header({ dict, lang }: HeaderProps) {
   const { operator1, operator2, operator3, logout } = usePersonalNumberStore();
   const { selectedOven, selectedProgram, clearOven, clearProgram } = useOvenStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
@@ -66,10 +74,15 @@ export default function Header() {
       >
         <div className='relative mx-auto flex h-4 w-full items-center justify-between'>
           <div className='flex items-center gap-2'>
-            {selectedOven && (
+            {selectedOven ? (
               <Badge variant='default' size='default' className='flex items-center gap-1'>
                 <Flame className='h-3 w-3' />
                 {selectedOven.toUpperCase()}
+              </Badge>
+            ) : (
+              <Badge variant='default' size='default' className='flex items-center gap-1'>
+                <Flame className='h-3 w-3' />
+                OVEN
               </Badge>
             )}
             {selectedProgram && (
@@ -128,8 +141,8 @@ export default function Header() {
                 onClick={() =>
                   handleConfirmAction(
                     'logout',
-                    'Wylogowanie',
-                    'Czy na pewno chcesz wylogować?',
+                    dict.header.logoutDialog.title,
+                    dict.header.logoutDialog.description,
                     () => {
                       logout();
                       clearOven();
@@ -143,6 +156,7 @@ export default function Header() {
               </Button>
             )}
             <ThemeModeToggle />
+            <LanguageSwitcher currentLang={lang} />
           </div>
         </div>
       </header>
@@ -160,9 +174,9 @@ export default function Header() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
+            <AlertDialogCancel>{dict.header.logoutDialog.cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={executeAction}>
-              Kontynuuj
+              {dict.header.logoutDialog.continue}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

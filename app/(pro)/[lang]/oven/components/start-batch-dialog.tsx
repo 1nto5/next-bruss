@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { memo, RefObject, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import type { Dictionary } from '../lib/dictionary';
 import { StartBatchType } from '../lib/zod';
 
 interface StartBatchDialogProps {
@@ -23,6 +24,7 @@ interface StartBatchDialogProps {
   articleInputRef: RefObject<HTMLInputElement>;
   batchInputRef: RefObject<HTMLInputElement>;
   onStart: (data: StartBatchType) => Promise<void>;
+  dict: Dictionary;
 }
 
 export const StartBatchDialog = memo<StartBatchDialogProps>(
@@ -32,6 +34,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
     articleInputRef,
     batchInputRef,
     onStart,
+    dict,
   }) {
     const form = useForm<StartBatchType>({
       // Remove resolver to prevent FormMessage display
@@ -65,7 +68,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent className='max-w-md'>
           <DialogHeader>
-            <DialogTitle>Nowy proces</DialogTitle>
+            <DialogTitle>{dict.startBatchDialog.title}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -82,7 +85,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                         <Input
                           {...field}
                           className='text-center'
-                          placeholder='Zeskanuj numer artykułu...'
+                          placeholder={dict.startBatchDialog.articlePlaceholder}
                           autoFocus
                           ref={articleInputRef}
                           maxLength={5}
@@ -113,7 +116,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                         <Input
                           {...field}
                           className='text-center'
-                          placeholder='Zeskanuj HYDRA batch...'
+                          placeholder={dict.startBatchDialog.batchPlaceholder}
                           ref={batchInputRef}
                           maxLength={10}
                           autoComplete='off'
@@ -137,10 +140,10 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                   className='flex-1'
                   variant='outline'
                 >
-                  Anuluj
+                  {dict.startBatchDialog.cancel}
                 </Button>
                 <Button type='submit' className='flex-1'>
-                  Rozpocznij
+                  {dict.startBatchDialog.start}
                 </Button>
               </div>
             </form>

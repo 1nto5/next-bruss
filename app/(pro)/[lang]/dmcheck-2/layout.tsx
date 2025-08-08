@@ -1,9 +1,10 @@
 import '@/app/globals.css';
-import Footer from '@/components/footer';
+import ProLayout from '@/app/(pro)/components/pro-layout';
 import type { Locale } from '@/i18n.config';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Header from './components/header';
+import { getDictionary } from './lib/dictionary';
 import Providers from './lib/query-provider';
 
 export const metadata: Metadata = {
@@ -17,17 +18,14 @@ export default async function DmCheck2Layout(props: {
   const params = await props.params;
   const { lang } = params;
   const { children } = props;
+  const dict = await getDictionary(lang);
 
   return (
     <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
       <Providers>
-        <div className='flex min-h-screen flex-col'>
-          <Header lang={lang} />
-          <main className='w-full flex-1 px-2 py-2'>
-            <div className='w-full'>{children}</div>
-          </main>
-          <Footer />
-        </div>
+        <ProLayout header={<Header lang={lang} dict={dict} />}>
+          {children}
+        </ProLayout>
       </Providers>
     </ThemeProvider>
   );

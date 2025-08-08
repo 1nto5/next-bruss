@@ -59,7 +59,7 @@ export default memo<NumericKeypadProps>(function NumericKeypad({
             className='h-16'
             onClick={onBackspace}
           >
-            <Delete className='h-6 w-6' />
+            <Delete />
           </Button>
         </div>
       </CardContent>

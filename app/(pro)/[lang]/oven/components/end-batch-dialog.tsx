@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { memo, RefObject } from 'react';
 import { useForm } from 'react-hook-form';
+import type { Dictionary } from '../lib/dictionary';
 import { EndBatchType } from '../lib/zod';
 
 interface EndBatchDialogProps {
@@ -22,10 +23,11 @@ interface EndBatchDialogProps {
   onOpenChange: (open: boolean) => void;
   inputRef: RefObject<HTMLInputElement>;
   onEnd: (data: EndBatchType) => Promise<void>;
+  dict: Dictionary;
 }
 
 export const EndBatchDialog = memo<EndBatchDialogProps>(
-  function EndBatchDialog({ open, onOpenChange, inputRef, onEnd }) {
+  function EndBatchDialog({ open, onOpenChange, inputRef, onEnd, dict }) {
     const form = useForm<EndBatchType>({
       // Remove resolver to prevent FormMessage display
       defaultValues: {
@@ -47,7 +49,7 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
       <Dialog open={open} onOpenChange={handleDialogClose}>
         <DialogContent className='max-w-md'>
           <DialogHeader>
-            <DialogTitle>Zakończ proces</DialogTitle>
+            <DialogTitle>{dict.endBatchDialog.title}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -64,7 +66,7 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
                         <Input
                           {...field}
                           className='text-center'
-                          placeholder='Zeskanuj HYDRA batch...'
+                          placeholder={dict.endBatchDialog.batchPlaceholder}
                           autoFocus
                           ref={inputRef}
                           maxLength={10}
@@ -90,10 +92,10 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
                   className='flex-1'
                   variant='outline'
                 >
-                  Anuluj
+                  {dict.endBatchDialog.cancel}
                 </Button>
                 <Button type='submit' className='flex-1'>
-                  Zakończ
+                  {dict.endBatchDialog.end}
                 </Button>
               </div>
             </form>

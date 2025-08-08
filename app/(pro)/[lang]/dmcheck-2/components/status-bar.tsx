@@ -74,12 +74,7 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
   const [boxDialogOpen, setBoxDialogOpen] = useState(false);
   const [palletDialogOpen, setPalletDialogOpen] = useState(false);
 
-  // Don't render if no article selected
-  if (!selectedArticle) return null;
-
-  const { piecesPerBox, boxesPerPallet } = selectedArticle;
-
-  // React Query hooks with manual refetch
+  // React Query hooks with manual refetch - must be called before conditional return
   const {
     data: boxScans = [],
     refetch: refetchBoxScans,
@@ -92,13 +87,7 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
     isFetching: isLoadingPalletBoxes,
   } = useGetPalletBoxes(selectedArticle?.id);
 
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
-
-  const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString(locale);
-  };
-
-  // Handle icon clicks to fetch data and open dialog
+  // Handle icon clicks to fetch data and open dialog - must be called before conditional return
   const handleBoxIconClick = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation(); // Prevent card click
@@ -116,6 +105,17 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
     },
     [refetchPalletBoxes],
   );
+
+  // Don't render if no article selected
+  if (!selectedArticle) return null;
+
+  const { piecesPerBox, boxesPerPallet } = selectedArticle;
+
+  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
+
+  const formatTime = (time: string) => {
+    return new Date(time).toLocaleTimeString(locale);
+  };
 
   // Calculate progress percentages
   const boxProgress = (boxData.piecesInBox / piecesPerBox) * 100;

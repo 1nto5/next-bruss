@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import type { LoginType } from './lib/zod';
+import type { ArticleConfigType } from './lib/types';
 
 export async function login(data: LoginType) {
   try {
@@ -160,7 +161,7 @@ function bmwDateValidation(dmc: string) {
   return false;
 }
 
-function createDmcValidationSchema(articleConfig: any) {
+function createDmcValidationSchema(articleConfig: ArticleConfigType) {
   return z.object({
     dmc: z
       .string()
@@ -173,9 +174,10 @@ function createDmcValidationSchema(articleConfig: any) {
       .refine(
         (dmc) =>
           !articleConfig.secondValidation ||
-          dmc
-            .toLowerCase()
-            .includes(articleConfig.dmcSecondValidation.toLowerCase()),
+          (articleConfig.dmcSecondValidation &&
+            dmc
+              .toLowerCase()
+              .includes(articleConfig.dmcSecondValidation.toLowerCase())),
       ),
   });
 }
@@ -187,12 +189,16 @@ export async function saveDmc(
 ): Promise<{ message: string; dmc?: string; time?: string }> {
   try {
     const articlesConfigCollection = await dbc('articles_config');
-    const articleConfig = await articlesConfigCollection.findOne({
+    const articleConfigDoc = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
-    if (!articleConfig) {
+    if (!articleConfigDoc) {
       return { message: 'article not found' };
     }
+    const articleConfig = {
+      ...articleConfigDoc,
+      id: articleConfigDoc._id.toString(),
+    } as ArticleConfigType;
 
     const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({
@@ -277,7 +283,7 @@ export async function saveDmc(
 
     const insertResult = await scansCollection.insertOne({
       status: 'box',
-      dmc: validatedDmc,
+      dmc: validatedDmc.toUpperCase(),
       workplace: articleConfig.workplace,
       article: articleConfig.articleNumber,
       operator: operators[0],
@@ -347,12 +353,10 @@ export async function saveHydra(
     }
     const validatedHydra = parse.data.hydra;
 
-    let qrBatch;
-
     const {
       qrArticle,
       qrQuantity,
-      qrBatch: extractedBatch,
+      qrBatch,
     } = extractQrValues(validatedHydra.toUpperCase());
 
     if (qrArticle !== articleConfig.articleNumber) {
@@ -362,8 +366,6 @@ export async function saveHydra(
     if (qrQuantity !== articleConfig.piecesPerBox) {
       return { message: 'qr wrong quantity' };
     }
-
-    qrBatch = extractedBatch;
 
     if (!qrBatch) {
       return { message: 'qr not valid' };
@@ -401,7 +403,7 @@ export async function saveHydra(
       {
         $set: {
           status: 'pallet',
-          hydra_batch: qrBatch,
+          hydra_batch: qrBatch.toUpperCase(),
           operator: operators[0],
           hydra_time: new Date(),
         },
@@ -496,7 +498,7 @@ export async function savePallet(
     }
 
     const existingBatch = await scansCollection.findOne({
-      pallet_batch: qrBatch,
+      pallet_batch: qrBatch.toUpperCase(),
     });
 
     if (existingBatch) {
@@ -512,7 +514,7 @@ export async function savePallet(
       {
         $set: {
           status: 'warehouse',
-          pallet_batch: qrBatch,
+          pallet_batch: qrBatch.toUpperCase(),
           pallet_time: new Date(),
           pallet_operator: operators[0],
         },
@@ -532,34 +534,25 @@ export async function savePallet(
 }
 
 export async function save(
-  _prevState: any,
-  formData: FormData,
+  articleConfigId: string,
+  operators: string[],
+  scanType: 'dmc' | 'hydra' | 'pallet',
+  scanValue: string,
 ): Promise<{ message: string; dmc?: string; time?: string } | undefined> {
-  const articleConfigId = formData.get('articleConfigId')?.toString();
-  const operatorIds = formData.get('operatorIds')?.toString();
-  
-  if (!articleConfigId || !operatorIds) {
+  if (!articleConfigId || !operators || !scanType || !scanValue) {
     return { message: 'missing data' };
   }
   
-  const operators = JSON.parse(operatorIds) as string[];
-  
-  if (formData.get('dmc')) {
-    const dmc = formData.get('dmc')?.toString();
-    if (!dmc) return { message: 'missing dmc' };
-    return await saveDmc(dmc, articleConfigId, operators);
+  switch (scanType) {
+    case 'dmc':
+      return await saveDmc(scanValue, articleConfigId, operators);
+    case 'hydra':
+      return await saveHydra(scanValue, articleConfigId, operators);
+    case 'pallet':
+      return await savePallet(scanValue, articleConfigId, operators);
+    default:
+      return { message: 'invalid scan type' };
   }
-  if (formData.get('hydra')) {
-    const hydra = formData.get('hydra')?.toString();
-    if (!hydra) return { message: 'missing hydra' };
-    return await saveHydra(hydra, articleConfigId, operators);
-  }
-  if (formData.get('pallet')) {
-    const pallet = formData.get('pallet')?.toString();
-    if (!pallet) return { message: 'missing pallet' };
-    return await savePallet(pallet, articleConfigId, operators);
-  }
-  return { message: 'no action' };
 }
 
 export async function getInBoxTableData(articleConfigId: string) {

@@ -13,7 +13,7 @@ export type ArticleConfigType = {
   piecesPerBox: number;
   boxesPerPallet?: number;
   pallet: boolean;
-  dmc: any;
+  dmc: string;
   dmcFirstValidation: string;
   dmcSecondValidation?: string;
   secondValidation: boolean;
