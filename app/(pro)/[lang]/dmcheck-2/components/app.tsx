@@ -7,7 +7,7 @@ import { useGetArticles } from '../data/get-articles';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useScanStore } from '../lib/stores';
 import ArticleSelection from './article-selection';
-import ErrorAlert from './error-alert';
+import ErrorAlert from '@/app/(pro)/components/error-alert';
 import LastScans from './last-scans';
 import Loading from './loading';
 import Login from './login';

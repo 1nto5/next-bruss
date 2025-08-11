@@ -1,7 +1,7 @@
 'use client';
 
-import { Card, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { ProCard, ProCardHeader } from '@/app/(pro)/components/ui/pro-card';
+import { ProInput } from '@/app/(pro)/components/ui/pro-input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
@@ -216,9 +216,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <Input
+    <ProCard>
+      <ProCardHeader>
+        <ProInput
           ref={inputRef}
           type='text'
           name={inputName}
@@ -226,11 +226,12 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
           autoComplete='off'
-          className='text-center'
+          className='text-center text-xl font-semibold'
           onFocus={(e) => e.target.select()}
           onKeyDown={handleKeyDown}
+          proSize='xl'
         />
-      </CardHeader>
-    </Card>
+      </ProCardHeader>
+    </ProCard>
   );
 }

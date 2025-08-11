@@ -1,6 +1,7 @@
 'use client';
 
-import { ThemeModeToggle } from '@/components/theme-mode-toggle';
+import { ProThemeToggle } from '@/app/(pro)/components/ui/pro-theme-toggle';
+import { ProHeader, ProHeaderBadge, ProHeaderButton } from '@/app/(pro)/components/ui/pro-layout';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,8 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import type { Locale } from '@/i18n.config';
 import { Component, User, UserPen, Factory } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -39,80 +38,78 @@ export default function Header({ lang, dict }: HeaderProps) {
     (operator): operator is NonNullable<typeof operator> => operator !== null,
   );
 
+  const leftContent = (
+    <>
+      {workplace && (
+        <ProHeaderBadge icon={<Factory />} variant='default'>
+          {workplace.toUpperCase()}
+        </ProHeaderBadge>
+      )}
+      {selectedArticle && (
+        <ProHeaderBadge icon={<Component />} variant='secondary'>
+          {selectedArticle.articleNumber}
+        </ProHeaderBadge>
+      )}
+      {boxStatus.piecesInBox > 0 && (
+        <ProHeaderBadge 
+          variant={boxStatus.piecesInBox === selectedArticle?.piecesPerBox ? 'default' : 'outline'}
+          className={boxStatus.piecesInBox === selectedArticle?.piecesPerBox ? 'animate-pulse bg-green-600 hover:bg-green-700' : ''}
+        >
+          {dict.statusBar.box}: {boxStatus.piecesInBox}/
+          {selectedArticle?.piecesPerBox || '?'}
+        </ProHeaderBadge>
+      )}
+      {palletStatus && palletStatus.boxesOnPallet > 0 && (
+        <ProHeaderBadge 
+          variant={palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet ? 'default' : 'outline'}
+          className={palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet ? 'animate-pulse bg-green-600 hover:bg-green-700' : ''}
+        >
+          {dict.statusBar.pallet}: {palletStatus.boxesOnPallet}/
+          {selectedArticle?.boxesPerPallet || '?'}
+        </ProHeaderBadge>
+      )}
+      {loggedInOperators.length > 0 && (
+        <div className='flex items-center gap-2'>
+          {loggedInOperators.map((operator) => (
+            <ProHeaderBadge
+              key={operator.identifier}
+              icon={<User />}
+              variant='secondary'
+            >
+              {operator.firstName}{' '}
+              {operator.lastName.charAt(0).toUpperCase()}.
+            </ProHeaderBadge>
+          ))}
+        </div>
+      )}
+    </>
+  );
+
+  const rightContent = (
+    <>
+      {selectedArticle && (
+        <ProHeaderButton
+          icon={<Component />}
+          onClick={clearArticle}
+          title={dict.logout?.clearArticle || 'Wyloguj artykuł'}
+        />
+      )}
+      {loggedInOperators.length > 0 && (
+        <ProHeaderButton
+          icon={<UserPen />}
+          onClick={() => setAlertOpen(true)}
+          title={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
+        />
+      )}
+      <VolumeControl />
+      <ProThemeToggle />
+      <LanguageSwitcher currentLang={lang} />
+    </>
+  );
+
   return (
     <>
-      <header className='bg-background sticky top-0 z-50 w-full border-b px-2 py-4 transition-all'>
-        <div className='relative mx-auto flex h-4 w-full items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            {workplace && (
-              <Badge variant='default' className='flex items-center gap-1'>
-                <Factory className='h-3 w-3' />
-                {workplace.toUpperCase()}
-              </Badge>
-            )}
-            {selectedArticle && (
-              <Badge variant='secondary' className='flex items-center gap-1'>
-                <Component className='h-3 w-3' />
-                {selectedArticle.articleNumber}
-              </Badge>
-            )}
-            {boxStatus.piecesInBox > 0 && (
-              <Badge variant='outline' size='sm'>
-                {dict.statusBar.box}: {boxStatus.piecesInBox}/
-                {selectedArticle?.piecesPerBox || '?'}
-              </Badge>
-            )}
-            {palletStatus && palletStatus.boxesOnPallet > 0 && (
-              <Badge variant='outline' size='sm'>
-                {dict.statusBar.pallet}: {palletStatus.boxesOnPallet}/
-                {selectedArticle?.boxesPerPallet || '?'}
-              </Badge>
-            )}
-            {loggedInOperators.length > 0 && (
-              <div className='flex items-center gap-1'>
-                {loggedInOperators.map((operator) => (
-                  <Badge
-                    key={operator.identifier}
-                    variant='secondary'
-                    size='sm'
-                    className='flex items-center gap-1'
-                  >
-                    <User className='h-3 w-3' />
-                    {operator.firstName}{' '}
-                    {operator.lastName.charAt(0).toUpperCase()}.
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className='flex items-center space-x-1'>
-            {selectedArticle && (
-              <Button
-                onClick={clearArticle}
-                variant='ghost'
-                size='icon'
-                title={dict.logout?.clearArticle || 'Wyloguj artykuł'}
-              >
-                <Component className='h-[1.2rem] w-[1.2rem]' />
-              </Button>
-            )}
-            {loggedInOperators.length > 0 && (
-              <Button
-                onClick={() => setAlertOpen(true)}
-                variant='ghost'
-                size='icon'
-                title={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
-              >
-                <UserPen className='h-[1.2rem] w-[1.2rem]' />
-              </Button>
-            )}
-            <VolumeControl />
-            <ThemeModeToggle />
-            <LanguageSwitcher currentLang={lang} />
-          </div>
-        </div>
-      </header>
+      <ProHeader leftContent={leftContent} rightContent={rightContent} />
 
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>

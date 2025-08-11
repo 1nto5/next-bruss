@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { ProButton } from '@/app/(pro)/components/ui/pro-button';
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  ProCard,
+  ProCardContent,
+  ProCardFooter,
+  ProCardHeader,
+  ProCardTitle,
+} from '@/app/(pro)/components/ui/pro-card';
 import {
   Form,
   FormControl,
@@ -16,8 +16,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { ProInput } from '@/app/(pro)/components/ui/pro-input';
+import { ProSwitch } from '@/app/(pro)/components/ui/pro-switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, CircleX, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -154,28 +154,29 @@ export default function LoginWithKeypad({
 
   return (
     <>
-      <Card className='w-full max-w-none'>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
+      <ProCard className='w-full max-w-none'>
+        <ProCardHeader>
+          <ProCardTitle>{title}</ProCardTitle>
+        </ProCardHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-            <CardContent className='grid w-full items-center gap-4'>
+            <ProCardContent className='grid w-full items-center gap-6'>
               <FormField
                 control={form.control}
                 name='identifier1'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{operator1Label}</FormLabel>
+                    <FormLabel className='text-base font-medium'>{operator1Label}</FormLabel>
                     <FormControl>
-                      <Input
+                      <ProInput
                         autoComplete='off'
                         placeholder={placeholder}
                         {...field}
                         onFocus={() => handleFieldFocus('identifier1')}
                         readOnly
                         className='cursor-pointer text-center'
+                        proSize='lg'
                       />
                     </FormControl>
                     <FormMessage />
@@ -185,10 +186,10 @@ export default function LoginWithKeypad({
 
               <FormItem className='flex flex-row items-center justify-between'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>{operator2Label}</FormLabel>
+                  <FormLabel className='text-base font-medium'>{operator2Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch
+                  <ProSwitch
                     checked={personalNumber2Form}
                     onCheckedChange={setPersonalNumber2Form}
                   />
@@ -201,15 +202,16 @@ export default function LoginWithKeypad({
                   name='identifier2'
                   render={({ field }) => (
                     <FormItem className=''>
-                      <FormLabel>{personalNumber2Label}</FormLabel>
+                      <FormLabel className='text-base font-medium'>{personalNumber2Label}</FormLabel>
                       <FormControl>
-                        <Input
+                        <ProInput
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier2')}
                           readOnly
                           className='cursor-pointer text-center'
+                          proSize='lg'
                         />
                       </FormControl>
                       <FormMessage />
@@ -220,10 +222,10 @@ export default function LoginWithKeypad({
 
               <FormItem className='flex flex-row items-center justify-between'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>{operator3Label}</FormLabel>
+                  <FormLabel className='text-base font-medium'>{operator3Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch
+                  <ProSwitch
                     checked={personalNumber3Form}
                     onCheckedChange={setPersonalNumber3Form}
                   />
@@ -236,15 +238,16 @@ export default function LoginWithKeypad({
                   name='identifier3'
                   render={({ field }) => (
                     <FormItem className=''>
-                      <FormLabel>{personalNumber3Label}</FormLabel>
+                      <FormLabel className='text-base font-medium'>{personalNumber3Label}</FormLabel>
                       <FormControl>
-                        <Input
+                        <ProInput
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier3')}
                           readOnly
                           className='cursor-pointer text-center'
+                          proSize='lg'
                         />
                       </FormControl>
                       <FormMessage />
@@ -252,13 +255,14 @@ export default function LoginWithKeypad({
                   )}
                 />
               )}
-            </CardContent>
+            </ProCardContent>
 
-            <CardFooter>
-              <div className='flex w-full gap-2'>
-                <Button
+            <ProCardFooter>
+              <div className='flex w-full gap-4'>
+                <ProButton
                   type='button'
                   variant='destructive'
+                  proSize='lg'
                   className='w-1/4'
                   onClick={() => {
                     form.reset();
@@ -268,16 +272,16 @@ export default function LoginWithKeypad({
                 >
                   <CircleX />
                   {clearButton}
-                </Button>
-                <Button type='submit' disabled={isPending} className='w-3/4'>
+                </ProButton>
+                <ProButton type='submit' disabled={isPending} proSize='lg' className='w-3/4'>
                   {isPending ? <Loader2 className='animate-spin' /> : <Check />}
                   {loginButton}
-                </Button>
+                </ProButton>
               </div>
-            </CardFooter>
+            </ProCardFooter>
           </form>
         </Form>
-      </Card>
+      </ProCard>
 
       <NumericKeypadDialog
         open={showKeypad}

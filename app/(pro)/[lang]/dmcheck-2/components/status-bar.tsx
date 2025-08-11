@@ -11,22 +11,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { ProBadge } from '@/app/(pro)/components/ui/pro-badge';
+import { ProButton } from '@/app/(pro)/components/ui/pro-button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  ProCard,
+  ProCardContent,
+  ProCardDescription,
+  ProCardHeader,
+  ProCardTitle,
+} from '@/app/(pro)/components/ui/pro-card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ProDialog,
+  ProDialogContent,
+  ProDialogDescription,
+  ProDialogHeader,
+  ProDialogTitle,
+} from '@/app/(pro)/components/ui/pro-dialog';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -126,103 +126,114 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
 
   return (
     <>
-      <div className='grid grid-cols-1 gap-2 md:grid-cols-2'>
-        <Card>
-          <CardHeader>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <ProCard>
+          <ProCardHeader>
             <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                <Package className='text-muted-foreground' />
-                <CardTitle className='text-base'>{dict.box}</CardTitle>
+              <div className='flex items-center gap-3'>
+                <Package className='text-muted-foreground h-6 w-6' />
+                <ProCardTitle>{dict.box}</ProCardTitle>
               </div>
-              <div className='flex items-center gap-2'>
+              <div className='flex items-center gap-3'>
                 {boxIsFull && (
-                  <Badge variant='destructive' className='animate-pulse text-xs'>
+                  <ProBadge variant='destructive' className='animate-pulse' proSize='default'>
                     {dict.full}
-                  </Badge>
+                  </ProBadge>
                 )}
                 {boxData.piecesInBox > 0 && (
-                  <button
+                  <ProButton
                     onClick={handleBoxIconClick}
-                    className='hover:bg-accent rounded-sm p-1 transition-colors'
+                    variant='ghost'
+                    size='icon'
                     disabled={isLoadingBoxScans}
+                    className='h-12 w-12'
                   >
                     {isLoadingBoxScans ? (
-                      <Loader2 className='text-muted-foreground animate-spin' />
+                      <Loader2 className='text-muted-foreground animate-spin h-6 w-6' />
                     ) : (
-                      <ExternalLink className='text-muted-foreground' />
+                      <ExternalLink className='text-muted-foreground h-6 w-6' />
                     )}
-                  </button>
+                  </ProButton>
                 )}
               </div>
             </div>
-            <CardDescription>
-              {boxData.piecesInBox} / {piecesPerBox} {dict.pieces}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress 
-              value={boxProgress} 
-              className={`h-2 ${boxIsFull ? 'animate-pulse [&>div]:bg-destructive' : ''}`} 
-            />
-          </CardContent>
-        </Card>
+          </ProCardHeader>
+          <ProCardContent>
+            <div className='space-y-4'>
+              <div className='text-center'>
+                <span className='text-6xl font-bold'>{boxData.piecesInBox}</span>
+                <span className='text-4xl text-muted-foreground mx-3'>/</span>
+                <span className='text-5xl font-semibold text-muted-foreground'>{piecesPerBox}</span>
+              </div>
+              <Progress 
+                value={boxProgress} 
+                className={`h-4 ${boxIsFull ? 'animate-pulse [&>div]:bg-destructive' : ''}`} 
+              />
+            </div>
+          </ProCardContent>
+        </ProCard>
 
         {selectedArticle.pallet && (
-          <Card>
-            <CardHeader>
+          <ProCard>
+            <ProCardHeader>
               <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <Forklift className='text-muted-foreground' />
-                  <CardTitle className='text-base'>{dict.pallet}</CardTitle>
+                <div className='flex items-center gap-3'>
+                  <Forklift className='text-muted-foreground h-6 w-6' />
+                  <ProCardTitle>{dict.pallet}</ProCardTitle>
                 </div>
                 <div className='flex items-center gap-2'>
                   {palletIsFull && (
-                    <Badge variant='destructive' className='animate-pulse text-xs'>
+                    <ProBadge variant='destructive' className='animate-pulse' proSize='default'>
                       {dict.fullPallet}
-                    </Badge>
+                    </ProBadge>
                   )}
                   {palletData.boxesOnPallet > 0 && (
-                    <button
+                    <ProButton
                       onClick={handlePalletIconClick}
-                      className='hover:bg-accent rounded-sm p-1 transition-colors'
+                      variant='ghost'
+                      size='icon'
                       disabled={isLoadingPalletBoxes}
+                      className='h-12 w-12'
                     >
                       {isLoadingPalletBoxes ? (
-                        <Loader2 className='text-muted-foreground animate-spin' />
+                        <Loader2 className='text-muted-foreground animate-spin h-6 w-6' />
                       ) : (
-                        <ExternalLink className='text-muted-foreground' />
+                        <ExternalLink className='text-muted-foreground h-6 w-6' />
                       )}
-                    </button>
+                    </ProButton>
                   )}
                 </div>
               </div>
-              <CardDescription>
-                {palletData.boxesOnPallet} / {boxesPerPallet || 0}{' '}
-                {dict.boxes}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Progress 
-                value={palletProgress} 
-                className={`h-2 ${palletIsFull ? 'animate-pulse [&>div]:bg-destructive' : ''}`} 
-              />
-            </CardContent>
-          </Card>
+            </ProCardHeader>
+            <ProCardContent>
+              <div className='space-y-4'>
+                <div className='text-center'>
+                  <span className='text-6xl font-bold'>{palletData.boxesOnPallet}</span>
+                  <span className='text-4xl text-muted-foreground mx-3'>/</span>
+                  <span className='text-5xl font-semibold text-muted-foreground'>{boxesPerPallet || 0}</span>
+                </div>
+                <Progress 
+                  value={palletProgress} 
+                  className={`h-4 ${palletIsFull ? 'animate-pulse [&>div]:bg-destructive' : ''}`} 
+                />
+              </div>
+            </ProCardContent>
+          </ProCard>
         )}
       </div>
 
       {/* Box Scans Dialog */}
-      <Dialog open={boxDialogOpen} onOpenChange={setBoxDialogOpen}>
-        <DialogContent className='max-w-2xl'>
-          <DialogHeader>
-            <DialogTitle className='flex items-center gap-2'>
-              <Package className='h-4 w-4' />
+      <ProDialog open={boxDialogOpen} onOpenChange={setBoxDialogOpen}>
+        <ProDialogContent size='xl'>
+          <ProDialogHeader>
+            <ProDialogTitle className='flex items-center gap-3'>
+              <Package className='h-6 w-6' />
               {dict.box}
-            </DialogTitle>
-            <DialogDescription>
+            </ProDialogTitle>
+            <ProDialogDescription>
               {boxData.piecesInBox} / {piecesPerBox} {dict.pieces}
-            </DialogDescription>
-          </DialogHeader>
+            </ProDialogDescription>
+          </ProDialogHeader>
           <ScrollArea className='h-[400px] w-full'>
             {boxScans.length > 0 ? (
               <Table>
@@ -243,13 +254,13 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
                       <TableCell className='text-right'>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button
+                            <ProButton
                               size='icon'
                               variant='ghost'
-                              className='h-8 w-8'
+                              className='h-10 w-10'
                             >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
+                              <Trash2 className='h-5 w-5' />
+                            </ProButton>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
@@ -304,23 +315,23 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
               </div>
             )}
           </ScrollArea>
-        </DialogContent>
-      </Dialog>
+        </ProDialogContent>
+      </ProDialog>
 
       {/* Pallet Scans Dialog */}
       {selectedArticle.pallet && (
-        <Dialog open={palletDialogOpen} onOpenChange={setPalletDialogOpen}>
-          <DialogContent className='max-w-2xl'>
-            <DialogHeader>
-              <DialogTitle className='flex items-center gap-2'>
-                <Forklift className='h-4 w-4' />
+        <ProDialog open={palletDialogOpen} onOpenChange={setPalletDialogOpen}>
+          <ProDialogContent size='xl'>
+            <ProDialogHeader>
+              <ProDialogTitle className='flex items-center gap-3'>
+                <Forklift className='h-6 w-6' />
                 {dict.pallet}
-              </DialogTitle>
-              <DialogDescription>
+              </ProDialogTitle>
+              <ProDialogDescription>
                 {palletData.boxesOnPallet} / {boxesPerPallet || 0}{' '}
                 {dict.boxes}
-              </DialogDescription>
-            </DialogHeader>
+              </ProDialogDescription>
+            </ProDialogHeader>
             <ScrollArea className='h-[400px] w-full'>
               {palletBoxes.length > 0 ? (
                 <Table>
@@ -341,13 +352,13 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
                         <TableCell className='text-right'>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button
+                              <ProButton
                                 size='icon'
                                 variant='ghost'
-                                className='h-8 w-8'
+                                className='h-10 w-10'
                               >
-                                <Trash2 className='h-4 w-4' />
-                              </Button>
+                                <Trash2 className='h-5 w-5' />
+                              </ProButton>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -402,8 +413,8 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
                 </div>
               )}
             </ScrollArea>
-          </DialogContent>
-        </Dialog>
+          </ProDialogContent>
+        </ProDialog>
       )}
     </>
   );

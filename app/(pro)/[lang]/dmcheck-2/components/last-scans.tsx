@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { ProCard, ProCardContent } from '@/app/(pro)/components/ui/pro-card';
 import type { Locale } from '@/i18n.config';
 import { useScanStore } from '../lib/stores';
 
@@ -18,21 +18,21 @@ export default function LastScans({ lang }: LastScansProps) {
   const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
 
   return (
-    <Card>
-      <CardContent className='mt-4 space-y-2'>
+    <ProCard>
+      <ProCardContent className='space-y-3'>
         {lastScans.map((scan, index) => (
-          <Card key={index}>
-            <CardContent className='flex items-center justify-between p-4'>
+          <ProCard key={index}>
+            <ProCardContent className='flex items-center justify-between px-6 py-4'>
               <div className='flex items-center gap-4'>
-                <span className='font-mono text-xs'>{scan.dmc}</span>
+                <span className='font-mono text-base'>{scan.dmc}</span>
               </div>
-              <span className='text-muted-foreground text-sm'>
+              <span className='text-muted-foreground text-base'>
                 {new Date(scan.time).toLocaleTimeString(locale)}
               </span>
-            </CardContent>
-          </Card>
+            </ProCardContent>
+          </ProCard>
         ))}
-      </CardContent>
-    </Card>
+      </ProCardContent>
+    </ProCard>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ProButton } from '@/app/(pro)/components/ui/pro-button';
+import { ProCard, ProCardContent, ProCardHeader, ProCardTitle } from '@/app/(pro)/components/ui/pro-card';
 import { Component } from 'lucide-react';
 import { useScanStore } from '../lib/stores';
 import type { ArticleConfigType } from '../lib/types';
@@ -21,18 +21,19 @@ export default function ArticleSelection({
   const { setSelectedArticle } = useScanStore();
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{dict.title} - {workplace.toUpperCase()}</CardTitle>
-      </CardHeader>
+    <ProCard>
+      <ProCardHeader>
+        <ProCardTitle>{dict.title} - {workplace.toUpperCase()}</ProCardTitle>
+      </ProCardHeader>
 
-      <CardContent>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+      <ProCardContent>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {articles.map((article) => (
-            <Button
+            <ProButton
               key={article.id}
               variant='outline'
-              className='h-auto flex-col items-start justify-start p-4 text-left'
+              proSize='lg'
+              className='h-auto flex-col items-start justify-start p-6 text-left'
               onClick={() => setSelectedArticle({
                 id: article.id,
                 articleNumber: article.articleNumber,
@@ -44,27 +45,27 @@ export default function ArticleSelection({
               })}
             >
               <div className='flex w-full items-center justify-between'>
-                <Component className='h-5 w-5' />
-                <span className='text-xs text-muted-foreground'>
+                <Component className='h-6 w-6' />
+                <span className='text-sm text-muted-foreground'>
                   {article.piecesPerBox} {dict.piecesPerBox}
                   {article.pallet && `, ${article.boxesPerPallet} ${dict.boxesPerPallet}`}
                 </span>
               </div>
-              <div className='mt-2 space-y-1'>
-                <div className='font-semibold'>{article.articleNumber}</div>
-                <div className='text-sm text-muted-foreground'>
+              <div className='mt-3 space-y-2'>
+                <div className='text-lg font-semibold'>{article.articleNumber}</div>
+                <div className='text-base text-muted-foreground'>
                   {article.articleName}
                 </div>
                 {(article.ford || article.bmw) && (
-                  <div className='text-xs text-blue-600'>
+                  <div className='text-sm text-blue-600 font-medium'>
                     {article.ford && 'FORD'} {article.bmw && 'BMW'}
                   </div>
                 )}
               </div>
-            </Button>
+            </ProButton>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </ProCardContent>
+    </ProCard>
   );
 }
