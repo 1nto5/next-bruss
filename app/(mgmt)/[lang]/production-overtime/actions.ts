@@ -137,6 +137,7 @@ export async function deleteDayOff(
 
     if (
       request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('admin') &&
       !session.user.roles?.includes('production-manager') &&
       !session.user.roles?.includes('group-leader') &&
       !session.user.roles?.includes('plant-manager') &&
@@ -226,6 +227,7 @@ export async function addEmployeeDayOff(
 
     if (
       request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('admin') &&
       !session.user.roles?.includes('plant-manager') &&
       !session.user.roles?.includes('hr')
     ) {
@@ -565,14 +567,27 @@ export async function getOvertimeRequestForEdit(id: string) {
       return null;
     }
 
-    // Check if user is the author of the request
-    if (request.requestedBy !== session.user.email) {
-      return null;
-    }
-
-    // Only allow editing if status is pending or approved
-    if (request.status !== 'pending' && request.status !== 'approved') {
-      return null;
+    // Check if user has permission to edit
+    const isAdmin = session.user.roles?.includes('admin');
+    const isHR = session.user.roles?.includes('hr');
+    const isPlantManager = session.user.roles?.includes('plant-manager');
+    const isAuthor = request.requestedBy === session.user.email;
+    
+    // For canceled and accounted statuses - only admin can edit
+    if (request.status === 'canceled' || request.status === 'accounted') {
+      if (!isAdmin) {
+        return null;
+      }
+    } else {
+      // For other statuses:
+      // Admin, HR, and plant-manager can edit always
+      // Author can edit only pending status
+      const canEdit = isAdmin || isHR || isPlantManager || 
+                     (isAuthor && request.status === 'pending');
+      
+      if (!canEdit) {
+        return null;
+      }
     }
 
     // Convert MongoDB document to OvertimeType
@@ -626,14 +641,27 @@ export async function updateOvertimeRequest(
       return { error: 'not found' };
     }
 
-    // Check if user is the author of the request
-    if (request.requestedBy !== session.user.email) {
-      return { error: 'unauthorized' };
-    }
-
-    // Only allow editing if status is pending or approved
-    if (request.status !== 'pending' && request.status !== 'approved') {
-      return { error: 'cannot edit - invalid status' };
+    // Check if user has permission to edit
+    const isAdmin = session.user.roles?.includes('admin');
+    const isHR = session.user.roles?.includes('hr');
+    const isPlantManager = session.user.roles?.includes('plant-manager');
+    const isAuthor = request.requestedBy === session.user.email;
+    
+    // For canceled and accounted statuses - only admin can edit
+    if (request.status === 'canceled' || request.status === 'accounted') {
+      if (!isAdmin) {
+        return { error: 'unauthorized - only admin can edit canceled or accounted requests' };
+      }
+    } else {
+      // For other statuses:
+      // Admin, HR, and plant-manager can edit always
+      // Author can edit only pending status
+      const canEdit = isAdmin || isHR || isPlantManager || 
+                     (isAuthor && request.status === 'pending');
+      
+      if (!canEdit) {
+        return { error: 'unauthorized' };
+      }
     }
 
     // Update the request

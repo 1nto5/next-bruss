@@ -144,6 +144,7 @@ export async function POST(req: NextRequest) {
     const userRoles = session.user?.roles || [];
     const userEmail = session.user?.email;
     const ATTACHMENT_ROLES = [
+      'admin',
       'group-leader',
       'production-manager',
       'plant-manager',

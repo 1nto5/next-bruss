@@ -180,10 +180,17 @@ export const createColumns = (
           userEmail === request.requestedBy ||
           userEmail === request.responsibleEmployee;
 
-        // Check if user can edit (only author, and only pending/approved status)
+        // Check if user can edit
+        // For canceled and accounted statuses - only admin can edit
+        // For other statuses: Admin, HR, and plant-manager can edit always
+        // Author can edit only pending status
         const canEdit = 
-          request.requestedBy === userEmail &&
-          (request.status === 'pending' || request.status === 'approved');
+          (request.status === 'canceled' || request.status === 'accounted') 
+            ? userRoles.includes('admin')
+            : ((request.requestedBy === userEmail && request.status === 'pending') ||
+               userRoles.includes('admin') ||
+               userRoles.includes('hr') ||
+               userRoles.includes('plant-manager'));
 
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
