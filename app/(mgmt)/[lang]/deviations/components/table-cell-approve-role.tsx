@@ -120,7 +120,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
     }
 
     // Start with the current role if the user has it directly
-    let availableRoles = deviationUserRoles.includes(role) ? [role] : [];
+    const availableRoles = deviationUserRoles.includes(role) ? [role] : [];
 
     // Add elevated roles
     for (const userRole of deviationUserRoles) {

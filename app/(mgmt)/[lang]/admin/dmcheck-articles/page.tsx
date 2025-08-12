@@ -23,7 +23,7 @@ async function getArticleConfigs(
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  let allConfigs = await res.json();
+  const allConfigs = await res.json();
 
   return { fetchTime, allConfigs };
 }

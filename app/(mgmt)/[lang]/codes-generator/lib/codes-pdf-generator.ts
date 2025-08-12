@@ -177,7 +177,7 @@ export async function codesPdfGenerator({
           },
         });
 
-        let qrY = pageSize === 'standard' ? 10 : 20;
+        const qrY = pageSize === 'standard' ? 10 : 20;
 
         const qrX = centerX - actualCodeSize / 2;
         doc.addImage(
@@ -227,7 +227,7 @@ export async function codesPdfGenerator({
 
         const barcodeDataUrl = canvas.toDataURL('image/png');
 
-        let barcodeY = pageSize === 'standard' ? 10 : 30;
+        const barcodeY = pageSize === 'standard' ? 10 : 30;
 
         // Calculate barcode dimensions based on actualCodeSize and orientation
         let barcodeWidth, barcodeHeight;

@@ -98,7 +98,7 @@ export async function getAllPositions(): Promise<PositionOption[]> {
     const collection = db.collection(collectionName);
     const cards = await collection.find({}).toArray();
 
-    let formattedPositions: PositionOption[] = [];
+    const formattedPositions: PositionOption[] = [];
 
     cards.forEach((card) => {
       if (Array.isArray(card.positions)) {
