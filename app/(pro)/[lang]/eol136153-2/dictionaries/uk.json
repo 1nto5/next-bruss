@@ -1,0 +1,73 @@
+{
+  "login": {
+    "title": "Вхід EOL136153",
+    "operator1Label": "Особистий номер",
+    "placeholder": "tap to enter...",
+    "loginButton": "Увійти",
+    "clearButton": "Очистити",
+    "keypadTitle": "Введіть особистий номер",
+    "errors": {
+      "wrongNumber1": "Недійсний особистий номер",
+      "loginError": "Помилка входу",
+      "wrongNumber2": "",
+      "wrongNumber3": ""
+    },
+    "operator2Label": "",
+    "operator3Label": "",
+    "personalNumber2Label": "",
+    "personalNumber3Label": ""
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Оператор",
+    "logout": "Вийти",
+    "changeArticle": "Змінити",
+    "volume": "Гучність"
+  },
+  "status": {
+    "article136": "136 (28067)",
+    "article153": "153 (28042)",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Коробок на палеті",
+    "palletFull": "Палета повна",
+    "scanPallet": "Сканувати палету"
+  },
+  "scanning": {
+    "title": "Сканувати код Hydra",
+    "placeholder": "HYDRA QR",
+    "scanning": "Сканування...",
+    "messages": {
+      "saved": "Партію збережено!",
+      "exists": "Партія вже існує!",
+      "invalid": "Недійсний код!",
+      "wrongArticle": "Неправильний артикул!",
+      "wrongQuantity": "Неправильна кількість!",
+      "wrongProcess": "Неправильний процес!",
+      "fullPallet": "Палета повна!",
+      "error": "Помилка! Зверніться до ІТ"
+    }
+  },
+  "pallet": {
+    "title": "Сканувати код палети",
+    "placeholder": "КОД ПАЛЕТИ",
+    "generateBatch": "Згенерувати партію палети",
+    "print": "Друкувати етикетку",
+    "printing": "Друкування...",
+    "nextPallet": "Наступна палета",
+    "messages": {
+      "success": "Палету збережено!",
+      "invalid": "Недійсний код палети!",
+      "error": "Помилка збереження палети!"
+    }
+  },
+  "lastScans": {
+    "title": "Останні сканування",
+    "empty": "Немає сканувань"
+  },
+  "errors": {
+    "somethingWrong": "Щось пішло не так",
+    "fetchError": "Не вдалося отримати дані",
+    "contactIT": "Зверніться до ІТ"
+  }
+}

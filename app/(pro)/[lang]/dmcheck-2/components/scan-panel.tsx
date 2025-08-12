@@ -1,7 +1,7 @@
 'use client';
 
-import { ProCard, ProCardHeader } from '@/app/(pro)/components/ui/pro-card';
-import { ProInput } from '@/app/(pro)/components/ui/pro-input';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
@@ -9,7 +9,9 @@ import { saveDmc, saveHydra, savePallet } from '../actions';
 import { useGetBoxStatus } from '../data/get-box-status';
 import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dictionary';
-import { useOperatorStore, useScanStore, useVolumeStore } from '../lib/stores';
+import { useOperatorStore, useScanStore } from '../lib/stores';
+import { useVolumeStore } from '@/app/(pro)/components/volume-control';
+import { PrintPalletLabel } from './print-pallet-label';
 
 interface ScanPanelProps {
   dict: Dictionary;
@@ -28,9 +30,15 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     [operator1, operator2, operator3]
   );
   
-  // Get status from React Query
-  const { data: boxStatus = { piecesInBox: 0, boxIsFull: false } } = useGetBoxStatus(selectedArticle?.id);
-  const { data: palletStatus = { boxesOnPallet: 0, palletIsFull: false } } = useGetPalletStatus(
+  // Get status from React Query with refetch functions
+  const { 
+    data: boxStatus = { piecesInBox: 0, boxIsFull: false },
+    refetch: refetchBoxStatus 
+  } = useGetBoxStatus(selectedArticle?.id);
+  const { 
+    data: palletStatus = { boxesOnPallet: 0, palletIsFull: false },
+    refetch: refetchPalletStatus
+  } = useGetPalletStatus(
     selectedArticle?.id,
     selectedArticle?.pallet || false
   );
@@ -61,6 +69,8 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           if (result.dmc) {
             addScan(result.dmc);
           }
+          // Refetch box status to update piece count
+          await refetchBoxStatus();
           setTimeout(() => inputRef.current?.focus(), 50);
           return dict.scan.messages.dmcSaved;
         } else if (result.message === 'dmc saved smart unknown') {
@@ -68,6 +78,8 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           if (result.dmc) {
             addScan(result.dmc);
           }
+          // Refetch box status to update piece count
+          await refetchBoxStatus();
           setTimeout(() => inputRef.current?.focus(), 50);
           return dict.scan.messages.smartUnknown;
         } else {
@@ -86,9 +98,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
             'smart pattern': dict.scan.messages.smartPattern,
             'smart fetch error': dict.scan.messages.smartFetchError,
           };
+          // Clear the input value on error
           setTimeout(() => {
-            setInputValue(dmcValue);
-            inputRef.current?.select();
+            inputRef.current?.focus();
           }, 50);
           throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
         }
@@ -99,7 +111,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         error: (err) => err.message,
       }
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, addScan, dict.scan]);
+  }, [inputValue, selectedArticle, operators, playOk, playNok, addScan, dict.scan, refetchBoxStatus]);
 
   const handleHydraScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
@@ -113,6 +125,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         
         if (result.message === 'batch saved') {
           playOk();
+          // Refetch box and pallet status to update UI
+          await refetchBoxStatus();
+          await refetchPalletStatus();
           setTimeout(() => inputRef.current?.focus(), 50);
           return dict.scan.messages.batchSaved;
         } else {
@@ -126,9 +141,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
             'qr wrong quantity': dict.scan.messages.qrWrongQuantity,
             'box not full': dict.scan.messages.boxNotFull,
           };
+          // Clear the input value on error
           setTimeout(() => {
-            setInputValue(hydraValue);
-            inputRef.current?.select();
+            inputRef.current?.focus();
           }, 50);
           throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
         }
@@ -139,7 +154,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         error: (err) => err.message,
       }
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan]);
+  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan, refetchBoxStatus, refetchPalletStatus]);
 
   const handlePalletScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
@@ -153,6 +168,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         
         if (result.message === 'batch saved') {
           playOk();
+          // Refetch both box and pallet status to reset UI
+          await refetchBoxStatus();
+          await refetchPalletStatus();
           setTimeout(() => inputRef.current?.focus(), 50);
           return dict.scan.messages.batchSaved;
         } else {
@@ -167,9 +185,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
             'qr wrong process': dict.scan.messages.qrWrongProcess,
             'pallet not full': dict.scan.messages.palletNotFull,
           };
+          // Clear the input value on error
           setTimeout(() => {
-            setInputValue(palletValue);
-            inputRef.current?.select();
+            inputRef.current?.focus();
           }, 50);
           throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
         }
@@ -180,7 +198,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         error: (err) => err.message,
       }
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan]);
+  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan, refetchBoxStatus, refetchPalletStatus]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -216,22 +234,27 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   }
 
   return (
-    <ProCard>
-      <ProCardHeader>
-        <ProInput
-          ref={inputRef}
-          type='text'
-          name={inputName}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder={placeholder}
-          autoComplete='off'
-          className='text-center text-xl font-semibold'
-          onFocus={(e) => e.target.select()}
-          onKeyDown={handleKeyDown}
-          proSize='xl'
-        />
-      </ProCardHeader>
-    </ProCard>
+    <div className='space-y-4'>
+      <Card>
+        <CardHeader>
+          <Input
+            ref={inputRef}
+            type='text'
+            name={inputName}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={placeholder}
+            autoComplete='off'
+            className='text-center'
+            onFocus={(e) => e.target.select()}
+            onKeyDown={handleKeyDown}
+          />
+        </CardHeader>
+      </Card>
+      {/* Show print button when pallet is full */}
+      {palletStatus.palletIsFull && isPalletWorkplace && (
+        <PrintPalletLabel dict={dict.scan} />
+      )}
+    </div>
   );
 }

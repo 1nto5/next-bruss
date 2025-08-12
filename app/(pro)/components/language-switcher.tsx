@@ -57,18 +57,18 @@ export default function LanguageSwitcher({ currentLang }: LanguageSwitcherProps)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon'>
-          <span className='text-[1.2rem] leading-none'>{currentFlag}</span>
+        <Button variant='ghost' size='icon' className='h-10 w-10'>
+          <span className='text-2xl leading-none'>{currentFlag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='min-w-0'>
+      <DropdownMenuContent className='min-w-0 p-3'>
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => switchLanguage(lang.code)}
-            className={`text-center px-3 py-2 ${currentLang === lang.code ? 'bg-accent' : ''}`}
+            className={`text-center px-6 py-4 min-h-[56px] flex items-center justify-center ${currentLang === lang.code ? 'bg-accent' : ''}`}
           >
-            <span className='text-xl'>{lang.flag}</span>
+            <span className='text-3xl'>{lang.flag}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

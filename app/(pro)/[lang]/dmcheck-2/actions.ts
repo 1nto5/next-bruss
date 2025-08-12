@@ -5,6 +5,7 @@ import pgp from '@/lib/pg';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 import type { LoginType } from './lib/zod';
 import type { ArticleConfigType } from './lib/types';
 
@@ -323,9 +324,14 @@ function extractQrValues(hydra: string) {
   const qrQuantityMatch = hydra.match(/Q:([^|]+)/);
   const qrBatchMatch = hydra.match(/B:([^|]+)/);
 
-  const qrArticle = qrArticleMatch ? qrArticleMatch[1] : '';
+  const qrArticle = qrArticleMatch ? qrArticleMatch[1].trim() : '';
   const qrQuantity = qrQuantityMatch ? parseInt(qrQuantityMatch[1], 10) : 0;
-  const qrBatch = qrBatchMatch ? qrBatchMatch[1] : '';
+  const qrBatch = qrBatchMatch ? qrBatchMatch[1].trim() : '';
+
+  // Additional validation - ensure we got valid values
+  if (!qrArticle || !qrBatch || isNaN(qrQuantity) || qrQuantity <= 0) {
+    return { qrArticle: '', qrQuantity: 0, qrBatch: '' };
+  }
 
   return { qrArticle, qrQuantity, qrBatch };
 }
@@ -344,8 +350,18 @@ export async function saveHydra(
       return { message: 'article not found' };
     }
 
+    // Validate Hydra QR format - must contain pipe delimiters and specific fields
     const schema = z.object({
-      hydra: z.string(),
+      hydra: z.string()
+        .min(10, 'QR code too short')
+        .refine((val) => val.includes('|'), 'Invalid QR format - missing delimiters')
+        .refine((val) => {
+          // Check for required fields: A:, Q:, B:
+          const hasArticle = val.toUpperCase().includes('A:');
+          const hasQuantity = val.toUpperCase().includes('Q:');
+          const hasBatch = val.toUpperCase().includes('B:');
+          return hasArticle && hasQuantity && hasBatch;
+        }, 'Invalid Hydra QR - missing required fields'),
     });
     const parse = schema.safeParse({ hydra });
     if (!parse.success) {
@@ -359,16 +375,23 @@ export async function saveHydra(
       qrBatch,
     } = extractQrValues(validatedHydra.toUpperCase());
 
-    if (qrArticle !== articleConfig.articleNumber) {
+    // Check if extraction failed (invalid QR format)
+    if (!qrArticle || qrQuantity === 0 || !qrBatch) {
+      return { message: 'qr not valid' };
+    }
+
+    // For short Hydra QR codes, check if the QR article is contained in the config article number
+    // or if the config article number starts with the QR article
+    const isArticleMatch = qrArticle === articleConfig.articleNumber || 
+                          articleConfig.articleNumber.startsWith(qrArticle) ||
+                          articleConfig.articleNumber.includes(qrArticle);
+    
+    if (!isArticleMatch) {
       return { message: 'qr wrong article' };
     }
 
     if (qrQuantity !== articleConfig.piecesPerBox) {
       return { message: 'qr wrong quantity' };
-    }
-
-    if (!qrBatch) {
-      return { message: 'qr not valid' };
     }
 
     const scansCollection = await dbc('scans');
@@ -747,5 +770,50 @@ export async function deleteHydraFromPallet(hydra: string) {
   } catch (error) {
     console.error(error);
     return { message: 'error' };
+  }
+}
+
+// Generate unique pallet QR code
+export async function getPalletQr(articleConfigId: string) {
+  try {
+    const articlesConfigCollection = await dbc('articles_config');
+    const articleConfig = await articlesConfigCollection.findOne({
+      _id: new ObjectId(articleConfigId),
+    });
+    if (!articleConfig) {
+      return null;
+    }
+
+    // Generate unique batch number by checking against existing batches
+    let batch = '';
+    let isUnique = false;
+    const scansCollection = await dbc('scans');
+    const scansArchiveCollection = await dbc('scans_archive');
+
+    while (!isUnique) {
+      batch = `AA${uuidv4().slice(0, 8).toUpperCase()}`;
+
+      // Check if batch exists in scans collection
+      const existingInScans = await scansCollection.findOne({
+        pallet_batch: batch,
+      });
+
+      // Check if batch exists in scans_archive collection  
+      const existingInArchive = await scansArchiveCollection.findOne({
+        pallet_batch: batch,
+      });
+
+      // If batch doesn't exist in either collection, it's unique
+      if (!existingInScans && !existingInArchive) {
+        isUnique = true;
+      }
+    }
+
+    // Generate QR code string in the format expected by the system
+    const totalQuantity = articleConfig.boxesPerPallet * articleConfig.piecesPerBox;
+    return `A:${articleConfig.articleNumber}|O:669|Q:${totalQuantity}|B:${batch}|C:G`;
+  } catch (error) {
+    console.error('Error generating pallet QR:', error);
+    return null;
   }
 }

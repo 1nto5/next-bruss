@@ -24,10 +24,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
-import { AlertTriangle, Play, ScanLine, StopCircle, X } from 'lucide-react';
+import { AlertTriangle, Play, ScanLine, StopCircle, X, Trash2 } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
+import { useVolumeStore } from '@/app/(pro)/components/volume-control';
 import {
   completeOvenProcess,
   deleteOvenProcess,
@@ -76,9 +77,10 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
   const batchInputRef = useRef<HTMLInputElement>(null!);
   const endInputRef = useRef<HTMLInputElement>(null!);
 
-  const [playOvenIn] = useSound('/oven-in.wav', { volume: 0.75 });
-  const [playOvenOut] = useSound('/oven-out.wav', { volume: 0.75 });
-  const [playNok] = useSound('/nok.mp3', { volume: 0.75 });
+  const { volume } = useVolumeStore();
+  const [playOvenIn] = useSound('/oven-in.wav', { volume });
+  const [playOvenOut] = useSound('/oven-out.wav', { volume });
+  const [playNok] = useSound('/nok.mp3', { volume });
   const operators = useMemo(
     () =>
       [operator1, operator2, operator3]
@@ -369,17 +371,22 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       <div>
         <Card>
           <CardHeader>
-            <div className='flex gap-2'>
-              <Button onClick={() => setStartDialogOpen(true)} className='flex-1'>
-                <Play />
+            <div className='flex gap-4'>
+              <Button 
+                onClick={() => setStartDialogOpen(true)} 
+                className='w-1/2'
+                size='lg'
+              >
+                <Play className='mr-2' />
                 {dict.processList.newProcess}
               </Button>
               <Button
                 onClick={() => setEndDialogOpen(true)}
                 variant='secondary'
-                className='flex-1'
+                className='w-1/2'
+                size='lg'
               >
-                <StopCircle />
+                <StopCircle className='mr-2' />
                 {dict.processList.endProcess}
               </Button>
             </div>
@@ -510,11 +517,13 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
               {dict.processList.deleteDialog.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelDelete}>
+          <AlertDialogFooter className="flex flex-row gap-2 w-full">
+            <AlertDialogCancel onClick={handleCancelDelete} className="w-1/4 flex items-center justify-center gap-2">
+              <X className="h-4 w-4" />
               {dict.processList.deleteDialog.cancel}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>
+            <AlertDialogAction onClick={handleConfirmDelete} className="w-3/4 flex items-center justify-center gap-2">
+              <Trash2 className="h-4 w-4" />
               {dict.processList.deleteDialog.delete}
             </AlertDialogAction>
           </AlertDialogFooter>

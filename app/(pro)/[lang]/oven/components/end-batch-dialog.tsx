@@ -1,10 +1,6 @@
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -12,7 +8,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { CircleX, StopCircle } from 'lucide-react';
 import { memo, RefObject } from 'react';
 import { useForm } from 'react-hook-form';
 import type { Dictionary } from '../lib/dictionary';
@@ -47,16 +43,16 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
 
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
-        <DialogContent className='max-w-md'>
+        <DialogContent className='max-w-lg'>
           <DialogHeader>
             <DialogTitle>{dict.endBatchDialog.title}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className='space-y-4'
+              className='space-y-6'
             >
-              <div className='space-y-2'>
+              <div className='space-y-4'>
                 <FormField
                   control={form.control}
                   name='scannedBatch'
@@ -85,16 +81,18 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
                 />
               </div>
 
-              <div className='flex gap-2'>
+              <div className='flex gap-4'>
                 <Button
                   type='button'
                   onClick={() => handleDialogClose(false)}
-                  className='flex-1'
+                  className='w-1/2'
                   variant='outline'
                 >
+                  <CircleX className='mr-2' />
                   {dict.endBatchDialog.cancel}
                 </Button>
-                <Button type='submit' className='flex-1'>
+                <Button type='submit' className='w-1/2'>
+                  <StopCircle className='mr-2' />
                   {dict.endBatchDialog.end}
                 </Button>
               </div>

@@ -1,5 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ProButton } from '@/app/(pro)/components/ui/pro-button';
+import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCcw, Terminal } from 'lucide-react';
 
 interface ErrorAlertProps {
@@ -31,10 +31,10 @@ export default function ErrorAlert({
           {description}
           {refetch && (
             <div className='mt-6 flex justify-end'>
-              <ProButton onClick={refetch} disabled={isFetching} proSize='lg'>
+              <Button onClick={refetch} disabled={isFetching}>
                 {isFetching ? <Loader2 className='animate-spin' /> : <RefreshCcw />}
                 {buttonText}
-              </ProButton>
+              </Button>
             </div>
           )}
         </AlertDescription>

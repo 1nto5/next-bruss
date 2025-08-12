@@ -1,13 +1,14 @@
 'use client';
 
-import { ProButton } from '@/app/(pro)/components/ui/pro-button';
 import {
-  ProCard,
-  ProCardContent,
-  ProCardFooter,
-  ProCardHeader,
-  ProCardTitle,
-} from '@/app/(pro)/components/ui/pro-card';
+  PButton,
+  PCard,
+  PCardContent,
+  PCardHeader,
+  PInput,
+  PSwitch,
+} from '@/app/(pro)/components/ui/wrappers';
+import { CardFooter, CardTitle } from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -16,8 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { ProInput } from '@/app/(pro)/components/ui/pro-input';
-import { ProSwitch } from '@/app/(pro)/components/ui/pro-switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, CircleX, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -154,14 +153,14 @@ export default function LoginWithKeypad({
 
   return (
     <>
-      <ProCard className='w-full max-w-none'>
-        <ProCardHeader>
-          <ProCardTitle>{title}</ProCardTitle>
-        </ProCardHeader>
+      <PCard>
+        <PCardHeader>
+          <CardTitle>{title}</CardTitle>
+        </PCardHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-            <ProCardContent className='grid w-full items-center gap-6'>
+            <PCardContent className='grid w-full items-center gap-6'>
               <FormField
                 control={form.control}
                 name='identifier1'
@@ -169,14 +168,13 @@ export default function LoginWithKeypad({
                   <FormItem>
                     <FormLabel className='text-base font-medium'>{operator1Label}</FormLabel>
                     <FormControl>
-                      <ProInput
+                      <PInput
                         autoComplete='off'
                         placeholder={placeholder}
                         {...field}
                         onFocus={() => handleFieldFocus('identifier1')}
                         readOnly
                         className='cursor-pointer text-center'
-                        proSize='lg'
                       />
                     </FormControl>
                     <FormMessage />
@@ -189,7 +187,7 @@ export default function LoginWithKeypad({
                   <FormLabel className='text-base font-medium'>{operator2Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <ProSwitch
+                  <PSwitch
                     checked={personalNumber2Form}
                     onCheckedChange={setPersonalNumber2Form}
                   />
@@ -204,14 +202,13 @@ export default function LoginWithKeypad({
                     <FormItem className=''>
                       <FormLabel className='text-base font-medium'>{personalNumber2Label}</FormLabel>
                       <FormControl>
-                        <ProInput
+                        <PInput
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier2')}
                           readOnly
                           className='cursor-pointer text-center'
-                          proSize='lg'
                         />
                       </FormControl>
                       <FormMessage />
@@ -225,7 +222,7 @@ export default function LoginWithKeypad({
                   <FormLabel className='text-base font-medium'>{operator3Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <ProSwitch
+                  <PSwitch
                     checked={personalNumber3Form}
                     onCheckedChange={setPersonalNumber3Form}
                   />
@@ -240,14 +237,13 @@ export default function LoginWithKeypad({
                     <FormItem className=''>
                       <FormLabel className='text-base font-medium'>{personalNumber3Label}</FormLabel>
                       <FormControl>
-                        <ProInput
+                        <PInput
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier3')}
                           readOnly
                           className='cursor-pointer text-center'
-                          proSize='lg'
                         />
                       </FormControl>
                       <FormMessage />
@@ -255,14 +251,13 @@ export default function LoginWithKeypad({
                   )}
                 />
               )}
-            </ProCardContent>
+            </PCardContent>
 
-            <ProCardFooter>
+            <CardFooter>
               <div className='flex w-full gap-4'>
-                <ProButton
+                <PButton
                   type='button'
                   variant='destructive'
-                  proSize='lg'
                   className='w-1/4'
                   onClick={() => {
                     form.reset();
@@ -272,16 +267,16 @@ export default function LoginWithKeypad({
                 >
                   <CircleX />
                   {clearButton}
-                </ProButton>
-                <ProButton type='submit' disabled={isPending} proSize='lg' className='w-3/4'>
+                </PButton>
+                <PButton type='submit' disabled={isPending} className='w-3/4'>
                   {isPending ? <Loader2 className='animate-spin' /> : <Check />}
                   {loginButton}
-                </ProButton>
+                </PButton>
               </div>
-            </ProCardFooter>
+            </CardFooter>
           </form>
         </Form>
-      </ProCard>
+      </PCard>
 
       <NumericKeypadDialog
         open={showKeypad}

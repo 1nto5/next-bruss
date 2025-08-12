@@ -1,7 +1,12 @@
 'use client';
 
-import { ProButton } from '@/app/(pro)/components/ui/pro-button';
-import { ProCard, ProCardContent, ProCardHeader, ProCardTitle } from '@/app/(pro)/components/ui/pro-card';
+import { Button } from '@/components/ui/button';
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
 import { Component } from 'lucide-react';
 import { useScanStore } from '../lib/stores';
 import type { ArticleConfigType } from '../lib/types';
@@ -21,18 +26,17 @@ export default function ArticleSelection({
   const { setSelectedArticle } = useScanStore();
 
   return (
-    <ProCard>
-      <ProCardHeader>
-        <ProCardTitle>{dict.title} - {workplace.toUpperCase()}</ProCardTitle>
-      </ProCardHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle>{dict.title} - {workplace.toUpperCase()}</CardTitle>
+      </CardHeader>
 
-      <ProCardContent>
+      <CardContent>
         <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
           {articles.map((article) => (
-            <ProButton
+            <Button
               key={article.id}
               variant='outline'
-              proSize='lg'
               className='h-auto flex-col items-start justify-start p-6 text-left'
               onClick={() => setSelectedArticle({
                 id: article.id,
@@ -52,7 +56,7 @@ export default function ArticleSelection({
                 </span>
               </div>
               <div className='mt-3 space-y-2'>
-                <div className='text-lg font-semibold'>{article.articleNumber}</div>
+                <div className='text-lg'>{article.articleNumber}</div>
                 <div className='text-base text-muted-foreground'>
                   {article.articleName}
                 </div>
@@ -62,10 +66,10 @@ export default function ArticleSelection({
                   </div>
                 )}
               </div>
-            </ProButton>
+            </Button>
           ))}
         </div>
-      </ProCardContent>
-    </ProCard>
+      </CardContent>
+    </Card>
   );
 }

@@ -9,8 +9,9 @@ import { useOperatorStore, useScanStore } from '../lib/stores';
 import ArticleSelection from './article-selection';
 import ErrorAlert from '@/app/(pro)/components/error-alert';
 import LastScans from './last-scans';
-import Loading from './loading';
-import Login from './login';
+import Loading from '@/app/(pro)/components/loading';
+import UniversalLogin from '@/app/(pro)/components/universal-login';
+import { login } from '../actions';
 import ScanPanel from './scan-panel';
 import StatusBar from './status-bar';
 
@@ -23,7 +24,7 @@ export default function App({ dict, lang }: AppProps) {
   const searchParams = useSearchParams();
   const workplace = searchParams.get('workplace');
 
-  const { operator1 } = useOperatorStore();
+  const { operator1, setOperator1, setOperator2, setOperator3 } = useOperatorStore();
   const { selectedArticle, setSelectedArticle } = useScanStore();
 
   // Use React Query hooks
@@ -74,7 +75,17 @@ export default function App({ dict, lang }: AppProps) {
 
   // Check if operator is logged in
   if (!operator1) {
-    return <Login dict={dict.login} />;
+    return (
+      <UniversalLogin
+        dict={dict.login}
+        loginAction={login}
+        onSuccess={(res) => {
+          setOperator1(res.operator1 || null);
+          setOperator2(res.operator2 || null);
+          setOperator3(res.operator3 || null);
+        }}
+      />
+    );
   }
 
   // Loading state for articles

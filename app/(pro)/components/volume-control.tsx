@@ -1,6 +1,6 @@
 'use client';
 
-import { ProButton } from '@/app/(pro)/components/ui/pro-button';
+import { Button } from '@/components/ui/button';
 import {
   Popover,
   PopoverContent,
@@ -8,7 +8,26 @@ import {
 } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
 import { Volume2, VolumeX } from 'lucide-react';
-import { useVolumeStore } from '../lib/stores';
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+// Universal volume store for all pro apps
+interface VolumeStore {
+  volume: number;
+  setVolume: (volume: number) => void;
+}
+
+export const useVolumeStore = create<VolumeStore>()(
+  persist(
+    (set) => ({
+      volume: 0.75,
+      setVolume: (volume) => set({ volume }),
+    }),
+    {
+      name: 'pro-volume-storage',
+    }
+  )
+);
 
 export default function VolumeControl() {
   const { volume, setVolume } = useVolumeStore();
@@ -24,17 +43,17 @@ export default function VolumeControl() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <ProButton variant="ghost" size="icon" className="h-12 w-12">
+        <Button variant="ghost" size="icon" className="h-10 w-10">
           {volume > 0 ? (
-            <Volume2 className="h-6 w-6" />
+            <Volume2 className="h-5 w-5" />
           ) : (
-            <VolumeX className="h-6 w-6" />
+            <VolumeX className="h-5 w-5" />
           )}
-        </ProButton>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-6">
         <div className="flex items-center gap-6">
-          <ProButton
+          <Button
             variant="ghost"
             size="icon"
             className="h-14 w-14 flex-shrink-0"
@@ -45,7 +64,7 @@ export default function VolumeControl() {
             ) : (
               <VolumeX className="h-8 w-8" />
             )}
-          </ProButton>
+          </Button>
           <Slider
             value={[volume]}
             onValueChange={handleVolumeChange}

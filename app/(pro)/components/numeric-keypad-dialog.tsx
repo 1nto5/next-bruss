@@ -1,13 +1,12 @@
 'use client';
 
-import { ProButton } from '@/app/(pro)/components/ui/pro-button';
 import {
-  ProDialog,
-  ProDialogContent,
-  ProDialogHeader,
-  ProDialogTitle,
-} from '@/app/(pro)/components/ui/pro-dialog';
-import { ProInput } from '@/app/(pro)/components/ui/pro-input';
+  PButton,
+  PDialog,
+  PDialogContent,
+  PInput,
+} from '@/app/(pro)/components/ui/wrappers';
+import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Check, RotateCcw } from 'lucide-react';
 import { useCallback } from 'react';
 
@@ -58,16 +57,16 @@ export default function NumericKeypadDialog({
   };
 
   return (
-    <ProDialog open={open} onOpenChange={onOpenChange}>
-      <ProDialogContent size='lg'>
-        <ProDialogHeader>
-          <ProDialogTitle>{title}</ProDialogTitle>
-        </ProDialogHeader>
+    <PDialog open={open} onOpenChange={onOpenChange}>
+      <PDialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
         <form
           onSubmit={handleSubmit}
           className='grid grid-cols-3 gap-4'
         >
-          <ProInput
+          <PInput
             autoFocus
             value={value}
             onChange={handleInputChange}
@@ -75,43 +74,42 @@ export default function NumericKeypadDialog({
             autoComplete='off'
             inputMode='numeric'
             pattern='[0-9]*'
-            proSize='xl'
           />
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
-            <ProButton
+            <PButton
               key={number}
               type='button'
-              proSize='xl'
               variant='outline'
               onClick={() => handleNumberClick(number)}
               className='text-2xl font-bold'
+              size='lg'
             >
               {number}
-            </ProButton>
+            </PButton>
           ))}
-          <ProButton
+          <PButton
             type='button'
             variant='destructive'
             onClick={handleReset}
-            proSize='xl'
             aria-label='Reset'
+            size='lg'
           >
             <RotateCcw />
-          </ProButton>
-          <ProButton
+          </PButton>
+          <PButton
             type='button'
-            proSize='xl'
             variant='outline'
             onClick={() => handleNumberClick(0)}
             className='text-2xl font-bold'
+            size='lg'
           >
             0
-          </ProButton>
-          <ProButton type='submit' proSize='xl' aria-label={confirmText || 'Save'} className='bg-green-600 text-white hover:bg-green-700'>
+          </PButton>
+          <PButton type='submit' aria-label={confirmText || 'Save'} size='lg'>
             <Check />
-          </ProButton>
+          </PButton>
         </form>
-      </ProDialogContent>
-    </ProDialog>
+      </PDialogContent>
+    </PDialog>
   );
 }
