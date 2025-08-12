@@ -8,6 +8,7 @@
     "personalNumber3Label": "Персональний номер 3",
     "placeholder": "торкніться для введення...",
     "loginButton": "Увійти",
+    "clearButton": "Очистити",
     "keypadTitle": "Введіть персональний номер оператора",
     "keypadReset": "Скинути",
     "keypadSave": "Зберегти",
@@ -54,7 +55,9 @@
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Друкувати етикетку палети",
-    "generatingLabel": "Генерація етикетки..."
+    "generatingLabel": "Генерація етикетки...",
+    "labelGenerated": "Етикетку успішно згенеровано",
+    "labelGenerationError": "Помилка генерації етикетки"
   },
   "statusBar": {
     "logout": "Вийти",
@@ -108,7 +111,7 @@
     "description": "Ви впевнені, що хочете вийти?",
     "cancel": "Скасувати",
     "confirm": "Вийти",
-    "clearArticle": "Вийти з артикулу",
-    "logoutOperators": "Вийти операторів"
+    "clearArticle": "Змінити артикул",
+    "logoutOperators": "Вийти"
   }
 }

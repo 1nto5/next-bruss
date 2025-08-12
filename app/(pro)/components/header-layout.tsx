@@ -43,9 +43,24 @@ interface HeaderButtonProps {
   icon: ReactNode;
   onClick: () => void;
   title?: string;
+  text?: string;
 }
 
-export function HeaderButton({ icon, onClick, title }: HeaderButtonProps) {
+export function HeaderButton({ icon, onClick, title, text }: HeaderButtonProps) {
+  if (text) {
+    return (
+      <Button
+        variant="ghost"
+        onClick={onClick}
+        title={title}
+        className="h-10 px-3 flex items-center gap-2"
+      >
+        {icon}
+        <span className="text-sm">{text}</span>
+      </Button>
+    );
+  }
+
   return (
     <Button
       variant="ghost"

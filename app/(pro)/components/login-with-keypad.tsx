@@ -1,14 +1,13 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
-  PButton,
-  PCard,
-  PCardContent,
-  PCardHeader,
-  PInput,
-  PSwitch,
-} from '@/app/(pro)/components/ui/wrappers';
-import { CardFooter, CardTitle } from '@/components/ui/card';
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -17,10 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, CircleX, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useForm, UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 import NumericKeypadDialog from './numeric-keypad-dialog';
 
@@ -47,11 +49,8 @@ export type LoginFormData = {
 };
 
 export interface LoginWithKeypadProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
-  onError?: (
-    field: 'identifier1' | 'identifier2' | 'identifier3',
-    message: string,
-  ) => void;
+  loginAction: (data: LoginFormData) => Promise<any>;
+  onSuccess: (result: any) => void;
   title?: string;
   operator1Label?: string;
   operator2Label?: string;
@@ -62,13 +61,17 @@ export interface LoginWithKeypadProps {
   loginButton?: string;
   clearButton?: string;
   keypadTitle?: string;
-  isPending?: boolean;
-  form?: UseFormReturn<LoginFormData>;
+  errors?: {
+    wrongNumber1?: string;
+    wrongNumber2?: string;
+    wrongNumber3?: string;
+    loginError?: string;
+  };
 }
 
 export default function LoginWithKeypad({
-  onSubmit,
-  onError,
+  loginAction,
+  onSuccess,
   title = 'Login',
   operator1Label = 'Operator 1',
   operator2Label = 'Operator 2',
@@ -79,16 +82,21 @@ export default function LoginWithKeypad({
   loginButton = 'Login',
   clearButton = 'Clear',
   keypadTitle = 'Enter personal number',
-  isPending = false,
-  form: externalForm,
+  errors = {
+    wrongNumber1: 'Wrong number 1',
+    wrongNumber2: 'Wrong number 2',
+    wrongNumber3: 'Wrong number 3',
+    loginError: 'Login failed',
+  },
 }: LoginWithKeypadProps) {
   const [personalNumber2Form, setPersonalNumber2Form] = useState(false);
   const [personalNumber3Form, setPersonalNumber3Form] = useState(false);
   const [showKeypad, setShowKeypad] = useState(false);
   const [activeField, setActiveField] = useState<string>('');
   const [keypadValue, setKeypadValue] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
-  const internalForm = useForm<LoginFormData>({
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(
       createLoginSchema(personalNumber2Form, personalNumber3Form),
     ),
@@ -99,8 +107,6 @@ export default function LoginWithKeypad({
     },
     shouldFocusError: false,
   });
-
-  const form = externalForm || internalForm;
 
   useEffect(() => {
     if (!personalNumber2Form) {
@@ -138,11 +144,40 @@ export default function LoginWithKeypad({
   }, [activeField, keypadValue, form]);
 
   const handleFormSubmit = async (data: LoginFormData) => {
+    setIsPending(true);
     try {
-      await onSubmit(data);
+      const res = await loginAction(data);
+      if (res.error) {
+        switch (res.error) {
+          case 'wrong number 1':
+            form.setError('identifier1', {
+              type: 'manual',
+              message: errors.wrongNumber1!,
+            });
+            break;
+          case 'wrong number 2':
+            form.setError('identifier2', {
+              type: 'manual',
+              message: errors.wrongNumber2!,
+            });
+            break;
+          case 'wrong number 3':
+            form.setError('identifier3', {
+              type: 'manual',
+              message: errors.wrongNumber3!,
+            });
+            break;
+          default:
+            toast.error(errors.loginError!);
+        }
+      } else if (res.success) {
+        onSuccess(res);
+      }
     } catch (error) {
-      // Error handling is done in the parent component
       console.error('Login error:', error);
+      toast.error(errors.loginError!);
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -153,28 +188,28 @@ export default function LoginWithKeypad({
 
   return (
     <>
-      <PCard>
-        <PCardHeader>
+      <Card>
+        <CardHeader>
           <CardTitle>{title}</CardTitle>
-        </PCardHeader>
+        </CardHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-            <PCardContent className='grid w-full items-center gap-6'>
+            <CardContent className='grid w-full items-center gap-6'>
               <FormField
                 control={form.control}
                 name='identifier1'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-base font-medium'>{operator1Label}</FormLabel>
+                    <FormLabel>{operator1Label}</FormLabel>
                     <FormControl>
-                      <PInput
+                      <Input
                         autoComplete='off'
                         placeholder={placeholder}
                         {...field}
                         onFocus={() => handleFieldFocus('identifier1')}
                         readOnly
-                        className='cursor-pointer text-center'
+                        className='text-center'
                       />
                     </FormControl>
                     <FormMessage />
@@ -183,11 +218,11 @@ export default function LoginWithKeypad({
               />
 
               <FormItem className='flex flex-row items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <FormLabel className='text-base font-medium'>{operator2Label}</FormLabel>
+                <div className=''>
+                  <FormLabel>{operator2Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <PSwitch
+                  <Switch
                     checked={personalNumber2Form}
                     onCheckedChange={setPersonalNumber2Form}
                   />
@@ -200,15 +235,15 @@ export default function LoginWithKeypad({
                   name='identifier2'
                   render={({ field }) => (
                     <FormItem className=''>
-                      <FormLabel className='text-base font-medium'>{personalNumber2Label}</FormLabel>
+                      <FormLabel>{personalNumber2Label}</FormLabel>
                       <FormControl>
-                        <PInput
+                        <Input
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier2')}
                           readOnly
-                          className='cursor-pointer text-center'
+                          className='text-center'
                         />
                       </FormControl>
                       <FormMessage />
@@ -218,11 +253,11 @@ export default function LoginWithKeypad({
               )}
 
               <FormItem className='flex flex-row items-center justify-between'>
-                <div className='space-y-0.5'>
-                  <FormLabel className='text-base font-medium'>{operator3Label}</FormLabel>
+                <div className=''>
+                  <FormLabel>{operator3Label}</FormLabel>
                 </div>
                 <FormControl>
-                  <PSwitch
+                  <Switch
                     checked={personalNumber3Form}
                     onCheckedChange={setPersonalNumber3Form}
                   />
@@ -235,15 +270,15 @@ export default function LoginWithKeypad({
                   name='identifier3'
                   render={({ field }) => (
                     <FormItem className=''>
-                      <FormLabel className='text-base font-medium'>{personalNumber3Label}</FormLabel>
+                      <FormLabel>{personalNumber3Label}</FormLabel>
                       <FormControl>
-                        <PInput
+                        <Input
                           autoComplete='off'
                           placeholder={placeholder}
                           {...field}
                           onFocus={() => handleFieldFocus('identifier3')}
                           readOnly
-                          className='cursor-pointer text-center'
+                          className='text-center'
                         />
                       </FormControl>
                       <FormMessage />
@@ -251,11 +286,11 @@ export default function LoginWithKeypad({
                   )}
                 />
               )}
-            </PCardContent>
+            </CardContent>
 
             <CardFooter>
               <div className='flex w-full gap-4'>
-                <PButton
+                <Button
                   type='button'
                   variant='destructive'
                   className='w-1/4'
@@ -267,16 +302,16 @@ export default function LoginWithKeypad({
                 >
                   <CircleX />
                   {clearButton}
-                </PButton>
-                <PButton type='submit' disabled={isPending} className='w-3/4'>
+                </Button>
+                <Button type='submit' disabled={isPending} className='w-3/4'>
                   {isPending ? <Loader2 className='animate-spin' /> : <Check />}
                   {loginButton}
-                </PButton>
+                </Button>
               </div>
             </CardFooter>
           </form>
         </Form>
-      </PCard>
+      </Card>
 
       <NumericKeypadDialog
         open={showKeypad}

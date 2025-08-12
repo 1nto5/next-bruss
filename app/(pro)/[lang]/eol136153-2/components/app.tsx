@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useEOLStore } from '../lib/stores';
 import { getArticleStatuses, login } from '../actions';
-import UniversalLogin from '@/app/(pro)/components/universal-login';
+import LoginWithKeypad from '@/app/(pro)/components/login-with-keypad';
 import ErrorAlert from '@/app/(pro)/components/error-alert';
 import Loading from '@/app/(pro)/components/loading';
 import StatusBar from './status-bar';
@@ -75,8 +75,8 @@ export default function App({ dict, lang }: AppProps) {
   // Check if operator is logged in
   if (!operator) {
     return (
-      <UniversalLogin
-        dict={dict.login}
+      <LoginWithKeypad
+        {...dict.login}
         loginAction={login}
         onSuccess={(res) => {
           setOperator(res.operator1 || null);

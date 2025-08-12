@@ -8,6 +8,7 @@
     "personalNumber3Label": "Персанальны нумар 3",
     "placeholder": "дакраніцеся для ўводу...",
     "loginButton": "Увайсці",
+    "clearButton": "Ачысціць",
     "keypadTitle": "Увядзіце персанальны нумар аператара",
     "keypadReset": "Скінуць",
     "keypadSave": "Захаваць",
@@ -54,7 +55,9 @@
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Друкаваць этыкетку палеты",
-    "generatingLabel": "Генерацыя этыкеткі..."
+    "generatingLabel": "Генерацыя этыкеткі...",
+    "labelGenerated": "Этыкетка паспяхова згенеравана",
+    "labelGenerationError": "Памылка генерацыі этыкеткі"
   },
   "statusBar": {
     "logout": "Выйсці",
@@ -108,7 +111,7 @@
     "description": "Вы ўпэўнены, што хочаце выйсці?",
     "cancel": "Адмяніць",
     "confirm": "Выйсці",
-    "clearArticle": "Выйсці з артыкула",
-    "logoutOperators": "Выйсці аператараў"
+    "clearArticle": "Змяніць артыкул",
+    "logoutOperators": "Выйсці"
   }
 }

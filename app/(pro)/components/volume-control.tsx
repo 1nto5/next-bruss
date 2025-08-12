@@ -25,8 +25,8 @@ export const useVolumeStore = create<VolumeStore>()(
     }),
     {
       name: 'pro-volume-storage',
-    }
-  )
+    },
+  ),
 );
 
 export default function VolumeControl() {
@@ -43,27 +43,14 @@ export default function VolumeControl() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-10 w-10">
-          {volume > 0 ? (
-            <Volume2 className="h-5 w-5" />
-          ) : (
-            <VolumeX className="h-5 w-5" />
-          )}
+        <Button variant='ghost' size='icon'>
+          {volume > 0 ? <Volume2 /> : <VolumeX />}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-6">
-        <div className="flex items-center gap-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-14 w-14 flex-shrink-0"
-            onClick={toggleMute}
-          >
-            {volume > 0 ? (
-              <Volume2 className="h-8 w-8" />
-            ) : (
-              <VolumeX className="h-8 w-8" />
-            )}
+      <PopoverContent>
+        <div className='flex items-center gap-2'>
+          <Button variant='ghost' size='icon' onClick={toggleMute}>
+            {volume > 0 ? <Volume2 /> : <VolumeX />}
           </Button>
           <Slider
             value={[volume]}
@@ -71,7 +58,7 @@ export default function VolumeControl() {
             min={0}
             max={1}
             step={0.05}
-            className="flex-1 [&_[role=slider]]:h-8 [&_[role=slider]]:w-8"
+            className='flex-1'
           />
         </div>
       </PopoverContent>

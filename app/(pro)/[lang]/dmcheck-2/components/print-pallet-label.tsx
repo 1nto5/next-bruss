@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas-pro';
 import { Loader2, Printer } from 'lucide-react';
 import QRCode from 'qrcode.react';
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import type { Dictionary } from '../lib/dictionary';
 import { getPalletQr } from '../actions';
 import { useScanStore } from '../lib/stores';
@@ -80,46 +81,63 @@ export function PrintPalletLabel({ dict }: PrintPalletLabelProps) {
     }, 1500);
   };
 
-  const handlePrint = async () => {
+  const handlePrint = () => {
     if (!selectedArticle) return;
 
-    setIsGenerating(true);
-    try {
-      // Generate unique QR code
-      const generatedQr = await getPalletQr(selectedArticle.id);
-      if (!generatedQr) {
-        throw new Error('Failed to generate QR code');
-      }
-      setQrCode(generatedQr);
+    toast.promise(
+      async () => {
+        setIsGenerating(true);
+        try {
+          // Generate unique QR code
+          const generatedQr = await getPalletQr(selectedArticle.id);
+          if (!generatedQr) {
+            throw new Error('Failed to generate QR code');
+          }
+          setQrCode(generatedQr);
 
-      // Extract batch code from QR string
-      const batchMatch = generatedQr.match(/B:([^|]+)/);
-      const batchCode = batchMatch ? batchMatch[1] : '';
+          // Extract batch code from QR string
+          const batchMatch = generatedQr.match(/B:([^|]+)/);
+          const batchCode = batchMatch ? batchMatch[1] : '';
 
-      // Wait for React to render the QR code
-      setTimeout(() => {
-        if (!qrCodeRef.current) {
-          setIsGenerating(false);
-          return;
-        }
+          // Wait for React to render the QR code and generate canvas
+          await new Promise<void>((resolve, reject) => {
+            setTimeout(() => {
+              if (!qrCodeRef.current) {
+                reject(new Error('QR code element not found'));
+                return;
+              }
 
-        const qrCodeCanvas = qrCodeRef.current.querySelector('canvas');
-        if (qrCodeCanvas) {
-          html2canvas(qrCodeCanvas, { scale: 2, backgroundColor: '#ffffff' }).then(
-            (canvas: HTMLCanvasElement) => {
-              const imgData = canvas.toDataURL('image/png');
-              generatePrintWindow(imgData, batchCode);
-              setIsGenerating(false);
-            },
-          ).catch(() => {
-            setIsGenerating(false);
+              const qrCodeCanvas = qrCodeRef.current.querySelector('canvas');
+              if (qrCodeCanvas) {
+                html2canvas(qrCodeCanvas, { scale: 2, backgroundColor: '#ffffff' }).then(
+                  (canvas: HTMLCanvasElement) => {
+                    const imgData = canvas.toDataURL('image/png');
+                    generatePrintWindow(imgData, batchCode);
+                    resolve();
+                  },
+                ).catch((error) => {
+                  reject(error);
+                });
+              } else {
+                reject(new Error('QR code canvas not found'));
+              }
+            }, 100);
           });
+
+          return dict.labelGenerated || 'Label generated successfully';
+        } catch (error) {
+          console.error('Error generating pallet QR:', error);
+          throw new Error(dict.labelGenerationError || 'Failed to generate label');
+        } finally {
+          setIsGenerating(false);
         }
-      }, 100);
-    } catch (error) {
-      console.error('Error generating pallet QR:', error);
-      setIsGenerating(false);
-    }
+      },
+      {
+        loading: dict.generatingLabel || 'Generating label...',
+        success: (msg) => msg,
+        error: (err) => err.message,
+      }
+    );
   };
 
   if (!selectedArticle) return null;

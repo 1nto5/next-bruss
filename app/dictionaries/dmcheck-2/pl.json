@@ -1,13 +1,14 @@
 {
   "login": {
     "title": "Logowanie",
-    "operator1Label": "Nr personalny 1",
+    "operator1Label": "Numer personalny 1",
     "operator2Label": "Operator 2",
     "operator3Label": "Operator 3",
     "personalNumber2Label": "Numer personalny 2",
     "personalNumber3Label": "Numer personalny 3",
     "placeholder": "dotknij aby wprowadzić...",
     "loginButton": "Zaloguj",
+    "clearButton": "Wyczyść",
     "keypadTitle": "Wprowadź numer personalny operatora",
     "keypadReset": "Resetuj",
     "keypadSave": "Zapisz",
@@ -54,7 +55,9 @@
       "saveError": "Błąd zapisu - skontaktuj się z IT"
     },
     "printPalletButton": "Drukuj etykietę palety",
-    "generatingLabel": "Generowanie etykiety..."
+    "generatingLabel": "Generowanie etykiety...",
+    "labelGenerated": "Etykieta wygenerowana pomyślnie",
+    "labelGenerationError": "Błąd generowania etykiety"
   },
   "statusBar": {
     "logout": "Wyloguj",
@@ -106,7 +109,7 @@
     "description": "Czy na pewno chcesz wylogować?",
     "cancel": "Anuluj",
     "confirm": "Wyloguj",
-    "clearArticle": "Wyloguj artykuł",
-    "logoutOperators": "Wyloguj operatorów"
+    "clearArticle": "Zmień artykuł",
+    "logoutOperators": "Wyloguj"
   }
 }

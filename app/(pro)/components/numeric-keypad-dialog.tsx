@@ -1,12 +1,8 @@
 'use client';
 
-import {
-  PButton,
-  PDialog,
-  PDialogContent,
-  PInput,
-} from '@/app/(pro)/components/ui/wrappers';
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Check, RotateCcw } from 'lucide-react';
 import { useCallback } from 'react';
 
@@ -57,8 +53,8 @@ export default function NumericKeypadDialog({
   };
 
   return (
-    <PDialog open={open} onOpenChange={onOpenChange}>
-      <PDialogContent>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -66,50 +62,45 @@ export default function NumericKeypadDialog({
           onSubmit={handleSubmit}
           className='grid grid-cols-3 gap-4'
         >
-          <PInput
+          <Input
             autoFocus
             value={value}
             onChange={handleInputChange}
-            className='col-span-3 text-center text-2xl font-semibold'
+            className='col-span-3 text-center'
             autoComplete='off'
             inputMode='numeric'
             pattern='[0-9]*'
           />
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
-            <PButton
+            <Button
               key={number}
               type='button'
               variant='outline'
               onClick={() => handleNumberClick(number)}
-              className='text-2xl font-bold'
-              size='lg'
             >
               {number}
-            </PButton>
+            </Button>
           ))}
-          <PButton
+          <Button
             type='button'
             variant='destructive'
             onClick={handleReset}
             aria-label='Reset'
-            size='lg'
           >
             <RotateCcw />
-          </PButton>
-          <PButton
+          </Button>
+          <Button
             type='button'
             variant='outline'
             onClick={() => handleNumberClick(0)}
-            className='text-2xl font-bold'
-            size='lg'
           >
             0
-          </PButton>
-          <PButton type='submit' aria-label={confirmText || 'Save'} size='lg'>
+          </Button>
+          <Button type='submit' aria-label={confirmText || 'Save'}>
             <Check />
-          </PButton>
+          </Button>
         </form>
-      </PDialogContent>
-    </PDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

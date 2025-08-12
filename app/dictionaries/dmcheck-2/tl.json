@@ -8,6 +8,7 @@
     "personalNumber3Label": "Personal na numero 3",
     "placeholder": "pindutin upang maglagay...",
     "loginButton": "Mag-login",
+    "clearButton": "I-clear",
     "keypadTitle": "Ilagay ang personal na numero ng operator",
     "keypadReset": "I-reset",
     "keypadSave": "I-save",
@@ -54,7 +55,9 @@
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "I-print ang Pallet Label",
-    "generatingLabel": "Ginagawa ang label..."
+    "generatingLabel": "Ginagawa ang label...",
+    "labelGenerated": "Matagumpay na nagawa ang label",
+    "labelGenerationError": "Nabigo sa paggawa ng label"
   },
   "statusBar": {
     "logout": "Mag-logout",
@@ -108,7 +111,7 @@
     "description": "Sigurado ka bang gusto mong mag-logout?",
     "cancel": "Kanselahin",
     "confirm": "Mag-logout",
-    "clearArticle": "I-logout ang artikulo",
-    "logoutOperators": "I-logout ang mga operator"
+    "clearArticle": "Palitan ang artikulo",
+    "logoutOperators": "Mag-logout"
   }
 }

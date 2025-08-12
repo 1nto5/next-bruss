@@ -8,6 +8,7 @@
     "personalNumber3Label": "Personalnummer 3",
     "placeholder": "zum Eingeben berühren...",
     "loginButton": "Anmelden",
+    "clearButton": "Löschen",
     "keypadTitle": "Personalnummer des Operators eingeben",
     "keypadReset": "Zurücksetzen",
     "keypadSave": "Speichern",
@@ -54,7 +55,9 @@
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Palettenetikett drucken",
-    "generatingLabel": "Etikett wird generiert..."
+    "generatingLabel": "Etikett wird generiert...",
+    "labelGenerated": "Etikett erfolgreich generiert",
+    "labelGenerationError": "Fehler beim Generieren des Etiketts"
   },
   "statusBar": {
     "logout": "Abmelden",
@@ -108,7 +111,7 @@
     "description": "Möchten Sie sich wirklich abmelden?",
     "cancel": "Abbrechen",
     "confirm": "Abmelden",
-    "clearArticle": "Artikel abmelden",
-    "logoutOperators": "Bediener abmelden"
+    "clearArticle": "Artikel ändern",
+    "logoutOperators": "Abmelden"
   }
 }

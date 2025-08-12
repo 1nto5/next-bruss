@@ -23,33 +23,35 @@ const languageFlags: Record<Locale, string> = {
   be: '🇧🇾',
 };
 
-export default function LanguageSwitcher({ currentLang }: LanguageSwitcherProps) {
+export default function LanguageSwitcher({
+  currentLang,
+}: LanguageSwitcherProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const switchLanguage = (newLang: Locale) => {
     if (newLang === currentLang) return;
-    
+
     // Replace the language in the pathname
     const segments = pathname.split('/');
     segments[1] = newLang; // Replace [lang] segment
     const newPathname = segments.join('/');
-    
+
     // Preserve search params
     const search = searchParams.toString();
     const url = search ? `${newPathname}?${search}` : newPathname;
-    
+
     router.push(url);
   };
 
-  const languages: { code: Locale; flag: string }[] = [
-    { code: 'pl', flag: '🇵🇱' },
-    { code: 'de', flag: '🇩🇪' },
-    { code: 'en', flag: '🇬🇧' },
-    { code: 'tl', flag: '🇵🇭' },
-    { code: 'uk', flag: '🇺🇦' },
-    { code: 'be', flag: '🇧🇾' },
+  const languages: { code: Locale; flag: string; name: string }[] = [
+    { code: 'pl', flag: '🇵🇱', name: 'Polski' },
+    { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
+    { code: 'en', flag: '🇬🇧', name: 'English' },
+    { code: 'tl', flag: '🇵🇭', name: 'Tagalog' },
+    { code: 'uk', flag: '🇺🇦', name: 'Українська' },
+    { code: 'be', flag: '🇧🇾', name: 'Беларуская' },
   ];
 
   const currentFlag = languageFlags[currentLang] || '🌐';
@@ -58,17 +60,20 @@ export default function LanguageSwitcher({ currentLang }: LanguageSwitcherProps)
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size='icon' className='h-10 w-10'>
-          <span className='text-2xl leading-none'>{currentFlag}</span>
+          <span className='text-xl'>{currentFlag}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='min-w-0 p-3'>
+      <DropdownMenuContent align="end">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => switchLanguage(lang.code)}
-            className={`text-center px-6 py-4 min-h-[56px] flex items-center justify-center ${currentLang === lang.code ? 'bg-accent' : ''}`}
+            className={currentLang === lang.code ? 'bg-accent' : ''}
           >
-            <span className='text-3xl'>{lang.flag}</span>
+            <div className='flex items-center gap-3'>
+              <span className='text-xl'>{lang.flag}</span>
+              <span>{lang.name}</span>
+            </div>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

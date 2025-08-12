@@ -8,6 +8,7 @@
     "personalNumber3Label": "Personal number 3",
     "placeholder": "touch to enter...",
     "loginButton": "Login",
+    "clearButton": "Clear",
     "keypadTitle": "Enter operator personal number",
     "keypadReset": "Reset",
     "keypadSave": "Save",
@@ -54,7 +55,9 @@
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Print Pallet Label",
-    "generatingLabel": "Generating label..."
+    "generatingLabel": "Generating label...",
+    "labelGenerated": "Label generated successfully",
+    "labelGenerationError": "Failed to generate label"
   },
   "statusBar": {
     "logout": "Logout",
@@ -108,7 +111,7 @@
     "description": "Are you sure you want to logout?",
     "cancel": "Cancel",
     "confirm": "Logout",
-    "clearArticle": "Logout article",
-    "logoutOperators": "Logout operators"
+    "clearArticle": "Change article",
+    "logoutOperators": "Logout"
   }
 }

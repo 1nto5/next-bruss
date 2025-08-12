@@ -2,7 +2,7 @@
 import type { Locale } from '@/i18n.config';
 import type { Dictionary } from '../lib/dictionary';
 import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
-import UniversalLogin from '@/app/(pro)/components/universal-login';
+import LoginWithKeypad from '@/app/(pro)/components/login-with-keypad';
 import { login } from '../actions';
 import OvenSelection from './oven-selection';
 import ProcessList from './process-list';
@@ -19,8 +19,8 @@ export default function App({ dict, lang }: AppProps) {
 
   if (!operator1 && !operator2 && !operator3) {
     return (
-      <UniversalLogin
-        dict={dict.login}
+      <LoginWithKeypad
+        {...dict.login}
         loginAction={login}
         onSuccess={(res) => {
           setOperator1(res.operator1 || null);

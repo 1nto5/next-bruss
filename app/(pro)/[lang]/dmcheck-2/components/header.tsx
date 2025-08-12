@@ -96,6 +96,7 @@ export default function Header({ lang, dict }: HeaderProps) {
           icon={<Component />}
           onClick={clearArticle}
           title={dict.logout?.clearArticle || 'Wyloguj artykuł'}
+          text={dict.logout?.clearArticle || 'Wyloguj artykuł'}
         />
       )}
       {loggedInOperators.length > 0 && (
@@ -103,6 +104,7 @@ export default function Header({ lang, dict }: HeaderProps) {
           icon={<UserPen />}
           onClick={() => setAlertOpen(true)}
           title={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
+          text={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
         />
       )}
       <VolumeControl />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useVolumeStore } from '@/app/(pro)/components/volume-control';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +11,6 @@ import { useGetBoxStatus } from '../data/get-box-status';
 import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useScanStore } from '../lib/stores';
-import { useVolumeStore } from '@/app/(pro)/components/volume-control';
 import { PrintPalletLabel } from './print-pallet-label';
 
 interface ScanPanelProps {
@@ -21,28 +21,26 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   const { selectedArticle, addScan } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
   const { volume } = useVolumeStore();
-  
+
   // Get operators array
-  const operators = useMemo(() => 
-    [operator1, operator2, operator3]
-      .filter(op => op?.identifier)
-      .map(op => op!.identifier),
-    [operator1, operator2, operator3]
+  const operators = useMemo(
+    () =>
+      [operator1, operator2, operator3]
+        .filter((op) => op?.identifier)
+        .map((op) => op!.identifier),
+    [operator1, operator2, operator3],
   );
-  
+
   // Get status from React Query with refetch functions
-  const { 
+  const {
     data: boxStatus = { piecesInBox: 0, boxIsFull: false },
-    refetch: refetchBoxStatus 
+    refetch: refetchBoxStatus,
   } = useGetBoxStatus(selectedArticle?.id);
-  const { 
+  const {
     data: palletStatus = { boxesOnPallet: 0, palletIsFull: false },
-    refetch: refetchPalletStatus
-  } = useGetPalletStatus(
-    selectedArticle?.id,
-    selectedArticle?.pallet || false
-  );
-  
+    refetch: refetchPalletStatus,
+  } = useGetPalletStatus(selectedArticle?.id, selectedArticle?.pallet || false);
+
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -63,7 +61,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     toast.promise(
       async () => {
         const result = await saveDmc(dmcValue, selectedArticle.id, operators);
-        
+
         if (result.message === 'dmc saved') {
           playOk();
           if (result.dmc) {
@@ -102,16 +100,27 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           setTimeout(() => {
             inputRef.current?.focus();
           }, 50);
-          throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
+          throw new Error(
+            errorMessages[result.message] || dict.scan.messages.saveError,
+          );
         }
       },
       {
         loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
         success: (msg) => msg,
         error: (err) => err.message,
-      }
+      },
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, addScan, dict.scan, refetchBoxStatus]);
+  }, [
+    inputValue,
+    selectedArticle,
+    operators,
+    playOk,
+    playNok,
+    addScan,
+    dict.scan,
+    refetchBoxStatus,
+  ]);
 
   const handleHydraScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
@@ -121,8 +130,12 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
 
     toast.promise(
       async () => {
-        const result = await saveHydra(hydraValue, selectedArticle.id, operators);
-        
+        const result = await saveHydra(
+          hydraValue,
+          selectedArticle.id,
+          operators,
+        );
+
         if (result.message === 'batch saved') {
           playOk();
           // Refetch box and pallet status to update UI
@@ -145,16 +158,27 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           setTimeout(() => {
             inputRef.current?.focus();
           }, 50);
-          throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
+          throw new Error(
+            errorMessages[result.message] || dict.scan.messages.saveError,
+          );
         }
       },
       {
         loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
         success: (msg) => msg,
         error: (err) => err.message,
-      }
+      },
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan, refetchBoxStatus, refetchPalletStatus]);
+  }, [
+    inputValue,
+    selectedArticle,
+    operators,
+    playOk,
+    playNok,
+    dict.scan,
+    refetchBoxStatus,
+    refetchPalletStatus,
+  ]);
 
   const handlePalletScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
@@ -164,8 +188,12 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
 
     toast.promise(
       async () => {
-        const result = await savePallet(palletValue, selectedArticle.id, operators);
-        
+        const result = await savePallet(
+          palletValue,
+          selectedArticle.id,
+          operators,
+        );
+
         if (result.message === 'batch saved') {
           playOk();
           // Refetch both box and pallet status to reset UI
@@ -189,32 +217,53 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           setTimeout(() => {
             inputRef.current?.focus();
           }, 50);
-          throw new Error(errorMessages[result.message] || dict.scan.messages.saveError);
+          throw new Error(
+            errorMessages[result.message] || dict.scan.messages.saveError,
+          );
         }
       },
       {
         loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
         success: (msg) => msg,
         error: (err) => err.message,
-      }
+      },
     );
-  }, [inputValue, selectedArticle, operators, playOk, playNok, dict.scan, refetchBoxStatus, refetchPalletStatus]);
+  }, [
+    inputValue,
+    selectedArticle,
+    operators,
+    playOk,
+    playNok,
+    dict.scan,
+    refetchBoxStatus,
+    refetchPalletStatus,
+  ]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const isPalletWorkplace = selectedArticle?.pallet || false;
-      
-      // Check box full first - it has priority over pallet
-      if (boxStatus.boxIsFull && isPalletWorkplace) {
-        handleHydraScan();
-      } else if (palletStatus.palletIsFull && isPalletWorkplace) {
-        handlePalletScan();
-      } else {
-        handleDmcScan();
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const isPalletWorkplace = selectedArticle?.pallet || false;
+
+        // Check box full first - it has priority over pallet
+        if (boxStatus.boxIsFull && isPalletWorkplace) {
+          handleHydraScan();
+        } else if (palletStatus.palletIsFull && isPalletWorkplace) {
+          handlePalletScan();
+        } else {
+          handleDmcScan();
+        }
       }
-    }
-  }, [selectedArticle, boxStatus.boxIsFull, palletStatus.palletIsFull, handleDmcScan, handleHydraScan, handlePalletScan]);
+    },
+    [
+      selectedArticle,
+      boxStatus.boxIsFull,
+      palletStatus.palletIsFull,
+      handleDmcScan,
+      handleHydraScan,
+      handlePalletScan,
+    ],
+  );
 
   // Don't render if no article selected
   if (!selectedArticle) return null;
@@ -223,7 +272,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   const isPalletWorkplace = selectedArticle.pallet || false;
   let inputName = 'dmc';
   let placeholder = dict.scan.dmcPlaceholder;
-  
+
   // Check box full first - it has priority over pallet
   if (boxStatus.boxIsFull && isPalletWorkplace) {
     inputName = 'hydra';
@@ -234,7 +283,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   }
 
   return (
-    <div className='space-y-4'>
+    <>
       <Card>
         <CardHeader>
           <Input
@@ -255,6 +304,6 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
       {palletStatus.palletIsFull && isPalletWorkplace && (
         <PrintPalletLabel dict={dict.scan} />
       )}
-    </div>
+    </>
   );
 }
