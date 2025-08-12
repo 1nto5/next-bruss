@@ -35,7 +35,7 @@
       "dmcExists": "DMC już istnieje",
       "batchExists": "Batch już istnieje",
       "dmcNotValid": "DMC nieprawidłowy",
-      "qrNotValid": "Kod QR nieprawidłowy",
+      "qrNotValid": "Nieprawidłowy kod QR - sprawdź format",
       "articleNotFound": "Artykuł nie znaleziony",
       "fordDateNotValid": "Data FORD nieprawidłowa",
       "bmwDateNotValid": "Data BMW nieprawidłowa",
@@ -52,7 +52,9 @@
       "smartFetchError": "Problem połączenia z bazą SMART",
       "smartUnknown": "SMART: Część nieprzeprocesowana na wszystkich stacjach",
       "saveError": "Błąd zapisu - skontaktuj się z IT"
-    }
+    },
+    "printPalletButton": "Drukuj etykietę palety",
+    "generatingLabel": "Generowanie etykiety..."
   },
   "statusBar": {
     "logout": "Wyloguj",

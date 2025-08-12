@@ -52,7 +52,9 @@
       "smartFetchError": "Problema sa koneksyon ng SMART database",
       "smartUnknown": "SMART: Hindi naproseso ang bahagi sa lahat ng istasyon",
       "saveError": "Save error - contact IT"
-    }
+    },
+    "printPalletButton": "I-print ang Pallet Label",
+    "generatingLabel": "Ginagawa ang label..."
   },
   "statusBar": {
     "logout": "Mag-logout",

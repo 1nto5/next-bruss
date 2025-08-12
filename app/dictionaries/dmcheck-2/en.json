@@ -35,7 +35,7 @@
       "dmcExists": "DMC already exists",
       "batchExists": "Batch already exists",
       "dmcNotValid": "DMC invalid",
-      "qrNotValid": "QR code invalid",
+      "qrNotValid": "Invalid QR code - check format",
       "articleNotFound": "Article not found",
       "fordDateNotValid": "FORD date invalid",
       "bmwDateNotValid": "BMW date invalid",
@@ -52,7 +52,9 @@
       "smartFetchError": "SMART database connection problem",
       "smartUnknown": "SMART: Part not processed on all stations",
       "saveError": "Save error - contact IT"
-    }
+    },
+    "printPalletButton": "Print Pallet Label",
+    "generatingLabel": "Generating label..."
   },
   "statusBar": {
     "logout": "Logout",

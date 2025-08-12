@@ -52,7 +52,9 @@
       "smartFetchError": "Праблема злучэння з базай SMART",
       "smartUnknown": "SMART: Частка не апрацавана на ўсіх станцыях",
       "saveError": "Save error - contact IT"
-    }
+    },
+    "printPalletButton": "Друкаваць этыкетку палеты",
+    "generatingLabel": "Генерацыя этыкеткі..."
   },
   "statusBar": {
     "logout": "Выйсці",
