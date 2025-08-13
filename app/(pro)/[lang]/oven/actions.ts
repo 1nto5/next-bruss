@@ -5,7 +5,7 @@ import { dbc } from '@/lib/mongo';
 
 // Type definitions
 import { ObjectId } from 'mongodb';
-import { OvenProcessConfigType, OvenProgramConfigType, OvenProcessType } from './lib/types';
+import { OvenProgramConfigType, OvenProcessType } from './lib/types';
 import {
   completeProcessSchema,
   loginType,
@@ -129,12 +129,10 @@ export async function fetchOvenProcessConfig(
 /**
  * Retrieves all oven processes for a specific oven
  * @param oven - The oven identifier (tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
- * @param includeConfig - This parameter is now deprecated - target values are saved directly in process
  * @returns Array of processes or error message
  */
 export async function fetchOvenProcesses(
   oven: string,
-  includeConfig = false,
 ): Promise<{ success: OvenProcessType[] } | { error: string }> {
   try {
     const collection = await dbc('oven_processes');
@@ -286,9 +284,9 @@ export async function startOvenProcess(
         return { error: 'not created' };
       }
       return { success: true, processId: result.insertedId.toString() };
-    } catch (error: any) {
+    } catch (error) {
       // MongoDB duplicate key error code
-      if (error.code === 11000) {
+      if ((error as { code?: number }).code === 11000) {
         return { error: 'duplicate batch' };
       }
       // Log error and return generic error message

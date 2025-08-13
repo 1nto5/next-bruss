@@ -21,7 +21,7 @@ import { useState } from 'react';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import type { Dictionary } from '../lib/dictionary';
-import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
+import { useOvenStore, useOperatorStore } from '../lib/stores';
 
 interface HeaderProps {
   dict: Dictionary;
@@ -29,7 +29,7 @@ interface HeaderProps {
 }
 
 export default function Header({ dict, lang }: HeaderProps) {
-  const { operator1, operator2, operator3, logout } = usePersonalNumberStore();
+  const { operator1, operator2, operator3, logout } = useOperatorStore();
   const { selectedOven, selectedProgram, clearOven, clearProgram } = useOvenStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const { data: processesData } = useGetOvenProcesses(selectedOven);

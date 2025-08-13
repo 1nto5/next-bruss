@@ -3,7 +3,6 @@
 import { dbc } from '@/lib/mongo';
 import pgp from '@/lib/pg';
 import { ObjectId } from 'mongodb';
-import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import type { LoginType } from './lib/zod';
@@ -292,7 +291,6 @@ export async function saveDmc(
     });
 
     if (insertResult) {
-      revalidateTag('box');
       // EOL810/EOL488 lighting the lamp
       if (
         articleConfig.workplace === 'eol810' ||
@@ -434,7 +432,6 @@ export async function saveHydra(
     );
 
     if (updateResult.modifiedCount > 0) {
-      revalidateTag('pallet');
       return { message: 'batch saved' };
     }
     return { message: 'save error' };
@@ -545,8 +542,6 @@ export async function savePallet(
     );
 
     if (updateResult.modifiedCount > 0) {
-      revalidateTag('box');
-      revalidateTag('pallet');
       return { message: 'batch saved' };
     }
     return { message: 'save error' };
@@ -736,8 +731,6 @@ export async function deleteDmcFromBox(dmc: string) {
       },
     );
     if (result.modifiedCount === 1) {
-      revalidateTag('box-status');
-      revalidateTag('box-scans');
       return { message: 'deleted' };
     }
     return { message: 'not found' };
@@ -762,8 +755,6 @@ export async function deleteHydraFromPallet(hydra: string) {
       },
     );
     if (result.modifiedCount > 0) {
-      revalidateTag('pallet-status');
-      revalidateTag('pallet-boxes');
       return { message: 'deleted' };
     }
     return { message: 'not found' };

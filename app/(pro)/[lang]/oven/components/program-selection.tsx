@@ -3,7 +3,6 @@
 import ErrorComponent from '@/components/error-component';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { Locale } from '@/i18n.config';
 import { Loader2, TimerReset } from 'lucide-react';
 import { useOvenProgram } from '../data/get-oven-program';
 import type { Dictionary } from '../lib/dictionary';
@@ -11,10 +10,9 @@ import { useOvenStore } from '../lib/stores';
 
 interface ProgramSelectionProps {
   dict: Dictionary;
-  lang: Locale;
 }
 
-export default function ProgramSelection({ dict, lang }: ProgramSelectionProps) {
+export default function ProgramSelection({ dict }: ProgramSelectionProps) {
   const { selectedOven, setSelectedProgram } = useOvenStore();
   const { data, isLoading, error } = useOvenProgram();
 

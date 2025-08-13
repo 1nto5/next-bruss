@@ -7,7 +7,7 @@ type OperatorType = {
   lastName: string;
 };
 
-type PersonalNumbersStateType = {
+type OperatorStoreType = {
   operator1: OperatorType | null;
   operator2: OperatorType | null;
   operator3: OperatorType | null;
@@ -17,9 +17,9 @@ type PersonalNumbersStateType = {
   logout: () => void;
 };
 
-export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
+export const useOperatorStore = create<OperatorStoreType>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       operator1: null,
       operator2: null,
       operator3: null,
@@ -28,7 +28,7 @@ export const usePersonalNumberStore = create<PersonalNumbersStateType>()(
       setOperator3: (operator) => set({ operator3: operator }),
       logout: () => set({ operator1: null, operator2: null, operator3: null }),
     }),
-    { name: 'personal-numbers' },
+    { name: 'oven-operators' },
   ),
 );
 
@@ -41,21 +41,41 @@ type OvenStateType = {
   clearProgram: () => void;
 };
 
-export const useOvenStore = create<OvenStateType>((set) => ({
-  selectedOven: '',
-  selectedProgram: null,
-  setSelectedOven: async (oven: string) => {
-    set({ selectedOven: oven });
-    
-    // Automatically check for active program when oven is selected
-    const { fetchActiveOvenProgram } = await import('../actions');
-    const result = await fetchActiveOvenProgram(oven);
-    
-    if ('program' in result && result.program !== null) {
-      set({ selectedProgram: result.program });
-    }
-  },
-  setSelectedProgram: (program: number | null) => set({ selectedProgram: program }),
-  clearOven: () => set({ selectedOven: '', selectedProgram: null }),
-  clearProgram: () => set({ selectedProgram: null }),
-}));
+export const useOvenStore = create<OvenStateType>()(
+  persist(
+    (set) => ({
+      selectedOven: '',
+      selectedProgram: null,
+      setSelectedOven: async (oven: string) => {
+        set({ selectedOven: oven });
+        
+        // Automatically check for active program when oven is selected
+        const { fetchActiveOvenProgram } = await import('../actions');
+        const result = await fetchActiveOvenProgram(oven);
+        
+        if ('program' in result && result.program !== null) {
+          set({ selectedProgram: result.program });
+        }
+      },
+      setSelectedProgram: (program: number | null) => set({ selectedProgram: program }),
+      clearOven: () => set({ selectedOven: '', selectedProgram: null }),
+      clearProgram: () => set({ selectedProgram: null }),
+    }),
+    { name: 'oven-application' },
+  ),
+);
+
+type VolumeStoreType = {
+  volume: number;
+  setVolume: (volume: number) => void;
+};
+
+export const useVolumeStore = create<VolumeStoreType>()(
+  persist(
+    (set) => ({
+      volume: 0.75,
+      setVolume: (volume) => set({ volume }),
+    }),
+    { name: 'oven-volume' },
+  ),
+);

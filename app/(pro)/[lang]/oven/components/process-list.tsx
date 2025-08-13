@@ -28,7 +28,7 @@ import { AlertTriangle, Play, ScanLine, StopCircle, X, Trash2 } from 'lucide-rea
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { useVolumeStore } from '@/app/(pro)/components/volume-control';
+import { useVolumeStore } from '../lib/stores';
 import {
   completeOvenProcess,
   deleteOvenProcess,
@@ -37,7 +37,7 @@ import {
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import type { Dictionary } from '../lib/dictionary';
-import { useOvenStore, usePersonalNumberStore } from '../lib/stores';
+import { useOvenStore, useOperatorStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
 import type { EndBatchType, StartBatchType } from '../lib/zod';
 import { endBatchSchema, startBatchSchema } from '../lib/zod';
@@ -51,7 +51,7 @@ interface ProcessListProps {
 
 export default function ProcessList({ dict, lang }: ProcessListProps) {
   const { selectedOven, selectedProgram } = useOvenStore();
-  const { operator1, operator2, operator3 } = usePersonalNumberStore();
+  const { operator1, operator2, operator3 } = useOperatorStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const currentTemp =
     tempData &&
@@ -114,10 +114,6 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
     return expectedCompletion.toLocaleString(lang);
   };
 
-  const formatOperators = (operators?: string[]): string => {
-    if (!operators || operators.length === 0) return '-';
-    return operators.join(', ');
-  };
 
   const translateError = useCallback(
     (serverError: string): string => {
@@ -171,59 +167,48 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       const { scannedArticle, scannedBatch } = formData;
       if (!isSuccess(data)) return;
 
-      const loadingToast = toast.loading(
-        dict.processList.toasts.startingProcess,
-      );
+      toast.promise(
+        async () => {
+          const result = await startOvenProcess(
+            selectedOven,
+            scannedArticle,
+            scannedBatch,
+            operators,
+            selectedProgram!,
+          );
 
-      try {
-        const result = await startOvenProcess(
-          selectedOven,
-          scannedArticle,
-          scannedBatch,
-          operators,
-          selectedProgram!,
-        );
+          if ('success' in result && result.success) {
+            playOvenIn();
+            await refetch();
+            setTimeout(() => {
+              articleInputRef.current?.focus();
+            }, 0);
+            return dict.processList.toasts.processStarted;
+          }
 
-        if ('success' in result && result.success) {
-          playOvenIn();
-          refetch();
-          setTimeout(() => {
-            articleInputRef.current?.focus();
-          }, 0);
-          toast.success(dict.processList.toasts.processStarted, {
-            id: loadingToast,
-          });
-          return;
-        }
+          if ('error' in result && result.error) {
+            playNok();
+            const errorMessage = translateError(result.error);
+            setTimeout(() => {
+              batchInputRef.current?.focus();
+            }, 0);
+            throw new Error(errorMessage);
+          }
 
-        if ('error' in result && result.error) {
+          // Unexpected response format
           playNok();
-          const errorMessage = translateError(result.error);
           setTimeout(() => {
             batchInputRef.current?.focus();
           }, 0);
-          toast.error(errorMessage, { id: loadingToast });
-          return;
-        }
-
-        // Unexpected response format
-        playNok();
-        setTimeout(() => {
-          batchInputRef.current?.focus();
-        }, 0);
-        console.error('Unexpected response format:', result);
-        toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-        return;
-      } catch (error) {
-        // Network or other unexpected errors
-        playNok();
-        setTimeout(() => {
-          batchInputRef.current?.focus();
-        }, 0);
-        console.error('Start process error:', error);
-        toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-        return;
-      }
+          console.error('Unexpected response format:', result);
+          throw new Error(dict.processList.toasts.contactIT);
+        },
+        {
+          loading: dict.processList.toasts.startingProcess,
+          success: (msg) => msg,
+          error: (err) => err.message || dict.processList.toasts.contactIT,
+        },
+      );
     },
     [
       data,
@@ -268,53 +253,44 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
         return; // Don't throw
       }
 
-      const loadingToast = toast.loading(dict.processList.toasts.endingProcess);
+      toast.promise(
+        async () => {
+          const result = await completeOvenProcess(existingProcess.id, operators);
 
-      try {
-        const result = await completeOvenProcess(existingProcess.id, operators);
+          if ('success' in result && result.success) {
+            playOvenOut();
+            await refetch();
+            setTimeout(() => {
+              endInputRef.current?.focus();
+            }, 0);
+            return dict.processList.toasts.processEnded;
+          }
 
-        if ('success' in result && result.success) {
-          playOvenOut();
-          refetch();
-          setTimeout(() => {
-            endInputRef.current?.focus();
-          }, 0);
-          toast.success(dict.processList.toasts.processEnded, {
-            id: loadingToast,
-          });
-          return;
-        }
+          if ('error' in result && result.error) {
+            playNok();
+            const errorMessage = translateError(result.error);
+            setTimeout(() => {
+              endInputRef.current?.focus();
+            }, 0);
+            throw new Error(errorMessage);
+          }
 
-        if ('error' in result && result.error) {
+          // Unexpected response format
           playNok();
-          const errorMessage = translateError(result.error);
           setTimeout(() => {
             endInputRef.current?.focus();
           }, 0);
-          toast.error(errorMessage, { id: loadingToast });
-          return;
-        }
-
-        // Unexpected response format
-        playNok();
-        setTimeout(() => {
-          endInputRef.current?.focus();
-        }, 0);
-        console.error('Unexpected response format:', result);
-        toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-        return;
-      } catch (error) {
-        // Network or other unexpected errors
-        playNok();
-        setTimeout(() => {
-          endInputRef.current?.focus();
-        }, 0);
-        console.error('End process error:', error);
-        toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-        return;
-      }
+          console.error('Unexpected response format:', result);
+          throw new Error(dict.processList.toasts.contactIT);
+        },
+        {
+          loading: dict.processList.toasts.endingProcess,
+          success: (msg) => msg,
+          error: (err) => err.message || dict.processList.toasts.contactIT,
+        },
+      );
     },
-    [data, refetch, playNok, playOvenOut, dict, translateError],
+    [data, refetch, playNok, playOvenOut, dict, translateError, operators],
   );
 
   const handleDeleteClick = useCallback((processId: string) => {
@@ -327,34 +303,31 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
 
     setDeleteDialogOpen(false);
 
-    const loadingToast = toast.loading(dict.processList.toasts.deletingProcess);
+    toast.promise(
+      async () => {
+        const result = await deleteOvenProcess(processToDelete);
 
-    try {
-      const result = await deleteOvenProcess(processToDelete);
+        if ('success' in result && result.success) {
+          await refetch();
+          setProcessToDelete(null);
+          return dict.processList.toasts.processDeleted;
+        }
 
-      if ('success' in result && result.success) {
-        refetch();
-        toast.success(dict.processList.toasts.processDeleted, {
-          id: loadingToast,
-        });
+        if ('error' in result && result.error) {
+          const errorMessage = translateError(result.error);
+          setProcessToDelete(null);
+          throw new Error(errorMessage);
+        }
+
         setProcessToDelete(null);
-        return;
-      }
-
-      if ('error' in result && result.error) {
-        const errorMessage = translateError(result.error);
-        toast.error(errorMessage, { id: loadingToast });
-        setProcessToDelete(null);
-        return;
-      }
-
-      toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-      setProcessToDelete(null);
-    } catch (error) {
-      console.error(error);
-      toast.error(dict.processList.toasts.contactIT, { id: loadingToast });
-      setProcessToDelete(null);
-    }
+        throw new Error(dict.processList.toasts.contactIT);
+      },
+      {
+        loading: dict.processList.toasts.deletingProcess,
+        success: (msg) => msg,
+        error: (err) => err.message || dict.processList.toasts.contactIT,
+      },
+    );
   }, [processToDelete, refetch, dict, translateError]);
 
   const handleCancelDelete = useCallback(() => {
