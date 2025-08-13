@@ -1,15 +1,22 @@
 'use client';
 
-import { PCard, PCardHeader, PInput, PButton } from '@/app/(pro)/components/ui/wrappers';
+import { useVolumeStore } from '@/app/(pro)/[lang]/components/volume-control';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Printer, QrCode } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { saveHydraBatch, savePalletBatch, generatePalletBatch, printPalletLabel } from '../actions';
+import {
+  generatePalletBatch,
+  printPalletLabel,
+  saveHydraBatch,
+  savePalletBatch,
+} from '../actions';
 import type { Dictionary } from '../lib/dictionary';
 import { useEOLStore } from '../lib/stores';
-import { useVolumeStore } from '@/app/(pro)/components/volume-control';
 import type { ArticleStatus } from '../lib/types';
-import { Printer, QrCode } from 'lucide-react';
 
 interface ScanPanelProps {
   dict: Dictionary;
@@ -20,17 +27,17 @@ interface ScanPanelProps {
   onScanSuccess: () => void;
 }
 
-export default function ScanPanel({ 
-  dict, 
-  operator, 
-  article136Status, 
+export default function ScanPanel({
+  dict,
+  operator,
+  article136Status,
   article153Status,
-  currentMode, 
-  onScanSuccess 
+  currentMode,
+  onScanSuccess,
 }: ScanPanelProps) {
   const { addScan } = useEOLStore();
   const { volume } = useVolumeStore();
-  
+
   const [inputValue, setInputValue] = useState('');
   const [generatedQr, setGeneratedQr] = useState('');
   const [isPrinting, setIsPrinting] = useState(false);
@@ -53,7 +60,7 @@ export default function ScanPanel({
     toast.promise(
       async () => {
         const result = await saveHydraBatch(hydraValue, operator);
-        
+
         if (result.status === 'saved') {
           playOk();
           if (result.article && result.batch) {
@@ -72,99 +79,127 @@ export default function ScanPanel({
             'full pallet': dict.scanning.messages.fullPallet,
             'error': dict.scanning.messages.error,
           };
-          throw new Error(errorMessages[result.status] || dict.scanning.messages.error);
+          throw new Error(
+            errorMessages[result.status] || dict.scanning.messages.error,
+          );
         }
       },
       {
         loading: dict.scanning.scanning || 'Zapisywanie...',
         success: (msg) => msg,
         error: (err) => err.message,
-      }
-    );
-
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, [inputValue, operator, playOk, playNok, addScan, dict.scanning, onScanSuccess]);
-
-  const handlePalletScan = useCallback(async (article: string) => {
-    if (!inputValue.trim()) return;
-
-    const palletValue = inputValue;
-    setInputValue('');
-
-    toast.promise(
-      async () => {
-        const result = await savePalletBatch(palletValue, article, operator);
-        
-        if (result.status === 'success') {
-          playOk();
-          await onScanSuccess();
-          return dict.pallet.messages.success;
-        } else {
-          playNok();
-          const errorMessages: Record<string, string> = {
-            'invalid': dict.pallet.messages.invalid,
-            'error': dict.pallet.messages.error,
-          };
-          throw new Error(errorMessages[result.status] || dict.pallet.messages.error);
-        }
       },
-      {
-        loading: dict.pallet.messages.success || 'Zapisywanie...',
-        success: (msg) => msg,
-        error: (err) => err.message,
-      }
     );
 
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, [inputValue, operator, playOk, playNok, dict.pallet, onScanSuccess]);
+  }, [
+    inputValue,
+    operator,
+    playOk,
+    playNok,
+    addScan,
+    dict.scanning,
+    onScanSuccess,
+  ]);
 
-  const handleGenerateBatch = useCallback(async (article: string) => {
-    try {
-      const qr = await generatePalletBatch(article);
-      setGeneratedQr(qr);
-      setInputValue(qr);
-      toast.success(dict.pallet.generateBatch);
+  const handlePalletScan = useCallback(
+    async (article: string) => {
+      if (!inputValue.trim()) return;
+
+      const palletValue = inputValue;
+      setInputValue('');
+
+      toast.promise(
+        async () => {
+          const result = await savePalletBatch(palletValue, article, operator);
+
+          if (result.status === 'success') {
+            playOk();
+            await onScanSuccess();
+            return dict.pallet.messages.success;
+          } else {
+            playNok();
+            const errorMessages: Record<string, string> = {
+              invalid: dict.pallet.messages.invalid,
+              error: dict.pallet.messages.error,
+            };
+            throw new Error(
+              errorMessages[result.status] || dict.pallet.messages.error,
+            );
+          }
+        },
+        {
+          loading: dict.pallet.messages.success || 'Zapisywanie...',
+          success: (msg) => msg,
+          error: (err) => err.message,
+        },
+      );
+
       setTimeout(() => inputRef.current?.focus(), 50);
-    } catch (error) {
-      console.error('Generate error:', error);
-      toast.error('Failed to generate batch');
-      playNok();
-    }
-  }, [dict.pallet.generateBatch, playNok]);
+    },
+    [inputValue, operator, playOk, playNok, dict.pallet, onScanSuccess],
+  );
 
-  const handlePrint = useCallback(async (article: string, articleName: string) => {
-    setIsPrinting(true);
-    try {
-      const result = await printPalletLabel('eol136153', article, articleName);
-      if (result.success) {
-        toast.success('Label printed successfully');
-        playOk();
-      } else {
-        toast.error('Failed to print label');
+  const handleGenerateBatch = useCallback(
+    async (article: string) => {
+      try {
+        const qr = await generatePalletBatch(article);
+        setGeneratedQr(qr);
+        setInputValue(qr);
+        toast.success(dict.pallet.generateBatch);
+        setTimeout(() => inputRef.current?.focus(), 50);
+      } catch (error) {
+        console.error('Generate error:', error);
+        toast.error('Failed to generate batch');
         playNok();
       }
-    } catch (error) {
-      console.error('Print error:', error);
-      toast.error('Print error');
-      playNok();
-    } finally {
-      setIsPrinting(false);
-    }
-  }, [playOk, playNok]);
+    },
+    [dict.pallet.generateBatch, playNok],
+  );
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      
-      if (currentMode === 'scanning') {
-        handleHydraScan();
-      } else if (currentMode === 'pallet136') {
-        handlePalletScan('28067');
-      } else if (currentMode === 'pallet153') {
-        handlePalletScan('28042');
+  const handlePrint = useCallback(
+    async (article: string, articleName: string) => {
+      setIsPrinting(true);
+      try {
+        const result = await printPalletLabel(
+          'eol136153',
+          article,
+          articleName,
+        );
+        if (result.success) {
+          toast.success('Label printed successfully');
+          playOk();
+        } else {
+          toast.error('Failed to print label');
+          playNok();
+        }
+      } catch (error) {
+        console.error('Print error:', error);
+        toast.error('Print error');
+        playNok();
+      } finally {
+        setIsPrinting(false);
       }
-    }
-  }, [currentMode, handleHydraScan, handlePalletScan]);
+    },
+    [playOk, playNok],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+
+        if (currentMode === 'scanning') {
+          handleHydraScan();
+        } else if (currentMode === 'pallet136') {
+          handlePalletScan('28067');
+        } else if (currentMode === 'pallet153') {
+          handlePalletScan('28042');
+        }
+      }
+    },
+    [currentMode, handleHydraScan, handlePalletScan],
+  );
 
   // Determine placeholder based on mode
   let placeholder = dict.scanning.placeholder;
@@ -189,10 +224,10 @@ export default function ScanPanel({
 
   return (
     <>
-      <PCard>
-        <PCardHeader>
+      <Card>
+        <CardHeader>
           <div className='flex gap-2'>
-            <PInput
+            <Input
               ref={inputRef}
               type='text'
               name='scan'
@@ -205,33 +240,33 @@ export default function ScanPanel({
               onKeyDown={handleKeyDown}
             />
             {showGenerate && (
-              <PButton
+              <Button
                 onClick={() => handleGenerateBatch(currentArticle)}
                 variant='outline'
                 size='default'
               >
-                <QrCode className='mr-2 h-5 w-5' />
+                <QrCode />
                 {dict.pallet.generateBatch}
-              </PButton>
+              </Button>
             )}
           </div>
-        </PCardHeader>
-      </PCard>
+        </CardHeader>
+      </Card>
       {showPrint && (
-        <PCard>
-          <PCardHeader>
-            <PButton
+        <Card>
+          <CardHeader>
+            <Button
               onClick={() => handlePrint(currentArticle, currentArticleName)}
               variant='default'
               size='lg'
               disabled={isPrinting}
               className='w-full'
             >
-              <Printer className='mr-2 h-5 w-5' />
+              <Printer />
               {isPrinting ? dict.pallet.printing : dict.pallet.print}
-            </PButton>
-          </PCardHeader>
-        </PCard>
+            </Button>
+          </CardHeader>
+        </Card>
       )}
     </>
   );

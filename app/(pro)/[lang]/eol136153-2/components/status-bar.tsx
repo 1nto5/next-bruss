@@ -1,6 +1,7 @@
 'use client';
 
-import { PBadge, PCard, PCardContent, PCardHeader } from '@/app/(pro)/components/ui/wrappers';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Package, RefreshCw } from 'lucide-react';
@@ -35,21 +36,21 @@ export default function StatusBar({
   ) => {
     if (!status) {
       return (
-        <PCard>
-          <PCardHeader>
+        <Card>
+          <CardHeader>
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-3'>
                 <Package className='text-muted-foreground h-6 w-6' />
                 <CardTitle>{title}</CardTitle>
               </div>
             </div>
-          </PCardHeader>
-          <PCardContent>
+          </CardHeader>
+          <CardContent>
             <div className='flex items-center justify-center py-8 text-muted-foreground'>
               Loading...
             </div>
-          </PCardContent>
-        </PCard>
+          </CardContent>
+        </Card>
       );
     }
 
@@ -57,8 +58,8 @@ export default function StatusBar({
     const isFull = status.isFull;
 
     return (
-      <PCard>
-        <PCardHeader>
+      <Card>
+        <CardHeader>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-3'>
               <Package className='text-muted-foreground h-6 w-6' />
@@ -66,14 +67,14 @@ export default function StatusBar({
             </div>
             <div className='flex items-center gap-3'>
               {isFull && (
-                <PBadge variant='destructive' className='animate-pulse'>
+                <Badge variant='destructive' className='animate-pulse'>
                   {dict.palletFull}
-                </PBadge>
+                </Badge>
               )}
             </div>
           </div>
-        </PCardHeader>
-        <PCardContent>
+        </CardHeader>
+        <CardContent>
           <div className='space-y-4'>
             <div className='text-center'>
               <span className='text-6xl font-bold'>{status.boxesOnPallet}</span>
@@ -92,8 +93,8 @@ export default function StatusBar({
               </div>
             )}
           </div>
-        </PCardContent>
-      </PCard>
+        </CardContent>
+      </Card>
     );
   };
 

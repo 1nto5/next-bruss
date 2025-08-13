@@ -1,6 +1,6 @@
 'use client';
 
-import { PCard, PCardContent, PCardHeader } from '@/app/(pro)/components/ui/wrappers';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CardTitle } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 import type { Locale } from '@/i18n.config';
@@ -26,14 +26,14 @@ export default function LastScans({ lang }: LastScansProps) {
   if (lastScans.length === 0) return null;
 
   return (
-    <PCard>
-      <PCardHeader>
+    <Card>
+      <CardHeader>
         <div className='flex items-center gap-3'>
           <Clock className='text-muted-foreground h-6 w-6' />
           <CardTitle>Ostatnie skanowania</CardTitle>
         </div>
-      </PCardHeader>
-      <PCardContent>
+      </CardHeader>
+      <CardContent>
         <div className='space-y-2'>
           {lastScans.slice(0, 5).map((scan, index) => (
             <div 
@@ -52,7 +52,7 @@ export default function LastScans({ lang }: LastScansProps) {
             </div>
           ))}
         </div>
-      </PCardContent>
-    </PCard>
+      </CardContent>
+    </Card>
   );
 }

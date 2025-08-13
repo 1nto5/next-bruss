@@ -24,11 +24,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
-import { AlertTriangle, Play, ScanLine, StopCircle, X, Trash2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  Play,
+  ScanLine,
+  StopCircle,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { useVolumeStore } from '../lib/stores';
 import {
   completeOvenProcess,
   deleteOvenProcess,
@@ -37,7 +43,7 @@ import {
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import type { Dictionary } from '../lib/dictionary';
-import { useOvenStore, useOperatorStore } from '../lib/stores';
+import { useOperatorStore, useOvenStore, useVolumeStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
 import type { EndBatchType, StartBatchType } from '../lib/zod';
 import { endBatchSchema, startBatchSchema } from '../lib/zod';
@@ -113,7 +119,6 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
 
     return expectedCompletion.toLocaleString(lang);
   };
-
 
   const translateError = useCallback(
     (serverError: string): string => {
@@ -255,7 +260,10 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
 
       toast.promise(
         async () => {
-          const result = await completeOvenProcess(existingProcess.id, operators);
+          const result = await completeOvenProcess(
+            existingProcess.id,
+            operators,
+          );
 
           if ('success' in result && result.success) {
             playOvenOut();
@@ -345,12 +353,12 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
         <Card>
           <CardHeader>
             <div className='flex gap-4'>
-              <Button 
-                onClick={() => setStartDialogOpen(true)} 
+              <Button
+                onClick={() => setStartDialogOpen(true)}
                 className='w-1/2'
                 size='lg'
               >
-                <Play className='mr-2' />
+                <Play />
                 {dict.processList.newProcess}
               </Button>
               <Button
@@ -359,7 +367,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                 className='w-1/2'
                 size='lg'
               >
-                <StopCircle className='mr-2' />
+                <StopCircle />
                 {dict.processList.endProcess}
               </Button>
             </div>
@@ -490,13 +498,19 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
               {dict.processList.deleteDialog.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row gap-2 w-full">
-            <AlertDialogCancel onClick={handleCancelDelete} className="w-1/4 flex items-center justify-center gap-2">
-              <X className="h-4 w-4" />
+          <AlertDialogFooter className='flex w-full flex-row gap-2'>
+            <AlertDialogCancel
+              onClick={handleCancelDelete}
+              className='flex w-1/4 items-center justify-center gap-2'
+            >
+              <X className='h-4 w-4' />
               {dict.processList.deleteDialog.cancel}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="w-3/4 flex items-center justify-center gap-2">
-              <Trash2 className="h-4 w-4" />
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className='flex w-3/4 items-center justify-center gap-2'
+            >
+              <Trash2 className='h-4 w-4' />
               {dict.processList.deleteDialog.delete}
             </AlertDialogAction>
           </AlertDialogFooter>

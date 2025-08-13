@@ -152,12 +152,12 @@ export function PrintPalletLabel({ dict }: PrintPalletLabelProps) {
       >
         {isGenerating ? (
           <>
-            <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+            <Loader2 className='animate-spin' />
             {dict.generatingLabel || 'Generating label...'}
           </>
         ) : (
           <>
-            <Printer className='mr-2 h-5 w-5' />
+            <Printer />
             {dict.printPalletButton || 'Print Pallet Label'}
           </>
         )}

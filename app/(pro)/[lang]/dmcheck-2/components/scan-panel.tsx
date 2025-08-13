@@ -1,6 +1,6 @@
 'use client';
 
-import { useVolumeStore } from '@/app/(pro)/components/volume-control';
+import { useVolumeStore } from '@/app/(pro)/[lang]/components/volume-control';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

@@ -88,11 +88,11 @@ export const EndBatchDialog = memo<EndBatchDialogProps>(
                   className='w-1/2'
                   variant='outline'
                 >
-                  <CircleX className='mr-2' />
+                  <CircleX />
                   {dict.endBatchDialog.cancel}
                 </Button>
                 <Button type='submit' className='w-1/2'>
-                  <StopCircle className='mr-2' />
+                  <StopCircle />
                   {dict.endBatchDialog.end}
                 </Button>
               </div>

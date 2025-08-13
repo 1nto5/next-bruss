@@ -1,8 +1,8 @@
 'use client';
 
-import ErrorAlert from '@/app/(pro)/components/error-alert';
-import Loading from '@/app/(pro)/components/loading';
-import LoginWithKeypad from '@/app/(pro)/components/login-with-keypad';
+import ErrorAlert from '@/app/(pro)/[lang]/components/error-alert';
+import Loading from '@/app/(pro)/[lang]/components/loading';
+import LoginWithKeypad from '@/app/(pro)/[lang]/components/login-with-keypad';
 import type { Locale } from '@/i18n.config';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';

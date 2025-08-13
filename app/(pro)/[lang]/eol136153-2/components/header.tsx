@@ -1,7 +1,12 @@
 'use client';
 
-import { ThemeToggle } from '@/app/(pro)/components/theme-toggle';
-import { Header as BaseHeader, HeaderButton } from '@/app/(pro)/components/header-layout';
+import {
+  Header as BaseHeader,
+  HeaderButton,
+} from '@/app/(pro)/[lang]/components/header-layout';
+import LanguageSwitcher from '@/app/(pro)/[lang]/components/language-switcher';
+import { ThemeToggle } from '@/app/(pro)/[lang]/components/theme-toggle';
+import VolumeControl from '@/app/(pro)/[lang]/components/volume-control';
 import { PBadge } from '@/app/(pro)/components/ui/wrappers';
 import {
   AlertDialog,
@@ -14,12 +19,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import type { Locale } from '@/i18n.config';
-import { Factory, User, UserPen, Package } from 'lucide-react';
+import { Factory, Package, User, UserPen } from 'lucide-react';
 import { useState } from 'react';
 import type { Dictionary } from '../lib/dictionary';
-import { useOperatorStore, useEOLStore } from '../lib/stores';
-import LanguageSwitcher from '@/app/(pro)/components/language-switcher';
-import VolumeControl from '@/app/(pro)/components/volume-control';
+import { useEOLStore, useOperatorStore } from '../lib/stores';
 
 interface HeaderProps {
   lang: Locale;
@@ -38,8 +41,8 @@ export default function Header({ lang, dict }: HeaderProps) {
         EOL136153
       </PBadge>
       {article136Status && (
-        <PBadge 
-          variant={article136Status.isFull ? 'destructive' : 'secondary'} 
+        <PBadge
+          variant={article136Status.isFull ? 'destructive' : 'secondary'}
           className={article136Status.isFull ? 'animate-pulse' : ''}
         >
           <Package className='mr-1 h-4 w-4' />
@@ -47,7 +50,7 @@ export default function Header({ lang, dict }: HeaderProps) {
         </PBadge>
       )}
       {article153Status && (
-        <PBadge 
+        <PBadge
           variant={article153Status.isFull ? 'destructive' : 'secondary'}
           className={article153Status.isFull ? 'animate-pulse' : ''}
         >

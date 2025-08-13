@@ -1,16 +1,16 @@
 'use client';
 
+import ErrorAlert from '@/app/(pro)/[lang]/components/error-alert';
+import Loading from '@/app/(pro)/[lang]/components/loading';
+import LoginWithKeypad from '@/app/(pro)/[lang]/components/login-with-keypad';
 import type { Locale } from '@/i18n.config';
 import { useEffect, useState } from 'react';
-import type { Dictionary } from '../lib/dictionary';
-import { useOperatorStore, useEOLStore } from '../lib/stores';
 import { getArticleStatuses, login } from '../actions';
-import LoginWithKeypad from '@/app/(pro)/components/login-with-keypad';
-import ErrorAlert from '@/app/(pro)/components/error-alert';
-import Loading from '@/app/(pro)/components/loading';
-import StatusBar from './status-bar';
-import ScanPanel from './scan-panel';
+import type { Dictionary } from '../lib/dictionary';
+import { useEOLStore, useOperatorStore } from '../lib/stores';
 import LastScans from './last-scans';
+import ScanPanel from './scan-panel';
+import StatusBar from './status-bar';
 
 interface AppProps {
   dict: Dictionary;
@@ -19,16 +19,16 @@ interface AppProps {
 
 export default function App({ dict, lang }: AppProps) {
   const { operator, setOperator, logout } = useOperatorStore();
-  const { 
-    article136Status, 
-    article153Status, 
-    setArticle136Status, 
+  const {
+    article136Status,
+    article153Status,
+    setArticle136Status,
     setArticle153Status,
     currentMode,
     setCurrentMode,
     reset,
   } = useEOLStore();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,12 +38,12 @@ export default function App({ dict, lang }: AppProps) {
     setError(null);
     try {
       const statuses = await getArticleStatuses();
-      const status136 = statuses.find(s => s.article === '28067');
-      const status153 = statuses.find(s => s.article === '28042');
-      
+      const status136 = statuses.find((s) => s.article === '28067');
+      const status153 = statuses.find((s) => s.article === '28042');
+
       if (status136) setArticle136Status(status136);
       if (status153) setArticle153Status(status153);
-      
+
       // Determine current mode based on status
       if (status136?.isFull) {
         setCurrentMode('pallet136');
@@ -103,8 +103,8 @@ export default function App({ dict, lang }: AppProps) {
 
   // Main app interface
   return (
-    <div className="space-y-4">
-      <StatusBar 
+    <div className='space-y-4'>
+      <StatusBar
         dict={dict.status}
         article136Status={article136Status}
         article153Status={article153Status}

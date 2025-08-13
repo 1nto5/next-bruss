@@ -1,5 +1,5 @@
+import ProLayout from '@/app/(pro)/[lang]/components/pro-layout';
 import '@/app/globals.css';
-import ProLayout from '@/app/(pro)/components/pro-layout';
 import { Locale } from '@/i18n.config';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';

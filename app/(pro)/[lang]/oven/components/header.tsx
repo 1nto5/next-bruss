@@ -1,10 +1,12 @@
 'use client';
 
-import LanguageSwitcher from '@/app/(pro)/components/language-switcher';
-import VolumeControl from '@/app/(pro)/components/volume-control';
-import { ThemeToggle } from '@/app/(pro)/components/theme-toggle';
-import { Header as BaseHeader, HeaderButton } from '@/app/(pro)/components/header-layout';
-import { Badge } from '@/components/ui/badge';
+import {
+  Header as BaseHeader,
+  HeaderButton,
+} from '@/app/(pro)/[lang]/components/header-layout';
+import LanguageSwitcher from '@/app/(pro)/[lang]/components/language-switcher';
+import { ThemeToggle } from '@/app/(pro)/[lang]/components/theme-toggle';
+import VolumeControl from '@/app/(pro)/[lang]/components/volume-control';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,13 +17,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import type { Locale } from '@/i18n.config';
-import { Flame, UserPen, TimerReset, Thermometer, User, X, LogOut } from 'lucide-react';
+import {
+  Flame,
+  LogOut,
+  Thermometer,
+  TimerReset,
+  User,
+  UserPen,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useOvenLastAvgTemp } from '../data/get-oven-last-avg-temp';
 import { useGetOvenProcesses } from '../data/get-oven-processes';
 import type { Dictionary } from '../lib/dictionary';
-import { useOvenStore, useOperatorStore } from '../lib/stores';
+import { useOperatorStore, useOvenStore } from '../lib/stores';
 
 interface HeaderProps {
   dict: Dictionary;
@@ -30,7 +41,8 @@ interface HeaderProps {
 
 export default function Header({ dict, lang }: HeaderProps) {
   const { operator1, operator2, operator3, logout } = useOperatorStore();
-  const { selectedOven, selectedProgram, clearOven, clearProgram } = useOvenStore();
+  const { selectedOven, selectedProgram, clearOven, clearProgram } =
+    useOvenStore();
   const { data: tempData } = useOvenLastAvgTemp(selectedOven);
   const { data: processesData } = useGetOvenProcesses(selectedOven);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -42,8 +54,10 @@ export default function Header({ dict, lang }: HeaderProps) {
   } | null>(null);
 
   // Check if there are running processes
-  const hasRunningProcesses = processesData && 'success' in processesData && 
-    processesData.success.some(process => process.status === 'running');
+  const hasRunningProcesses =
+    processesData &&
+    'success' in processesData &&
+    processesData.success.some((process) => process.status === 'running');
 
   // Get logged-in operators from store
   const loggedInOperators = [operator1, operator2, operator3].filter(
@@ -89,10 +103,7 @@ export default function Header({ dict, lang }: HeaderProps) {
       )}
       {/* Show last average temperature if available */}
       {selectedOven && (
-        <Badge
-          variant='destructive'
-          className='flex items-center gap-2'
-        >
+        <Badge variant='destructive' className='flex items-center gap-2'>
           <Thermometer className='h-4 w-4' />
           {tempData &&
           'avgTemp' in tempData &&
@@ -111,8 +122,7 @@ export default function Header({ dict, lang }: HeaderProps) {
               className='flex items-center gap-2'
             >
               <User className='h-4 w-4' />
-              {operator.firstName}{' '}
-              {operator.lastName.charAt(0).toUpperCase()}.
+              {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
             </Badge>
           ))}
         </div>
@@ -175,13 +185,16 @@ export default function Header({ dict, lang }: HeaderProps) {
               {pendingAction?.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row gap-2 w-full">
-            <AlertDialogCancel className="w-1/4 flex items-center justify-center gap-2">
-              <X className="h-4 w-4" />
+          <AlertDialogFooter className='flex w-full flex-row gap-2'>
+            <AlertDialogCancel className='flex w-1/4 items-center justify-center gap-2'>
+              <X className='h-4 w-4' />
               {dict.header.logoutDialog.cancel}
             </AlertDialogCancel>
-            <AlertDialogAction onClick={executeAction} className="w-3/4 flex items-center justify-center gap-2">
-              <LogOut className="h-4 w-4" />
+            <AlertDialogAction
+              onClick={executeAction}
+              className='flex w-3/4 items-center justify-center gap-2'
+            >
+              <LogOut className='h-4 w-4' />
               {dict.header.logoutDialog.continue}
             </AlertDialogAction>
           </AlertDialogFooter>

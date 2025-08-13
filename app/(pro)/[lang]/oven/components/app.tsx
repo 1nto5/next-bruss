@@ -1,9 +1,9 @@
 'use client';
+import LoginWithKeypad from '@/app/(pro)/[lang]/components/login-with-keypad';
 import type { Locale } from '@/i18n.config';
-import type { Dictionary } from '../lib/dictionary';
-import { useOvenStore, useOperatorStore } from '../lib/stores';
-import LoginWithKeypad from '@/app/(pro)/components/login-with-keypad';
 import { login } from '../actions';
+import type { Dictionary } from '../lib/dictionary';
+import { useOperatorStore, useOvenStore } from '../lib/stores';
 import OvenSelection from './oven-selection';
 import ProcessList from './process-list';
 import ProgramSelection from './program-selection';
@@ -14,7 +14,14 @@ interface AppProps {
 }
 
 export default function App({ dict, lang }: AppProps) {
-  const { operator1, operator2, operator3, setOperator1, setOperator2, setOperator3 } = useOperatorStore();
+  const {
+    operator1,
+    operator2,
+    operator3,
+    setOperator1,
+    setOperator2,
+    setOperator3,
+  } = useOperatorStore();
   const { selectedOven, selectedProgram } = useOvenStore();
 
   if (!operator1 && !operator2 && !operator3) {

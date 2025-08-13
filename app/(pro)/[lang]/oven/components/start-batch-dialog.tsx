@@ -136,11 +136,11 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                   className='w-1/2'
                   variant='outline'
                 >
-                  <CircleX className='mr-2' />
+                  <CircleX />
                   {dict.startBatchDialog.cancel}
                 </Button>
                 <Button type='submit' className='w-1/2'>
-                  <Play className='mr-2' />
+                  <Play />
                   {dict.startBatchDialog.start}
                 </Button>
               </div>

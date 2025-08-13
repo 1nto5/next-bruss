@@ -1,8 +1,12 @@
 'use client';
 
-import { ThemeToggle } from '@/app/(pro)/components/theme-toggle';
-import { Header as BaseHeader, HeaderButton } from '@/app/(pro)/components/header-layout';
-import { Badge } from '@/components/ui/badge';
+import {
+  Header as BaseHeader,
+  HeaderButton,
+} from '@/app/(pro)/[lang]/components/header-layout';
+import LanguageSwitcher from '@/app/(pro)/[lang]/components/language-switcher';
+import { ThemeToggle } from '@/app/(pro)/[lang]/components/theme-toggle';
+import VolumeControl from '@/app/(pro)/[lang]/components/volume-control';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,14 +17,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import type { Locale } from '@/i18n.config';
-import { Component, User, UserPen, Factory, X, LogOut } from 'lucide-react';
+import { Component, Factory, LogOut, User, UserPen, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useScanStore } from '../lib/stores';
-import LanguageSwitcher from '@/app/(pro)/components/language-switcher';
-import VolumeControl from '@/app/(pro)/components/volume-control';
 
 interface HeaderProps {
   lang: Locale;
@@ -54,18 +57,34 @@ export default function Header({ lang, dict }: HeaderProps) {
         </Badge>
       )}
       {boxStatus.piecesInBox > 0 && (
-        <Badge 
-          variant={boxStatus.piecesInBox === selectedArticle?.piecesPerBox ? 'default' : 'outline'}
-          className={boxStatus.piecesInBox === selectedArticle?.piecesPerBox ? 'animate-pulse bg-green-600 hover:bg-green-700' : ''}
+        <Badge
+          variant={
+            boxStatus.piecesInBox === selectedArticle?.piecesPerBox
+              ? 'default'
+              : 'outline'
+          }
+          className={
+            boxStatus.piecesInBox === selectedArticle?.piecesPerBox
+              ? 'animate-pulse bg-green-600 hover:bg-green-700'
+              : ''
+          }
         >
           {dict.statusBar.box}: {boxStatus.piecesInBox}/
           {selectedArticle?.piecesPerBox || '?'}
         </Badge>
       )}
       {palletStatus && palletStatus.boxesOnPallet > 0 && (
-        <Badge 
-          variant={palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet ? 'default' : 'outline'}
-          className={palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet ? 'animate-pulse bg-green-600 hover:bg-green-700' : ''}
+        <Badge
+          variant={
+            palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet
+              ? 'default'
+              : 'outline'
+          }
+          className={
+            palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet
+              ? 'animate-pulse bg-green-600 hover:bg-green-700'
+              : ''
+          }
         >
           {dict.statusBar.pallet}: {palletStatus.boxesOnPallet}/
           {selectedArticle?.boxesPerPallet || '?'}
@@ -80,8 +99,7 @@ export default function Header({ lang, dict }: HeaderProps) {
               className='flex items-center gap-2'
             >
               <User className='h-4 w-4' />
-              {operator.firstName}{' '}
-              {operator.lastName.charAt(0).toUpperCase()}.
+              {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
             </Badge>
           ))}
         </div>
@@ -127,9 +145,9 @@ export default function Header({ lang, dict }: HeaderProps) {
               {dict.logout?.description || 'Czy na pewno chcesz wylogować?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row gap-2 w-full">
-            <AlertDialogCancel className="w-1/4 flex items-center justify-center gap-2">
-              <X className="h-4 w-4" />
+          <AlertDialogFooter className='flex w-full flex-row gap-2'>
+            <AlertDialogCancel className='flex w-1/4 items-center justify-center gap-2'>
+              <X className='h-4 w-4' />
               {dict.logout?.cancel || 'Anuluj'}
             </AlertDialogCancel>
             <AlertDialogAction
@@ -138,9 +156,9 @@ export default function Header({ lang, dict }: HeaderProps) {
                 clearArticle();
                 setAlertOpen(false);
               }}
-              className="w-3/4 flex items-center justify-center gap-2"
+              className='flex w-3/4 items-center justify-center gap-2'
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className='h-4 w-4' />
               {dict.logout?.confirm || 'Wyloguj'}
             </AlertDialogAction>
           </AlertDialogFooter>
