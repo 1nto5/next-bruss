@@ -7,7 +7,7 @@ import {
 import LanguageSwitcher from '@/app/(pro)/[lang]/components/language-switcher';
 import { ThemeToggle } from '@/app/(pro)/[lang]/components/theme-toggle';
 import VolumeControl from '@/app/(pro)/[lang]/components/volume-control';
-import { PBadge } from '@/app/(pro)/components/ui/wrappers';
+import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,33 +36,33 @@ export default function Header({ lang, dict }: HeaderProps) {
 
   const leftContent = (
     <>
-      <PBadge variant='default' className='flex items-center gap-2'>
+      <Badge variant='default' className='flex items-center gap-2'>
         <Factory className='h-4 w-4' />
         EOL136153
-      </PBadge>
+      </Badge>
       {article136Status && (
-        <PBadge
+        <Badge
           variant={article136Status.isFull ? 'destructive' : 'secondary'}
           className={article136Status.isFull ? 'animate-pulse' : ''}
         >
           <Package className='mr-1 h-4 w-4' />
           136: {article136Status.boxesOnPallet}/{article136Status.palletSize}
-        </PBadge>
+        </Badge>
       )}
       {article153Status && (
-        <PBadge
+        <Badge
           variant={article153Status.isFull ? 'destructive' : 'secondary'}
           className={article153Status.isFull ? 'animate-pulse' : ''}
         >
           <Package className='mr-1 h-4 w-4' />
           153: {article153Status.boxesOnPallet}/{article153Status.palletSize}
-        </PBadge>
+        </Badge>
       )}
       {operator && (
-        <PBadge variant='secondary' className='flex items-center gap-2'>
+        <Badge variant='secondary' className='flex items-center gap-2'>
           <User className='h-4 w-4' />
           {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
-        </PBadge>
+        </Badge>
       )}
     </>
   );

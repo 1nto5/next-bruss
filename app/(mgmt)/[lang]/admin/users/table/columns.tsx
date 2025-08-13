@@ -49,7 +49,7 @@ const onDeleteUser = async (userId: string) => {
   }
 };
 
-const ActionsCell = ({ row }: { row: any }) => {
+const ActionsCell = ({ row }: { row: { original: unknown } }) => {
   const user = row.original;
   const [isOpen, setIsOpen] = useState(false);
 

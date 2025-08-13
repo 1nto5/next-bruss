@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { CopyDialog } from '../components/copy-dialog';
 import { DeleteDialog } from '../components/delete-dialog';
 
-const ActionsCell = ({ row }: { row: any }) => {
+const ActionsCell = ({ row }: { row: { original: unknown } }) => {
   const articleConfig = row.original;
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [isOpenCopyDialog, setIsOpenCopyDialog] = useState(false);

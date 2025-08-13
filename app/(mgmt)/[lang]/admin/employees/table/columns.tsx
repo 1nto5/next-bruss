@@ -47,7 +47,7 @@ const onDeleteEmployee = async (articleId: string) => {
   }
 };
 
-const ActionsCell = ({ row }: { row: any }) => {
+const ActionsCell = ({ row }: { row: { original: unknown } }) => {
   const articleConfig = row.original;
   const [isOpen, setIsOpen] = useState(false);
 
