@@ -1,12 +1,10 @@
 import '@/app/globals.css';
-
-import Footer from '@/components/footer';
-
+import ProLayout from '@/app/(pro)/components/pro-layout';
 import { Locale } from '@/i18n.config';
-// import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 import Header from './components/header';
+import { getDictionary } from './lib/dictionary';
 import QueryProvider from './lib/query-provider';
 
 export const metadata: Metadata = {
@@ -24,7 +22,7 @@ export default async function RootLayout(props: {
 
   const { children } = props;
 
-  // const dictionary = await getDictionary(lang);
+  const dict = await getDictionary(lang);
   return (
     <ThemeProvider
       attribute='class'
@@ -33,13 +31,9 @@ export default async function RootLayout(props: {
       // disableTransitionOnChange
     >
       <QueryProvider>
-        <div className='flex min-h-screen flex-col space-y-1'>
-          <Header />
-          <main className='w-full flex-1 px-1'>
-            <div className='w-full'>{children}</div>
-          </main>
-          <Footer />
-        </div>
+        <ProLayout header={<Header dict={dict} lang={lang} />}>
+          {children}
+        </ProLayout>
       </QueryProvider>
     </ThemeProvider>
   );

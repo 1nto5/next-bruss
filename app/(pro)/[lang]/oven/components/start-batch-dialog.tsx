@@ -1,10 +1,6 @@
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -12,9 +8,10 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { CircleX, Play } from 'lucide-react';
 import { memo, RefObject, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import type { Dictionary } from '../lib/dictionary';
 import { StartBatchType } from '../lib/zod';
 
 interface StartBatchDialogProps {
@@ -23,6 +20,7 @@ interface StartBatchDialogProps {
   articleInputRef: RefObject<HTMLInputElement>;
   batchInputRef: RefObject<HTMLInputElement>;
   onStart: (data: StartBatchType) => Promise<void>;
+  dict: Dictionary;
 }
 
 export const StartBatchDialog = memo<StartBatchDialogProps>(
@@ -32,6 +30,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
     articleInputRef,
     batchInputRef,
     onStart,
+    dict,
   }) {
     const form = useForm<StartBatchType>({
       // Remove resolver to prevent FormMessage display
@@ -63,16 +62,16 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
 
     return (
       <Dialog open={open} onOpenChange={handleDialogClose}>
-        <DialogContent className='max-w-md'>
+        <DialogContent className='max-w-lg'>
           <DialogHeader>
-            <DialogTitle>Nowy proces</DialogTitle>
+            <DialogTitle>{dict.startBatchDialog.title}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className='space-y-4'
+              className='space-y-6'
             >
-              <div className='space-y-2'>
+              <div className='space-y-4'>
                 <FormField
                   control={form.control}
                   name='scannedArticle'
@@ -82,7 +81,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                         <Input
                           {...field}
                           className='text-center'
-                          placeholder='Zeskanuj numer artykułu...'
+                          placeholder={dict.startBatchDialog.articlePlaceholder}
                           autoFocus
                           ref={articleInputRef}
                           maxLength={5}
@@ -113,7 +112,7 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                         <Input
                           {...field}
                           className='text-center'
-                          placeholder='Zeskanuj HYDRA batch...'
+                          placeholder={dict.startBatchDialog.batchPlaceholder}
                           ref={batchInputRef}
                           maxLength={10}
                           autoComplete='off'
@@ -130,17 +129,19 @@ export const StartBatchDialog = memo<StartBatchDialogProps>(
                   )}
                 />
               </div>
-              <div className='flex gap-2'>
+              <div className='flex gap-4'>
                 <Button
                   type='button'
                   onClick={() => handleDialogClose(false)}
-                  className='flex-1'
+                  className='w-1/2'
                   variant='outline'
                 >
-                  Anuluj
+                  <CircleX className='mr-2' />
+                  {dict.startBatchDialog.cancel}
                 </Button>
-                <Button type='submit' className='flex-1'>
-                  Rozpocznij
+                <Button type='submit' className='w-1/2'>
+                  <Play className='mr-2' />
+                  {dict.startBatchDialog.start}
                 </Button>
               </div>
             </form>

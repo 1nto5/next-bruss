@@ -828,7 +828,7 @@ export async function approveDeviation(
   try {
     const coll = await dbc('deviations');
     const deviationObjectId = new ObjectId(id); // Use ObjectId
-    let deviation = (await coll.findOne({
+    const deviation = (await coll.findOne({
       _id: deviationObjectId,
     })) as DeviationType | null; // Cast to DeviationType
     if (!deviation) {
@@ -909,11 +909,11 @@ export async function approveDeviation(
         currentDate.setHours(0, 0, 0, 0); // Normalize to start of day for comparison
 
         // Ensure from and to dates exist and convert to Date objects if they're strings
-        let fromDate = deviation.timePeriod?.from
+        const fromDate = deviation.timePeriod?.from
           ? new Date(deviation.timePeriod.from)
           : null;
 
-        let toDate = deviation.timePeriod?.to
+        const toDate = deviation.timePeriod?.to
           ? new Date(deviation.timePeriod.to)
           : null;
 

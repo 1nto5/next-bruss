@@ -20,7 +20,7 @@ async function getAllUsers(
   const dateFromResponse = new Date(res.headers.get('date') || '');
   const fetchTime = dateFromResponse.toLocaleString(lang);
 
-  let allUsers = await res.json();
+  const allUsers = await res.json();
 
   return { fetchTime, allUsers };
 }

@@ -5,9 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, TimerReset } from 'lucide-react';
 import { useOvenProgram } from '../data/get-oven-program';
+import type { Dictionary } from '../lib/dictionary';
 import { useOvenStore } from '../lib/stores';
 
-export default function ProgramSelection() {
+interface ProgramSelectionProps {
+  dict: Dictionary;
+}
+
+export default function ProgramSelection({ dict }: ProgramSelectionProps) {
   const { selectedOven, setSelectedProgram } = useOvenStore();
   const { data, isLoading, error } = useOvenProgram();
 
@@ -29,7 +34,7 @@ export default function ProgramSelection() {
         error={
           error ||
           new Error(
-            data && 'error' in data ? data.error : 'Failed to load programs',
+            data && 'error' in data ? data.error : dict.programSelection.errorLoadPrograms,
           )
         }
         reset={() => window.location.reload()}
@@ -43,7 +48,7 @@ export default function ProgramSelection() {
     <Card>
       <CardHeader>
         <CardTitle>
-          Wybór programu dla pieca {selectedOven.toUpperCase()}
+          {dict.programSelection.title} {selectedOven.toUpperCase()}
         </CardTitle>
       </CardHeader>
 

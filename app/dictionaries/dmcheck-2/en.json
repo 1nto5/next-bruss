@@ -1,0 +1,117 @@
+{
+  "login": {
+    "title": "Login - DMCheck 2",
+    "operator1Label": "Personal number 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal number 2",
+    "personalNumber3Label": "Personal number 3",
+    "placeholder": "touch to enter...",
+    "loginButton": "Login",
+    "clearButton": "Clear",
+    "keypadTitle": "Enter operator personal number",
+    "keypadReset": "Reset",
+    "keypadSave": "Save",
+    "errors": {
+      "wrongNumber1": "Invalid personal number!",
+      "wrongNumber2": "Invalid personal number!",
+      "wrongNumber3": "Invalid personal number!",
+      "loginError": "Contact IT!"
+    }
+  },
+  "articleSelection": {
+    "title": "Article selection",
+    "piecesPerBox": "pcs/box",
+    "boxesPerPallet": "box/pal"
+  },
+  "scan": {
+    "title": "Scanning",
+    "dmcPlaceholder": "Scan DMC...",
+    "hydraPlaceholder": "Scan HYDRA QR code...",
+    "palletPlaceholder": "Scan pallet QR code...",
+    "savingPlaceholder": "Saving...",
+    "messages": {
+      "dmcSaved": "DMC saved",
+      "batchSaved": "Batch saved",
+      "dmcExists": "DMC already exists",
+      "batchExists": "Batch already exists",
+      "dmcNotValid": "DMC invalid",
+      "qrNotValid": "Invalid QR code - check format",
+      "articleNotFound": "Article not found",
+      "fordDateNotValid": "FORD date invalid",
+      "bmwDateNotValid": "BMW date invalid",
+      "qrWrongArticle": "Wrong article in QR",
+      "qrWrongQuantity": "Wrong quantity in QR",
+      "qrWrongProcess": "Wrong process in QR",
+      "boxNotFull": "Box is not full - cannot save HYDRA",
+      "palletNotFull": "Pallet is not full - cannot save pallet batch",
+      "40040Nok": "BRI test NOK",
+      "briPgError": "BRI connection error",
+      "smartNotFound": "Not found in SMART database",
+      "smartNok": "SMART: Part received NOK status",
+      "smartPattern": "SMART: Part is a pattern",
+      "smartFetchError": "SMART database connection problem",
+      "smartUnknown": "SMART: Part not processed on all stations",
+      "saveError": "Save error - contact IT"
+    },
+    "printPalletButton": "Print Pallet Label",
+    "generatingLabel": "Generating label...",
+    "labelGenerated": "Label generated successfully",
+    "labelGenerationError": "Failed to generate label"
+  },
+  "statusBar": {
+    "logout": "Logout",
+    "box": "BOX",
+    "pallet": "PALLET",
+    "pieces": "pcs",
+    "boxes": "box",
+    "full": "FULL",
+    "fullPallet": "FULL",
+    "time": "Time",
+    "noScans": "None",
+    "deleteDmc": "Delete DMC",
+    "deleteBox": "Delete box",
+    "deleteDmcConfirm": "Are you sure you want to delete this DMC from the box?",
+    "deleteBoxConfirm": "Are you sure you want to delete this box from the pallet?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "deletingDmc": "Deleting DMC...",
+    "deletingBox": "Deleting box...",
+    "dmcDeleted": "DMC has been deleted",
+    "boxDeleted": "Box has been removed from pallet",
+    "dmcNotFound": "DMC not found",
+    "boxNotFound": "Box not found",
+    "deleteError": "Error while deleting"
+  },
+  "lastScans": {
+    "title": "Last scans",
+    "noScans": "No recent scans",
+    "columns": {
+      "number": "No.",
+      "dmc": "DMC",
+      "time": "Time"
+    }
+  },
+  "errors": {
+    "noWorkplace": "No workplace!",
+    "noWorkplaceDescription": "Missing workplace parameter in URL (example: ?workplace=eol74)",
+    "noConfiguration": "No configuration!",
+    "noArticlesDescription": "No configured articles for the workplace",
+    "contactIT": "Contact IT.",
+    "somethingWrong": "Something went wrong!",
+    "unexpectedError": "An unexpected error occurred.",
+    "tryAgain": "Try again",
+    "loading": "Loading...",
+    "fetchArticlesError": "Error fetching articles",
+    "fetchStatusError": "Error fetching status"
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Are you sure you want to logout?",
+    "cancel": "Cancel",
+    "confirm": "Logout",
+    "clearArticle": "Change article",
+    "logoutOperators": "Logout"
+  }
+}

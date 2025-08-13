@@ -1,0 +1,117 @@
+{
+  "login": {
+    "title": "Anmeldung - DMCheck 2",
+    "operator1Label": "Personalnummer 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personalnummer 2",
+    "personalNumber3Label": "Personalnummer 3",
+    "placeholder": "zum Eingeben berühren...",
+    "loginButton": "Anmelden",
+    "clearButton": "Löschen",
+    "keypadTitle": "Personalnummer des Operators eingeben",
+    "keypadReset": "Zurücksetzen",
+    "keypadSave": "Speichern",
+    "errors": {
+      "wrongNumber1": "Ungültige Personalnummer!",
+      "wrongNumber2": "Ungültige Personalnummer!",
+      "wrongNumber3": "Ungültige Personalnummer!",
+      "loginError": "Kontaktieren Sie die IT!"
+    }
+  },
+  "articleSelection": {
+    "title": "Artikel auswählen",
+    "piecesPerBox": "Stk/Box",
+    "boxesPerPallet": "Box/Pal"
+  },
+  "scan": {
+    "title": "Scannen",
+    "dmcPlaceholder": "DMC scannen...",
+    "hydraPlaceholder": "HYDRA QR-Code scannen...",
+    "palletPlaceholder": "Paletten QR-Code scannen...",
+    "savingPlaceholder": "Speichern...",
+    "messages": {
+      "dmcSaved": "DMC gespeichert",
+      "batchSaved": "Batch gespeichert",
+      "dmcExists": "DMC existiert bereits",
+      "batchExists": "Batch existiert bereits",
+      "dmcNotValid": "DMC ungültig",
+      "qrNotValid": "Ungültiger QR-Code - Format prüfen",
+      "articleNotFound": "Artikel nicht gefunden",
+      "fordDateNotValid": "FORD-Datum ungültig",
+      "bmwDateNotValid": "BMW-Datum ungültig",
+      "qrWrongArticle": "Falscher Artikel im QR",
+      "qrWrongQuantity": "Falsche Menge im QR",
+      "qrWrongProcess": "Falscher Prozess im QR",
+      "boxNotFull": "Box ist nicht voll - HYDRA kann nicht gespeichert werden",
+      "palletNotFull": "Palette ist nicht voll - Palettenbatch kann nicht gespeichert werden",
+      "40040Nok": "BRI-Test NOK",
+      "briPgError": "BRI-Verbindungsfehler",
+      "smartNotFound": "Nicht in SMART-Datenbank gefunden",
+      "smartNok": "SMART: Teil hat NOK-Status erhalten",
+      "smartPattern": "SMART: Teil ist ein Muster",
+      "smartFetchError": "SMART-Datenbankverbindungsproblem",
+      "smartUnknown": "SMART: Teil nicht auf allen Stationen verarbeitet",
+      "saveError": "Save error - contact IT"
+    },
+    "printPalletButton": "Palettenetikett drucken",
+    "generatingLabel": "Etikett wird generiert...",
+    "labelGenerated": "Etikett erfolgreich generiert",
+    "labelGenerationError": "Fehler beim Generieren des Etiketts"
+  },
+  "statusBar": {
+    "logout": "Abmelden",
+    "box": "BOX",
+    "pallet": "PALETTE",
+    "pieces": "Stk",
+    "boxes": "Box",
+    "full": "VOLL",
+    "fullPallet": "VOLL",
+    "time": "Zeit",
+    "noScans": "Keine",
+    "deleteDmc": "DMC löschen",
+    "deleteBox": "Box löschen",
+    "deleteDmcConfirm": "Möchten Sie diesen DMC wirklich aus der Box löschen?",
+    "deleteBoxConfirm": "Möchten Sie diese Box wirklich von der Palette löschen?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "deleting": "Löschen...",
+    "deletingDmc": "DMC wird gelöscht...",
+    "deletingBox": "Box wird gelöscht...",
+    "dmcDeleted": "DMC wurde gelöscht",
+    "boxDeleted": "Box wurde von der Palette entfernt",
+    "dmcNotFound": "DMC nicht gefunden",
+    "boxNotFound": "Box nicht gefunden",
+    "deleteError": "Fehler beim Löschen"
+  },
+  "lastScans": {
+    "title": "Letzte Scans",
+    "noScans": "Keine letzten Scans",
+    "columns": {
+      "number": "Nr.",
+      "dmc": "DMC",
+      "time": "Zeit"
+    }
+  },
+  "errors": {
+    "noWorkplace": "Keine Arbeitsstation!",
+    "noWorkplaceDescription": "Fehlender workplace-Parameter in URL (Beispiel: ?workplace=eol74)",
+    "noConfiguration": "Keine Konfiguration!",
+    "noArticlesDescription": "Keine konfigurierten Artikel für die Arbeitsstation",
+    "contactIT": "Kontaktieren Sie die IT.",
+    "somethingWrong": "Etwas ist schief gelaufen!",
+    "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+    "tryAgain": "Erneut versuchen",
+    "loading": "Laden...",
+    "fetchArticlesError": "Fehler beim Abrufen von Artikeln",
+    "fetchStatusError": "Fehler beim Abrufen des Status"
+  },
+  "logout": {
+    "title": "Abmelden",
+    "description": "Möchten Sie sich wirklich abmelden?",
+    "cancel": "Abbrechen",
+    "confirm": "Abmelden",
+    "clearArticle": "Artikel ändern",
+    "logoutOperators": "Abmelden"
+  }
+}

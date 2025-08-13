@@ -18,7 +18,7 @@ export default async function EditUserPage(
   } = params;
 
   // const dict = await getDictionary(lang);
-  let user = await getUser(new ObjectId(userId));
+  const user = await getUser(new ObjectId(userId));
   if (!user) {
     redirect('/admin/users');
   }

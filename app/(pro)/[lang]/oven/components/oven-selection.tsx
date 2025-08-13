@@ -5,9 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Flame } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import type { Dictionary } from '../lib/dictionary';
 import { useOvenStore } from '../lib/stores';
 
-export default function OvenSelection() {
+interface OvenSelectionProps {
+  dict: Dictionary;
+}
+
+export default function OvenSelection({ dict }: OvenSelectionProps) {
   const { setSelectedOven } = useOvenStore();
   // Get search params from the URL
   const searchParams = useSearchParams();
@@ -30,7 +35,7 @@ export default function OvenSelection() {
       <ErrorComponent
         error={
           new Error(
-            'No ovens specified in search parameters (example: ?ovens=tem10,tem11).',
+            dict.ovenSelection.errorNoOvens,
           )
         }
         reset={() => window.location.reload()}
@@ -41,7 +46,7 @@ export default function OvenSelection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Wybór pieca</CardTitle>
+        <CardTitle>{dict.ovenSelection.title}</CardTitle>
       </CardHeader>
 
       <CardContent>
