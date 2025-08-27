@@ -23,6 +23,7 @@ export const ROUTE_PATHS = {
   adminEmployeesAddMany: '/admin/employees/add-many',
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
+  newsAdd: '/news/add',
   productionOvertime: '/production-overtime',
   overtimeSubmissions: '/overtime-submissions',
   codesGenerator: '/codes-generator',
@@ -105,6 +106,72 @@ export const deHeaderRoutes: HeaderRoute[] = [
   },
 ];
 
+export const enHeaderRoutes: HeaderRoute[] = [
+  {
+    title: 'Production',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.dmcheckData,
+        title: 'DMCheck Data',
+        description: 'Data in the DMC code scanning system.',
+      },
+      {
+        href: ROUTE_PATHS.ovenData,
+        title: 'Oven Data',
+        description: 'Temperature and process data from ovens.',
+      },
+      {
+        href: ROUTE_PATHS.deviations,
+        title: 'Deviations',
+        description: 'Quality control deviation tracking.',
+      },
+      {
+        href: ROUTE_PATHS.failuresLv,
+        title: 'LV Failures',
+        description: 'Low voltage system failure analysis.',
+      },
+    ],
+  },
+  {
+    title: 'Employee',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.productionOvertime,
+        title: 'Production overtime work',
+        description: 'Overtime work management for production.',
+      },
+      {
+        href: ROUTE_PATHS.overtimeSubmissions,
+        title: 'Overtime submissions',
+        description: 'Submit and manage overtime requests.',
+      },
+    ],
+  },
+  {
+    title: 'Tools',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.codesGenerator,
+        title: 'QR/Barcode/DMC Generator',
+        description: 'Generate various types of codes.',
+      },
+      {
+        href: ROUTE_PATHS.inw2spis,
+        title: 'Inventory - count',
+        description: 'Inventory counting system.',
+      },
+      {
+        href: ROUTE_PATHS.inw2zatwierdz,
+        title: 'Inventory approval',
+        description: 'Approve inventory count results.',
+      },
+    ],
+  },
+];
+
 export const adminHeaderRoutes: HeaderRoute[] = [
   {
     title: 'Admin',
@@ -133,6 +200,10 @@ export const adminHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.projects,
         title: 'Projects',
+      },
+      {
+        href: ROUTE_PATHS.newsAdd,
+        title: 'Add news',
       },
     ],
   },
