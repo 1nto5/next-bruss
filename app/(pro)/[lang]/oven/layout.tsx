@@ -14,15 +14,16 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }) {
   const params = await props.params;
 
   const { lang } = params;
+  const locale = lang as Locale;
 
   const { children } = props;
 
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(locale);
   return (
     <ThemeProvider
       attribute='class'
@@ -31,7 +32,7 @@ export default async function RootLayout(props: {
       // disableTransitionOnChange
     >
       <QueryProvider>
-        <ProLayout header={<Header dict={dict} lang={lang} />}>
+        <ProLayout header={<Header dict={dict} lang={locale} />}>
           {children}
         </ProLayout>
       </QueryProvider>

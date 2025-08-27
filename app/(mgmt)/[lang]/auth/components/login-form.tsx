@@ -29,7 +29,7 @@ import { KeyRound } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
-export default function LoginForm({ cDict }: { cDict: unknown }) {
+export default function LoginForm({ cDict }: { cDict: any }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const searchParams = useSearchParams();

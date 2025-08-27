@@ -94,6 +94,8 @@
     "end": "End"
   },
   "header": {
+    "clearOven": "Clear oven",
+    "clearProgram": "Clear program",
     "logoutDialog": {
       "title": "Logout",
       "description": "Are you sure you want to logout?",

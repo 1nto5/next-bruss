@@ -94,6 +94,8 @@
     "end": "Завершити"
   },
   "header": {
+    "clearOven": "Очистити піч",
+    "clearProgram": "Очистити програму",
     "logoutDialog": {
       "title": "Вихід",
       "description": "Ви впевнені, що хочете вийти?",

@@ -891,6 +891,10 @@ export async function getArticleStatistics(
     const timeZones: Record<Locale, string> = {
       pl: 'Europe/Warsaw',
       de: 'Europe/Berlin',
+      en: 'Europe/London',
+      tl: 'Europe/Berlin',
+      uk: 'Europe/Kiev',
+      be: 'Europe/Minsk',
     };
 
     const timeZone = timeZones[lang] || 'UTC';

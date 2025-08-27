@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function Layout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }) {
   const params = await props.params;
 
@@ -19,7 +19,7 @@ export default async function Layout(props: {
 
   const { children } = props;
 
-  const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang as Locale);
   const noAccess = (
     <>
       {dict.noAccess}{' '}

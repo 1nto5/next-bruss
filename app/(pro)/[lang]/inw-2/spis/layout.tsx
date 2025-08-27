@@ -2,7 +2,6 @@ import '@/app/globals.css';
 
 import Footer from '@/components/footer';
 
-import { Locale } from '@/i18n.config';
 // import { getDictionary } from '@/lib/dictionary';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
@@ -16,12 +15,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
 }) {
-  const params = await props.params;
-
-  const { lang } = params;
-
   const { children } = props;
 
   // const dictionary = await getDictionary(lang);

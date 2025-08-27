@@ -198,7 +198,7 @@ export async function saveDmc(
     const articleConfig = {
       ...articleConfigDoc,
       id: articleConfigDoc._id.toString(),
-    } as ArticleConfigType;
+    } as unknown as ArticleConfigType;
 
     const schema = createDmcValidationSchema(articleConfig);
     const parse = schema.safeParse({

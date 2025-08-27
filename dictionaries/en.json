@@ -1,5 +1,302 @@
 {
+  "header": {
+    "production": {
+      "title": "Production",
+      "dmcheckData": {
+        "title": "DMCheck Data",
+        "description": "Data in the part scanning system - DMC codes."
+      },
+      "rework": {
+        "title": "Mark rework",
+        "description": "Marking batches as rework - rescanning."
+      },
+      "zero": {
+        "title": "Reset status",
+        "description": "Resetting the part quantity status when using the rework option is impossible."
+      },
+      "articleConfig": {
+        "title": "Add article",
+        "description": "Adding articles in the DMC scanning system."
+      },
+      "personsConfig": {
+        "title": "Add employee",
+        "description": "Adding employees in the DMC scanning system."
+      }
+    },
+    "inventory": {
+      "title": "Inventory",
+      "inventory": {
+        "title": "Inventory",
+        "description": "Application supporting the inventory process."
+      },
+      "inventory2": {
+        "title": "Inventory",
+        "description": "Tool for confirming inventoried positions."
+      },
+      "inventoryApprove": {
+        "title": "Inventory approval",
+        "description": "Tool for confirming inventoried positions."
+      },
+      "inventoryApprove2": {
+        "title": "Inventory approval",
+        "description": "Tool for confirming inventoried positions."
+      }
+    }
+  },
+  "noAccess": "You don't have permission to this function. Click to send a request to grant it:",
+  "noAccessTitle": "No permission!",
+  "noAccessMailSubject": "Grant permission to: (enter function name)",
+  "auth": {
+    "cardTitle": "Login",
+    "cardDescription": "Enter your company email and password that you use to log into your computer.",
+    "emailInputLabel": "Email",
+    "passwordInputLabel": "Password",
+    "loginButton": "Login",
+    "loggingButton": "Logging in",
+    "savingButton": "Saving",
+    "zod": {
+      "emailTooShort": "Email is too short!",
+      "emailNotFromBruss": "The provided email does not belong to the bruss-group.com domain!",
+      "passwordTooShort": "Password must contain at least 5 characters!",
+      "credentialsError": "Invalid login credentials!"
+    },
+    "toasts": {
+      "pleaseContactIt": "Please contact IT!",
+      "loginSuccess": "Logged in!"
+    }
+  },
   "home": {
-    "title": "Hello!"
+    "title": "Hello",
+    "description": "I'm constantly working on improving the solutions you'll find here. Your opinion is extremely valuable to me - if you have any suggestions or questions, please contact me: "
+  },
+  "exportData": {
+    "cardTitle": "Data export",
+    "cardDescription": "In case of wide range of criteria, the 10000 newest records will be downloaded.",
+    "workplaceLabel": "Workplace",
+    "articleLabel": "Article",
+    "statusLabel": "Status",
+    "chooseInputPlaceholder": "choose...",
+    "anyInputPlaceholder": "type any...",
+    "emptyCommand": "not found",
+    "downloadButton": "Download file",
+    "downloadingButton": "Generating",
+    "clearButton": "Clear",
+    "timeFrameLabel": "Time range",
+    "dateFromLabel": "Date from",
+    "dateToLabel": "Date to",
+    "exportButton": "Export",
+    "toasts": {
+      "exportSuccess": "Data exported!",
+      "exportError": "Error during data export!"
+    },
+    "pleaseContactIt": "Please contact IT!"
+  },
+  "rework": {
+    "articleLabel": "Article",
+    "noSearchTerm": "No search value!",
+    "noResults": "No items found!",
+    "pleaseContactIt": "Please contact IT!",
+    "noReason": "Enter reason!",
+    "tooShortReason": "Reason must have at least 20 characters!",
+    "positionsLengthZero": "Enter DMC code, hydra batch or pallet to search and mark as rework.",
+    "checkPositionsAndReason": "Check the correctness of found positions and enter reason to mark as rework.",
+    "inputLabel": "DMC / hydra batch / pallet",
+    "inputPlaceholder": "type any...",
+    "searchButton": "Search",
+    "reasonInputLabel": "Reason",
+    "reasonTextareaPlaceholder": "Enter short rework description.",
+    "markAsReworkButton": "Mark as rework",
+    "updatedPositions": "Updated positions:",
+    "statusTableHead": "Status",
+    "workplaceTableHead": "Workplace"
+  },
+  "articleConfig": {
+    "tabs": {
+      "edit": "Edit",
+      "add": "Add"
+    },
+    "add": {
+      "z": {
+        "workplace": "Enter minimum 4 characters according to current naming",
+        "articleNumber": "Article number must be in format: XXXXX or 10.0XXXXX.00 (X - integer)",
+        "articleName": "Minimum 5 characters",
+        "boxesPerPallet": "Enter integer number",
+        "dmc": "Minimum 10 characters",
+        "dmcValidation": "String of minimum 4 characters contained in DMC field",
+        "dmcSecondValidation": "String of minimum 4 characters contained in DMC field, different than in \"DMC validation value\" field",
+        "piecesPerBox": "Enter integer number",
+        "hydraProcess": "Enter correct process!"
+      },
+      "cardTitle": "Add article",
+      "cardDescription": "Fill all data to add new article.",
+      "addButton": "Add",
+      "addingButton": "Adding",
+      "clearButton": "Clear",
+      "workplaceFormLabel": "Workplace",
+      "articleNumberFormLabel": "Article number",
+      "articleNameFormLabel": "Article name",
+      "piecesPerBoxFormLabel": "Pieces per box",
+      "palletFormLabel": "Pallet collective labels",
+      "boxesPerPalletFormLabel": "Boxes per pallet",
+      "dmcFormLabel": "DMC",
+      "dmcFormDescription": "Full content of scanned DMC code",
+      "dmcFirstValidationFormLabel": "DMC validation value",
+      "dmcFirstValidationFormDescription": "Constant code content (e.g. customer article number) - string that must contain scanned DMC code",
+      "secondValidationCheckboxFormLabel": "Two string validation",
+      "dmcSecondValidationFormLabel": "Second DMC validation value",
+      "dmcSecondValidationFormDescription": "Use only when DMC contains two constant strings (beginning and end)!",
+      "fordCheckboxFormLabel": "FORD date validation",
+      "bmwCheckboxFormLabel": "BMW date validation",
+      "hydraProcessFormLabel": "Hydra process",
+      "hydraProcessFormDescription": "HYDRA process from which the article comes (e.g. 050 - after EOL pressure control)",
+      "hydraProcessSelectOption050": "050 - after EOL pressure control",
+      "hydraProcessSelectOption090": "090 - Q3",
+      "hydraProcessSelectPlaceholder": "Choose process appropriate for the article",
+      "articleNoteFormLabel": "Article note",
+      "articleNoteFormDescription": "Additional information about the article (e.g. packaging type, \"common\" name, etc.)",
+      "toasts": {
+        "articleSaved": "Article added!",
+        "articleExists": "Article exists!",
+        "pleaseContactIt": "Please contact IT!"
+      }
+    }
+  },
+  "personsConfig": {
+    "z": {
+      "firstName": "First name must contain 3 characters!",
+      "lastName": "Last name must contain 3 characters!",
+      "loginCode": "Personal number is required!",
+      "password": "Password must contain 5 characters!"
+    },
+    "cardTitle": "Add employee",
+    "cardDescription": "Fill all data to add new employee.",
+    "firstNameFormLabel": "First name",
+    "lastNameFormLabel": "Last name",
+    "loginCodeFormLabel": "Personal number",
+    "loginCodeFormDescription": "Used for login in DMCheck application.",
+    "passwordFormLabel": "Password",
+    "passwordFormDescription": "Used in inventory process support application. Leave empty to skip.",
+    "clearButton": "Clear",
+    "addButton": "Add",
+    "addingButton": "Adding",
+    "toasts": {
+      "saved": "Employee has been added!",
+      "exists": "Personal number is already defined in database!"
+    }
+  },
+  "dmcheck": {
+    "lastFiveTable": {
+      "tableCaption": "last positions",
+      "timeTableHead": "time",
+      "dateTableHead": "date"
+    },
+    "articleSelection": {
+      "cardTitle": "Choose article",
+      "noArticleConfigForWorkplaceTitle": "No configuration!",
+      "noArticleConfigForWorkplaceDescription": "No articles in configuration for workplace: ",
+      "piecesPerBox": "pcs / box",
+      "boxesPerPallet": "box / pallet",
+      "articleNumber": "number",
+      "articleName": "name",
+      "articleNote": "note"
+    },
+    "personLogin": {
+      "cardTitle": "Login",
+      "personalNumberInputPlaceholder": "Personal number",
+      "confirmButton": "Login",
+      "loginButton": "Login",
+      "loginNotValid": "Enter correct personal number!",
+      "loginNotExist": "Personal number does not exist in database!",
+      "loginSuccess": "Logged in as: "
+    },
+    "scan": {
+      "statusBar": {
+        "operator": "operator",
+        "article": "article",
+        "onPallet": "pallet",
+        "boxCardDialog": {
+          "cardHeader": "box",
+          "timeTableHead": "time",
+          "dateTableHead": "date",
+          "dialogTitle": "Parts in box",
+          "noDataDialogDescription": "Box is empty, start scanning parts.",
+          "dmcSearchInputPlaceholder": "scan DMC code to search...",
+          "deleteTableHead": "delete",
+          "dmcDeletedToast": "Part has been deleted!",
+          "dmcNotFoundToast": "Part not found!",
+          "alertDialogTitle": "Are you sure?",
+          "alertDialogDescription": "Are you sure you want to delete this part from current box?",
+          "alertDialogCancel": "Cancel",
+          "alertDialogAction": "Delete"
+        },
+        "palletCardDialog": {
+          "cardHeader": "pallet",
+          "timeTableHead": "time",
+          "dateTableHead": "date",
+          "dialogTitle": "Boxes on pallet",
+          "noDataDialogDescription": "There is no full box on pallet yet.",
+          "hydraBatchSearchInputPlaceholder": "scan hydra batch to search...",
+          "deleteTableHead": "delete",
+          "hydraBatchDeletedToast": "Box has been deleted!",
+          "hydraBatchNotFoundToast": "Box not found!",
+          "alertDialogTitle": "Are you sure?",
+          "alertDialogDescription": "All parts from the box will be deleted! Are you sure you want to delete this box from current pallet?",
+          "alertDialogCancel": "Cancel",
+          "alertDialogAction": "Delete"
+        },
+        "articleCardDialog": {
+          "cardHeader": "article",
+          "dialogTitle": "Statistics of processed parts for article",
+          "currentShiftTableCell": "current",
+          "shiftTableHead": "shift",
+          "amountTableHead": "amount"
+        },
+        "operatorCardDialog": {
+          "cardHeader": "operator",
+          "dialogTitle": "Statistics of processed parts for operator",
+          "allTableCell": "all",
+          "monthTableCell": "month",
+          "weekTableCell": "week",
+          "dayTableCell": "day",
+          "yearTableCell": "year",
+          "amountTableHead": "amount"
+        }
+      },
+      "dmcScanInputPlaceholder": "scan DMC code...",
+      "dmcReworkInputPlaceholder": "WARNING: DMC rework active!",
+      "scanInputSavingPlaceholder": "processing...",
+      "hydraScanInputPlaceholder": "scan QR code from HYDRA label...",
+      "toast": {
+        "dmcNotValid": "Invalid DMC code!",
+        "articleNotFound": "Invalid article!",
+        "dmcSaved": "DMC saved!",
+        "dmcExists": "DMC exists in database!",
+        "fordDateNotValid": "Invalid FORD date!",
+        "bmwDateNotValid": "Invalid BMW date!",
+        "unknownSavingError": "Unknown error, please contact IT!",
+        "nok": "NOK!",
+        "qrNotValid": "Invalid QR code!",
+        "qrWrongArticle": "Label with incorrect article number!",
+        "qrWrongQuantity": "Incorrect quantity on label!",
+        "qrWrongProcess": "Label with incorrect process number!",
+        "briPgSavingError": "Contact error with external database",
+        "reworkNotPossible": "Rework possible only after finishing box/pallet!",
+        "reworkDmcSaved": "Rework DMC saved!",
+        "batchSaved": "Batch saved!",
+        "batchExists": "Batch exists in database!"
+      },
+      "palletScanInputPlaceholder": "scan QR code from printed pallet label...",
+      "printPalletButton": "Print pallet label",
+      "printHydraLabelReprint": "Hydra label reprint",
+      "printHydraLabelPrinting": "Printing...",
+      "printHydraLabelSuccess": "Hydra label printed!",
+      "printHydraLabelError": "Hydra label printing error",
+      "printHydraLabelErrorNoConfig": "No Hydra label printing configuration",
+      "printHydraLabelAutoPrinted": "Label was automatically printed after box completion",
+      "printHydraLabelConfirmTitle": "Confirm reprint",
+      "printHydraLabelConfirmReprint": "This label has already been printed automatically. Are you sure you want to print it again?",
+      "cancel": "Cancel",
+      "confirm": "Yes, reprint"
+    }
   }
 }

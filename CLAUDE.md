@@ -16,7 +16,6 @@ Next-Bruss is an industrial manufacturing web application built with Next.js 15,
 bun dev          # Start development server with Turbopack (always run in background)
 bun build        # Create production build (with Turbopack) - DO NOT run while bun dev is running
 bun start        # Start production server
-bun lint         # Run ESLint
 
 # Database connections
 # MongoDB: Connection string in MONGODB_URI env var

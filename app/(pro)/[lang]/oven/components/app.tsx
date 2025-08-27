@@ -39,7 +39,7 @@ export default function App({ dict, lang }: AppProps) {
   } else if (!selectedOven) {
     return <OvenSelection dict={dict} />;
   } else if (selectedProgram === null) {
-    return <ProgramSelection dict={dict} lang={lang} />;
+    return <ProgramSelection dict={dict} />;
   } else {
     return <ProcessList dict={dict} lang={lang} />;
   }

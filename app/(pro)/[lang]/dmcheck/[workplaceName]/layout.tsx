@@ -13,15 +13,16 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale; workplaceName: string }>;
+  params: Promise<{ lang: string; workplaceName: string }>;
 }) {
   const params = await props.params;
 
   const { lang, workplaceName } = params;
+  const locale = lang as Locale;
 
   const { children } = props;
 
-  const dictionary = await getDictionary(lang);
+  const dictionary = await getDictionary(locale);
   return (
     <ThemeProvider
       attribute='class'
