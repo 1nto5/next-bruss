@@ -184,7 +184,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         <div className='flex items-center gap-2'>
           {hasRolePrivilege && !isApprovalDisabled && (
             <>
-              {/* Allow approval when not already approved (either undefined or rejected) */}
+              {/* Allow approval when this specific role hasn't approved yet */}
               {approved !== true && (
                 <Dialog open={openApprove} onOpenChange={setOpenApprove}>
                   <DialogTrigger asChild>
@@ -233,7 +233,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                 </Dialog>
               )}
 
-              {/* Only show reject button when not already decided (undefined) */}
+              {/* Allow rejection when this specific role hasn't made a decision yet */}
               {approved === undefined && (
                 <Dialog open={openReject} onOpenChange={setOpenReject}>
                   <DialogTrigger asChild>
