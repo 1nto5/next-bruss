@@ -49,14 +49,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             options,
           );
           if (searchResults.length === 0) {
-            return null;
+            await ldapClient.unbind();
+            return null; // User not found - invalid credentials
           } else {
             const userDn = searchResults[0].dn;
             try {
               await ldapClient.bind(userDn, password);
             } catch (error) {
               await ldapClient.unbind();
-              return null;
+              return null; // Wrong password - invalid credentials
             }
 
             try {
