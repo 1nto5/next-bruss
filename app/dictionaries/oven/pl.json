@@ -94,8 +94,8 @@
     "end": "Zakończ"
   },
   "header": {
-    "clearOven": "Wyloguj piec",
-    "clearProgram": "Wyczyść program",
+    "clearOven": "Zmień piec",
+    "clearProgram": "Zmień program",
     "logoutDialog": {
       "title": "Wylogowanie",
       "description": "Czy na pewno chcesz wylogować?",
