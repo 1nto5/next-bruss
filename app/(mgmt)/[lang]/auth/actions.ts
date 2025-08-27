@@ -23,8 +23,13 @@ export async function login(email: string, password: string) {
         case 'CredentialsSignin':
           return { error: 'invalid credentials' };
         case 'CallbackRouteError':
-          // This might be thrown when credentials are invalid
-          if (error.cause?.err?.message?.includes('authorize') || 
+          // Check for specific credential errors
+          const errorMessage = error.cause?.err?.message;
+          if (errorMessage === 'user not found') {
+            return { error: 'user not found' };
+          } else if (errorMessage === 'wrong password') {
+            return { error: 'wrong password' };
+          } else if (errorMessage?.includes('authorize') || 
               error.cause?.err?.type === 'CredentialsSignin') {
             return { error: 'invalid credentials' };
           }
