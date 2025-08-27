@@ -8,20 +8,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Locale } from '@/i18n.config';
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface LanguageSwitcherProps {
   currentLang: Locale;
 }
-
-const languageFlags: Record<Locale, string> = {
-  pl: '🇵🇱',
-  de: '🇩🇪',
-  en: '🇬🇧',
-  tl: '🇵🇭',
-  uk: '🇺🇦',
-  be: '🇧🇾',
-};
 
 export default function LanguageSwitcher({
   currentLang,
@@ -45,22 +37,26 @@ export default function LanguageSwitcher({
     router.push(url);
   };
 
-  const languages: { code: Locale; flag: string; name: string }[] = [
-    { code: 'pl', flag: '🇵🇱', name: 'Polski' },
-    { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-    { code: 'en', flag: '🇬🇧', name: 'English' },
-    { code: 'tl', flag: '🇵🇭', name: 'Tagalog' },
-    { code: 'uk', flag: '🇺🇦', name: 'Українська' },
-    { code: 'be', flag: '🇧🇾', name: 'Беларуская' },
+  const languages: { code: Locale; name: string }[] = [
+    { code: 'pl', name: 'Polski' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'en', name: 'English' },
+    { code: 'tl', name: 'Tagalog' },
+    { code: 'uk', name: 'Українська' },
+    { code: 'be', name: 'Беларуская' },
   ];
-
-  const currentFlag = languageFlags[currentLang] || '🌐';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size='icon' className='h-10 w-10'>
-          <span className='text-xl'>{currentFlag}</span>
+          <Image
+            src={`/flags/${currentLang}.svg`}
+            alt={`${currentLang} flag`}
+            width={24}
+            height={18}
+            className="rounded-sm"
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -71,7 +67,13 @@ export default function LanguageSwitcher({
             className={currentLang === lang.code ? 'bg-accent' : ''}
           >
             <div className='flex items-center gap-3'>
-              <span className='text-xl'>{lang.flag}</span>
+              <Image
+                src={`/flags/${lang.code}.svg`}
+                alt={`${lang.code} flag`}
+                width={20}
+                height={15}
+                className="rounded-sm"
+              />
               <span>{lang.name}</span>
             </div>
           </DropdownMenuItem>

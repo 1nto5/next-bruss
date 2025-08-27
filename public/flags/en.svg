@@ -1,0 +1,18 @@
+<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue background -->
+  <rect width="24" height="18" fill="#012169"/>
+  
+  <!-- White diagonal crosses -->
+  <path d="M0 0 L24 18 M24 0 L0 18" stroke="white" stroke-width="3"/>
+  
+  <!-- Red diagonal crosses -->
+  <path d="M0 0 L24 18 M24 0 L0 18" stroke="#C8102E" stroke-width="2"/>
+  
+  <!-- White cross -->
+  <rect x="0" y="8" width="24" height="2" fill="white"/>
+  <rect x="11" y="0" width="2" height="18" fill="white"/>
+  
+  <!-- Red cross -->
+  <rect x="0" y="8.5" width="24" height="1" fill="#C8102E"/>
+  <rect x="11.5" y="0" width="1" height="18" fill="#C8102E"/>
+</svg>
