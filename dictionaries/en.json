@@ -58,7 +58,9 @@
       "emailTooShort": "Email is too short!",
       "emailNotFromBruss": "The provided email does not belong to the bruss-group.com domain!",
       "passwordTooShort": "Password must contain at least 5 characters!",
-      "credentialsError": "Invalid login credentials!"
+      "credentialsError": "Invalid login credentials!",
+      "emailNotFound": "User with this email does not exist!",
+      "wrongPassword": "Wrong password! Use the password you use to log into your computer."
     },
     "toasts": {
       "pleaseContactIt": "Please contact IT!",

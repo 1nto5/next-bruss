@@ -49,14 +49,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             options,
           );
           if (searchResults.length === 0) {
-            return null;
+            try {
+              await ldapClient.unbind();
+            } catch (unbindError) {
+              // Unbind error can be ignored - connection might be already closed
+            }
+            throw new Error('user not found'); // User not found in LDAP
           } else {
             const userDn = searchResults[0].dn;
             try {
               await ldapClient.bind(userDn, password);
             } catch (error) {
-              await ldapClient.unbind();
-              return null;
+              try {
+                await ldapClient.unbind();
+              } catch (unbindError) {
+                // Unbind error can be ignored - connection might be already closed
+              }
+              throw new Error('wrong password'); // Wrong password - invalid credentials
             }
 
             try {
@@ -68,7 +77,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   email: email.toLowerCase(),
                 });
               } catch (error) {
-                await ldapClient.unbind();
+                try {
+                  await ldapClient.unbind();
+                } catch (unbindError) {
+                  // Unbind error can be ignored - connection might be already closed
+                }
                 throw new Error('authorize database error: findOne failed');
               }
 
@@ -79,7 +92,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     roles: ['user'],
                   });
                 } catch (error) {
-                  await ldapClient.unbind();
+                  try {
+                    await ldapClient.unbind();
+                  } catch (unbindError) {
+                    // Unbind error can be ignored - connection might be already closed
+                  }
                   throw new Error('authorize database error: insertOne failed');
                 }
                 return {
@@ -93,12 +110,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 } as User;
               }
             } catch (error) {
-              await ldapClient.unbind();
+              try {
+                await ldapClient.unbind();
+              } catch (unbindError) {
+                // Unbind error can be ignored - connection might be already closed
+              }
               throw new Error('authorize database error');
             }
           }
         } catch (error) {
-          await ldapClient.unbind();
+          console.log('Outer catch - error message:', (error as Error).message);
+          try {
+            await ldapClient.unbind();
+          } catch (unbindError) {
+            // Unbind error can be ignored - connection might be already closed
+          }
+          
+          // Re-throw specific errors instead of generic 'authorize ldap error'
+          if ((error as Error).message === 'user not found' || (error as Error).message === 'wrong password') {
+            console.log('Re-throwing specific error:', (error as Error).message);
+            throw error;
+          }
+          console.log('Throwing generic authorize ldap error');
           throw new Error('authorize ldap error');
         }
       },

@@ -62,16 +62,21 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       if (res?.success) {
         toast.success(cDict.toasts.loginSuccess);
         router.push(callbackUrl); // Redirect to home after successful login
-      } else if (res?.error === 'invalid credentials') {
-        // Handle invalid credentials
+      } else if (res?.error === 'user not found') {
+        // Handle user not found
         form.setError('email', {
           type: 'manual',
-          message: cDict.zod.credentialsError,
+          message: cDict.zod.emailNotFound,
         });
+      } else if (res?.error === 'wrong password') {
+        // Handle wrong password
         form.setError('password', {
           type: 'manual',
-          message: cDict.zod.credentialsError,
+          message: cDict.zod.wrongPassword,
         });
+      } else if (res?.error === 'invalid credentials') {
+        // Handle generic invalid credentials (fallback)
+        toast.error(cDict.zod.credentialsError);
       } else {
         // Handle other errors
         toast.error(cDict.toasts.pleaseContactIt);
