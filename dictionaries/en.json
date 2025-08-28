@@ -59,8 +59,7 @@
       "emailNotFromBruss": "The provided email does not belong to the bruss-group.com domain!",
       "passwordTooShort": "Password must contain at least 5 characters!",
       "credentialsError": "Invalid login credentials!",
-      "emailNotFound": "User with this email does not exist!",
-      "wrongPassword": "Wrong password! Use the password you use to log into your computer."
+      "emailOrPasswordIncorrect": "Email address or password incorrect!"
     },
     "toasts": {
       "pleaseContactIt": "Please contact IT!",

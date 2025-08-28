@@ -60,8 +60,7 @@
       "emailNotFromBruss": "Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!",
       "passwordTooShort": "Das Passwort muss mindestens 5 Zeichen lang sein!",
       "credentialsError": "Ungültige Anmeldedaten!",
-      "emailNotFound": "Benutzer mit dieser E-Mail existiert nicht!",
-      "wrongPassword": "Falsches Passwort! Verwenden Sie das Passwort, mit dem Sie sich am Computer anmelden."
+      "emailOrPasswordIncorrect": "E-Mail-Adresse oder Passwort falsch!"
     },
     "toasts": {
       "pleaseContactIt": "Bitte kontaktieren Sie die IT!",

@@ -21,17 +21,14 @@ export async function login(email: string, password: string) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
+          // Since both user not found and wrong password return null from auth.ts,
+          // NextAuth converts both to CredentialsSignin. For security and simplicity,
+          // we'll return a generic "invalid credentials" error for both cases.
           return { error: 'invalid credentials' };
         case 'CallbackRouteError':
-          // Check for specific credential errors
-          const errorMessage = error.cause?.err?.message;
-          if (errorMessage === 'user not found') {
-            return { error: 'user not found' };
-          } else if (errorMessage === 'wrong password') {
-            return { error: 'wrong password' };
-          } else if (errorMessage?.includes('authorize') || 
-              error.cause?.err?.type === 'CredentialsSignin') {
-            return { error: 'invalid credentials' };
+          // Handle other callback errors (database issues, etc.)
+          if (error.cause?.err?.message?.includes('authorize')) {
+            return { error: 'default error' };
           }
           return { error: 'default error' };
         default:
@@ -39,16 +36,11 @@ export async function login(email: string, password: string) {
       }
     }
 
-    // Check if it's a generic error that might indicate credential issues
-    const errorMessage = (error as any)?.message || '';
-    if (errorMessage.includes('authorize') || errorMessage.includes('credentials')) {
-      return { error: 'invalid credentials' };
-    }
-
     // For any other type of error
     return { error: 'default error' };
   }
 }
+
 
 export async function getSession() {
   const session = await auth();

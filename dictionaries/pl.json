@@ -59,8 +59,7 @@
       "emailNotFromBruss": "Podany email nie należy do domeny bruss-group.com!",
       "passwordTooShort": "Hasło musi zawierać co najmniej 5 znaków!",
       "credentialsError": "Nieprawidłowe dane logowania!",
-      "emailNotFound": "Użytkownik o tym adresie email nie istnieje!",
-      "wrongPassword": "Nieprawidłowe hasło! Użyj hasła, którego używasz do logowania do komputera."
+      "emailOrPasswordIncorrect": "Adres email lub hasło niepoprawne!"
     },
     "toasts": {
       "pleaseContactIt": "Skontaktuj się z IT!",

@@ -17,6 +17,19 @@ async function fetchLatestUserRoles(email: string) {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  logger: {
+    error: (code: any, ...message: any[]) => {
+      // Suppress CredentialsSignin errors (normal user login failures)
+      if (code?.name === 'SIGNIN_OAUTH_ERROR' || 
+          code?.name === 'SIGNIN_EMAIL_ERROR' || 
+          code?.name === 'CredentialsSignin' ||
+          (typeof message[0] === 'string' && message[0].includes('CredentialsSignin'))) {
+        return; // Silent - don't log expected authentication failures
+      }
+      // Log all other errors normally
+      console.error(code, ...message);
+    },
+  },
   providers: [
     Credentials({
       credentials: {
@@ -54,7 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             } catch (unbindError) {
               // Unbind error can be ignored - connection might be already closed
             }
-            throw new Error('user not found'); // User not found in LDAP
+            return null; // User not found in LDAP - silent failure
           } else {
             const userDn = searchResults[0].dn;
             try {
@@ -65,7 +78,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               } catch (unbindError) {
                 // Unbind error can be ignored - connection might be already closed
               }
-              throw new Error('wrong password'); // Wrong password - invalid credentials
+              return null; // Wrong password - silent failure
             }
 
             try {
@@ -119,19 +132,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           }
         } catch (error) {
-          console.log('Outer catch - error message:', (error as Error).message);
           try {
             await ldapClient.unbind();
           } catch (unbindError) {
             // Unbind error can be ignored - connection might be already closed
           }
           
-          // Re-throw specific errors instead of generic 'authorize ldap error'
-          if ((error as Error).message === 'user not found' || (error as Error).message === 'wrong password') {
-            console.log('Re-throwing specific error:', (error as Error).message);
-            throw error;
-          }
-          console.log('Throwing generic authorize ldap error');
           throw new Error('authorize ldap error');
         }
       },
