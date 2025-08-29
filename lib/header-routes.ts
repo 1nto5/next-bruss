@@ -1,7 +1,6 @@
 export interface SubHeaderRoute {
   href: string;
   title: string;
-  description?: string;
 }
 
 export interface HeaderRoute {
@@ -95,12 +94,10 @@ export const deHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
-        description: 'Daten im DMC-Code-Scanning-System.',
       },
       {
         href: ROUTE_PATHS.proOldRework,
         title: 'Rework',
-        description: 'Markierung von Teilen oder Chargen als Nacharbeit.',
       },
     ],
   },
@@ -114,22 +111,18 @@ export const enHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
-        description: 'Data in the DMC code scanning system.',
       },
       {
         href: ROUTE_PATHS.ovenData,
         title: 'Oven Data',
-        description: 'Temperature and process data from ovens.',
       },
       {
         href: ROUTE_PATHS.deviations,
         title: 'Deviations',
-        description: 'Quality control deviation tracking.',
       },
       {
         href: ROUTE_PATHS.failuresLv,
         title: 'LV Failures',
-        description: 'Low voltage system failure analysis.',
       },
     ],
   },
@@ -140,12 +133,10 @@ export const enHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.productionOvertime,
         title: 'Production overtime work',
-        description: 'Overtime work management for production.',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
         title: 'Overtime submissions',
-        description: 'Submit and manage overtime requests.',
       },
     ],
   },
@@ -156,17 +147,14 @@ export const enHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.codesGenerator,
         title: 'QR/Barcode/DMC Generator',
-        description: 'Generate various types of codes.',
       },
       {
         href: ROUTE_PATHS.inw2spis,
         title: 'Inventory - count',
-        description: 'Inventory counting system.',
       },
       {
         href: ROUTE_PATHS.inw2zatwierdz,
         title: 'Inventory approval',
-        description: 'Approve inventory count results.',
       },
     ],
   },
