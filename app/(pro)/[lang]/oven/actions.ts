@@ -470,6 +470,65 @@ export async function fetchActiveOvenProgram(
 }
 
 /**
+ * Completes all running oven processes for a specific oven
+ * @param oven - The oven identifier  
+ * @param endOperators - Array of operator identifiers who completed the processes
+ * @returns Success status with count or error message
+ */
+export async function completeAllOvenProcesses(
+  oven: string,
+  endOperators: string[],
+): Promise<{ 
+  success?: { count: number };
+  error?: string 
+}> {
+  try {
+    // Additional validation for endOperators array
+    if (!endOperators || endOperators.length === 0) {
+      return { error: 'no operator' };
+    }
+
+    const collection = await dbc('oven_processes');
+
+    // Find all running processes for this oven
+    const runningProcesses = await collection
+      .find({ oven, status: 'running' })
+      .toArray();
+
+    if (runningProcesses.length === 0) {
+      return { error: 'no running processes' };
+    }
+
+    // Complete all running processes
+    const processIds = runningProcesses.map(p => p._id);
+    const result = await collection.updateMany(
+      { _id: { $in: processIds } },
+      {
+        $set: {
+          status: 'finished',
+          endTime: new Date(),
+          endOperators: endOperators,
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.modifiedCount > 0) {
+      return { 
+        success: { 
+          count: result.modifiedCount
+        } 
+      };
+    }
+
+    return { error: 'not completed' };
+  } catch (error) {
+    console.error('completeAllOvenProcesses error:', error);
+    return { error: 'complete error' };
+  }
+}
+
+/**
  * Fetches the latest average temperature for the currently running process in a given oven
  * @param oven - The oven identifier
  * @returns { avgTemp: number | null } or { error: string }

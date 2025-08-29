@@ -77,7 +77,8 @@
       "validationFailed": "IT kontaktieren!",
       "articleNotConfigured": "Artikel ist nicht konfiguriert!",
       "wrongProgramForArticle": "Artikel passt nicht zum ausgewählten Programm!",
-      "databaseError": "Datenbankfehler - IT kontaktieren"
+      "databaseError": "Datenbankfehler - IT kontaktieren",
+      "noRunningProcesses": "Keine aktiven Prozesse zu beenden"
     }
   },
   "startBatchDialog": {
@@ -89,13 +90,18 @@
   },
   "endBatchDialog": {
     "title": "Prozess beenden",
-    "batchPlaceholder": "HYDRA-Charge scannen...",
+    "description": {
+      "plural": "Möchten Sie wirklich den Prozess für {count} Chargen in diesem Ofen beenden?",
+      "singular": "Möchten Sie wirklich den Prozess für 1 Charge in diesem Ofen beenden?"
+    },
+    "temperatureWarning": "⚠️ Aktuelle Temperaturmessungen vom Ofen erkannt ({temp}°C). Der Ofen läuft möglicherweise noch!",
+    "noProcesses": "Keine aktiven Prozesse zu beenden",
     "cancel": "Abbrechen",
-    "end": "Beenden"
+    "end": "Prozess beenden"
   },
   "header": {
-    "clearOven": "Ofen abmelden",
-    "clearProgram": "Programm löschen",
+    "clearOven": "Ofen wechseln",
+    "clearProgram": "Programm wechseln",
     "logoutDialog": {
       "title": "Abmelden",
       "description": "Möchten Sie sich wirklich abmelden?",
