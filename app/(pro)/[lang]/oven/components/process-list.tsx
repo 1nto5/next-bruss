@@ -71,7 +71,9 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
     if (!date) return '-';
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return '-';
-    return dateObj.toLocaleString(lang);
+    return dateObj.toLocaleString('pl-PL', { 
+      timeZone: 'Europe/Warsaw' 
+    });
   };
 
   const [startDialogOpen, setStartDialogOpen] = useState(false);
@@ -117,7 +119,9 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       startTime.getTime() + targetDuration * 1000,
     );
 
-    return expectedCompletion.toLocaleString(lang);
+    return expectedCompletion.toLocaleString('pl-PL', { 
+      timeZone: 'Europe/Warsaw' 
+    });
   };
 
   const translateError = useCallback(
