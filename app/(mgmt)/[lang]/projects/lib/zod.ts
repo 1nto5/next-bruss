@@ -1,7 +1,6 @@
 import * as z from 'zod';
 
 export const ProjectsSchema = z.object({
-  project: z.string(),
   scope: z.string(),
   date: z.date(),
   time: z.preprocess((arg) => Number(arg), z.number()),

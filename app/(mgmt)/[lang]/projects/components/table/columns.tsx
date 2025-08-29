@@ -69,19 +69,11 @@ export const columns: ColumnDef<ProjectsLocaleStringType>[] = [
     header: 'Time [h]',
   },
   {
-    accessorKey: 'project',
-    header: 'Project',
-    cell: ({ row }) => {
-      const note = row.getValue('project');
-      return <div className='w-[250px] text-justify'>{note as string}</div>;
-    },
-  },
-  {
     accessorKey: 'scope',
-    header: 'Scope',
+    header: 'Work Scope',
     cell: ({ row }) => {
       const reason = row.getValue('scope');
-      return <div className='w-[250px] text-justify'>{reason as string}</div>;
+      return <div className='w-[400px] text-justify'>{reason as string}</div>;
     },
   },
   {

@@ -25,15 +25,12 @@ export async function GET(req: NextRequest) {
 
   try {
     const coll = await dbc('projects');
-    const pipeline = [
-      { $match: { date: { $gte: startDate, $lt: endDate } } },
-      { $group: { _id: '$project', totalTime: { $sum: '$time' } } },
-      { $project: { _id: 0, project: '$_id', time: '$totalTime' } },
-      { $sort: { time: -1 } }, // sortowanie malejąco wg. time
-    ];
-    const summary = await coll.aggregate(pipeline).toArray();
-    console.log('api/projects/summary:', summary);
-    return NextResponse.json(summary);
+    const entries = await coll
+      .find({ date: { $gte: startDate, $lt: endDate } })
+      .sort({ date: -1 })
+      .toArray();
+    console.log('api/projects/summary:', entries);
+    return NextResponse.json(entries);
   } catch (error) {
     console.error('api/projects/summary: ' + error);
     return NextResponse.json(
