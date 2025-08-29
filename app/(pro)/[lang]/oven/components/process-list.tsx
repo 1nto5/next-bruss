@@ -425,20 +425,11 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                           <TableCell>{process.article}</TableCell>
                           <TableCell>{process.hydraBatch}</TableCell>
                           <TableCell
-                            className={(() => {
-                              if (!process.startTime || !process.targetDuration)
-                                return undefined;
-                              // Ensure startTime is properly converted to Date object
-                              const startTime = new Date(process.startTime);
-                              const expectedCompletion = new Date(
-                                startTime.getTime() + process.targetDuration * 1000,
-                              );
-                              const now = new Date();
-                              if (expectedCompletion.getTime() < now.getTime()) {
-                                return 'font-bold text-red-600 dark:text-red-400';
-                              }
-                              return undefined;
-                            })()}
+                            className={
+                              process.isOverdue
+                                ? 'font-bold text-red-600 dark:text-red-400'
+                                : undefined
+                            }
                           >
                             {formatExpectedCompletion(
                               process.startTime,

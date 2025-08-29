@@ -165,7 +165,16 @@ export async function fetchOvenProcesses(
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Note: expectedCompletion is now calculated on the frontend to handle timezone correctly
+        // Calculate isOverdue on server to avoid timezone issues
+        let isOverdue = false;
+        if (doc.startTime && doc.targetDuration) {
+          const startTime = new Date(doc.startTime).getTime();
+          const targetDurationMs = doc.targetDuration * 1000;
+          const durationToleranceMs = (doc.durationTolerance || 0) * 1000;
+          const overdueThreshold = startTime + targetDurationMs + durationToleranceMs;
+          const currentTime = new Date().getTime();
+          isOverdue = currentTime > overdueThreshold;
+        }
 
         return {
           id: doc._id.toString(),
@@ -182,6 +191,8 @@ export async function fetchOvenProcesses(
           targetTemp: doc.targetTemp,
           tempTolerance: doc.tempTolerance,
           targetDuration: doc.targetDuration,
+          durationTolerance: doc.durationTolerance,
+          isOverdue,
         };
       }),
     );

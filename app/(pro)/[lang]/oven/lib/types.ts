@@ -27,5 +27,7 @@ export type OvenProcessType = {
   targetTemp?: number;
   tempTolerance?: number;
   targetDuration?: number; // Duration in seconds
-  // Optional calculated values
+  durationTolerance?: number; // Duration tolerance in seconds
+  // Server-calculated values
+  isOverdue?: boolean; // True if currentTime > (startTime + targetDuration + durationTolerance)
 };
