@@ -71,8 +71,8 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
     if (!date) return '-';
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return '-';
-    return dateObj.toLocaleString('pl-PL', { 
-      timeZone: 'Europe/Warsaw' 
+    return dateObj.toLocaleString('pl-PL', {
+      timeZone: 'Europe/Warsaw',
     });
   };
 
@@ -119,8 +119,8 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       startTime.getTime() + targetDuration * 1000,
     );
 
-    return expectedCompletion.toLocaleString('pl-PL', { 
-      timeZone: 'Europe/Warsaw' 
+    return expectedCompletion.toLocaleString('pl-PL', {
+      timeZone: 'Europe/Warsaw',
     });
   };
 
@@ -376,7 +376,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className='pt-6'>
+          <CardContent className='pt-2'>
             {isFetching && !isSuccess(data) ? (
               <Skeleton className='h-96 w-full' />
             ) : isSuccess(data) && data.success.length > 0 ? (
@@ -428,14 +428,12 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                             className={(() => {
                               if (!process.startTime || !process.targetDuration)
                                 return undefined;
-                              const startTime = new Date(process.startTime);
                               const expectedCompletion = new Date(
-                                startTime.getTime() + process.targetDuration * 1000,
+                                process.startTime.getTime() +
+                                  process.targetDuration * 1000,
                               );
                               const now = new Date();
-                              if (
-                                expectedCompletion.getTime() < now.getTime()
-                              ) {
+                              if (expectedCompletion.getTime() < now.getTime()) {
                                 return 'font-bold text-red-600 dark:text-red-400';
                               }
                               return undefined;
