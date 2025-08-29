@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { StopCircle, X } from 'lucide-react';
 import { memo } from 'react';
 import type { Dictionary } from '../lib/dictionary';
@@ -59,11 +60,11 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
             </AlertDialogDescription>
           </AlertDialogHeader>
           {currentTemp !== null && (
-            <div className='mx-0 mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200'>
-              <span className='text-sm'>
+            <Alert className='mb-4'>
+              <AlertDescription>
                 {dict.endBatchDialog.temperatureWarning}
-              </span>
-            </div>
+              </AlertDescription>
+            </Alert>
           )}
           <AlertDialogFooter className='flex w-full flex-row gap-2'>
             <AlertDialogCancel className='flex w-1/4 items-center justify-center gap-2'>
