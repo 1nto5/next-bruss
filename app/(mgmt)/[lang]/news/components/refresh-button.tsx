@@ -20,24 +20,30 @@ export function RefreshButton({ dict }: RefreshButtonProps) {
       if (result.success) {
         toast.success(dict.news.messages[result.success] || result.success);
       } else if (result.error) {
-        toast.error(result.error === 'unauthorized' ? dict.news.messages.unauthorized : dict.news.messages[result.error] || result.error);
+        toast.error(
+          result.error === 'unauthorized'
+            ? dict.news.messages.unauthorized
+            : dict.news.messages[result.error] || result.error,
+        );
       }
     } catch (error) {
       console.error('Refresh error:', error);
-      toast.error(dict.news.messages.refreshError || 'Wystąpił błąd podczas odświeżania');
+      toast.error(
+        dict.news.messages.refreshError || 'Wystąpił błąd podczas odświeżania',
+      );
     } finally {
       setIsRefreshing(false);
     }
   };
 
   return (
-    <Button 
-      variant='outline' 
+    <Button
+      variant='outline'
       className='w-full sm:w-auto'
       onClick={handleRefresh}
       disabled={isRefreshing}
     >
-      <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      <RefreshCw className={`${isRefreshing ? 'animate-spin' : ''}`} />
       <span>{dict.news.refresh || 'Odśwież'}</span>
     </Button>
   );

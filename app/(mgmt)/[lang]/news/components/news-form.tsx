@@ -15,8 +15,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { createNews, updateNews, redirectToHome } from '../actions';
 import { NewsType } from '../lib/types';
-import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Loader2 } from 'lucide-react';
 
 interface NewsFormProps {
   news?: NewsType;
@@ -65,17 +64,7 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
   return (
     <Card className='max-w-4xl mx-auto'>
       <CardHeader>
-        <div className='flex justify-between items-center'>
-          <CardTitle>{news ? dict.news.form.editTitle : dict.news.form.addTitle}</CardTitle>
-          {news && (
-            <Link href={`/${lang}`}>
-              <Button variant='outline'>
-                <ArrowLeft className='mr-2 h-4 w-4' />
-                {dict.news.form.backButton}
-              </Button>
-            </Link>
-          )}
-        </div>
+        <CardTitle>{news ? dict.news.form.editTitle : dict.news.form.addTitle}</CardTitle>
       </CardHeader>
       <Separator className='mb-4' />
       
@@ -149,9 +138,9 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
               className='min-w-32'
             >
               {isPending ? (
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className='animate-spin' />
               ) : (
-                <Plus className='mr-2 h-4 w-4' />
+                <Plus />
               )}
               {news ? dict.news.form.updateButton : dict.news.form.addButton}
             </Button>
