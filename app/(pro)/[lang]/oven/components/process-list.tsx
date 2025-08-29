@@ -69,7 +69,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
 
   const formatDateTime = (date: Date | string | null | undefined): string => {
     if (!date) return '-';
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return '-';
     return dateObj.toLocaleString(lang);
   };
