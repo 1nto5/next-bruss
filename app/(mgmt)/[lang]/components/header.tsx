@@ -21,6 +21,7 @@ import { cn } from '@/lib/cn';
 import {
   adminHeaderRoutes,
   deHeaderRoutes,
+  enHeaderRoutes,
   plHeaderRoutes,
 } from '@/lib/header-routes';
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
@@ -42,7 +43,10 @@ type HeaderProps = {
 export default async function Header({ dict, lang }: HeaderProps) {
   const session = await auth();
 
-  const baseRoutes = lang === 'de' ? deHeaderRoutes : plHeaderRoutes;
+  const baseRoutes = 
+    lang === 'de' ? deHeaderRoutes 
+    : lang === 'en' ? enHeaderRoutes 
+    : plHeaderRoutes;
   const routes = session?.user?.roles?.includes('admin')
     ? [...baseRoutes, ...adminHeaderRoutes]
     : baseRoutes;
