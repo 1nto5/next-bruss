@@ -94,7 +94,7 @@
       "plural": "Are you sure you want to end the process for {count} batches in this oven?",
       "singular": "Are you sure you want to end the process for 1 batch in this oven?"
     },
-    "temperatureWarning": "⚠️ Recent temperature readings detected from the oven ({temp}°C). The oven may still be running!",
+    "temperatureWarning": "Recent temperature readings detected from the oven. The oven may still be running!",
     "noProcesses": "No active processes to end",
     "cancel": "Cancel",
     "end": "End process"

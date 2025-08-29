@@ -94,7 +94,7 @@
       "plural": "Czy na pewno chcesz zakończyć proces dla {count} partii w tym piecu?",
       "singular": "Czy na pewno chcesz zakończyć proces dla 1 partii w tym piecu?"
     },
-    "temperatureWarning": "⚠️ Wykryto aktualne odczyty temperatur z pieca ({temp}°C). Piec może nadal pracować!",
+    "temperatureWarning": "Wykryto aktualne odczyty temperatur z pieca. Piec może nadal pracować!",
     "noProcesses": "Brak aktywnych procesów do zakończenia",
     "cancel": "Anuluj", 
     "end": "Zakończ proces"

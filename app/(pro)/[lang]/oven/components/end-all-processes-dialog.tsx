@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { AlertTriangle, StopCircle, X } from 'lucide-react';
+import { StopCircle, X } from 'lucide-react';
 import { memo } from 'react';
 import type { Dictionary } from '../lib/dictionary';
 import type { OvenProcessType } from '../lib/types';
@@ -59,13 +59,9 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
             </AlertDialogDescription>
           </AlertDialogHeader>
           {currentTemp !== null && (
-            <div className='mx-6 mb-4 flex items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200'>
-              <AlertTriangle className='h-4 w-4 flex-shrink-0' />
+            <div className='mx-0 mb-4 rounded-md border border-yellow-200 bg-yellow-50 p-3 text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950 dark:text-yellow-200'>
               <span className='text-sm'>
-                {dict.endBatchDialog.temperatureWarning.replace(
-                  '{temp}',
-                  currentTemp.toString()
-                )}
+                {dict.endBatchDialog.temperatureWarning}
               </span>
             </div>
           )}
