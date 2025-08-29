@@ -97,7 +97,7 @@
     "clearOven": "Zmień piec",
     "clearProgram": "Zmień program",
     "logoutDialog": {
-      "title": "Wylogowanie",
+      "title": "Wyloguj",
       "description": "Czy na pewno chcesz wylogować?",
       "cancel": "Anuluj",
       "continue": "Kontynuuj"

@@ -94,8 +94,8 @@
     "end": "Tapusin"
   },
   "header": {
-    "clearOven": "I-clear ang oven",
-    "clearProgram": "I-clear ang program",
+    "clearOven": "Baguhin ang oven",
+    "clearProgram": "Baguhin ang programa",
     "logoutDialog": {
       "title": "Mag-logout",
       "description": "Sigurado ka bang gusto mong mag-logout?",

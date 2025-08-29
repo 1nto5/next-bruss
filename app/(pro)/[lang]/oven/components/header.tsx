@@ -136,14 +136,16 @@ export default function Header({ dict, lang }: HeaderProps) {
         <HeaderButton
           icon={<Flame />}
           onClick={clearOven}
-          title={dict.header.clearOven || 'Clear oven'}
+          title={dict.header.clearOven || 'Change oven'}
+          text={dict.header.clearOven || 'Change oven'}
         />
       )}
       {selectedProgram && !hasRunningProcesses && (
         <HeaderButton
           icon={<TimerReset />}
           onClick={clearProgram}
-          title={dict.header.clearProgram || 'Clear program'}
+          title={dict.header.clearProgram || 'Change program'}
+          text={dict.header.clearProgram || 'Change program'}
         />
       )}
       {loggedInOperators.length > 0 && (
@@ -161,6 +163,7 @@ export default function Header({ dict, lang }: HeaderProps) {
             )
           }
           title={dict.header.logoutDialog.title || 'Logout'}
+          text={dict.header.logoutDialog.title || 'Logout'}
         />
       )}
       <VolumeControl />

@@ -94,10 +94,10 @@
     "end": "Завяршыць"
   },
   "header": {
-    "clearOven": "Ачысціць печ",
-    "clearProgram": "Ачысціць праграму",
+    "clearOven": "Змяніць печ",
+    "clearProgram": "Змяніць праграму",
     "logoutDialog": {
-      "title": "Выхад",
+      "title": "Выйсці",
       "description": "Вы ўпэўнены, што хочаце выйсці?",
       "cancel": "Адмяніць",
       "continue": "Працягнуць"

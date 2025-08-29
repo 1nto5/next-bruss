@@ -94,8 +94,8 @@
     "end": "Beenden"
   },
   "header": {
-    "clearOven": "Ofen abmelden",
-    "clearProgram": "Programm löschen",
+    "clearOven": "Ofen wechseln",
+    "clearProgram": "Programm wechseln",
     "logoutDialog": {
       "title": "Abmelden",
       "description": "Möchten Sie sich wirklich abmelden?",
