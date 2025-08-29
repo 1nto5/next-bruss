@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,8 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, StopCircle, X } from 'lucide-react';
+import { AlertCircleIcon, StopCircle, X } from 'lucide-react';
 import { memo } from 'react';
 import type { Dictionary } from '../lib/dictionary';
 import type { OvenProcessType } from '../lib/types';
@@ -24,16 +24,16 @@ interface EndAllProcessesDialogProps {
 }
 
 export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
-  function EndAllProcessesDialog({ 
-    open, 
-    onOpenChange, 
-    onConfirm, 
-    processes, 
-    currentTemp, 
-    dict 
+  function EndAllProcessesDialog({
+    open,
+    onOpenChange,
+    onConfirm,
+    processes,
+    currentTemp,
+    dict,
   }) {
     const runningProcesses = processes;
-    
+
     const handleConfirm = async () => {
       const success = await onConfirm();
       if (success) {
@@ -46,23 +46,19 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
       <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {dict.endBatchDialog.title}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{dict.endBatchDialog.title}</AlertDialogTitle>
             <AlertDialogDescription>
-              {runningProcesses.length === 1 
+              {runningProcesses.length === 1
                 ? dict.endBatchDialog.description.singular
                 : dict.endBatchDialog.description.plural.replace(
                     '{count}',
-                    runningProcesses.length.toString()
-                  )
-              }
+                    runningProcesses.length.toString(),
+                  )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           {currentTemp !== null && (
-            <Alert variant="destructive" className='mb-4'>
-              <AlertCircle />
-              <AlertTitle>Ostrzeżenie</AlertTitle>
+            <Alert variant='destructive' className='mb-4'>
+              <AlertCircleIcon />
               <AlertDescription>
                 {dict.endBatchDialog.temperatureWarning}
               </AlertDescription>
