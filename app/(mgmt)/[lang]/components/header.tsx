@@ -43,10 +43,12 @@ type HeaderProps = {
 export default async function Header({ dict, lang }: HeaderProps) {
   const session = await auth();
 
-  const baseRoutes = 
-    lang === 'de' ? deHeaderRoutes 
-    : lang === 'en' ? enHeaderRoutes 
-    : plHeaderRoutes;
+  const baseRoutes =
+    lang === 'de'
+      ? deHeaderRoutes
+      : lang === 'en'
+        ? enHeaderRoutes
+        : plHeaderRoutes;
   const routes = session?.user?.roles?.includes('admin')
     ? [...baseRoutes, ...adminHeaderRoutes]
     : baseRoutes;
@@ -109,9 +111,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
                           key={subItem.title}
                           title={subItem.title}
                           href={subItem.href}
-                        >
-                          {subItem.description}
-                        </ListItem>
+                        ></ListItem>
                       ))}
                     </ul>
                   </NavigationMenuContent>
