@@ -60,7 +60,7 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
             <Alert variant='destructive' className='mb-4'>
               <AlertCircleIcon />
               <AlertDescription>
-                {dict.endBatchDialog.temperatureWarning}
+                <p>{dict.endBatchDialog.temperatureWarning}</p>
               </AlertDescription>
             </Alert>
           )}
