@@ -22,11 +22,11 @@ export default function LastScans({ lang }: LastScansProps) {
       <CardHeader className='pb-6'>
         {lastScans.map((scan, index) => (
           <Card key={index}>
-            <CardContent className='flex items-center justify-between px-4 py-4'>
-              <div className='flex items-center gap-4'>
-                <span className='font-mono'>{scan.dmc}</span>
+            <CardContent className='flex items-center justify-between px-3 py-2'>
+              <div className='flex items-center gap-3'>
+                <span className='font-mono text-sm'>{scan.dmc}</span>
               </div>
-              <span className='text-muted-foreground'>
+              <span className='text-muted-foreground text-sm'>
                 {new Date(scan.time).toLocaleTimeString(locale)}
               </span>
             </CardContent>
