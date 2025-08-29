@@ -31,7 +31,7 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
     currentTemp, 
     dict 
   }) {
-    const runningProcesses = processes; // Already filtered to running processes
+    const runningProcesses = processes;
     
     const handleConfirm = async () => {
       const success = await onConfirm();
@@ -50,8 +50,8 @@ export const EndAllProcessesDialog = memo<EndAllProcessesDialogProps>(
             </AlertDialogTitle>
             <AlertDialogDescription>
               {runningProcesses.length === 1 
-                ? dict.endBatchDialog.descriptionSingular
-                : dict.endBatchDialog.description.replace(
+                ? dict.endBatchDialog.description.singular
+                : dict.endBatchDialog.description.plural.replace(
                     '{count}',
                     runningProcesses.length.toString()
                   )

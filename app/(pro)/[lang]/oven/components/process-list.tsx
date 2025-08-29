@@ -251,7 +251,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
     if ('success' in result && result.success) {
       playOvenOut();
       await refetch();
-      toast.success(dict.processList.toasts.processEnded.replace('{count}', result.success.count.toString()));
+      toast.success((dict.processList.toasts.processEnded || 'Ended {count} processes!').replace('{count}', result.success.count.toString()));
       return true; // Success - dialog will close
     }
 

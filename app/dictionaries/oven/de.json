@@ -90,8 +90,10 @@
   },
   "endBatchDialog": {
     "title": "Prozess beenden",
-    "description": "Möchten Sie wirklich den Prozess für {count} Chargen in diesem Ofen beenden?",
-    "descriptionSingular": "Möchten Sie wirklich den Prozess für 1 Charge in diesem Ofen beenden?",
+    "description": {
+      "plural": "Möchten Sie wirklich den Prozess für {count} Chargen in diesem Ofen beenden?",
+      "singular": "Möchten Sie wirklich den Prozess für 1 Charge in diesem Ofen beenden?"
+    },
     "temperatureWarning": "⚠️ Aktuelle Temperaturmessungen vom Ofen erkannt ({temp}°C). Der Ofen läuft möglicherweise noch!",
     "noProcesses": "Keine aktiven Prozesse zu beenden",
     "cancel": "Abbrechen",

@@ -90,8 +90,10 @@
   },
   "endBatchDialog": {
     "title": "Tapusin ang proseso",
-    "description": "Sigurado ka bang gusto mong tapusin ang proseso para sa {count} batch sa oven na ito?",
-    "descriptionSingular": "Sigurado ka bang gusto mong tapusin ang proseso para sa 1 batch sa oven na ito?",
+    "description": {
+      "plural": "Sigurado ka bang gusto mong tapusin ang proseso para sa {count} batch sa oven na ito?",
+      "singular": "Sigurado ka bang gusto mong tapusin ang proseso para sa 1 batch sa oven na ito?"
+    },
     "temperatureWarning": "⚠️ Nakakita ng mga kamakailang pagbabasa ng temperatura mula sa oven ({temp}°C). Maaari pang tumatakbo ang oven!",
     "noProcesses": "Walang aktibong proseso na tapusin",
     "cancel": "Kanselahin",
