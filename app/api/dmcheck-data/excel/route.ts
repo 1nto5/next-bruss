@@ -3,6 +3,15 @@ import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Helper function to format operator(s) - handles both string and array
+function formatOperators(operator: string | string[] | undefined): string {
+  if (!operator) return '';
+  if (Array.isArray(operator)) {
+    return operator.join(', ');
+  }
+  return operator;
+}
+
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
@@ -93,11 +102,13 @@ export async function GET(req: NextRequest) {
       { header: 'DMC', key: 'dmc', width: 36 },
       { header: 'Time', key: 'time', width: 18 },
       { header: 'Article', key: 'article', width: 10 },
-      { header: 'Operator', key: 'operator', width: 8 },
+      { header: 'Operator', key: 'operator', width: 20 },
       { header: 'Workplace', key: 'workplace', width: 15 },
       { header: 'Hydra batch', key: 'hydra_batch', width: 18 },
+      { header: 'Hydra operator', key: 'hydra_operator', width: 20 },
       { header: 'Hydra time', key: 'hydra_time', width: 18 },
       { header: 'Pallet batch', key: 'pallet_batch', width: 18 },
+      { header: 'Pallet operator', key: 'pallet_operator', width: 20 },
       { header: 'Pallet time', key: 'pallet_time', width: 18 },
     ];
 
@@ -117,13 +128,15 @@ export async function GET(req: NextRequest) {
         workplace: doc.workplace.toUpperCase(),
         type: doc.type,
         article: doc.article,
-        operator: doc.operator,
+        operator: formatOperators(doc.operator),
         time: convertToLocalTimeWithMoment(new Date(doc.time)),
         hydra_batch: doc.hydra_batch,
+        hydra_operator: formatOperators(doc.hydra_operator),
         hydra_time: doc.hydra_time
           ? convertToLocalTimeWithMoment(new Date(doc.hydra_time))
           : '',
         pallet_batch: doc.pallet_batch,
+        pallet_operator: formatOperators(doc.pallet_operator),
         pallet_time: doc.pallet_time
           ? convertToLocalTimeWithMoment(new Date(doc.pallet_time))
           : '',

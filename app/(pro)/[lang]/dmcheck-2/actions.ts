@@ -286,7 +286,7 @@ export async function saveDmc(
       dmc: validatedDmc.toUpperCase(),
       workplace: articleConfig.workplace,
       article: articleConfig.articleNumber,
-      operator: operators[0],
+      operator: operators, // Always save as array
       time: new Date(),
     });
 
@@ -425,7 +425,7 @@ export async function saveHydra(
         $set: {
           status: 'pallet',
           hydra_batch: qrBatch.toUpperCase(),
-          operator: operators[0],
+          hydra_operator: operators, // Separate field for hydra operator, don't overwrite original operator
           hydra_time: new Date(),
         },
       },
@@ -536,7 +536,7 @@ export async function savePallet(
           status: 'warehouse',
           pallet_batch: qrBatch.toUpperCase(),
           pallet_time: new Date(),
-          pallet_operator: operators[0],
+          pallet_operator: operators, // Always save as array
         },
       },
     );
