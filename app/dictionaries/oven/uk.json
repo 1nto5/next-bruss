@@ -77,7 +77,8 @@
       "validationFailed": "Зверніться до IT!",
       "articleNotConfigured": "Артикул не налаштовано!",
       "wrongProgramForArticle": "Артикул не відповідає вибраній програмі!",
-      "databaseError": "Помилка бази даних - зверніться до IT"
+      "databaseError": "Помилка бази даних - зверніться до IT",
+      "noRunningProcesses": "Немає активних процесів для завершення"
     }
   },
   "startBatchDialog": {
@@ -89,9 +90,12 @@
   },
   "endBatchDialog": {
     "title": "Завершити процес",
-    "batchPlaceholder": "Скануйте HYDRA партію...",
+    "description": "Ви впевнені, що хочете завершити процес для {count} партій у цій печі?",
+    "descriptionSingular": "Ви впевнені, що хочете завершити процес для 1 партії у цій печі?",
+    "temperatureWarning": "⚠️ Виявлено поточні показники температури з печі ({temp}°C). Піч може все ще працювати!",
+    "noProcesses": "Немає активних процесів для завершення",
     "cancel": "Скасувати",
-    "end": "Завершити"
+    "end": "Завершити процес"
   },
   "header": {
     "clearOven": "Змінити піч",

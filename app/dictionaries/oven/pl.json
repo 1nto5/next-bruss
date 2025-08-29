@@ -77,7 +77,8 @@
       "validationFailed": "Skontaktuj się z IT!",
       "articleNotConfigured": "Artykuł nie jest skonfigurowany!",
       "wrongProgramForArticle": "Artykuł nie pasuje do wybranego programu!",
-      "databaseError": "Błąd bazy danych - skontaktuj się z IT"
+      "databaseError": "Błąd bazy danych - skontaktuj się z IT",
+      "noRunningProcesses": "Brak aktywnych procesów do zakończenia"
     }
   },
   "startBatchDialog": {
@@ -89,9 +90,12 @@
   },
   "endBatchDialog": {
     "title": "Zakończ proces",
-    "batchPlaceholder": "Zeskanuj HYDRA batch...",
-    "cancel": "Anuluj",
-    "end": "Zakończ"
+    "description": "Czy na pewno chcesz zakończyć proces dla {count} partii w tym piecu?",
+    "descriptionSingular": "Czy na pewno chcesz zakończyć proces dla 1 partii w tym piecu?",
+    "temperatureWarning": "⚠️ Wykryto aktualne odczyty temperatur z pieca ({temp}°C). Piec może nadal pracować!",
+    "noProcesses": "Brak aktywnych procesów do zakończenia",
+    "cancel": "Anuluj", 
+    "end": "Zakończ proces"
   },
   "header": {
     "clearOven": "Zmień piec",

@@ -77,7 +77,8 @@
       "validationFailed": "Contact IT!",
       "articleNotConfigured": "Article is not configured!",
       "wrongProgramForArticle": "Article doesn't match selected program!",
-      "databaseError": "Database error - contact IT"
+      "databaseError": "Database error - contact IT",
+      "noRunningProcesses": "No active processes to end"
     }
   },
   "startBatchDialog": {
@@ -89,9 +90,12 @@
   },
   "endBatchDialog": {
     "title": "End process",
-    "batchPlaceholder": "Scan HYDRA batch...",
+    "description": "Are you sure you want to end the process for {count} batches in this oven?",
+    "descriptionSingular": "Are you sure you want to end the process for 1 batch in this oven?",
+    "temperatureWarning": "⚠️ Recent temperature readings detected from the oven ({temp}°C). The oven may still be running!",
+    "noProcesses": "No active processes to end",
     "cancel": "Cancel",
-    "end": "End"
+    "end": "End process"
   },
   "header": {
     "clearOven": "Change oven",

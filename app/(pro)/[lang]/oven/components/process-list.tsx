@@ -36,6 +36,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
 import {
+  completeAllOvenProcesses,
   completeOvenProcess,
   deleteOvenProcess,
   startOvenProcess,
@@ -45,9 +46,9 @@ import { useGetOvenProcesses } from '../data/get-oven-processes';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useOvenStore, useVolumeStore } from '../lib/stores';
 import type { OvenProcessType } from '../lib/types';
-import type { EndBatchType, StartBatchType } from '../lib/zod';
-import { endBatchSchema, startBatchSchema } from '../lib/zod';
-import { EndBatchDialog } from './end-batch-dialog';
+import type { StartBatchType } from '../lib/zod';
+import { startBatchSchema } from '../lib/zod';
+import { EndAllProcessesDialog } from './end-all-processes-dialog';
 import { StartBatchDialog } from './start-batch-dialog';
 
 interface ProcessListProps {
@@ -77,13 +78,12 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
   };
 
   const [startDialogOpen, setStartDialogOpen] = useState(false);
-  const [endDialogOpen, setEndDialogOpen] = useState(false);
+  const [endAllDialogOpen, setEndAllDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [processToDelete, setProcessToDelete] = useState<string | null>(null);
 
   const articleInputRef = useRef<HTMLInputElement>(null!);
   const batchInputRef = useRef<HTMLInputElement>(null!);
-  const endInputRef = useRef<HTMLInputElement>(null!);
 
   const { volume } = useVolumeStore();
   const [playOvenIn] = useSound('/oven-in.wav', { volume });
@@ -146,6 +146,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
         'article not configured': 'articleNotConfigured',
         'wrong program for article': 'wrongProgramForArticle',
         'database error': 'databaseError',
+        'no running processes': 'noRunningProcesses',
       };
       const errorKey = errorMap[serverError];
       return errorKey
@@ -232,78 +233,41 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
     ],
   );
 
-  const handleEndProcess = useCallback(
-    async (formData: EndBatchType) => {
-      // Validate form data first
-      const validationResult = endBatchSchema.safeParse(formData);
-      if (!validationResult.success) {
-        const firstError = validationResult.error.errors[0];
-        playNok();
-        toast.error(firstError.message);
-        setTimeout(() => {
-          endInputRef.current?.focus();
-        }, 0);
-        return;
-      }
+  // Calculate running processes for button disabled state
+  const runningProcesses = useMemo(() => {
+    if (!isSuccess(data) || data.success.length === 0) return [];
+    return data.success.filter(p => p.status === 'running');
+  }, [data]);
 
-      const { scannedBatch } = formData;
-      if (!isSuccess(data)) return;
+  const hasRunningProcesses = runningProcesses.length > 0;
 
-      const existingProcess = data.success.find(
-        (process) =>
-          process.hydraBatch === scannedBatch && process.status === 'running',
-      );
-      if (!existingProcess) {
-        toast.error(dict.processList.toasts.noActiveProcess);
-        setTimeout(() => {
-          endInputRef.current?.focus();
-        }, 0);
-        playNok();
-        return; // Don't throw
-      }
+  const handleEndAllProcesses = useCallback(() => {
+    setEndAllDialogOpen(true);
+  }, []);
 
-      toast.promise(
-        async () => {
-          const result = await completeOvenProcess(
-            existingProcess.id,
-            operators,
-          );
+  const handleConfirmEndAll = useCallback(async () => {
+    const result = await completeAllOvenProcesses(selectedOven, operators);
 
-          if ('success' in result && result.success) {
-            playOvenOut();
-            await refetch();
-            setTimeout(() => {
-              endInputRef.current?.focus();
-            }, 0);
-            return dict.processList.toasts.processEnded;
-          }
+    if ('success' in result && result.success) {
+      playOvenOut();
+      await refetch();
+      toast.success(dict.processList.toasts.processEnded.replace('{count}', result.success.count.toString()));
+      return true; // Success - dialog will close
+    }
 
-          if ('error' in result && result.error) {
-            playNok();
-            const errorMessage = translateError(result.error);
-            setTimeout(() => {
-              endInputRef.current?.focus();
-            }, 0);
-            throw new Error(errorMessage);
-          }
+    if ('error' in result && result.error) {
+      playNok();
+      const errorMessage = translateError(result.error);
+      toast.error(errorMessage);
+      return false; // Error - keep dialog open
+    }
 
-          // Unexpected response format
-          playNok();
-          setTimeout(() => {
-            endInputRef.current?.focus();
-          }, 0);
-          console.error('Unexpected response format:', result);
-          throw new Error(dict.processList.toasts.contactIT);
-        },
-        {
-          loading: dict.processList.toasts.endingProcess,
-          success: (msg) => msg,
-          error: (err) => err.message || dict.processList.toasts.contactIT,
-        },
-      );
-    },
-    [data, refetch, playNok, playOvenOut, dict, translateError, operators],
-  );
+    // Unexpected response format
+    playNok();
+    console.error('Unexpected response format:', result);
+    toast.error(dict.processList.toasts.contactIT);
+    return false; // Error - keep dialog open
+  }, [selectedOven, operators, refetch, playNok, playOvenOut, dict, translateError]);
 
   const handleDeleteClick = useCallback((processId: string) => {
     setProcessToDelete(processId);
@@ -366,10 +330,11 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                 {dict.processList.newProcess}
               </Button>
               <Button
-                onClick={() => setEndDialogOpen(true)}
+                onClick={handleEndAllProcesses}
                 variant='secondary'
                 className='w-1/2'
                 size='lg'
+                disabled={!hasRunningProcesses}
               >
                 <StopCircle />
                 {dict.processList.endProcess}
@@ -474,11 +439,12 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
         dict={dict}
       />
 
-      <EndBatchDialog
-        open={endDialogOpen}
-        onOpenChange={setEndDialogOpen}
-        inputRef={endInputRef}
-        onEnd={handleEndProcess}
+      <EndAllProcessesDialog
+        open={endAllDialogOpen}
+        onOpenChange={setEndAllDialogOpen}
+        onConfirm={handleConfirmEndAll}
+        processes={runningProcesses}
+        currentTemp={currentTemp}
         dict={dict}
       />
 

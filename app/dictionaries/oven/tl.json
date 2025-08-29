@@ -77,7 +77,8 @@
       "validationFailed": "Makipag-ugnayan sa IT!",
       "articleNotConfigured": "Hindi naka-configure ang artikulo!",
       "wrongProgramForArticle": "Hindi tumutugma ang artikulo sa napiling programa!",
-      "databaseError": "Error sa database - makipag-ugnayan sa IT"
+      "databaseError": "Error sa database - makipag-ugnayan sa IT",
+      "noRunningProcesses": "Walang aktibong proseso na tapusin"
     }
   },
   "startBatchDialog": {
@@ -89,9 +90,12 @@
   },
   "endBatchDialog": {
     "title": "Tapusin ang proseso",
-    "batchPlaceholder": "I-scan ang HYDRA batch...",
+    "description": "Sigurado ka bang gusto mong tapusin ang proseso para sa {count} batch sa oven na ito?",
+    "descriptionSingular": "Sigurado ka bang gusto mong tapusin ang proseso para sa 1 batch sa oven na ito?",
+    "temperatureWarning": "⚠️ Nakakita ng mga kamakailang pagbabasa ng temperatura mula sa oven ({temp}°C). Maaari pang tumatakbo ang oven!",
+    "noProcesses": "Walang aktibong proseso na tapusin",
     "cancel": "Kanselahin",
-    "end": "Tapusin"
+    "end": "Tapusin ang proseso"
   },
   "header": {
     "clearOven": "Baguhin ang oven",
