@@ -9,15 +9,13 @@ import { Locale } from '@/i18n.config';
 async function getNews(id: string) {
   try {
     const collection = await dbc('news');
-    // Try first as ObjectId, then as string if it fails
-    let query;
-    try {
-      query = { _id: new ObjectId(id) };
-    } catch {
-      query = { _id: id };
+    // Try first as ObjectId if valid, otherwise search by string id
+    let result;
+    if (ObjectId.isValid(id)) {
+      result = await collection.findOne({ _id: new ObjectId(id) });
+    } else {
+      result = await collection.findOne({ _id: id as any });
     }
-    
-    const result = await collection.findOne(query);
     if (!result) return null;
     
     return {

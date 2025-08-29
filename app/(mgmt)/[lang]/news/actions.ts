@@ -37,14 +37,12 @@ export async function updateNews(id: string, data: NewsFormData) {
   
   try {
     const collection = await dbc('news');
-    let query;
-    try {
-      query = { _id: new ObjectId(id) };
-    } catch {
-      query = { _id: id };
-    }
     
-    await collection.updateOne(query, { $set: data });
+    if (ObjectId.isValid(id)) {
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
+    } else {
+      await collection.updateOne({ _id: id as any }, { $set: data });
+    }
     
     revalidateTag('news');
     return { success: 'updateSuccess' };
@@ -62,14 +60,12 @@ export async function deleteNews(id: string) {
   
   try {
     const collection = await dbc('news');
-    let query;
-    try {
-      query = { _id: new ObjectId(id) };
-    } catch {
-      query = { _id: id };
-    }
     
-    await collection.deleteOne(query);
+    if (ObjectId.isValid(id)) {
+      await collection.deleteOne({ _id: new ObjectId(id) });
+    } else {
+      await collection.deleteOne({ _id: id as any });
+    }
     revalidateTag('news');
     return { success: 'deleteSuccess' };
   } catch (error) {
@@ -86,14 +82,12 @@ export async function togglePin(id: string, isPinned: boolean) {
   
   try {
     const collection = await dbc('news');
-    let query;
-    try {
-      query = { _id: new ObjectId(id) };
-    } catch {
-      query = { _id: id };
-    }
     
-    await collection.updateOne(query, { $set: { isPinned } });
+    if (ObjectId.isValid(id)) {
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: { isPinned } });
+    } else {
+      await collection.updateOne({ _id: id as any }, { $set: { isPinned } });
+    }
     
     revalidateTag('news');
     return { success: isPinned ? 'pinSuccess' : 'unpinSuccess' };
