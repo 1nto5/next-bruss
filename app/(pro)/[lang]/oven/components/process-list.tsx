@@ -428,9 +428,10 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                             className={(() => {
                               if (!process.startTime || !process.targetDuration)
                                 return undefined;
+                              // Ensure startTime is properly converted to Date object
+                              const startTime = new Date(process.startTime);
                               const expectedCompletion = new Date(
-                                process.startTime.getTime() +
-                                  process.targetDuration * 1000,
+                                startTime.getTime() + process.targetDuration * 1000,
                               );
                               const now = new Date();
                               if (expectedCompletion.getTime() < now.getTime()) {
