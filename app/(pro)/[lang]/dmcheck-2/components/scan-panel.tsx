@@ -246,7 +246,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         const isPalletWorkplace = selectedArticle?.pallet || false;
 
         // Check box full first - it has priority over pallet
-        if (boxStatus.boxIsFull && isPalletWorkplace) {
+        if (boxStatus.boxIsFull) {
           handleHydraScan();
         } else if (palletStatus.palletIsFull && isPalletWorkplace) {
           handlePalletScan();
@@ -274,7 +274,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   let placeholder = dict.scan.dmcPlaceholder;
 
   // Check box full first - it has priority over pallet
-  if (boxStatus.boxIsFull && isPalletWorkplace) {
+  if (boxStatus.boxIsFull) {
     inputName = 'hydra';
     placeholder = dict.scan.hydraPlaceholder;
   } else if (palletStatus.palletIsFull && isPalletWorkplace) {
