@@ -64,7 +64,7 @@
     "labelGenerationError": "Fehler beim Generieren des Etiketts",
     "reworkDialog": {
       "title": "Rework-Modus",
-      "description": "Aktivieren Sie den Rework-Modus, um Teile erneut zu scannen. Das vorherige Dokument wird als Rework in der Datenbank markiert.",
+      "description": "Aktivieren Sie den Rework-Modus, um Teile erneut zu scannen. Der Rework-Modus wird automatisch nach dem Scannen eines Teils deaktiviert. Das vorherige Dokument wird als Rework in der Datenbank markiert.",
       "enableLabel": "Rework-Modus aktivieren",
       "cancel": "Abbrechen", 
       "save": "Speichern"

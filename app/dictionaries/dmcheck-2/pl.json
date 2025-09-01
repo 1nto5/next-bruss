@@ -64,7 +64,7 @@
     "labelGenerationError": "Błąd generowania etykiety",
     "reworkDialog": {
       "title": "Tryb Rework",
-      "description": "Włącz tryb rework aby ponownie skanować części. Poprzedni dokument zostanie oznaczony jako rework w bazie danych.",
+      "description": "Włącz tryb rework aby ponownie skanować części. Tryb rework zostanie automatycznie wyłączony po zeskanowaniu jednej części. Poprzedni dokument zostanie oznaczony jako rework w bazie danych.",
       "enableLabel": "Włącz tryb rework",
       "cancel": "Anuluj",
       "save": "Zapisz"

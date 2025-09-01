@@ -64,7 +64,7 @@
     "labelGenerationError": "Failed to generate label",
     "reworkDialog": {
       "title": "Rework Mode",
-      "description": "Enable rework mode to scan parts again. The previous document will be marked as rework in the database.",
+      "description": "Enable rework mode to scan parts again. Rework mode will automatically disable after scanning one part. The previous document will be marked as rework in the database.",
       "enableLabel": "Enable rework mode",
       "cancel": "Cancel",
       "save": "Save"

@@ -64,7 +64,7 @@
     "labelGenerationError": "Nabigo sa paggawa ng label",
     "reworkDialog": {
       "title": "Rework Mode",
-      "description": "I-enable ang rework mode para muling i-scan ang mga bahagi. Ang nakaraang document ay mamarkahan bilang rework sa database.",
+      "description": "I-enable ang rework mode para muling i-scan ang mga bahagi. Ang rework mode ay awtomatikong madi-disable pagkatapos mag-scan ng isang bahagi. Ang nakaraang document ay mamarkahan bilang rework sa database.",
       "enableLabel": "I-enable ang rework mode",
       "cancel": "I-cancel",
       "save": "I-save"

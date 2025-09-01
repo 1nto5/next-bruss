@@ -18,7 +18,7 @@ interface ScanPanelProps {
 }
 
 export default function ScanPanel({ dict }: ScanPanelProps) {
-  const { selectedArticle, addScan, isRework } = useScanStore();
+  const { selectedArticle, addScan, isRework, setIsRework } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
   const { volume } = useVolumeStore();
 
@@ -139,6 +139,8 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           if (result.dmc) {
             addScan(result.dmc);
           }
+          // Auto-disable rework mode after successful scan
+          setIsRework(false);
           // Refetch box status to update piece count
           await refetchBoxStatus();
           setTimeout(() => inputRef.current?.focus(), 50);
