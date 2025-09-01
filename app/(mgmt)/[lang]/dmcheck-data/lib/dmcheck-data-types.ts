@@ -12,7 +12,8 @@ export type DmcType = {
   pallet_batch?: string;
   pallet_time?: string;
   pallet_operator?: string | string[]; // Support both formats for pallet operator
-  reworkReason?: string;
+  rework_reason?: string;
+  rework_user?: string;
   rework_time?: string;
 };
 

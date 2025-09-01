@@ -793,7 +793,7 @@ export async function deleteDmcFromBox(dmc: string) {
         $set: {
           status: 'rework',
           rework_time: new Date(),
-          reworkReason: 'deleted from box by operator',
+          rework_reason: 'deleted from box by operator',
         },
       },
     );
@@ -862,7 +862,7 @@ export async function deleteBoxFromPallet(hydra_batch: string) {
         $set: {
           status: 'rework',
           rework_time: new Date(),
-          reworkReason: 'deleted from pallet by operator',
+          rework_reason: 'deleted from pallet by operator',
         },
       },
     );

@@ -110,6 +110,9 @@ export async function GET(req: NextRequest) {
       { header: 'Pallet batch', key: 'pallet_batch', width: 18 },
       { header: 'Pallet operator', key: 'pallet_operator', width: 20 },
       { header: 'Pallet time', key: 'pallet_time', width: 18 },
+      { header: 'Rework reason', key: 'rework_reason', width: 30 },
+      { header: 'Rework user', key: 'rework_user', width: 20 },
+      { header: 'Rework time', key: 'rework_time', width: 18 },
     ];
 
     const convertToLocalTimeWithMoment = (date: Date) => {
@@ -139,6 +142,11 @@ export async function GET(req: NextRequest) {
         pallet_operator: formatOperators(doc.pallet_operator),
         pallet_time: doc.pallet_time
           ? convertToLocalTimeWithMoment(new Date(doc.pallet_time))
+          : '',
+        rework_reason: doc.rework_reason || '',
+        rework_user: doc.rework_user || '',
+        rework_time: doc.rework_time
+          ? convertToLocalTimeWithMoment(new Date(doc.rework_time))
           : '',
       };
       sheet.addRow(row);
