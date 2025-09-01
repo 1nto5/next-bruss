@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { saveDmc, saveHydra, savePallet } from '../actions';
+import { saveDmc, saveDmcRework, saveHydra, savePallet } from '../actions';
 import { useGetBoxStatus } from '../data/get-box-status';
 import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dictionary';
@@ -18,7 +18,7 @@ interface ScanPanelProps {
 }
 
 export default function ScanPanel({ dict }: ScanPanelProps) {
-  const { selectedArticle, addScan } = useScanStore();
+  const { selectedArticle, addScan, isRework } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
   const { volume } = useVolumeStore();
 
@@ -58,6 +58,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     const dmcValue = inputValue;
     setInputValue('');
 
+    toast.dismiss();
     toast.promise(
       async () => {
         const result = await saveDmc(dmcValue, selectedArticle.id, operators);
@@ -122,12 +123,71 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     refetchBoxStatus,
   ]);
 
+  const handleDmcReworkScan = useCallback(async () => {
+    if (!inputValue.trim() || !selectedArticle) return;
+
+    const dmcValue = inputValue;
+    setInputValue('');
+
+    toast.dismiss();
+    toast.promise(
+      async () => {
+        const result = await saveDmcRework(dmcValue, selectedArticle.id, operators);
+
+        if (result.message === 'rework dmc saved') {
+          playOk();
+          if (result.dmc) {
+            addScan(result.dmc);
+          }
+          // Refetch box status to update piece count
+          await refetchBoxStatus();
+          setTimeout(() => inputRef.current?.focus(), 50);
+          return dict.scan.messages.reworkDmcSaved;
+        } else {
+          playNok();
+          // Map error messages
+          const errorMessages: Record<string, string> = {
+            'rework not possible': dict.scan.messages.reworkNotPossible,
+            'dmc not valid': dict.scan.messages.dmcNotValid,
+            'article not found': dict.scan.messages.articleNotFound,
+            'smart not found': dict.scan.messages.smartNotFound,
+            'smart nok': dict.scan.messages.smartNok,
+            'smart pattern': dict.scan.messages.smartPattern,
+            'smart fetch error': dict.scan.messages.smartFetchError,
+          };
+          // Clear the input value on error
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 50);
+          throw new Error(
+            errorMessages[result.message] || dict.scan.messages.saveError,
+          );
+        }
+      },
+      {
+        loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
+        success: (msg) => msg,
+        error: (err) => err.message,
+      },
+    );
+  }, [
+    inputValue,
+    selectedArticle,
+    operators,
+    playOk,
+    playNok,
+    addScan,
+    dict.scan,
+    refetchBoxStatus,
+  ]);
+
   const handleHydraScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
 
     const hydraValue = inputValue;
     setInputValue('');
 
+    toast.dismiss();
     toast.promise(
       async () => {
         const result = await saveHydra(
@@ -186,6 +246,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     const palletValue = inputValue;
     setInputValue('');
 
+    toast.dismiss();
     toast.promise(
       async () => {
         const result = await savePallet(
@@ -251,7 +312,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         } else if (palletStatus.palletIsFull && isPalletWorkplace) {
           handlePalletScan();
         } else {
-          handleDmcScan();
+          isRework ? handleDmcReworkScan() : handleDmcScan();
         }
       }
     },
@@ -259,7 +320,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
       selectedArticle,
       boxStatus.boxIsFull,
       palletStatus.palletIsFull,
+      isRework,
       handleDmcScan,
+      handleDmcReworkScan,
       handleHydraScan,
       handlePalletScan,
     ],
@@ -280,6 +343,8 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   } else if (palletStatus.palletIsFull && isPalletWorkplace) {
     inputName = 'pallet';
     placeholder = dict.scan.palletPlaceholder;
+  } else if (isRework) {
+    placeholder = dict.scan.reworkDmcPlaceholder;
   }
 
   return (

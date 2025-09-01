@@ -551,6 +551,124 @@ export async function savePallet(
   }
 }
 
+export async function saveDmcRework(
+  dmc: string,
+  articleConfigId: string,
+  operators: string[]
+): Promise<{ message: string; dmc?: string; time?: string }> {
+  try {
+    const articlesConfigCollection = await dbc('articles_config');
+    const articleConfigDoc = await articlesConfigCollection.findOne({
+      _id: new ObjectId(articleConfigId),
+    });
+    if (!articleConfigDoc) {
+      return { message: 'article not found' };
+    }
+    const articleConfig = {
+      ...articleConfigDoc,
+      id: articleConfigDoc._id.toString(),
+    } as unknown as ArticleConfigType;
+
+    const schema = createDmcValidationSchema(articleConfig);
+    const parse = schema.safeParse({
+      dmc: dmc,
+    });
+
+    if (!parse.success) {
+      return { message: 'dmc not valid' };
+    }
+    const validatedDmc = parse.data.dmc;
+
+    const scansCollection = await dbc('scans');
+
+    const existingDmc = await scansCollection.findOne(
+      {
+        dmc: validatedDmc,
+        workplace: articleConfig.workplace,
+      },
+      { sort: { time: -1 } },
+    );
+
+    if (
+      !existingDmc ||
+      existingDmc.status === 'rework' ||
+      existingDmc.status === 'box' ||
+      (articleConfig.pallet && existingDmc.status === 'pallet')
+    ) {
+      return { message: 'rework not possible' };
+    }
+
+    if (existingDmc && existingDmc.status !== 'rework') {
+      await scansCollection.updateOne(
+        { _id: existingDmc._id },
+        {
+          $set: {
+            status: 'rework',
+            rework_time: new Date(),
+            rework_reason: `workplace rework: ${articleConfig.workplace.toUpperCase()}`,
+            rework_user: `personal number: ${operators.join(', ')}`,
+          },
+        },
+      );
+    }
+
+    // EOL810/EOL488 check in external SMART API
+    if (
+      articleConfig.workplace === 'eol810' ||
+      articleConfig.workplace === 'eol488'
+    ) {
+      const url = `http://10.27.90.4:8025/api/part-status-plain/${validatedDmc}`;
+
+      const res = await fetch(url);
+      if (!res.ok || res.status === 404) {
+        return { message: 'smart fetch error' };
+      }
+      const data = await res.text();
+      switch (data) {
+        case 'NOT_FOUND':
+          return { message: 'smart not found' };
+        case 'UNKNOWN':
+          return { message: 'smart unknown' };
+        case 'NOK':
+          return { message: 'smart nok' };
+        case 'PATTERN':
+          return { message: 'smart pattern' };
+      }
+    }
+
+    const insertResult = await scansCollection.insertOne({
+      status: 'box',
+      dmc: validatedDmc.toUpperCase(),
+      workplace: articleConfig.workplace,
+      article: articleConfig.articleNumber,
+      operator: operators,
+      time: new Date(),
+    });
+
+    if (insertResult) {
+      // EOL810/EOL488 lighting the lamp
+      if (
+        articleConfig.workplace === 'eol810' ||
+        articleConfig.workplace === 'eol488'
+      ) {
+        const variant = articleConfig.workplace === 'eol810' ? '10' : '20';
+        await fetch(
+          `http://10.27.90.4:8090/api/turn-on-ok-indicator/${variant}`,
+        );
+      }
+      return {
+        message: 'rework dmc saved',
+        dmc: validatedDmc,
+        time: new Date().toISOString(),
+      };
+    }
+    return { message: 'save error' };
+  } catch (error) {
+    console.error(error);
+    return { message: 'save error' };
+  }
+}
+
 export async function save(
   articleConfigId: string,
   operators: string[],
@@ -717,7 +835,7 @@ export async function getPalletBoxes(articleConfigId: string) {
 }
 
 // Delete DMC from box (set status to rework)
-export async function deleteDmcFromBox(dmc: string) {
+export async function deleteDmcFromBox(dmc: string, operators: string[]) {
   try {
     const scansCollection = await dbc('scans');
     const result = await scansCollection.updateOne(
@@ -726,7 +844,8 @@ export async function deleteDmcFromBox(dmc: string) {
         $set: {
           status: 'rework',
           rework_time: new Date(),
-          reworkReason: 'deleted from box by operator',
+          rework_reason: 'deleted from box by operator',
+          rework_user: `personal number: ${operators.join(', ')}`,
         },
       },
     );
@@ -741,7 +860,7 @@ export async function deleteDmcFromBox(dmc: string) {
 }
 
 // Delete HYDRA batch from pallet (set status to rework)
-export async function deleteHydraFromPallet(hydra: string) {
+export async function deleteHydraFromPallet(hydra: string, operators: string[]) {
   try {
     const scansCollection = await dbc('scans');
     const result = await scansCollection.updateMany(
@@ -750,7 +869,8 @@ export async function deleteHydraFromPallet(hydra: string) {
         $set: {
           status: 'rework',
           rework_time: new Date(),
-          reworkReason: 'deleted from pallet by operator',
+          rework_reason: 'deleted from pallet by operator',
+          rework_user: `personal number: ${operators.join(', ')}`,
         },
       },
     );

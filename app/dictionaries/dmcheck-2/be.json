@@ -27,9 +27,11 @@
   "scan": {
     "title": "Сканаванне",
     "dmcPlaceholder": "Скануйце DMC...",
+    "reworkDmcPlaceholder": "Скануйце DMC (REWORK)...",
     "hydraPlaceholder": "Скануйце QR-код HYDRA...",
     "palletPlaceholder": "Скануйце QR-код палеты...",
     "savingPlaceholder": "Захаванне...",
+    "reworkLabel": "Rework",
     "messages": {
       "dmcSaved": "DMC захавана",
       "batchSaved": "Партыя захавана",
@@ -52,12 +54,21 @@
       "smartPattern": "SMART: Частка з'яўляецца ўзорам",
       "smartFetchError": "Праблема злучэння з базай SMART",
       "smartUnknown": "SMART: Частка не апрацавана на ўсіх станцыях",
+      "reworkNotPossible": "Rework немагчымы",
+      "reworkDmcSaved": "DMC захавана як rework",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Друкаваць этыкетку палеты",
     "generatingLabel": "Генерацыя этыкеткі...",
     "labelGenerated": "Этыкетка паспяхова згенеравана",
-    "labelGenerationError": "Памылка генерацыі этыкеткі"
+    "labelGenerationError": "Памылка генерацыі этыкеткі",
+    "reworkDialog": {
+      "title": "Рэжым Rework",
+      "description": "Уключыце рэжым rework для паўторнага сканавання частак. Папярэдні дакумент будзе пазначаны як rework у базе даных.",
+      "enableLabel": "Уключыць рэжым rework",
+      "cancel": "Скасаваць",
+      "save": "Захаваць"
+    }
   },
   "statusBar": {
     "logout": "Выйсці",

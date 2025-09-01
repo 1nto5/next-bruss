@@ -19,11 +19,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import type { Locale } from '@/i18n.config';
-import { Component, Factory, LogOut, User, UserPen, X } from 'lucide-react';
+import { Component, Factory, LogOut, RotateCcw, User, UserPen, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useScanStore } from '../lib/stores';
+import ReworkDialog from './rework-dialog';
 
 interface HeaderProps {
   lang: Locale;
@@ -32,11 +33,12 @@ interface HeaderProps {
 
 export default function Header({ lang, dict }: HeaderProps) {
   const { operator1, operator2, operator3, logout } = useOperatorStore();
-  const { selectedArticle, clearArticle, boxStatus, palletStatus } =
+  const { selectedArticle, clearArticle, boxStatus, palletStatus, isRework, setIsRework } =
     useScanStore();
   const searchParams = useSearchParams();
   const workplace = searchParams.get('workplace');
   const [alertOpen, setAlertOpen] = useState(false);
+  const [reworkDialogOpen, setReworkDialogOpen] = useState(false);
 
   const loggedInOperators = [operator1, operator2, operator3].filter(
     (operator): operator is NonNullable<typeof operator> => operator !== null,
@@ -109,6 +111,15 @@ export default function Header({ lang, dict }: HeaderProps) {
 
   const rightContent = (
     <>
+      {selectedArticle && !boxStatus.boxIsFull && !palletStatus.palletIsFull && (
+        <HeaderButton
+          icon={<RotateCcw />}
+          onClick={() => setReworkDialogOpen(true)}
+          title={isRework ? 'Rework aktywny' : 'Otwórz dialog rework'}
+          text={dict.scan?.reworkLabel || 'Rework'}
+          variant={isRework ? 'destructive' : 'ghost'}
+        />
+      )}
       {selectedArticle && (
         <HeaderButton
           icon={<Component />}
@@ -134,6 +145,14 @@ export default function Header({ lang, dict }: HeaderProps) {
   return (
     <>
       <BaseHeader leftContent={leftContent} rightContent={rightContent} />
+
+      <ReworkDialog
+        open={reworkDialogOpen}
+        onOpenChange={setReworkDialogOpen}
+        isRework={isRework}
+        onReworkChange={setIsRework}
+        dict={dict}
+      />
 
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>

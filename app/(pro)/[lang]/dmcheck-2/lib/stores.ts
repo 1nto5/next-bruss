@@ -50,6 +50,7 @@ export const useOperatorStore = create<OperatorStoreType>()(
 type ScanStoreType = {
   selectedArticle: ArticleConfigType | null;
   lastScans: ScanType[];
+  isRework: boolean;
   boxStatus: {
     piecesInBox: number;
     boxIsFull: boolean;
@@ -60,6 +61,7 @@ type ScanStoreType = {
   };
   setSelectedArticle: (article: ArticleConfigType | null) => void;
   addScan: (dmc: string) => void;
+  setIsRework: (isRework: boolean) => void;
   updateBoxStatus: (piecesInBox: number, boxIsFull: boolean) => void;
   updatePalletStatus: (boxesOnPallet: number, palletIsFull: boolean) => void;
   clearArticle: () => void;
@@ -71,6 +73,7 @@ export const useScanStore = create<ScanStoreType>()(
     (set) => ({
       selectedArticle: null,
       lastScans: [],
+      isRework: false,
       boxStatus: {
         piecesInBox: 0,
         boxIsFull: false,
@@ -82,6 +85,7 @@ export const useScanStore = create<ScanStoreType>()(
       setSelectedArticle: (article) => set({ 
         selectedArticle: article,
         lastScans: [],
+        isRework: false,
         boxStatus: { piecesInBox: 0, boxIsFull: false },
         palletStatus: { boxesOnPallet: 0, palletIsFull: false },
       }),
@@ -91,6 +95,7 @@ export const useScanStore = create<ScanStoreType>()(
           ...state.lastScans.slice(0, 4), // Keep only last 5
         ],
       })),
+      setIsRework: (isRework) => set({ isRework }),
       updateBoxStatus: (piecesInBox, boxIsFull) => set({
         boxStatus: { piecesInBox, boxIsFull },
       }),
@@ -100,6 +105,7 @@ export const useScanStore = create<ScanStoreType>()(
       clearArticle: () => set({ 
         selectedArticle: null,
         lastScans: [],
+        isRework: false,
         boxStatus: { piecesInBox: 0, boxIsFull: false },
         palletStatus: { boxesOnPallet: 0, palletIsFull: false },
       }),

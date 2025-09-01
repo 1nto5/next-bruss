@@ -27,9 +27,11 @@
   "scan": {
     "title": "Pag-scan",
     "dmcPlaceholder": "I-scan ang DMC...",
+    "reworkDmcPlaceholder": "I-scan ang DMC (REWORK)...",
     "hydraPlaceholder": "I-scan ang HYDRA QR code...",
     "palletPlaceholder": "I-scan ang pallet QR code...",
     "savingPlaceholder": "Sinisave...",
+    "reworkLabel": "Rework",
     "messages": {
       "dmcSaved": "Na-save ang DMC",
       "batchSaved": "Na-save ang batch",
@@ -52,12 +54,21 @@
       "smartPattern": "SMART: Ang bahagi ay isang pattern",
       "smartFetchError": "Problema sa koneksyon ng SMART database",
       "smartUnknown": "SMART: Hindi naproseso ang bahagi sa lahat ng istasyon",
+      "reworkNotPossible": "Hindi maaaring gawin ang rework",
+      "reworkDmcSaved": "DMC na-save bilang rework",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "I-print ang Pallet Label",
     "generatingLabel": "Ginagawa ang label...",
     "labelGenerated": "Matagumpay na nagawa ang label",
-    "labelGenerationError": "Nabigo sa paggawa ng label"
+    "labelGenerationError": "Nabigo sa paggawa ng label",
+    "reworkDialog": {
+      "title": "Rework Mode",
+      "description": "I-enable ang rework mode para muling i-scan ang mga bahagi. Ang nakaraang document ay mamarkahan bilang rework sa database.",
+      "enableLabel": "I-enable ang rework mode",
+      "cancel": "I-cancel",
+      "save": "I-save"
+    }
   },
   "statusBar": {
     "logout": "Mag-logout",

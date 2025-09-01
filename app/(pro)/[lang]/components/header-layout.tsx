@@ -44,13 +44,14 @@ interface HeaderButtonProps {
   onClick: () => void;
   title?: string;
   text?: string;
+  variant?: 'ghost' | 'destructive';
 }
 
-export function HeaderButton({ icon, onClick, title, text }: HeaderButtonProps) {
+export function HeaderButton({ icon, onClick, title, text, variant = 'ghost' }: HeaderButtonProps) {
   if (text) {
     return (
       <Button
-        variant="ghost"
+        variant={variant}
         onClick={onClick}
         title={title}
         className="h-10 px-3 flex items-center gap-2"
@@ -63,7 +64,7 @@ export function HeaderButton({ icon, onClick, title, text }: HeaderButtonProps) 
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       size="icon"
       onClick={onClick}
       title={title}

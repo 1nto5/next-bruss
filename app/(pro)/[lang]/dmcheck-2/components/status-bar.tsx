@@ -10,7 +10,7 @@ import { useGetBoxStatus } from '../data/get-box-status';
 import { useGetPalletBoxes } from '../data/get-pallet-boxes';
 import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dictionary';
-import { useScanStore } from '../lib/stores';
+import { useOperatorStore, useScanStore } from '../lib/stores';
 import DeleteConfirmDialog from './delete-confirm-dialog';
 import ItemListDialog from './item-list-dialog';
 import StatusCard from './status-card';
@@ -22,6 +22,12 @@ interface StatusBarProps {
 
 export default function StatusBar({ dict, lang }: StatusBarProps) {
   const { selectedArticle } = useScanStore();
+  const { operator1, operator2, operator3 } = useOperatorStore();
+
+  // Get operators array
+  const operators = [operator1, operator2, operator3]
+    .filter((op) => op?.identifier)
+    .map((op) => op!.identifier);
 
   // Get status from React Query with refetch functions
   const { data: boxData = { piecesInBox: 0 }, refetch: refetchBoxStatus } =
@@ -86,7 +92,7 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
   const handleDeleteDmc = async (dmc: string) => {
     toast.promise(
       async () => {
-        const res = await deleteDmcFromBox(dmc);
+        const res = await deleteDmcFromBox(dmc, operators);
         if (res.message === 'deleted') {
           await refetchBoxScans();
           await refetchBoxStatus();
@@ -106,7 +112,7 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
   const handleDeleteBox = async (hydra: string) => {
     toast.promise(
       async () => {
-        const res = await deleteHydraFromPallet(hydra);
+        const res = await deleteHydraFromPallet(hydra, operators);
         if (res.message === 'deleted') {
           await refetchPalletBoxes();
           await refetchPalletStatus();

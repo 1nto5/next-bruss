@@ -27,9 +27,11 @@
   "scan": {
     "title": "Scanning",
     "dmcPlaceholder": "Scan DMC...",
+    "reworkDmcPlaceholder": "Scan DMC (REWORK)...",
     "hydraPlaceholder": "Scan HYDRA QR code...",
     "palletPlaceholder": "Scan pallet QR code...",
     "savingPlaceholder": "Saving...",
+    "reworkLabel": "Rework",
     "messages": {
       "dmcSaved": "DMC saved",
       "batchSaved": "Batch saved",
@@ -52,12 +54,21 @@
       "smartPattern": "SMART: Part is a pattern",
       "smartFetchError": "SMART database connection problem",
       "smartUnknown": "SMART: Part not processed on all stations",
+      "reworkNotPossible": "Rework not possible",
+      "reworkDmcSaved": "DMC saved as rework",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Print Pallet Label",
     "generatingLabel": "Generating label...",
     "labelGenerated": "Label generated successfully",
-    "labelGenerationError": "Failed to generate label"
+    "labelGenerationError": "Failed to generate label",
+    "reworkDialog": {
+      "title": "Rework Mode",
+      "description": "Enable rework mode to scan parts again. The previous document will be marked as rework in the database.",
+      "enableLabel": "Enable rework mode",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
   },
   "statusBar": {
     "logout": "Logout",
