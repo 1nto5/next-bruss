@@ -62,7 +62,7 @@ export default function App({ dict, lang }: AppProps) {
         }
       }
     }
-  }, [articles, selectedArticle, setSelectedArticle]);
+  }, [articles, selectedArticle?.id, setSelectedArticle]);
 
   // Check if workplace is provided
   if (!workplace) {
