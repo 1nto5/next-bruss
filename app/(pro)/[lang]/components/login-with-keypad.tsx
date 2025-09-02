@@ -30,14 +30,19 @@ import NumericKeypadDialog from './numeric-keypad-dialog';
 const createLoginSchema = (
   requireOperator2: boolean,
   requireOperator3: boolean,
+  errorMessages?: {
+    requiredNumber1?: string;
+    requiredNumber2?: string;
+    requiredNumber3?: string;
+  },
 ) => {
   return z.object({
-    identifier1: z.string().min(1, 'Required'),
+    identifier1: z.string().min(1, errorMessages?.requiredNumber1 || 'Required'),
     identifier2: requireOperator2
-      ? z.string().min(1, 'Required')
+      ? z.string().min(1, errorMessages?.requiredNumber2 || 'Required')
       : z.string().optional(),
     identifier3: requireOperator3
-      ? z.string().min(1, 'Required')
+      ? z.string().min(1, errorMessages?.requiredNumber3 || 'Required')
       : z.string().optional(),
   });
 };
@@ -65,6 +70,9 @@ export interface LoginWithKeypadProps {
     wrongNumber1?: string;
     wrongNumber2?: string;
     wrongNumber3?: string;
+    requiredNumber1?: string;
+    requiredNumber2?: string;
+    requiredNumber3?: string;
     loginError?: string;
   };
 }
@@ -86,6 +94,9 @@ export default function LoginWithKeypad({
     wrongNumber1: 'Wrong number 1',
     wrongNumber2: 'Wrong number 2',
     wrongNumber3: 'Wrong number 3',
+    requiredNumber1: 'Personal number 1 is required',
+    requiredNumber2: 'Personal number 2 is required',
+    requiredNumber3: 'Personal number 3 is required',
     loginError: 'Login failed',
   },
 }: LoginWithKeypadProps) {
@@ -98,7 +109,11 @@ export default function LoginWithKeypad({
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(
-      createLoginSchema(personalNumber2Form, personalNumber3Form),
+      createLoginSchema(personalNumber2Form, personalNumber3Form, {
+        requiredNumber1: errors.requiredNumber1,
+        requiredNumber2: errors.requiredNumber2,
+        requiredNumber3: errors.requiredNumber3,
+      }),
     ),
     defaultValues: {
       identifier1: '',

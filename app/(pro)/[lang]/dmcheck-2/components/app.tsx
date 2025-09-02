@@ -79,6 +79,9 @@ export default function App({ dict, lang }: AppProps) {
     return (
       <LoginWithKeypad
         {...dict.login}
+        errors={{
+          ...dict.login.errors,
+        }}
         loginAction={login}
         onSuccess={(res) => {
           setOperator1(res.operator1 || null);
