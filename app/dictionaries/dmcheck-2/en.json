@@ -16,6 +16,9 @@
       "wrongNumber1": "Invalid personal number!",
       "wrongNumber2": "Invalid personal number!",
       "wrongNumber3": "Invalid personal number!",
+      "requiredNumber1": "Personal number 1 is required!",
+      "requiredNumber2": "Personal number 2 is required!",
+      "requiredNumber3": "Personal number 3 is required!",
       "loginError": "Contact IT!"
     }
   },

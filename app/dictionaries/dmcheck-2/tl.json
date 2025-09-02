@@ -16,6 +16,9 @@
       "wrongNumber1": "Hindi wastong personal na numero!",
       "wrongNumber2": "Hindi wastong personal na numero!",
       "wrongNumber3": "Hindi wastong personal na numero!",
+      "requiredNumber1": "Kailangan ang personal na numero 1!",
+      "requiredNumber2": "Kailangan ang personal na numero 2!",
+      "requiredNumber3": "Kailangan ang personal na numero 3!",
       "loginError": "Makipag-ugnayan sa IT!"
     }
   },

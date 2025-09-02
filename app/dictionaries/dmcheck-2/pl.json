@@ -16,6 +16,9 @@
       "wrongNumber1": "Nieprawidłowy nr personalny!",
       "wrongNumber2": "Nieprawidłowy nr personalny!",
       "wrongNumber3": "Nieprawidłowy nr personalny!",
+      "requiredNumber1": "Nr personalny 1 jest wymagany!",
+      "requiredNumber2": "Nr personalny 2 jest wymagany!",
+      "requiredNumber3": "Nr personalny 3 jest wymagany!",
       "loginError": "Skontaktuj się z IT!"
     }
   },

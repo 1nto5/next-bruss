@@ -16,6 +16,9 @@
       "wrongNumber1": "Ungültige Personalnummer!",
       "wrongNumber2": "Ungültige Personalnummer!",
       "wrongNumber3": "Ungültige Personalnummer!",
+      "requiredNumber1": "Personalnummer 1 ist erforderlich!",
+      "requiredNumber2": "Personalnummer 2 ist erforderlich!",
+      "requiredNumber3": "Personalnummer 3 ist erforderlich!",
       "loginError": "Kontaktieren Sie die IT!"
     }
   },
