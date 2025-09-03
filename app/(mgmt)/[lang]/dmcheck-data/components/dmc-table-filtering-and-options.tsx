@@ -9,9 +9,10 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CircleX, FileSpreadsheet, Loader, Search } from 'lucide-react';
-import Link from 'next/link';
+import { CommandShortcut } from '@/components/ui/command';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { usePlatform } from '@/lib/hooks/use-platform';
 import { revalidateDmcheckTableData as revalidate } from '../actions';
 import PasteValuesDialog from './paste-values-dialog';
 
@@ -25,27 +26,14 @@ export default function DmcTableFilteringAndOptions({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { isMac, isClient } = usePlatform();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     setIsPendingSearch(false);
   }, [fetchTime]);
-
-  // Helper functions for default dates
-  const getOneMonthAgo = () => {
-    const today = new Date();
-    const oneMonthAgo = new Date(today);
-    oneMonthAgo.setMonth(today.getMonth() - 1);
-    oneMonthAgo.setHours(0, 0, 0, 0); // Start of day
-    return oneMonthAgo;
-  };
-
-  const getToday = () => {
-    const today = new Date();
-    today.setHours(23, 59, 59, 999); // End of day
-    return today;
-  };
 
   const [statusFilter, setStatusFilter] = useState<string[]>(() => {
     const statusParam = searchParams?.get('status');
@@ -56,13 +44,13 @@ export default function DmcTableFilteringAndOptions({
           .filter((s) => s.length > 0)
       : [];
   });
-  const [fromFilter, setFromFilter] = useState<Date>(() => {
+  const [fromFilter, setFromFilter] = useState<Date | null>(() => {
     const fromParam = searchParams?.get('from');
-    return fromParam ? new Date(fromParam) : getOneMonthAgo();
+    return fromParam ? new Date(fromParam) : null;
   });
-  const [toFilter, setToFilter] = useState<Date>(() => {
+  const [toFilter, setToFilter] = useState<Date | null>(() => {
     const toParam = searchParams?.get('to');
-    return toParam ? new Date(toParam) : getToday();
+    return toParam ? new Date(toParam) : null;
   });
   const [dmcFilter, setDmcFilter] = useState(searchParams?.get('dmc') || '');
   const [hydraFilter, setHydraFilter] = useState(
@@ -99,23 +87,30 @@ export default function DmcTableFilteringAndOptions({
       .filter((v) => v.length > 0).length;
   };
 
-  const handleClearFilters = () => {
-    setStatusFilter([]);
-    setFromFilter(getOneMonthAgo());
-    setToFilter(getToday());
-    setDmcFilter('');
-    setHydraFilter('');
-    setPalletFilter('');
-    setWorkplaceFilter([]);
-    setArticleFilter([]);
+  // Check if filters have been modified from their initial state
+  const hasFilters = statusFilter.length > 0 || fromFilter || toFilter || dmcFilter || hydraFilter || palletFilter || workplaceFilter.length > 0 || articleFilter.length > 0;
+  
+  // Check if current filters match the URL params (use useMemo to prevent hydration issues)
+  const isRefresh = useMemo(() => {
+    if (!isClient) return true; // Default to refresh on server
+    
+    const currentParams = new URLSearchParams();
+    if (statusFilter.length > 0) currentParams.set('status', statusFilter.join(','));
+    if (fromFilter) currentParams.set('from', fromFilter.toISOString());
+    if (toFilter) currentParams.set('to', toFilter.toISOString());
+    if (dmcFilter) currentParams.set('dmc', dmcFilter);
+    if (hydraFilter) currentParams.set('hydra_batch', hydraFilter);
+    if (palletFilter) currentParams.set('pallet_batch', palletFilter);
+    if (workplaceFilter.length > 0)
+      currentParams.set('workplace', workplaceFilter.join(','));
+    if (articleFilter.length > 0)
+      currentParams.set('article', articleFilter.join(','));
+    
+    const filtersMatchUrl = currentParams.toString() === (searchParams?.toString() || '');
+    return !hasFilters || filtersMatchUrl;
+  }, [isClient, statusFilter, fromFilter, toFilter, dmcFilter, hydraFilter, palletFilter, workplaceFilter, articleFilter, searchParams, hasFilters]);
 
-    if (searchParams?.toString()) {
-      setIsPendingSearch(true);
-      router.push(pathname || '');
-    }
-  };
-
-  const handleSearchClick = (e: React.FormEvent) => {
+  const handleSearchClick = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (statusFilter.length > 0) params.set('status', statusFilter.join(','));
@@ -136,7 +131,101 @@ export default function DmcTableFilteringAndOptions({
       setIsPendingSearch(true);
       revalidate();
     }
+  }, [
+    statusFilter,
+    fromFilter,
+    toFilter,
+    dmcFilter,
+    hydraFilter,
+    palletFilter,
+    workplaceFilter,
+    articleFilter,
+    pathname,
+    searchParams,
+    router,
+    setIsPendingSearch
+  ]);
+
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Command+Enter on macOS, Ctrl+Enter on Windows/Linux
+      if (event.key === 'Enter' && 
+          ((isMac && event.metaKey) ||
+           (!isMac && event.ctrlKey))) {
+        event.preventDefault();
+        handleSearchClick(event as any);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isClient, isMac, handleSearchClick]);
+
+  const handleClearFilters = () => {
+    setStatusFilter([]);
+    setFromFilter(null);
+    setToFilter(null);
+    setDmcFilter('');
+    setHydraFilter('');
+    setPalletFilter('');
+    setWorkplaceFilter([]);
+    setArticleFilter([]);
+
+    if (searchParams?.toString()) {
+      setIsPendingSearch(true);
+      router.push(pathname || '');
+    }
   };
+
+  const handleExportClick = async () => {
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams(
+        Object.entries({
+          status: Array.isArray(statusFilter)
+            ? statusFilter.join(',')
+            : statusFilter,
+          from: fromFilter?.toISOString(),
+          to: toFilter?.toISOString(),
+          dmc: dmcFilter,
+          hydra_batch: hydraFilter,
+          pallet_batch: palletFilter,
+          workplace: Array.isArray(workplaceFilter)
+            ? workplaceFilter.join(',')
+            : workplaceFilter,
+          article: Array.isArray(articleFilter)
+            ? articleFilter.join(',')
+            : articleFilter,
+        }).reduce(
+          (acc, [key, value]) => {
+            if (value) acc[key] = value;
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
+      );
+
+      const response = await fetch(`/api/dmcheck-data/excel?${params.toString()}`);
+      if (!response.ok) throw new Error('Export failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'DMCheck-data.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
 
   const statusOptions = [
     { value: 'box', label: 'box - scanned' },
@@ -182,15 +271,13 @@ export default function DmcTableFilteringAndOptions({
             <div className='flex flex-col space-y-1'>
               <Label>From:</Label>
               <DateTimePicker
-                value={fromFilter}
-                onChange={(date) => setFromFilter(date || getOneMonthAgo())}
-                max={toFilter}
+                value={fromFilter || undefined}
+                onChange={(date) => setFromFilter(date || null)}
+                max={toFilter || undefined}
                 renderTrigger={({ value, setOpen, open }) => (
                   <DateTimeInput
                     value={value}
-                    onChange={(x) =>
-                      !open && setFromFilter(x || getOneMonthAgo())
-                    }
+                    onChange={(x) => !open && setFromFilter(x || null)}
                     format='dd/MM/yyyy HH:mm'
                     disabled={open}
                     onCalendarClick={() => setOpen(!open)}
@@ -202,14 +289,14 @@ export default function DmcTableFilteringAndOptions({
             <div className='flex flex-col space-y-1'>
               <Label>To:</Label>
               <DateTimePicker
-                value={toFilter}
-                onChange={(date) => setToFilter(date || getToday())}
+                value={toFilter || undefined}
+                onChange={(date) => setToFilter(date || null)}
                 max={new Date()}
-                min={fromFilter}
+                min={fromFilter || undefined}
                 renderTrigger={({ value, setOpen, open }) => (
                   <DateTimeInput
                     value={value}
-                    onChange={(x) => !open && setToFilter(x || getToday())}
+                    onChange={(x) => !open && setToFilter(x || null)}
                     format='dd/MM/yyyy HH:mm'
                     disabled={open}
                     onCalendarClick={() => setOpen(!open)}
@@ -357,56 +444,39 @@ export default function DmcTableFilteringAndOptions({
               onClick={handleClearFilters}
               title='Clear filters'
               disabled={isPendingSearch}
-              className='order-3 w-full sm:order-1'
+              className='order-3 w-full justify-start sm:order-1'
             >
               <CircleX /> <span>Clear</span>
             </Button>
 
-            <Link
-              href={`/api/dmcheck-data/excel?${new URLSearchParams(
-                Object.entries({
-                  status: Array.isArray(statusFilter)
-                    ? statusFilter.join(',')
-                    : statusFilter,
-                  from: fromFilter?.toISOString(),
-                  to: toFilter?.toISOString(),
-                  dmc: dmcFilter,
-                  hydra_batch: hydraFilter,
-                  pallet_batch: palletFilter,
-                  workplace: Array.isArray(workplaceFilter)
-                    ? workplaceFilter.join(',')
-                    : workplaceFilter,
-                  article: Array.isArray(articleFilter)
-                    ? articleFilter.join(',')
-                    : articleFilter,
-                }).reduce(
-                  (acc, [key, value]) => {
-                    if (value) acc[key] = value;
-                    return acc;
-                  },
-                  {} as Record<string, string>,
-                ),
-              ).toString()}`}
-              className='order-2 w-full sm:order-2'
+            <Button
+              onClick={handleExportClick}
+              disabled={isExporting || isPendingSearch}
+              className='order-2 w-full justify-start sm:order-2'
             >
-              <Button className='w-full'>
+              {isExporting ? (
+                <Loader className='animate-spin' />
+              ) : (
                 <FileSpreadsheet />
-                <span>Export</span>
-              </Button>
-            </Link>
+              )}
+              <span>Export</span>
+            </Button>
 
             <Button
               type='submit'
               variant='secondary'
               disabled={isPendingSearch}
-              className='order-1 w-full sm:order-3 sm:col-span-2'
+              className='order-1 w-full justify-start sm:order-3 sm:col-span-2'
             >
               {isPendingSearch ? (
                 <Loader className='animate-spin' />
               ) : (
                 <Search />
               )}
-              <span>Search</span>
+              <span>{isRefresh ? 'Refresh' : 'Search'}</span>
+              <CommandShortcut>
+                {isClient ? (isMac ? '⌘↵' : 'Ctrl+↵') : ''}
+              </CommandShortcut>
             </Button>
           </div>
         </form>
