@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CircleX, FileSpreadsheet, Loader, Search } from 'lucide-react';
 import { CommandShortcut } from '@/components/ui/command';
-import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { usePlatform } from '@/lib/hooks/use-platform';
@@ -30,6 +29,7 @@ export default function DmcTableFilteringAndOptions({
   const { isMac, isClient } = usePlatform();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     setIsPendingSearch(false);
@@ -176,6 +176,53 @@ export default function DmcTableFilteringAndOptions({
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
+    }
+  };
+
+  const handleExportClick = async () => {
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams(
+        Object.entries({
+          status: Array.isArray(statusFilter)
+            ? statusFilter.join(',')
+            : statusFilter,
+          from: fromFilter?.toISOString(),
+          to: toFilter?.toISOString(),
+          dmc: dmcFilter,
+          hydra_batch: hydraFilter,
+          pallet_batch: palletFilter,
+          workplace: Array.isArray(workplaceFilter)
+            ? workplaceFilter.join(',')
+            : workplaceFilter,
+          article: Array.isArray(articleFilter)
+            ? articleFilter.join(',')
+            : articleFilter,
+        }).reduce(
+          (acc, [key, value]) => {
+            if (value) acc[key] = value;
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
+      );
+
+      const response = await fetch(`/api/dmcheck-data/excel?${params.toString()}`);
+      if (!response.ok) throw new Error('Export failed');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'DMCheck-data.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -402,38 +449,18 @@ export default function DmcTableFilteringAndOptions({
               <CircleX /> <span>Clear</span>
             </Button>
 
-            <Link
-              href={`/api/dmcheck-data/excel?${new URLSearchParams(
-                Object.entries({
-                  status: Array.isArray(statusFilter)
-                    ? statusFilter.join(',')
-                    : statusFilter,
-                  from: fromFilter?.toISOString(),
-                  to: toFilter?.toISOString(),
-                  dmc: dmcFilter,
-                  hydra_batch: hydraFilter,
-                  pallet_batch: palletFilter,
-                  workplace: Array.isArray(workplaceFilter)
-                    ? workplaceFilter.join(',')
-                    : workplaceFilter,
-                  article: Array.isArray(articleFilter)
-                    ? articleFilter.join(',')
-                    : articleFilter,
-                }).reduce(
-                  (acc, [key, value]) => {
-                    if (value) acc[key] = value;
-                    return acc;
-                  },
-                  {} as Record<string, string>,
-                ),
-              ).toString()}`}
-              className='order-2 w-full sm:order-2'
+            <Button
+              onClick={handleExportClick}
+              disabled={isExporting || isPendingSearch}
+              className='order-2 w-full justify-start sm:order-2'
             >
-              <Button className='w-full justify-start'>
+              {isExporting ? (
+                <Loader className='animate-spin' />
+              ) : (
                 <FileSpreadsheet />
-                <span>Export</span>
-              </Button>
-            </Link>
+              )}
+              <span>Export</span>
+            </Button>
 
             <Button
               type='submit'
