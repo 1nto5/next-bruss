@@ -1,5 +1,4 @@
 import { DmcTableDataType as TableDataType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
-import { RefreshButton } from '@/components/refresh-button';
 import {
   Card,
   CardDescription,
@@ -94,17 +93,11 @@ export default async function InventoryPage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='flex items-center justify-between'>
-          <div>
-            <CardTitle>DMCheck data</CardTitle>
-            <CardDescription>
-              Last sync: {fetchTimeLocaleString}
-            </CardDescription>
-          </div>
-          <RefreshButton
-            fetchTime={fetchTime}
-            onRefresh={revalidateDmcheckTableData}
-          />
+        <div>
+          <CardTitle>DMCheck data</CardTitle>
+          <CardDescription>
+            Last sync: {fetchTimeLocaleString}
+          </CardDescription>
         </div>
         <DmcTableFilteringAndOptions
           articles={articles}

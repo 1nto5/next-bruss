@@ -1,9 +1,9 @@
-import { RefreshCcw } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 
 export default function Loading() {
   return (
     <div className='flex justify-center'>
-      <RefreshCcw className='mt-8 h-8 w-8 animate-spin' />
+      <LoaderCircle className='mt-12 h-6 w-6 animate-spin' />
     </div>
   );
 }

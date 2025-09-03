@@ -209,7 +209,7 @@ export function DateTimePicker({
   );
 
   // If value is undefined, month and date are undefined until user picks
-  const [month, setMonth] = useState<Date | undefined>(initDate);
+  const [month, setMonth] = useState<Date | undefined>(initDate || new Date());
   const [date, setDate] = useState<Date | undefined>(initDate);
 
   // Always have a displayable month for navigation (fallback to current date)
@@ -282,7 +282,7 @@ export function DateTimePicker({
   useEffect(() => {
     if (open) {
       setDate(initDate);
-      setMonth(initDate);
+      setMonth(initDate || new Date());
       setMonthYearPicker(false);
     }
   }, [open, initDate]);
