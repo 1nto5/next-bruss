@@ -61,6 +61,7 @@ type ScanStoreType = {
   };
   setSelectedArticle: (article: ArticleConfigType | null) => void;
   addScan: (dmc: string) => void;
+  removeScan: (dmc: string) => void;
   setIsRework: (isRework: boolean) => void;
   updateBoxStatus: (piecesInBox: number, boxIsFull: boolean) => void;
   updatePalletStatus: (boxesOnPallet: number, palletIsFull: boolean) => void;
@@ -94,6 +95,9 @@ export const useScanStore = create<ScanStoreType>()(
           { dmc, time: new Date() },
           ...state.lastScans.slice(0, 4), // Keep only last 5
         ],
+      })),
+      removeScan: (dmc) => set((state) => ({
+        lastScans: state.lastScans.filter((scan) => scan.dmc !== dmc),
       })),
       setIsRework: (isRework) => set({ isRework }),
       updateBoxStatus: (piecesInBox, boxIsFull) => set({

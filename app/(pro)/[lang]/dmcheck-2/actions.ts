@@ -837,7 +837,20 @@ export async function getPalletBoxes(articleConfigId: string) {
 // Delete DMC from box (set status to rework)
 export async function deleteDmcFromBox(dmc: string, operators: string[]) {
   try {
+    if (!dmc || !operators || operators.length === 0) {
+      console.error('Invalid parameters for deleteDmcFromBox:', { dmc, operators });
+      return { message: 'invalid parameters' };
+    }
+
     const scansCollection = await dbc('scans');
+    
+    // First check if the DMC exists in box status
+    const existingDmc = await scansCollection.findOne({ dmc, status: 'box' });
+    if (!existingDmc) {
+      console.warn(`DMC ${dmc} not found in box status`);
+      return { message: 'not found' };
+    }
+
     const result = await scansCollection.updateOne(
       { dmc, status: 'box' },
       {
@@ -849,12 +862,16 @@ export async function deleteDmcFromBox(dmc: string, operators: string[]) {
         },
       },
     );
+    
     if (result.modifiedCount === 1) {
+      console.log(`Successfully deleted DMC ${dmc} from box by operators: ${operators.join(', ')}`);
       return { message: 'deleted' };
     }
-    return { message: 'not found' };
+    
+    console.error(`Failed to delete DMC ${dmc} - no documents modified`);
+    return { message: 'update failed' };
   } catch (error) {
-    console.error(error);
+    console.error('Error in deleteDmcFromBox:', error);
     return { message: 'error' };
   }
 }
@@ -862,7 +879,20 @@ export async function deleteDmcFromBox(dmc: string, operators: string[]) {
 // Delete HYDRA batch from pallet (set status to rework)
 export async function deleteHydraFromPallet(hydra: string, operators: string[]) {
   try {
+    if (!hydra || !operators || operators.length === 0) {
+      console.error('Invalid parameters for deleteHydraFromPallet:', { hydra, operators });
+      return { message: 'invalid parameters' };
+    }
+
     const scansCollection = await dbc('scans');
+    
+    // First check if the HYDRA batch exists in pallet status
+    const existingBatch = await scansCollection.findOne({ hydra_batch: hydra, status: 'pallet' });
+    if (!existingBatch) {
+      console.warn(`HYDRA batch ${hydra} not found in pallet status`);
+      return { message: 'not found' };
+    }
+
     const result = await scansCollection.updateMany(
       { hydra_batch: hydra, status: 'pallet' },
       {
@@ -874,12 +904,16 @@ export async function deleteHydraFromPallet(hydra: string, operators: string[]) 
         },
       },
     );
+    
     if (result.modifiedCount > 0) {
+      console.log(`Successfully deleted HYDRA batch ${hydra} from pallet (${result.modifiedCount} records) by operators: ${operators.join(', ')}`);
       return { message: 'deleted' };
     }
-    return { message: 'not found' };
+    
+    console.error(`Failed to delete HYDRA batch ${hydra} - no documents modified`);
+    return { message: 'update failed' };
   } catch (error) {
-    console.error(error);
+    console.error('Error in deleteHydraFromPallet:', error);
     return { message: 'error' };
   }
 }

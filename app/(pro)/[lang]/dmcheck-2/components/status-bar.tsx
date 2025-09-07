@@ -4,6 +4,7 @@ import type { Locale } from '@/i18n.config';
 import { Forklift, Package } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { deleteDmcFromBox, deleteHydraFromPallet } from '../actions';
 import { useGetBoxScans } from '../data/get-box-scans';
 import { useGetBoxStatus } from '../data/get-box-status';
@@ -21,21 +22,21 @@ interface StatusBarProps {
 }
 
 export default function StatusBar({ dict, lang }: StatusBarProps) {
-  const { selectedArticle } = useScanStore();
+  const { selectedArticle, removeScan } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
+  const queryClient = useQueryClient();
 
   // Get operators array
   const operators = [operator1, operator2, operator3]
     .filter((op) => op?.identifier)
     .map((op) => op!.identifier);
 
-  // Get status from React Query with refetch functions
-  const { data: boxData = { piecesInBox: 0 }, refetch: refetchBoxStatus } =
-    useGetBoxStatus(selectedArticle?.id);
-  const {
-    data: palletData = { boxesOnPallet: 0 },
-    refetch: refetchPalletStatus,
-  } = useGetPalletStatus(selectedArticle?.id, selectedArticle?.pallet || false);
+  // Get status from React Query
+  const { data: boxData = { piecesInBox: 0 } } = useGetBoxStatus(selectedArticle?.id);
+  const { data: palletData = { boxesOnPallet: 0 } } = useGetPalletStatus(
+    selectedArticle?.id, 
+    selectedArticle?.pallet || false
+  );
 
   // Calculate full status locally using selectedArticle from store
   const boxIsFull = boxData.piecesInBox >= (selectedArticle?.piecesPerBox || 0);
@@ -94,11 +95,26 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
       async () => {
         const res = await deleteDmcFromBox(dmc, operators);
         if (res.message === 'deleted') {
+          // Remove from local store
+          removeScan(dmc);
+          
+          // Refetch box scans manually since it's disabled by default
           await refetchBoxScans();
-          await refetchBoxStatus();
+          
+          // Invalidate box status query for counter update
+          await queryClient.invalidateQueries({
+            queryKey: ['box-status', selectedArticle?.id],
+          });
+          
           return dict.dmcDeleted;
-        } else {
+        } else if (res.message === 'not found') {
           throw new Error(dict.dmcNotFound);
+        } else if (res.message === 'invalid parameters') {
+          throw new Error('Invalid parameters provided');
+        } else if (res.message === 'update failed') {
+          throw new Error('Failed to update database');
+        } else {
+          throw new Error(dict.deleteError);
         }
       },
       {
@@ -114,11 +130,23 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
       async () => {
         const res = await deleteHydraFromPallet(hydra, operators);
         if (res.message === 'deleted') {
+          // Refetch pallet boxes manually since it's disabled by default
           await refetchPalletBoxes();
-          await refetchPalletStatus();
+          
+          // Invalidate pallet status query for counter update
+          await queryClient.invalidateQueries({
+            queryKey: ['pallet-status', selectedArticle?.id],
+          });
+          
           return dict.boxDeleted;
-        } else {
+        } else if (res.message === 'not found') {
           throw new Error(dict.boxNotFound);
+        } else if (res.message === 'invalid parameters') {
+          throw new Error('Invalid parameters provided');
+        } else if (res.message === 'update failed') {
+          throw new Error('Failed to update database');
+        } else {
+          throw new Error(dict.deleteError);
         }
       },
       {
