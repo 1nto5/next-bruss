@@ -2,63 +2,164 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
-
-Next-Bruss is an industrial manufacturing web application built with Next.js 15, serving production floor operations and management tasks. The app has two main sections:
-
-- **Production** (`/pro`) - DMC scanning, inventory, oven monitoring
-- **Management** (`/mgmt`) - Admin, deviations, failures, quality control
-
-## Essential Commands
+## Development Commands
 
 ```bash
-# Development
-bun dev          # Start development server with Turbopack (always run in background)
-bun build        # Create production build (with Turbopack) - DO NOT run while bun dev is running
-bun start        # Start production server
+# Development server with Turbopack
+bun dev
 
-# Database connections
-# MongoDB: Connection string in MONGODB_URI env var
-# PostgreSQL: Connection string in PG_STRING env var
+# Production build with Turbopack
+bun build
 
-# Note: No test framework configured - testing is handled manually
-```
-
-## High-Level Architecture
-
-### Route Structure
+# Start production server
+bun start
 
 ```
-app/
-├── (pro)/[lang]/       # Production floor apps (minimal layout)
-│   ├── dmcheck-2/      # DMC scanning and validation (new version)
-│   ├── dmcheck/        # Legacy DMC system
-│   ├── inw-2/spis/     # Inventory management
-│   └── oven/           # Oven process monitoring
-└── (mgmt)/[lang]/      # Management apps (full layout with nav)
-    ├── admin/          # User administration
-    ├── deviations/     # Quality deviation tracking
-    └── failures/       # Failure analysis
+
+## MCP Server Tools
+
+This Claude Code instance has access to several MCP (Model Context Protocol) servers that provide enhanced capabilities for development, testing, and debugging.
+
+### MCP Playwright Testing
+
+The integrated Playwright MCP server provides browser automation capabilities for end-to-end testing.
+
+**Key Functions:**
+
+- `mcp__playwright__browser_navigate` - Navigate to URLs for testing
+- `mcp__playwright__browser_snapshot` - Capture page state for analysis
+- `mcp__playwright__browser_click` - Interact with page elements
+- `mcp__playwright__browser_type` - Fill forms and input fields
+- `mcp__playwright__browser_take_screenshot` - Visual testing and debugging
+
+**Common Testing Patterns:**
+
+```typescript
+// E2E testing workflow example
+1. Navigate to application page
+2. Take snapshot to analyze page structure
+3. Fill forms and interact with elements
+4. Verify expected outcomes
+5. Take screenshots for visual verification
 ```
 
-### Production Floor Applications (Pro)
+**Best Practices:**
 
-Production applications are touchscreen-optimized interfaces for factory floor operations. **For detailed Production Floor Applications documentation, patterns, and implementation guidelines, see [PRO.md](PRO.md).**
+- Use snapshots before actions to understand page structure
+- Take screenshots for debugging failed tests
+- Test critical user flows (authentication, data entry, navigation)
+- Verify multi-language interface functionality
 
-### Management Applications (Mgmt)
+**Automated Server Check Pattern:**
 
-Management applications are full-featured web interfaces for administrative tasks. **For detailed Management Applications documentation, patterns, and implementation guidelines, see [MGMT.md](MGMT.md).**
+```typescript
+// When using Playwright MCP tools, first verify server availability
+1. Check if localhost:3000 is accessible
+2. If not accessible, start development server with 'bun dev'
+3. Wait for server to respond before proceeding with tests
+4. Navigate to application and continue with test workflow
+```
 
-### Key Patterns
+### MCP MongoDB Database Operations
 
-#### Server Actions
+The MongoDB MCP server provides direct database access and inspection capabilities.
 
-Located in `actions.ts` files, follow this pattern:
+**Key Functions:**
+
+- `mcp__mongodb__connect` - Connect to MongoDB instances
+- `mcp__mongodb__find` - Query collections with filters and projections
+- `mcp__mongodb__collection-schema` - Analyze collection structure
+- `mcp__mongodb__count` - Get document counts with optional filters
+- `mcp__mongodb__aggregate` - Run aggregation pipelines
+
+**When to Use MCP vs Standard Connection:**
+
+- **Use `dbc()` pattern** for application code and server actions
+- **Use MCP MongoDB** for debugging, data inspection, and analysis
+- **Use MCP MongoDB** when you need to explore unfamiliar collections
+- **Use MCP MongoDB** for complex aggregation pipeline development
+
+**Common Operations:**
+
+```typescript
+// Data inspection and debugging workflow
+1. Connect to database
+2. List collections and analyze schemas
+3. Query data with filters to understand structure
+4. Count documents to verify data integrity
+5. Run aggregations for complex data analysis
+```
+
+### MCP Context7 Documentation
+
+The Context7 MCP server provides access to up-to-date documentation for libraries and frameworks.
+
+**Key Functions:**
+
+- `mcp__context7__resolve-library-id` - Find correct library identifiers
+- `mcp__context7__get-library-docs` - Retrieve current documentation
+
+**When to Use Context7:**
+
+- When you need the latest API documentation for a library
+- When working with recently updated frameworks or packages
+- When existing knowledge might be outdated
+- When looking for specific implementation examples
+
+**Common Libraries to Query:**
+
+- Next.js (`/vercel/next.js`)
+- React documentation
+- MongoDB driver documentation
+- shadcn/ui component references
+- TypeScript language features
+
+**Usage Pattern:**
+
+```typescript
+// Documentation access workflow
+1. Resolve library ID for the specific package
+2. Get relevant documentation sections
+3. Apply current best practices and APIs
+4. Verify implementation patterns
+```
+
+## Project Architecture
+
+Next-Bruss is an industrial manufacturing web application with two distinct user interfaces:
+
+### Application Structure
+
+- **Production Floor Apps** (`/app/(pro)/[lang]/`) - Minimal terminal-optimized interfaces
+  - `dmcheck/` - DMC scanning and quality tracking (legacy)
+  - `dmcheck-2/` - Modern DMC system with box/pallet management
+  - `inw-2/` - Inventory management
+  - `oven/` - Oven monitoring and temperature tracking
+  - `eol136153-2/` - End-of-line validation system
+
+- **Management Interface** (`/app/(mgmt)/[lang]/`) - Full-featured administrative interface
+  - `admin/` - User management, articles, employees
+  - Quality management: `deviations/`, `failures/`, `capa-old/`
+  - Production data: `dmcheck-data/`, `oven-data/`, `production-overtime/`
+  - Tools: `codes-generator/`, `projects/`, `news/`
+
+### Key Technical Patterns
+
+**Database Access Pattern:**
+
+```typescript
+import { dbc } from '@/lib/mongo';
+
+const collection = await dbc('collection_name');
+// Always check for archive collections with _archive suffix
+const archiveCollection = await dbc('collection_name_archive');
+```
+
+**Server Actions Pattern:**
 
 ```typescript
 'use server';
 import { auth } from '@/auth';
-import { dbc } from '@/lib/mongo';
 import { revalidateTag } from 'next/cache';
 
 export async function actionName(data: Type) {
@@ -67,117 +168,74 @@ export async function actionName(data: Type) {
     return { error: 'unauthorized' };
   }
 
-  const collection = await dbc('collection_name');
   // Perform operation
   revalidateTag('tag-name');
   return { success: 'message' };
 }
 ```
 
-#### Database Access
+**Authentication & Authorization:**
 
-- **MongoDB**: Use `dbc()` from `/lib/mongo` - handles connection pooling
-- **PostgreSQL**: Use `pgp` default export from `/lib/pg` - for legacy integrations
-- Always check for archive collections (suffix `_archive`) as fallback
+- LDAP-based authentication via NextAuth.js
+- Role-based access control stored in MongoDB `users` collection
+- Session includes `user.roles` array for permission checking
+- Roles are refreshed periodically (default: 1 hour)
 
-#### Authentication
+**State Management:**
 
-- LDAP-based authentication via NextAuth.js v5
-- Role checking: `session.user.roles.includes('role-name')`
-- Roles stored in MongoDB `users` collection
+- **Zustand** for client-side state with persistence (`/lib/hooks/`)
+- **React Query** for server state management
+- **nuqs** for URL state synchronization
+- Server Components by default, `'use client'` when needed
 
-#### Component Structure
+**Form Handling:**
 
-- **Global UI components**: `/components/ui/` (shadcn/ui based)
-- **Page-specific components**: Co-located with routes
-- **Server Components**: Default, mark Client Components with `'use client'`
+- React Hook Form + Zod validation
+- Error handling: return `{ error: string }` from server actions
 
-#### State Management
+## Technology Stack
 
-- **URL state**: nuqs for search params synchronization
+- **Runtime**: Bun package manager
+- **Framework**: Next.js 15 with App Router and Turbopack
+- **Language**: TypeScript with strict mode
+- **Styling**: Tailwind CSS v4 with custom Bruss theme (`bruss: '#8bb63b'`)
+- **UI Components**: shadcn/ui (Radix UI primitives) in `/components/ui/`
+- **Databases**: MongoDB (primary) + PostgreSQL (legacy integrations)
+- **Authentication**: NextAuth.js with LDAP provider
+- **Internationalization**: Built-in i18n (Polish, German, English, and other languages for production applications)
 
-#### Internationalization
+## Debugging & Troubleshooting
 
-- **Locales**: `pl` (default), `de`, `en`, `uk`, `be`, `tl` (6 total)
-- **Dictionary files**: `/app/dictionaries/{app-name}/{locale}.json`
-- **Access pattern**: `getDictionary(lang)` for server components
-- **Fallback**: Always provide Polish fallback for missing translations
-- **URL structure**: `/[lang]/app-name` (e.g., `/pl/dmcheck-2`, `/en/admin`)
+### Using MCP Tools for Debugging
 
-### Critical Implementation Notes
+**Playwright MCP for UI Issues:**
 
-1. **Multi-select filters**: Use OR within field, AND between fields
-2. **Date handling**: Always use ISO strings for consistency
-3. **Error handling**: Return `{ error: string }` from server actions
-4. **Form validation**: Zod schemas with React Hook Form
-5. **Archive data**: Check both main and archive collections
-6. **Dictionary fallbacks**: Always provide Polish fallbacks with `|| 'Polish text'`
+```bash
+# Debug workflow with Playwright MCP
+1. Navigate to problematic page
+2. Take screenshot to see current state
+3. Take snapshot to analyze DOM structure
+4. Interact with elements to reproduce issue
+5. Verify expected vs actual behavior
+```
 
-### Code Style Guidelines
+**MongoDB MCP for Data Issues:**
 
-**Code Style and Structure**
+```bash
+# Data debugging workflow
+1. Connect to database using MCP MongoDB
+2. Inspect collection schemas to understand structure
+3. Query specific documents with filters
+4. Analyze data integrity with count operations
+5. Use aggregation to identify patterns or issues
+```
 
-- Write concise, technical TypeScript code with accurate examples
-- Use functional and declarative programming patterns; avoid classes
-- Prefer iteration and modularization over code duplication
-- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError)
-- Structure files: exported component, subcomponents, helpers, static content, types
+**Context7 for Documentation Issues:**
 
-**Naming Conventions**
-
-- Use lowercase with dashes for directories (e.g., components/auth-wizard)
-- Favor named exports for components
-
-**TypeScript Usage**
-
-- Use TypeScript for all code; prefer interfaces over types
-- Avoid enums; use maps instead
-- Use functional components with TypeScript interfaces
-
-**Syntax and Formatting**
-
-- Use the "function" keyword for pure functions
-- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements
-- Use declarative JSX
-
-**UI and Styling**
-
-- Use Shadcn UI and Tailwind for components and styling
-- Implement responsive design with Tailwind CSS; use a mobile-first approach
-- No border-radius (`--radius: 0rem`)
-- Uses OKLCH color space for better color management and accessibility
-
-**Performance Optimization**
-
-- Minimize 'use client', 'useEffect', and 'setState'; favor React Server Components (RSC)
-- Wrap client components in Suspense with fallback
-- Use dynamic loading for non-critical components
-- Optimize images: use WebP format, include size data, implement lazy loading
-
-**Key Conventions**
-
-- Use 'nuqs' for URL search parameter state management
-- Optimize Web Vitals (LCP, CLS, FID)
-- Limit 'use client': Favor server components and Next.js SSR, use only for Web API access in small components, avoid for data fetching or state management
-
-**Development Workflow**
-
-- **CRITICAL**: Always start `bun dev` in background immediately after the first question is asked - this enables monitoring of the Next.js application and real-time error detection
-- Monitor development server output for build errors, runtime issues, and performance warnings
-
-### External Integrations
-
-- **SMART API**: EOL validation endpoints
-- **LDAP**: Enterprise authentication
-- **PostgreSQL**: Legacy system data access
-
-### Cron Jobs (next-bruss-cron workspace)
-
-Separate Node.js app handles:
-
-- Deviation reminders and status updates
-- Production overtime notifications
-- HR training evaluation tracking
-- LDAP/R2platnik data synchronization
-- IoT sensor logging (every minute)
-- Weekly data archiving
+```bash
+# When existing patterns don't work
+1. Resolve library ID for the problematic package
+2. Get current documentation for the specific feature
+3. Compare with existing implementation
+4. Update code to match current best practices
+```
