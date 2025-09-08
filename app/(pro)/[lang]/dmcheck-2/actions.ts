@@ -8,6 +8,30 @@ import { v4 as uuidv4 } from 'uuid';
 import type { LoginType } from './lib/zod';
 import type { ArticleConfigType } from './lib/types';
 
+async function getNextReworkAttempt(dmc: string, workplace: string): Promise<string> {
+  const scansCollection = await dbc('scans');
+  
+  const existingReworks = await scansCollection
+    .find({
+      dmc,
+      workplace,
+      status: { $regex: /^rework\d+$/ }
+    })
+    .toArray();
+  
+  const reworkNumbers = existingReworks.map(record => {
+    const match = record.status.match(/^rework(\d+)$/);
+    return match ? parseInt(match[1], 10) : 1;
+  });
+  
+  const maxNumber = reworkNumbers.length > 0 ? Math.max(...reworkNumbers) : 0;
+  return `rework${maxNumber + 1}`;
+}
+
+function isReworkStatus(status: string): boolean {
+  return /^rework\d+$/.test(status);
+}
+
 export async function login(data: LoginType) {
   try {
     const collection = await dbc('employees');
@@ -232,7 +256,7 @@ export async function saveDmc(
       { sort: { time: -1 } },
     );
 
-    if (existingDmc && existingDmc.status !== 'rework') {
+    if (existingDmc && !isReworkStatus(existingDmc.status)) {
       return { message: 'dmc exists' };
     }
 
@@ -589,28 +613,24 @@ export async function saveDmcRework(
       { sort: { time: -1 } },
     );
 
-    if (
-      !existingDmc ||
-      existingDmc.status === 'rework' ||
-      existingDmc.status === 'box' ||
-      (articleConfig.pallet && existingDmc.status === 'pallet')
-    ) {
-      return { message: 'rework not possible' };
+    if (!existingDmc) {
+      return { message: 'dmc not found' };
     }
 
-    if (existingDmc && existingDmc.status !== 'rework') {
-      await scansCollection.updateOne(
-        { _id: existingDmc._id },
-        {
-          $set: {
-            status: 'rework',
-            rework_time: new Date(),
-            rework_reason: `workplace rework: ${articleConfig.workplace.toUpperCase()}`,
-            rework_user: `personal number: ${operators.join(', ')}`,
-          },
+
+    const nextReworkStatus = await getNextReworkAttempt(validatedDmc, articleConfig.workplace);
+    
+    await scansCollection.updateOne(
+      { _id: existingDmc._id },
+      {
+        $set: {
+          status: nextReworkStatus,
+          rework_time: new Date(),
+          rework_reason: `workplace rework: ${articleConfig.workplace.toUpperCase()}`,
+          rework_user: `personal number: ${operators.join(', ')}`,
         },
-      );
-    }
+      },
+    );
 
     // EOL810/EOL488 check in external SMART API
     if (
@@ -851,11 +871,13 @@ export async function deleteDmcFromBox(dmc: string, operators: string[]) {
       return { message: 'not found' };
     }
 
+    const nextReworkStatus = await getNextReworkAttempt(dmc, existingDmc.workplace);
+    
     const result = await scansCollection.updateOne(
       { dmc, status: 'box' },
       {
         $set: {
-          status: 'rework',
+          status: nextReworkStatus,
           rework_time: new Date(),
           rework_reason: 'deleted from box by operator',
           rework_user: `personal number: ${operators.join(', ')}`,
@@ -864,7 +886,6 @@ export async function deleteDmcFromBox(dmc: string, operators: string[]) {
     );
     
     if (result.modifiedCount === 1) {
-      console.log(`Successfully deleted DMC ${dmc} from box by operators: ${operators.join(', ')}`);
       return { message: 'deleted' };
     }
     
@@ -893,20 +914,34 @@ export async function deleteHydraFromPallet(hydra: string, operators: string[]) 
       return { message: 'not found' };
     }
 
-    const result = await scansCollection.updateMany(
-      { hydra_batch: hydra, status: 'pallet' },
-      {
-        $set: {
-          status: 'rework',
-          rework_time: new Date(),
-          rework_reason: 'deleted from pallet by operator',
-          rework_user: `personal number: ${operators.join(', ')}`,
+    const palletDmcs = await scansCollection
+      .find({ hydra_batch: hydra, status: 'pallet' })
+      .toArray();
+    
+    let totalUpdated = 0;
+    for (const dmcRecord of palletDmcs) {
+      const nextReworkStatus = await getNextReworkAttempt(dmcRecord.dmc, dmcRecord.workplace);
+      
+      const result = await scansCollection.updateOne(
+        { _id: dmcRecord._id },
+        {
+          $set: {
+            status: nextReworkStatus,
+            rework_time: new Date(),
+            rework_reason: 'deleted from pallet by operator',
+            rework_user: `personal number: ${operators.join(', ')}`,
+          },
         },
-      },
-    );
+      );
+      
+      if (result.modifiedCount === 1) {
+        totalUpdated++;
+      }
+    }
+    
+    const result = { modifiedCount: totalUpdated };
     
     if (result.modifiedCount > 0) {
-      console.log(`Successfully deleted HYDRA batch ${hydra} from pallet (${result.modifiedCount} records) by operators: ${operators.join(', ')}`);
       return { message: 'deleted' };
     }
     

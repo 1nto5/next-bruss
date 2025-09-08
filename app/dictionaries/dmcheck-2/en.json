@@ -57,8 +57,9 @@
       "smartPattern": "SMART: Part is a pattern",
       "smartFetchError": "SMART database connection problem",
       "smartUnknown": "SMART: Part not processed on all stations",
-      "reworkNotPossible": "Rework not possible",
+      "reworkNotPossible": "This part is already in the current box",
       "reworkDmcSaved": "DMC saved as rework",
+      "dmcNotFound": "DMC not found",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Print Pallet Label",

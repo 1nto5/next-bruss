@@ -54,7 +54,23 @@ export async function GET(req: NextRequest) {
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
 
-      if (values.length === 1) {
+      if (key === 'status' && values.includes('rework')) {
+        // Handle rework special case - match all rework attempts
+        const otherStatuses = values.filter(v => v !== 'rework');
+        const statusConditions = [];
+        
+        if (otherStatuses.length > 0) {
+          statusConditions.push({ status: { $in: otherStatuses } });
+        }
+        
+        statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        
+        if (statusConditions.length === 1) {
+          Object.assign(query, statusConditions[0]);
+        } else {
+          query.$or = statusConditions;
+        }
+      } else if (values.length === 1) {
         // Single value
         query[key] = values[0];
       } else if (values.length > 1) {

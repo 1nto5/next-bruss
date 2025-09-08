@@ -57,8 +57,9 @@
       "smartPattern": "SMART: Ang bahagi ay isang pattern",
       "smartFetchError": "Problema sa koneksyon ng SMART database",
       "smartUnknown": "SMART: Hindi naproseso ang bahagi sa lahat ng istasyon",
-      "reworkNotPossible": "Hindi maaaring gawin ang rework",
+      "reworkNotPossible": "Ang bahaging ito ay nasa kasalukuyang box na",
       "reworkDmcSaved": "DMC na-save bilang rework",
+      "dmcNotFound": "Hindi nahanap ang DMC",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "I-print ang Pallet Label",

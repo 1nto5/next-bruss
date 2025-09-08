@@ -57,8 +57,9 @@
       "smartPattern": "SMART: Частка з'яўляецца ўзорам",
       "smartFetchError": "Праблема злучэння з базай SMART",
       "smartUnknown": "SMART: Частка не апрацавана на ўсіх станцыях",
-      "reworkNotPossible": "Rework немагчымы",
+      "reworkNotPossible": "Гэтая частка ўжо знаходзіцца ў бягучым боксе",
       "reworkDmcSaved": "DMC захавана як rework",
+      "dmcNotFound": "DMC не знойдзены",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Друкаваць этыкетку палеты",

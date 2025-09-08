@@ -231,7 +231,7 @@ export default function DmcTableFilteringAndOptions({
     { value: 'box', label: 'box - scanned' },
     { value: 'pallet', label: 'pallet - confirmed with hydra label' },
     { value: 'warehouse', label: 'warehouse - confirmed with pallet label' },
-    { value: 'rework', label: 'rework - marked as rework' },
+    { value: 'rework', label: 'rework - all rework attempts' },
   ];
 
   const workplaceOptions = Array.from(

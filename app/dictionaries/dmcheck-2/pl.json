@@ -57,8 +57,9 @@
       "smartPattern": "SMART: Część jest wzornikiem",
       "smartFetchError": "Problem połączenia z bazą SMART",
       "smartUnknown": "SMART: Część nieprzeprocesowana na wszystkich stacjach",
-      "reworkNotPossible": "Rework niemożliwy",
+      "reworkNotPossible": "Ta część jest już w aktualnym boxie",
       "reworkDmcSaved": "DMC zapisany jako rework",
+      "dmcNotFound": "DMC nie został znaleziony",
       "saveError": "Błąd zapisu - skontaktuj się z IT"
     },
     "printPalletButton": "Drukuj etykietę palety",

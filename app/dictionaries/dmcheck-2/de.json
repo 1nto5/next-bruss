@@ -57,8 +57,9 @@
       "smartPattern": "SMART: Teil ist ein Muster",
       "smartFetchError": "SMART-Datenbankverbindungsproblem",
       "smartUnknown": "SMART: Teil nicht auf allen Stationen verarbeitet",
-      "reworkNotPossible": "Rework nicht möglich",
+      "reworkNotPossible": "Dieses Teil ist bereits in der aktuellen Box",
       "reworkDmcSaved": "DMC als Rework gespeichert",
+      "dmcNotFound": "DMC nicht gefunden",
       "saveError": "Save error - contact IT"
     },
     "printPalletButton": "Palettenetikett drucken",
