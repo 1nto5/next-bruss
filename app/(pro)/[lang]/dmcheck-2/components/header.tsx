@@ -55,7 +55,7 @@ export default function Header({ lang, dict }: HeaderProps) {
       {selectedArticle && (
         <Badge variant='secondary' className='flex items-center gap-2'>
           <Component className='h-4 w-4' />
-          {selectedArticle.articleNumber}
+          {selectedArticle.articleNumber} - {selectedArticle.articleName}
         </Badge>
       )}
       {boxStatus.piecesInBox > 0 && (
