@@ -5,8 +5,12 @@ import { dbc } from '@/lib/mongo';
 
 // Type definitions
 import { ObjectId } from 'mongodb';
-import { OvenProcessConfigType, OvenProcessType } from './lib/types';
-import { loginType } from './lib/zod';
+import { OvenProgramConfigType, OvenProcessType } from './lib/types';
+import {
+  completeProcessSchema,
+  loginType,
+  startBatchSchemaServer,
+} from './lib/zod';
 
 /**
  * Authenticates users for inventory access
@@ -15,6 +19,8 @@ import { loginType } from './lib/zod';
  */
 export async function login(data: loginType) {
   try {
+    // Note: loginType is already validated by the client using zodResolver
+    // but we could add server-side validation here as well if needed
     const collection = await dbc('employees');
     let operator1 = null;
     let operator2 = null;
@@ -68,57 +74,70 @@ export async function login(data: loginType) {
     };
   } catch (error) {
     console.error(error);
-    return { error: 'login server action error' };
+    return { error: 'login error' };
   }
 }
 
 /**
  * Fetches oven process configuration for a specific article
+ * First fetches the program number from oven_process_configs,
+ * then fetches the actual program details from oven_program_configs
  * @param article - The article number to lookup
- * @returns Configuration data or null if not found
+ * @returns Configuration data with program details or null if not found
  */
 export async function fetchOvenProcessConfig(
   article: string,
 ): Promise<
-  { success: OvenProcessConfigType } | { error: string } | { success: null }
+  { success: OvenProgramConfigType & { article: string } } | { error: string } | { success: null }
 > {
   try {
-    const collection = await dbc('oven_process_configs');
-    const config = await collection.findOne({ article });
-
-    if (!config) {
+    // First, get the program number for this article
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection
+      .findOne({ article });
+    
+    if (!processConfig) {
       return { success: null };
+    }
+
+    // Then, get the program details
+    const programConfigCollection = await dbc('oven_program_configs');
+    const programConfig = await programConfigCollection
+      .findOne({ program: processConfig.program });
+    
+    if (!programConfig) {
+      return { error: 'program not found' };
     }
 
     return {
       success: {
-        id: config._id.toString(),
-        article: config.article,
-        temp: config.temp,
-        tempTolerance: config.tempTolerance,
-        duration: config.duration,
+        id: programConfig._id.toString(),
+        article: article,
+        program: programConfig.program,
+        temp: programConfig.temp,
+        tempTolerance: programConfig.tempTolerance,
+        duration: programConfig.duration,
+        durationTolerance: programConfig.durationTolerance,
       },
     };
   } catch (error) {
     console.error(error);
-    return { error: 'fetchOvenProcessConfig server action error' };
+    return { error: 'config error' };
   }
 }
 
 /**
  * Retrieves all oven processes for a specific oven
- * @param oven - The oven identifier (tem2, tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
- * @param includeConfig - This parameter is now deprecated - target values are saved directly in process
+ * @param oven - The oven identifier (tem10, tem11, tem12, tem13, tem14, tem15, tem16, tem17)
  * @returns Array of processes or error message
  */
 export async function fetchOvenProcesses(
   oven: string,
-  includeConfig = false,
 ): Promise<{ success: OvenProcessType[] } | { error: string }> {
   try {
     const collection = await dbc('oven_processes');
     const processes = await collection
-      .find({ oven })
+      .find({ oven, status: { $in: ['prepared', 'running'] } }) // Return prepared and running processes
       .sort({ startTime: -1 }) // Sort by startTime (existing field)
       .toArray();
 
@@ -146,12 +165,15 @@ export async function fetchOvenProcesses(
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Calculate expected completion if we have target duration
-        let expectedCompletion: Date | undefined;
-        if (doc.targetDuration) {
-          expectedCompletion = new Date(
-            doc.startTime.getTime() + doc.targetDuration * 1000,
-          );
+        // Calculate isOverdue on server to avoid timezone issues
+        let isOverdue = false;
+        if (doc.startTime && doc.targetDuration) {
+          const startTime = new Date(doc.startTime).getTime();
+          const targetDurationMs = doc.targetDuration * 1000;
+          const durationToleranceMs = (doc.durationTolerance || 0) * 1000;
+          const overdueThreshold = startTime + targetDurationMs + durationToleranceMs;
+          const currentTime = new Date().getTime();
+          isOverdue = currentTime > overdueThreshold;
         }
 
         return {
@@ -159,7 +181,8 @@ export async function fetchOvenProcesses(
           oven: doc.oven,
           article: doc.article || '',
           hydraBatch: doc.hydraBatch,
-          operator: doc.operator,
+          startOperators: doc.startOperators || doc.operator || [], // Handle legacy data
+          endOperators: doc.endOperators || undefined,
           status: doc.status,
           startTime: doc.startTime,
           endTime: doc.endTime,
@@ -168,38 +191,72 @@ export async function fetchOvenProcesses(
           targetTemp: doc.targetTemp,
           tempTolerance: doc.tempTolerance,
           targetDuration: doc.targetDuration,
-          expectedCompletion,
+          durationTolerance: doc.durationTolerance,
+          isOverdue,
         };
       }),
     );
     return { success: sanitizedProcesses };
   } catch (error) {
     console.error(error);
-    return { error: 'fetchOvenProcesses server action error' };
+    return { error: 'fetch error' };
   }
 }
 
 /**
  * Starts (creates if needed) an oven process
  * @param oven - The oven string (e.g., 'tem10')
- * @param article - Article number from scan
- * @param hydraBatch - Batch number from scan
- * @param operator - Array of operator identifiers
- * @returns Success status or error message
+ * @param article - Article number from scan (validated: exactly 5 digits)
+ * @param hydraBatch - Batch number from scan (validated: exactly 10 characters)
+ * @param operator - Array of operator identifiers (validated: at least one required)
+ * @param selectedProgram - The program number selected for this oven
+ * @returns Success status or error message (includes validation errors)
  */
 export async function startOvenProcess(
   oven: string,
   article: string,
   hydraBatch: string,
   operator: string[],
+  selectedProgram: number,
 ): Promise<{ error: string } | { success: boolean; processId: string }> {
   try {
+    // Validate input data using ZOD schema
+    const validationResult = startBatchSchemaServer.safeParse({
+      scannedArticle: article,
+      scannedBatch: hydraBatch,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
+    // Additional validation for operators array
+    if (!operator || operator.length === 0) {
+      return { error: 'no operator' };
+    }
+
+    // Validate article is configured for the selected program
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection.findOne({ article });
+    
+    if (!processConfig) {
+      return { error: 'article not configured' };
+    }
+    
+    if (processConfig.program !== selectedProgram) {
+      return { error: 'wrong program for article' };
+    }
+
     const collection = await dbc('oven_processes');
 
     // Fetch the configuration to save target values at time of creation
     let targetTemp: number | undefined;
     let tempTolerance: number | undefined;
     let targetDuration: number | undefined;
+    let durationTolerance: number | undefined;
 
     try {
       const configResult = await fetchOvenProcessConfig(article);
@@ -208,6 +265,7 @@ export async function startOvenProcess(
         targetTemp = config.temp;
         tempTolerance = config.tempTolerance;
         targetDuration = config.duration;
+        durationTolerance = config.durationTolerance;
       }
     } catch (configError) {
       console.error('Error fetching config for new process:', configError);
@@ -219,14 +277,16 @@ export async function startOvenProcess(
       oven,
       article,
       hydraBatch,
-      operator: operator,
-      status: 'running' as const,
+      startOperators: operator,
+      endOperators: null,
+      status: 'prepared' as const,
       startTime: new Date(),
       endTime: null,
       // Save target values from config at time of creation
       targetTemp,
       tempTolerance,
       targetDuration,
+      durationTolerance,
     };
 
     try {
@@ -235,31 +295,98 @@ export async function startOvenProcess(
         return { error: 'not created' };
       }
       return { success: true, processId: result.insertedId.toString() };
-    } catch (error: any) {
+    } catch (error) {
       // MongoDB duplicate key error code
-      if (error.code === 11000) {
-        console.log('duplicate batch');
+      if ((error as { code?: number }).code === 11000) {
         return { error: 'duplicate batch' };
       }
-      throw error; // Re-throw other errors
+      // Log error and return generic error message
+      console.error('Database error:', error);
+      return { error: 'database error' };
     }
   } catch (error) {
     console.error(error);
-    return { error: 'startOvenProcess server action error' };
+    return { error: 'start error' };
+  }
+}
+
+/**
+ * Deletes an oven process by changing status to 'deleted'
+ * @param processId - The process ID to delete (validated: 24-character hex string)
+ * @returns Success status or error message (includes validation errors)
+ */
+export async function deleteOvenProcess(
+  processId: string,
+): Promise<{ error: string } | { success: boolean }> {
+  try {
+    // Validate input data using ZOD schema
+    const validationResult = completeProcessSchema.safeParse({
+      processId,
+      notes: undefined,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
+    const collection = await dbc('oven_processes');
+
+    const result = await collection.updateOne(
+      { _id: new ObjectId(processId) },
+      {
+        $set: {
+          status: 'deleted',
+          deletedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.modifiedCount > 0) {
+      return { success: true };
+    }
+
+    return { error: 'not deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'delete error' };
   }
 }
 
 /**
  * Completes an oven process
- * @param processId - The process ID to complete
+ * @param processId - The process ID to complete (validated: 24-character hex string)
+ * @param endOperators - Array of operator identifiers who completed the process
  * @param notes - Optional completion notes
- * @returns Success status or error message
+ * @returns Success status or error message (includes validation errors)
  */
 export async function completeOvenProcess(
   processId: string,
+  endOperators: string[],
   notes?: string,
 ): Promise<{ error: string } | { success: boolean }> {
   try {
+    // Validate input data using ZOD schema
+    const validationResult = completeProcessSchema.safeParse({
+      processId,
+      notes,
+    });
+
+    if (!validationResult.success) {
+      // Return generic validation error - if ZOD validation fails on server,
+      // it indicates either malicious input or client-side validation bypass
+      // All ZOD validation should be handled properly on the frontend
+      return { error: 'validation failed' };
+    }
+
+    // Additional validation for endOperators array
+    if (!endOperators || endOperators.length === 0) {
+      return { error: 'no operator' };
+    }
+
     const collection = await dbc('oven_processes');
 
     const result = await collection.updateOne(
@@ -268,6 +395,7 @@ export async function completeOvenProcess(
         $set: {
           status: 'finished', // match OvenProcessType
           endTime: new Date(),
+          endOperators: endOperators,
           updatedAt: new Date(),
         },
       },
@@ -280,7 +408,123 @@ export async function completeOvenProcess(
     return { error: 'not completed' };
   } catch (error) {
     console.error(error);
-    return { error: 'completeOvenProcess server action error' };
+    return { error: 'complete error' };
+  }
+}
+
+/**
+ * Fetches all available oven programs from the database
+ * @returns Array of program numbers or error message
+ */
+export async function fetchOvenProgram(): Promise<
+  { success: number[] } | { error: string }
+> {
+  try {
+    const collection = await dbc('oven_program_configs');
+    const programs = await collection
+      .find({})
+      .project({ program: 1 })
+      .sort({ program: 1 })
+      .toArray();
+    
+    const programNumbers = programs.map(p => p.program);
+    return { success: programNumbers };
+  } catch (error) {
+    console.error('fetchOvenProgram error:', error);
+    return { error: 'programs fetch error' };
+  }
+}
+
+/**
+ * Fetches the active program for a given oven based on running processes
+ * @param oven - The oven identifier
+ * @returns { program: number | null } or { error: string }
+ */
+export async function fetchActiveOvenProgram(
+  oven: string,
+): Promise<{ program: number | null } | { error: string }> {
+  try {
+    const processCollection = await dbc('oven_processes');
+    // Find running processes for this oven
+    const runningProcess = await processCollection
+      .findOne({ oven, status: 'running' });
+    
+    if (!runningProcess || !runningProcess.article) {
+      return { program: null };
+    }
+
+    // Get the program for this article
+    const processConfigCollection = await dbc('oven_process_configs');
+    const processConfig = await processConfigCollection
+      .findOne({ article: runningProcess.article });
+    
+    if (!processConfig) {
+      return { program: null };
+    }
+
+    return { program: processConfig.program };
+  } catch (error) {
+    console.error('fetchActiveOvenProgram error:', error);
+    return { error: 'program fetch error' };
+  }
+}
+
+/**
+ * Completes all running oven processes for a specific oven
+ * @param oven - The oven identifier  
+ * @param endOperators - Array of operator identifiers who completed the processes
+ * @returns Success status with count or error message
+ */
+export async function completeAllOvenProcesses(
+  oven: string,
+  endOperators: string[],
+): Promise<{ 
+  success?: { count: number };
+  error?: string 
+}> {
+  try {
+    // Additional validation for endOperators array
+    if (!endOperators || endOperators.length === 0) {
+      return { error: 'no operator' };
+    }
+
+    const collection = await dbc('oven_processes');
+
+    // Find all running processes for this oven
+    const runningProcesses = await collection
+      .find({ oven, status: 'running' })
+      .toArray();
+
+    if (runningProcesses.length === 0) {
+      return { error: 'no running processes' };
+    }
+
+    // Complete all running processes
+    const processIds = runningProcesses.map(p => p._id);
+    const result = await collection.updateMany(
+      { _id: { $in: processIds } },
+      {
+        $set: {
+          status: 'finished',
+          endTime: new Date(),
+          endOperators: endOperators,
+          updatedAt: new Date(),
+        },
+      },
+    );
+
+    if (result.modifiedCount > 0) {
+      return { 
+        success: { 
+          count: result.modifiedCount
+        } 
+      };
+    }
+
+    return { error: 'not completed' };
+  } catch (error) {
+    console.error('completeAllOvenProcesses error:', error);
+    return { error: 'complete error' };
   }
 }
 
@@ -334,6 +578,6 @@ export async function fetchOvenLastAvgTemp(
     return { avgTemp };
   } catch (error) {
     console.error('fetchOvenLastAvgTemp error:', error);
-    return { error: 'fetchOvenLastAvgTemp server action error' };
+    return { error: 'temp error' };
   }
 }

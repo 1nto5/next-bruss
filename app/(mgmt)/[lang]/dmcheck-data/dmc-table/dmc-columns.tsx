@@ -3,6 +3,15 @@
 import { DmcTableDataType } from '@/app/(mgmt)/[lang]/dmcheck-data/lib/dmcheck-data-types';
 import { ColumnDef } from '@tanstack/react-table';
 
+// Helper function to format operator(s) - handles both string and array
+function formatOperators(operator: string | string[] | undefined): string {
+  if (!operator) return '';
+  if (Array.isArray(operator)) {
+    return operator.join(', ');
+  }
+  return operator;
+}
+
 export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
   {
     accessorKey: 'status',
@@ -27,6 +36,9 @@ export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
   {
     accessorKey: 'operator',
     header: 'Operator',
+    cell: ({ row }) => {
+      return formatOperators(row.original.operator);
+    },
   },
   {
     accessorKey: 'workplace',
@@ -41,6 +53,13 @@ export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
     header: 'HYDRA batch',
   },
   {
+    accessorKey: 'hydra_operator',
+    header: 'HYDRA operator',
+    cell: ({ row }) => {
+      return formatOperators(row.original.hydra_operator);
+    },
+  },
+  {
     accessorKey: 'hydraTimeLocaleString',
     header: 'HYDRA time',
   },
@@ -49,12 +68,23 @@ export const dmcColumns: ColumnDef<DmcTableDataType>[] = [
     header: 'Pallet batch',
   },
   {
+    accessorKey: 'pallet_operator',
+    header: 'Pallet operator',
+    cell: ({ row }) => {
+      return formatOperators(row.original.pallet_operator);
+    },
+  },
+  {
     accessorKey: 'palletTimeLocaleString',
     header: 'Pallet time',
   },
   {
-    accessorKey: 'reworkReason',
+    accessorKey: 'rework_reason',
     header: 'Rework reason',
+  },
+  {
+    accessorKey: 'rework_user',
+    header: 'Rework user',
   },
   {
     accessorKey: 'reworkTimeLocaleString',

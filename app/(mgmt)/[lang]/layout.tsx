@@ -13,18 +13,18 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }) {
   const params = await props.params;
   const { lang } = params;
   const { children } = props;
 
-  const dictionary = await getDictionary(lang);
+  const dictionary = await getDictionary(lang as Locale);
 
   return (
     <>
       <div className='flex min-h-screen flex-col space-y-1'>
-        <Header dict={dictionary} lang={lang} />
+        <Header dict={dictionary} lang={lang as Locale} />
         <main className='mx-auto w-full max-w-[96rem] flex-1'>
           <div className='w-full'>
             <NuqsProvider>{children}</NuqsProvider>

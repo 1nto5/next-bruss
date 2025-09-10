@@ -17,6 +17,7 @@ import {
   Check,
   CheckCircle,
   Download,
+  Edit,
   FileText,
   MoreHorizontal,
   X,
@@ -222,6 +223,18 @@ export const createColumns = (
           userEmail === request.requestedBy ||
           userEmail === request.responsibleEmployee;
 
+        // Check if user can edit
+        // For canceled and accounted statuses - only admin can edit
+        // For other statuses: Admin, HR, and plant-manager can edit always
+        // Author can edit only pending status
+        const canEdit = 
+          (request.status === 'canceled' || request.status === 'accounted') 
+            ? userRoles.includes('admin')
+            : ((request.requestedBy === userEmail && request.status === 'pending') ||
+               userRoles.includes('admin') ||
+               userRoles.includes('hr') ||
+               userRoles.includes('plant-manager'));
+
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
         const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
@@ -236,6 +249,7 @@ export const createColumns = (
           hasApproveAction ||
           hasMarkAsAccountedAction ||
           canCancel ||
+          canEdit ||
           hasAddAttachmentAction ||
           hasDownloadAttachmentAction;
 
@@ -270,6 +284,15 @@ export const createColumns = (
                         <span>Odbiór nadgodzin</span>
                       </DropdownMenuItem>
                     </Link>
+                    {/* Edit button - only for author and pending/approved status */}
+                    {canEdit && (
+                      <Link href={`/production-overtime/${request._id}/edit`}>
+                        <DropdownMenuItem>
+                          <Edit className='mr-2 h-4 w-4' />
+                          <span>Edytuj zlecenie</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
                     {/* Only show approve button if user can approve */}
                     {canApprove &&
                       request.status !== 'approved' &&

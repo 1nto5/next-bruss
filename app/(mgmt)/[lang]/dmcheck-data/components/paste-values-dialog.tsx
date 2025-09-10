@@ -1,0 +1,240 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Check, Loader2, Trash2, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import * as z from 'zod';
+
+const PasteValuesSchema = z.object({
+  values: z.string(),
+});
+
+type PasteValuesFormData = z.infer<typeof PasteValuesSchema>;
+
+interface PasteValuesDialogProps {
+  fieldType: 'dmc' | 'hydra_batch' | 'pallet_batch';
+  fieldLabel: string;
+  currentValue: string;
+  currentCount: number;
+  onApplyValues: (values: string) => void;
+  children: React.ReactNode;
+}
+
+export default function PasteValuesDialog({
+  fieldType,
+  fieldLabel,
+  currentValue,
+  currentCount,
+  onApplyValues,
+  children,
+}: PasteValuesDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [isPendingApply, setIsPendingApply] = useState(false);
+
+  // Helper function to convert comma-separated values to newline-separated
+  const formatCurrentValues = (value: string) => {
+    if (!value) return '';
+    return value
+      .split(',')
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0)
+      .join('\n');
+  };
+
+  const form = useForm<PasteValuesFormData>({
+    resolver: zodResolver(PasteValuesSchema),
+    defaultValues: {
+      values: '',
+    },
+  });
+
+  // Update form when dialog opens with current values formatted
+  useEffect(() => {
+    if (open) {
+      form.reset({
+        values: formatCurrentValues(currentValue),
+      });
+    }
+  }, [open, currentValue, form]);
+
+  const onSubmit = async (data: PasteValuesFormData) => {
+    setIsPendingApply(true);
+    try {
+      // Parse the pasted values - split by newlines and filter out empty lines
+      const valuesList = data.values
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      // Validate values based on field type
+      if (valuesList.length > 0) {
+        const invalidValues: string[] = [];
+
+        valuesList.forEach((value) => {
+          if (fieldType === 'hydra_batch') {
+            // HYDRA Batch should be 10 characters
+            if (value.length !== 10) {
+              invalidValues.push(value);
+            }
+          } else if (fieldType === 'pallet_batch') {
+            // Pallet Batch should be 10 characters
+            if (value.length !== 10) {
+              invalidValues.push(value);
+            }
+          }
+          // No validation for DMC field
+        });
+
+        if (invalidValues.length > 0) {
+          const errorMessage =
+            fieldType === 'hydra_batch'
+              ? `Invalid HYDRA Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`
+              : `Invalid Pallet Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`;
+
+          toast.error(errorMessage);
+          return;
+        }
+      }
+
+      // Convert to comma-separated format or empty string if no values
+      const commaSeparatedValues =
+        valuesList.length > 0 ? valuesList.join(', ') : '';
+
+      // Apply the values using the callback
+      onApplyValues(commaSeparatedValues);
+
+      const message =
+        valuesList.length > 0
+          ? `Applied ${valuesList.length} values to ${fieldLabel} filter`
+          : `Cleared ${fieldLabel} filter`;
+
+      toast.success(message);
+      setOpen(false);
+      form.reset({ values: '' });
+    } catch (error) {
+      console.error('Error applying pasted values:', error);
+      toast.error('Error applying values');
+    } finally {
+      setIsPendingApply(false);
+    }
+  };
+
+  const handleClearAll = () => {
+    onApplyValues('');
+    toast.success(`Cleared ${fieldLabel} filter`);
+    setOpen(false);
+    form.reset({ values: '' });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className='sm:max-w-[500px]'>
+        <DialogHeader>
+          <DialogTitle>Manage {fieldLabel} Values</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <FormField
+              control={form.control}
+              name='values'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Values (one per line)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={
+                        currentCount > 0
+                          ? fieldType === 'hydra_batch' ||
+                            fieldType === 'pallet_batch'
+                            ? `Current values are shown below. You can edit them or paste new values:
+HH12345678
+AB98765432
+XY11223344`
+                            : `Current values are shown below. You can edit them or paste new values:
+C9E0C25175A12400GK2Q
+6K301 AA 1021310071895021025070710279
+p32298714#tpp0000212667#vexrga`
+                          : fieldType === 'hydra_batch'
+                            ? `Paste your HYDRA Batch values here (10 characters), for example:
+HH12345678
+AB98765432
+XY11223344`
+                            : fieldType === 'pallet_batch'
+                              ? `Paste your Pallet Batch values here (10 characters), for example:
+HH12345678
+AB98765432
+XY11223344`
+                              : `Paste your DMC values here, for example:
+C9E0C25175A12400GK2Q
+6K301 AA 1021310071895021025070710279
+p32298714#tpp0000212667#vexrga`
+                      }
+                      className='min-h-[150px]'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
+              <div className='flex flex-col gap-2 sm:flex-row sm:gap-2'>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  onClick={handleClearAll}
+                  disabled={isPendingApply}
+                  className='w-full sm:w-auto'
+                >
+                  <Trash2 />
+                  Clear All
+                </Button>
+                <Button
+                  type='button'
+                  variant='secondary'
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  className='w-full sm:w-auto'
+                >
+                  <X />
+                  Cancel
+                </Button>
+              </div>
+              <Button type='submit' disabled={isPendingApply} className='w-full sm:w-auto'>
+                {isPendingApply ? (
+                  <Loader2 className='animate-spin' />
+                ) : (
+                  <Check />
+                )}
+                Confirm
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}

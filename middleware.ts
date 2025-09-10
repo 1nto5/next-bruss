@@ -32,7 +32,8 @@ export function middleware(request: NextRequest) {
       '/oven-in.wav',
       '/oven-out.wav',
       // Your other files in `public`
-    ].includes(pathname)
+    ].includes(pathname) ||
+    pathname.startsWith('/flags/')
   )
     return;
 

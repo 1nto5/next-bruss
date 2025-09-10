@@ -1,0 +1,73 @@
+{
+  "login": {
+    "title": "EOL136153 Login",
+    "operator1Label": "Personal number",
+    "operator2Label": "",
+    "operator3Label": "",
+    "personalNumber2Label": "",
+    "personalNumber3Label": "",
+    "placeholder": "tap to enter...",
+    "loginButton": "Login",
+    "clearButton": "Clear",
+    "keypadTitle": "Enter personal number",
+    "errors": {
+      "wrongNumber1": "Invalid personal number",
+      "wrongNumber2": "",
+      "wrongNumber3": "",
+      "loginError": "Login error"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Operator",
+    "logout": "Logout",
+    "changeArticle": "Change",
+    "volume": "Volume"
+  },
+  "status": {
+    "article136": "136 (28067)",
+    "article153": "153 (28042)",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Boxes on pallet",
+    "palletFull": "Pallet full",
+    "scanPallet": "Scan pallet"
+  },
+  "scanning": {
+    "title": "Scan Hydra code",
+    "placeholder": "HYDRA QR",
+    "scanning": "Scanning...",
+    "messages": {
+      "saved": "Batch saved!",
+      "exists": "Batch already exists!",
+      "invalid": "Invalid code!",
+      "wrongArticle": "Wrong article!",
+      "wrongQuantity": "Wrong quantity!",
+      "wrongProcess": "Wrong process!",
+      "fullPallet": "Pallet full!",
+      "error": "Error! Contact IT"
+    }
+  },
+  "pallet": {
+    "title": "Scan pallet code",
+    "placeholder": "PALLET CODE",
+    "generateBatch": "Generate pallet batch",
+    "print": "Print label",
+    "printing": "Printing...",
+    "nextPallet": "Next pallet",
+    "messages": {
+      "success": "Pallet saved!",
+      "invalid": "Invalid pallet code!",
+      "error": "Pallet save error!"
+    }
+  },
+  "lastScans": {
+    "title": "Last scans",
+    "empty": "No scans"
+  },
+  "errors": {
+    "somethingWrong": "Something went wrong",
+    "fetchError": "Failed to fetch data",
+    "contactIT": "Contact IT"
+  }
+}

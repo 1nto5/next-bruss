@@ -53,7 +53,7 @@ async function getFailures(
   const fetchTime = new Date(res.headers.get('date') || '');
   const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
 
-  let failures: FailureType[] = await res.json();
+  const failures: FailureType[] = await res.json();
 
   const formatTime = (failure: FailureType) => {
     return {

@@ -274,14 +274,10 @@ export default function Login() {
           </CardContent>
 
           <CardFooter className='flex justify-end'>
-            {isPending ? (
-              <Button disabled>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Logowanie
-              </Button>
-            ) : (
-              <Button type='submit'>Zaloguj</Button>
-            )}
+            <Button type='submit' disabled={isPending}>
+              {isPending && <Loader2 className='animate-spin' />}
+              Zaloguj
+            </Button>
           </CardFooter>
         </form>
       </Form>

@@ -37,6 +37,7 @@ import { MultiArticleManager } from './multi-article-manager';
 
 // Update the attachment roles to match the specified requirements
 const ATTACHMENT_ROLES = [
+  'admin',
   'group-leader',
   'production-manager',
   'plant-manager',

@@ -38,7 +38,6 @@ export default function NewEntryForm({}: {}) {
   const form = useForm<z.infer<typeof ProjectsSchema>>({
     resolver: zodResolver(ProjectsSchema),
     defaultValues: {
-      project: '',
       scope: '',
       date: (() => {
         const today = new Date();
@@ -129,23 +128,10 @@ export default function NewEntryForm({}: {}) {
             />
             <FormField
               control={form.control}
-              name='project'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project</FormLabel>
-                  <FormControl>
-                    <Textarea className='' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name='scope'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Scope</FormLabel>
+                  <FormLabel>Work Scope</FormLabel>
                   <FormControl>
                     <Textarea className='' {...field} />
                   </FormControl>

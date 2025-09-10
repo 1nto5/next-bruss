@@ -1,18 +1,14 @@
-'use client';
-import Login from './components/login';
-import OvenSelection from './components/oven-selection';
-import ProcessList from './components/process-list';
-import { useOvenStore, usePersonalNumberStore } from './lib/stores';
+import type { Locale } from '@/i18n.config';
+import App from './components/app';
+import { getDictionary } from './lib/dictionary';
 
-export default function App() {
-  const { operator1, operator2, operator3 } = usePersonalNumberStore();
-  const { selectedOven } = useOvenStore();
+export default async function OvenPage({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
-  if (!operator1 && !operator2 && !operator3) {
-    return <Login />;
-  } else if (!selectedOven) {
-    return <OvenSelection />;
-  } else {
-    return <ProcessList />;
-  }
+  return <App dict={dict} lang={lang} />;
 }

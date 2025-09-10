@@ -6,6 +6,6 @@ export function useOvenProcessConfig(article: string) {
     queryFn: async () => fetchOvenProcessConfig(article),
     queryKey: ['oven-process-config', article],
     enabled: !!article,
-    staleTime: 8 * 60 * 60 * 1000, // 8 hours - configs don't change often
+    staleTime: 1 * 60 * 60 * 1000, // 1 hour - configs don't change often
   });
 }

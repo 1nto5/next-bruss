@@ -181,14 +181,10 @@ export default function CardSelection() {
                 />
               </CardContent>
               <CardFooter className='flex justify-end'>
-                {isPending ? (
-                  <Button disabled>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Tworzę kartę
-                  </Button>
-                ) : (
-                  <Button type='submit'>Utwórz kartę</Button>
-                )}
+                <Button type='submit' disabled={isPending}>
+                  <Loader2 className={isPending ? 'animate-spin' : ''} />
+                  Utwórz kartę
+                </Button>
               </CardFooter>
             </form>
           </Form>

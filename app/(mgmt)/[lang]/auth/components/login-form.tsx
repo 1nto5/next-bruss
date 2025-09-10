@@ -63,14 +63,14 @@ export default function LoginForm({ cDict }: { cDict: any }) {
         toast.success(cDict.toasts.loginSuccess);
         router.push(callbackUrl); // Redirect to home after successful login
       } else if (res?.error === 'invalid credentials') {
-        // Handle invalid credentials
+        // Handle generic invalid credentials - show as form error on both fields
         form.setError('email', {
           type: 'manual',
-          message: cDict.zod.credentialsError,
+          message: cDict.zod.emailOrPasswordIncorrect,
         });
         form.setError('password', {
           type: 'manual',
-          message: cDict.zod.credentialsError,
+          message: cDict.zod.emailOrPasswordIncorrect,
         });
       } else {
         // Handle other errors

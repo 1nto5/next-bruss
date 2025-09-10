@@ -1,7 +1,6 @@
 export interface SubHeaderRoute {
   href: string;
   title: string;
-  description?: string;
 }
 
 export interface HeaderRoute {
@@ -23,6 +22,7 @@ export const ROUTE_PATHS = {
   adminEmployeesAddMany: '/admin/employees/add-many',
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
+  newsAdd: '/news/add',
   productionOvertime: '/production-overtime',
   overtimeSubmissions: '/overtime-submissions',
   codesGenerator: '/codes-generator',
@@ -94,12 +94,67 @@ export const deHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
-        description: 'Daten im DMC-Code-Scanning-System.',
       },
       {
         href: ROUTE_PATHS.proOldRework,
         title: 'Rework',
-        description: 'Markierung von Teilen oder Chargen als Nacharbeit.',
+      },
+    ],
+  },
+];
+
+export const enHeaderRoutes: HeaderRoute[] = [
+  {
+    title: 'Production',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.dmcheckData,
+        title: 'DMCheck Data',
+      },
+      {
+        href: ROUTE_PATHS.ovenData,
+        title: 'Oven Data',
+      },
+      {
+        href: ROUTE_PATHS.deviations,
+        title: 'Deviations',
+      },
+      {
+        href: ROUTE_PATHS.failuresLv,
+        title: 'LV Failures',
+      },
+    ],
+  },
+  {
+    title: 'Employee',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.productionOvertime,
+        title: 'Production overtime work',
+      },
+      {
+        href: ROUTE_PATHS.overtimeSubmissions,
+        title: 'Overtime submissions',
+      },
+    ],
+  },
+  {
+    title: 'Tools',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.codesGenerator,
+        title: 'QR/Barcode/DMC Generator',
+      },
+      {
+        href: ROUTE_PATHS.inw2spis,
+        title: 'Inventory - count',
+      },
+      {
+        href: ROUTE_PATHS.inw2zatwierdz,
+        title: 'Inventory approval',
       },
     ],
   },
@@ -133,6 +188,10 @@ export const adminHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.projects,
         title: 'Projects',
+      },
+      {
+        href: ROUTE_PATHS.newsAdd,
+        title: 'Add news',
       },
     ],
   },

@@ -3,8 +3,9 @@ export type OvenProcessDataType = {
   oven: string;
   article: string;
   hydraBatch: string;
-  operator: string[];
-  status: 'running' | 'finished';
+  startOperators: string[];
+  endOperators?: string[];
+  status: 'prepared' | 'running' | 'finished' | 'deleted';
   startTime: Date;
   endTime: Date | null;
   startTimeLocaleString: string;
@@ -15,7 +16,6 @@ export type OvenProcessDataType = {
   targetTemp?: number;
   tempTolerance?: number;
   targetDuration?: number; // Duration in seconds
-  expectedCompletion?: Date;
 };
 
 export type OvenTemperatureLogType = {
@@ -32,5 +32,5 @@ export type OvenConfigType = {
   article: string;
   temp: number;
   tempTolerance: number;
-  duration: number;
+  duration: number; // Duration in seconds
 };

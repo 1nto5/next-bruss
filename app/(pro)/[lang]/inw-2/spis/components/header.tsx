@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { SquarePen, StickyNote, UserPen } from 'lucide-react';
+import { SquarePen, StickyNote, UserPen, X, Check } from 'lucide-react';
 import { useState } from 'react';
 import {
   useCardStore,
@@ -125,9 +125,13 @@ export default function Header() {
               {pendingAction?.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
-            <AlertDialogAction onClick={executeAction}>
+          <AlertDialogFooter className="flex flex-row gap-2 w-full">
+            <AlertDialogCancel className="w-1/4 flex items-center justify-center gap-2">
+              <X className="h-4 w-4" />
+              Anuluj
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={executeAction} className="w-3/4 flex items-center justify-center gap-2">
+              <Check className="h-4 w-4" />
               Kontynuuj
             </AlertDialogAction>
           </AlertDialogFooter>

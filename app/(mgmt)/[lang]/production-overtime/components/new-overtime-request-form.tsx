@@ -285,7 +285,7 @@ export default function NewOvertimeRequestForm({
                           e.target.value === '' ? '' : parseInt(e.target.value);
                         field.onChange(value);
                       }}
-                      value={field.value}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -379,7 +379,7 @@ export default function NewOvertimeRequestForm({
                           e.target.value === '' ? '' : parseInt(e.target.value);
                         field.onChange(value);
                       }}
-                      value={field.value}
+                      value={field.value || ''}
                     />
                   </FormControl>
                   <FormMessage />

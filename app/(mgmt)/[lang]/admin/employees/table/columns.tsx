@@ -47,8 +47,8 @@ const onDeleteEmployee = async (articleId: string) => {
   }
 };
 
-const ActionsCell = ({ row }: { row: any }) => {
-  const articleConfig = row.original;
+const ActionsCell = ({ row }: { row: { original: EmployeeType } }) => {
+  const employee = row.original;
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -61,7 +61,7 @@ const ActionsCell = ({ row }: { row: any }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <Link href={`/admin/employees/edit/${articleConfig._id}`}>
+          <Link href={`/admin/employees/edit/${employee._id || ''}`}>
             <DropdownMenuItem>
               <Pencil className='mr-2 h-4 w-4' />
               <span>Edit</span>
@@ -92,8 +92,8 @@ const ActionsCell = ({ row }: { row: any }) => {
             <AlertDialogAction
               onClick={() => {
                 setIsOpen(false);
-                if (articleConfig._id) {
-                  onDeleteEmployee(articleConfig._id);
+                if (employee._id) {
+                  onDeleteEmployee(employee._id);
                 } else {
                   toast.error(`Employee _id is missing. Please contact IT.`);
                 }

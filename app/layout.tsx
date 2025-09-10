@@ -1,5 +1,5 @@
 import '@/app/globals.css';
-import { Locale } from '@/i18n.config';
+import { i18n } from '@/i18n.config';
 import { ThemeProvider } from '@/lib/theme-provider';
 import { Metadata } from 'next';
 // import { Toaster } from 'sonner';
@@ -12,16 +12,11 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
 }) {
-  const params = await props.params;
-
-  const { lang } = params;
-
   const { children } = props;
 
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={i18n.defaultLocale} suppressHydrationWarning>
       <head />
 
       <body className='bg-background min-h-screen font-sans antialiased'>

@@ -209,7 +209,7 @@ export function DateTimePicker({
   );
 
   // If value is undefined, month and date are undefined until user picks
-  const [month, setMonth] = useState<Date | undefined>(initDate);
+  const [month, setMonth] = useState<Date | undefined>(initDate || new Date());
   const [date, setDate] = useState<Date | undefined>(initDate);
 
   // Always have a displayable month for navigation (fallback to current date)
@@ -282,7 +282,7 @@ export function DateTimePicker({
   useEffect(() => {
     if (open) {
       setDate(initDate);
-      setMonth(initDate);
+      setMonth(initDate || new Date());
       setMonthYearPicker(false);
     }
   }, [open, initDate]);
@@ -767,7 +767,7 @@ function TimePicker({
   const onHourChange = useCallback(
     (v: TimeOption) => {
       if (min) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -782,7 +782,7 @@ function TimePicker({
         }
       }
       if (max) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -804,7 +804,7 @@ function TimePicker({
   const onMinuteChange = useCallback(
     (v: TimeOption) => {
       if (min) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -818,7 +818,7 @@ function TimePicker({
         }
       }
       if (max) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -839,7 +839,7 @@ function TimePicker({
   const onAmpmChange = useCallback(
     (v: TimeOption) => {
       if (min) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -856,7 +856,7 @@ function TimePicker({
         }
       }
       if (max) {
-        let newTime = buildTime({
+        const newTime = buildTime({
           use12HourFormat,
           value,
           formatStr,
@@ -888,7 +888,7 @@ function TimePicker({
   );
 
   const display = useMemo(() => {
-    let arr = [];
+    const arr = [];
     for (const element of ['hour', 'minute', 'second']) {
       if (!timePicker || timePicker[element as keyof typeof timePicker]) {
         if (element === 'hour') {

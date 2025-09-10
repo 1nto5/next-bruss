@@ -4,13 +4,16 @@ export type DmcType = {
   dmc: string;
   workplace: string;
   article: string;
-  operator: string;
+  operator: string | string[]; // Support both string (legacy) and array (new)
   time: string;
   hydra_batch?: string;
+  hydra_operator?: string | string[]; // New field for hydra operator
   hydra_time?: string;
   pallet_batch?: string;
   pallet_time?: string;
-  reworkReason?: string;
+  pallet_operator?: string | string[]; // Support both formats for pallet operator
+  rework_reason?: string;
+  rework_user?: string;
   rework_time?: string;
 };
 

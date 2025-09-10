@@ -29,15 +29,36 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
       const statusLabel = status
         ? status.charAt(0).toUpperCase() + status.slice(1)
         : '';
+
+      const getStatusStyles = (status: string) => {
+        switch (status) {
+          case 'prepared':
+            return {
+              variant: 'outline' as const,
+              className: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+            };
+          case 'running':
+            return {
+              variant: 'default' as const,
+              className: 'bg-green-100 text-green-800 hover:bg-green-200',
+            };
+          case 'deleted':
+            return {
+              variant: 'destructive' as const,
+              className: 'bg-red-100 text-red-800 hover:bg-red-200',
+            };
+          default: // finished
+            return {
+              variant: 'secondary' as const,
+              className: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
+            };
+        }
+      };
+
+      const styles = getStatusStyles(status);
+
       return (
-        <Badge
-          variant={status === 'running' ? 'default' : 'secondary'}
-          className={
-            status === 'running'
-              ? 'bg-green-100 text-green-800 hover:bg-green-200'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }
-        >
+        <Badge variant={styles.variant} className={styles.className}>
           {statusLabel}
         </Badge>
       );
@@ -54,14 +75,25 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
     cell: ({ row }) => <div>{row.getValue('hydraBatch')}</div>,
   },
   {
-    accessorKey: 'operator',
-    header: 'Operators',
+    accessorKey: 'startOperators',
+    header: 'Start Operators',
     cell: ({ row }) => {
-      // Render operators as a comma-separated string
-      const operators = row.getValue('operator') as string[];
+      // Render start operators as a comma-separated string
+      const operators = row.getValue('startOperators') as string[];
       return (
-        <div>{Array.isArray(operators) ? operators.join(', ') : operators}</div>
+        <div>
+          {Array.isArray(operators) ? operators.join(', ') : operators || '-'}
+        </div>
       );
+    },
+  },
+  {
+    accessorKey: 'endOperators',
+    header: 'End Operators',
+    cell: ({ row }) => {
+      // Render end operators as a comma-separated string
+      const operators = row.getValue('endOperators') as string[];
+      return <div>{Array.isArray(operators) ? operators.join(', ') : '-'}</div>;
     },
   },
   {
@@ -75,7 +107,16 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         <ArrowUpDown className='ml-2 h-4 w-4' />
       </Button>
     ),
-    cell: ({ row }) => <div>{row.getValue('startTimeLocaleString')}</div>,
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      const startTime = row.getValue('startTimeLocaleString') as string;
+      
+      if (status === 'prepared') {
+        return <div>-</div>;
+      }
+      
+      return <div>{startTime}</div>;
+    },
   },
   {
     accessorKey: 'endTimeLocaleString',
@@ -90,11 +131,17 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
     ),
     cell: ({ row }) => {
       const endTime = row.getValue('endTimeLocaleString') as string;
-      return (
-        <div>
-          {endTime || <span className='text-gray-400'>In progress</span>}
-        </div>
-      );
+      const status = row.getValue('status') as string;
+
+      if (endTime) {
+        return <div>{endTime}</div>;
+      }
+
+      if (status === 'deleted') {
+        return <span className='text-gray-400'>-</span>;
+      }
+
+      return <span className='text-gray-400'>-</span>;
     },
   },
   {

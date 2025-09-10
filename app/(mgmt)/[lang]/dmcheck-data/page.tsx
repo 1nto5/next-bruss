@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import { revalidateDmcheckTableData } from './actions';
 import DmcTableFilteringAndOptions from './components/dmc-table-filtering-and-options';
 import { dmcColumns } from './dmc-table/dmc-columns';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
@@ -92,8 +93,12 @@ export default async function InventoryPage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>DMCheck data</CardTitle>
-        <CardDescription>Last sync: {fetchTimeLocaleString}</CardDescription>
+        <div>
+          <CardTitle>DMCheck data</CardTitle>
+          <CardDescription>
+            Last sync: {fetchTimeLocaleString}
+          </CardDescription>
+        </div>
         <DmcTableFilteringAndOptions
           articles={articles}
           fetchTime={fetchTime}

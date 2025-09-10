@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Anmeldung",
+    "operator1Label": "Personalnummer 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personalnummer 2",
+    "personalNumber3Label": "Personalnummer 3",
+    "placeholder": "zum Eingeben berühren...",
+    "loginButton": "Anmelden",
+    "clearButton": "Löschen",
+    "keypadTitle": "Personalnummer des Bedieners eingeben",
+    "errors": {
+      "wrongNumber1": "Ungültige Personalnummer!",
+      "wrongNumber2": "Ungültige Personalnummer!",
+      "wrongNumber3": "Ungültige Personalnummer!",
+      "loginError": "IT kontaktieren!"
+    }
+  },
+  "ovenSelection": {
+    "title": "Ofenauswahl",
+    "errorNoOvens": "Keine Öfen in Suchparametern angegeben (Beispiel: ?ovens=tem10,tem11)."
+  },
+  "programSelection": {
+    "title": "Programmauswahl für Ofen",
+    "loading": "Laden...",
+    "errorLoadPrograms": "Programme konnten nicht geladen werden"
+  },
+  "processList": {
+    "title": "Heizprozesse",
+    "newProcess": "Neuer Prozess",
+    "endProcess": "Prozess beenden",
+    "noProcesses": "Keine gestarteten Prozesse",
+    "table": {
+      "start": "Start",
+      "article": "Artikel",
+      "hydraBatch": "HYDRA-Charge",
+      "plannedEnd": "Geplante Fertigstellung",
+      "waiting": "wartet"
+    },
+    "alerts": {
+      "noTemperature": "Keine Temperaturmessung",
+      "noTemperatureDesc": "System erhielt keine Daten von Temperatursensoren. Wenn der Ofen bereits läuft, kontaktieren Sie die IT!"
+    },
+    "deleteDialog": {
+      "title": "Prozess löschen",
+      "description": "Möchten Sie diesen Prozess wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Abbrechen",
+      "delete": "Löschen"
+    },
+    "toasts": {
+      "startingProcess": "Prozess wird gestartet...",
+      "processStarted": "Prozess gestartet!",
+      "endingProcess": "Prozess wird beendet...",
+      "processEnded": "Prozess beendet!",
+      "deletingProcess": "Prozess wird gelöscht...",
+      "processDeleted": "Prozess gelöscht!",
+      "noActiveProcess": "Kein aktiver Prozess für HYDRA-Charge!",
+      "contactIT": "IT kontaktieren!"
+    },
+    "errors": {
+      "duplicateBatch": "HYDRA-Charge existiert in Datenbank!",
+      "noOperator": "Mindestens ein Bediener erforderlich",
+      "notCreated": "Prozess konnte nicht erstellt werden",
+      "notCompleted": "Prozess konnte nicht abgeschlossen werden",
+      "notDeleted": "Prozess konnte nicht gelöscht werden",
+      "wrongNumber1": "Ungültige Personalnummer",
+      "wrongNumber2": "Ungültige Personalnummer",
+      "wrongNumber3": "Ungültige Personalnummer",
+      "loginError": "Anmeldefehler - IT kontaktieren",
+      "configError": "Ofenkonfigurationsfehler - IT kontaktieren",
+      "fetchError": "Prozessabruffehler - IT kontaktieren",
+      "startError": "Prozessstartfehler - IT kontaktieren",
+      "completeError": "Prozessabschlussfehler - IT kontaktieren",
+      "deleteError": "Prozesslöschfehler - IT kontaktieren",
+      "tempError": "Ofentemperaturfehler - IT kontaktieren",
+      "validationFailed": "IT kontaktieren!",
+      "articleNotConfigured": "Artikel ist nicht konfiguriert!",
+      "wrongProgramForArticle": "Artikel passt nicht zum ausgewählten Programm!",
+      "databaseError": "Datenbankfehler - IT kontaktieren",
+      "noRunningProcesses": "Keine aktiven Prozesse zu beenden"
+    }
+  },
+  "startBatchDialog": {
+    "title": "Neuer Prozess",
+    "articlePlaceholder": "Artikelnummer scannen...",
+    "batchPlaceholder": "HYDRA-Charge scannen...",
+    "cancel": "Abbrechen",
+    "start": "Starten"
+  },
+  "endBatchDialog": {
+    "title": "Prozess beenden",
+    "description": {
+      "plural": "Möchten Sie wirklich den Prozess für {count} Chargen in diesem Ofen beenden?",
+      "singular": "Möchten Sie wirklich den Prozess für 1 Charge in diesem Ofen beenden?"
+    },
+    "temperatureWarning": "Aktuelle Temperaturmessungen vom Ofen erkannt. Der Ofen läuft möglicherweise noch!",
+    "noProcesses": "Keine aktiven Prozesse zu beenden",
+    "cancel": "Abbrechen",
+    "end": "Prozess beenden"
+  },
+  "header": {
+    "clearOven": "Ofen wechseln",
+    "clearProgram": "Programm wechseln",
+    "logoutDialog": {
+      "title": "Abmelden",
+      "description": "Möchten Sie sich wirklich abmelden?",
+      "cancel": "Abbrechen",
+      "continue": "Fortfahren"
+    }
+  }
+}

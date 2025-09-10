@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { CopyDialog } from '../components/copy-dialog';
 import { DeleteDialog } from '../components/delete-dialog';
 
-const ActionsCell = ({ row }: { row: any }) => {
+const ActionsCell = ({ row }: { row: { original: ArticleConfigType } }) => {
   const articleConfig = row.original;
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [isOpenCopyDialog, setIsOpenCopyDialog] = useState(false);
@@ -36,7 +36,7 @@ const ActionsCell = ({ row }: { row: any }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id}`}>
+          <Link href={`/admin/dmcheck-articles/edit/${articleConfig._id || ''}`}>
             <DropdownMenuItem>
               <Pencil className='mr-2 h-4 w-4' />
               <span>Edit</span>
@@ -58,12 +58,12 @@ const ActionsCell = ({ row }: { row: any }) => {
       <CopyDialog
         isOpen={isOpenCopyDialog}
         setIsOpen={setIsOpenCopyDialog}
-        articleId={articleConfig._id}
+        articleId={articleConfig._id || ''}
       />
       <DeleteDialog
         isOpen={isOpenDeleteDialog}
         setIsOpen={setIsOpenDeleteDialog}
-        articleId={articleConfig._id}
+        articleId={articleConfig._id || ''}
       />
     </>
   );

@@ -24,7 +24,7 @@ const HTML_FOOTER = `<br/><br/><hr/>Wiadomość wysłana automatycznie. Nie odpo
 
 const mailer = async (mailOptions: any) => {
   // Add the default "from" address to the options
-  let originalTo = mailOptions.to;
+  const originalTo = mailOptions.to;
   let to = originalTo;
   let subject = mailOptions.subject || '';
 

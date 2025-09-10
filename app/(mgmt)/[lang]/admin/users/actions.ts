@@ -120,7 +120,7 @@ export async function revalidateUsers() {
 
 export async function getResetPasswordLink(
   _id: string,
-): Promise<{ status: string; resetUrl?: string; error?: any }> {
+): Promise<{ status: string; resetUrl?: string; error?: unknown }> {
   try {
     const collection = await dbc('users');
 

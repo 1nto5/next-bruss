@@ -8,29 +8,93 @@ export async function GET(request: NextRequest) {
 
     // Build filter object based on search parameters
     const filter: any = {};
+    const andConditions: any[] = [];
 
-    // Filter by oven
+    // Filter by oven (multi-select)
     const oven = searchParams.get('oven');
     if (oven) {
-      filter.oven = oven;
+      const values = oven
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+      
+      if (values.length === 1) {
+        filter.oven = values[0];
+      } else if (values.length > 1) {
+        filter.oven = { $in: values };
+      }
     }
 
-    // Filter by Hydra batch
+    // Filter by Hydra batch (multi-value with exact match)
     const hydraBatch = searchParams.get('hydra_batch');
     if (hydraBatch) {
-      filter.hydraBatch = { $regex: hydraBatch, $options: 'i' };
+      const values = hydraBatch
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          hydraBatch: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            hydraBatch: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            hydraBatch: { $in: values },
+          });
+        }
+      }
     }
 
-    // Filter by article
+    // Filter by article (multi-value with exact match)
     const article = searchParams.get('article');
     if (article) {
-      filter.article = { $regex: article, $options: 'i' };
+      const values = article
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          article: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            article: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            article: { $in: values },
+          });
+        }
+      }
     }
 
-    // Filter by status
+    // Filter by status (multi-select)
     const status = searchParams.get('status');
-    if (status && (status === 'running' || status === 'finished')) {
-      filter.status = status;
+    if (status) {
+      const values = status
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0)
+        .filter((v) => ['prepared', 'running', 'finished', 'deleted'].includes(v));
+      
+      if (values.length === 1) {
+        filter.status = values[0];
+      } else if (values.length > 1) {
+        filter.status = { $in: values };
+      }
     }
 
     // Filter by time range
@@ -44,6 +108,11 @@ export async function GET(request: NextRequest) {
       if (to) {
         filter.startTime.$lte = new Date(to);
       }
+    }
+
+    // Add $and conditions if any exist
+    if (andConditions.length > 0) {
+      filter.$and = andConditions;
     }
 
     const collection = await dbc('oven_processes');
@@ -90,20 +159,15 @@ export async function GET(request: NextRequest) {
           console.error('Error calculating lastAvgTemp:', tempError);
         }
 
-        // Calculate expected completion if we have target duration
-        let expectedCompletion: Date | undefined;
-        if (doc.targetDuration) {
-          expectedCompletion = new Date(
-            doc.startTime.getTime() + doc.targetDuration * 1000,
-          );
-        }
+        // Note: expectedCompletion is now calculated on the frontend to handle timezone correctly
 
         return {
           id: doc._id.toString(),
           oven: doc.oven,
           article: doc.article || '',
           hydraBatch: doc.hydraBatch,
-          operator: doc.operator || [],
+          startOperators: doc.startOperators || doc.operator || [], // Handle legacy data
+          endOperators: doc.endOperators || undefined,
           status: doc.status,
           startTime: doc.startTime,
           endTime: doc.endTime,
@@ -113,7 +177,6 @@ export async function GET(request: NextRequest) {
           targetTemp: doc.targetTemp,
           tempTolerance: doc.tempTolerance,
           targetDuration: doc.targetDuration,
-          expectedCompletion,
         };
       }),
     );

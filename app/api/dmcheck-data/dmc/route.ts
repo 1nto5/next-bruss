@@ -10,9 +10,11 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
+  const andConditions: any[] = [];
 
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
+      // Date filters remain as AND conditions (time range)
       if (!query.time) query.time = {};
       if (key === 'from') query.time.$gte = new Date(value);
       if (key === 'to') query.time.$lte = new Date(value);
@@ -21,11 +23,67 @@ export async function GET(req: NextRequest) {
       key === 'hydra_batch' ||
       key === 'pallet_batch'
     ) {
-      query[key] = { $regex: new RegExp(value, 'i') };
-    } else {
-      query[key] = value;
+      // Handle multiple values separated by commas - OR within field, AND between fields
+      const values = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        // Ensure field exists and is not empty
+        andConditions.push({
+          [key]: { $exists: true, $nin: [null, ''] },
+        });
+
+        if (values.length === 1) {
+          // Single value - use exact match
+          andConditions.push({
+            [key]: values[0],
+          });
+        } else {
+          // Multiple values - use $in for exact matches
+          andConditions.push({
+            [key]: { $in: values },
+          });
+        }
+      }
+    } else if (key === 'status' || key === 'workplace' || key === 'article') {
+      // Handle multi-select filters - OR within field, AND between fields
+      const values = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (key === 'status' && values.includes('rework')) {
+        // Handle rework special case - match all rework attempts
+        const otherStatuses = values.filter(v => v !== 'rework');
+        const statusConditions = [];
+        
+        if (otherStatuses.length > 0) {
+          statusConditions.push({ status: { $in: otherStatuses } });
+        }
+        
+        statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        
+        if (statusConditions.length === 1) {
+          Object.assign(query, statusConditions[0]);
+        } else {
+          query.$or = statusConditions;
+        }
+      } else if (values.length === 1) {
+        // Single value
+        query[key] = values[0];
+      } else if (values.length > 1) {
+        // Multiple values - use $in for OR within field
+        query[key] = { $in: values };
+      }
     }
   });
+
+  // Add $and conditions if any exist
+  if (andConditions.length > 0) {
+    query.$and = andConditions;
+  }
 
   try {
     const coll = await dbc('scans');
