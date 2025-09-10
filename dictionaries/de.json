@@ -1,0 +1,359 @@
+{
+  "header": {
+    "production": {
+      "title": "Produktion",
+      "dmcheckData": {
+        "title": "DMCheck Data",
+        "description": "Daten im DMCheck."
+      },
+      "rework": {
+        "title": "Nacharbeit",
+        "description": "Markieren von Chargen für die Nacharbeit - erneutes Scannen."
+      },
+      "zero": {
+        "title": "Wyzeruj stan",
+        "description": "Zerowanie stanu ilości cześci, gdy użycie opcji rework jest niemożliwe."
+      },
+      "articleConfig": {
+        "title": "Artikelkonfiguration",
+        "description": "Hinzufügen von Artikeln im DMC-Scansystem."
+      },
+      "personsConfig": {
+        "title": "Mitarbeiterverwaltung",
+        "description": "Hinzufügen von Mitarbeitern im DMC-Scansystem."
+      }
+    },
+    "inventory": {
+      "title": "Inwentaryzacja",
+      "inventory": {
+        "title": "Inwentaryzacja",
+        "description": "Aplikacja wspierająca proces inwentaryzacji."
+      },
+      "inventory2": {
+        "title": "Inwentaryzacja v2",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      },
+      "inventoryApprove": {
+        "title": "Zatwierdzanie inwentaryzacji",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      },
+      "inventoryApprove2": {
+        "title": "Zatwierdzanie inwentaryzacji v2",
+        "description": "Narzędzie do potwierdzania zinwentaryzowanych pozycji."
+      }
+    }
+  },
+  "noAccess": "Sie haben keine Berechtigung für diese Funktion. Klicken Sie hier, um einen Berechtigungsantrag zu stellen:",
+  "noAccessTitle": "Keine Berechtigung!",
+  "noAccessMailSubject": "Berechtigung erteilen für: (Name der Funktion eintragen)",
+  "auth": {
+    "cardTitle": "Anmeldung",
+    "cardDescription": "Geben Sie die geschäftliche E-Mail-Adresse und das Passwort ein, mit denen Sie sich am Computer anmelden.",
+    "emailInputLabel": "E-Mail",
+    "passwordInputLabel": "Passwort",
+    "loginButton": "Anmelden",
+    "loggingButton": "Anmeldung",
+    "saveNewPasswordButton": "Passwort speichern",
+    "savingButton": "Aufnahme",
+    "zod": {
+      "emailTooShort": "Die E-Mail ist zu kurz!",
+      "emailNotFromBruss": "Die angegebene E-Mail gehört nicht zur Domain bruss-group.com!",
+      "passwordTooShort": "Das Passwort muss mindestens 5 Zeichen lang sein!",
+      "credentialsError": "Ungültige Anmeldedaten!",
+      "emailOrPasswordIncorrect": "E-Mail-Adresse oder Passwort falsch!"
+    },
+    "toasts": {
+      "pleaseContactIt": "Bitte kontaktieren Sie die IT!",
+      "loginSuccess": "Rebloggt!"
+    }
+  },
+  "home": {
+    "title": "Hallo",
+    "description": "Ich arbeite ständig an den Lösungen, die Sie hier finden werden. Wenn Sie Vorschläge oder Kommentare haben, lassen Sie es mich bitte wissen unter: "
+  },
+  "exportData": {
+    "cardTitle": "Datenexport",
+    "cardDescription": "Bei einem breiten Kriterienbereich werden die neuesten 10.000 Datensätze heruntergeladen.",
+    "workplaceLabel": "Arbeitsplatz",
+    "articleLabel": "Artikel",
+    "statusLabel": "Status",
+    "chooseInputPlaceholder": "wählen...",
+    "anyInputPlaceholder": "beliebig eingeben...",
+    "emptyCommand": "nicht gefunden",
+    "downloadButton": "Datei herunterladen",
+    "downloadingButton": "Generierung",
+    "clearButton": "Löschen",
+    "timeFrameLabel": "Zeitraum",
+    "dateFromLabel": "Datum von",
+    "dateToLabel": "Datum bis",
+    "exportButton": "Export",
+    "toasts": {
+      "exportSuccess": "Daten exportiert!",
+      "exportError": "Fehler beim Export der Daten!"
+    },
+    "pleaseContactIt": "Bitte kontaktieren Sie die IT!"
+  },
+
+  "rework": {
+    "articleLabel": "Artikel",
+    "noSearchTerm": "Keine Werte zum Suchen!",
+    "noResults": "Keine Positionen gefunden!",
+    "pleaseContactIt": "Bitte kontaktieren Sie die IT!",
+    "noReason": "Bitte Grund eingeben!",
+    "tooShortReason": "Der Grund muss mindestens 20 Zeichen lang sein!",
+    "positionsLengthZero": "Geben Sie den DMC-Code, Batch Hydra oder Palette ein, um nachzusuchen und als Nacharbeit zu markieren.",
+    "checkPositionsAndReason": "Überprüfen Sie die Richtigkeit der gefundenen Positionen und geben Sie einen Grund an, um als Nacharbeit zu markieren.",
+    "inputLabel": "DMC / Batch Hydra / Palette",
+    "inputPlaceholder": "beliebig eingeben...",
+    "searchButton": "Suchen",
+    "reasonInputLabel": "Grund",
+    "reasonTextareaPlaceholder": "Geben Sie eine kurze Beschreibung der Nacharbeit ein.",
+    "markAsReworkButton": "Als Nacharbeit markieren",
+    "updatedPositions": "Positionen aktualisiert:",
+    "statusTableHead": "Status",
+    "workplaceTableHead": "Arbeitsplatz"
+  },
+  "articleConfig": {
+    "tabs": {
+      "edit": "Bearbeiten",
+      "add": "Hinzufügen"
+    },
+    "add": {
+      "z": {
+        "workplace": "Geben Sie mindestens 4 Zeichen ein, die der aktuellen Benennung entsprechen!",
+        "articleNumber": "Die Artikelnummer muss das folgende Format haben: XXXXX oder 10.0XXXXX.00 (X - ganze Zahl)",
+        "articleName": "Mindestens 5 Zeichen!",
+        "boxesPerPallet": "Geben Sie eine ganze Zahl ein!",
+        "dmc": "Mindestens 10 Zeichen!",
+        "dmcValidation": "Mindestens 4 Zeichen im DMC-Feld enthalten!",
+        "dmcSecondValidation": "Mindestens 4 Zeichen im DMC-Feld, anders als im Feld 'Validierter DMC-Wert'!",
+        "piecesPerBox": "Geben Sie eine ganze Zahl ein!",
+        "hydraProcess": "Geben Sie den richtigen Prozess ein!"
+      },
+      "cardTitle": "Artikel hinzufügen",
+      "cardDescription": "Füllen Sie alle Daten aus, um einen neuen Artikel hinzuzufügen.",
+      "addButton": "Hinzufügen",
+      "addingButton": "Wird hinzugefügt",
+      "clearButton": "Löschen",
+      "workplaceFormLabel": "Arbeitsplatz",
+      "articleNumberFormLabel": "Artikelnummer",
+      "articleNameFormLabel": "Artikelname",
+      "piecesPerBoxFormLabel": "Anzahl der Stücke pro Box",
+      "palletFormLabel": "Sammellabels für Palette",
+      "boxesPerPalletFormLabel": "Anzahl der Boxen pro Palette",
+      "dmcFormLabel": "DMC",
+      "dmcFormDescription": "Vollständiger Inhalt des gescannten DMC-Codes",
+      "dmcFirstValidationFormLabel": "Validierter DMC-Wert",
+      "dmcFirstValidationFormDescription": "Fester Inhalt des Codes (z.B. Artikelnummer des Kunden) - Zeichenfolge, die der gescannte DMC-Code enthalten muss",
+      "secondValidationCheckboxFormLabel": "Validierung von zwei Zeichenfolgen",
+      "dmcSecondValidationFormLabel": "Zweiter validierter DMC-Wert",
+      "dmcSecondValidationFormDescription": "Nur verwenden, wenn der DMC zwei feste Zeichenfolgen enthält (Anfang und Ende)!",
+      "fordCheckboxFormLabel": "Validierung des FORD-Datums",
+      "bmwCheckboxFormLabel": "Validierung des BMW-Datums",
+      "hydraProcessFormLabel": "Hydra-Prozess",
+      "hydraProcessFormDescription": "Hydra-Prozess, aus dem der Artikel stammt. (z.B. 050 - nach EOL-Kontrolle)",
+      "hydraProcessSelectOption050": "050 - nach der Druckprüfung EOL",
+      "hydraProcessSelectOption090": "090 - Q3",
+      "hydraProcessSelectPlaceholder": "Wählen Sie den richtigen Prozess für den Artikel",
+      "articleNoteFormLabel": "Artikelnotiz",
+      "articleNoteFormDescription": "Zusätzliche Informationen über den Artikel (z.B. Verpackungsart, umgangssprachlicher Name usw.)",
+      "toasts": {
+        "articleSaved": "Artikel hinzugefügt!",
+        "articleExists": "Artikel existiert bereits!",
+        "pleaseContactIt": "Bitte kontaktieren Sie die IT!"
+      }
+    }
+  },
+  "personsConfig": {
+    "z": {
+      "firstName": "Der Vorname muss 3 Zeichen enthalten!",
+      "lastName": "Der Nachname muss 3 Zeichen enthalten!",
+      "loginCode": "Personalnummer ist erforderlich!",
+      "password": "Das Passwort muss 5 Zeichen enthalten!"
+    },
+    "cardTitle": "Mitarbeiter hinzufügen",
+    "cardDescription": "Füllen Sie alle Daten aus, um einen neuen Mitarbeiter hinzuzufügen.",
+    "firstNameFormLabel": "Vorname",
+    "lastNameFormLabel": "Nachname",
+    "loginCodeFormLabel": "Log-in Kartencode",
+    "loginCodeFormDescription": "Wird zum Einloggen in die DMCheck-App verwendet.",
+    "passwordFormLabel": "Passwort",
+    "passwordFormDescription": "Wird in der Inventur-Unterstützungs-App verwendet. Leer lassen, um zu überspringen.",
+    "clearButton": "Löschen",
+    "addButton": "Hinzufügen",
+    "addingButton": "Wird hinzugefügt",
+    "toasts": {
+      "saved": "Mitarbeiter hinzugefügt!",
+      "exists": "Personalnummer ist bereits in der Datenbank definiert!"
+    }
+  },
+  "dmcheck": {
+    "lastFiveTable": {
+      "tableCaption": "zuletzt erfasste Elemente",
+      "timeTableHead": "Stunde",
+      "dateTableHead": "Daten"
+    },
+    "articleSelection": {
+      "cardTitle": "Artikel wählen",
+      "noArticleConfigForWorkplaceTitle": "Keine Konfiguration!",
+      "noArticleConfigForWorkplaceDescription": "Keine Artikel in der Konfiguration für den Arbeitsplatz: ",
+      "piecesPerBox": "Stk. / Box",
+      "boxesPerPallet": "Box / Palette",
+      "articleNumber": "Nummer",
+      "articleName": "Name",
+      "articleNote": "Notiz"
+    },
+    "personLogin": {
+      "cardTitle": "Anmeldung",
+      "personalNumberInputPlaceholder": "Personalnummer",
+      "confirmButton": "Login",
+      "loginButton": "Anmelden",
+      "loginNotValid": "Geben Sie eine gültige Personalnummer ein!",
+      "loginNotExist": "Personalnummer existiert nicht in der Datenbank!",
+      "loginSuccess": "Eingeloggt als: "
+    },
+    "scan": {
+      "statusBar": {
+        "operator": "operator",
+        "boxCardDialog": {
+          "cardHeader": "box",
+          "timeTableHead": "stunde",
+          "dateTableHead": "datum",
+          "dialogTitle": "Teile in box",
+          "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
+          "dmcSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
+          "deleteTableHead": "Löschen",
+          "dmcDeletedToast": "Teil entfernt!",
+          "dmcNotFoundToast": "Keine Teile gefunden!",
+          "alertDialogTitle": "Sind Sie sicher?",
+          "alertDialogDescription": "Sind Sie sicher, dass Sie diesen Teil aus der aktuellen Box entfernen möchten?",
+          "alertDialogCancel": "Ankündigung",
+          "alertDialogAction": "Löschen"
+        },
+        "palletCardDialog": {
+          "cardHeader": "pallet",
+          "timeTableHead": "stunde",
+          "dateTableHead": "datum",
+          "dialogTitle": "Teile in box",
+          "noDataDialogDescription": "Die Box ist leer, beginnen Sie mit dem Scannen der Teile.",
+          "hydraBatchSearchInputPlaceholder": "Scannen Sie den DMC-Code und suchen Sie nach...",
+          "deleteTableHead": "Löschen",
+          "hydraBatchDeletedToast": "Teil entfernt!",
+          "hydraBatchNotFoundToast": "Keine Teile gefunden!",
+          "alertDialogTitle": "Sind Sie sicher?",
+          "alertDialogDescription": "Sind Sie sicher, dass Sie diesen Teil aus der aktuellen Box entfernen möchten?",
+          "alertDialogCancel": "Ankündigung",
+          "alertDialogAction": "Löschen"
+        },
+        "articleCardDialog": {
+          "cardHeader": "artikel",
+          "dialogTitle": "Statistiken über verarbeitete Teile",
+          "currentShiftTableCell": "aktuell",
+          "shiftTableHead": "arbeitsplatzwechsel",
+          "amountTableHead": "menge"
+        },
+        "operatorCardDialog": {
+          "cardHeader": "operator",
+          "dialogTitle": "Statistiken über verarbeitete Teile",
+          "allTableCell": "alle",
+          "monthTableCell": "monat",
+          "weekTableCell": "woche",
+          "dayTableCell": "tag",
+          "yearTableCell": "jahr",
+          "amountTableHead": "menge"
+        }
+      },
+      "dmcScanInputPlaceholder": "DMC-Code scannen...",
+      "dmcReworkInputPlaceholder": "ANMERKUNG: DMC rework aktiv!",
+      "scanInputSavingPlaceholder": "wird verarbeitet...",
+      "hydraScanInputPlaceholder": "QR-Code vom HYDRA-Label scannen...",
+      "toast": {
+        "dmcNotValid": "Ungültiger DMC-Code!",
+        "articleNotFound": "Artikel nicht korrekt!",
+        "dmcSaved": "DMC gespeichert!",
+        "dmcExists": "DMC existiert bereits in der Datenbank!",
+        "fordDateNotValid": "Ungültiges FORD-Datum!",
+        "bmwDateNotValid": "Ungültiges BMW-Datum!",
+        "unknownSavingError": "Unbekannter Fehler, bitte kontaktieren Sie die IT!",
+        "nok": "NOK!",
+        "qrNotValid": "Ungültiger QR-Code!",
+        "qrWrongArticle": "Label mit falscher Artikelnummer!",
+        "qrWrongQuantity": "Falsche Stückzahl auf dem Label!",
+        "qrWrongProcess": "Label mit falscher Prozessnummer!",
+        "briPgSavingError": "Kontaktfehler mit externer Datenbank",
+        "reworkNotPossible": "Keine Teile im System - Nacharbeit unmöglich!",
+        "reworkDmcSaved": "Rework DMC gespeichert!",
+        "batchSaved": "Batch gespeichert!",
+        "batchExists": "Batch existiert bereits in der Datenbank!"
+      },
+      "palletScanInputPlaceholder": "QR-Code von gedrucktem Palette-Label scannen...",
+      "printPalletButton": "Palette-Label drucken",
+      "printHydraLabelReprint": "Hydra-Etikett erneut drucken",
+      "printHydraLabelPrinting": "Drucken...",
+      "printHydraLabelSuccess": "Hydra-Etikett gedruckt!",
+      "printHydraLabelError": "Fehler beim Drucken des Hydra-Etiketts",
+      "printHydraLabelErrorNoConfig": "Keine Konfiguration für den Druck des Hydra-Etiketts",
+      "printHydraLabelAutoPrinted": "Das Etikett wurde automatisch gedruckt, als die Box voll wurde",
+      "printHydraLabelConfirmTitle": "Erneuten Druck bestätigen",
+      "printHydraLabelConfirmReprint": "Dieses Etikett wurde bereits automatisch gedruckt. Sind Sie sicher, dass Sie es erneut drucken möchten?",
+      "cancel": "Abbrechen",
+      "confirm": "Ja, erneut drucken"
+    }
+  },
+  "news": {
+    "title": "Nachrichten",
+    "addNew": "News hinzufügen",
+    "noNews": "Keine Nachrichten verfügbar",
+    "form": {
+      "titleLabel": "Titel",
+      "titlePlaceholder": "News-Titel eingeben",
+      "contentLabel": "Inhalt (Markdown)",
+      "contentPlaceholder": "Sie können **Fett**, *Kursiv*, [Links](url), `Code` usw. verwenden.",
+      "pinnedLabel": "Oben anheften",
+      "pinnedDescription": "News werden oben in der Liste angezeigt",
+      "addButton": "Hinzufügen",
+      "updateButton": "Aktualisieren",
+      "backButton": "Zurück",
+      "editTitle": "News bearbeiten",
+      "addTitle": "News hinzufügen",
+      "saving": "Speichern..."
+    },
+    "validation": {
+      "titleRequired": "Titel ist erforderlich",
+      "titleMaxLength": "Titel kann maximal 200 Zeichen haben",
+      "contentRequired": "Inhalt ist erforderlich"
+    },
+    "actions": {
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleting": "Löschen...",
+      "cancel": "Abbrechen",
+      "pin": "Anheften",
+      "unpin": "Lösen",
+      "confirmDelete": "Sind Sie sicher, dass Sie diese Nachricht löschen möchten?",
+      "confirmDeleteTitle": "News löschen"
+    },
+    "messages": {
+      "createSuccess": "News erfolgreich hinzugefügt",
+      "updateSuccess": "News erfolgreich aktualisiert",
+      "deleteSuccess": "News erfolgreich gelöscht",
+      "pinSuccess": "News angeheftet",
+      "unpinSuccess": "News gelöst",
+      "refreshSuccess": "News-Liste erfolgreich aktualisiert",
+      "unauthorized": "Nicht berechtigt",
+      "createError": "Fehler beim Hinzufügen der News",
+      "updateError": "Fehler beim Aktualisieren der News",
+      "deleteError": "Fehler beim Löschen der News",
+      "pinError": "Fehler beim Anheften/Lösen der News",
+      "refreshError": "Fehler beim Aktualisieren",
+      "saveError": "Ein Fehler ist beim Speichern aufgetreten",
+      "deleteErrorGeneric": "Ein Fehler ist beim Löschen aufgetreten",
+      "pinErrorGeneric": "Ein Fehler ist beim Anheften aufgetreten"
+    },
+    "refresh": "Aktualisieren"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  }
+}

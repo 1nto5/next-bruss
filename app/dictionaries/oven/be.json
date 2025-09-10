@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Уваход",
+    "operator1Label": "Асабісты нумар 1",
+    "operator2Label": "Аператар 2",
+    "operator3Label": "Аператар 3",
+    "personalNumber2Label": "Асабісты нумар 2",
+    "personalNumber3Label": "Асабісты нумар 3",
+    "placeholder": "дакраніцеся для ўводу...",
+    "loginButton": "Увайсці",
+    "clearButton": "Ачысціць",
+    "keypadTitle": "Увядзіце асабісты нумар аператара",
+    "errors": {
+      "wrongNumber1": "Няправільны асабісты нумар!",
+      "wrongNumber2": "Няправільны асабісты нумар!",
+      "wrongNumber3": "Няправільны асабісты нумар!",
+      "loginError": "Звярніцеся ў IT!"
+    }
+  },
+  "ovenSelection": {
+    "title": "Выбар печы",
+    "errorNoOvens": "У параметрах пошуку не пазначаны печы (прыклад: ?ovens=tem10,tem11)."
+  },
+  "programSelection": {
+    "title": "Выбар праграмы для печы",
+    "loading": "Загрузка...",
+    "errorLoadPrograms": "Не атрымалася загрузіць праграмы"
+  },
+  "processList": {
+    "title": "Працэсы нагрэву",
+    "newProcess": "Новы працэс",
+    "endProcess": "Завяршыць працэс",
+    "noProcesses": "Няма пачатых працэсаў",
+    "table": {
+      "start": "Пачатак",
+      "article": "Артыкул",
+      "hydraBatch": "HYDRA партыя",
+      "plannedEnd": "Планавае завяршэнне",
+      "waiting": "чакае"
+    },
+    "alerts": {
+      "noTemperature": "Няма паказанняў тэмпературы",
+      "noTemperatureDesc": "Сістэма не атрымала даныя ад датчыкаў тэмпературы. Калі печ ужо працуе, звярніцеся ў IT!"
+    },
+    "deleteDialog": {
+      "title": "Выдаліць працэс",
+      "description": "Вы ўпэўнены, што хочаце выдаліць гэты працэс? Гэта дзеянне нельга адмяніць.",
+      "cancel": "Адмяніць",
+      "delete": "Выдаліць"
+    },
+    "toasts": {
+      "startingProcess": "Запуск працэсу...",
+      "processStarted": "Працэс запушчаны!",
+      "endingProcess": "Завяршэнне працэсу...",
+      "processEnded": "Працэс завершаны!",
+      "deletingProcess": "Выдаленне працэсу...",
+      "processDeleted": "Працэс выдалены!",
+      "noActiveProcess": "Няма актыўнага працэсу для HYDRA партыі!",
+      "contactIT": "Звярніцеся ў IT!"
+    },
+    "errors": {
+      "duplicateBatch": "HYDRA партыя існуе ў базе даных!",
+      "noOperator": "Патрэбен прынамсі адзін аператар",
+      "notCreated": "Не атрымалася стварыць працэс",
+      "notCompleted": "Не атрымалася завяршыць працэс",
+      "notDeleted": "Не атрымалася выдаліць працэс",
+      "wrongNumber1": "Няправільны асабісты нумар",
+      "wrongNumber2": "Няправільны асабісты нумар",
+      "wrongNumber3": "Няправільны асабісты нумар",
+      "loginError": "Памылка ўваходу - звярніцеся ў IT",
+      "configError": "Памылка канфігурацыі печы - звярніцеся ў IT",
+      "fetchError": "Памылка атрымання працэсаў - звярніцеся ў IT",
+      "startError": "Памылка запуску працэсу - звярніцеся ў IT",
+      "completeError": "Памылка завяршэння працэсу - звярніцеся ў IT",
+      "deleteError": "Памылка выдалення працэсу - звярніцеся ў IT",
+      "tempError": "Памылка тэмпературы печы - звярніцеся ў IT",
+      "validationFailed": "Звярніцеся ў IT!",
+      "articleNotConfigured": "Артыкул не наладжаны!",
+      "wrongProgramForArticle": "Артыкул не адпавядае абранай праграме!",
+      "databaseError": "Памылка базы даных - звярніцеся ў IT",
+      "noRunningProcesses": "Няма актыўных працэсаў для завяршэння"
+    }
+  },
+  "startBatchDialog": {
+    "title": "Новы працэс",
+    "articlePlaceholder": "Скануйце нумар артыкула...",
+    "batchPlaceholder": "Скануйце HYDRA партыю...",
+    "cancel": "Адмяніць",
+    "start": "Пачаць"
+  },
+  "endBatchDialog": {
+    "title": "Завяршыць працэс",
+    "description": {
+      "plural": "Вы ўпэўнены, што хочаце завяршыць працэс для {count} партый у гэтай печы?",
+      "singular": "Вы ўпэўнены, што хочаце завяршыць працэс для 1 партыі ў гэтай печы?"
+    },
+    "temperatureWarning": "Выяўлены бягучыя паказчыкі тэмпературы з печы. Печ можа ўсё яшчэ працаваць!",
+    "noProcesses": "Няма актыўных працэсаў для завяршэння",
+    "cancel": "Адмяніць",
+    "end": "Завяршыць працэс"
+  },
+  "header": {
+    "clearOven": "Змяніць печ",
+    "clearProgram": "Змяніць праграму",
+    "logoutDialog": {
+      "title": "Выйсці",
+      "description": "Вы ўпэўнены, што хочаце выйсці?",
+      "cancel": "Адмяніць",
+      "continue": "Працягнуць"
+    }
+  }
+}

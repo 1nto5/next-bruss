@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Logowanie",
+    "operator1Label": "Nr personalny 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Numer personalny 2",
+    "personalNumber3Label": "Numer personalny 3",
+    "placeholder": "dotknij aby wprowadzić...",
+    "loginButton": "Zaloguj",
+    "clearButton": "Wyczyść",
+    "keypadTitle": "Wprowadź numer personalny operatora",
+    "errors": {
+      "wrongNumber1": "Nieprawidłowy nr personalny!",
+      "wrongNumber2": "Nieprawidłowy nr personalny!",
+      "wrongNumber3": "Nieprawidłowy nr personalny!",
+      "loginError": "Skontaktuj się z IT!"
+    }
+  },
+  "ovenSelection": {
+    "title": "Wybór pieca",
+    "errorNoOvens": "Brak pieców określonych w parametrach wyszukiwania (przykład: ?ovens=tem10,tem11)."
+  },
+  "programSelection": {
+    "title": "Wybór programu dla pieca",
+    "loading": "Ładowanie...",
+    "errorLoadPrograms": "Nie udało się załadować programów"
+  },
+  "processList": {
+    "title": "Procesy wygrzewania",
+    "newProcess": "Nowy proces",
+    "endProcess": "Zakończ proces",
+    "noProcesses": "Brak rozpoczętych procesów",
+    "table": {
+      "start": "Start",
+      "article": "Artykuł",
+      "hydraBatch": "HYDRA batch",
+      "plannedEnd": "Planowane zakończenie",
+      "waiting": "oczekuje"
+    },
+    "alerts": {
+      "noTemperature": "Brak odczytu temperatury",
+      "noTemperatureDesc": "System nie uzyskał danych z czujników temperatur. Jeśli piec jest już uruchomiony, skontaktuj się z IT!"
+    },
+    "deleteDialog": {
+      "title": "Usuń proces",
+      "description": "Czy na pewno chcesz usunąć ten proces? Ta akcja nie może zostać cofnięta.",
+      "cancel": "Anuluj",
+      "delete": "Usuń"
+    },
+    "toasts": {
+      "startingProcess": "Rozpoczynanie procesu...",
+      "processStarted": "Proces uruchomiony!",
+      "endingProcess": "Kończenie procesu...",
+      "processEnded": "Proces zakończony!",
+      "deletingProcess": "Usuwanie procesu...",
+      "processDeleted": "Proces usunięty!",
+      "noActiveProcess": "Brak aktywnego procesu dla HYDRA batch!",
+      "contactIT": "Skontaktuj się z IT!"
+    },
+    "errors": {
+      "duplicateBatch": "HYDRA batch istnieje w bazie danych!",
+      "noOperator": "Co najmniej jeden operator jest wymagany",
+      "notCreated": "Nie udało się utworzyć procesu",
+      "notCompleted": "Nie udało się zakończyć procesu",
+      "notDeleted": "Nie udało się usunąć procesu",
+      "wrongNumber1": "Nieprawidłowy numer personalny",
+      "wrongNumber2": "Nieprawidłowy numer personalny",
+      "wrongNumber3": "Nieprawidłowy numer personalny",
+      "loginError": "Błąd logowania - skontaktuj się z IT",
+      "configError": "Błąd konfiguracji pieca - skontaktuj się z IT",
+      "fetchError": "Błąd pobierania procesów - skontaktuj się z IT",
+      "startError": "Błąd uruchamiania procesu - skontaktuj się z IT",
+      "completeError": "Błąd kończenia procesu - skontaktuj się z IT",
+      "deleteError": "Błąd usuwania procesu - skontaktuj się z IT",
+      "tempError": "Błąd temperatury pieca - skontaktuj się z IT",
+      "validationFailed": "Skontaktuj się z IT!",
+      "articleNotConfigured": "Artykuł nie jest skonfigurowany!",
+      "wrongProgramForArticle": "Artykuł nie pasuje do wybranego programu!",
+      "databaseError": "Błąd bazy danych - skontaktuj się z IT",
+      "noRunningProcesses": "Brak aktywnych procesów do zakończenia"
+    }
+  },
+  "startBatchDialog": {
+    "title": "Nowy proces",
+    "articlePlaceholder": "Zeskanuj numer artykułu...",
+    "batchPlaceholder": "Zeskanuj HYDRA batch...",
+    "cancel": "Anuluj",
+    "start": "Rozpocznij"
+  },
+  "endBatchDialog": {
+    "title": "Zakończ proces",
+    "description": {
+      "plural": "Czy na pewno chcesz zakończyć proces dla {count} partii w tym piecu?",
+      "singular": "Czy na pewno chcesz zakończyć proces dla 1 partii w tym piecu?"
+    },
+    "temperatureWarning": "Wykryto aktualne odczyty temperatur z pieca. Piec może nadal pracować!",
+    "noProcesses": "Brak aktywnych procesów do zakończenia",
+    "cancel": "Anuluj", 
+    "end": "Zakończ proces"
+  },
+  "header": {
+    "clearOven": "Zmień piec",
+    "clearProgram": "Zmień program",
+    "logoutDialog": {
+      "title": "Wyloguj",
+      "description": "Czy na pewno chcesz wylogować?",
+      "cancel": "Anuluj",
+      "continue": "Kontynuuj"
+    }
+  }
+}

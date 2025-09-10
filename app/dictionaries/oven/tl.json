@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Pag-login",
+    "operator1Label": "Personal na numero 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal na numero 2",
+    "personalNumber3Label": "Personal na numero 3",
+    "placeholder": "hawakan upang maglagay...",
+    "loginButton": "Mag-login",
+    "clearButton": "Burahin",
+    "keypadTitle": "Ilagay ang personal na numero ng operator",
+    "errors": {
+      "wrongNumber1": "Hindi wastong personal na numero!",
+      "wrongNumber2": "Hindi wastong personal na numero!",
+      "wrongNumber3": "Hindi wastong personal na numero!",
+      "loginError": "Makipag-ugnayan sa IT!"
+    }
+  },
+  "ovenSelection": {
+    "title": "Pagpili ng oven",
+    "errorNoOvens": "Walang mga oven na tinukoy sa mga parameter ng paghahanap (halimbawa: ?ovens=tem10,tem11)."
+  },
+  "programSelection": {
+    "title": "Pagpili ng programa para sa oven",
+    "loading": "Naglo-load...",
+    "errorLoadPrograms": "Nabigo ang pag-load ng mga programa"
+  },
+  "processList": {
+    "title": "Mga proseso ng pagpapainit",
+    "newProcess": "Bagong proseso",
+    "endProcess": "Tapusin ang proseso",
+    "noProcesses": "Walang nasimulan na proseso",
+    "table": {
+      "start": "Simula",
+      "article": "Artikulo",
+      "hydraBatch": "HYDRA batch",
+      "plannedEnd": "Planong pagtatapos",
+      "waiting": "naghihintay"
+    },
+    "alerts": {
+      "noTemperature": "Walang pagbasa ng temperatura",
+      "noTemperatureDesc": "Hindi nakatanggap ang sistema ng data mula sa mga sensor ng temperatura. Kung tumatakbo na ang oven, makipag-ugnayan sa IT!"
+    },
+    "deleteDialog": {
+      "title": "Tanggalin ang proseso",
+      "description": "Sigurado ka bang gusto mong tanggalin ang prosesong ito? Hindi maaaring bawiin ang aksyong ito.",
+      "cancel": "Kanselahin",
+      "delete": "Tanggalin"
+    },
+    "toasts": {
+      "startingProcess": "Sinisimulan ang proseso...",
+      "processStarted": "Nasimulan ang proseso!",
+      "endingProcess": "Tinutupos ang proseso...",
+      "processEnded": "Natapos ang proseso!",
+      "deletingProcess": "Tinatanggal ang proseso...",
+      "processDeleted": "Natanggal ang proseso!",
+      "noActiveProcess": "Walang aktibong proseso para sa HYDRA batch!",
+      "contactIT": "Makipag-ugnayan sa IT!"
+    },
+    "errors": {
+      "duplicateBatch": "Umiiral ang HYDRA batch sa database!",
+      "noOperator": "Kailangan ng kahit isang operator",
+      "notCreated": "Nabigo ang paggawa ng proseso",
+      "notCompleted": "Nabigo ang pagkumpleto ng proseso",
+      "notDeleted": "Nabigo ang pagtanggal ng proseso",
+      "wrongNumber1": "Hindi wastong personal na numero",
+      "wrongNumber2": "Hindi wastong personal na numero",
+      "wrongNumber3": "Hindi wastong personal na numero",
+      "loginError": "Error sa pag-login - makipag-ugnayan sa IT",
+      "configError": "Error sa configuration ng oven - makipag-ugnayan sa IT",
+      "fetchError": "Error sa pagkuha ng proseso - makipag-ugnayan sa IT",
+      "startError": "Error sa pagsisimula ng proseso - makipag-ugnayan sa IT",
+      "completeError": "Error sa pagkumpleto ng proseso - makipag-ugnayan sa IT",
+      "deleteError": "Error sa pagtanggal ng proseso - makipag-ugnayan sa IT",
+      "tempError": "Error sa temperatura ng oven - makipag-ugnayan sa IT",
+      "validationFailed": "Makipag-ugnayan sa IT!",
+      "articleNotConfigured": "Hindi naka-configure ang artikulo!",
+      "wrongProgramForArticle": "Hindi tumutugma ang artikulo sa napiling programa!",
+      "databaseError": "Error sa database - makipag-ugnayan sa IT",
+      "noRunningProcesses": "Walang aktibong proseso na tapusin"
+    }
+  },
+  "startBatchDialog": {
+    "title": "Bagong proseso",
+    "articlePlaceholder": "I-scan ang numero ng artikulo...",
+    "batchPlaceholder": "I-scan ang HYDRA batch...",
+    "cancel": "Kanselahin",
+    "start": "Simulan"
+  },
+  "endBatchDialog": {
+    "title": "Tapusin ang proseso",
+    "description": {
+      "plural": "Sigurado ka bang gusto mong tapusin ang proseso para sa {count} batch sa oven na ito?",
+      "singular": "Sigurado ka bang gusto mong tapusin ang proseso para sa 1 batch sa oven na ito?"
+    },
+    "temperatureWarning": "Nakakita ng mga kamakailang pagbabasa ng temperatura mula sa oven. Maaari pang tumatakbo ang oven!",
+    "noProcesses": "Walang aktibong proseso na tapusin",
+    "cancel": "Kanselahin",
+    "end": "Tapusin ang proseso"
+  },
+  "header": {
+    "clearOven": "Baguhin ang oven",
+    "clearProgram": "Baguhin ang programa",
+    "logoutDialog": {
+      "title": "Mag-logout",
+      "description": "Sigurado ka bang gusto mong mag-logout?",
+      "cancel": "Kanselahin",
+      "continue": "Magpatuloy"
+    }
+  }
+}

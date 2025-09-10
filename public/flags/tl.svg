@@ -1,0 +1,14 @@
+<svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Philippines flag: Blue, Red, White triangle -->
+  <rect width="24" height="9" fill="#0038A8"/>
+  <rect y="9" width="24" height="9" fill="#CE1126"/>
+  <polygon points="0,0 12,9 0,18" fill="white"/>
+  
+  <!-- Simplified sun -->
+  <circle cx="6" cy="9" r="2" fill="#FCD116"/>
+  
+  <!-- Three stars -->
+  <polygon points="3,5 3.5,6.5 2.5,6.5" fill="#FCD116"/>
+  <polygon points="9,5 9.5,6.5 8.5,6.5" fill="#FCD116"/>
+  <polygon points="6,13 6.5,14.5 5.5,14.5" fill="#FCD116"/>
+</svg>

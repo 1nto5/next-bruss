@@ -1,0 +1,73 @@
+{
+  "login": {
+    "title": "Logowanie EOL136153",
+    "operator1Label": "Nr personalny",
+    "operator2Label": "",
+    "operator3Label": "",
+    "personalNumber2Label": "",
+    "personalNumber3Label": "",
+    "placeholder": "dotknij aby wprowadzić...",
+    "loginButton": "Zaloguj",
+    "clearButton": "Wyczyść",
+    "keypadTitle": "Wprowadź numer personalny",
+    "errors": {
+      "wrongNumber1": "Nieprawidłowy numer personalny",
+      "wrongNumber2": "",
+      "wrongNumber3": "",
+      "loginError": "Błąd logowania"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Operator",
+    "logout": "Wyloguj",
+    "changeArticle": "Zmień",
+    "volume": "Głośność"
+  },
+  "status": {
+    "article136": "136 (28067)",
+    "article153": "153 (28042)",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Kartonów na palecie",
+    "palletFull": "Pełna paleta",
+    "scanPallet": "Skanuj paletę"
+  },
+  "scanning": {
+    "title": "Skanuj kod Hydra",
+    "placeholder": "HYDRA QR",
+    "scanning": "Skanowanie...",
+    "messages": {
+      "saved": "Batch zapisany!",
+      "exists": "Batch już istnieje!",
+      "invalid": "Nieprawidłowy kod!",
+      "wrongArticle": "Błędny artykuł!",
+      "wrongQuantity": "Błędna ilość!",
+      "wrongProcess": "Błędny proces!",
+      "fullPallet": "Paleta pełna!",
+      "error": "Błąd! Zgłoś się do IT"
+    }
+  },
+  "pallet": {
+    "title": "Skanuj kod palety",
+    "placeholder": "KOD PALETY",
+    "generateBatch": "Generuj batch palety",
+    "print": "Drukuj etykietę",
+    "printing": "Drukowanie...",
+    "nextPallet": "Następna paleta",
+    "messages": {
+      "success": "Paleta zapisana!",
+      "invalid": "Nieprawidłowy kod palety!",
+      "error": "Błąd zapisu palety!"
+    }
+  },
+  "lastScans": {
+    "title": "Ostatnie skanowania",
+    "empty": "Brak skanowań"
+  },
+  "errors": {
+    "somethingWrong": "Coś poszło nie tak",
+    "fetchError": "Nie udało się pobrać danych",
+    "contactIT": "Skontaktuj się z IT"
+  }
+}

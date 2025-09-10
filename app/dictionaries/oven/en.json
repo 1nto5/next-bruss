@@ -1,0 +1,112 @@
+{
+  "login": {
+    "title": "Login",
+    "operator1Label": "Personal number 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal number 2",
+    "personalNumber3Label": "Personal number 3",
+    "placeholder": "touch to enter...",
+    "loginButton": "Login",
+    "clearButton": "Clear",
+    "keypadTitle": "Enter operator personal number",
+    "errors": {
+      "wrongNumber1": "Invalid personal number!",
+      "wrongNumber2": "Invalid personal number!",
+      "wrongNumber3": "Invalid personal number!",
+      "loginError": "Contact IT!"
+    }
+  },
+  "ovenSelection": {
+    "title": "Oven selection",
+    "errorNoOvens": "No ovens specified in search parameters (example: ?ovens=tem10,tem11)."
+  },
+  "programSelection": {
+    "title": "Program selection for oven",
+    "loading": "Loading...",
+    "errorLoadPrograms": "Failed to load programs"
+  },
+  "processList": {
+    "title": "Heating processes",
+    "newProcess": "New process",
+    "endProcess": "End process",
+    "noProcesses": "No processes started",
+    "table": {
+      "start": "Start",
+      "article": "Article",
+      "hydraBatch": "HYDRA batch",
+      "plannedEnd": "Planned completion",
+      "waiting": "waiting"
+    },
+    "alerts": {
+      "noTemperature": "No temperature reading",
+      "noTemperatureDesc": "System didn't receive data from temperature sensors. If the oven is already running, contact IT!"
+    },
+    "deleteDialog": {
+      "title": "Delete process",
+      "description": "Are you sure you want to delete this process? This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "toasts": {
+      "startingProcess": "Starting process...",
+      "processStarted": "Process started!",
+      "endingProcess": "Ending process...",
+      "processEnded": "Process ended!",
+      "deletingProcess": "Deleting process...",
+      "processDeleted": "Process deleted!",
+      "noActiveProcess": "No active process for HYDRA batch!",
+      "contactIT": "Contact IT!"
+    },
+    "errors": {
+      "duplicateBatch": "HYDRA batch exists in database!",
+      "noOperator": "At least one operator is required",
+      "notCreated": "Failed to create process",
+      "notCompleted": "Failed to complete process",
+      "notDeleted": "Failed to delete process",
+      "wrongNumber1": "Invalid personal number",
+      "wrongNumber2": "Invalid personal number",
+      "wrongNumber3": "Invalid personal number",
+      "loginError": "Login error - contact IT",
+      "configError": "Oven configuration error - contact IT",
+      "fetchError": "Process fetch error - contact IT",
+      "startError": "Process start error - contact IT",
+      "completeError": "Process complete error - contact IT",
+      "deleteError": "Process delete error - contact IT",
+      "tempError": "Oven temperature error - contact IT",
+      "validationFailed": "Contact IT!",
+      "articleNotConfigured": "Article is not configured!",
+      "wrongProgramForArticle": "Article doesn't match selected program!",
+      "databaseError": "Database error - contact IT",
+      "noRunningProcesses": "No active processes to end"
+    }
+  },
+  "startBatchDialog": {
+    "title": "New process",
+    "articlePlaceholder": "Scan article number...",
+    "batchPlaceholder": "Scan HYDRA batch...",
+    "cancel": "Cancel",
+    "start": "Start"
+  },
+  "endBatchDialog": {
+    "title": "End process",
+    "description": {
+      "plural": "Are you sure you want to end the process for {count} batches in this oven?",
+      "singular": "Are you sure you want to end the process for 1 batch in this oven?"
+    },
+    "temperatureWarning": "Recent temperature readings detected from the oven. The oven may still be running!",
+    "noProcesses": "No active processes to end",
+    "cancel": "Cancel",
+    "end": "End process"
+  },
+  "header": {
+    "clearOven": "Change oven",
+    "clearProgram": "Change program",
+    "logoutDialog": {
+      "title": "Logout",
+      "description": "Are you sure you want to logout?",
+      "cancel": "Cancel",
+      "continue": "Continue"
+    }
+  }
+}
