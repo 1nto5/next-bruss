@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get the order from database to check permissions
-    const collection = await dbc('production_overtime');
+    const collection = await dbc('overtime_orders');
     const objectId = new ObjectId(overTimeRequestId);
     const order = await collection.findOne({ _id: objectId });
 
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Construct path to file
-    const filePath = path.join(BASE_PATH, 'production_overtime', filename);
+    const filePath = path.join(BASE_PATH, 'overtime_orders', filename);
 
     // Check if file exists
     if (!fs.existsSync(filePath)) {

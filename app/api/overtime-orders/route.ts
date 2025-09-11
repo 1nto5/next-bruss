@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const failures = await coll
       .find(query)
       .sort({ _id: -1 })
@@ -72,9 +72,9 @@ export async function GET(req: NextRequest) {
       .toArray();
     return new NextResponse(JSON.stringify(failures));
   } catch (error) {
-    console.error('api/production-overtime: ' + error);
+    console.error('api/overtime-orders: ' + error);
     return NextResponse.json(
-      { error: 'production-overtime api' },
+      { error: 'overtime-orders api' },
       { status: 503 },
     );
   }

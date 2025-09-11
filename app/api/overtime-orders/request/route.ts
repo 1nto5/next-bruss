@@ -14,13 +14,13 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
   }
-  console.log('api/production-overtime/request: ' + searchParams.get('id'));
+  console.log('api/overtime-orders/request: ' + searchParams.get('id'));
 
   try {
     const id = searchParams.get('id')!;
     const query = { _id: new ObjectId(id) };
 
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const document = await coll.findOne(query);
 
     if (!document) {
@@ -32,9 +32,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(document);
   } catch (error) {
-    console.error('api/production-overtime/request: ' + error);
+    console.error('api/overtime-orders/request: ' + error);
     return NextResponse.json(
-      { error: 'production-overtime/request api' },
+      { error: 'overtime-orders/request api' },
       { status: 400 },
     );
   }

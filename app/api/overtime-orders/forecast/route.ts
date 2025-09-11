@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const overtimeRequests = await coll.find(query).sort({ from: 1 }).toArray();
 
     // Group data by time periods for chart display
@@ -219,9 +219,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('api/production-overtime/forecast: ' + error);
+    console.error('api/overtime-orders/forecast: ' + error);
     return NextResponse.json(
-      { error: 'production-overtime forecast api error' },
+      { error: 'overtime-orders forecast api error' },
       { status: 503 },
     );
   }

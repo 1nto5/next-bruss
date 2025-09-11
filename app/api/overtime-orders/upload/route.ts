@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the overtime request to check permissions
-    const collection = await dbc('production_overtime');
+    const collection = await dbc('overtime_orders');
     let objectId;
     try {
       objectId = new ObjectId(overTimeRequestId);
@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create base directory if it doesn't exist
-    const baseFolder = path.join(BASE_PATH, 'production_overtime');
+    const baseFolder = path.join(BASE_PATH, 'overtime_orders');
     fs.mkdirSync(baseFolder, { recursive: true });
 
     const filesToMerge: Buffer[] = [];

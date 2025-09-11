@@ -20,7 +20,7 @@ export async function revalidateOvertimeOrdersRequest() {
 // Helper function to generate the next internal ID
 async function generateNextInternalId(): Promise<string> {
   try {
-    const collection = await dbc('production_overtime');
+    const collection = await dbc('overtime_orders');
     const currentYear = new Date().getFullYear();
     const shortYear = currentYear.toString().slice(-2);
 
@@ -99,7 +99,7 @@ export async function approveOvertimeRequest(id: string) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -113,7 +113,7 @@ export async function approveOvertimeRequest(id: string) {
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
     await sendEmailNotificationToRequestor(session.user.email, id);
     return { success: 'approved' };
   } catch (error) {
@@ -130,7 +130,7 @@ export async function insertOvertimeRequest(
     redirect('/auth');
   }
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
 
     // Generate internal ID
     const internalId = await generateNextInternalId();
@@ -174,7 +174,7 @@ export async function deleteDayOff(
     redirect('/auth');
   }
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
 
     // Check if the user is authorized to modify this request
     const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
@@ -220,7 +220,7 @@ export async function deleteDayOff(
       return { error: 'not found employee' };
     }
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
     return { success: 'deleted' };
   } catch (error) {
     console.error(error);
@@ -240,7 +240,7 @@ export async function deleteEmployee(
     redirect('/auth');
   }
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
     if (!request) {
       return { error: 'not found' };
@@ -269,7 +269,7 @@ export async function addEmployeeDayOff(
     redirect('/auth');
   }
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
 
     // Check if the user is authorized to modify this request
     const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
@@ -323,8 +323,8 @@ export async function addEmployeeDayOff(
       return { error: 'not found' };
     }
 
-    revalidateProductionOvertime();
-    revalidateProductionOvertimeRequest();
+    revalidateOvertimeOrders();
+    revalidateOvertimeOrdersRequest();
     return { success: 'added' };
   } catch (error) {
     console.error(error);
@@ -340,10 +340,18 @@ export async function cancelOvertimeRequest(id: string) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
+
+    // Handle both ObjectId and string ID formats
+    let convertedId;
+    try {
+      convertedId = new ObjectId(id);
+    } catch {
+      convertedId = id;
+    }
 
     // First check if the request exists and get its current status
-    const request = await coll.findOne({ _id: new ObjectId(id) });
+    const request = await coll.findOne({ _id: convertedId });
     if (!request) {
       return { error: 'not found' };
     }
@@ -370,7 +378,7 @@ export async function cancelOvertimeRequest(id: string) {
     }
 
     const update = await coll.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: convertedId },
       {
         $set: {
           status: 'canceled',
@@ -386,7 +394,7 @@ export async function cancelOvertimeRequest(id: string) {
       return { error: 'not found' };
     }
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
     return { success: 'canceled' };
   } catch (error) {
     console.error(error);
@@ -408,7 +416,7 @@ export async function markAsAccountedOvertimeRequest(id: string) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
 
     // First check if the request exists and get its current status
     const request = await coll.findOne({ _id: new ObjectId(id) });
@@ -438,7 +446,7 @@ export async function markAsAccountedOvertimeRequest(id: string) {
       return { error: 'not found' };
     }
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
     return { success: 'accounted' };
   } catch (error) {
     console.error(error);
@@ -462,7 +470,7 @@ export async function bulkApproveOvertimeRequests(ids: string[]) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const objectIds = ids.map((id) => new ObjectId(id));
 
     const update = await coll.updateMany(
@@ -481,7 +489,7 @@ export async function bulkApproveOvertimeRequests(ids: string[]) {
       },
     );
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
 
     return {
       success: `${update.modifiedCount} requests approved`,
@@ -501,7 +509,7 @@ export async function bulkCancelOvertimeRequests(ids: string[]) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const objectIds = ids.map((id) => new ObjectId(id));
 
     // First get all requests to check permissions
@@ -548,7 +556,7 @@ export async function bulkCancelOvertimeRequests(ids: string[]) {
       },
     );
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
 
     return {
       success: `${update.modifiedCount} requests canceled`,
@@ -574,7 +582,7 @@ export async function bulkMarkAsAccountedOvertimeRequests(ids: string[]) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const objectIds = ids.map((id) => new ObjectId(id));
 
     const update = await coll.updateMany(
@@ -593,7 +601,7 @@ export async function bulkMarkAsAccountedOvertimeRequests(ids: string[]) {
       },
     );
 
-    revalidateProductionOvertime();
+    revalidateOvertimeOrders();
 
     return {
       success: `${update.modifiedCount} requests marked as accounted`,
@@ -612,7 +620,7 @@ export async function getOvertimeRequestForEdit(id: string) {
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     const request = await coll.findOne({ _id: new ObjectId(id) });
     
     if (!request) {
@@ -685,7 +693,7 @@ export async function updateOvertimeRequest(
   }
 
   try {
-    const coll = await dbc('production_overtime');
+    const coll = await dbc('overtime_orders');
     
     // First check if the request exists and get its current data
     const request = await coll.findOne({ _id: new ObjectId(id) });
@@ -732,11 +740,115 @@ export async function updateOvertimeRequest(
       return { error: 'not found' };
     }
 
-    revalidateProductionOvertime();
-    revalidateProductionOvertimeRequest();
+    revalidateOvertimeOrders();
+    revalidateOvertimeOrdersRequest();
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
     return { error: 'updateOvertimeRequest server action error' };
+  }
+}
+
+export async function bulkDeleteOvertimeRequests(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  // Only admins can delete orders
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  if (!isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    
+    // Handle both ObjectIds and string IDs
+    const convertedIds = ids.map((id) => {
+      try {
+        // Try to convert to ObjectId first
+        return new ObjectId(id);
+      } catch {
+        // If it fails, use as string
+        return id;
+      }
+    });
+
+    const deleteResult = await coll.deleteMany({ _id: { $in: convertedIds } });
+
+    revalidateOvertimeOrders();
+    return {
+      success: 'deleted',
+      count: deleteResult.deletedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkDeleteOvertimeRequests server action error' };
+  }
+}
+
+export async function bulkReactivateOvertimeRequests(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  // Only admins can reactivate orders
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  if (!isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    
+    // Handle both ObjectIds and string IDs
+    const convertedIds = ids.map((id) => {
+      try {
+        // Try to convert to ObjectId first
+        return new ObjectId(id);
+      } catch {
+        // If it fails, use as string
+        return id;
+      }
+    });
+
+    // First get all requests to check which ones can be reactivated
+    const requests = await coll.find({ _id: { $in: convertedIds } }).toArray();
+    
+    // Filter to only canceled requests
+    const reactivatableIds = requests
+      .filter(req => req.status === 'canceled')
+      .map(req => req._id);
+
+    if (reactivatableIds.length === 0) {
+      return { error: 'no canceled requests found' };
+    }
+
+    // Update canceled requests back to pending
+    const update = await coll.updateMany(
+      { _id: { $in: reactivatableIds } },
+      { 
+        $set: { 
+          status: 'pending',
+          reactivatedAt: new Date(),
+          reactivatedBy: session.user.email
+        },
+        $unset: { 
+          canceledAt: "",
+          canceledBy: ""
+        }
+      }
+    );
+
+    revalidateOvertimeOrders();
+    return {
+      success: 'reactivated',
+      count: update.modifiedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkReactivateOvertimeRequests server action error' };
   }
 }

@@ -20,12 +20,18 @@ import {
   Edit,
   FileText,
   MoreHorizontal,
+  RotateCcw,
+  Trash2,
   X,
 } from 'lucide-react';
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
 import { OvertimeType, getDepartmentDisplayName } from '../../lib/types';
+import {
+  bulkDeleteOvertimeRequests,
+  bulkReactivateOvertimeRequests,
+} from '../../actions';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -376,6 +382,45 @@ export const createColumns = (
                       <span>Pobierz listę obecności</span>
                     </DropdownMenuItem>
                   </Link>
+                )}
+
+                {/* Admin actions */}
+                {isAdmin && request.status === 'canceled' && (
+                  <DropdownMenuItem
+                    onSelect={async (e) => {
+                      e.preventDefault();
+                      const result = await bulkReactivateOvertimeRequests([request._id]);
+                      if (result.error) {
+                        alert(`Błąd: ${result.error}`);
+                      } else {
+                        alert('Zlecenie zostało reaktywowane');
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    <RotateCcw className='mr-2 h-4 w-4' />
+                    <span>Reaktywuj zlecenie</span>
+                  </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem
+                    onSelect={async (e) => {
+                      e.preventDefault();
+                      if (confirm('Czy na pewno chcesz TRWALE usunąć to zlecenie? Ta operacja jest nieodwracalna.')) {
+                        const result = await bulkDeleteOvertimeRequests([request._id]);
+                        if (result.error) {
+                          alert(`Błąd: ${result.error}`);
+                        } else {
+                          alert('Zlecenie zostało usunięte');
+                          window.location.reload();
+                        }
+                      }
+                    }}
+                    className='text-destructive'
+                  >
+                    <Trash2 className='mr-2 h-4 w-4' />
+                    <span>Usuń zlecenie</span>
+                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
