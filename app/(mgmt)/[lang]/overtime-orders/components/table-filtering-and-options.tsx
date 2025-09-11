@@ -17,7 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateProductionOvertime as revalidate } from '../actions';
+import { revalidateOvertimeOrders as revalidate } from '../actions';
 
 export default function TableFilteringAndOptions({
   fetchTime,
