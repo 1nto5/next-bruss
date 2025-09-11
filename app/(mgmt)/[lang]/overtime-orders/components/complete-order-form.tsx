@@ -149,7 +149,7 @@ export default function CompleteOrderForm({
             );
           }
 
-          const response = await fetch('/api/production-overtime/upload', {
+          const response = await fetch('/api/overtime-orders/upload', {
             method: 'POST',
             body: formData,
           });
@@ -178,7 +178,7 @@ export default function CompleteOrderForm({
             await revalidate();
 
             // Navigate back to the production overtime list
-            router.push(`/production-overtime`);
+            router.push(`/overtime-orders`);
             resolve();
           } else {
             const errorMap: { [key: string]: string } = {
@@ -235,7 +235,7 @@ export default function CompleteOrderForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>Zamykanie zlecenia</CardTitle>
-          <Link href={`/production-overtime`}>
+          <Link href={`/overtime-orders`}>
             <Button variant='outline'>
               <Table /> <span>Powrót do listy zleceń</span>
             </Button>

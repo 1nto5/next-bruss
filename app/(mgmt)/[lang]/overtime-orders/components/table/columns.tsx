@@ -25,7 +25,7 @@ import {
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
-import { OvertimeType } from '../../lib/types';
+import { OvertimeType, getDepartmentDisplayName } from '../../lib/types';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -134,6 +134,23 @@ export const createColumns = (
         // Fallback to string comparison
         return aValue.localeCompare(bValue);
       },
+    },
+    {
+      accessorKey: 'department',
+      header: ({ column }) => (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Dział
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const department = row.getValue('department') as string;
+        return <div>{getDepartmentDisplayName(department as any) || 'Nieznany'}</div>;
+      },
+      enableSorting: true,
     },
     {
       accessorKey: 'status',
@@ -267,7 +284,7 @@ export const createColumns = (
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 {/* View Details - always available */}
-                <Link href={`/production-overtime/${request._id}`}>
+                <Link href={`/overtime-orders/${request._id}`}>
                   <DropdownMenuItem>
                     <FileText className='mr-2 h-4 w-4' />
                     <span>Szczegóły zlecenia</span>
@@ -277,7 +294,7 @@ export const createColumns = (
                 {request.status !== 'canceled' && (
                   <>
                     <Link
-                      href={`/production-overtime/${request._id}/employees`}
+                      href={`/overtime-orders/${request._id}/employees`}
                     >
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
@@ -286,7 +303,7 @@ export const createColumns = (
                     </Link>
                     {/* Edit button - only for author and pending/approved status */}
                     {canEdit && (
-                      <Link href={`/production-overtime/${request._id}/edit`}>
+                      <Link href={`/overtime-orders/${request._id}/edit`}>
                         <DropdownMenuItem>
                           <Edit className='mr-2 h-4 w-4' />
                           <span>Edytuj zlecenie</span>
@@ -339,7 +356,7 @@ export const createColumns = (
 
                 {/* Add attachment button - only for approved orders and authorized users */}
                 {hasAddAttachmentAction && (
-                  <Link href={`/production-overtime/${request._id}/complete`}>
+                  <Link href={`/overtime-orders/${request._id}/complete`}>
                     <DropdownMenuItem>
                       <CheckCircle className='mr-2 h-4 w-4' />
                       <span>Zamknij zlecenie</span>
@@ -350,7 +367,7 @@ export const createColumns = (
                 {/* Download attachment button - show if attachment exists */}
                 {request._id && request.hasAttachment && (
                   <Link
-                    href={`/api/production-overtime/download?overTimeRequestId=${request._id}`}
+                    href={`/api/overtime-orders/download?overTimeRequestId=${request._id}`}
                     target='_blank'
                     rel='noopener noreferrer'
                   >

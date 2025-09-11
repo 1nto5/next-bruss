@@ -22,7 +22,7 @@ export default async function AddDayOffPage(props: {
     session.user?.roles.includes('hr') ||
     false;
   if (access === false) {
-    redirect('/production-overtime');
+    redirect('/overtime-orders');
   }
 
   // Check overtime request status
@@ -33,7 +33,7 @@ export default async function AddDayOffPage(props: {
 
   // Redirect if status is not valid for adding day off
   if (status !== 'pending' && status !== 'approved' && status !== 'forecast') {
-    redirect(`/production-overtime/${id}`);
+    redirect(`/overtime-orders/${id}`);
   }
 
   const employees = await getEmployees();

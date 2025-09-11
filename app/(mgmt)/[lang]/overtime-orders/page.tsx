@@ -32,9 +32,9 @@ async function getOvertimeRequests(
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(
-    `${process.env.API}/production-overtime?${queryParams}`,
+    `${process.env.API}/overtime-orders?${queryParams}`,
     {
-      next: { revalidate: 0, tags: ['production-overtime'] },
+      next: { revalidate: 0, tags: ['overtime-orders'] },
     },
   );
 
@@ -83,12 +83,12 @@ export default async function ProductionOvertimePage(props: {
     <Card>
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>Godziny nadliczbowe - produkcja</CardTitle>
+          <CardTitle>Zlecenia godzin nadliczbowych</CardTitle>
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && (
               <Link
-                href='/production-overtime/forecast'
+                href='/overtime-orders/forecast'
                 className='w-full sm:w-auto'
               >
                 <Button variant={'outline'} className='w-full'>
@@ -98,7 +98,7 @@ export default async function ProductionOvertimePage(props: {
             )}
             {session && canCreateRequest ? (
               <Link
-                href='/production-overtime/new-request'
+                href='/overtime-orders/new-request'
                 className='w-full sm:w-auto'
               >
                 <Button variant={'outline'} className='w-full'>
@@ -107,7 +107,7 @@ export default async function ProductionOvertimePage(props: {
               </Link>
             ) : !session ? (
               <Link
-                href={`/auth?callbackUrl=/production-overtime`}
+                href={`/auth?callbackUrl=/overtime-orders`}
                 className='w-full sm:w-auto'
               >
                 <Button variant={'outline'} className='w-full'>

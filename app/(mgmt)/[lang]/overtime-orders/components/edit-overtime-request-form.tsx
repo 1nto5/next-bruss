@@ -48,8 +48,7 @@ import {
   Check,
   ChevronsUpDown,
   CircleX,
-  Copy,
-  Plus,
+  Save,
   Table,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -58,107 +57,74 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
-  insertOvertimeRequest as insert,
+  updateOvertimeRequest as update,
   redirectToProductionOvertime as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { NewOvertimeRequestSchema } from '../lib/zod';
-import { MultiArticleManager } from './multi-article-manager';
+import { OvertimeType } from '../lib/types';
 
-export default function NewOvertimeRequestForm({
+export default function EditOvertimeRequestForm({
   employees,
   users,
-  loggedInUserEmail,
+  overtimeRequest,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
-  loggedInUserEmail: string;
+  overtimeRequest: OvertimeType;
 }) {
-  const [isPendingInsert, setIsPendingInserting] = useState(false);
+  const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
-  const [actionType, setActionType] = useState<'save' | 'save-and-add-another'>(
-    'save',
-  );
-
-  const today = new Date();
-  const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
-  const nextSaturdayFrom = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + daysUntilSaturday,
-    6,
-    0,
-    0,
-  );
-  const nextSaturdayTo = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + daysUntilSaturday,
-    14,
-    0,
-    0,
-  );
 
   const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
-      numberOfEmployees: 1,
-      numberOfShifts: 1,
-      responsibleEmployee: loggedInUserEmail || '',
-      employeesWithScheduledDayOff: [],
-      from: nextSaturdayFrom,
-      to: nextSaturdayTo,
-      reason: '',
-      plannedArticles: [],
+      numberOfEmployees: overtimeRequest.numberOfEmployees,
+      numberOfShifts: overtimeRequest.numberOfShifts,
+      responsibleEmployee: overtimeRequest.responsibleEmployee,
+      employeesWithScheduledDayOff: overtimeRequest.employeesWithScheduledDayOff || [],
+      from: new Date(overtimeRequest.from),
+      to: new Date(overtimeRequest.to),
+      reason: overtimeRequest.reason,
+      note: overtimeRequest.note || '',
     },
   });
 
-  const onSubmit = async (
-    data: z.infer<typeof NewOvertimeRequestSchema>,
-    currentActionType: 'save' | 'save-and-add-another' = actionType,
-  ) => {
-    setIsPendingInserting(true);
+  const onSubmit = async (data: z.infer<typeof NewOvertimeRequestSchema>) => {
+    setIsPendingUpdate(true);
     try {
-      const res = await insert(data);
+      const res = await update(overtimeRequest._id, data);
       if ('success' in res) {
-        if (currentActionType === 'save-and-add-another') {
-          toast.success('Zlecenie zapisane!');
-          // Do NOT reset the form here
-        } else {
-          toast.success('Zlecenie dodane!');
-          form.reset();
-          redirect();
-        }
+        toast.success('Zlecenie zaktualizowane!');
+        redirect();
       } else if ('error' in res) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        if (res.error === 'unauthorized') {
+          toast.error('Nie masz uprawnień do edycji tego zlecenia');
+        } else if (res.error === 'cannot edit - invalid status') {
+          toast.error('Nie można edytować zlecenia w tym statusie');
+        } else {
+          toast.error('Skontaktuj się z IT!');
+        }
       }
     } catch (error) {
       console.error('onSubmit', error);
       toast.error('Skontaktuj się z IT!');
     } finally {
-      setIsPendingInserting(false);
+      setIsPendingUpdate(false);
     }
-  };
-
-  const handleSaveAndAddAnother = () => {
-    setActionType('save-and-add-another');
-    form.handleSubmit((data) => onSubmit(data, 'save-and-add-another'))();
-  };
-
-  const handleRegularSave = () => {
-    setActionType('save');
-    form.handleSubmit((data) => onSubmit(data, 'save'))();
   };
 
   return (
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Nowe zlecenie godz. nadliczbowych - produkcja</CardTitle>
-          <Link href='/production-overtime'>
+          <CardTitle>
+            Edycja zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
+          </CardTitle>
+          <Link href='/overtime-orders'>
             <Button variant='outline'>
-              <Table /> <span>Zlecenia</span>
+              <Table /> <span>Tabela zleceń</span>
             </Button>
           </Link>
         </div>
@@ -166,12 +132,7 @@ export default function NewOvertimeRequestForm({
       <Separator className='mb-4' />
 
       <Form {...form}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegularSave();
-          }}
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
             <FormField
               control={form.control}
@@ -186,45 +147,13 @@ export default function NewOvertimeRequestForm({
                   <FormControl>
                     <DateTimePicker
                       value={field.value}
-                      onChange={(date) => {
-                        field.onChange(date);
-                        // Check if start date is later than end date
-                        const currentEndDate = form.getValues('to');
-                        if (date && currentEndDate && date > currentEndDate) {
-                          // Set end date to same day as start date, keeping the time
-                          const newEndDate = new Date(date);
-                          newEndDate.setHours(currentEndDate.getHours());
-                          newEndDate.setMinutes(currentEndDate.getMinutes());
-                          newEndDate.setSeconds(currentEndDate.getSeconds());
-                          form.setValue('to', newEndDate);
-                        }
-                      }}
+                      onChange={field.onChange}
                       min={new Date(Date.now() + 8 * 3600 * 1000)}
                       timePicker={{ hour: true, minute: true, second: false }}
                       renderTrigger={({ value, setOpen, open }) => (
                         <DateTimeInput
                           value={value}
-                          onChange={(date) => {
-                            field.onChange(date);
-                            // Check if start date is later than end date
-                            const currentEndDate = form.getValues('to');
-                            if (
-                              date &&
-                              currentEndDate &&
-                              date > currentEndDate
-                            ) {
-                              // Set end date to same day as start date, keeping the time
-                              const newEndDate = new Date(date);
-                              newEndDate.setHours(currentEndDate.getHours());
-                              newEndDate.setMinutes(
-                                currentEndDate.getMinutes(),
-                              );
-                              newEndDate.setSeconds(
-                                currentEndDate.getSeconds(),
-                              );
-                              form.setValue('to', newEndDate);
-                            }
-                          }}
+                          onChange={field.onChange}
                           format='dd/MM/yyyy HH:mm'
                           onCalendarClick={() => setOpen(!open)}
                         />
@@ -281,8 +210,7 @@ export default function NewOvertimeRequestForm({
                       min={1}
                       {...field}
                       onChange={(e) => {
-                        const value =
-                          e.target.value === '' ? '' : parseInt(e.target.value);
+                        const value = parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
                       value={field.value || ''}
@@ -375,8 +303,7 @@ export default function NewOvertimeRequestForm({
                       min={1}
                       {...field}
                       onChange={(e) => {
-                        const value =
-                          e.target.value === '' ? '' : parseInt(e.target.value);
+                        const value = parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
                       value={field.value || ''}
@@ -402,7 +329,7 @@ export default function NewOvertimeRequestForm({
                           const employeesWithDays = selectedEmployees.map(
                             (emp) => ({
                               ...emp,
-                              agreedReceivingAt: new Date(
+                              agreedReceivingAt: emp.agreedReceivingAt || new Date(
                                 Date.now() + 7 * 24 * 60 * 60 * 1000,
                               ),
                             }),
@@ -442,21 +369,6 @@ export default function NewOvertimeRequestForm({
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
-
-            {/* New forecasting fields */}
-            <FormField
-              control={form.control}
-              name='plannedArticles'
-              render={({ field }) => (
-                <>
-                  <MultiArticleManager
-                    value={field.value || []}
-                    onChange={field.onChange}
-                  />
-                  <FormMessage />
-                </>
               )}
             />
 
@@ -528,49 +440,27 @@ export default function NewOvertimeRequestForm({
           </CardContent>
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
+            <Link href='/overtime-orders'>
+              <Button
+                variant='outline'
+                type='button'
+                className='w-full sm:w-auto'
+                disabled={isPendingUpdate}
+              >
+                <CircleX className='' />
+                Anuluj
+              </Button>
+            </Link>
             <Button
-              variant='destructive'
-              type='button'
-              onClick={() => form.reset()}
+              type='submit'
               className='w-full sm:w-auto'
-              disabled={isPendingInsert}
+              disabled={isPendingUpdate}
             >
-              <CircleX className='' />
-              Wyczyść
+              <Save
+                className={isPendingUpdate ? 'animate-spin' : ''}
+              />
+              Zapisz zmiany
             </Button>
-            <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row'>
-              <Button
-                type='button'
-                variant='secondary'
-                onClick={handleSaveAndAddAnother}
-                disabled={isPendingInsert}
-                className='w-full sm:w-auto'
-              >
-                <Copy
-                  className={
-                    isPendingInsert && actionType === 'save-and-add-another'
-                      ? 'animate-spin'
-                      : ''
-                  }
-                />
-                Zapisz i dodaj kolejne
-              </Button>
-              <Button
-                type='button'
-                onClick={handleRegularSave}
-                className='w-full sm:w-auto'
-                disabled={isPendingInsert}
-              >
-                <Plus
-                  className={
-                    isPendingInsert && actionType === 'save'
-                      ? 'animate-spin'
-                      : ''
-                  }
-                />
-                Dodaj zlecenie
-              </Button>
-            </div>
           </CardFooter>
         </form>
       </Form>

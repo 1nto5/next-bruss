@@ -9,6 +9,29 @@ export type OvertimeStatus =
   | 'completed'
   | 'accounted';
 
+export type OvertimeDepartment =
+  | 'utrzymanie-ruchu'
+  | 'produkcja'
+  | 'pracownicy-zewnetrzni'
+  | 'serwis';
+
+export function getDepartmentDisplayName(department?: OvertimeDepartment): string {
+  if (!department) return '';
+  
+  switch (department) {
+    case 'utrzymanie-ruchu':
+      return 'Utrzymanie ruchu';
+    case 'produkcja':
+      return 'Produkcja';
+    case 'pracownicy-zewnetrzni':
+      return 'Pracownicy zewnętrzni';
+    case 'serwis':
+      return 'Serwis';
+    default:
+      return '';
+  }
+}
+
 export type ArticleQuantityType = {
   articleNumber: string;
   quantity: number;
@@ -18,6 +41,7 @@ export type OvertimeType = {
   _id: string;
   internalId?: string; // Format: "N/YY", e.g. "1/25" - Optional as existing orders don't have it
   status: OvertimeStatus;
+  department?: OvertimeDepartment; // Department selection
   numberOfEmployees: number; // Number of employees in the order
   numberOfShifts: number; // Number of shifts
   responsibleEmployee: string; // Email of the responsible person

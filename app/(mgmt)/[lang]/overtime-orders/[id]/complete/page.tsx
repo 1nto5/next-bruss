@@ -43,12 +43,12 @@ export default async function CompleteOrderPage(props: {
     userEmail === responsibleEmployee;
 
   if (!canCompleteOrder) {
-    redirect(`/production-overtime`);
+    redirect(`/overtime-orders`);
   }
 
   // Redirect if status is not valid for completing order
   if (status !== 'approved') {
-    redirect(`/production-overtime/${id}`);
+    redirect(`/overtime-orders/${id}`);
   }
 
   return (

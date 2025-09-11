@@ -41,7 +41,7 @@ export default async function ProductionOvertimePage(props: {
           </div>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             <Link
-              href={`/production-overtime/${id}`}
+              href={`/overtime-orders/${id}`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
@@ -50,7 +50,7 @@ export default async function ProductionOvertimePage(props: {
             </Link>
             {shouldShowAddButton && (
               <Link
-                href={`/production-overtime/${id}/add-day-off`}
+                href={`/overtime-orders/${id}/add-day-off`}
                 className='w-full sm:w-auto'
               >
                 <Button variant='outline' className='w-full'>
@@ -58,7 +58,7 @@ export default async function ProductionOvertimePage(props: {
                 </Button>
               </Link>
             )}
-            <Link href={`/production-overtime`} className='w-full sm:w-auto'>
+            <Link href={`/overtime-orders`} className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
                 <Table /> <span>Zlecenia</span>
               </Button>

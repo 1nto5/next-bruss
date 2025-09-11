@@ -23,7 +23,7 @@ export async function getForecastData(
   }
 
   const res = await fetch(
-    `${process.env.API}/production-overtime/forecast?${params.toString()}`,
+    `${process.env.API}/overtime-orders/forecast?${params.toString()}`,
     {
       next: { revalidate: 0, tags: ['production-overtime-forecast'] },
     },

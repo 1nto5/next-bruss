@@ -12,6 +12,9 @@ const ArticleQuantitySchema = z.object({
 
 export const NewOvertimeRequestSchema = z
   .object({
+    department: z.enum(['utrzymanie-ruchu', 'produkcja', 'pracownicy-zewnetrzni', 'serwis'], {
+      message: 'Wybierz dział!',
+    }),
     numberOfEmployees: z
       .union([z.number(), z.string()])
       .transform((val) =>

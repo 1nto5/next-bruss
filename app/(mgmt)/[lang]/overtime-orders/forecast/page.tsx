@@ -98,7 +98,7 @@ export default async function ForecastPage(props: {
           </CardTitle>
 
           <div className='flex gap-2'>
-            <Link href='/production-overtime' className='w-full sm:w-auto'>
+            <Link href='/overtime-orders' className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
                 <Table />
                 Zlecenia

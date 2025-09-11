@@ -9,12 +9,12 @@ import { redirect } from 'next/navigation';
 import { overtimeRequestEmployeeType } from './lib/types';
 import { NewOvertimeRequestType } from './lib/zod';
 
-export async function revalidateProductionOvertime() {
-  revalidateTag('production-overtime');
+export async function revalidateOvertimeOrders() {
+  revalidateTag('overtime-orders');
 }
 
-export async function revalidateProductionOvertimeRequest() {
-  revalidateTag('production-overtime-request');
+export async function revalidateOvertimeOrdersRequest() {
+  revalidateTag('overtime-orders-request');
 }
 
 // Helper function to generate the next internal ID
@@ -58,12 +58,12 @@ async function generateNextInternalId(): Promise<string> {
   }
 }
 
-export async function redirectToProductionOvertime() {
-  redirect('/production-overtime');
+export async function redirectToOvertimeOrders() {
+  redirect('/overtime-orders');
 }
 
-export async function redirectToProductionOvertimeDaysOff(id: string) {
-  redirect(`/production-overtime/${id}/employees`);
+export async function redirectToOvertimeOrdersDaysOff(id: string) {
+  redirect(`/overtime-orders/${id}/employees`);
 }
 
 async function sendEmailNotificationToRequestor(email: string, id: string) {
@@ -74,7 +74,7 @@ async function sendEmailNotificationToRequestor(email: string, id: string) {
     html: `<div style="font-family: sans-serif;">
           <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
           <p>
-          <a href="${process.env.BASE_URL}/production-overtime/${id}" 
+          <a href="${process.env.BASE_URL}/overtime-orders/${id}" 
              style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
             Otwórz zlecenie
           </a>
@@ -154,7 +154,7 @@ export async function insertOvertimeRequest(
 
     const res = await coll.insertOne(overtimeRequestToInsert);
     if (res) {
-      revalidateTag('production-overtime');
+      revalidateTag('overtime-orders');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };

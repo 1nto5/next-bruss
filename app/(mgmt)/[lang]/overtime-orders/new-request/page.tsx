@@ -25,7 +25,7 @@ export default async function AddDeviationPage(props: {
   const isAdmin = session?.user?.roles?.includes('admin') || false;
   const canCreateRequest = isGroupLeader || isManager || isAdmin;
   if (!canCreateRequest) {
-    redirect('/production-overtime');
+    redirect('/overtime-orders');
   }
 
   return (

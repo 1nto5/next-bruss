@@ -32,6 +32,7 @@ import {
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getOvertimeRequest } from '../lib/get-overtime-request';
+import { getDepartmentDisplayName } from '../lib/types';
 
 function getStatusBadge(status: string) {
   switch (status) {
@@ -113,7 +114,7 @@ export default async function OvertimeDetailsPage(props: {
     ({ overtimeRequestLocaleString } = await getOvertimeRequest(lang, id));
   } catch (error) {
     console.error('Error fetching overtime request:', error);
-    redirect(`/production-overtime`);
+    redirect(`/overtime-orders`);
   }
 
   const request = overtimeRequestLocaleString;
@@ -129,7 +130,7 @@ export default async function OvertimeDetailsPage(props: {
             {/* Download attachment button */}
             {request.hasAttachment && (
               <Link
-                href={`/api/production-overtime/download?overTimeRequestId=${request._id}`}
+                href={`/api/overtime-orders/download?overTimeRequestId=${request._id}`}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='w-full sm:w-auto'
@@ -142,7 +143,7 @@ export default async function OvertimeDetailsPage(props: {
 
             {/* Manage employees button */}
             <Link
-              href={`/production-overtime/${id}/employees`}
+              href={`/overtime-orders/${id}/employees`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
@@ -152,7 +153,7 @@ export default async function OvertimeDetailsPage(props: {
 
             {/* Analytics button */}
             <Link
-              href={`/production-overtime/forecast`}
+              href={`/overtime-orders/forecast`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
@@ -161,7 +162,7 @@ export default async function OvertimeDetailsPage(props: {
             </Link>
 
             {/* Back to table button */}
-            <Link href={`/production-overtime`} className='w-full sm:w-auto'>
+            <Link href={`/overtime-orders`} className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
                 <TableIcon /> Zlecenia
               </Button>
@@ -211,6 +212,17 @@ export default async function OvertimeDetailsPage(props: {
                         {extractNameFromEmail(request.responsibleEmployee)}
                       </TableCell>
                     </TableRow>
+
+                    {request.department && (
+                      <TableRow>
+                        <TableCell className='font-medium'>
+                          Dział:
+                        </TableCell>
+                        <TableCell>
+                          {getDepartmentDisplayName(request.department)}
+                        </TableCell>
+                      </TableRow>
+                    )}
 
                     <TableRow>
                       <TableCell className='font-medium'>
@@ -411,7 +423,7 @@ export default async function OvertimeDetailsPage(props: {
                           odbierający dni wolne
                         </CardTitle>
                         <Link
-                          href={`/production-overtime/${id}/employees`}
+                          href={`/overtime-orders/${id}/employees`}
                           className='w-full sm:w-auto'
                         >
                           <Button variant='outline' className='w-full'>

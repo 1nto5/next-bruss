@@ -23,7 +23,7 @@ export const ROUTE_PATHS = {
   adminDmcheckArticles: '/admin/dmcheck-articles',
   adminReworkMany: '/admin/rework-many',
   newsAdd: '/news/add',
-  productionOvertime: '/production-overtime',
+  overtimeOrders: '/overtime-orders',
   overtimeSubmissions: '/overtime-submissions',
   codesGenerator: '/codes-generator',
   projects: '/projects',
@@ -57,8 +57,8 @@ export const plHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Godziny nadliczbowe - produkcja',
+        href: ROUTE_PATHS.overtimeOrders,
+        title: 'Zlecenia godzin nadliczbowych',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
@@ -131,8 +131,8 @@ export const enHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Production overtime work',
+        href: ROUTE_PATHS.overtimeOrders,
+        title: 'Overtime Orders',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,

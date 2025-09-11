@@ -11,7 +11,7 @@ export async function getOvertimeRequest(
   overtimeRequestLocaleString: OvertimeType;
 }> {
   const res = await fetch(
-    `${process.env.API}/production-overtime/request?id=${id}`,
+    `${process.env.API}/overtime-orders/request?id=${id}`,
     {
       next: { revalidate: 0, tags: ['production-overtime-request'] },
     },

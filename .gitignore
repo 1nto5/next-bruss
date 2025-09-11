@@ -49,3 +49,6 @@ TODOS.md
 
 # playwright
 .playwright-mcp
+
+# git worktrees
+.worktrees/
