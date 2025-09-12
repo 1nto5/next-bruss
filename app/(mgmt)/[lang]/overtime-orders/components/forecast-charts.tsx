@@ -7,18 +7,16 @@ import ForecastSummaryCards from './forecast-summary-cards';
 interface ForecastChartsProps {
   data: ForecastPeriodData[];
   summary: ForecastSummary;
-  hourlyRate: number;
 }
 
 export default function ForecastCharts({
   data,
   summary,
-  hourlyRate,
 }: ForecastChartsProps) {
   return (
     <div className='space-y-6'>
       {/* Summary Cards */}
-      <ForecastSummaryCards summary={summary} hourlyRate={hourlyRate} />
+      <ForecastSummaryCards summary={summary} />
 
       {/* Main Charts */}
       <div className='grid gap-6'>

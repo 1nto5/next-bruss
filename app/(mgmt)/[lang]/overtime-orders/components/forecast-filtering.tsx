@@ -16,6 +16,15 @@ import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+type Department = {
+  _id: string;
+  id: string;
+  name: string;
+  namePl: string;
+  nameDe: string;
+  isActive: boolean;
+};
+
 export default function ForecastFiltering({
   fetchTime,
   isLogged,
@@ -61,17 +70,40 @@ export default function ForecastFiltering({
           : currentYear.toString()),
   );
 
+  const [department, setDepartment] = useState(
+    searchParams?.get('department') || 'all',
+  );
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  // Fetch departments on component mount
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await fetch('/api/overtime-orders/departments');
+        if (response.ok) {
+          const data = await response.json();
+          setDepartments(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch departments:', error);
+      }
+    };
+    fetchDepartments();
+  }, []);
+
   const clearFilters = () => {
     setFilterType('week');
     setYear(currentYear.toString());
     setStartValue(Math.max(1, currentWeek - 4).toString());
     setEndValue(Math.min(52, currentWeek + 4).toString());
+    setDepartment('all');
 
     const params = new URLSearchParams(searchParams?.toString());
     params.delete('filterType');
     params.delete('year');
     params.delete('startValue');
     params.delete('endValue');
+    params.delete('department');
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -86,6 +118,13 @@ export default function ForecastFiltering({
     params.set('year', year);
     params.set('startValue', startValue);
     params.set('endValue', endValue);
+    
+    // Set department filter if selected
+    if (department && department !== 'all') {
+      params.set('department', department);
+    } else {
+      params.delete('department');
+    }
 
     router.push(`${pathname}?${params.toString()}`);
   };
@@ -177,6 +216,24 @@ export default function ForecastFiltering({
               </div>
             </div>
           )}
+
+          {/* Department Filter */}
+          <div className='grid gap-2'>
+            <Label htmlFor='department'>Dział (opcjonalnie)</Label>
+            <Select value={department} onValueChange={setDepartment}>
+              <SelectTrigger>
+                <SelectValue placeholder='Wszystkie działy' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>Wszystkie działy</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>
+                    {dept.namePl || dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Range Selection */}
           <div className='grid grid-cols-2 gap-4'>

@@ -53,10 +53,52 @@ export async function GET(req: NextRequest) {
     searchParams.get('endValue') || startValue.toString(),
   );
   const userEmail = searchParams.get('userEmail');
+  const departmentFilter = searchParams.get('department'); // Optional department filter
 
   let dateRanges: DateRange[] = [];
 
   try {
+    // Fetch department rates from department_configs collection
+    const departmentsColl = await dbc('department_configs');
+    const departments = await departmentsColl
+      .find({ isActive: true })
+      .toArray();
+    
+    // Create a map of department id to hourly rate and validate all have rates
+    const departmentRates: Record<string, number> = {};
+    const missingRates: string[] = [];
+    
+    departments.forEach((dept) => {
+      const hourlyRate = dept.configs?.overtime?.hourlyRate;
+      if (typeof hourlyRate === 'number' && hourlyRate > 0) {
+        departmentRates[dept.id] = hourlyRate;
+      } else {
+        missingRates.push(dept.name || dept.id);
+      }
+    });
+
+    // Return error if any department is missing hourly rate configuration
+    if (missingRates.length > 0) {
+      return NextResponse.json(
+        { 
+          error: 'Missing hourly rate configuration',
+          details: `Departments without configured rates: ${missingRates.join(', ')}`,
+          code: 'MISSING_DEPARTMENT_RATES',
+          missingDepartments: missingRates
+        },
+        { status: 400 }
+      );
+    }
+
+    // Helper function to get hourly rate for a department
+    const getDepartmentRate = (departmentId: string): number => {
+      const rate = departmentRates[departmentId];
+      if (!rate) {
+        throw new Error(`Missing hourly rate for department: ${departmentId}`);
+      }
+      return rate;
+    };
+
     // Generate date ranges based on filter type
     if (filterType === 'week') {
       for (let week = startValue; week <= endValue; week++) {
@@ -102,6 +144,12 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Add department filtering
+    if (departmentFilter) {
+      query.$and = query.$and || [];
+      query.$and.push({ department: departmentFilter });
+    }
+
     const coll = await dbc('overtime_orders');
     const overtimeRequests = await coll.find(query).sort({ from: 1 }).toArray();
 
@@ -136,23 +184,87 @@ export async function GET(req: NextRequest) {
           r.status === 'accounted',
       );
 
-      // Calculate totals
-      const forecastHours = forecast.reduce((total, req) => {
+      // Calculate department-specific data for forecast
+      const forecastDepartmentData: Record<string, { hours: number; cost: number; count: number }> = {};
+      let forecastHours = 0;
+      let forecastCost = 0;
+      
+      forecast.forEach((req) => {
         const duration =
           (new Date(req.to).getTime() - new Date(req.from).getTime()) /
           (1000 * 60 * 60);
-        return (
-          total + (duration * req.numberOfEmployees) / (req.numberOfShifts || 1)
-        );
-      }, 0);
+        const hours = (duration * req.numberOfEmployees) / (req.numberOfShifts || 1);
+        const departmentRate = getDepartmentRate(req.department);
+        const cost = hours * departmentRate;
+        
+        // Initialize department data if not exists
+        if (!forecastDepartmentData[req.department]) {
+          forecastDepartmentData[req.department] = { hours: 0, cost: 0, count: 0 };
+        }
+        
+        // Add to department totals
+        forecastDepartmentData[req.department].hours += hours;
+        forecastDepartmentData[req.department].cost += cost;
+        forecastDepartmentData[req.department].count += 1;
+        
+        // Add to overall totals
+        forecastHours += hours;
+        forecastCost += cost;
+      });
 
-      const historicalHours = historical.reduce((total, req) => {
+      // Calculate department-specific data for historical
+      const historicalDepartmentData: Record<string, { hours: number; cost: number; count: number }> = {};
+      let historicalHours = 0;
+      let historicalCost = 0;
+      
+      historical.forEach((req) => {
         const duration =
           (new Date(req.to).getTime() - new Date(req.from).getTime()) /
           (1000 * 60 * 60);
         const employees = req.actualEmployeesWorked || req.numberOfEmployees;
-        return total + (duration * employees) / (req.numberOfShifts || 1);
-      }, 0);
+        const hours = (duration * employees) / (req.numberOfShifts || 1);
+        const departmentRate = getDepartmentRate(req.department);
+        const cost = hours * departmentRate;
+        
+        // Initialize department data if not exists
+        if (!historicalDepartmentData[req.department]) {
+          historicalDepartmentData[req.department] = { hours: 0, cost: 0, count: 0 };
+        }
+        
+        // Add to department totals
+        historicalDepartmentData[req.department].hours += hours;
+        historicalDepartmentData[req.department].cost += cost;
+        historicalDepartmentData[req.department].count += 1;
+        
+        // Add to overall totals
+        historicalHours += hours;
+        historicalCost += cost;
+      });
+
+      // Convert department data to arrays with department info
+      const forecastDepartmentBreakdown = Object.entries(forecastDepartmentData).map(([deptId, data]) => {
+        const dept = departments.find(d => d.id === deptId);
+        return {
+          departmentId: deptId,
+          departmentName: dept?.name || deptId,
+          hours: Math.round(data.hours * 100) / 100,
+          cost: Math.round(data.cost * 100) / 100,
+          count: data.count,
+          hourlyRate: getDepartmentRate(deptId)
+        };
+      });
+
+      const historicalDepartmentBreakdown = Object.entries(historicalDepartmentData).map(([deptId, data]) => {
+        const dept = departments.find(d => d.id === deptId);
+        return {
+          departmentId: deptId,
+          departmentName: dept?.name || deptId,
+          hours: Math.round(data.hours * 100) / 100,
+          cost: Math.round(data.cost * 100) / 100,
+          count: data.count,
+          hourlyRate: getDepartmentRate(deptId)
+        };
+      });
 
       return {
         period: periodName,
@@ -160,13 +272,21 @@ export async function GET(req: NextRequest) {
         historicalCount: historical.length,
         forecastHours: Math.round(forecastHours * 100) / 100,
         historicalHours: Math.round(historicalHours * 100) / 100,
+        forecastCost: Math.round(forecastCost * 100) / 100,
+        historicalCost: Math.round(historicalCost * 100) / 100,
         totalHours: Math.round((forecastHours + historicalHours) * 100) / 100,
+        totalCost: Math.round((forecastCost + historicalCost) * 100) / 100,
         totalCount: forecast.length + historical.length,
+        departmentBreakdown: {
+          forecast: forecastDepartmentBreakdown,
+          historical: historicalDepartmentBreakdown,
+        },
         details: {
           forecast: forecast.map((req) => ({
             _id: req._id,
             internalId: req.internalId,
             status: req.status,
+            department: req.department,
             from: req.from,
             to: req.to,
             numberOfEmployees: req.numberOfEmployees,
@@ -177,6 +297,7 @@ export async function GET(req: NextRequest) {
             _id: req._id,
             internalId: req.internalId,
             status: req.status,
+            department: req.department,
             from: req.from,
             to: req.to,
             numberOfEmployees: req.numberOfEmployees,
@@ -193,6 +314,61 @@ export async function GET(req: NextRequest) {
       (period) => period.forecastCount > 0 || period.historicalCount > 0,
     );
 
+    // Calculate department totals across all periods
+    const departmentTotals: Record<string, { 
+      departmentId: string;
+      departmentName: string;
+      forecastHours: number;
+      forecastCost: number;
+      forecastCount: number;
+      historicalHours: number;
+      historicalCost: number;
+      historicalCount: number;
+      hourlyRate: number;
+    }> = {};
+
+    groupedData.forEach((period: any) => {
+      // Process forecast department breakdown
+      period.departmentBreakdown.forecast.forEach((dept: any) => {
+        if (!departmentTotals[dept.departmentId]) {
+          departmentTotals[dept.departmentId] = {
+            departmentId: dept.departmentId,
+            departmentName: dept.departmentName,
+            forecastHours: 0,
+            forecastCost: 0,
+            forecastCount: 0,
+            historicalHours: 0,
+            historicalCost: 0,
+            historicalCount: 0,
+            hourlyRate: dept.hourlyRate,
+          };
+        }
+        departmentTotals[dept.departmentId].forecastHours += dept.hours;
+        departmentTotals[dept.departmentId].forecastCost += dept.cost;
+        departmentTotals[dept.departmentId].forecastCount += dept.count;
+      });
+
+      // Process historical department breakdown
+      period.departmentBreakdown.historical.forEach((dept: any) => {
+        if (!departmentTotals[dept.departmentId]) {
+          departmentTotals[dept.departmentId] = {
+            departmentId: dept.departmentId,
+            departmentName: dept.departmentName,
+            forecastHours: 0,
+            forecastCost: 0,
+            forecastCount: 0,
+            historicalHours: 0,
+            historicalCost: 0,
+            historicalCount: 0,
+            hourlyRate: dept.hourlyRate,
+          };
+        }
+        departmentTotals[dept.departmentId].historicalHours += dept.hours;
+        departmentTotals[dept.departmentId].historicalCost += dept.cost;
+        departmentTotals[dept.departmentId].historicalCount += dept.count;
+      });
+    });
+
     return NextResponse.json({
       data: groupedData,
       summary: {
@@ -204,6 +380,14 @@ export async function GET(req: NextRequest) {
           (sum: number, period: any) => sum + period.historicalHours,
           0,
         ),
+        totalForecastCost: groupedData.reduce(
+          (sum: number, period: any) => sum + period.forecastCost,
+          0,
+        ),
+        totalHistoricalCost: groupedData.reduce(
+          (sum: number, period: any) => sum + period.historicalCost,
+          0,
+        ),
         totalForecastCount: groupedData.reduce(
           (sum: number, period: any) => sum + period.forecastCount,
           0,
@@ -212,6 +396,13 @@ export async function GET(req: NextRequest) {
           (sum: number, period: any) => sum + period.historicalCount,
           0,
         ),
+        departmentTotals: Object.values(departmentTotals).map((dept) => ({
+          ...dept,
+          forecastHours: Math.round(dept.forecastHours * 100) / 100,
+          forecastCost: Math.round(dept.forecastCost * 100) / 100,
+          historicalHours: Math.round(dept.historicalHours * 100) / 100,
+          historicalCost: Math.round(dept.historicalCost * 100) / 100,
+        })),
         filterType,
         year,
         startValue,

@@ -48,14 +48,13 @@ export default async function ForecastPage(props: {
       : filterType === 'month'
         ? 12
         : currentYear;
+  const department = searchParams.department || undefined;
 
   let forecastData;
   let fetchTime;
   let fetchTimeLocaleString;
   let error = null;
 
-  // Get hourly rate from environment variable
-  const hourlyRate = parseFloat(process.env.OVERTIME_HOURLY_PLN_RATE || '0');
 
   try {
     const result = await getForecastData(
@@ -64,6 +63,7 @@ export default async function ForecastPage(props: {
       startValue,
       endValue,
       session.user.email,
+      department,
     );
     forecastData = result.forecastData;
     fetchTime = result.fetchTime;
@@ -146,7 +146,6 @@ export default async function ForecastPage(props: {
               <ForecastCharts
                 data={forecastData.data}
                 summary={forecastData.summary}
-                hourlyRate={hourlyRate}
               />
             )}
           </>

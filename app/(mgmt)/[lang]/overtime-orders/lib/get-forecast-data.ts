@@ -6,6 +6,7 @@ export async function getForecastData(
   startValue: number,
   endValue: number,
   userEmail?: string,
+  department?: string,
 ): Promise<{
   fetchTime: Date;
   fetchTimeLocaleString: string;
@@ -20,6 +21,10 @@ export async function getForecastData(
 
   if (userEmail) {
     params.append('userEmail', userEmail);
+  }
+
+  if (department && department !== 'all') {
+    params.append('department', department);
   }
 
   const res = await fetch(
