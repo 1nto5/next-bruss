@@ -27,11 +27,11 @@ import {
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
-import { OvertimeType, getDepartmentDisplayName } from '../../lib/types';
 import {
   bulkDeleteOvertimeRequests,
   bulkReactivateOvertimeRequests,
 } from '../../actions';
+import { DepartmentConfig, OvertimeType } from '../../lib/types';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -40,6 +40,7 @@ import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 export const createColumns = (
   session: Session | null,
   lang?: string,
+  departments?: DepartmentConfig[],
 ): ColumnDef<OvertimeType>[] => {
   // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
@@ -143,20 +144,16 @@ export const createColumns = (
     },
     {
       accessorKey: 'department',
-      header: ({ column }) => (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Dział
-          <ArrowUpDown className='ml-2 h-4 w-4' />
-        </Button>
-      ),
+      header: 'Dział',
       cell: ({ row }) => {
         const department = row.getValue('department') as string;
-        return <div>{getDepartmentDisplayName(department as any) || 'Nieznany'}</div>;
+        const departmentConfig = departments?.find(
+          (dept) => dept.value === department,
+        );
+        const displayName =
+          departmentConfig?.namePl || department || 'Nieznany';
+        return <div>{displayName}</div>;
       },
-      enableSorting: true,
     },
     {
       accessorKey: 'status',
@@ -250,13 +247,14 @@ export const createColumns = (
         // For canceled and accounted statuses - only admin can edit
         // For other statuses: Admin, HR, and plant-manager can edit always
         // Author can edit only pending status
-        const canEdit = 
-          (request.status === 'canceled' || request.status === 'accounted') 
+        const canEdit =
+          request.status === 'canceled' || request.status === 'accounted'
             ? userRoles.includes('admin')
-            : ((request.requestedBy === userEmail && request.status === 'pending') ||
-               userRoles.includes('admin') ||
-               userRoles.includes('hr') ||
-               userRoles.includes('plant-manager'));
+            : (request.requestedBy === userEmail &&
+                request.status === 'pending') ||
+              userRoles.includes('admin') ||
+              userRoles.includes('hr') ||
+              userRoles.includes('plant-manager');
 
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
@@ -299,9 +297,7 @@ export const createColumns = (
 
                 {request.status !== 'canceled' && (
                   <>
-                    <Link
-                      href={`/overtime-orders/${request._id}/employees`}
-                    >
+                    <Link href={`/overtime-orders/${request._id}/employees`}>
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
                         <span>Odbiór nadgodzin</span>
@@ -389,7 +385,9 @@ export const createColumns = (
                   <DropdownMenuItem
                     onSelect={async (e) => {
                       e.preventDefault();
-                      const result = await bulkReactivateOvertimeRequests([request._id]);
+                      const result = await bulkReactivateOvertimeRequests([
+                        request._id,
+                      ]);
                       if (result.error) {
                         alert(`Błąd: ${result.error}`);
                       } else {
@@ -406,8 +404,14 @@ export const createColumns = (
                   <DropdownMenuItem
                     onSelect={async (e) => {
                       e.preventDefault();
-                      if (confirm('Czy na pewno chcesz TRWALE usunąć to zlecenie? Ta operacja jest nieodwracalna.')) {
-                        const result = await bulkDeleteOvertimeRequests([request._id]);
+                      if (
+                        confirm(
+                          'Czy na pewno chcesz TRWALE usunąć to zlecenie? Ta operacja jest nieodwracalna.',
+                        )
+                      ) {
+                        const result = await bulkDeleteOvertimeRequests([
+                          request._id,
+                        ]);
                         if (result.error) {
                           alert(`Błąd: ${result.error}`);
                         } else {

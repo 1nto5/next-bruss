@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
+import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { KeyRound, Plus, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
@@ -79,6 +80,8 @@ export default async function ProductionOvertimePage(props: {
   ({ fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString } =
     await getOvertimeRequests(lang, searchParams, userEmail));
 
+  const departments = await getOvertimeDepartments();
+
   return (
     <Card>
       <CardHeader className='pb-2'>
@@ -131,6 +134,7 @@ export default async function ProductionOvertimePage(props: {
         fetchTime={fetchTime}
         session={session}
         lang={lang}
+        departments={departments}
       />
     </Card>
   );

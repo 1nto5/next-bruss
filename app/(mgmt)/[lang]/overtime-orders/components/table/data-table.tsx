@@ -27,17 +27,20 @@ import { CardContent, CardFooter } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Session } from 'next-auth';
 import BulkActions from '../bulk-actions';
+import { DepartmentConfig } from '../../lib/types';
 
 interface DataTableProps<TData, TValue> {
   columns: (
     session: Session | null,
     lang?: string,
+    departments?: DepartmentConfig[]
   ) => ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
   session: Session | null;
   lang?: string;
+  departments?: DepartmentConfig[];
 }
 
 export function DataTable<TData, TValue>({
@@ -45,6 +48,7 @@ export function DataTable<TData, TValue>({
   data,
   session,
   lang,
+  departments,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -54,8 +58,8 @@ export function DataTable<TData, TValue>({
 
   // Use the session and lang to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session, lang),
-    [columns, session, lang],
+    () => columns(session, lang, departments),
+    [columns, session, lang, departments],
   );
 
   const table = useReactTable({

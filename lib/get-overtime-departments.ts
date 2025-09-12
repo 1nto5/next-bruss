@@ -12,10 +12,13 @@ export default async function getOvertimeDepartments(): Promise<DepartmentConfig
   });
 
   if (!res.ok) {
-    console.error(`getOvertimeDepartments error: ${res.status} ${res.statusText}`);
-    return [];
+    throw new Error(`Failed to fetch overtime departments: ${res.status} ${res.statusText}`);
   }
   
-  const data = await res.json();
-  return data;
+  try {
+    const data = await res.json();
+    return data;
+  } catch (parseError) {
+    throw new Error(`Failed to parse overtime departments response: ${parseError}`);
+  }
 }
