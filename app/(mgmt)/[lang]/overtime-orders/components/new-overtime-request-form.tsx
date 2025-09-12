@@ -70,15 +70,18 @@ import {
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { NewOvertimeRequestSchema } from '../lib/zod';
+import { DepartmentConfig } from '../lib/types';
 import { MultiArticleManager } from './multi-article-manager';
 
 export default function NewOvertimeRequestForm({
   employees,
   users,
+  departments,
   loggedInUserEmail,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
+  departments: DepartmentConfig[];
   loggedInUserEmail: string;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
@@ -109,7 +112,7 @@ export default function NewOvertimeRequestForm({
   const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
     resolver: zodResolver(NewOvertimeRequestSchema),
     defaultValues: {
-      department: 'produkcja' as const,
+      department: '',
       numberOfEmployees: 1,
       numberOfShifts: 1,
       responsibleEmployee: loggedInUserEmail || '',
@@ -196,18 +199,13 @@ export default function NewOvertimeRequestForm({
                         <SelectValue placeholder="Wybierz dział" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="utrzymanie-ruchu">
-                          Utrzymanie ruchu
-                        </SelectItem>
-                        <SelectItem value="produkcja">
-                          Produkcja
-                        </SelectItem>
-                        <SelectItem value="pracownicy-zewnetrzni">
-                          Pracownicy zewnętrzni
-                        </SelectItem>
-                        <SelectItem value="serwis">
-                          Serwis
-                        </SelectItem>
+                        {departments
+                          .sort((a, b) => a.namePl.localeCompare(b.namePl, 'pl'))
+                          .map((dept) => (
+                            <SelectItem key={dept.value} value={dept.value}>
+                              {dept.namePl}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </FormControl>

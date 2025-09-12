@@ -1,5 +1,6 @@
 import { auth } from '@/auth';
 import getEmployees from '@/lib/get-employees';
+import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { getUsers } from '@/lib/get-users';
 import { redirect } from 'next/navigation';
 import NewOvertimeRequestForm from '../components/new-overtime-request-form';
@@ -11,6 +12,7 @@ export default async function AddDeviationPage(props: {
   const { lang } = params;
   const employees = await getEmployees();
   const users = await getUsers();
+  const departments = await getOvertimeDepartments();
   const session = await auth();
 
   if (!session || !session.user?.email) {
@@ -32,6 +34,7 @@ export default async function AddDeviationPage(props: {
     <NewOvertimeRequestForm
       employees={employees}
       users={users}
+      departments={departments}
       loggedInUserEmail={session.user.email ?? ''}
     />
   );

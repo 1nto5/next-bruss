@@ -1,5 +1,15 @@
 import { EmployeeType } from '@/lib/types/employee-types';
 
+export type DepartmentConfig = {
+  _id: string;
+  value: string;        // kebab-case English name (e.g., "form-service")
+  name: string;         // English display name (e.g., "Form Service") 
+  namePl: string;       // Polish display name (e.g., "Serwis form")
+  nameDe: string;       // German display name (e.g., "Formservice")
+  hourlyRate: number;
+  currency: string;
+};
+
 // Add or update the status options to include 'forecast'
 export type OvertimeStatus =
   | 'forecast'
@@ -9,28 +19,7 @@ export type OvertimeStatus =
   | 'completed'
   | 'accounted';
 
-export type OvertimeDepartment =
-  | 'utrzymanie-ruchu'
-  | 'produkcja'
-  | 'pracownicy-zewnetrzni'
-  | 'serwis';
 
-export function getDepartmentDisplayName(department?: OvertimeDepartment): string {
-  if (!department) return '';
-  
-  switch (department) {
-    case 'utrzymanie-ruchu':
-      return 'Utrzymanie ruchu';
-    case 'produkcja':
-      return 'Produkcja';
-    case 'pracownicy-zewnetrzni':
-      return 'Pracownicy zewnętrzni';
-    case 'serwis':
-      return 'Serwis';
-    default:
-      return '';
-  }
-}
 
 export type ArticleQuantityType = {
   articleNumber: string;
@@ -41,7 +30,7 @@ export type OvertimeType = {
   _id: string;
   internalId?: string; // Format: "N/YY", e.g. "1/25" - Optional as existing orders don't have it
   status: OvertimeStatus;
-  department?: OvertimeDepartment; // Department selection
+  department?: string; // Department selection (matches DepartmentConfig.value)
   numberOfEmployees: number; // Number of employees in the order
   numberOfShifts: number; // Number of shifts
   responsibleEmployee: string; // Email of the responsible person
@@ -91,25 +80,56 @@ export type ForecastRequestDetail = {
   reason: string;
 };
 
+export type DepartmentBreakdown = {
+  departmentId: string;
+  departmentName: string;
+  hours: number;
+  cost: number;
+  count: number;
+  hourlyRate: number;
+};
+
 export type ForecastPeriodData = {
   period: string;
   forecastCount: number;
   historicalCount: number;
   forecastHours: number;
   historicalHours: number;
+  forecastCost: number;
+  historicalCost: number;
   totalHours: number;
+  totalCost: number;
   totalCount: number;
+  departmentBreakdown: {
+    forecast: DepartmentBreakdown[];
+    historical: DepartmentBreakdown[];
+  };
   details: {
     forecast: ForecastRequestDetail[];
     historical: ForecastRequestDetail[];
   };
 };
 
+export type DepartmentTotal = {
+  departmentId: string;
+  departmentName: string;
+  forecastHours: number;
+  forecastCost: number;
+  forecastCount: number;
+  historicalHours: number;
+  historicalCost: number;
+  historicalCount: number;
+  hourlyRate: number;
+};
+
 export type ForecastSummary = {
   totalForecastHours: number;
   totalHistoricalHours: number;
+  totalForecastCost: number;
+  totalHistoricalCost: number;
   totalForecastCount: number;
   totalHistoricalCount: number;
+  departmentTotals: DepartmentTotal[];
   filterType: ForecastFilterType;
   year: number;
   startValue: number;

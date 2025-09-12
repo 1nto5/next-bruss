@@ -5,17 +5,27 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const coll = await dbc('overtime_departments');
+    const coll = await dbc('department_configs');
     const departments = await coll
-      .find({ isActive: true })
-      .sort({ sortOrder: 1 })
+      .find({})
       .toArray();
     
-    return NextResponse.json(departments);
+    // Return all language variants for client-side translation selection
+    const transformedDepartments = departments.map(dept => ({
+      _id: dept._id,
+      value: dept.value,
+      name: dept.name,
+      namePl: dept.namePl,
+      nameDe: dept.nameDe,
+      hourlyRate: dept.hourlyRate,
+      currency: dept.currency
+    }));
+    
+    return NextResponse.json(transformedDepartments);
   } catch (error) {
-    console.error('api/overtime-departments: ' + error);
+    console.error('api/overtime-orders/departments: ' + error);
     return NextResponse.json(
-      { error: 'overtime-departments api error' },
+      { error: 'departments api error' },
       { status: 503 },
     );
   }
