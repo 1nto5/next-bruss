@@ -24,11 +24,10 @@ export type OvenTemperatureLogType = {
   timestamp: Date;
   timestampLocaleString: string;
   sensorData: Record<string, number>;
-  avgTemp: number;
+  avgTemp: number; // Now always the filtered average (excluding outliers)
   // Outlier detection fields
   outlierSensors: string[];
   medianTemp: number | null;
-  filteredAvgTemp: number;
   hasOutliers: boolean;
 };
 

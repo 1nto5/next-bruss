@@ -65,33 +65,34 @@ export async function GET(request: NextRequest) {
 
     // Process temperature data for charts
     const chartData = temperatureLogs.map((log) => {
-      // Only use the four main sensors: z0, z1, z2, z3
-      const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
-      const sensorValues = sensorKeys
-        .map((key) => log.sensorData?.[key])
-        .filter((value) => typeof value === 'number') as number[];
+      // For backward compatibility with old data, calculate avgTemp if not present
+      let avgTemp = log.avgTemp;
 
-      // Calculate average and round to one decimal place (backward compatibility)
-      // The division by 10 is for rounding: (avg * 10) rounded, then divided by 10 gives one decimal place
-      const avgTemp =
-        sensorValues.length > 0
+      if (!avgTemp) {
+        // Fallback calculation for older records without outlier detection
+        const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
+        const sensorValues = sensorKeys
+          .map((key) => log.sensorData?.[key])
+          .filter((value) => typeof value === 'number') as number[];
+
+        avgTemp = sensorValues.length > 0
           ? Math.round(
               (sensorValues.reduce((acc, val) => acc + val, 0) /
                 sensorValues.length) *
                 10,
             ) / 10
           : null;
+      }
 
       return {
         _id: log._id.toString(),
         processIds: log.processIds.map((id: any) => id.toString()),
         timestamp: log.timestamp,
         sensorData: log.sensorData || {},
-        avgTemp,
+        avgTemp, // This is now always the filtered average (excluding outliers)
         // Include outlier detection data if available
         outlierSensors: log.outlierSensors || [],
         medianTemp: log.medianTemp || null,
-        filteredAvgTemp: log.filteredAvgTemp || avgTemp,
         hasOutliers: log.hasOutliers || false,
       };
     });

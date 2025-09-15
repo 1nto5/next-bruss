@@ -47,6 +47,10 @@ const chartConfig = {
     label: 'Avg',
     color: '#8b5cf6', // Purple
   },
+  medianTemp: {
+    label: 'Median',
+    color: '#06b6d4', // Cyan
+  },
   targetTemp: {
     label: 'Tgt',
     color: '#6b7280', // Gray (dashed line)
@@ -120,26 +124,32 @@ export default function OvenTemperatureChart({
     );
 
   // Process data for chart
-  const chartData = temperatureData.map((log: any) => ({
-    timestamp: isSingleDay
-      ? new Date(log.timestamp).toLocaleTimeString(lang, {
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : new Date(log.timestamp).toLocaleString(lang, {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-    z0: log.sensorData?.z0 || null,
-    z1: log.sensorData?.z1 || null,
-    z2: log.sensorData?.z2 || null,
-    z3: log.sensorData?.z3 || null,
-    avgTemp: log.avgTemp,
-    targetTemp: selectedProcess?.targetTemp, // Use saved target temp or default
-  }));
+  const chartData = temperatureData.map((log: any) => {
+    const outlierSensors = log.outlierSensors || [];
+
+    return {
+      timestamp: isSingleDay
+        ? new Date(log.timestamp).toLocaleTimeString(lang, {
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : new Date(log.timestamp).toLocaleString(lang, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+      // Only include sensor data if it's not an outlier
+      z0: outlierSensors.includes('z0') ? null : (log.sensorData?.z0 || null),
+      z1: outlierSensors.includes('z1') ? null : (log.sensorData?.z1 || null),
+      z2: outlierSensors.includes('z2') ? null : (log.sensorData?.z2 || null),
+      z3: outlierSensors.includes('z3') ? null : (log.sensorData?.z3 || null),
+      avgTemp: log.avgTemp, // This is now the filtered average (excluding outliers)
+      medianTemp: log.medianTemp || null, // Add median temperature
+      targetTemp: selectedProcess?.targetTemp, // Use saved target temp or default
+    };
+  });
 
   // Show placeholder when no process is selected
   if (!selectedProcess) {
@@ -194,9 +204,9 @@ export default function OvenTemperatureChart({
     );
   }
 
-  // Calculate min/max for Y-axis from actual sensor/average data (not target)
+  // Calculate min/max for Y-axis from actual sensor/average/median data (not target)
   const yValues = chartData.flatMap((d: any) =>
-    [d.z0, d.z1, d.z2, d.z3, d.avgTemp].filter((v) => typeof v === 'number'),
+    [d.z0, d.z1, d.z2, d.z3, d.avgTemp, d.medianTemp].filter((v) => typeof v === 'number'),
   );
   const minY = yValues.length ? Math.min(...yValues) : 0;
   const maxY = yValues.length ? Math.max(...yValues) : 100;
@@ -244,6 +254,7 @@ export default function OvenTemperatureChart({
                       z2: 'BL',
                       z3: 'BR',
                       avgTemp: 'Avg',
+                      medianTemp: 'Median',
                       targetTemp: 'Tgt',
                     };
                     return [`${labels[name] || name}: ${value}°C`, ''];
@@ -299,6 +310,17 @@ export default function OvenTemperatureChart({
               strokeWidth={1}
               dot={false}
               activeDot={{ r: 2 }}
+            />
+
+            {/* Median temperature */}
+            <Line
+              type='monotone'
+              dataKey='medianTemp'
+              stroke={chartConfig.medianTemp.color}
+              strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
+              connectNulls={false}
             />
 
             {/* Target temperature - dashed reference line, thin */}
