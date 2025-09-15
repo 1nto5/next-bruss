@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         .map((key) => log.sensorData?.[key])
         .filter((value) => typeof value === 'number') as number[];
 
-      // Calculate average and round to one decimal place
+      // Calculate average and round to one decimal place (backward compatibility)
       // The division by 10 is for rounding: (avg * 10) rounded, then divided by 10 gives one decimal place
       const avgTemp =
         sensorValues.length > 0
@@ -88,6 +88,11 @@ export async function GET(request: NextRequest) {
         timestamp: log.timestamp,
         sensorData: log.sensorData || {},
         avgTemp,
+        // Include outlier detection data if available
+        outlierSensors: log.outlierSensors || [],
+        medianTemp: log.medianTemp || null,
+        filteredAvgTemp: log.filteredAvgTemp || avgTemp,
+        hasOutliers: log.hasOutliers || false,
       };
     });
 

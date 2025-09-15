@@ -25,6 +25,11 @@ export type OvenTemperatureLogType = {
   timestampLocaleString: string;
   sensorData: Record<string, number>;
   avgTemp: number;
+  // Outlier detection fields
+  outlierSensors: string[];
+  medianTemp: number | null;
+  filteredAvgTemp: number;
+  hasOutliers: boolean;
 };
 
 export type OvenConfigType = {
