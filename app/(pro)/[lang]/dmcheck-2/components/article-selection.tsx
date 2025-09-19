@@ -38,15 +38,7 @@ export default function ArticleSelection({
               key={article.id}
               variant='outline'
               className='h-auto flex-col items-start justify-start p-6 text-left'
-              onClick={() => setSelectedArticle({
-                id: article.id,
-                articleNumber: article.articleNumber,
-                articleName: article.articleName,
-                workplace: article.workplace,
-                piecesPerBox: article.piecesPerBox,
-                boxesPerPallet: article.boxesPerPallet,
-                pallet: article.pallet,
-              })}
+              onClick={() => setSelectedArticle(article)}
             >
               <div className='flex w-full items-center justify-between'>
                 <Component className='h-6 w-6' />
