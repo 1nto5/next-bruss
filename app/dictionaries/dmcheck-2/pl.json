@@ -72,6 +72,15 @@
       "enableLabel": "Włącz tryb rework",
       "cancel": "Anuluj",
       "save": "Zapisz"
+    },
+    "dmcPartVerifyDialog": {
+      "title": "Weryfikacja kodu DMC",
+      "description": "Porównaj zawartość skanowanego kodu DMC widocznego poniżej z fizycznym zapisem na części. W przypadku niezgodności przerwij pracę i zgłoś się do przełożonego - części nie mogą zostać spakowane!",
+      "scannedCode": "Zeskanowany kod DMC:",
+      "imageAlt": "Lokalizacja DMC na części",
+      "confirmQuestion": "Czy CZERWONE podświetlone części na fizycznej części zgadzają się z czerwonymi podświetlonymi częściami poniżej?",
+      "cancel": "Nie, nie zgadza się",
+      "confirm": "Tak, zgadza się"
     }
   },
   "statusBar": {

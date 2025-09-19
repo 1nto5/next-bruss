@@ -70,8 +70,17 @@
       "title": "Rework-Modus",
       "description": "Aktivieren Sie den Rework-Modus, um Teile erneut zu scannen. Der Rework-Modus wird automatisch nach dem Scannen eines Teils deaktiviert. Das vorherige Dokument wird als Rework in der Datenbank markiert.",
       "enableLabel": "Rework-Modus aktivieren",
-      "cancel": "Abbrechen", 
+      "cancel": "Abbrechen",
       "save": "Speichern"
+    },
+    "dmcPartVerifyDialog": {
+      "title": "DMC-Code-Verifizierung",
+      "description": "Vergleichen Sie den unten angezeigten gescannten DMC-Code mit der physischen Kennzeichnung am Teil. Bei Abweichungen stoppen Sie die Arbeit und melden Sie sich bei Ihrem Vorgesetzten - Teile dürfen nicht verpackt werden!",
+      "scannedCode": "Gescannter DMC-Code:",
+      "imageAlt": "DMC-Position am Teil",
+      "confirmQuestion": "Stimmen die ROT hervorgehobenen Teile am physischen Teil mit den rot hervorgehobenen Teilen unten überein?",
+      "cancel": "Nein, stimmt nicht überein",
+      "confirm": "Ja, stimmt überein"
     }
   },
   "statusBar": {
