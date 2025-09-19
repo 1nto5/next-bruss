@@ -16,13 +16,13 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { Locale } from '@/i18n.config';
-import { useEffect, useState } from 'react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
-import { OvenProcessDataType, OvenTemperatureLogType } from '../lib/types';
+import { OvenProcessDataType } from '../lib/types';
+import { useTemperatureData } from '../hooks/use-temperature-data';
+import TemperatureChartSkeleton from './temperature-chart-skeleton';
 
 interface OvenTemperatureChartProps {
-  searchParams: { [key: string]: string | undefined };
-  selectedProcess?: OvenProcessDataType | null;
+  selectedProcess: OvenProcessDataType | null;
   lang: Locale;
 }
 
@@ -51,6 +51,10 @@ const chartConfig = {
     label: 'Median',
     color: '#06b6d4', // Cyan
   },
+  historicalMedian: {
+    label: '30d Median',
+    color: '#ec4899', // Pink
+  },
   targetTemp: {
     label: 'Tgt',
     color: '#6b7280', // Gray (dashed line)
@@ -58,62 +62,38 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function OvenTemperatureChart({
-  searchParams,
   selectedProcess,
   lang,
 }: OvenTemperatureChartProps) {
-  const [temperatureData, setTemperatureData] = useState<
-    OvenTemperatureLogType[]
-  >([]);
-  const [error, setError] = useState<string | null>(null);
-  // Removed: const [showFullScreen, setShowFullScreen] = useState(false);
+  // React Query with manual loading state management
+  const { data: temperatureData, isLoading, error } = useTemperatureData(selectedProcess);
 
-  const fetchTemperatureData = async () => {
-    // Only fetch data if a process is selected
-    if (!selectedProcess) {
-      setTemperatureData([]);
-      return;
-    }
+  // Show loading skeleton when data is being fetched
+  if (isLoading && selectedProcess) {
+    return <TemperatureChartSkeleton />;
+  }
 
-    setError(null);
-
-    try {
-      // Prepare search parameters with process-specific filters
-      const processSearchParams = {
-        ...searchParams,
-        process_id: selectedProcess.id,
-        from: selectedProcess.startTime.toISOString(),
-        to: selectedProcess.endTime?.toISOString() || undefined,
-        oven: selectedProcess.oven,
-      };
-
-      const filteredSearchParams = Object.fromEntries(
-        Object.entries(processSearchParams).filter(
-          ([_, value]) => value !== undefined,
-        ) as [string, string][],
-      );
-
-      const queryParams = new URLSearchParams(filteredSearchParams).toString();
-      const url = `/api/oven-data/temperature?${queryParams}`;
-
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Failed to fetch temperature data');
-      }
-
-      const data = await response.json();
-      setTemperatureData(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    }
-  };
-
-  useEffect(() => {
-    fetchTemperatureData();
-  }, [searchParams, selectedProcess]);
+  // Show placeholder when no process is selected
+  if (!selectedProcess) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Temperature Trend</CardTitle>
+          <CardDescription>
+            Select a process from the table above to view its temperature data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className='flex h-[500px] items-center justify-center text-gray-500'>
+            No process selected
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Determine if all data is from a single day
-  const allDates = temperatureData.map((log: any) => new Date(log.timestamp));
+  const allDates = (temperatureData || []).map((log: any) => new Date(log.timestamp));
   const isSingleDay =
     allDates.length > 0 &&
     allDates.every(
@@ -124,7 +104,7 @@ export default function OvenTemperatureChart({
     );
 
   // Process data for chart
-  const chartData = temperatureData.map((log: any) => {
+  const chartData = (temperatureData || []).map((log: any) => {
     const outlierSensors = log.outlierSensors || [];
 
     return {
@@ -147,44 +127,10 @@ export default function OvenTemperatureChart({
       z3: outlierSensors.includes('z3') ? null : (log.sensorData?.z3 || null),
       avgTemp: log.avgTemp, // This is now the filtered average (excluding outliers)
       medianTemp: log.medianTemp || null, // Add median temperature
+      historicalMedian: log.historicalMedian || null, // Add historical median for this article
       targetTemp: selectedProcess?.targetTemp, // Use saved target temp or default
     };
   });
-
-  // Show placeholder when no process is selected
-  if (!selectedProcess) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Temperature Trend</CardTitle>
-          <CardDescription>
-            Select a process from the table above to view its temperature data
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='flex h-[500px] items-center justify-center text-gray-500'>
-            No process selected
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Temperature Trend</CardTitle>
-          <CardDescription>Error loading temperature data</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='flex h-[500px] items-center justify-center text-red-500'>
-            {error}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   if (chartData.length === 0) {
     return (
@@ -206,7 +152,7 @@ export default function OvenTemperatureChart({
 
   // Calculate min/max for Y-axis from actual sensor/average/median data (not target)
   const yValues = chartData.flatMap((d: any) =>
-    [d.z0, d.z1, d.z2, d.z3, d.avgTemp, d.medianTemp].filter((v) => typeof v === 'number'),
+    [d.z0, d.z1, d.z2, d.z3, d.avgTemp, d.medianTemp, d.historicalMedian].filter((v) => typeof v === 'number'),
   );
   const minY = yValues.length ? Math.min(...yValues) : 0;
   const maxY = yValues.length ? Math.max(...yValues) : 100;
@@ -255,6 +201,7 @@ export default function OvenTemperatureChart({
                       z3: 'BR',
                       avgTemp: 'Avg',
                       medianTemp: 'Median',
+                      historicalMedian: '30d Median',
                       targetTemp: 'Tgt',
                     };
                     return [`${labels[name] || name}: ${value}°C`, ''];
@@ -318,6 +265,18 @@ export default function OvenTemperatureChart({
               dataKey='medianTemp'
               stroke={chartConfig.medianTemp.color}
               strokeWidth={1}
+              dot={false}
+              activeDot={{ r: 2 }}
+              connectNulls={false}
+            />
+
+            {/* Historical median temperature - dashed line for distinction */}
+            <Line
+              type='monotone'
+              dataKey='historicalMedian'
+              stroke={chartConfig.historicalMedian.color}
+              strokeWidth={1}
+              strokeDasharray='3 3'
               dot={false}
               activeDot={{ r: 2 }}
               connectNulls={false}

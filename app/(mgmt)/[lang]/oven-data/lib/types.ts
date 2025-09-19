@@ -29,6 +29,8 @@ export type OvenTemperatureLogType = {
   outlierSensors: string[];
   medianTemp: number | null;
   hasOutliers: boolean;
+  // Historical median for same article over last 30 days at this relative time
+  historicalMedian: number | null;
 };
 
 export type OvenConfigType = {
