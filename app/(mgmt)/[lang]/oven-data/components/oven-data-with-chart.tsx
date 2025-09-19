@@ -2,9 +2,11 @@
 
 import { Locale } from '@/i18n.config';
 import { useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { OvenProcessDataType } from '../lib/types';
 import { ovenColumns } from '../table/columns';
 import { OvenDataTable } from '../table/data-table';
+import ChartErrorState from './chart-error-state';
 import OvenTemperatureChart from './temperature-chart';
 
 interface OvenDataWithChartProps {
@@ -38,11 +40,17 @@ export default function OvenDataWithChart({
         lang={lang}
         onProcessSelect={setSelectedProcess}
       />
-      <OvenTemperatureChart
-        searchParams={searchParams}
-        selectedProcess={selectedProcess}
-        lang={lang}
-      />
+      {/* ErrorBoundary for graceful error handling */}
+      <ErrorBoundary
+        FallbackComponent={ChartErrorState}
+        onReset={() => setSelectedProcess(null)}
+        resetKeys={[selectedProcess?.id]}
+      >
+        <OvenTemperatureChart
+          selectedProcess={selectedProcess}
+          lang={lang}
+        />
+      </ErrorBoundary>
     </div>
   );
 }
