@@ -21,23 +21,30 @@ export async function GET(request: Request) {
     };
 
     const month = monthName ? monthToNumber[monthName] : null;
-    if (!month || !year) return new NextResponse('0');
+    if (!month || !year) return new NextResponse('error');
 
-    // Fetch tickets
-    const response = await fetch(
-      `${process.env.SERVICEDESK_API_URL}/api/v3/requests?input_data=${encodeURIComponent(JSON.stringify({ list_info: { row_count: 100, page: 1 } }))}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authtoken': process.env.SERVICEDESK_API_KEY!,
-        },
+    // Fetch tickets from first 5 pages (500 tickets)
+    const allTickets: ServiceDeskTicket[] = [];
+    for (let page = 1; page <= 5; page++) {
+      const response = await fetch(
+        `${process.env.SERVICEDESK_API_URL}/api/v3/requests?input_data=${encodeURIComponent(JSON.stringify({ list_info: { row_count: 100, page } }))}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authtoken': process.env.SERVICEDESK_API_KEY!,
+          },
+        }
+      );
+
+      if (!response.ok) return new NextResponse('error');
+
+      const data = await response.json();
+      if (data.requests?.length) {
+        allTickets.push(...data.requests);
+      } else {
+        break;
       }
-    );
-
-    if (!response.ok) return new NextResponse('error');
-
-    const data = await response.json();
-    const allTickets: ServiceDeskTicket[] = data.requests || [];
+    }
 
     // Filter tickets
     const targetTechnicians = ['Wojciech Bawirsz', 'Adrian Antosiak'];
