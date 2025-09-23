@@ -31,6 +31,7 @@ export function middleware(request: NextRequest) {
       '/nok.mp3',
       '/oven-in.wav',
       '/oven-out.wav',
+      '/eol74_dmc.png',
       // Your other files in `public`
     ].includes(pathname) ||
     pathname.startsWith('/flags/')

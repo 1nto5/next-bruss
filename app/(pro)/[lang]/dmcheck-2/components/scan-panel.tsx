@@ -12,6 +12,7 @@ import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dictionary';
 import { useOperatorStore, useScanStore } from '../lib/stores';
 import { PrintPalletLabel } from './print-pallet-label';
+import DmcPartVerifyDialog from './dmc-part-verify-dialog';
 
 interface ScanPanelProps {
   dict: Dictionary;
@@ -21,6 +22,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   const { selectedArticle, addScan, isRework, setIsRework } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
   const { volume } = useVolumeStore();
+
+  // Local state for DMC part verification
+  const [pendingDmcVerification, setPendingDmcVerification] = useState<string | null>(null);
 
   // Get operators array
   const operators = useMemo(
@@ -52,11 +56,25 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [boxStatus.boxIsFull, palletStatus.palletIsFull]);
 
-  const handleDmcScan = useCallback(async () => {
-    if (!inputValue.trim() || !selectedArticle) return;
+  const handleDmcScan = useCallback(async (dmcToProcess?: string) => {
+    const dmcValue = dmcToProcess || inputValue;
+    if (!dmcValue.trim() || !selectedArticle) return;
 
-    const dmcValue = inputValue;
-    setInputValue('');
+    // Check if we need DMC part verification on first scan in box
+
+    if (
+      !dmcToProcess &&
+      selectedArticle.requireDmcPartVerification &&
+      boxStatus.piecesInBox === 0
+    ) {
+      setPendingDmcVerification(dmcValue);
+      setInputValue('');
+      return;
+    }
+
+    if (!dmcToProcess) {
+      setInputValue('');
+    }
 
     toast.dismiss();
     toast.promise(
@@ -121,6 +139,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     addScan,
     dict.scan,
     refetchBoxStatus,
+    boxStatus.piecesInBox,
   ]);
 
   const handleDmcReworkScan = useCallback(async () => {
@@ -330,6 +349,18 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     ],
   );
 
+  const handleDmcVerifyConfirm = useCallback(() => {
+    if (pendingDmcVerification) {
+      handleDmcScan(pendingDmcVerification);
+      setPendingDmcVerification(null);
+    }
+  }, [pendingDmcVerification, handleDmcScan]);
+
+  const handleDmcVerifyCancel = useCallback(() => {
+    setPendingDmcVerification(null);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
   // Don't render if no article selected
   if (!selectedArticle) return null;
 
@@ -370,6 +401,21 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
       {/* Show print button when pallet is full */}
       {palletStatus.palletIsFull && isPalletWorkplace && (
         <PrintPalletLabel dict={dict.scan} />
+      )}
+
+      {/* DMC Part Verification Dialog - only render if feature is enabled */}
+      {selectedArticle?.requireDmcPartVerification && (
+        <DmcPartVerifyDialog
+          open={pendingDmcVerification !== null}
+          onOpenChange={(open) => !open && setPendingDmcVerification(null)}
+          scannedDmc={pendingDmcVerification || ''}
+          workplace={selectedArticle.workplace}
+          dmcFirstValidation={selectedArticle.dmcFirstValidation}
+          dmcSecondValidation={selectedArticle.dmcSecondValidation}
+          onConfirm={handleDmcVerifyConfirm}
+          onCancel={handleDmcVerifyCancel}
+          dict={dict}
+        />
       )}
     </>
   );
