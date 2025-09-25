@@ -3,17 +3,62 @@ import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Calculate historical median temperatures for all time points in batch
+ * Filter outliers using Interquartile Range (IQR) method
+ * @param values - Array of numerical values to filter
+ * @param multiplier - IQR multiplier for outlier detection (default 1.5)
+ * @returns Filtered array excluding outliers
+ */
+function filterOutliersIQR(values: number[], multiplier: number = 1.5): number[] {
+  if (values.length < 4) return values; // Need minimum data for IQR
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const q1Index = Math.floor(sorted.length * 0.25);
+  const q3Index = Math.floor(sorted.length * 0.75);
+
+  const Q1 = sorted[q1Index];
+  const Q3 = sorted[q3Index];
+  const IQR = Q3 - Q1;
+
+  const lowerBound = Q1 - multiplier * IQR;
+  const upperBound = Q3 + multiplier * IQR;
+
+  return values.filter(v => v >= lowerBound && v <= upperBound);
+}
+
+/**
+ * Calculate mean of an array of numbers
+ */
+function calculateMean(values: number[]): number {
+  return values.reduce((sum, val) => sum + val, 0) / values.length;
+}
+
+/**
+ * Calculate median of an array of numbers
+ */
+function calculateMedian(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+}
+
+/**
+ * Calculate historical statistics (both median and average) for all time points
+ * Uses only properly filtered data from cron job (avgTemp/medianTemp)
  * @param article - The article number to analyze
  * @param currentProcessStartTime - Start time of the current process
  * @param oven - The oven identifier for filtering (optional optimization)
- * @returns Map of relative time (in minutes) to median temperature
+ * @returns Object with maps for medians and averages by relative time
  */
-async function calculateAllHistoricalMedians(
+async function calculateHistoricalStatistics(
   article: string,
   currentProcessStartTime: Date,
   oven?: string
-): Promise<Map<number, number>> {
+): Promise<{
+  medians: Map<number, number>;
+  averages: Map<number, number>;
+}> {
   try {
     const processCollection = await dbc('oven_processes');
     const tempCollection = await dbc('oven_temperature_logs');
@@ -54,8 +99,9 @@ async function calculateAllHistoricalMedians(
       .sort({ timestamp: 1 })
       .toArray();
 
-    // IN-MEMORY PROCESSING: Group temperatures by relative time in minutes
-    const temperaturesByMinute = new Map<number, number[]>();
+    // IN-MEMORY PROCESSING: Group statistics by relative time in minutes
+    // Only use properly filtered data from cron job (no fallback)
+    const statsByMinute = new Map<number, { averages: number[]; medians: number[] }>();
 
     for (const log of historicalTempLogs) {
       // Find the process for this log to get start time
@@ -72,58 +118,64 @@ async function calculateAllHistoricalMedians(
 
       if (relativeTimeMinutes < 0) continue; // Skip invalid data
 
-      // Use avgTemp if available, otherwise calculate from sensor data
-      let temperature = log.avgTemp;
-      if (!temperature && log.sensorData) {
-        const sensorValues = Object.values(log.sensorData).filter(
-          (value) => typeof value === 'number'
-        ) as number[];
-        if (sensorValues.length > 0) {
-          temperature = sensorValues.reduce((acc, val) => acc + val, 0) / sensorValues.length;
-        }
-      }
+      // Only use pre-filtered data from cron job - no fallback to raw sensors
+      const avgTemperature = log.avgTemp;
+      const medianTemperature = log.medianTemp;
 
-      if (temperature) {
-        if (!temperaturesByMinute.has(relativeTimeMinutes)) {
-          temperaturesByMinute.set(relativeTimeMinutes, []);
+      // Skip records that don't have properly filtered data
+      if (avgTemperature && medianTemperature) {
+        if (!statsByMinute.has(relativeTimeMinutes)) {
+          statsByMinute.set(relativeTimeMinutes, { averages: [], medians: [] });
         }
-        temperaturesByMinute.get(relativeTimeMinutes)!.push(temperature);
+        statsByMinute.get(relativeTimeMinutes)!.averages.push(avgTemperature);
+        statsByMinute.get(relativeTimeMinutes)!.medians.push(medianTemperature);
       }
     }
 
-    // Calculate medians for all time points
+    // Calculate clean statistics with IQR filtering to remove temporal outliers
     const mediansByMinute = new Map<number, number>();
-    for (const [minute, temperatures] of temperaturesByMinute) {
-      if (temperatures.length > 0) {
-        temperatures.sort((a, b) => a - b);
-        const mid = Math.floor(temperatures.length / 2);
-        const median = temperatures.length % 2 === 0
-          ? (temperatures[mid - 1] + temperatures[mid]) / 2
-          : temperatures[mid];
+    const averagesByMinute = new Map<number, number>();
 
-        mediansByMinute.set(minute, Math.round(median * 10) / 10); // Round to 1 decimal place
+    for (const [minute, stats] of statsByMinute) {
+      if (stats.averages.length > 0 && stats.medians.length > 0) {
+        // Apply IQR filtering to remove extreme values (temporal outliers)
+        const filteredAverages = filterOutliersIQR(stats.averages);
+        const filteredMedians = filterOutliersIQR(stats.medians);
+
+        if (filteredAverages.length > 0) {
+          const cleanAverage = calculateMean(filteredAverages);
+          averagesByMinute.set(minute, Math.round(cleanAverage * 10) / 10);
+        }
+
+        if (filteredMedians.length > 0) {
+          const cleanMedian = calculateMedian(filteredMedians);
+          mediansByMinute.set(minute, Math.round(cleanMedian * 10) / 10);
+        }
       }
     }
 
-    return mediansByMinute;
+    return { medians: mediansByMinute, averages: averagesByMinute };
   } catch (error) {
-    console.error('Error calculating historical medians:', error);
-    return new Map();
+    console.error('Error calculating historical statistics:', error);
+    return { medians: new Map(), averages: new Map() };
   }
 }
 
 /**
- * Get historical median for a specific relative time from pre-calculated data
- * @param historicalMedians - Pre-calculated medians map
+ * Get historical statistics for a specific relative time from pre-calculated data
+ * @param historicalStats - Pre-calculated statistics object
  * @param relativeTimeMinutes - Target relative time in minutes
- * @returns Median temperature or null if no data
+ * @returns Object with median and average temperatures or nulls if no data
  */
-function getHistoricalMedianAtTime(
-  historicalMedians: Map<number, number>,
+function getHistoricalStatsAtTime(
+  historicalStats: { medians: Map<number, number>; averages: Map<number, number> },
   relativeTimeMinutes: number
-): number | null {
+): { median: number | null; average: number | null } {
   const targetMinute = Math.floor(relativeTimeMinutes);
-  return historicalMedians.get(targetMinute) || null;
+  return {
+    median: historicalStats.medians.get(targetMinute) || null,
+    average: historicalStats.averages.get(targetMinute) || null
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -196,49 +248,49 @@ export async function GET(request: NextRequest) {
       .limit(1000) // Support for long processes: 12h@1min = 720 readings, with safety margin
       .toArray();
 
-    // BATCH PROCESSING: Calculate all historical medians once before processing temperature logs
-    let historicalMedians = new Map<number, number>();
+    // BATCH PROCESSING: Calculate all historical statistics once before processing temperature logs
+    let historicalStats = { medians: new Map<number, number>(), averages: new Map<number, number>() };
     if (currentProcess && currentProcess.article) {
-      historicalMedians = await calculateAllHistoricalMedians(
+      historicalStats = await calculateHistoricalStatistics(
         currentProcess.article,
         currentProcess.startTime,
         currentProcess.oven
       );
     }
 
-    // Process temperature data for charts (now without async operations)
+    // Process temperature data for charts with temporal outlier detection
     const chartData = temperatureLogs.map((log) => {
-      // For backward compatibility with old data, calculate avgTemp if not present
-      let avgTemp = log.avgTemp;
+      // Only use properly filtered data from cron job (no fallback)
+      const avgTemp = log.avgTemp;
+      const medianTemp = log.medianTemp;
 
-      if (!avgTemp) {
-        // Fallback calculation for older records without outlier detection
-        const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
-        const sensorValues = sensorKeys
-          .map((key) => log.sensorData?.[key])
-          .filter((value) => typeof value === 'number') as number[];
-
-        avgTemp = sensorValues.length > 0
-          ? Math.round(
-              (sensorValues.reduce((acc, val) => acc + val, 0) /
-                sensorValues.length) *
-                10,
-            ) / 10
-          : null;
-      }
-
-      // Get pre-calculated historical median for this specific temperature point
+      // Get historical statistics for this specific time point
       let historicalMedian: number | null = null;
-      if (currentProcess && currentProcess.article) {
+      let historicalAverage: number | null = null;
+      let isTemporalOutlier = false;
+
+      if (currentProcess && currentProcess.article && avgTemp && medianTemp) {
         // Calculate relative time in minutes from process start
         const relativeTimeMs = log.timestamp.getTime() - currentProcess.startTime.getTime();
         const relativeTimeMinutes = relativeTimeMs / (60 * 1000);
 
         if (relativeTimeMinutes >= 0) {
-          historicalMedian = getHistoricalMedianAtTime(
-            historicalMedians,
+          const historicalData = getHistoricalStatsAtTime(
+            historicalStats,
             relativeTimeMinutes
           );
+
+          historicalMedian = historicalData.median;
+          historicalAverage = historicalData.average;
+
+          // Detect temporal outliers: both average and median must deviate significantly
+          if (historicalAverage && historicalMedian) {
+            const avgDeviation = Math.abs(avgTemp - historicalAverage) / historicalAverage;
+            const medDeviation = Math.abs(medianTemp - historicalMedian) / historicalMedian;
+
+            // Mark as temporal outlier if BOTH deviate > 30%
+            isTemporalOutlier = avgDeviation > 0.30 && medDeviation > 0.30;
+          }
         }
       }
 
@@ -247,13 +299,15 @@ export async function GET(request: NextRequest) {
         processIds: log.processIds.map((id: any) => id.toString()),
         timestamp: log.timestamp,
         sensorData: log.sensorData || {},
-        avgTemp, // This is now always the filtered average (excluding outliers)
-        // Include outlier detection data if available
+        avgTemp, // Filtered average from cron job (excluding sensor outliers)
+        medianTemp, // Median from cron job
+        // Include sensor-level outlier detection data
         outlierSensors: log.outlierSensors || [],
-        medianTemp: log.medianTemp || null,
         hasOutliers: log.hasOutliers || false,
-        // Add historical median for this specific time point
+        // Add historical statistics for comparison
         historicalMedian,
+        historicalAverage, // NEW: Historical 30-day average
+        isTemporalOutlier, // NEW: Flag for temporal deviation
       };
     });
 

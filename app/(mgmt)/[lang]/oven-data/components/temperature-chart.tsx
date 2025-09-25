@@ -11,10 +11,11 @@ import {
   ChartConfig,
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 import { Locale } from '@/i18n.config';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { OvenProcessDataType } from '../lib/types';
@@ -55,6 +56,10 @@ const chartConfig = {
     label: '30d Median',
     color: '#ec4899', // Pink
   },
+  historicalAverage: {
+    label: '30d Avg',
+    color: '#10b981', // Green
+  },
   targetTemp: {
     label: 'Tgt',
     color: '#6b7280', // Gray (dashed line)
@@ -66,7 +71,7 @@ export default function OvenTemperatureChart({
   lang,
 }: OvenTemperatureChartProps) {
   // React Query with manual loading state management
-  const { data: temperatureData, isLoading, error } = useTemperatureData(selectedProcess);
+  const { data: temperatureData, isLoading } = useTemperatureData(selectedProcess);
 
   // Show loading skeleton when data is being fetched
   if (isLoading && selectedProcess) {
@@ -103,6 +108,9 @@ export default function OvenTemperatureChart({
         date.getDate() === allDates[0].getDate(),
     );
 
+  // Count temporal outliers for alert banner
+  const deviationCount = (temperatureData || []).filter((log: any) => log.isTemporalOutlier).length;
+
   // Process data for chart
   const chartData = (temperatureData || []).map((log: any) => {
     const outlierSensors = log.outlierSensors || [];
@@ -125,10 +133,12 @@ export default function OvenTemperatureChart({
       z1: outlierSensors.includes('z1') ? null : (log.sensorData?.z1 || null),
       z2: outlierSensors.includes('z2') ? null : (log.sensorData?.z2 || null),
       z3: outlierSensors.includes('z3') ? null : (log.sensorData?.z3 || null),
-      avgTemp: log.avgTemp, // This is now the filtered average (excluding outliers)
-      medianTemp: log.medianTemp || null, // Add median temperature
-      historicalMedian: log.historicalMedian || null, // Add historical median for this article
-      targetTemp: selectedProcess?.targetTemp, // Use saved target temp or default
+      avgTemp: log.avgTemp, // Filtered average (excluding sensor outliers)
+      medianTemp: log.medianTemp || null, // Median temperature
+      historicalMedian: log.historicalMedian || null, // 30-day historical median
+      historicalAverage: log.historicalAverage || null, // 30-day historical average
+      targetTemp: selectedProcess?.targetTemp, // Target temperature
+      isTemporalOutlier: log.isTemporalOutlier || false, // Temporal outlier flag
     };
   });
 
@@ -150,29 +160,43 @@ export default function OvenTemperatureChart({
     );
   }
 
+  // Check if historical data exists in the dataset
+  const hasHistoricalMedian = chartData.some((d: any) => d.historicalMedian !== null && typeof d.historicalMedian === 'number');
+  const hasHistoricalAverage = chartData.some((d: any) => d.historicalAverage !== null && typeof d.historicalAverage === 'number');
+
   // Calculate min/max for Y-axis from actual sensor/average/median data (not target)
   const yValues = chartData.flatMap((d: any) =>
-    [d.z0, d.z1, d.z2, d.z3, d.avgTemp, d.medianTemp, d.historicalMedian].filter((v) => typeof v === 'number'),
+    [d.z0, d.z1, d.z2, d.z3, d.avgTemp, d.medianTemp, d.historicalMedian, d.historicalAverage].filter((v) => typeof v === 'number'),
   );
   const minY = yValues.length ? Math.min(...yValues) : 0;
   const maxY = yValues.length ? Math.max(...yValues) : 100;
   const yDomain = [Math.floor(minY), Math.ceil(maxY)];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Temperature Trend</CardTitle>
-        <CardDescription>
-          {selectedProcess && (
-            <>
-              {selectedProcess.hydraBatch} ({selectedProcess.article}) on{' '}
-              {selectedProcess.oven.toUpperCase()} (Target:{' '}
-              {selectedProcess.targetTemp}°C ±{selectedProcess.tempTolerance}°C)
-            </>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Temperature Trend</CardTitle>
+          <CardDescription>
+            {selectedProcess && (
+              <>
+                {selectedProcess.hydraBatch} ({selectedProcess.article}) on{' '}
+                {selectedProcess.oven.toUpperCase()} (Target:{' '}
+                {selectedProcess.targetTemp}°C ±{selectedProcess.tempTolerance}°C)
+              </>
+            )}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Deviation Alert Banner */}
+          {deviationCount > 0 && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                {deviationCount} measurement{deviationCount !== 1 ? 's' : ''} deviated significantly from expected patterns and {deviationCount !== 1 ? 'have' : 'has'} been marked with orange dots on the chart.
+              </AlertDescription>
+            </Alert>
           )}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
         <ChartContainer config={chartConfig} className='h-[500px] w-full'>
           <LineChart
             data={chartData}
@@ -193,7 +217,7 @@ export default function OvenTemperatureChart({
               content={
                 <ChartTooltipContent
                   labelFormatter={(value) => `Time: ${value}`}
-                  formatter={(value, name) => {
+                  formatter={(value, name, props) => {
                     const labels: { [key: string]: string } = {
                       z0: 'TL',
                       z1: 'TR',
@@ -202,14 +226,84 @@ export default function OvenTemperatureChart({
                       avgTemp: 'Avg',
                       medianTemp: 'Median',
                       historicalMedian: '30d Median',
+                      historicalAverage: '30d Avg',
                       targetTemp: 'Tgt',
                     };
+
+                    // No special handling for temporal outliers in tooltip - dots only on chart
+
                     return [`${labels[name] || name}: ${value}°C`, ''];
                   }}
                 />
               }
             />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend
+              content={({ payload }) => (
+                <div className="flex flex-wrap justify-center gap-4 text-sm">
+                  {payload?.map((entry, index) => {
+                    const isHistorical = entry.dataKey === 'historicalMedian' || entry.dataKey === 'historicalAverage';
+                    const isTarget = entry.dataKey === 'targetTemp';
+
+                    // Hide historical entries when no data exists
+                    if (entry.dataKey === 'historicalMedian' && !hasHistoricalMedian) {
+                      return null;
+                    }
+                    if (entry.dataKey === 'historicalAverage' && !hasHistoricalAverage) {
+                      return null;
+                    }
+
+                    return (
+                      <div key={`legend-${index}`} className="flex items-center gap-2">
+                        <div className="flex items-center">
+                          {isHistorical ? (
+                            // Dashed line for historical data
+                            <svg width="18" height="2">
+                              <line
+                                x1="0"
+                                y1="1"
+                                x2="18"
+                                y2="1"
+                                stroke={entry.color}
+                                strokeWidth="2"
+                                strokeDasharray={entry.dataKey === 'historicalAverage' ? '2 2' : '3 3'}
+                              />
+                            </svg>
+                          ) : isTarget ? (
+                            // Longer dashed line for target
+                            <svg width="18" height="2">
+                              <line
+                                x1="0"
+                                y1="1"
+                                x2="18"
+                                y2="1"
+                                stroke={entry.color}
+                                strokeWidth="2"
+                                strokeDasharray="5 5"
+                              />
+                            </svg>
+                          ) : (
+                            // Solid line for current data
+                            <svg width="18" height="2">
+                              <line
+                                x1="0"
+                                y1="1"
+                                x2="18"
+                                y2="1"
+                                stroke={entry.color}
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span style={{ color: entry.color }}>
+                          {chartConfig[entry.dataKey as keyof typeof chartConfig]?.label || entry.value}
+                        </span>
+                      </div>
+                    );
+                  }).filter(Boolean) /* Remove null entries */}
+                </div>
+              )}
+            />
 
             {/* Individual sensor readings */}
             <Line
@@ -249,13 +343,38 @@ export default function OvenTemperatureChart({
               connectNulls={false}
             />
 
-            {/* Average temperature - slightly thicker, but still thin */}
+            {/* Average temperature with temporal outlier indicators */}
             <Line
               type='monotone'
               dataKey='avgTemp'
               stroke={chartConfig.avgTemp.color}
               strokeWidth={1}
-              dot={false}
+              dot={(props: any) => {
+                // Show orange dot for temporal outliers - ensure immediate rendering
+                if (props.payload && props.payload.isTemporalOutlier === true) {
+                  return (
+                    <circle
+                      key={`outlier-${props.payload.timestamp}-${props.index}`}
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={4}
+                      fill="#f97316" // Orange warning color
+                      stroke="#fff"
+                      strokeWidth={2}
+                      style={{ pointerEvents: 'none' }} // Prevent interaction delays
+                    />
+                  );
+                }
+                // Return an invisible dot for normal points to satisfy TypeScript
+                return (
+                  <circle
+                    cx={props.cx}
+                    cy={props.cy}
+                    r={0}
+                    fill="transparent"
+                  />
+                );
+              }}
               activeDot={{ r: 2 }}
             />
 
@@ -282,6 +401,18 @@ export default function OvenTemperatureChart({
               connectNulls={false}
             />
 
+            {/* Historical average temperature - dotted line */}
+            <Line
+              type='monotone'
+              dataKey='historicalAverage'
+              stroke={chartConfig.historicalAverage.color}
+              strokeWidth={1}
+              strokeDasharray='2 2'
+              dot={false}
+              activeDot={{ r: 2 }}
+              connectNulls={false}
+            />
+
             {/* Target temperature - dashed reference line, thin */}
             <Line
               type='monotone'
@@ -295,5 +426,6 @@ export default function OvenTemperatureChart({
         </ChartContainer>
       </CardContent>
     </Card>
+    </>
   );
 }
