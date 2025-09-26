@@ -361,6 +361,12 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     setTimeout(() => inputRef.current?.focus(), 50);
   }, []);
 
+  const handleDmcVerifyReject = useCallback(() => {
+    // This is called when operator confirms they will report to supervisor
+    setPendingDmcVerification(null);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
   // Don't render if no article selected
   if (!selectedArticle) return null;
 
@@ -414,6 +420,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
           dmcSecondValidation={selectedArticle.dmcSecondValidation}
           onConfirm={handleDmcVerifyConfirm}
           onCancel={handleDmcVerifyCancel}
+          onReject={handleDmcVerifyReject}
           dict={dict}
         />
       )}

@@ -81,6 +81,12 @@
       "confirmQuestion": "Stimmen die ROT hervorgehobenen Teile am physischen Teil mit den rot hervorgehobenen Teilen unten überein?",
       "cancel": "Nein, stimmt nicht überein",
       "confirm": "Ja, stimmt überein"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Meldebestätigung",
+      "description": "Haben Sie die DMC-Diskrepanz Ihrem Vorgesetzten gemeldet?",
+      "confirmButton": "Ja, ich habe es gemeldet",
+      "cancelButton": "Nein, zurück zur Verifizierung"
     }
   },
   "statusBar": {

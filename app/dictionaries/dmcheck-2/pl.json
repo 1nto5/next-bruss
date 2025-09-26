@@ -81,6 +81,12 @@
       "confirmQuestion": "Czy CZERWONE podświetlone części na fizycznej części zgadzają się z czerwonymi podświetlonymi częściami poniżej?",
       "cancel": "Nie, nie zgadza się",
       "confirm": "Tak, zgadza się"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Potwierdzenie zgłoszenia",
+      "description": "Czy zgłosiłeś niezgodność DMC przełożonemu?",
+      "confirmButton": "Tak, zgłosiłem",
+      "cancelButton": "Nie, wracam do weryfikacji"
     }
   },
   "statusBar": {
