@@ -87,7 +87,7 @@ async function calculateHistoricalStatistics(
       .toArray();
 
     if (historicalProcesses.length === 0) {
-      return new Map();
+      return { medians: new Map(), averages: new Map() };
     }
 
     // SINGLE QUERY: Get all temperature logs for these historical processes

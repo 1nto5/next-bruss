@@ -81,6 +81,12 @@
       "confirmQuestion": "Ang mga PULANG naka-highlight na bahagi sa pisikal na bahagi ba ay tumugma sa mga pulang naka-highlight na bahagi sa ibaba?",
       "cancel": "Hindi, hindi tumugma",
       "confirm": "Oo, tumugma"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Pagkumpirma ng Pag-report",
+      "description": "Na-report mo ba ang DMC discrepancy sa supervisor?",
+      "confirmButton": "Oo, na-report ko na",
+      "cancelButton": "Hindi, babalik sa verification"
     }
   },
   "statusBar": {

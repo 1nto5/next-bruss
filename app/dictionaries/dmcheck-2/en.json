@@ -81,6 +81,12 @@
       "confirmQuestion": "Do the RED highlighted parts on the physical part match the red highlighted parts below?",
       "cancel": "No, doesn't match",
       "confirm": "Yes, matches"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Report Confirmation",
+      "description": "Did you report the DMC discrepancy to your supervisor?",
+      "confirmButton": "Yes, I reported it",
+      "cancelButton": "No, back to verification"
     }
   },
   "statusBar": {

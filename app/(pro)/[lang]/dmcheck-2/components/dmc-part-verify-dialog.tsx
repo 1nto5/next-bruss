@@ -11,6 +11,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import Image from 'next/image';
+import { useState } from 'react';
+import SupervisorNotifyDialog from './supervisor-notify-dialog';
 import type { Dictionary } from '../lib/dictionary';
 
 interface DmcPartVerifyDialogProps {
@@ -22,6 +24,7 @@ interface DmcPartVerifyDialogProps {
   dmcSecondValidation?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  onReject: () => void;
   dict: Dictionary;
 }
 
@@ -34,16 +37,30 @@ export default function DmcPartVerifyDialog({
   dmcSecondValidation,
   onConfirm,
   onCancel,
+  onReject,
   dict,
 }: DmcPartVerifyDialogProps) {
+  const [showSupervisorDialog, setShowSupervisorDialog] = useState(false);
+
   const handleConfirm = () => {
     onConfirm();
     onOpenChange(false);
   };
 
   const handleCancel = () => {
-    onCancel();
+    // Show supervisor notification dialog instead of direct cancel
+    setShowSupervisorDialog(true);
+  };
+
+  const handleSupervisorConfirm = () => {
+    setShowSupervisorDialog(false);
+    onReject();
     onOpenChange(false);
+  };
+
+  const handleSupervisorCancel = () => {
+    setShowSupervisorDialog(false);
+    // Stay in the verification dialog
   };
 
 
@@ -102,6 +119,15 @@ export default function DmcPartVerifyDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Supervisor Notification Dialog */}
+      <SupervisorNotifyDialog
+        open={showSupervisorDialog}
+        onOpenChange={setShowSupervisorDialog}
+        onConfirm={handleSupervisorConfirm}
+        onCancel={handleSupervisorCancel}
+        dict={dict}
+      />
     </Dialog>
   );
 }
