@@ -27,16 +27,50 @@ const BATCH_PROCESSING_CONFIG = {
 };
 
 /**
+ * Linear interpolation helper for precise percentile calculation
+ *
+ * When a percentile position falls between two array indices, this function
+ * interpolates between the adjacent values to provide a more accurate result
+ * than simply using the nearest value.
+ *
+ * @param sortedArray - Pre-sorted array of values
+ * @param position - Exact position (can be fractional) in the array
+ * @returns Interpolated value at the specified position
+ */
+function interpolateValue(sortedArray: number[], position: number): number {
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.ceil(position);
+
+  // If position is exactly on an index, return that value
+  if (lowerIndex === upperIndex) {
+    return sortedArray[lowerIndex];
+  }
+
+  // Handle edge cases at array boundaries
+  if (lowerIndex < 0) return sortedArray[0];
+  if (upperIndex >= sortedArray.length) return sortedArray[sortedArray.length - 1];
+
+  // Linear interpolation between the two adjacent values
+  const fraction = position - lowerIndex;
+  const lowerValue = sortedArray[lowerIndex];
+  const upperValue = sortedArray[upperIndex];
+
+  return lowerValue + fraction * (upperValue - lowerValue);
+}
+
+/**
  * Filter outliers using Interquartile Range (IQR) method
  *
  * IQR is a robust statistical method for outlier detection that:
- * 1. Calculates the 25th percentile (Q1) and 75th percentile (Q3) of the dataset
+ * 1. Calculates the 25th percentile (Q1) and 75th percentile (Q3) using linear interpolation
  * 2. Computes the Interquartile Range: IQR = Q3 - Q1
  * 3. Defines outlier boundaries as Q1 - (multiplier × IQR) and Q3 + (multiplier × IQR)
  * 4. Filters out values beyond these boundaries
  *
  * This method is preferred over standard deviation because it's less sensitive
  * to extreme values and works well with skewed distributions common in industrial data.
+ * The linear interpolation approach provides more accurate quartiles than nearest-rank methods,
+ * especially important for smaller datasets or when precise outlier detection is critical.
  *
  * @param values - Array of numerical temperature values to filter
  * @param multiplier - IQR multiplier for outlier detection (1.5 = standard, 1.0 = aggressive)
@@ -48,12 +82,14 @@ function filterOutliersIQR(values: number[], multiplier: number = IQR_MULTIPLIER
   // Sort values to calculate quartiles accurately
   const sorted = [...values].sort((a, b) => a - b);
 
-  // Calculate quartile positions using standard method
-  const q1Index = Math.floor(sorted.length * 0.25);
-  const q3Index = Math.floor(sorted.length * 0.75);
+  // Calculate quartile positions using interpolation for statistical accuracy
+  // This method provides more precise quartiles than simple nearest-rank approach
+  const q1Position = (sorted.length - 1) * 0.25;
+  const q3Position = (sorted.length - 1) * 0.75;
 
-  const Q1 = sorted[q1Index]; // 25th percentile (first quartile)
-  const Q3 = sorted[q3Index]; // 75th percentile (third quartile)
+  // Linear interpolation for more accurate quartile calculation
+  const Q1 = interpolateValue(sorted, q1Position); // 25th percentile (first quartile)
+  const Q3 = interpolateValue(sorted, q3Position); // 75th percentile (third quartile)
   const IQR = Q3 - Q1; // Interquartile range - measure of statistical spread
 
   // Define outlier boundaries using the "1.5 × IQR rule"
