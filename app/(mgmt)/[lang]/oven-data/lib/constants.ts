@@ -26,13 +26,6 @@ export const CONNECTION_TIMEOUT_MS = 5000; // Timeout for Arduino sensor connect
 export const TEMPERATURE_PRECISION_DECIMALS = 1; // Decimal places for temperature rounding
 export const RELATIVE_TIME_MINUTE_PRECISION = 1; // Minutes precision for relative time calculations
 
-// Database Collection Names (for consistency)
-export const COLLECTIONS = {
-  OVEN_PROCESSES: 'oven_processes',
-  OVEN_TEMPERATURE_LOGS: 'oven_temperature_logs',
-  OVEN_CONTROLLINO_CONFIGS: 'oven_controllino_configs'
-} as const;
-
 // Sensor Configuration
 export const SENSOR_KEYS = ['z0', 'z1', 'z2', 'z3'] as const;
 export const SENSOR_LABELS = {
@@ -40,12 +33,4 @@ export const SENSOR_LABELS = {
   z1: 'Top Right',
   z2: 'Bottom Left',
   z3: 'Bottom Right'
-} as const;
-
-// Process Status Types
-export const PROCESS_STATUS = {
-  PREPARED: 'prepared',
-  RUNNING: 'running',
-  FINISHED: 'finished',
-  DELETED: 'deleted'
 } as const;

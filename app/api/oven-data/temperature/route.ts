@@ -8,9 +8,7 @@ import {
   TEMPORAL_OUTLIER_THRESHOLD,
   MAX_TEMPERATURE_LOGS_PER_QUERY,
   MAX_HISTORICAL_PROCESSES_LIMIT,
-  TEMPERATURE_PRECISION_DECIMALS,
-  COLLECTIONS,
-  PROCESS_STATUS
+  TEMPERATURE_PRECISION_DECIMALS
 } from '@/app/(mgmt)/[lang]/oven-data/lib/constants';
 import type {
   HistoricalStatistics,
@@ -134,8 +132,8 @@ async function calculateHistoricalStatistics(
   oven?: string
 ): Promise<HistoricalStatistics> {
   try {
-    const processCollection = await dbc(COLLECTIONS.OVEN_PROCESSES);
-    const tempCollection = await dbc(COLLECTIONS.OVEN_TEMPERATURE_LOGS);
+    const processCollection = await dbc('oven_processes');
+    const tempCollection = await dbc('oven_temperature_logs');
 
     // Find all processes with the same article in the last N days (excluding current process)
     const lookbackDate = new Date();
@@ -147,7 +145,7 @@ async function calculateHistoricalStatistics(
         $gte: lookbackDate,
         $lt: currentProcessStartTime // Exclude current process
       },
-      status: { $in: [PROCESS_STATUS.FINISHED, PROCESS_STATUS.RUNNING] } // Only completed or active processes
+      status: { $in: ['finished', 'running'] } // Only completed or active processes
     };
 
     // Optionally filter by oven for better performance and relevance
@@ -311,7 +309,7 @@ export async function GET(request: NextRequest) {
       processIds = [new ObjectId(processId)];
     } else {
       // Find processes based on filters
-      const processCollection = await dbc(COLLECTIONS.OVEN_PROCESSES);
+      const processCollection = await dbc('oven_processes');
       const processFilter: any = {};
 
       if (oven) processFilter.oven = oven;
@@ -338,14 +336,14 @@ export async function GET(request: NextRequest) {
     // Get current process information for historical median calculation
     let currentProcess = null;
     if (processId) {
-      const processCollection = await dbc(COLLECTIONS.OVEN_PROCESSES);
+      const processCollection = await dbc('oven_processes');
       currentProcess = await processCollection.findOne({
         _id: new ObjectId(processId)
       });
     }
 
     // Get temperature logs
-    const tempCollection = await dbc(COLLECTIONS.OVEN_TEMPERATURE_LOGS);
+    const tempCollection = await dbc('oven_temperature_logs');
     const tempFilter: any = {
       processIds: { $in: processIds },
     };
