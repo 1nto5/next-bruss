@@ -1,3 +1,5 @@
+export type ProcessStatus = 'prepared' | 'running' | 'finished' | 'deleted';
+
 export type OvenProcessDataType = {
   id: string;
   oven: string;
@@ -5,7 +7,7 @@ export type OvenProcessDataType = {
   hydraBatch: string;
   startOperators: string[];
   endOperators?: string[];
-  status: 'prepared' | 'running' | 'finished' | 'deleted';
+  status: ProcessStatus;
   startTime: Date;
   endTime: Date | null;
   startTimeLocaleString: string;
@@ -18,19 +20,65 @@ export type OvenProcessDataType = {
   targetDuration?: number; // Duration in seconds
 };
 
+// Sensor identifiers
+export type SensorKey = 'z0' | 'z1' | 'z2' | 'z3';
+
+// Sensor data mapping
+export type SensorData = Record<SensorKey, number>;
+
+// Complete temperature log from database
 export type OvenTemperatureLogType = {
   _id: string;
   processIds: string[];
   timestamp: Date;
   timestampLocaleString: string;
-  sensorData: Record<string, number>;
-  avgTemp: number; // Now always the filtered average (excluding outliers)
-  // Outlier detection fields
-  outlierSensors: string[];
+  sensorData: SensorData;
+  avgTemp: number; // Filtered average (excluding sensor outliers)
   medianTemp: number | null;
+  // Outlier detection fields
+  outlierSensors: SensorKey[];
   hasOutliers: boolean;
-  // Historical median for same article over last 30 days at this relative time
+  // Historical statistics for temporal outlier detection
   historicalMedian: number | null;
+  historicalAverage?: number | null; // 30-day historical average
+  isTemporalOutlier?: boolean; // Flag for temporal deviation detection
+};
+
+// Enhanced temperature log for chart display
+export type ChartTemperatureData = {
+  _id: string;
+  processIds: string[];
+  timestamp: Date;
+  sensorData: Partial<SensorData>; // May have nulls for outlier sensors
+  avgTemp: number;
+  medianTemp: number | null;
+  historicalMedian: number | null;
+  historicalAverage: number | null;
+  isTemporalOutlier: boolean;
+  outlierSensors: SensorKey[];
+  hasOutliers: boolean;
+};
+
+// Temperature analysis result from statistical calculations
+export type TemperatureAnalysis = {
+  validValues: number[];
+  validSensors: SensorKey[];
+  outlierSensors: SensorKey[];
+  medianTemp: number;
+  avgTemp: number; // Filtered average excluding outliers
+  hasOutliers: boolean;
+};
+
+// Historical statistics structure
+export type HistoricalStatistics = {
+  medians: Map<number, number>;
+  averages: Map<number, number>;
+};
+
+// Historical data point for specific time
+export type HistoricalDataPoint = {
+  median: number | null;
+  average: number | null;
 };
 
 export type OvenConfigType = {
