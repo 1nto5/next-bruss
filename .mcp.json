@@ -1,11 +1,24 @@
 {
   "mcpServers": {
     "shadcn": {
-      "command": "npx",
+      "command": "bunx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "mongodb": {
+      "command": "bunx",
       "args": [
-        "shadcn@latest",
-        "mcp"
+        "-y",
+        "mongodb-mcp-server",
+        "--connectionString",
+        "mongodb://localhost:27017/next_bruss_dev"
       ]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-cc5d4c31-22d0-4990-9d71-e85c173d3f90"
+      }
     }
   }
 }

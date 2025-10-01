@@ -72,6 +72,21 @@
       "enableLabel": "Enable rework mode",
       "cancel": "Cancel",
       "save": "Save"
+    },
+    "dmcPartVerifyDialog": {
+      "title": "DMC Code Verification",
+      "description": "Compare the scanned DMC code shown below with the physical marking on the part. In case of discrepancy, stop work and report to your supervisor - parts cannot be packed!",
+      "scannedCode": "Scanned DMC Code:",
+      "imageAlt": "DMC location on part",
+      "confirmQuestion": "Do the RED highlighted parts on the physical part match the red highlighted parts below?",
+      "cancel": "No, doesn't match",
+      "confirm": "Yes, matches"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Report Confirmation",
+      "description": "Did you report the DMC discrepancy to your supervisor?",
+      "confirmButton": "Yes, I reported it",
+      "cancelButton": "No, back to verification"
     }
   },
   "statusBar": {

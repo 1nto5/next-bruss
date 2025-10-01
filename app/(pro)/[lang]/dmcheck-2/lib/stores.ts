@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { ArticleConfigType } from './types';
 
 type OperatorType = {
   identifier: string;
@@ -10,16 +11,6 @@ type OperatorType = {
 type ScanType = {
   dmc: string;
   time: Date;
-};
-
-type ArticleConfigType = {
-  id: string;
-  articleNumber: string;
-  articleName: string;
-  workplace: string;
-  piecesPerBox: number;
-  boxesPerPallet?: number;
-  pallet: boolean;
 };
 
 type OperatorStoreType = {
@@ -83,7 +74,7 @@ export const useScanStore = create<ScanStoreType>()(
         boxesOnPallet: 0,
         palletIsFull: false,
       },
-      setSelectedArticle: (article) => set({ 
+      setSelectedArticle: (article) => set({
         selectedArticle: article,
         lastScans: [],
         isRework: false,
@@ -106,7 +97,7 @@ export const useScanStore = create<ScanStoreType>()(
       updatePalletStatus: (boxesOnPallet, palletIsFull) => set({
         palletStatus: { boxesOnPallet, palletIsFull },
       }),
-      clearArticle: () => set({ 
+      clearArticle: () => set({
         selectedArticle: null,
         lastScans: [],
         isRework: false,

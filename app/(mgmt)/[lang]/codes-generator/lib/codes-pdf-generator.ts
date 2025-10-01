@@ -6,7 +6,7 @@ import { generateDataMatrix } from './bwip-loader';
 interface GeneratePdfOptions {
   items: string[];
   title: string;
-  pageSize: 'standard' | 'a4' | 'a3';
+  pageSize: 'standard' | 'label70x100' | 'a4' | 'a3';
   codeSize?: number;
   fontSize?: number;
   spacing?: number;
@@ -79,8 +79,6 @@ export async function codesPdfGenerator({
   codeType = 'qr',
   orientation = 'portrait',
   isCodeRange = false,
-  rangeStart,
-  rangeEnd,
 }: GeneratePdfOptions): Promise<void> {
   let format: any = pageSize;
   let processedItems = items;
@@ -99,6 +97,9 @@ export async function codesPdfGenerator({
     spacing = 0;
   } else if (pageSize === 'standard') {
     format = orientation === 'portrait' ? [125, 104] : [104, 125];
+  } else if (pageSize === 'label70x100') {
+    format = [100, 70]; // Always landscape: 100mm width × 70mm height
+    orientation = 'landscape';
   }
 
   const doc = new jsPDF({
@@ -125,18 +126,21 @@ export async function codesPdfGenerator({
 
   const defaultCodeSizes = {
     standard: 85,
+    label70x100: 44,
     a4: 190,
     a3: 270,
   };
 
   const defaultFontSizes = {
     standard: 48,
+    label70x100: 26,
     a4: 105,
     a3: 150,
   };
 
   const defaultSpacings = {
     standard: 22,
+    label70x100: 10,
     a4: 80,
     a3: 120,
   };
@@ -144,6 +148,7 @@ export async function codesPdfGenerator({
   // Barcode dimensions are different - they're typically wider than tall
   const defaultBarcodeSizes = {
     standard: { width: 85, height: 50 },
+    label70x100: { width: 44, height: 26 },
     a4: { width: 190, height: 100 },
     a3:
       orientation === 'portrait'
@@ -177,7 +182,7 @@ export async function codesPdfGenerator({
           },
         });
 
-        const qrY = pageSize === 'standard' ? 10 : 20;
+        const qrY = pageSize === 'standard' ? 10 : pageSize === 'label70x100' ? 8 : 20;
 
         const qrX = centerX - actualCodeSize / 2;
         doc.addImage(
@@ -198,7 +203,11 @@ export async function codesPdfGenerator({
           doc.internal.scaleFactor;
         const textX = centerX - textWidth / 2;
 
-        doc.text(uppercaseText, textX, qrY + actualCodeSize + actualSpacing);
+        // Position text at bottom for 70x100mm, below QR code for others
+        const textY = pageSize === 'label70x100'
+          ? pageHeight - 8  // 8mm from bottom
+          : qrY + actualCodeSize + actualSpacing;
+        doc.text(uppercaseText, textX, textY);
       } else if (codeType === 'dmc') {
         // Generate Data Matrix Code
         const canvas = document.createElement('canvas');
@@ -227,7 +236,7 @@ export async function codesPdfGenerator({
 
         const barcodeDataUrl = canvas.toDataURL('image/png');
 
-        const barcodeY = pageSize === 'standard' ? 10 : 30;
+        const barcodeY = pageSize === 'standard' ? 10 : pageSize === 'label70x100' ? 8 : 30;
 
         // Calculate barcode dimensions based on actualCodeSize and orientation
         let barcodeWidth, barcodeHeight;
@@ -267,11 +276,11 @@ export async function codesPdfGenerator({
           doc.internal.scaleFactor;
         const textX = centerX - textWidth / 2;
 
-        doc.text(
-          uppercaseText,
-          textX,
-          barcodeY + barcodeHeight + actualSpacing,
-        );
+        // Position text at bottom for 70x100mm, below barcode for others
+        const textY = pageSize === 'label70x100'
+          ? pageHeight - 8  // 8mm from bottom
+          : barcodeY + barcodeHeight + actualSpacing;
+        doc.text(uppercaseText, textX, textY);
       }
     } catch (error) {
       console.error(
