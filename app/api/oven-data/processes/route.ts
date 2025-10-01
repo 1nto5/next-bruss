@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
         // Calculate duration for finished processes
         if (doc.status === 'finished' && doc.endTime) {
           duration = Math.round(
-            (doc.endTime.getTime() - doc.startTime.getTime()) / 1000,
+            (new Date(doc.endTime).getTime() - new Date(doc.startTime).getTime()) / 1000,
           );
         }
 

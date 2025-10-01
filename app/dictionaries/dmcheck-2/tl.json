@@ -72,6 +72,21 @@
       "enableLabel": "I-enable ang rework mode",
       "cancel": "I-cancel",
       "save": "I-save"
+    },
+    "dmcPartVerifyDialog": {
+      "title": "Pag-verify ng DMC Code",
+      "description": "Ikumpara ang na-scan na DMC code na ipinakita sa ibaba sa pisikal na pagmamarka sa bahagi. Kapag may hindi pagkakatugma, ihinto ang trabaho at i-report sa supervisor - hindi dapat i-pack ang mga bahagi!",
+      "scannedCode": "Na-scan na DMC Code:",
+      "imageAlt": "Lokasyon ng DMC sa bahagi",
+      "confirmQuestion": "Ang mga PULANG naka-highlight na bahagi sa pisikal na bahagi ba ay tumugma sa mga pulang naka-highlight na bahagi sa ibaba?",
+      "cancel": "Hindi, hindi tumugma",
+      "confirm": "Oo, tumugma"
+    },
+    "supervisorNotifyDialog": {
+      "title": "Pagkumpirma ng Pag-report",
+      "description": "Na-report mo ba ang DMC discrepancy sa supervisor?",
+      "confirmButton": "Oo, na-report ko na",
+      "cancelButton": "Hindi, babalik sa verification"
     }
   },
   "statusBar": {

@@ -530,6 +530,7 @@ export async function completeAllOvenProcesses(
 
 /**
  * Fetches the latest average temperature for the currently running process in a given oven
+ * Uses filtered average (excluding outlier sensors) when available, falls back to simple average for older data
  * @param oven - The oven identifier
  * @returns { avgTemp: number | null } or { error: string }
  */
@@ -563,6 +564,13 @@ export async function fetchOvenLastAvgTemp(
     ) {
       return { avgTemp: null };
     }
+
+    // Use filtered average if available (from outlier detection system)
+    if (lastTempLog.avgTemp && typeof lastTempLog.avgTemp === 'number') {
+      return { avgTemp: lastTempLog.avgTemp };
+    }
+
+    // Fallback to old calculation for backward compatibility with older data
     // Only use the four main sensors: z0, z1, z2, z3
     const sensorKeys = ['z0', 'z1', 'z2', 'z3'];
     const sensorValues = sensorKeys

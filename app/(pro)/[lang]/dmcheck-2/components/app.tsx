@@ -40,26 +40,7 @@ export default function App({ dict, lang }: AppProps) {
     if (selectedArticle && articles.length > 0) {
       const updatedArticle = articles.find((a) => a.id === selectedArticle.id);
       if (updatedArticle) {
-        // Check if any value changed
-        const hasChanged =
-          updatedArticle.piecesPerBox !== selectedArticle.piecesPerBox ||
-          updatedArticle.boxesPerPallet !== selectedArticle.boxesPerPallet ||
-          updatedArticle.articleNumber !== selectedArticle.articleNumber ||
-          updatedArticle.articleName !== selectedArticle.articleName ||
-          updatedArticle.workplace !== selectedArticle.workplace ||
-          updatedArticle.pallet !== selectedArticle.pallet;
-
-        if (hasChanged) {
-          setSelectedArticle({
-            id: updatedArticle.id,
-            articleNumber: updatedArticle.articleNumber,
-            articleName: updatedArticle.articleName,
-            workplace: updatedArticle.workplace,
-            piecesPerBox: updatedArticle.piecesPerBox,
-            boxesPerPallet: updatedArticle.boxesPerPallet,
-            pallet: updatedArticle.pallet,
-          });
-        }
+        setSelectedArticle(updatedArticle);
       }
     }
   }, [articles, selectedArticle?.id, setSelectedArticle]);

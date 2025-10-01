@@ -21,6 +21,7 @@ export type ArticleConfigType = {
   ford: boolean;
   bmw: boolean;
   nonUniqueHydraBatch?: boolean;
+  requireDmcPartVerification?: boolean;
 };
 
 export type ScanType = {

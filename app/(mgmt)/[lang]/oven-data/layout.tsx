@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { OvenDataProviders } from './lib/providers';
 
 export const metadata: Metadata = {
   title: 'Oven Data (BRUSS)',
@@ -9,5 +10,9 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <OvenDataProviders>
+      {children}
+    </OvenDataProviders>
+  );
 }

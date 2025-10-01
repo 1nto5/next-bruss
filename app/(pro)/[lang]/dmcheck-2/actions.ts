@@ -112,6 +112,7 @@ export async function getArticlesForWorkplace(workplace: string) {
       hydraProcess: article.hydraProcess,
       ford: article.ford,
       bmw: article.bmw,
+      requireDmcPartVerification: article.requireDmcPartVerification || false,
     }));
   } catch (error) {
     console.error(error);
@@ -142,6 +143,7 @@ export async function getArticleConfigById(articleConfigId: string) {
       hydraProcess: article.hydraProcess,
       ford: article.ford,
       bmw: article.bmw,
+      requireDmcPartVerification: article.requireDmcPartVerification || false,
     };
   } catch (error) {
     console.error(error);

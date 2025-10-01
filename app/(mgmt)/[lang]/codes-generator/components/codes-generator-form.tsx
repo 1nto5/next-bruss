@@ -46,7 +46,7 @@ const formSchema = z
         message: 'List cannot be empty',
       }),
     title: z.string().optional(),
-    pageSize: z.enum(['standard', 'a4', 'a3']).default('standard'),
+    pageSize: z.enum(['standard', 'label70x100', 'a4', 'a3']).default('standard'),
     codeSize: z.number().int().default(85),
     fontSize: z.number().int().default(48),
     spacing: z.number().int().default(22),
@@ -145,6 +145,11 @@ export default function QrGeneratorForm() {
       form.setValue('codeSize', 85);
       form.setValue('fontSize', 48);
       form.setValue('spacing', 22);
+    } else if (selectedPageSize === 'label70x100') {
+      form.setValue('codeSize', 44);
+      form.setValue('fontSize', 26);
+      form.setValue('spacing', 10);
+      form.setValue('orientation', 'landscape');
     } else if (selectedPageSize === 'a4') {
       form.setValue('codeSize', 190);
       form.setValue('fontSize', 105);
@@ -313,6 +318,7 @@ export default function QrGeneratorForm() {
                           ? 'DMC Fixed Size (15x15 mm)'
                           : 'Standard (125x104 mm - production label)'}
                       </SelectItem>
+                      <SelectItem value='label70x100'>70x100 mm</SelectItem>
                       <SelectItem value='a4'>A4 (210x297 mm)</SelectItem>
                       <SelectItem value='a3'>A3 (297x420 mm)</SelectItem>
                     </SelectContent>
@@ -336,7 +342,7 @@ export default function QrGeneratorForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    disabled={selectedCodeType === 'dmc'}
+                    disabled={selectedCodeType === 'dmc' || selectedPageSize === 'label70x100'}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -351,7 +357,9 @@ export default function QrGeneratorForm() {
                   <FormDescription>
                     {selectedCodeType === 'dmc'
                       ? 'DMC uses fixed orientation'
-                      : 'Choose page orientation'}
+                      : selectedPageSize === 'label70x100'
+                        ? '70x100mm uses fixed landscape orientation'
+                        : 'Choose page orientation'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
