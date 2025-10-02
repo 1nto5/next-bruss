@@ -153,7 +153,7 @@ export default async function OvertimeDetailsPage(props: {
 
             {/* Analytics button */}
             <Link
-              href={`/overtime-orders/forecast`}
+              href={`/forecast`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>

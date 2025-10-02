@@ -89,6 +89,10 @@ export default function NewOvertimeRequestForm({
   const [actionType, setActionType] = useState<'save' | 'save-and-add-another'>(
     'save',
   );
+  const [pendingArticle, setPendingArticle] = useState<{
+    articleNumber: string;
+    quantity: string;
+  }>({ articleNumber: '', quantity: '' });
 
   const today = new Date();
   const daysUntilSaturday = (6 - today.getDay() + 7) % 7 || 7;
@@ -128,6 +132,15 @@ export default function NewOvertimeRequestForm({
     data: z.infer<typeof NewOvertimeRequestSchema>,
     currentActionType: 'save' | 'save-and-add-another' = actionType,
   ) => {
+    // Check if there's a pending article that hasn't been added
+    if (pendingArticle.articleNumber && pendingArticle.quantity) {
+      form.setError('plannedArticles', {
+        type: 'manual',
+        message: 'Nie dodałeś wybranego artykułu! Kliknij "+" aby dodać lub wyczyść pola.',
+      });
+      return;
+    }
+
     setIsPendingInserting(true);
     try {
       const res = await insert(data);
@@ -490,13 +503,15 @@ export default function NewOvertimeRequestForm({
               control={form.control}
               name='plannedArticles'
               render={({ field }) => (
-                <>
+                <FormItem>
                   <MultiArticleManager
                     value={field.value || []}
                     onChange={field.onChange}
+                    onPendingChange={setPendingArticle}
+                    onClearError={() => form.clearErrors('plannedArticles')}
                   />
                   <FormMessage />
-                </>
+                </FormItem>
               )}
             />
 

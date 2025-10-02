@@ -25,6 +25,7 @@ export const ROUTE_PATHS = {
   newsAdd: '/news/add',
   overtimeOrders: '/overtime-orders',
   overtimeSubmissions: '/overtime-submissions',
+  forecast: '/forecast',
   codesGenerator: '/codes-generator',
   projects: '/projects',
 };
@@ -63,6 +64,10 @@ export const plHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.overtimeSubmissions,
         title: 'Zgłoszenia nadgodzin - test',
+      },
+      {
+        href: ROUTE_PATHS.forecast,
+        title: 'Forecast nadgodzin',
       },
     ],
   },
@@ -137,6 +142,10 @@ export const enHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.overtimeSubmissions,
         title: 'Overtime submissions',
+      },
+      {
+        href: ROUTE_PATHS.forecast,
+        title: 'Overtime Forecast',
       },
     ],
   },

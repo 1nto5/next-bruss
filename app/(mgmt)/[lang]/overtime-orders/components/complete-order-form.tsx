@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { revalidateProductionOvertime as revalidate } from '../actions';
+import { revalidateOvertimeOrders as revalidate } from '../actions';
 import { OvertimeType } from '../lib/types';
 import {
   MultipleAttachmentFormSchema,

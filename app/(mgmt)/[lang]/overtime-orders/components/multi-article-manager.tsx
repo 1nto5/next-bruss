@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, CircleX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ArticleSearch, ArticleSearchRef } from './article-search';
 
@@ -30,6 +30,8 @@ interface MultiArticleManagerProps {
   label?: string;
   placeholder?: string;
   initialValues?: ArticleQuantity[];
+  onPendingChange?: (pending: { articleNumber: string; quantity: string }) => void;
+  onClearError?: () => void;
 }
 
 export function MultiArticleManager({
@@ -38,6 +40,8 @@ export function MultiArticleManager({
   label = 'Planowana produkcja',
   placeholder = 'Wybierz artykuł',
   initialValues = [],
+  onPendingChange,
+  onClearError,
 }: MultiArticleManagerProps) {
   const [newArticle, setNewArticle] = useState<{
     articleNumber: string;
@@ -46,6 +50,13 @@ export function MultiArticleManager({
     articleNumber: '',
     quantity: '',
   });
+
+  // Notify parent component about pending article changes
+  useEffect(() => {
+    if (onPendingChange) {
+      onPendingChange(newArticle);
+    }
+  }, [newArticle, onPendingChange]);
 
   const [initialized, setInitialized] = useState(false);
   const [articlesWithDetails, setArticlesWithDetails] = useState<
@@ -158,6 +169,16 @@ export function MultiArticleManager({
     }
   };
 
+  const clearFields = () => {
+    setNewArticle({ articleNumber: '', quantity: '' });
+    if (onClearError) {
+      onClearError();
+    }
+    setTimeout(() => {
+      articleSearchRef.current?.focus();
+    }, 100);
+  };
+
   return (
     <div className='space-y-4'>
       {label && <h3 className='text-base font-semibold'>{label}</h3>}
@@ -226,7 +247,7 @@ export function MultiArticleManager({
             placeholder={placeholder}
           />
         </div>
-        <div className='flex min-w-[140px] flex-[1] gap-2'>
+        <div className='flex min-w-[180px] flex-[1] gap-2'>
           <Input
             type='number'
             min={1}
@@ -241,12 +262,22 @@ export function MultiArticleManager({
           />
           <Button
             type='button'
+            onClick={clearFields}
+            disabled={!newArticle.articleNumber && !newArticle.quantity}
+            variant='destructive'
+            className='h-10 shrink-0 px-3'
+            title='Wyczyść pola'
+          >
+            <CircleX />
+          </Button>
+          <Button
+            type='button'
             onClick={addArticle}
             disabled={!newArticle.articleNumber || !newArticle.quantity}
-            size='sm'
-            className='shrink-0 px-3'
+            className='h-10 shrink-0 px-3'
+            title='Dodaj artykuł'
           >
-            <Plus className='h-4 w-4' />
+            <Plus />
           </Button>
         </div>
       </div>

@@ -1,14 +1,12 @@
 import { auth } from '@/auth';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { Table, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
+import { TrendingUp } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import ForecastCharts from '../components/forecast-charts';
-import ForecastFiltering from '../components/forecast-filtering';
-import { getForecastData } from '../lib/get-forecast-data';
-import { ForecastFilterType } from '../lib/types';
+import ForecastCharts from './components/forecast-charts';
+import ForecastFiltering from './components/forecast-filtering';
+import { getForecastData } from './lib/get-forecast-data';
+import { ForecastFilterType } from './lib/types';
 
 export default async function ForecastPage(props: {
   params: Promise<{ lang: Locale }>;
@@ -77,8 +75,11 @@ export default async function ForecastPage(props: {
       summary: {
         totalForecastHours: 0,
         totalHistoricalHours: 0,
+        totalForecastCost: 0,
+        totalHistoricalCost: 0,
         totalForecastCount: 0,
         totalHistoricalCount: 0,
+        departmentTotals: [],
         filterType,
         year,
         startValue,
@@ -92,20 +93,7 @@ export default async function ForecastPage(props: {
   return (
     <Card>
       <CardHeader>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle className='flex items-center gap-2'>
-            Forecast nadgodzin - produkcja
-          </CardTitle>
-
-          <div className='flex gap-2'>
-            <Link href='/overtime-orders' className='w-full sm:w-auto'>
-              <Button variant='outline' className='w-full'>
-                <Table />
-                Zlecenia
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <CardTitle>Forecast nadgodzin - produkcja</CardTitle>
       </CardHeader>
 
       <CardContent className='space-y-6'>

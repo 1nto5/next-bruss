@@ -58,7 +58,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import {
   updateOvertimeRequest as update,
-  redirectToProductionOvertime as redirect,
+  redirectToOvertimeOrders as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { NewOvertimeRequestSchema } from '../lib/zod';

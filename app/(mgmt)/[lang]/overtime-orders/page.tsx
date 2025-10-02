@@ -91,7 +91,7 @@ export default async function ProductionOvertimePage(props: {
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && (
               <Link
-                href='/overtime-orders/forecast'
+                href='/forecast'
                 className='w-full sm:w-auto'
               >
                 <Button variant={'outline'} className='w-full'>

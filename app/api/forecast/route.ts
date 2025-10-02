@@ -8,6 +8,23 @@ interface DateRange {
   end: Date;
 }
 
+// Normalized type for both overtime_orders and overtime_submissions
+interface NormalizedOvertimeRequest {
+  _id: any;
+  from: any;
+  to: any;
+  numberOfEmployees: number;
+  numberOfShifts: number;
+  department: string;
+  status: string;
+  reason?: any;
+  responsibleEmployee?: any;
+  submittedBy?: any;
+  _submissionHours?: number; // Only for submissions
+  _source: 'overtime_orders' | 'overtime_submissions';
+  [key: string]: any; // Allow other fields from overtime_orders
+}
+
 // Helper function to get week start and end dates
 function getWeekRange(year: number, week: number): DateRange {
   const jan1 = new Date(year, 0, 1);
@@ -60,41 +77,41 @@ export async function GET(req: NextRequest) {
   try {
     // Fetch department rates from department_configs collection
     const departmentsColl = await dbc('department_configs');
-    const departments = await departmentsColl
-      .find({ isActive: true })
-      .toArray();
-    
-    // Create a map of department id to hourly rate and validate all have rates
+    const departments = await departmentsColl.find({}).toArray();
+
+    // Create a map of department value to hourly rate
     const departmentRates: Record<string, number> = {};
     const missingRates: string[] = [];
-    
+
     departments.forEach((dept) => {
-      const hourlyRate = dept.configs?.overtime?.hourlyRate;
+      const hourlyRate = dept.hourlyRate;
       if (typeof hourlyRate === 'number' && hourlyRate > 0) {
-        departmentRates[dept.id] = hourlyRate;
+        departmentRates[dept.value] = hourlyRate;
       } else {
-        missingRates.push(dept.name || dept.id);
+        missingRates.push(dept.name || dept.value);
       }
     });
 
     // Return error if any department is missing hourly rate configuration
     if (missingRates.length > 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'Missing hourly rate configuration',
           details: `Departments without configured rates: ${missingRates.join(', ')}`,
           code: 'MISSING_DEPARTMENT_RATES',
-          missingDepartments: missingRates
+          missingDepartments: missingRates,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Helper function to get hourly rate for a department
-    const getDepartmentRate = (departmentId: string): number => {
-      const rate = departmentRates[departmentId];
+    const getDepartmentRate = (departmentValue: string): number => {
+      const rate = departmentRates[departmentValue];
       if (!rate) {
-        throw new Error(`Missing hourly rate for department: ${departmentId}`);
+        throw new Error(
+          `Missing hourly rate for department: ${departmentValue}`,
+        );
       }
       return rate;
     };
@@ -114,7 +131,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Build MongoDB query
+    // Build MongoDB query for overtime_orders
     const query: any = {};
 
     // Filter by date ranges
@@ -145,13 +162,69 @@ export async function GET(req: NextRequest) {
     }
 
     // Add department filtering
-    if (departmentFilter) {
+    if (departmentFilter && departmentFilter !== 'all') {
       query.$and = query.$and || [];
       query.$and.push({ department: departmentFilter });
     }
 
-    const coll = await dbc('overtime_orders');
-    const overtimeRequests = await coll.find(query).sort({ from: 1 }).toArray();
+    // 1. Fetch overtime_orders (includes migrated production_overtime)
+    const overtimeOrdersColl = await dbc('overtime_orders');
+    const overtimeOrders = await overtimeOrdersColl
+      .find(query)
+      .sort({ from: 1 })
+      .toArray();
+
+    // 2. Fetch overtime_submissions (if not filtering by specific non-submissions department)
+    let overtimeSubmissions: any[] = [];
+    if (!departmentFilter || departmentFilter === 'all' || departmentFilter === 'submissions') {
+      const submissionsColl = await dbc('overtime_submissions');
+      const submissionQuery: any = {};
+
+      // Build date filter for submissions
+      if (dateRanges.length > 0) {
+        submissionQuery.$or = dateRanges.map((range) => ({
+          date: { $gte: range.start, $lte: range.end },
+        }));
+      }
+
+      overtimeSubmissions = await submissionsColl
+        .find(submissionQuery)
+        .sort({ date: 1 })
+        .toArray();
+    }
+
+    // 3. Normalize submissions to order format
+    const normalizedSubmissions: NormalizedOvertimeRequest[] = overtimeSubmissions
+      .filter((s) => s.hours > 0 && s.status !== 'rejected') // Only positive hours, not rejected
+      .map((submission) => ({
+        _id: submission._id,
+        from: submission.date,
+        to: submission.date,
+        numberOfEmployees: 1,
+        numberOfShifts: 1,
+        department: 'submissions',
+        status: submission.status === 'pending' ? 'forecast' : 'approved',
+        reason: submission.reason || '',
+        responsibleEmployee: submission.supervisor,
+        submittedBy: submission.submittedBy,
+        _submissionHours: submission.hours, // Special field for direct hours
+        _source: 'overtime_submissions' as const,
+      }));
+
+    // 4. Combine both sources
+    const allOrders: NormalizedOvertimeRequest[] = [
+      ...overtimeOrders.map((o): NormalizedOvertimeRequest => ({
+        ...o,
+        department: o.department || 'production', // Fallback for old records
+        _source: 'overtime_orders' as const,
+        from: o.from,
+        to: o.to,
+        numberOfEmployees: o.numberOfEmployees,
+        numberOfShifts: o.numberOfShifts,
+        status: o.status,
+      })),
+      ...normalizedSubmissions,
+    ];
 
     // Group data by time periods for chart display
     const allGroupedData = dateRanges.map((range, index) => {
@@ -162,7 +235,7 @@ export async function GET(req: NextRequest) {
             ? `${year}/${String(startValue + index).padStart(2, '0')}`
             : `${startValue + index}`;
 
-      const periodRequests = overtimeRequests.filter((request) => {
+      const periodRequests = allOrders.filter((request) => {
         const requestStart = new Date(request.from);
         const requestEnd = new Date(request.to);
 
@@ -185,84 +258,116 @@ export async function GET(req: NextRequest) {
       );
 
       // Calculate department-specific data for forecast
-      const forecastDepartmentData: Record<string, { hours: number; cost: number; count: number }> = {};
+      const forecastDepartmentData: Record<
+        string,
+        { hours: number; cost: number; count: number }
+      > = {};
       let forecastHours = 0;
       let forecastCost = 0;
-      
+
       forecast.forEach((req) => {
-        const duration =
-          (new Date(req.to).getTime() - new Date(req.from).getTime()) /
-          (1000 * 60 * 60);
-        const hours = (duration * req.numberOfEmployees) / (req.numberOfShifts || 1);
+        // Calculate hours differently for submissions
+        let hours = 0;
+        if (req._source === 'overtime_submissions') {
+          hours = req._submissionHours || 0; // Direct hours from submission
+        } else {
+          const duration =
+            (new Date(req.to).getTime() - new Date(req.from).getTime()) /
+            (1000 * 60 * 60);
+          hours = (duration * req.numberOfEmployees) / (req.numberOfShifts || 1);
+        }
+
         const departmentRate = getDepartmentRate(req.department);
         const cost = hours * departmentRate;
-        
+
         // Initialize department data if not exists
         if (!forecastDepartmentData[req.department]) {
-          forecastDepartmentData[req.department] = { hours: 0, cost: 0, count: 0 };
+          forecastDepartmentData[req.department] = {
+            hours: 0,
+            cost: 0,
+            count: 0,
+          };
         }
-        
+
         // Add to department totals
         forecastDepartmentData[req.department].hours += hours;
         forecastDepartmentData[req.department].cost += cost;
         forecastDepartmentData[req.department].count += 1;
-        
+
         // Add to overall totals
         forecastHours += hours;
         forecastCost += cost;
       });
 
       // Calculate department-specific data for historical
-      const historicalDepartmentData: Record<string, { hours: number; cost: number; count: number }> = {};
+      const historicalDepartmentData: Record<
+        string,
+        { hours: number; cost: number; count: number }
+      > = {};
       let historicalHours = 0;
       let historicalCost = 0;
-      
+
       historical.forEach((req) => {
-        const duration =
-          (new Date(req.to).getTime() - new Date(req.from).getTime()) /
-          (1000 * 60 * 60);
-        const employees = req.actualEmployeesWorked || req.numberOfEmployees;
-        const hours = (duration * employees) / (req.numberOfShifts || 1);
+        // Calculate hours differently for submissions
+        let hours = 0;
+        if (req._source === 'overtime_submissions') {
+          hours = req._submissionHours || 0; // Direct hours from submission
+        } else {
+          const duration =
+            (new Date(req.to).getTime() - new Date(req.from).getTime()) /
+            (1000 * 60 * 60);
+          const employees = req.actualEmployeesWorked || req.numberOfEmployees;
+          hours = (duration * employees) / (req.numberOfShifts || 1);
+        }
+
         const departmentRate = getDepartmentRate(req.department);
         const cost = hours * departmentRate;
-        
+
         // Initialize department data if not exists
         if (!historicalDepartmentData[req.department]) {
-          historicalDepartmentData[req.department] = { hours: 0, cost: 0, count: 0 };
+          historicalDepartmentData[req.department] = {
+            hours: 0,
+            cost: 0,
+            count: 0,
+          };
         }
-        
+
         // Add to department totals
         historicalDepartmentData[req.department].hours += hours;
         historicalDepartmentData[req.department].cost += cost;
         historicalDepartmentData[req.department].count += 1;
-        
+
         // Add to overall totals
         historicalHours += hours;
         historicalCost += cost;
       });
 
       // Convert department data to arrays with department info
-      const forecastDepartmentBreakdown = Object.entries(forecastDepartmentData).map(([deptId, data]) => {
-        const dept = departments.find(d => d.id === deptId);
+      const forecastDepartmentBreakdown = Object.entries(
+        forecastDepartmentData,
+      ).map(([deptId, data]) => {
+        const dept = departments.find((d) => d.value === deptId);
         return {
           departmentId: deptId,
           departmentName: dept?.name || deptId,
           hours: Math.round(data.hours * 100) / 100,
           cost: Math.round(data.cost * 100) / 100,
           count: data.count,
-          hourlyRate: getDepartmentRate(deptId)
+          hourlyRate: getDepartmentRate(deptId),
         };
       });
 
-      const historicalDepartmentBreakdown = Object.entries(historicalDepartmentData).map(([deptId, data]) => {
-        const dept = departments.find(d => d.id === deptId);
+      const historicalDepartmentBreakdown = Object.entries(
+        historicalDepartmentData,
+      ).map(([deptId, data]) => {
+        const dept = departments.find((d) => d.value === deptId);
         return {
           departmentId: deptId,
           departmentName: dept?.name || deptId,
           hours: Math.round(data.hours * 100) / 100,
           cost: Math.round(data.cost * 100) / 100,
           count: data.count,
-          hourlyRate: getDepartmentRate(deptId)
+          hourlyRate: getDepartmentRate(deptId),
         };
       });
 
@@ -315,17 +420,20 @@ export async function GET(req: NextRequest) {
     );
 
     // Calculate department totals across all periods
-    const departmentTotals: Record<string, { 
-      departmentId: string;
-      departmentName: string;
-      forecastHours: number;
-      forecastCost: number;
-      forecastCount: number;
-      historicalHours: number;
-      historicalCost: number;
-      historicalCount: number;
-      hourlyRate: number;
-    }> = {};
+    const departmentTotals: Record<
+      string,
+      {
+        departmentId: string;
+        departmentName: string;
+        forecastHours: number;
+        forecastCost: number;
+        forecastCount: number;
+        historicalHours: number;
+        historicalCost: number;
+        historicalCount: number;
+        hourlyRate: number;
+      }
+    > = {};
 
     groupedData.forEach((period: any) => {
       // Process forecast department breakdown
@@ -410,9 +518,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('api/overtime-orders/forecast: ' + error);
+    console.error('api/forecast error:', error);
     return NextResponse.json(
-      { error: 'overtime-orders forecast api error' },
+      { error: 'forecast api error' },
       { status: 503 },
     );
   }

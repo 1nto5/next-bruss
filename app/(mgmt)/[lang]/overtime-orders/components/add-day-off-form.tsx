@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import {
   addEmployeeDayOff,
-  redirectToProductionOvertimeDaysOff as redirect,
+  redirectToOvertimeOrdersDaysOff as redirect,
 } from '../actions';
 import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';

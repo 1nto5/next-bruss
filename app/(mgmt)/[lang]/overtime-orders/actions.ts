@@ -343,11 +343,12 @@ export async function cancelOvertimeRequest(id: string) {
     const coll = await dbc('overtime_orders');
 
     // Handle both ObjectId and string ID formats
-    let convertedId;
+    let convertedId: ObjectId;
     try {
       convertedId = new ObjectId(id);
     } catch {
-      convertedId = id;
+      // If conversion fails, return error as this shouldn't happen
+      return { error: 'invalid id format' };
     }
 
     // First check if the request exists and get its current status
@@ -765,13 +766,14 @@ export async function bulkDeleteOvertimeRequests(ids: string[]) {
     const coll = await dbc('overtime_orders');
     
     // Handle both ObjectIds and string IDs
-    const convertedIds = ids.map((id) => {
+    const convertedIds: ObjectId[] = ids.map((id) => {
       try {
         // Try to convert to ObjectId first
         return new ObjectId(id);
       } catch {
-        // If it fails, use as string
-        return id;
+        // If it fails, create a new ObjectId (this should rarely happen)
+        // In production, all IDs should be valid ObjectId strings
+        throw new Error(`Invalid ObjectId format: ${id}`);
       }
     });
 
@@ -804,13 +806,13 @@ export async function bulkReactivateOvertimeRequests(ids: string[]) {
     const coll = await dbc('overtime_orders');
     
     // Handle both ObjectIds and string IDs
-    const convertedIds = ids.map((id) => {
+    const convertedIds: ObjectId[] = ids.map((id) => {
       try {
         // Try to convert to ObjectId first
         return new ObjectId(id);
       } catch {
-        // If it fails, use as string
-        return id;
+        // If it fails, throw error (all IDs should be valid ObjectId strings)
+        throw new Error(`Invalid ObjectId format: ${id}`);
       }
     });
 
