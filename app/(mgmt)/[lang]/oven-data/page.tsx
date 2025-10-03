@@ -12,6 +12,9 @@ import { RefreshButton } from '@/components/refresh-button';
 import { revalidateOvenTableData } from './actions';
 import OvenDataWithChart from './components/oven-data-with-chart';
 import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
+import { Button } from '@/components/ui/button';
+import { BarChart3 } from 'lucide-react';
+import Link from 'next/link';
 
 async function getOvens() {
   const res = await fetch(`${process.env.API}oven-data/ovens`, {
@@ -97,10 +100,18 @@ export default async function OvenDataPage(props: {
               Last sync: {fetchTimeLocaleString}
             </CardDescription>
           </div>
-          <RefreshButton
-            fetchTime={fetchTime}
-            onRefresh={revalidateOvenTableData}
-          />
+          <div className="flex gap-2">
+            <Link href={`/${lang}/oven-data/oee`}>
+              <Button variant="outline" size="sm">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                View OEE
+              </Button>
+            </Link>
+            <RefreshButton
+              fetchTime={fetchTime}
+              onRefresh={revalidateOvenTableData}
+            />
+          </div>
         </div>
         <OvenTableFilteringAndOptions ovens={ovens} fetchTime={fetchTime} />
       </CardHeader>
