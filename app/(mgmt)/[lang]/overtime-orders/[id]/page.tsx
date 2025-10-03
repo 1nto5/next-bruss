@@ -486,45 +486,17 @@ export default async function OvertimeDetailsPage(props: {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {/* Created */}
-                      <TableRow>
-                        <TableCell>
-                          <Badge variant='outline'>Utworzone</Badge>
-                        </TableCell>
-                        <TableCell>
-                          {extractNameFromEmail(request.requestedBy)}
-                        </TableCell>
-                        <TableCell>
-                          {new Date(request.requestedAt).toLocaleString(lang)}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Approved */}
-                      {request.approvedAt && (
+                      {/* Canceled */}
+                      {request.canceledAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusApproved'>Zatwierdzone</Badge>
+                            <Badge variant='statusRejected'>Anulowane</Badge>
                           </TableCell>
                           <TableCell>
-                            {extractNameFromEmail(request.approvedBy || '')}
+                            {extractNameFromEmail(request.canceledBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.approvedAt).toLocaleString(lang)}
-                          </TableCell>
-                        </TableRow>
-                      )}
-
-                      {/* Completed */}
-                      {request.completedAt && (
-                        <TableRow>
-                          <TableCell>
-                            <Badge variant='statusClosed'>Ukończone</Badge>
-                          </TableCell>
-                          <TableCell>
-                            {extractNameFromEmail(request.completedBy || '')}
-                          </TableCell>
-                          <TableCell>
-                            {new Date(request.completedAt).toLocaleString(lang)}
+                            {new Date(request.canceledAt).toLocaleString(lang)}
                           </TableCell>
                         </TableRow>
                       )}
@@ -544,20 +516,48 @@ export default async function OvertimeDetailsPage(props: {
                         </TableRow>
                       )}
 
-                      {/* Canceled */}
-                      {request.canceledAt && (
+                      {/* Completed */}
+                      {request.completedAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusRejected'>Anulowane</Badge>
+                            <Badge variant='statusClosed'>Ukończone</Badge>
                           </TableCell>
                           <TableCell>
-                            {extractNameFromEmail(request.canceledBy || '')}
+                            {extractNameFromEmail(request.completedBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.canceledAt).toLocaleString(lang)}
+                            {new Date(request.completedAt).toLocaleString(lang)}
                           </TableCell>
                         </TableRow>
                       )}
+
+                      {/* Approved */}
+                      {request.approvedAt && (
+                        <TableRow>
+                          <TableCell>
+                            <Badge variant='statusApproved'>Zatwierdzone</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {extractNameFromEmail(request.approvedBy || '')}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(request.approvedAt).toLocaleString(lang)}
+                          </TableCell>
+                        </TableRow>
+                      )}
+
+                      {/* Created */}
+                      <TableRow>
+                        <TableCell>
+                          <Badge variant='outline'>Utworzone</Badge>
+                        </TableCell>
+                        <TableCell>
+                          {extractNameFromEmail(request.requestedBy)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(request.requestedAt).toLocaleString(lang)}
+                        </TableCell>
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </CardContent>
