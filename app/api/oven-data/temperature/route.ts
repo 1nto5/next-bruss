@@ -200,7 +200,7 @@ async function calculateHistoricalStatistics(
           status: 1
         }
       })
-      .hint({ article: 1, startTime: -1 }) // Suggest index usage for performance
+      // Note: .hint() removed as it was causing silent query failures
       .toArray();
 
     if (historicalProcesses.length === 0) {
@@ -229,7 +229,7 @@ async function calculateHistoricalStatistics(
         medianTemp: 1
       }
     })
-    .hint({ processIds: 1, timestamp: 1 }) // Suggest compound index for performance
+    // Note: .hint() removed as it was causing silent query failures
     .sort({ timestamp: 1 });
 
     // IN-MEMORY PROCESSING: Group statistics by relative time in minutes
@@ -242,32 +242,35 @@ async function calculateHistoricalStatistics(
 
     // Use async iteration for better memory management
     for await (const log of cursor) {
-      // Find the process for this log to get start time
-      const processId = log.processIds[0]?.toString(); // Assuming single process per log
-      const process = processLookup.get(processId);
+      // IMPORTANT: Temperature logs can contain multiple processIds (batch processing)
+      // We need to iterate through ALL processIds and calculate relative times for each
+      for (const processIdObj of log.processIds) {
+        const processId = processIdObj.toString();
+        const process = processLookup.get(processId);
 
-      if (!process) continue;
+        if (!process) continue;
 
-      // Calculate relative time in minutes from process start
-      // This enables comparison of processes at equivalent stages
-      const relativeTimeMs = log.timestamp.getTime() - process.startTime.getTime();
-      const relativeTimeMinutes = Math.floor(relativeTimeMs / (60 * 1000)); // Round to nearest minute for grouping
+        // Calculate relative time in minutes from process start
+        // This enables comparison of processes at equivalent stages
+        const relativeTimeMs = log.timestamp.getTime() - process.startTime.getTime();
+        const relativeTimeMinutes = Math.floor(relativeTimeMs / (60 * 1000)); // Round to nearest minute for grouping
 
-      if (relativeTimeMinutes < 0) continue; // Skip invalid data (timestamps before process start)
+        if (relativeTimeMinutes < 0) continue; // Skip invalid data (timestamps before process start)
 
-      // Only use pre-filtered data from cron job - no fallback to raw sensors
-      // This ensures consistent baseline calculation using already-processed temperature values
-      const avgTemperature = log.avgTemp; // Filtered average (sensor outliers already removed)
-      const medianTemperature = log.medianTemp; // Median temperature (robust central tendency)
+        // Only use pre-filtered data from cron job - no fallback to raw sensors
+        // This ensures consistent baseline calculation using already-processed temperature values
+        const avgTemperature = log.avgTemp; // Filtered average (sensor outliers already removed)
+        const medianTemperature = log.medianTemp; // Median temperature (robust central tendency)
 
-      // Skip records that don't have properly filtered data
-      if (avgTemperature && medianTemperature) {
-        // Group by relative time to build statistical baseline for each process stage
-        if (!statsByMinute.has(relativeTimeMinutes)) {
-          statsByMinute.set(relativeTimeMinutes, { averages: [], medians: [] });
+        // Skip records that don't have properly filtered data
+        if (avgTemperature && medianTemperature) {
+          // Group by relative time to build statistical baseline for each process stage
+          if (!statsByMinute.has(relativeTimeMinutes)) {
+            statsByMinute.set(relativeTimeMinutes, { averages: [], medians: [] });
+          }
+          statsByMinute.get(relativeTimeMinutes)!.averages.push(avgTemperature);
+          statsByMinute.get(relativeTimeMinutes)!.medians.push(medianTemperature);
         }
-        statsByMinute.get(relativeTimeMinutes)!.averages.push(avgTemperature);
-        statsByMinute.get(relativeTimeMinutes)!.medians.push(medianTemperature);
       }
 
       processedCount++;
@@ -391,7 +394,7 @@ export async function GET(request: NextRequest) {
       if (to) tempFilter.timestamp.$lte = new Date(to);
     }
 
-    // Optimized temperature logs query with projection and indexing hints
+    // Optimized temperature logs query with projection
     const temperatureLogs = await tempCollection
       .find(tempFilter, {
         projection: {
@@ -405,7 +408,6 @@ export async function GET(request: NextRequest) {
           hasOutliers: 1
         }
       })
-      .hint({ processIds: 1, timestamp: 1 }) // Suggest compound index usage
       .sort({ timestamp: 1 })
       .limit(MAX_TEMPERATURE_LOGS_PER_QUERY) // Support for long processes: 12h@1min = 720 readings, with safety margin
       .toArray();

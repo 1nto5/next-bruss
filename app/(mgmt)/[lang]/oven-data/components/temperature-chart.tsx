@@ -368,6 +368,7 @@ export default function OvenTemperatureChart({
                 // Return an invisible dot for normal points to satisfy TypeScript
                 return (
                   <circle
+                    key={`normal-${props.payload.timestamp}-${props.index}`}
                     cx={props.cx}
                     cy={props.cy}
                     r={0}
