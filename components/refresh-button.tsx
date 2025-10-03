@@ -58,7 +58,6 @@ export function RefreshButton({ fetchTime, onRefresh }: RefreshButtonProps) {
     <Button
       onClick={handleRefresh}
       disabled={isPending}
-      size="sm"
       variant="outline"
     >
       {isPending ? (
@@ -66,7 +65,7 @@ export function RefreshButton({ fetchTime, onRefresh }: RefreshButtonProps) {
       ) : (
         <RefreshCw />
       )}
-      Refresh
+      <span>Refresh</span>
     </Button>
   );
 }

@@ -1,11 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { Locale } from '@/i18n.config';
-import OeeTimeSelector from '../components/oee-time-selector';
+import OeeFilteringAndOptions from '../components/oee-filtering-and-options';
 import OeeSummaryCards from '../components/oee-summary-cards';
 import OeeUtilizationChart from '../components/oee-utilization-chart';
+import OeeHeaderButtons from '../components/oee-header-buttons';
 
 export default async function OvenOeePage({
   params,
@@ -62,89 +60,27 @@ export default async function OvenOeePage({
   }
 
   return (
-    <div className="space-y-4">
-      {/* Back navigation */}
-      <Link href={`/${lang}/oven-data`}>
-        <Button variant="ghost" size="sm">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Oven Data
-        </Button>
-      </Link>
-
-      {/* Main OEE Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Oven OEE Analysis</CardTitle>
-              <CardDescription>
-                Overall Equipment Effectiveness - All ovens combined utilization tracking
-              </CardDescription>
-            </div>
-            <OeeTimeSelector />
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {oeeParams && (
-            <>
-              <OeeSummaryCards params={oeeParams} />
-              <OeeUtilizationChart params={oeeParams} lang={lang} />
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Information Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>About OEE Calculation</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-medium mb-2">Formula:</h4>
-            <p className="text-sm text-muted-foreground">
-              OEE = Availability × Performance × Quality
-            </p>
+            <CardTitle>Oven OEE Analysis</CardTitle>
+            <CardDescription>
+              Overall Equipment Effectiveness - All ovens combined utilization tracking
+            </CardDescription>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div>
-              <h4 className="font-medium mb-1">Availability</h4>
-              <p className="text-sm text-muted-foreground">
-                Actual running time / Total available time
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Measured from process start/end times
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium mb-1">Performance</h4>
-              <p className="text-sm text-muted-foreground">
-                100% (assumed optimal)
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Assumes ovens run at ideal speed
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium mb-1">Quality</h4>
-              <p className="text-sm text-muted-foreground">
-                100% (assumed perfect)
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Quality tracking handled separately
-              </p>
-            </div>
-          </div>
-          <div className="border-t pt-4">
-            <p className="text-sm text-muted-foreground">
-              <strong>Result:</strong> The OEE percentage shown represents the{' '}
-              <strong>Availability</strong> metric - how much of the total oven
-              capacity (across all configured ovens) was actively used during the
-              selected time period.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          <OeeHeaderButtons lang={lang} />
+        </div>
+        <OeeFilteringAndOptions />
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {oeeParams && (
+          <>
+            <OeeSummaryCards params={oeeParams} />
+            <OeeUtilizationChart params={oeeParams} lang={lang} />
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

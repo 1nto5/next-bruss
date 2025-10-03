@@ -100,11 +100,11 @@ export default async function OvenDataPage(props: {
               Last sync: {fetchTimeLocaleString}
             </CardDescription>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Link href={`/${lang}/oven-data/oee`}>
-              <Button variant="outline" size="sm">
-                <BarChart3 className="mr-2 h-4 w-4" />
-                View OEE
+              <Button variant="outline" className="w-full sm:w-auto">
+                <BarChart3 />
+                <span>View OEE</span>
               </Button>
             </Link>
             <RefreshButton

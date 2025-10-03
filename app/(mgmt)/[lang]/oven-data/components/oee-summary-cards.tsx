@@ -50,6 +50,27 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
     );
   }
 
+  // Check if there's no data for the selected period
+  // Consider "no data" when either: no data points exist OR all running minutes are zero
+  const hasNoData =
+    !data.dataPoints ||
+    data.dataPoints.length === 0 ||
+    data.summary.totalRunningHours === 0;
+
+  if (hasNoData) {
+    return (
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="md:col-span-3">
+          <CardContent className="flex h-24 items-center justify-center">
+            <p className="text-muted-foreground">
+              No oven processes found for the selected period.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const { summary } = data;
 
   return (

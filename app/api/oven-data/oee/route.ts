@@ -212,26 +212,69 @@ export async function GET(request: NextRequest) {
         .toArray();
 
       // Calculate total running minutes for this bucket across all ovens
+      // Group processes by oven to avoid double-counting overlapping processes on same oven
+      const ovenProcesses = new Map<string, typeof processes>();
+
+      for (const process of processes) {
+        if (!ovenProcesses.has(process.oven)) {
+          ovenProcesses.set(process.oven, []);
+        }
+        ovenProcesses.get(process.oven)!.push(process);
+      }
+
       let totalRunningMinutes = 0;
       const activeOvens = new Set<string>();
 
-      for (const process of processes) {
-        const processStart = new Date(process.startTime);
-        const processEnd = process.endTime
-          ? new Date(process.endTime)
-          : new Date(); // For running processes, use current time
+      // Calculate running time per oven
+      for (const [oven, ovenProcs] of ovenProcesses) {
+        // Create time intervals for this oven's processes
+        const intervals: Array<{ start: Date; end: Date }> = [];
 
-        // Calculate the overlap between process time and bucket time
-        const overlapStart =
-          processStart > bucketStart ? processStart : bucketStart;
-        const overlapEnd = processEnd < bucketEnd ? processEnd : bucketEnd;
+        for (const process of ovenProcs) {
+          const processStart = new Date(process.startTime);
+          const processEnd = process.endTime
+            ? new Date(process.endTime)
+            : new Date(); // For running processes, use current time
 
-        // Calculate overlap duration in minutes
-        const overlapMs = overlapEnd.getTime() - overlapStart.getTime();
-        const overlapMinutes = Math.max(0, overlapMs / 60000);
+          // Calculate the overlap between process time and bucket time
+          const overlapStart =
+            processStart > bucketStart ? processStart : bucketStart;
+          const overlapEnd = processEnd < bucketEnd ? processEnd : bucketEnd;
 
-        totalRunningMinutes += overlapMinutes;
-        activeOvens.add(process.oven);
+          if (overlapEnd > overlapStart) {
+            intervals.push({ start: overlapStart, end: overlapEnd });
+          }
+        }
+
+        // Merge overlapping intervals for this oven
+        if (intervals.length > 0) {
+          intervals.sort((a, b) => a.start.getTime() - b.start.getTime());
+
+          const merged: Array<{ start: Date; end: Date }> = [intervals[0]];
+
+          for (let i = 1; i < intervals.length; i++) {
+            const current = intervals[i];
+            const lastMerged = merged[merged.length - 1];
+
+            if (current.start <= lastMerged.end) {
+              // Overlapping intervals - merge them
+              lastMerged.end = new Date(
+                Math.max(lastMerged.end.getTime(), current.end.getTime())
+              );
+            } else {
+              // Non-overlapping - add as new interval
+              merged.push(current);
+            }
+          }
+
+          // Sum up the merged intervals
+          for (const interval of merged) {
+            const durationMs = interval.end.getTime() - interval.start.getTime();
+            totalRunningMinutes += durationMs / 60000;
+          }
+
+          activeOvens.add(oven);
+        }
       }
 
       // Calculate capacity and utilization based on actual configured oven count

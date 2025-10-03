@@ -92,8 +92,13 @@ export default function OeeUtilizationChart({
     );
   }
 
-  // Show empty state
-  if (!data.dataPoints || data.dataPoints.length === 0) {
+  // Show empty state when there are no data points OR all running hours are zero
+  const hasNoData =
+    !data.dataPoints ||
+    data.dataPoints.length === 0 ||
+    data.summary.totalRunningHours === 0;
+
+  if (hasNoData) {
     return (
       <Card>
         <CardHeader>
@@ -102,7 +107,7 @@ export default function OeeUtilizationChart({
         </CardHeader>
         <CardContent>
           <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-            No oven processes found in this time period
+            No oven processes found.
           </div>
         </CardContent>
       </Card>
@@ -116,14 +121,14 @@ export default function OeeUtilizationChart({
     switch (params.mode) {
       case 'day':
         // Hourly view: Show time only
-        return date.toLocaleTimeString(lang, {
+        return date.toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
         });
       case 'week':
       case 'month':
         // Daily view: Show date
-        return date.toLocaleDateString(lang, {
+        return date.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
         });
@@ -134,15 +139,31 @@ export default function OeeUtilizationChart({
           (new Date(params.to).getTime() - new Date(params.from).getTime()) /
           (1000 * 60 * 60 * 24);
         if (daysDiff <= 2) {
-          return date.toLocaleTimeString(lang, {
+          return date.toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit',
           });
         }
-        return date.toLocaleDateString(lang, {
+        return date.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
         });
+    }
+  };
+
+  // Helper function to get color based on utilization percentage
+  const getUtilizationColor = (utilization: number): string => {
+    // Green for low utilization (0-50%), yellow-orange for medium (50-85%), red for high (85-100%)
+    if (utilization <= 50) {
+      // Bruss green for low utilization
+      return 'hsl(142, 76%, 36%)'; // Green
+    } else if (utilization <= 85) {
+      // Interpolate between green and orange for medium utilization
+      const ratio = (utilization - 50) / 35; // 0 to 1 from 50% to 85%
+      return `hsl(${142 - ratio * 87}, 76%, 36%)`; // Transitions from green to orange
+    } else {
+      // Red for high utilization (above target)
+      return 'hsl(0, 84%, 60%)'; // Red
     }
   };
 
@@ -154,17 +175,18 @@ export default function OeeUtilizationChart({
     activeOvens: dp.activeOvenCount,
     runningHours: Math.round(dp.runningMinutes / 60),
     availableHours: Math.round(dp.availableMinutes / 60),
+    color: getUtilizationColor(dp.utilizationPercent),
   }));
 
   // Determine title based on mode
   const getTitle = () => {
     switch (params.mode) {
       case 'day':
-        return `Utilization Trend - ${new Date(params.date).toLocaleDateString(lang)}`;
+        return `Utilization Trend - ${new Date(params.date).toLocaleDateString('en-US')}`;
       case 'week':
         return `Utilization Trend - Week ${params.week}, ${params.year}`;
       case 'month':
-        return `Utilization Trend - ${new Date(params.year, params.month - 1).toLocaleDateString(lang, { month: 'long', year: 'numeric' })}`;
+        return `Utilization Trend - ${new Date(params.year, params.month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
       case 'range':
         return 'Utilization Trend';
     }
@@ -203,12 +225,11 @@ export default function OeeUtilizationChart({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => `Time: ${value}`}
+                  labelFormatter={(value) => value}
                   formatter={(value, name, props) => {
                     if (name === 'utilization') {
                       return [
                         <div key="utilization" className="space-y-1">
-                          <div>{`${value}%`}</div>
                           <div className="text-xs text-muted-foreground">
                             {props.payload.runningHours}h /{' '}
                             {props.payload.availableHours}h available
@@ -217,7 +238,7 @@ export default function OeeUtilizationChart({
                             {props.payload.activeOvens} ovens active
                           </div>
                         </div>,
-                        'Utilization',
+                        `${value}%`,
                       ];
                     }
                     if (name === 'target') {
@@ -228,7 +249,6 @@ export default function OeeUtilizationChart({
                 />
               }
             />
-            <ChartLegend />
 
             {/* Target reference line at 85% */}
             <ReferenceLine
@@ -236,15 +256,9 @@ export default function OeeUtilizationChart({
               stroke={chartConfig.target.color}
               strokeDasharray="5 5"
               strokeWidth={2}
-              label={{
-                value: 'Target',
-                position: 'right',
-                fill: chartConfig.target.color,
-                fontSize: 12,
-              }}
             />
 
-            {/* Utilization area chart */}
+            {/* Utilization area chart with dynamic colors */}
             <Area
               type="monotone"
               dataKey="utilization"
@@ -252,18 +266,33 @@ export default function OeeUtilizationChart({
               fill={chartConfig.utilization.color}
               fillOpacity={0.3}
               strokeWidth={2}
-              name="Utilization"
-            />
-
-            {/* Utilization line for clarity */}
-            <Line
-              type="monotone"
-              dataKey="utilization"
-              stroke={chartConfig.utilization.color}
-              strokeWidth={2}
-              dot={{ r: 3 }}
-              activeDot={{ r: 5 }}
-              name="Utilization"
+              dot={(props: any) => {
+                const { cx, cy, payload, index } = props;
+                return (
+                  <circle
+                    key={`dot-${index}`}
+                    cx={cx}
+                    cy={cy}
+                    r={3}
+                    fill={payload.color}
+                    stroke={payload.color}
+                  />
+                );
+              }}
+              activeDot={(props: any) => {
+                const { cx, cy, payload, index } = props;
+                return (
+                  <circle
+                    key={`active-dot-${index}`}
+                    cx={cx}
+                    cy={cy}
+                    r={5}
+                    fill={payload.color}
+                    stroke={payload.color}
+                  />
+                );
+              }}
+              name="utilization"
             />
           </ComposedChart>
         </ChartContainer>
