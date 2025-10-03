@@ -88,3 +88,23 @@ export type OvenConfigType = {
   tempTolerance: number;
   duration: number; // Duration in seconds
 };
+
+// OEE (Overall Equipment Effectiveness) Types
+export type OeeDataPoint = {
+  timestamp: string;
+  runningMinutes: number;
+  availableMinutes: number;
+  utilizationPercent: number;
+  activeOvenCount: number;
+};
+
+export type OeeSummary = {
+  overallUtilization: number;
+  totalRunningHours: number;
+  totalAvailableHours: number;
+};
+
+export type OeeResponse = {
+  dataPoints: OeeDataPoint[];
+  summary: OeeSummary;
+};
