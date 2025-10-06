@@ -1,9 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import OeeFilteringAndOptions from '../components/oee-filtering-and-options';
+import OeeHeaderButtons from '../components/oee-header-buttons';
 import OeeSummaryCards from '../components/oee-summary-cards';
 import OeeUtilizationChart from '../components/oee-utilization-chart';
-import OeeHeaderButtons from '../components/oee-header-buttons';
 
 export default async function OvenOeePage({
   params,
@@ -32,7 +38,10 @@ export default async function OvenOeePage({
         oeeParams = { mode: 'day', date: sp.date };
       } else {
         // Default to today
-        oeeParams = { mode: 'day', date: new Date().toISOString().split('T')[0] };
+        oeeParams = {
+          mode: 'day',
+          date: new Date().toISOString().split('T')[0],
+        };
       }
       break;
 
@@ -62,18 +71,18 @@ export default async function OvenOeePage({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className='flex items-center justify-between'>
           <div>
-            <CardTitle>Oven OEE Analysis</CardTitle>
+            <CardTitle>Oven OEE</CardTitle>
             <CardDescription>
-              Overall Equipment Effectiveness - All ovens combined utilization tracking
+              All ovens combined utilization tracking
             </CardDescription>
           </div>
           <OeeHeaderButtons lang={lang} />
         </div>
         <OeeFilteringAndOptions />
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className='space-y-6'>
         {oeeParams && (
           <>
             <OeeSummaryCards params={oeeParams} />

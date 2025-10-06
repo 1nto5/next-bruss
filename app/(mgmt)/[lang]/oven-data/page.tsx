@@ -9,12 +9,12 @@ import {
 import { Locale } from '@/i18n.config';
 
 import { RefreshButton } from '@/components/refresh-button';
-import { revalidateOvenTableData } from './actions';
-import OvenDataWithChart from './components/oven-data-with-chart';
-import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
 import { Button } from '@/components/ui/button';
 import { BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { revalidateOvenTableData } from './actions';
+import OvenDataWithChart from './components/oven-data-with-chart';
+import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
 
 async function getOvens() {
   const res = await fetch(`${process.env.API}oven-data/ovens`, {
@@ -100,11 +100,11 @@ export default async function OvenDataPage(props: {
               Last sync: {fetchTimeLocaleString}
             </CardDescription>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className='flex flex-col gap-2 sm:flex-row'>
             <Link href={`/${lang}/oven-data/oee`}>
-              <Button variant="outline" className="w-full sm:w-auto">
+              <Button variant='outline' className='w-full sm:w-auto'>
                 <BarChart3 />
-                <span>View OEE</span>
+                <span>OEE</span>
               </Button>
             </Link>
             <RefreshButton

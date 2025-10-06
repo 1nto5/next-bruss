@@ -165,24 +165,26 @@ export default function OeeFilteringAndOptions() {
 
           {/* Day Mode */}
           {mode === 'day' && (
-            <div className="flex flex-col space-y-1">
-              <Label>Select Date</Label>
-              <DateTimePicker
-                value={dayDate}
-                onChange={(date) => setDayDate(date || new Date())}
-                max={new Date()}
-                hideTime={true}
-                renderTrigger={({ value, setOpen, open }) => (
-                  <DateTimeInput
-                    value={value}
-                    onChange={(x) => !open && setDayDate(x || new Date())}
-                    format="dd/MM/yyyy"
-                    disabled={open}
-                    onCalendarClick={() => setOpen(!open)}
-                    className="w-full"
-                  />
-                )}
-              />
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex flex-col space-y-1">
+                <Label>Select Date</Label>
+                <DateTimePicker
+                  value={dayDate}
+                  onChange={(date) => setDayDate(date || new Date())}
+                  max={new Date()}
+                  hideTime={true}
+                  renderTrigger={({ value, setOpen, open }) => (
+                    <DateTimeInput
+                      value={value}
+                      onChange={(x) => !open && setDayDate(x || new Date())}
+                      format="dd/MM/yyyy"
+                      disabled={open}
+                      onCalendarClick={() => setOpen(!open)}
+                      className="w-full"
+                    />
+                  )}
+                />
+              </div>
             </div>
           )}
 
