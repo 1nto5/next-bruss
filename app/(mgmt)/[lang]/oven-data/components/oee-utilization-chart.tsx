@@ -209,8 +209,8 @@ export default function OeeUtilizationChart({
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis
               dataKey="timestamp"
-              interval="preserveStartEnd"
               tick={{ fontSize: 12 }}
+              interval={Math.ceil(chartData.length / 10)} // Show ~10 evenly distributed labels
             />
             <YAxis
               domain={[0, 100]}
