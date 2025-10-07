@@ -88,3 +88,34 @@ export type OvenConfigType = {
   tempTolerance: number;
   duration: number; // Duration in seconds
 };
+
+// OEE (Overall Equipment Effectiveness) Types
+export type OeeParams =
+  | { mode: 'day'; date: string }
+  | { mode: 'week'; year: number; week: number }
+  | { mode: 'month'; year: number; month: number }
+  | {
+      mode: 'range';
+      from: string;
+      to: string;
+      granularity?: 'hour' | 'day';
+    };
+
+export type OeeDataPoint = {
+  timestamp: string;
+  runningMinutes: number;
+  availableMinutes: number;
+  utilizationPercent: number;
+  activeOvenCount: number;
+};
+
+export type OeeSummary = {
+  overallUtilization: number;
+  totalRunningHours: number;
+  totalAvailableHours: number;
+};
+
+export type OeeResponse = {
+  dataPoints: OeeDataPoint[];
+  summary: OeeSummary;
+};
