@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server';
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
+import { NextResponse, type NextRequest } from 'next/server';
 
 async function getBoxStatus(articleConfigId: string) {
   const articlesConfigCollection = await dbc('articles_config');

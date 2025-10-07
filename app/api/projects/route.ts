@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

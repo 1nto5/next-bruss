@@ -1,6 +1,6 @@
-import { dbc } from '@/lib/mongo';
+import type { OeeResponse } from '@/app/[lang]/oven-data/lib/types';
+import { dbc } from '@/lib/db/mongo';
 import { NextRequest, NextResponse } from 'next/server';
-import type { OeeResponse } from '@/app/(mgmt)/[lang]/oven-data/lib/types';
 
 /**
  * Get the total number of configured ovens from the database
@@ -259,7 +259,7 @@ export async function GET(request: NextRequest) {
             if (current.start <= lastMerged.end) {
               // Overlapping intervals - merge them
               lastMerged.end = new Date(
-                Math.max(lastMerged.end.getTime(), current.end.getTime())
+                Math.max(lastMerged.end.getTime(), current.end.getTime()),
               );
             } else {
               // Non-overlapping - add as new interval
@@ -269,7 +269,8 @@ export async function GET(request: NextRequest) {
 
           // Sum up the merged intervals
           for (const interval of merged) {
-            const durationMs = interval.end.getTime() - interval.start.getTime();
+            const durationMs =
+              interval.end.getTime() - interval.start.getTime();
             totalRunningMinutes += durationMs / 60000;
           }
 

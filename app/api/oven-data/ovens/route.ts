@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { NextResponse } from 'next/server';
 
 export async function GET() {

@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
-      
+
       if (values.length === 1) {
         filter.oven = values[0];
       } else if (values.length > 1) {
@@ -89,8 +89,10 @@ export async function GET(request: NextRequest) {
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0)
-        .filter((v) => ['prepared', 'running', 'finished', 'deleted'].includes(v));
-      
+        .filter((v) =>
+          ['prepared', 'running', 'finished', 'deleted'].includes(v),
+        );
+
       if (values.length === 1) {
         filter.status = values[0];
       } else if (values.length > 1) {

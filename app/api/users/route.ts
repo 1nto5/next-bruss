@@ -1,7 +1,6 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
-import { ObjectId } from 'mongodb';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
 // https://nextjs.org/docs/app/building-your-application/caching#on-demand-revalidation

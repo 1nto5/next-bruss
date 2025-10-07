@@ -3,9 +3,9 @@ import {
   DeviationReasonType,
   DeviationType,
   PrintLogType,
-} from '@/app/(mgmt)/[lang]/deviations/lib/types';
-import { auth } from '@/auth';
-import { dbc } from '@/lib/mongo';
+} from '@/app/[lang]/deviations/lib/types';
+import { auth } from '@/lib/auth';
+import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import fs from 'fs';
 import { jsPDF } from 'jspdf';

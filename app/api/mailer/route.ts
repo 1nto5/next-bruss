@@ -1,4 +1,4 @@
-import mailer from '@/lib/mailer';
+import mailer from '@/lib/services/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

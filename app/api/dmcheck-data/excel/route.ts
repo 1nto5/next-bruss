@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { Workbook } from 'exceljs';
 import moment from 'moment';
 import { NextRequest, NextResponse } from 'next/server';
@@ -61,15 +61,15 @@ export async function GET(req: NextRequest) {
 
       if (key === 'status' && values.includes('rework')) {
         // Handle rework special case - match all rework attempts
-        const otherStatuses = values.filter(v => v !== 'rework');
+        const otherStatuses = values.filter((v) => v !== 'rework');
         const statusConditions = [];
-        
+
         if (otherStatuses.length > 0) {
           statusConditions.push({ status: { $in: otherStatuses } });
         }
-        
+
         statusConditions.push({ status: { $regex: /^rework\d*$/ } });
-        
+
         if (statusConditions.length === 1) {
           Object.assign(query, statusConditions[0]);
         } else {

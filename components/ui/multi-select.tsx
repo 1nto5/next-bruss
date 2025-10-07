@@ -14,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils/cn';
 import { Check, ChevronsUpDown, CircleX } from 'lucide-react';
 import { useState } from 'react';
 

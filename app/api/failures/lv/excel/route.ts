@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { Workbook } from 'exceljs';
 import moment from 'moment-timezone';
 import { NextRequest, NextResponse } from 'next/server';

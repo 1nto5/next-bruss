@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils/cn';
 import { format, getYear, isValid, parse } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import {

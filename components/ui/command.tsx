@@ -7,7 +7,7 @@ import * as React from 'react';
 
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils/cn';
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,

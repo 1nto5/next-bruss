@@ -70,7 +70,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/cn';
+import { cn } from '@/lib/utils/cn';
 
 // Locale mapping for date-fns
 const localeMap = {

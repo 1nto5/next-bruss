@@ -1,5 +1,5 @@
-import { auth } from '@/auth';
-import { dbc } from '@/lib/mongo';
+import { auth } from '@/lib/auth';
+import { dbc } from '@/lib/db/mongo';
 import fs from 'fs';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
