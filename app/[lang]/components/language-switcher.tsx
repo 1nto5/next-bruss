@@ -37,13 +37,10 @@ export default function LanguageSwitcher({
     router.push(url);
   };
 
-  const languages: { code: Locale; name: string }[] = [
+  const languages: { code: 'pl' | 'de' | 'en'; name: string }[] = [
     { code: 'pl', name: 'Polski' },
     { code: 'de', name: 'Deutsch' },
     { code: 'en', name: 'English' },
-    { code: 'tl', name: 'Tagalog' },
-    { code: 'uk', name: 'Українська' },
-    { code: 'be', name: 'Беларуская' },
   ];
 
   return (
