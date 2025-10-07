@@ -242,9 +242,42 @@
   font-weight: 600;
 }
 
+.prose a {
+  color: oklch(0.72 0.13 124.79);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s ease-in-out;
+}
+
+.prose a:hover {
+  color: oklch(0.62 0.13 124.79);
+}
+
+.prose code {
+  background-color: oklch(0.95 0 0);
+  color: oklch(0.2 0 0);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
 /* Dark mode adjustments */
 .dark .prose {
   color: var(--foreground);
+}
+
+.dark .prose a {
+  color: oklch(0.72 0.13 124.79);
+}
+
+.dark .prose a:hover {
+  color: oklch(0.82 0.13 124.79);
+}
+
+.dark .prose code {
+  background-color: oklch(0.27 0 0);
+  color: oklch(0.99 0 0);
 }
 
 .dark .prose h1,
