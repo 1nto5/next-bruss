@@ -30,13 +30,13 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
     try {
       const result = await deleteNews(news._id);
       if (result.success) {
-        toast.success(dict.news.messages[result.success] || result.success);
+        toast.success(dict.messages[result.success] || result.success);
       } else if (result.error) {
-        toast.error(result.error === 'unauthorized' ? dict.news.messages.unauthorized : dict.news.messages[result.error] || result.error);
+        toast.error(result.error === 'unauthorized' ? dict.messages.unauthorized : dict.messages[result.error] || result.error);
       }
     } catch (error) {
       console.error('handleDelete error:', error);
-      toast.error(dict.news.messages.deleteErrorGeneric);
+      toast.error(dict.messages.deleteErrorGeneric);
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
@@ -48,13 +48,13 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
     try {
       const result = await togglePin(news._id, !news.isPinned);
       if (result.success) {
-        toast.success(dict.news.messages[result.success] || result.success);
+        toast.success(dict.messages[result.success] || result.success);
       } else if (result.error) {
-        toast.error(result.error === 'unauthorized' ? dict.news.messages.unauthorized : dict.news.messages[result.error] || result.error);
+        toast.error(result.error === 'unauthorized' ? dict.messages.unauthorized : dict.messages[result.error] || result.error);
       }
     } catch (error) {
       console.error('handleTogglePin error:', error);
-      toast.error(dict.news.messages.pinErrorGeneric);
+      toast.error(dict.messages.pinErrorGeneric);
     } finally {
       setIsToggling(false);
     }
@@ -82,8 +82,8 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 <DropdownMenuItem asChild>
-                  <Link href={`/${lang}/news/${news._id}/edit`}>
-                    <Edit className='mr-2 h-4 w-4' /> {dict.news.actions.edit}
+                  <Link href={`${news._id}/edit`}>
+                    <Edit className='mr-2 h-4 w-4' /> {dict.actions.edit}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
@@ -92,11 +92,11 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
                 >
                   {news.isPinned ? (
                     <>
-                      <PinOff className='mr-2 h-4 w-4' /> {dict.news.actions.unpin}
+                      <PinOff className='mr-2 h-4 w-4' /> {dict.actions.unpin}
                     </>
                   ) : (
                     <>
-                      <Pin className='mr-2 h-4 w-4' /> {dict.news.actions.pin}
+                      <Pin className='mr-2 h-4 w-4' /> {dict.actions.pin}
                     </>
                   )}
                 </DropdownMenuItem>
@@ -106,7 +106,7 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
                   className='text-destructive'
                   disabled={isDeleting}
                 >
-                  <Trash className='mr-2 h-4 w-4' /> {dict.news.actions.delete}
+                  <Trash className='mr-2 h-4 w-4' /> {dict.actions.delete}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -122,19 +122,19 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{dict.news.actions.confirmDeleteTitle}</AlertDialogTitle>
+            <AlertDialogTitle>{dict.actions.confirmDeleteTitle}</AlertDialogTitle>
             <AlertDialogDescription>
-              {dict.news.actions.confirmDelete}
+              {dict.actions.confirmDelete}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{dict.news.actions.cancel}</AlertDialogCancel>
+            <AlertDialogCancel>{dict.actions.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? dict.news.actions.deleting : dict.news.actions.delete}
+              {isDeleting ? dict.actions.deleting : dict.actions.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

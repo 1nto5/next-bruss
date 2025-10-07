@@ -1,1 +1,13 @@
-{}
+{
+  "title": "Ofendaten",
+  "lastSync": "Letzte Synchronisierung",
+  "oee": "OEE",
+  "oeeTitle": "Ofen OEE",
+  "oeeDescription": "Verfolgung der Auslastung aller Öfen kombiniert",
+  "temperatureTrend": "Temperaturtrend",
+  "utilizationTrend": "Auslastungstrend",
+  "failedToLoadChart": "Diagrammdaten konnten nicht geladen werden",
+  "noDataAvailable": "Keine Daten für den ausgewählten Zeitraum verfügbar",
+  "errorLoadingData": "Fehler beim Laden der Daten",
+  "filters": "Filter"
+}

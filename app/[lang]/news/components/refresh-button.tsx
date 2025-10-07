@@ -18,18 +18,18 @@ export function RefreshButton({ dict }: RefreshButtonProps) {
     try {
       const result = await refreshNews();
       if (result.success) {
-        toast.success(dict.news.messages[result.success] || result.success);
+        toast.success(dict.messages[result.success] || result.success);
       } else if (result.error) {
         toast.error(
           result.error === 'unauthorized'
-            ? dict.news.messages.unauthorized
-            : dict.news.messages[result.error] || result.error,
+            ? dict.messages.unauthorized
+            : dict.messages[result.error] || result.error,
         );
       }
     } catch (error) {
       console.error('Refresh error:', error);
       toast.error(
-        dict.news.messages.refreshError || 'Wystąpił błąd podczas odświeżania',
+        dict.messages.refreshError || 'Wystąpił błąd podczas odświeżania',
       );
     } finally {
       setIsRefreshing(false);
@@ -44,7 +44,7 @@ export function RefreshButton({ dict }: RefreshButtonProps) {
       disabled={isRefreshing}
     >
       <RefreshCw className={`${isRefreshing ? 'animate-spin' : ''}`} />
-      <span>{dict.news.refresh || 'Odśwież'}</span>
+      <span>{dict.refresh || 'Odśwież'}</span>
     </Button>
   );
 }

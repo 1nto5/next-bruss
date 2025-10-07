@@ -1,1 +1,13 @@
-{}
+{
+  "title": "Oven Data",
+  "lastSync": "Last sync",
+  "oee": "OEE",
+  "oeeTitle": "Oven OEE",
+  "oeeDescription": "All ovens combined utilization tracking",
+  "temperatureTrend": "Temperature Trend",
+  "utilizationTrend": "Utilization Trend",
+  "failedToLoadChart": "Failed to load chart data",
+  "noDataAvailable": "No data available for selected period",
+  "errorLoadingData": "Error loading data",
+  "filters": "Filters"
+}

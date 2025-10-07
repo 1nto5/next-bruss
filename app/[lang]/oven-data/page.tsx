@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { revalidateOvenTableData } from './actions';
 import OvenDataWithChart from './components/oven-data-with-chart';
 import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
+import { getDictionary } from './lib/dict';
 
 async function getOvens() {
   const res = await fetch(`${process.env.API}oven-data/ovens`, {
@@ -82,6 +83,7 @@ export default async function OvenDataPage(props: {
   const searchParams = await props.searchParams;
 
   const { lang } = params;
+  const dict = await getDictionary(lang);
 
   let fetchTime, fetchTimeLocaleString, data;
   ({ fetchTime, fetchTimeLocaleString, data } = await getOvenProcesses(
@@ -95,16 +97,16 @@ export default async function OvenDataPage(props: {
       <CardHeader>
         <div className='flex items-center justify-between'>
           <div>
-            <CardTitle>Oven Data</CardTitle>
+            <CardTitle>{dict.title}</CardTitle>
             <CardDescription>
-              Last sync: {fetchTimeLocaleString}
+              {dict.lastSync}: {fetchTimeLocaleString}
             </CardDescription>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row'>
-            <Link href={`/${lang}/oven-data/oee`}>
+            <Link href="oee">
               <Button variant='outline' className='w-full sm:w-auto'>
                 <BarChart3 />
-                <span>OEE</span>
+                <span>{dict.oee}</span>
               </Button>
             </Link>
             <RefreshButton

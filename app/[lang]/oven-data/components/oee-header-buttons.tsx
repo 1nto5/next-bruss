@@ -30,7 +30,7 @@ export default function OeeHeaderButtons({ lang }: OeeHeaderButtonsProps) {
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
-      <Link href={`/${lang}/oven-data`}>
+      <Link href="..">
         <Button variant="outline" className="w-full sm:w-auto">
           <ArrowLeft />
           <span>Back to Oven Data</span>

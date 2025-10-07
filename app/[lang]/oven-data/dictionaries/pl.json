@@ -1,1 +1,13 @@
-{}
+{
+  "title": "Dane z pieców",
+  "lastSync": "Ostatnia synchronizacja",
+  "oee": "OEE",
+  "oeeTitle": "Oven OEE",
+  "oeeDescription": "Śledzenie wykorzystania wszystkich pieców łącznie",
+  "temperatureTrend": "Trend temperatury",
+  "utilizationTrend": "Trend wykorzystania",
+  "failedToLoadChart": "Nie udało się załadować danych wykresu",
+  "noDataAvailable": "Brak danych dla wybranego okresu",
+  "errorLoadingData": "Błąd ładowania danych",
+  "filters": "Filtry"
+}
