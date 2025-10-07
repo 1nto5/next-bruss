@@ -54,20 +54,20 @@ async function getScans(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let data: TableDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
-    timeLocaleString: new Date(item.time).toLocaleString(lang),
+    timeLocaleString: new Date(item.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     hydraTimeLocaleString: item.hydra_time
-      ? new Date(item.hydra_time).toLocaleString(lang)
+      ? new Date(item.hydra_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
     palletTimeLocaleString: item.pallet_time
-      ? new Date(item.pallet_time).toLocaleString(lang)
+      ? new Date(item.pallet_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
     reworkTimeLocaleString: item.rework_time
-      ? new Date(item.rework_time).toLocaleString(lang)
+      ? new Date(item.rework_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };

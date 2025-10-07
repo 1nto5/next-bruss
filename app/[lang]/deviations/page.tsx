@@ -51,7 +51,7 @@ async function getAllDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const deviations: DeviationType[] = await res.json();
   const deviationsFiltered = deviations.filter(
@@ -61,10 +61,10 @@ async function getAllDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
@@ -105,7 +105,7 @@ async function getUserDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
   const deviations: DeviationType[] = await res.json();
 
   const approvalMapping: { [key: string]: keyof DeviationType } = {
@@ -166,10 +166,10 @@ async function getUserDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };

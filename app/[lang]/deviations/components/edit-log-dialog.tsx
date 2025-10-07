@@ -23,7 +23,7 @@ const formatValue = (value: any, lang?: string): string => {
   if (typeof value === 'boolean') return value ? 'Tak' : 'Nie';
 
   // Handle Date objects
-  if (value instanceof Date) return value.toLocaleDateString(lang);
+  if (value instanceof Date) return value.toLocaleDateString(process.env.DATE_TIME_LOCALE);
 
   // Handle date strings - try to detect date format
   if (typeof value === 'string') {
@@ -33,7 +33,7 @@ const formatValue = (value: any, lang?: string): string => {
         const date = new Date(value);
         // Validate that it's a valid date
         if (!isNaN(date.getTime())) {
-          return date.toLocaleDateString(lang);
+          return date.toLocaleDateString(process.env.DATE_TIME_LOCALE);
         }
       } catch {
         // Fall through to default handling
@@ -49,7 +49,7 @@ const formatValue = (value: any, lang?: string): string => {
     typeof value.getMonth === 'function'
   ) {
     try {
-      return value.toLocaleDateString(lang);
+      return value.toLocaleDateString(process.env.DATE_TIME_LOCALE);
     } catch {
       // Fall through to default handling
     }
@@ -121,7 +121,7 @@ export default function EditLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell className='whitespace-nowrap'>
-                      {new Date(log.changedAt).toLocaleString(lang)}
+                      {new Date(log.changedAt).toLocaleString(process.env.DATE_TIME_LOCALE)}
                     </TableCell>
                     <TableCell className='whitespace-nowrap'>
                       {extractNameFromEmail(log.changedBy)}

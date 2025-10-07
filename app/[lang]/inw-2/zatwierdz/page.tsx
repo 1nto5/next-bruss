@@ -29,7 +29,7 @@ async function getCards(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const cardsFetchTime = dateFromResponse.toLocaleString(lang);
+  const cardsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let cards: CardTableDataType[] = await res.json();
 
@@ -64,7 +64,7 @@ async function getPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const positionsFetchTime = dateFromResponse.toLocaleString(lang);
+  const positionsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -78,11 +78,11 @@ async function getPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(lang),
+    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(lang),
+      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
   }));
 
   return {

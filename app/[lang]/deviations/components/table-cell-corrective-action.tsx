@@ -301,12 +301,12 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
         {extractNameFromEmail(correctiveAction.responsible)}
       </TableCell>
       <TableCell>
-        {new Date(correctiveAction.deadline).toLocaleDateString(lang)}
+        {new Date(correctiveAction.deadline).toLocaleDateString(process.env.DATE_TIME_LOCALE)}
       </TableCell>
 
       <TableCell className='whitespace-nowrap'>
         {correctiveAction.status?.changed?.at
-          ? new Date(correctiveAction.status.changed.at).toLocaleString(lang)
+          ? new Date(correctiveAction.status.changed.at).toLocaleString(process.env.DATE_TIME_LOCALE)
           : '-'}
       </TableCell>
 
@@ -341,7 +341,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     <TableCell>
                       {new Date(
                         correctiveAction.status.executedAt,
-                      ).toLocaleDateString(lang)}
+                      ).toLocaleDateString(process.env.DATE_TIME_LOCALE)}
                     </TableCell>
                     <TableCell>{correctiveAction.status.comment}</TableCell>
                     <TableCell>
@@ -350,7 +350,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     <TableCell className='text-right'>
                       {new Date(
                         correctiveAction.status.changed.at,
-                      ).toLocaleString(lang)}
+                      ).toLocaleString(process.env.DATE_TIME_LOCALE)}
                     </TableCell>
                   </TableRow>
                   {correctiveAction.history &&

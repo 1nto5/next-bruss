@@ -30,7 +30,7 @@ async function getCardPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -44,11 +44,11 @@ async function getCardPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(lang),
+    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(lang),
+      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
   }));
 
   return {

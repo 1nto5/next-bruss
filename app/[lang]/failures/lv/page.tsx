@@ -51,21 +51,21 @@ async function getFailures(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const failures: FailureType[] = await res.json();
 
   const formatTime = (failure: FailureType) => {
     return {
       ...failure,
-      fromLocaleString: new Date(failure.from).toLocaleString(lang),
+      fromLocaleString: new Date(failure.from).toLocaleString(process.env.DATE_TIME_LOCALE),
       toLocaleString: failure.to
-        ? new Date(failure.to).toLocaleString(lang)
+        ? new Date(failure.to).toLocaleString(process.env.DATE_TIME_LOCALE)
         : '',
-      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(lang),
+      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE),
 
       updatedAtLocaleString: failure.updatedAt
-        ? new Date(failure.updatedAt).toLocaleString(lang)
+        ? new Date(failure.updatedAt).toLocaleString(process.env.DATE_TIME_LOCALE)
         : '',
     };
   };

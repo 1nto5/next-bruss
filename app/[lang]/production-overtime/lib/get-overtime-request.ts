@@ -25,7 +25,7 @@ export async function getOvertimeRequest(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const overtimeRequest = await res.json();
 
@@ -42,7 +42,7 @@ export async function getOvertimeRequest(
         (employee: overtimeRequestEmployeeType) => ({
           ...employee,
           agreedReceivingAtLocaleString: employee.agreedReceivingAt
-            ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
+            ? new Date(employee.agreedReceivingAt).toLocaleDateString(process.env.DATE_TIME_LOCALE)
             : null,
         }),
       );
@@ -55,7 +55,7 @@ export async function getOvertimeRequest(
       (employee: overtimeRequestEmployeeType) => ({
         ...employee,
         agreedReceivingAtLocaleString: employee.agreedReceivingAt
-          ? new Date(employee.agreedReceivingAt).toLocaleDateString(lang)
+          ? new Date(employee.agreedReceivingAt).toLocaleDateString(process.env.DATE_TIME_LOCALE)
           : null,
       }),
     );

@@ -33,6 +33,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { ThemeModeToggle } from '../../../components/theme-mode-toggle';
+import LanguageSwitcher from './language-switcher';
 
 type HeaderProps = {
   dict: any;
@@ -156,6 +157,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
           )}
 
           <ThemeModeToggle />
+          <LanguageSwitcher currentLang={lang} />
         </div>
       </div>
     </header>

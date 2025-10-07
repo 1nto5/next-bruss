@@ -298,7 +298,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         {(by && extractNameFromEmail(by)) || '-'}
       </TableCell>
       <TableCell className='whitespace-nowrap'>
-        {at ? new Date(at).toLocaleString(lang) : '-'}
+        {at ? new Date(at).toLocaleString(process.env.DATE_TIME_LOCALE) : '-'}
       </TableCell>
       <TableCell className='min-w-[250px]'>{reason ? reason : '-'}</TableCell>
       <TableCell>
@@ -336,7 +336,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                         </TableCell>
                         <TableCell>
                           <span className='whitespace-nowrap'>
-                            {new Date(item.at).toLocaleString(lang)}
+                            {new Date(item.at).toLocaleString(process.env.DATE_TIME_LOCALE)}
                           </span>
                         </TableCell>
                         <TableCell>

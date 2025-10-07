@@ -55,7 +55,7 @@ export default function PrintLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {new Date(log.printedAt).toLocaleString(lang)}
+                      {new Date(log.printedAt).toLocaleString(process.env.DATE_TIME_LOCALE)}
                     </TableCell>
                     <TableCell>{extractNameFromEmail(log.printedBy)}</TableCell>
                   </TableRow>

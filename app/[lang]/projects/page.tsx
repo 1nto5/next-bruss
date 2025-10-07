@@ -39,14 +39,14 @@ async function getProjects(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const data: ProjectsType[] = await res.json();
   const dataLocaleString = data.map((data) => {
     return {
       ...data,
       dateLocaleString: data.date
-        ? new Date(data.date).toLocaleDateString(lang)
+        ? new Date(data.date).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
   });

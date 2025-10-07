@@ -59,16 +59,16 @@ async function getOvenProcesses(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let data: OvenProcessDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
     startTime: new Date(item.startTime),
     endTime: item.endTime ? new Date(item.endTime) : null,
-    startTimeLocaleString: new Date(item.startTime).toLocaleString(lang),
+    startTimeLocaleString: new Date(item.startTime).toLocaleString(process.env.DATE_TIME_LOCALE),
     endTimeLocaleString: item.endTime
-      ? new Date(item.endTime).toLocaleString(lang)
+      ? new Date(item.endTime).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };
