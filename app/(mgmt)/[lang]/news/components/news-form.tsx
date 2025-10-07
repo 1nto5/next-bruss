@@ -9,13 +9,14 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { createNews, updateNews, redirectToHome } from '../actions';
 import { NewsType } from '../lib/types';
 import { Plus, Loader2 } from 'lucide-react';
+import { MarkdownToolbar } from './markdown-toolbar';
 
 interface NewsFormProps {
   news?: NewsType;
@@ -25,7 +26,8 @@ interface NewsFormProps {
 
 export default function NewsForm({ news, lang, dict }: NewsFormProps) {
   const [isPending, setIsPending] = useState(false);
-  
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   const newsSchema = createNewsSchema(dict.news.validation);
   
   const form = useForm<z.infer<typeof newsSchema>>({
@@ -92,19 +94,30 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
             <FormField
               control={form.control}
               name='content'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{dict.news.form.contentLabel}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={dict.news.form.contentPlaceholder}
-                      className="min-h-[300px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const { ref: fieldRef, ...fieldProps } = field;
+                return (
+                  <FormItem>
+                    <FormLabel>{dict.news.form.contentLabel}</FormLabel>
+                    <MarkdownToolbar textareaRef={textareaRef} />
+                    <FormControl>
+                      <Textarea
+                        placeholder={dict.news.form.contentPlaceholder}
+                        className="min-h-[300px]"
+                        ref={(e) => {
+                          fieldRef(e);
+                          textareaRef.current = e;
+                        }}
+                        {...fieldProps}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-muted-foreground">
+                      Markdown formatting supported
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
             
             <FormField
