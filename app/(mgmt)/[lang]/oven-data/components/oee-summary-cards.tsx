@@ -4,17 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Clock, CalendarClock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOeeData } from '../hooks/use-oee-data';
-
-type OeeParams =
-  | { mode: 'day'; date: string }
-  | { mode: 'week'; year: number; week: number }
-  | { mode: 'month'; year: number; month: number }
-  | {
-      mode: 'range';
-      from: string;
-      to: string;
-      granularity?: 'hour' | 'day';
-    };
+import { OeeParams } from '../lib/types';
 
 interface OeeSummaryCardsProps {
   params: OeeParams;

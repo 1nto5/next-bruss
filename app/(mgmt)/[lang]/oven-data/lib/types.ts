@@ -90,6 +90,17 @@ export type OvenConfigType = {
 };
 
 // OEE (Overall Equipment Effectiveness) Types
+export type OeeParams =
+  | { mode: 'day'; date: string }
+  | { mode: 'week'; year: number; week: number }
+  | { mode: 'month'; year: number; month: number }
+  | {
+      mode: 'range';
+      from: string;
+      to: string;
+      granularity?: 'hour' | 'day';
+    };
+
 export type OeeDataPoint = {
   timestamp: string;
   runningMinutes: number;

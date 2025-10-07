@@ -26,17 +26,7 @@ import {
 } from 'recharts';
 import { useOeeData } from '../hooks/use-oee-data';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type OeeParams =
-  | { mode: 'day'; date: string }
-  | { mode: 'week'; year: number; week: number }
-  | { mode: 'month'; year: number; month: number }
-  | {
-      mode: 'range';
-      from: string;
-      to: string;
-      granularity?: 'hour' | 'day';
-    };
+import { OeeParams } from '../lib/types';
 
 interface OeeUtilizationChartProps {
   params: OeeParams;
@@ -53,6 +43,22 @@ const chartConfig = {
     color: 'hsl(var(--muted-foreground))',
   },
 } satisfies ChartConfig;
+
+// Helper function to get color based on utilization percentage
+function getUtilizationColor(utilization: number): string {
+  // Green for low utilization (0-50%), yellow-orange for medium (50-85%), red for high (85-100%)
+  if (utilization <= 50) {
+    // Bruss green for low utilization
+    return 'hsl(142, 76%, 36%)'; // Green
+  } else if (utilization <= 85) {
+    // Interpolate between green and orange for medium utilization
+    const ratio = (utilization - 50) / 35; // 0 to 1 from 50% to 85%
+    return `hsl(${142 - ratio * 87}, 76%, 36%)`; // Transitions from green to orange
+  } else {
+    // Red for high utilization (above target)
+    return 'hsl(0, 84%, 60%)'; // Red
+  }
+}
 
 export default function OeeUtilizationChart({
   params,
@@ -148,22 +154,6 @@ export default function OeeUtilizationChart({
           month: 'short',
           day: 'numeric',
         });
-    }
-  };
-
-  // Helper function to get color based on utilization percentage
-  const getUtilizationColor = (utilization: number): string => {
-    // Green for low utilization (0-50%), yellow-orange for medium (50-85%), red for high (85-100%)
-    if (utilization <= 50) {
-      // Bruss green for low utilization
-      return 'hsl(142, 76%, 36%)'; // Green
-    } else if (utilization <= 85) {
-      // Interpolate between green and orange for medium utilization
-      const ratio = (utilization - 50) / 35; // 0 to 1 from 50% to 85%
-      return `hsl(${142 - ratio * 87}, 76%, 36%)`; // Transitions from green to orange
-    } else {
-      // Red for high utilization (above target)
-      return 'hsl(0, 84%, 60%)'; // Red
     }
   };
 

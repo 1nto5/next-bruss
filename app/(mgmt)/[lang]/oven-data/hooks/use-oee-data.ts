@@ -1,16 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { OeeResponse } from '../lib/types';
-
-type OeeParams =
-  | { mode: 'day'; date: string }
-  | { mode: 'week'; year: number; week: number }
-  | { mode: 'month'; year: number; month: number }
-  | {
-      mode: 'range';
-      from: string;
-      to: string;
-      granularity?: 'hour' | 'day';
-    };
+import { OeeParams, OeeResponse } from '../lib/types';
 
 async function fetchOeeData(params: OeeParams): Promise<OeeResponse> {
   const searchParams = new URLSearchParams();
