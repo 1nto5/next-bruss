@@ -35,6 +35,7 @@ import { ArrowRight } from 'lucide-react';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 import { useEffect } from 'react';
+import { Dictionary } from '../../../lib/dict';
 import { FailureOptionType } from '../../lib/failures-types';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
@@ -44,6 +45,7 @@ interface DataTableProps<TData, TValue> {
   fetchTimeLocaleString: string;
   fetchTime: Date;
   failuresOptions: FailureOptionType[];
+  dict: Dictionary;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,6 +54,7 @@ export function DataTable<TData, TValue>({
   fetchTimeLocaleString,
   fetchTime,
   failuresOptions,
+  dict,
   // lang,
   // session,
 }: DataTableProps<TData, TValue>) {
@@ -88,7 +91,7 @@ export function DataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Awarie LV</CardTitle>
+        <CardTitle>{dict.title}</CardTitle>
         <CardDescription>
           Ostatnia synchronizacja: {fetchTimeLocaleString}
         </CardDescription>
@@ -96,6 +99,7 @@ export function DataTable<TData, TValue>({
           isPendingSearch={isPendingSearch}
           setIsPendingSearch={setIsPendingSearch}
           failuresOptions={failuresOptions}
+          dict={dict}
         />
       </CardHeader>
       <CardContent>
@@ -142,7 +146,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    Brak wyników.
+                    {dict.filters.notFound}
                   </TableCell>
                 </TableRow>
               )}

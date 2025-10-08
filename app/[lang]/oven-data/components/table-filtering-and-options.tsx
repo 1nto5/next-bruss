@@ -12,13 +12,16 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateOvenTableData as revalidate } from '../actions';
 import PasteValuesDialog from './paste-values-dialog';
+import type { Dictionary } from '../lib/dict';
 
 export default function OvenTableFilteringAndOptions({
   ovens,
   fetchTime,
+  dict,
 }: {
   ovens: string[];
   fetchTime: Date;
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -121,10 +124,10 @@ export default function OvenTableFilteringAndOptions({
   };
 
   const statusOptions = [
-    { value: 'prepared', label: 'Prepared' },
-    { value: 'running', label: 'Running' },
-    { value: 'finished', label: 'Finished' },
-    { value: 'deleted', label: 'Deleted' },
+    { value: 'prepared', label: dict.processStatus.prepared },
+    { value: 'running', label: dict.processStatus.running },
+    { value: 'finished', label: dict.processStatus.completed },
+    { value: 'deleted', label: dict.processStatus.failed },
   ];
 
   const ovenOptions = ovens.map((oven) => ({
@@ -139,7 +142,7 @@ export default function OvenTableFilteringAndOptions({
           {/* Row 1: Date filters - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div className='flex flex-col space-y-1'>
-              <Label>From:</Label>
+              <Label>{dict.timeFilters.from}</Label>
               <DateTimePicker
                 value={fromFilter}
                 onChange={(date) => setFromFilter(date || getOneMonthAgo())}
@@ -159,7 +162,7 @@ export default function OvenTableFilteringAndOptions({
               />
             </div>
             <div className='flex flex-col space-y-1'>
-              <Label>To:</Label>
+              <Label>{dict.timeFilters.to}</Label>
               <DateTimePicker
                 value={toFilter}
                 onChange={(date) => setToFilter(date || getToday())}
@@ -182,27 +185,27 @@ export default function OvenTableFilteringAndOptions({
           {/* Row 2: Oven and Status - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div className='flex flex-col space-y-1'>
-              <Label>Oven</Label>
+              <Label>{dict.processFilters.oven}</Label>
               <MultiSelect
                 options={ovenOptions}
                 value={ovenFilter}
                 onValueChange={setOvenFilter}
-                placeholder='Select...'
-                searchPlaceholder='search...'
-                emptyText='not found'
+                placeholder={dict.processFilters.select}
+                searchPlaceholder={dict.processFilters.searchPlaceholder}
+                emptyText={dict.processFilters.notFound}
                 className='w-full'
               />
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>Status</Label>
+              <Label>{dict.processFilters.status}</Label>
               <MultiSelect
                 options={statusOptions}
                 value={statusFilter}
                 onValueChange={setStatusFilter}
-                placeholder='Select...'
-                searchPlaceholder='search...'
-                emptyText='not found'
+                placeholder={dict.processFilters.select}
+                searchPlaceholder={dict.processFilters.searchPlaceholder}
+                emptyText={dict.processFilters.notFound}
                 className='w-full'
               />
             </div>
@@ -211,27 +214,28 @@ export default function OvenTableFilteringAndOptions({
           {/* Row 3: HYDRA Batch and Article - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div className='flex flex-col space-y-1'>
-              <Label>HYDRA Batch</Label>
+              <Label>{dict.processFilters.hydraBatch}</Label>
               <PasteValuesDialog
                 fieldType='hydra_batch'
-                fieldLabel='HYDRA Batch'
+                fieldLabel={dict.processFilters.hydraBatch}
                 currentValue={hydraBatchFilter}
                 currentCount={getValueCount(hydraBatchFilter)}
                 onApplyValues={setHydraBatchFilter}
+                dict={dict}
               >
                 <Button
                   variant='outline'
                   className='w-full justify-start'
-                  title='Click to paste values from Excel or edit manually'
+                  title={dict.processFilters.clickToPaste}
                 >
                   {hydraBatchFilter ? (
                     <span className='text-left'>
-                      HYDRA Batch ({getValueCount(hydraBatchFilter)} value
+                      {dict.processFilters.hydraBatch} ({getValueCount(hydraBatchFilter)} value
                       {getValueCount(hydraBatchFilter) !== 1 ? 's' : ''})
                     </span>
                   ) : (
                     <span className='text-muted-foreground'>
-                      Click to add...
+                      {dict.processFilters.clickToAdd}
                     </span>
                   )}
                 </Button>
@@ -239,27 +243,28 @@ export default function OvenTableFilteringAndOptions({
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>Article</Label>
+              <Label>{dict.processFilters.article}</Label>
               <PasteValuesDialog
                 fieldType='article'
-                fieldLabel='Article'
+                fieldLabel={dict.processFilters.article}
                 currentValue={articleFilter}
                 currentCount={getValueCount(articleFilter)}
                 onApplyValues={setArticleFilter}
+                dict={dict}
               >
                 <Button
                   variant='outline'
                   className='w-full justify-start'
-                  title='Click to paste values from Excel or edit manually'
+                  title={dict.processFilters.clickToPaste}
                 >
                   {articleFilter ? (
                     <span className='text-left'>
-                      Article ({getValueCount(articleFilter)} value
+                      {dict.processFilters.article} ({getValueCount(articleFilter)} value
                       {getValueCount(articleFilter) !== 1 ? 's' : ''})
                     </span>
                   ) : (
                     <span className='text-muted-foreground'>
-                      Click to add...
+                      {dict.processFilters.clickToAdd}
                     </span>
                   )}
                 </Button>
@@ -273,11 +278,11 @@ export default function OvenTableFilteringAndOptions({
               type='button'
               variant='destructive'
               onClick={handleClearFilters}
-              title='Clear filters'
+              title={dict.processFilters.clear}
               disabled={isPendingSearch}
               className='order-3 w-full sm:order-1'
             >
-              <CircleX /> <span>Clear</span>
+              <CircleX /> <span>{dict.processFilters.clear}</span>
             </Button>
 
             <Link
@@ -305,7 +310,7 @@ export default function OvenTableFilteringAndOptions({
             >
               <Button className='w-full'>
                 <FileSpreadsheet />
-                <span>Export</span>
+                <span>{dict.processFilters.export}</span>
               </Button>
             </Link>
 
@@ -320,7 +325,7 @@ export default function OvenTableFilteringAndOptions({
               ) : (
                 <Search />
               )}
-              <span>Search</span>
+              <span>{dict.processFilters.search}</span>
             </Button>
           </div>
         </form>

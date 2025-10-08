@@ -50,6 +50,7 @@ import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Dictionary } from '../lib/dict';
 import { overtimeRequestEmployeeType } from '../lib/types';
 
 interface MultiSelectEmployeesProps {
@@ -57,13 +58,15 @@ interface MultiSelectEmployeesProps {
   value: overtimeRequestEmployeeType[];
   onSelectChange: (value: overtimeRequestEmployeeType[]) => void;
   placeholder?: string;
+  dict: Dictionary;
 }
 
 export const MultiSelectEmployees = ({
   employees,
   value,
   onSelectChange,
-  placeholder = 'Wybierz pracowników...',
+  placeholder,
+  dict,
 }: MultiSelectEmployeesProps) => {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -74,7 +77,7 @@ export const MultiSelectEmployees = ({
   const [dateError, setDateError] = useState(false);
 
   const dayOffSchema = z.object({
-    date: z.date({ message: 'Wybierz datę odbioru!' }),
+    date: z.date({ message: dict.multiSelectEmployees.agreedDateError }),
     note: z.string().optional().default(''),
   });
 
@@ -139,8 +142,9 @@ export const MultiSelectEmployees = ({
       <DialogContent className='sm:max-w-[700px]'>
         <DialogHeader>
           <DialogTitle>
-            Uzgodniony termin odbioru dnia wolnego dla:{' '}
-            {pendingEmployee?.firstName} {pendingEmployee?.lastName}
+            {dict.multiSelectEmployees.dialogTitle
+              .replace('{firstName}', pendingEmployee?.firstName || '')
+              .replace('{lastName}', pendingEmployee?.lastName || '')}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -172,7 +176,7 @@ export const MultiSelectEmployees = ({
                     </FormControl>
                     {dateError && (
                       <p className='text-destructive text-sm'>
-                        Wybierz datę odbioru!
+                        {dict.multiSelectEmployees.agreedDateError}
                       </p>
                     )}
                     <FormMessage />
@@ -184,7 +188,7 @@ export const MultiSelectEmployees = ({
                 name='note'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Uwagi</FormLabel>
+                    <FormLabel>{dict.multiSelectEmployees.notes}</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
                     </FormControl>
@@ -200,13 +204,25 @@ export const MultiSelectEmployees = ({
               className='w-full'
               onClick={handleAddEmployee}
             >
-              <CopyPlus /> Dodaj odbiór dnia wolnego
+              <CopyPlus /> {dict.multiSelectEmployees.addDayOff}
             </Button>
           </DialogFooter>
         </Form>
       </DialogContent>
     </Dialog>
   );
+
+  const getPlural = (count: number) => {
+    if (count === 1) return dict.multiSelectEmployees.plural.one;
+    if (
+      count % 10 >= 2 &&
+      count % 10 <= 4 &&
+      (count % 100 < 10 || count % 100 >= 20)
+    ) {
+      return dict.multiSelectEmployees.plural.few;
+    }
+    return dict.multiSelectEmployees.plural.many;
+  };
 
   return (
     <>
@@ -219,8 +235,10 @@ export const MultiSelectEmployees = ({
           >
             <span className={cn(!value.length && 'opacity-50')}>
               {value.length > 0
-                ? `wybrano ${value.length} ${value.length === 1 ? 'pracownika' : 'pracowników'}`
-                : placeholder}
+                ? dict.multiSelectEmployees.selected
+                    .replace('{count}', value.length.toString())
+                    .replace('{plural}', getPlural(value.length))
+                : placeholder || dict.multiSelectEmployees.placeholder}
             </span>
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
@@ -228,17 +246,17 @@ export const MultiSelectEmployees = ({
         <PopoverContent className='p-0' side='bottom' align='start'>
           <Command>
             <CommandInput
-              placeholder='Szukaj pracowników...'
+              placeholder={dict.multiSelectEmployees.searchPlaceholder}
               value={inputValue}
               onValueChange={setInputValue}
             />
             <CommandList>
-              <CommandEmpty>Nie znaleziono pracowników.</CommandEmpty>
+              <CommandEmpty>{dict.multiSelectEmployees.notFound}</CommandEmpty>
               <CommandGroup>
                 {value.length > 0 && (
                   <CommandItem key='reset' onSelect={() => onSelectChange([])}>
                     <CircleX className='mr-2 h-4 w-4 text-red-500' />
-                    usuń wszystkich
+                    {dict.multiSelectEmployees.removeAll}
                   </CommandItem>
                 )}
                 {employees.map((employee) => (
@@ -269,14 +287,14 @@ export const MultiSelectEmployees = ({
 
       {value.length > 0 && (
         <Table>
-          <TableCaption>Wybrani pracownicy</TableCaption>
+          <TableCaption>{dict.multiSelectEmployees.placeholder}</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Pracownik</TableHead>
-              <TableHead>Nr personalny</TableHead>
-              <TableHead>Data odbioru</TableHead>
-              <TableHead>Uwagi</TableHead>
-              <TableHead>Usuń</TableHead>
+              <TableHead>{dict.idTable.firstName}</TableHead>
+              <TableHead>{dict.idTable.identifier}</TableHead>
+              <TableHead>{dict.idTable.agreedReceivingAt}</TableHead>
+              <TableHead>{dict.idTable.note}</TableHead>
+              <TableHead>{dict.common.cancel}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -27,6 +27,7 @@ import { CardContent, CardFooter } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Session } from 'next-auth';
 import BulkActions from '../bulk-actions';
+import { Dictionary } from '../../lib/dict';
 
 // Add TableMeta type
 interface TableMeta {
@@ -34,15 +35,17 @@ interface TableMeta {
 }
 
 interface DataTableProps<TData, TValue> {
-  columns: (session: Session | null) => ColumnDef<TData, TValue>[];
+  columns: (session: Session | null, dict: Dictionary) => ColumnDef<TData, TValue>[];
   data: TData[];
   session: Session | null;
+  dict: Dictionary;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   session,
+  dict,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -52,10 +55,10 @@ export function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  // Use the session to create the columns
+  // Use the session and dict to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session),
-    [columns, session],
+    () => columns(session, dict),
+    [columns, session, dict],
   );
 
   const table = useReactTable<TData>({
@@ -87,7 +90,7 @@ export function DataTable<TData, TValue>({
     <>
       <CardContent className='space-y-4'>
         {/* Bulk Actions */}
-        <BulkActions table={table as any} session={session} />
+        <BulkActions table={table as any} session={session} dict={dict} />
 
         <div className='rounded-md border'>
           <Table>

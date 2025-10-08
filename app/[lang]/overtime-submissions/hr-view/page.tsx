@@ -19,6 +19,7 @@ import {
   HROvertimeSummary,
 } from '../lib/calculate-overtime';
 import { OvertimeSubmissionType } from '../lib/types';
+import { getDictionary } from '../lib/dict';
 
 async function getOvertimeSubmissionsForHR(
   session: Session,
@@ -154,6 +155,7 @@ export default async function OvertimeHRViewPage(props: {
 }) {
   const params = await props.params;
   const { lang } = params;
+  const dict = await getDictionary(lang);
   const searchParams = await props.searchParams;
   const session = await auth();
 
@@ -182,24 +184,25 @@ export default async function OvertimeHRViewPage(props: {
     <Card>
       <CardHeader>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>Widok HR - Zgłoszenia nadgodzin</CardTitle>
+          <CardTitle>{dict.hrViewTitle}</CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            <Link href='/overtime-submissions'>
+            <Link href={`/${lang}/overtime-submissions`}>
               <Button variant={'outline'} className='w-full sm:w-auto'>
                 <ArrowLeft />
-                <span>Powrót do zgłoszeń</span>
+                <span>{dict.backToSubmissions}</span>
               </Button>
             </Link>
           </div>
         </div>
 
-        <HROvertimeSummaryDisplay hrOvertimeSummary={hrOvertimeSummary} />
+        <HROvertimeSummaryDisplay hrOvertimeSummary={hrOvertimeSummary} dict={dict} />
 
         <HrViewFilteringAndOptions
           fetchTime={fetchTime}
           userRoles={session?.user?.roles || []}
           users={users}
           pendingSettlementsCount={pendingSettlementsCount}
+          dict={dict}
         />
       </CardHeader>
 
@@ -207,6 +210,7 @@ export default async function OvertimeHRViewPage(props: {
         columns={createColumns}
         data={overtimeSubmissionsLocaleString}
         session={session}
+        dict={dict}
       />
     </Card>
   );

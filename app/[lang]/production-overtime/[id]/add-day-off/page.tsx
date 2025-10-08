@@ -4,6 +4,7 @@ import getEmployees from '@/lib/data/get-employees';
 import { redirect } from 'next/navigation';
 import AddDayOff from '../../components/add-day-off-form';
 import { getOvertimeRequest } from '../../lib/get-overtime-request';
+import { getDictionary } from '../../lib/dict';
 
 export default async function AddDayOffPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
@@ -37,5 +38,6 @@ export default async function AddDayOffPage(props: {
   }
 
   const employees = await getEmployees();
-  return <AddDayOff employees={employees} id={id} />;
+  const dict = await getDictionary(lang);
+  return <AddDayOff employees={employees} id={id} dict={dict} />;
 }

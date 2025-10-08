@@ -12,17 +12,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { cancelOvertimeRequest } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 interface CancelRequestDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
+  dict: Dictionary;
 }
 
 export default function CancelRequestDialog({
   isOpen,
   onOpenChange,
   requestId,
+  dict,
 }: CancelRequestDialogProps) {
   const handleCancel = async () => {
     toast.promise(
@@ -33,16 +36,15 @@ export default function CancelRequestDialog({
         return res;
       }),
       {
-        loading: 'Anulowanie zgłoszenia...',
-        success: 'Zgłoszenie zostało anulowane!',
+        loading: dict.toast.cancelling,
+        success: dict.toast.cancelled,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
-          if (errorMsg === 'cannot cancel')
-            return 'Nie można anulować tego zgłoszenia!';
+          if (errorMsg === 'unauthorized') return dict.errors.unauthorized;
+          if (errorMsg === 'not found') return dict.errors.notFound;
+          if (errorMsg === 'cannot cancel') return dict.errors.cannotCancel;
           console.error('handleCancel', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.errors.contactIT;
         },
       },
     );
@@ -53,16 +55,15 @@ export default function CancelRequestDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Anulować zgłoszenie?</AlertDialogTitle>
+          <AlertDialogTitle>{dict.dialogs.cancel.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz anulować to zgłoszenie godzin nadliczbowych? Tej
-            akcji nie można cofnąć.
+            {dict.dialogs.cancel.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Nie, zachowaj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.dialogs.cancel.cancelButton}</AlertDialogCancel>
           <AlertDialogAction onClick={handleCancel}>
-            Tak, anuluj zgłoszenie
+            {dict.dialogs.cancel.confirmButton}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -1,1 +1,6 @@
-{}
+{
+  "title": "Please add translations",
+  "editDialog": {
+    "save": "Speichern"
+  }
+}

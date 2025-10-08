@@ -1,5 +1,6 @@
 // import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
+import { getDictionary } from '../lib/dict';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { FailureOptionType, FailureType } from './lib/failures-types';
@@ -83,6 +84,8 @@ export default async function FailuresPage(props: {
 
   const { lang } = params;
 
+  const dict = await getDictionary(lang);
+
   let fetchTime, fetchTimeLocaleString, formattedFailures;
   ({ fetchTime, fetchTimeLocaleString, formattedFailures } = await getFailures(
     lang,
@@ -98,6 +101,7 @@ export default async function FailuresPage(props: {
       fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
       failuresOptions={failuresOptions}
+      dict={dict}
     />
   );
 }

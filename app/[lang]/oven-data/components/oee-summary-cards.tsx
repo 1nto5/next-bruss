@@ -5,12 +5,14 @@ import { Activity, Clock, CalendarClock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useOeeData } from '../hooks/use-oee-data';
 import { OeeParams } from '../lib/types';
+import type { Dictionary } from '../lib/dict';
 
 interface OeeSummaryCardsProps {
   params: OeeParams;
+  dict: Dictionary;
 }
 
-export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
+export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) {
   const { data, isLoading, error } = useOeeData(params);
 
   if (isLoading) {
@@ -35,7 +37,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
   if (error || !data) {
     return (
       <div className="text-center text-muted-foreground">
-        Failed to load OEE summary data
+        {dict.errorLoadingData}
       </div>
     );
   }
@@ -53,7 +55,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
         <Card className="md:col-span-3">
           <CardContent className="flex h-24 items-center justify-center">
             <p className="text-muted-foreground">
-              No oven processes found for the selected period.
+              {dict.noDataAvailable}
             </p>
           </CardContent>
         </Card>
@@ -69,7 +71,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Overall Utilization
+            {dict.oeeMetrics.overallUtilization}
           </CardTitle>
           <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -78,7 +80,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
             {summary.overallUtilization}%
           </div>
           <p className="text-xs text-muted-foreground">
-            Average across all ovens
+            {dict.oeeMetrics.averageAcrossOvens}
           </p>
         </CardContent>
       </Card>
@@ -87,7 +89,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Total Running Time
+            {dict.oeeMetrics.totalRunningTime}
           </CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -96,7 +98,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
             {summary.totalRunningHours.toLocaleString()}h
           </div>
           <p className="text-xs text-muted-foreground">
-            Actual production time
+            {dict.oeeMetrics.actualProductionTime}
           </p>
         </CardContent>
       </Card>
@@ -105,7 +107,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Available Capacity
+            {dict.oeeMetrics.availableCapacity}
           </CardTitle>
           <CalendarClock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -114,7 +116,7 @@ export default function OeeSummaryCards({ params }: OeeSummaryCardsProps) {
             {summary.totalAvailableHours.toLocaleString()}h
           </div>
           <p className="text-xs text-muted-foreground">
-            Total oven capacity for period
+            {dict.oeeMetrics.totalOvenCapacity}
           </p>
         </CardContent>
       </Card>

@@ -1,5 +1,6 @@
 'use client';
 
+import { Dictionary } from '../../lib/dict';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -41,10 +42,12 @@ export default function TableFilteringAndOptions({
   setIsPendingSearch,
   isPendingSearch,
   failuresOptions,
+  dict,
 }: {
   setIsPendingSearch: (value: boolean) => void;
   isPendingSearch: boolean;
   failuresOptions: FailureOptionType[];
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -140,14 +143,14 @@ export default function TableFilteringAndOptions({
           checked={showFilters}
           onCheckedChange={setShowFilters}
         />
-        <Label htmlFor='show-filters'>Pokaż filtry</Label>
+        <Label htmlFor='show-filters'>{dict.filters.showFilters}</Label>
       </div>
 
       {showFilters && (
         <>
           <div className='flex flex-wrap gap-2'>
             <div className='flex items-center space-x-2'>
-              <Label>od:</Label>
+              <Label>{dict.filters.from}</Label>
               <DateTimePicker
                 value={fromFilter}
                 onChange={setFromFilter}
@@ -164,7 +167,7 @@ export default function TableFilteringAndOptions({
               />
             </div>
             <div className='flex items-center space-x-2'>
-              <Label>do:</Label>
+              <Label>{dict.filters.to}</Label>
               <DateTimePicker
                 value={toFilter}
                 onChange={setToFilter}
@@ -215,7 +218,7 @@ export default function TableFilteringAndOptions({
                     ? stationsOptions.find(
                         (station) => station === stationFilter,
                       )
-                    : 'stacja'}
+                    : dict.filters.station}
                   <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                 </Button>
               </PopoverTrigger>
@@ -225,9 +228,9 @@ export default function TableFilteringAndOptions({
                 align='start'
               >
                 <Command>
-                  <CommandInput placeholder='szukaj...' />
+                  <CommandInput placeholder={dict.filters.searchPlaceholder} />
                   <CommandList>
-                    <CommandEmpty>not found</CommandEmpty>
+                    <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
                     <CommandGroup>
                       <CommandItem
                         key='reset'
@@ -237,7 +240,7 @@ export default function TableFilteringAndOptions({
                         }}
                       >
                         <Check className='mr-2 h-4 w-4 opacity-0' />
-                        not set
+                        {dict.filters.notSet}
                       </CommandItem>
                       {stationsOptions.map((station) => (
                         <CommandItem
@@ -279,7 +282,7 @@ export default function TableFilteringAndOptions({
                     ? filteredFailures.find(
                         (failure) => failure === failureFilter,
                       )
-                    : 'awaria'}
+                    : dict.filters.failure}
                   <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                 </Button>
               </PopoverTrigger>
@@ -289,9 +292,9 @@ export default function TableFilteringAndOptions({
                 align='start'
               >
                 <Command>
-                  <CommandInput placeholder='szukaj...' />
+                  <CommandInput placeholder={dict.filters.searchPlaceholder} />
                   <CommandList>
-                    <CommandEmpty>not found</CommandEmpty>
+                    <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
                     <CommandGroup>
                       <CommandItem
                         key='reset'
@@ -301,7 +304,7 @@ export default function TableFilteringAndOptions({
                         }}
                       >
                         <Check className='mr-2 h-4 w-4 opacity-0' />
-                        not set
+                        {dict.filters.notSet}
                       </CommandItem>
                       {filteredFailures.map((failure) => (
                         <CommandItem
@@ -329,7 +332,7 @@ export default function TableFilteringAndOptions({
               </PopoverContent>
             </Popover>
             <Input
-              placeholder='nadzorujący'
+              placeholder={dict.filters.supervisor}
               className='w-auto'
               value={supervisorFilter}
               onChange={(e) => {
@@ -337,7 +340,7 @@ export default function TableFilteringAndOptions({
               }}
             />
             <Input
-              placeholder='odpowiedzialny'
+              placeholder={dict.filters.responsible}
               className='w-auto'
               value={responsibleFilter}
               onChange={(e) => {
@@ -358,12 +361,12 @@ export default function TableFilteringAndOptions({
           {isPendingSearch ? (
             <>
               <Loader className={'animate-spin'} />{' '}
-              <span>{showFilters ? 'Szukaj' : 'Odśwież'}</span>
+              <span>{showFilters ? dict.filters.search : dict.filters.refresh}</span>
             </>
           ) : (
             <>
               {showFilters ? <Search /> : <RefreshCw />}{' '}
-              <span>{showFilters ? 'Szukaj' : 'Odśwież'}</span>
+              <span>{showFilters ? dict.filters.search : dict.filters.refresh}</span>
             </>
           )}
         </Button>
@@ -376,7 +379,7 @@ export default function TableFilteringAndOptions({
               title='Clear filters'
               // disabled={!areFiltersSet}
             >
-              <CircleX /> <span>Wyczyść</span>
+              <CircleX /> <span>{dict.filters.clear}</span>
             </Button>
 
             <Link
@@ -399,12 +402,12 @@ export default function TableFilteringAndOptions({
               ).toString()}`}
             >
               <Button>
-                <Sheet /> <span>Export do Excel</span>
+                <Sheet /> <span>{dict.filters.exportToExcel}</span>
               </Button>
             </Link>
           </>
         )}
-        <AddFailureDialog failuresOptions={failuresOptions} line={lineFilter} />
+        <AddFailureDialog failuresOptions={failuresOptions} line={lineFilter} dict={dict} />
       </div>
     </form>
   );

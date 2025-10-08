@@ -24,13 +24,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { addNote } from '../actions';
+import { Dictionary } from '../lib/dict';
 import { NoteFormSchema, NoteFormType } from '../lib/zod';
 
 interface AddNoteDialogProps {
   deviationId: string;
+  dict: Dictionary;
 }
 
-export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
+export default function AddNoteDialog({ deviationId, dict }: AddNoteDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,7 +45,7 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
 
   const onSubmit = async (data: NoteFormType) => {
     if (!deviationId) {
-      toast.error('Błąd ID odchylenia. Skontaktuj się z IT!');
+      toast.error(dict.dialogs.addNote.errors.deviationIdError);
       return;
     }
 
@@ -64,18 +66,18 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
             if (result.error) {
               console.error('Note submission error:', result.error);
             }
-            reject(new Error('Skontaktuj się z IT!'));
+            reject(new Error(dict.dialogs.addNote.errors.contactIT));
           }
         } catch (error) {
           console.error('Note submission error:', error);
-          reject(new Error('Skontaktuj się z IT!'));
+          reject(new Error(dict.dialogs.addNote.errors.contactIT));
         } finally {
           setIsSubmitting(false);
         }
       }),
       {
-        loading: 'Dodawanie notatki...',
-        success: 'Notatka dodana pomyślnie!',
+        loading: dict.dialogs.addNote.toasts.loading,
+        success: dict.dialogs.addNote.toasts.success,
         error: (err) => err.message,
       },
     );
@@ -86,12 +88,12 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
       <DialogTrigger asChild>
         <Button variant='outline'>
           <StickyNote className='' />
-          Dodaj
+          {dict.dialogs.addNote.triggerButton}
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
-          <DialogTitle>Dodaj notatkę</DialogTitle>
+          <DialogTitle>{dict.dialogs.addNote.title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -100,11 +102,11 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
               name='content'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor='content'>Treść notatki</FormLabel>
+                  <FormLabel htmlFor='content'>{dict.dialogs.addNote.contentLabel}</FormLabel>
                   <FormControl>
                     <Textarea
                       id='content'
-                      placeholder='Wprowadź treść notatki...'
+                      placeholder={dict.dialogs.addNote.contentPlaceholder}
                       className='h-32'
                       {...field}
                     />
@@ -116,7 +118,7 @@ export default function AddNoteDialog({ deviationId }: AddNoteDialogProps) {
             <DialogFooter className='mt-4'>
               <Button type='submit' disabled={isSubmitting}>
                 <StickyNote className='mr-2 h-4 w-4' />
-                Dodaj notatkę
+                {dict.dialogs.addNote.submitButton}
               </Button>
             </DialogFooter>
           </form>

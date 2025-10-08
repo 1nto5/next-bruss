@@ -13,12 +13,14 @@ import {
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
 import { markAsAccountedOvertimeSubmission as markAsAccounted } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 interface MarkAsAccountedDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   submissionId: string;
   session: Session | null;
+  dict: Dictionary;
 }
 
 export default function MarkAsAccountedDialog({
@@ -26,15 +28,14 @@ export default function MarkAsAccountedDialog({
   onOpenChange,
   submissionId,
   session,
+  dict,
 }: MarkAsAccountedDialogProps) {
   const handleMarkAsAccounted = async () => {
     // Check if user has HR role
     const isHR = session?.user?.roles?.includes('hr');
 
     if (!isHR) {
-      toast.error(
-        'Tylko pracownicy HR mogą oznaczać zgłoszenia jako rozliczone!',
-      );
+      toast.error(dict.errors.onlyHRCanMarkAsAccounted);
       return;
     }
 
@@ -48,16 +49,15 @@ export default function MarkAsAccountedDialog({
         return res;
       }),
       {
-        loading: 'Oznaczanie jako rozliczone...',
-        success: 'Zgłoszenie oznaczone jako rozliczone!',
+        loading: dict.toast.markingAsAccounted,
+        success: dict.toast.markedAsAccounted,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
-          if (errorMsg === 'invalid status')
-            return 'Nieprawidłowy status zgłoszenia!';
+          if (errorMsg === 'unauthorized') return dict.errors.unauthorized;
+          if (errorMsg === 'not found') return dict.errors.notFound;
+          if (errorMsg === 'invalid status') return dict.errors.invalidStatus;
           console.error('handleMarkAsAccounted', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.errors.contactIT;
         },
       },
     );
@@ -67,17 +67,15 @@ export default function MarkAsAccountedDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Oznacz jako rozliczone</AlertDialogTitle>
+          <AlertDialogTitle>{dict.dialogs.markAsAccounted.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz oznaczyć to zgłoszenie jako rozliczone? Ta akcja
-            jest nieodwracalna i oznacza, że wszystkie nadgodziny zostały
-            rozliczone w systemie płacowym.
+            {dict.dialogs.markAsAccounted.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.actions.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={handleMarkAsAccounted}>
-            Oznacz jako rozliczone
+            {dict.actions.markAsAccounted}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

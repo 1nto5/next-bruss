@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
 // import { Input } from '@/components/ui/input';
 import { ArrowRight } from 'lucide-react';
+import type { Dictionary } from '../../../lib/dict';
 // import { useEffect } from 'react';
 // import { revalidateFailures } from '../../actions';
 
@@ -33,11 +34,13 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
+  dict: Dictionary;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  dict,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -110,7 +113,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    Brak wyników.
+                    {dict.noResults}
                   </TableCell>
                 </TableRow>
               )}

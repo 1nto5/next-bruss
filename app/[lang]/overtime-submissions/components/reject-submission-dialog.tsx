@@ -24,21 +24,14 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { rejectOvertimeSubmission } from '../actions';
-
-const RejectSchema = z.object({
-  rejectionReason: z
-    .string()
-    .min(1, 'Powód odrzucenia jest wymagany!')
-    .max(500, 'Powód odrzucenia nie może być dłuższy niż 500 znaków!'),
-});
-
-type RejectFormType = z.infer<typeof RejectSchema>;
+import { Dictionary } from '../lib/dict';
 
 type RejectSubmissionDialogProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   submissionId: string;
   session: Session | null;
+  dict: Dictionary;
 };
 
 export default function RejectSubmissionDialog({
@@ -46,7 +39,17 @@ export default function RejectSubmissionDialog({
   onOpenChange,
   submissionId,
   session,
+  dict,
 }: RejectSubmissionDialogProps) {
+  const RejectSchema = z.object({
+    rejectionReason: z
+      .string()
+      .min(1, dict.validation.rejectionReasonRequired)
+      .max(500, dict.validation.rejectionReasonTooLong),
+  });
+
+  type RejectFormType = z.infer<typeof RejectSchema>;
+
   const form = useForm<RejectFormType>({
     resolver: zodResolver(RejectSchema),
     defaultValues: {
@@ -65,15 +68,14 @@ export default function RejectSubmissionDialog({
         },
       ),
       {
-        loading: 'Odrzucanie zgłoszenia...',
-        success: 'Zgłoszenie zostało odrzucone!',
+        loading: dict.toast.rejecting,
+        success: dict.toast.rejected,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized')
-            return 'Nie masz uprawnień do odrzucania!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
+          if (errorMsg === 'unauthorized') return dict.errors.unauthorizedToReject;
+          if (errorMsg === 'not found') return dict.errors.notFound;
           console.error('onSubmit', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.errors.contactIT;
         },
       },
     );
@@ -90,9 +92,9 @@ export default function RejectSubmissionDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>Odrzuć zgłoszenie</DialogTitle>
+          <DialogTitle>{dict.dialogs.reject.title}</DialogTitle>
           <DialogDescription>
-            Podaj powód odrzucenia zgłoszenia nadgodzin.
+            {dict.dialogs.reject.description}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -102,10 +104,10 @@ export default function RejectSubmissionDialog({
               name='rejectionReason'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Powód odrzucenia</FormLabel>
+                  <FormLabel>{dict.dialogs.reject.reasonLabel}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder='Wpisz powód odrzucenia...'
+                      placeholder={dict.dialogs.reject.reasonPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -115,10 +117,10 @@ export default function RejectSubmissionDialog({
             />
             <DialogFooter>
               <Button type='button' variant='outline' onClick={handleCancel}>
-                Anuluj
+                {dict.actions.cancel}
               </Button>
               <Button type='submit' variant='destructive'>
-                Odrzuć zgłoszenie
+                {dict.dialogs.reject.buttonText}
               </Button>
             </DialogFooter>
           </form>

@@ -9,6 +9,7 @@ import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { OvertimeType } from './lib/types';
+import { getDictionary } from './lib/dict';
 
 async function getOvertimeRequests(
   lang: string,
@@ -66,6 +67,7 @@ export default async function ProductionOvertimePage(props: {
   const params = await props.params;
   const { lang } = params;
   const searchParams = await props.searchParams;
+  const dict = await getDictionary(lang);
   const session = await auth();
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
   // Users with any role containing 'manager' (e.g., plant manager, logistics manager, etc.) can create requests
@@ -83,21 +85,19 @@ export default async function ProductionOvertimePage(props: {
     <Card>
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>
-            Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja
-          </CardTitle>
+          <CardTitle>{dict.page.title}</CardTitle>
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
               <Link href='/production-overtime/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <Plus /> <span>Nowe zlecenie</span>
+                  <Plus /> <span>{dict.page.newRequest}</span>
                 </Button>
               </Link>
             ) : !session ? (
               <Link href={`/auth?callbackUrl=/production-overtime`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <KeyRound /> <span>Zaloguj się</span>
+                  <KeyRound /> <span>{dict.page.login}</span>
                 </Button>
               </Link>
             ) : null}
@@ -108,6 +108,7 @@ export default async function ProductionOvertimePage(props: {
           isGroupLeader={isGroupLeader}
           isLogged={!!session}
           userEmail={session?.user?.email || undefined}
+          dict={dict}
         />
       </CardHeader>
       <DataTable
@@ -116,6 +117,7 @@ export default async function ProductionOvertimePage(props: {
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
         session={session}
+        dict={dict}
       />
     </Card>
   );

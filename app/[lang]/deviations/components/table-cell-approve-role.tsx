@@ -35,6 +35,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { ApprovalHistoryType } from '../lib/types';
 import { rejectDeviationSchema } from '../lib/zod';
+import { Dictionary } from '../lib/dict';
 
 type TableCellApproveRoleProps = {
   roleText: string;
@@ -48,6 +49,7 @@ type TableCellApproveRoleProps = {
   reason?: string;
   history?: ApprovalHistoryType[];
   deviationStatus?: string; // Add deviation status prop
+  dict: Dictionary;
 };
 
 // Define valid approval roles
@@ -93,6 +95,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
   reason,
   history,
   deviationStatus,
+  dict,
 }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
@@ -165,13 +168,13 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
     if (approved === undefined) {
       return (
         <Badge variant='outline' className='text-nowrap'>
-          Brak decyzji
+          {dict.view.approvalStatuses.pending}
         </Badge>
       );
     } else if (approved) {
-      return <Badge variant='statusApproved'>Zatwierdził</Badge>;
+      return <Badge variant='statusApproved'>{dict.view.approvalStatuses.approved}</Badge>;
     } else {
-      return <Badge variant='statusRejected'>Odrzucił</Badge>;
+      return <Badge variant='statusRejected'>{dict.view.approvalStatuses.rejected}</Badge>;
     }
   };
 
@@ -193,16 +196,16 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='approve'
                       disabled={false} // Remove the condition that checks for Plant Manager approval
-                      title='Zatwierdź odchylenie'
+                      title={dict.view.approvalDialogs.approveTitle}
                     >
                       <ThumbsUp />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className='sm:max-w-[425px]'>
                     <DialogHeader>
-                      <DialogTitle>Zatwierdź odchylenie</DialogTitle>
+                      <DialogTitle>{dict.view.approvalDialogs.approveTitle}</DialogTitle>
                       <DialogDescription>
-                        Stanowisko: {roleText}
+                        {dict.view.approvalDialogs.position}: {roleText}
                       </DialogDescription>
                     </DialogHeader>
 
@@ -213,7 +216,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                           name='comment'
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Komentarz</FormLabel>
+                              <FormLabel>{dict.view.approvalDialogs.comment}</FormLabel>
                               <FormControl>
                                 <Textarea {...field} />
                               </FormControl>
@@ -225,7 +228,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       <DialogFooter className='pt-4'>
                         <Button onClick={handleApproveWithComment}>
                           <Check />
-                          Zatwierdzam
+                          {dict.view.approvalDialogs.approveButton}
                         </Button>
                       </DialogFooter>
                     </Form>
@@ -242,18 +245,18 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       type='button'
                       variant='reject'
                       disabled={false} // Remove the condition that checks for Plant Manager approval
-                      title='Odrzuć odchylenie'
+                      title={dict.view.approvalDialogs.rejectTitle}
                     >
                       <ThumbsDown />
                     </Button>
                   </DialogTrigger>
                   <DialogContent className='sm:max-w-[425px]'>
                     <DialogHeader>
-                      <DialogTitle>Odrzuć odchylenie</DialogTitle>
+                      <DialogTitle>{dict.view.approvalDialogs.rejectTitle}</DialogTitle>
                       {deviationUserRoles.includes('plant-manager') &&
                         role !== 'plant-manager' && (
                           <DialogDescription className='font-semibold'>
-                            Stanowisko: {roleText}
+                            {dict.view.approvalDialogs.position}: {roleText}
                           </DialogDescription>
                         )}
                     </DialogHeader>
@@ -266,7 +269,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                             name='reason'
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Komentarz</FormLabel>
+                                <FormLabel>{dict.view.approvalDialogs.comment}</FormLabel>
                                 <FormControl>
                                   <Textarea {...field} />
                                 </FormControl>
@@ -278,7 +281,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                         <DialogFooter className='flex items-center justify-end pt-4'>
                           <Button variant={'destructive'} type='submit'>
                             <CircleX />
-                            Odrzucam
+                            {dict.view.approvalDialogs.rejectButton}
                           </Button>
                         </DialogFooter>
                       </form>
@@ -298,7 +301,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         {(by && extractNameFromEmail(by)) || '-'}
       </TableCell>
       <TableCell className='whitespace-nowrap'>
-        {at ? new Date(at).toLocaleString(process.env.DATE_TIME_LOCALE) : '-'}
+        {at ? new Date(at).toLocaleString(lang) : '-'}
       </TableCell>
       <TableCell className='min-w-[250px]'>{reason ? reason : '-'}</TableCell>
       <TableCell>
@@ -311,17 +314,17 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
             </DialogTrigger>
             <DialogContent className='sm:max-w-[768px]'>
               <DialogHeader>
-                <DialogTitle>Historia</DialogTitle>
+                <DialogTitle>{dict.view.approvalDialogs.history}</DialogTitle>
                 <DialogDescription>{roleText}</DialogDescription>
               </DialogHeader>
               <ScrollArea className='my-4 h-[300px]'>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Osoba</TableHead>
-                      <TableHead>Komentarz</TableHead>
+                      <TableHead>{dict.view.approvalDialogs.historyColumns.status}</TableHead>
+                      <TableHead>{dict.view.approvalDialogs.historyColumns.date}</TableHead>
+                      <TableHead>{dict.view.approvalDialogs.historyColumns.person}</TableHead>
+                      <TableHead>{dict.view.approvalDialogs.historyColumns.comment}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -329,14 +332,14 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                       <TableRow key={index}>
                         <TableCell className='font-medium'>
                           {item.approved ? (
-                            <Badge variant='statusApproved'>Zatwierdził</Badge>
+                            <Badge variant='statusApproved'>{dict.view.approvalStatuses.approved}</Badge>
                           ) : (
-                            <Badge variant='statusRejected'>Odrzucił</Badge>
+                            <Badge variant='statusRejected'>{dict.view.approvalStatuses.rejected}</Badge>
                           )}
                         </TableCell>
                         <TableCell>
                           <span className='whitespace-nowrap'>
-                            {new Date(item.at).toLocaleString(process.env.DATE_TIME_LOCALE)}
+                            {new Date(item.at).toLocaleString(lang)}
                           </span>
                         </TableCell>
                         <TableCell>

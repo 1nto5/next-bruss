@@ -25,12 +25,14 @@ import {
 import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
+import { Dictionary } from '../../lib/dict';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   id: string;
   status?: string;
+  dict: Dictionary;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +40,7 @@ export function DataTable<TData, TValue>({
   data,
   id,
   status,
+  dict,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -103,7 +106,7 @@ export function DataTable<TData, TValue>({
         <div className='mb-4 flex flex-wrap gap-2'>
           <div>
             <Input
-              placeholder='imie'
+              placeholder={dict.idTable.firstName.toLowerCase()}
               value={firstNameFilter}
               onChange={(event) =>
                 table.getColumn('firstName')?.setFilterValue(event.target.value)
@@ -113,7 +116,7 @@ export function DataTable<TData, TValue>({
           </div>
           <div>
             <Input
-              placeholder='nazwisko'
+              placeholder={dict.idTable.lastName.toLowerCase()}
               value={lastNameFilter}
               onChange={(event) =>
                 table.getColumn('lastName')?.setFilterValue(event.target.value)
@@ -123,7 +126,7 @@ export function DataTable<TData, TValue>({
           </div>
           <div>
             <Input
-              placeholder='nr pers.'
+              placeholder={dict.idTable.identifier.toLowerCase()}
               value={identifierFilter}
               onChange={(event) =>
                 table
@@ -140,14 +143,14 @@ export function DataTable<TData, TValue>({
               onClick={clearFilters}
               disabled={!hasActiveFilters}
             >
-              <CircleX /> <span>Wyczyść</span>
+              <CircleX /> <span>{dict.common.clear}</span>
             </Button>
           </div>
           {shouldShowAddButton && (
             <div>
               <Link href={`/production-overtime/${id}/add-day-off`}>
                 <Button variant='outline'>
-                  <AlarmClockPlus /> <span>Dodaj odbiór</span>
+                  <AlarmClockPlus /> <span>{dict.idTable.addPickup}</span>
                 </Button>
               </Link>
             </div>
@@ -198,7 +201,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    Brak wyników.
+                    {dict.idTable.noResults}
                   </TableCell>
                 </TableRow>
               )}

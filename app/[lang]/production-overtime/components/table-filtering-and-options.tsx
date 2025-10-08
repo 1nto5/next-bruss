@@ -17,17 +17,20 @@ import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateProductionOvertime as revalidate } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 export default function TableFilteringAndOptions({
   fetchTime,
   isGroupLeader,
   isLogged,
   userEmail,
+  dict,
 }: {
   fetchTime: Date;
   isGroupLeader: boolean;
   isLogged: boolean;
   userEmail?: string;
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -143,7 +146,9 @@ export default function TableFilteringAndOptions({
                 checked={showFilters}
                 onCheckedChange={setShowFilters}
               />
-              <Label htmlFor='show-filters'>Pokaż filtry</Label>
+              <Label htmlFor='show-filters'>
+                {dict.tableFiltering.showFilters}
+              </Label>
             </div>
             {isLogged && (
               <>
@@ -153,7 +158,9 @@ export default function TableFilteringAndOptions({
                     checked={showOnlyMine}
                     onCheckedChange={handleShowOnlyMineChange}
                   />
-                  <Label htmlFor='only-my-requests'>Moje zlecenia</Label>
+                  <Label htmlFor='only-my-requests'>
+                    {dict.tableFiltering.myRequests}
+                  </Label>
                 </div>
                 <div className='flex items-center space-x-2'>
                   <Switch
@@ -162,7 +169,7 @@ export default function TableFilteringAndOptions({
                     onCheckedChange={handleShowOnlyResponsibleChange}
                   />
                   <Label htmlFor='only-responsible'>
-                    Jestem odpowiedzialny
+                    {dict.tableFiltering.iAmResponsible}
                   </Label>
                 </div>
               </>
@@ -175,22 +182,32 @@ export default function TableFilteringAndOptions({
           <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
             <div className='flex flex-wrap items-start gap-2'>
               <div className='flex flex-col space-y-1'>
-                <Label>Status</Label>
+                <Label>{dict.tableFiltering.status}</Label>
                 <Select onValueChange={setStatusFilter} value={statusFilter}>
                   <SelectTrigger className='w-[150px]'>
-                    <SelectValue placeholder='wybierz' />
+                    <SelectValue placeholder={dict.common.select} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='pending'>Oczekuje</SelectItem>
-                    <SelectItem value='approved'>Zatwierdzone</SelectItem>
-                    <SelectItem value='canceled'>Anulowane</SelectItem>
-                    <SelectItem value='completed'>Ukończone</SelectItem>
-                    <SelectItem value='accounted'>Rozliczone</SelectItem>
+                    <SelectItem value='pending'>
+                      {dict.tableColumns.statuses.pending}
+                    </SelectItem>
+                    <SelectItem value='approved'>
+                      {dict.tableColumns.statuses.approved}
+                    </SelectItem>
+                    <SelectItem value='canceled'>
+                      {dict.tableColumns.statuses.canceled}
+                    </SelectItem>
+                    <SelectItem value='completed'>
+                      {dict.tableColumns.statuses.completed}
+                    </SelectItem>
+                    <SelectItem value='accounted'>
+                      {dict.tableColumns.statuses.accounted}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className='flex flex-col space-y-1'>
-                <Label>Termin</Label>
+                <Label>{dict.tableFiltering.deadline}</Label>
                 <DateTimePicker
                   value={dateFilter}
                   onChange={setDateFilter}
@@ -207,7 +224,7 @@ export default function TableFilteringAndOptions({
                 />
               </div>
               <div className='flex flex-col space-y-1'>
-                <Label>Data dodania</Label>
+                <Label>{dict.tableFiltering.dateAdded}</Label>
                 <DateTimePicker
                   value={requestedAtFilter}
                   onChange={setRequestedAtFilter}
@@ -236,11 +253,12 @@ export default function TableFilteringAndOptions({
                 {isPendingSearch ? (
                   <>
                     <Loader className='mr-1 animate-spin' size={16} />{' '}
-                    <span>Szukaj</span>
+                    <span>{dict.common.search}</span>
                   </>
                 ) : (
                   <>
-                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                    <Search className='mr-1' size={16} />{' '}
+                    <span>{dict.common.search}</span>
                   </>
                 )}
               </Button>
@@ -252,7 +270,8 @@ export default function TableFilteringAndOptions({
                 title='Clear filters'
                 disabled={isPendingSearch}
               >
-                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+                <CircleX className='mr-1' size={16} />{' '}
+                <span>{dict.common.clear}</span>
               </Button>
             </div>
           </form>

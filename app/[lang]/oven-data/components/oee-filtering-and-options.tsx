@@ -16,8 +16,9 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { Dictionary } from '../lib/dict';
 
-export default function OeeFilteringAndOptions() {
+export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -131,22 +132,6 @@ export default function OeeFilteringAndOptions() {
   // Generate week options (1-53)
   const weeks = Array.from({ length: 53 }, (_, i) => i + 1);
 
-  // Month names
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
   return (
     <Card>
       <CardContent className="p-4">
@@ -155,10 +140,10 @@ export default function OeeFilteringAndOptions() {
           <div>
             <Tabs value={mode} onValueChange={setMode}>
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="day">Day</TabsTrigger>
-                <TabsTrigger value="week">Week</TabsTrigger>
-                <TabsTrigger value="month">Month</TabsTrigger>
-                <TabsTrigger value="range">Range</TabsTrigger>
+                <TabsTrigger value="day">{dict.timeFilters.day}</TabsTrigger>
+                <TabsTrigger value="week">{dict.timeFilters.week}</TabsTrigger>
+                <TabsTrigger value="month">{dict.timeFilters.month}</TabsTrigger>
+                <TabsTrigger value="range">{dict.timeFilters.range}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -167,7 +152,7 @@ export default function OeeFilteringAndOptions() {
           {mode === 'day' && (
             <div className="grid grid-cols-1 gap-4">
               <div className="flex flex-col space-y-1">
-                <Label>Select Date</Label>
+                <Label>{dict.timeFilters.selectDate}</Label>
                 <DateTimePicker
                   value={dayDate}
                   onChange={(date) => setDayDate(date || new Date())}
@@ -192,7 +177,7 @@ export default function OeeFilteringAndOptions() {
           {mode === 'week' && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col space-y-1">
-                <Label>Year</Label>
+                <Label>{dict.timeFilters.year}</Label>
                 <Select
                   value={weekYear.toString()}
                   onValueChange={(v) => setWeekYear(parseInt(v))}
@@ -210,7 +195,7 @@ export default function OeeFilteringAndOptions() {
                 </Select>
               </div>
               <div className="flex flex-col space-y-1">
-                <Label>Week</Label>
+                <Label>{dict.timeFilters.weekLabel}</Label>
                 <Select
                   value={weekNumber.toString()}
                   onValueChange={(v) => setWeekNumber(parseInt(v))}
@@ -221,7 +206,7 @@ export default function OeeFilteringAndOptions() {
                   <SelectContent className="max-h-[200px]">
                     {weeks.map((week) => (
                       <SelectItem key={week} value={week.toString()}>
-                        Week {week}
+                        {dict.timeFilters.weekLabel} {week}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -234,7 +219,7 @@ export default function OeeFilteringAndOptions() {
           {mode === 'month' && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col space-y-1">
-                <Label>Year</Label>
+                <Label>{dict.timeFilters.year}</Label>
                 <Select
                   value={monthYear.toString()}
                   onValueChange={(v) => setMonthYear(parseInt(v))}
@@ -252,7 +237,7 @@ export default function OeeFilteringAndOptions() {
                 </Select>
               </div>
               <div className="flex flex-col space-y-1">
-                <Label>Month</Label>
+                <Label>{dict.timeFilters.month}</Label>
                 <Select
                   value={monthNumber.toString()}
                   onValueChange={(v) => setMonthNumber(parseInt(v))}
@@ -261,7 +246,7 @@ export default function OeeFilteringAndOptions() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {months.map((month, idx) => (
+                    {dict.timeFilters.months.map((month, idx) => (
                       <SelectItem key={idx + 1} value={(idx + 1).toString()}>
                         {month}
                       </SelectItem>
@@ -276,7 +261,7 @@ export default function OeeFilteringAndOptions() {
           {mode === 'range' && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col space-y-1">
-                <Label>From</Label>
+                <Label>{dict.timeFilters.from}</Label>
                 <DateTimePicker
                   value={fromDate}
                   onChange={(date) => setFromDate(date || new Date())}
@@ -295,7 +280,7 @@ export default function OeeFilteringAndOptions() {
                 />
               </div>
               <div className="flex flex-col space-y-1">
-                <Label>To</Label>
+                <Label>{dict.timeFilters.to}</Label>
                 <DateTimePicker
                   value={toDate}
                   onChange={(date) => setToDate(date || new Date())}
@@ -323,12 +308,12 @@ export default function OeeFilteringAndOptions() {
               type="button"
               variant="destructive"
               onClick={handleClearFilters}
-              title="Clear filters"
+              title={dict.timeFilters.clear}
               disabled={isPendingSearch}
               className="order-2 w-full sm:order-1"
             >
               <CircleX />
-              <span>Clear</span>
+              <span>{dict.timeFilters.clear}</span>
             </Button>
 
             <Button
@@ -342,7 +327,7 @@ export default function OeeFilteringAndOptions() {
               ) : (
                 <Search />
               )}
-              <span>Search</span>
+              <span>{dict.timeFilters.search}</span>
             </Button>
           </div>
         </form>

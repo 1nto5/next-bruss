@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Pin, PinOff, Edit, Trash, MoreVertical } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { deleteNews, togglePin } from '../actions';
 import { toast } from 'sonner';
 import { NewsType } from '../lib/types';
@@ -82,9 +82,9 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 <DropdownMenuItem asChild>
-                  <Link href={`${news._id}/edit`}>
+                  <LocalizedLink href={`/news/${news._id}/edit`}>
                     <Edit className='mr-2 h-4 w-4' /> {dict.actions.edit}
-                  </Link>
+                  </LocalizedLink>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={handleTogglePin}

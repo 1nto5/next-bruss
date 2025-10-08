@@ -1,1 +1,166 @@
-{}
+{
+  "title": "Zgłoszenia nadgodzin",
+  "pageTitle": "Zgłoszenia nadgodzin",
+  "testWarning": "Aplikacja w fazie testów - wpisy nie są oficjalne",
+  "hrView": "Widok HR",
+  "hrViewTitle": "Widok HR - Zgłoszenia nadgodzin",
+  "backToSubmissions": "Powrót do zgłoszeń",
+  "newSubmission": "Nowe zgłoszenie",
+  "filters": {
+    "showFilters": "Pokaż filtry",
+    "select": "wybierz",
+    "search": "Szukaj",
+    "searchPlaceholder": "szukaj...",
+    "notFound": "nie znaleziono",
+    "clear": "Wyczyść",
+    "status": "Status",
+    "employee": "Pracownik",
+    "year": "Rok",
+    "month": "Miesiąc",
+    "manager": "Kierownik",
+    "pendingSettlements": "Do rozliczenia",
+    "pendingApprovals": "Do zatwierdzenia"
+  },
+  "status": {
+    "pending": "Oczekuje",
+    "approved": "Zatwierdzone",
+    "rejected": "Odrzucone",
+    "accounted": "Rozliczone",
+    "cancelled": "Anulowane"
+  },
+  "actions": {
+    "approve": "Zatwierdź",
+    "approveDirector": "Zatwierdź (Dyrektor)",
+    "reject": "Odrzuć",
+    "markAsAccounted": "Oznacz jako rozliczone",
+    "cancel": "Anuluj",
+    "edit": "Edytuj",
+    "confirm": "Potwierdź",
+    "save": "Zapisz zmiany",
+    "add": "Dodaj zgłoszenie",
+    "saveAndAddAnother": "Zapisz i dodaj kolejne"
+  },
+  "dialogs": {
+    "approve": {
+      "title": "Zatwierdź zgłoszenie",
+      "description": "Czy na pewno chcesz zatwierdzić to zgłoszenie nadgodzin?"
+    },
+    "reject": {
+      "title": "Odrzuć zgłoszenie",
+      "description": "Podaj powód odrzucenia zgłoszenia nadgodzin.",
+      "reasonLabel": "Powód odrzucenia",
+      "reasonPlaceholder": "Wpisz powód odrzucenia...",
+      "buttonText": "Odrzuć zgłoszenie"
+    },
+    "markAsAccounted": {
+      "title": "Oznacz jako rozliczone",
+      "description": "Czy na pewno chcesz oznaczyć to zgłoszenie jako rozliczone? Ta akcja jest nieodwracalna i oznacza, że wszystkie nadgodziny zostały rozliczone w systemie płacowym."
+    },
+    "cancel": {
+      "title": "Anulować zgłoszenie?",
+      "description": "Czy na pewno chcesz anulować to zgłoszenie godzin nadliczbowych? Tej akcji nie można cofnąć.",
+      "cancelButton": "Nie, zachowaj",
+      "confirmButton": "Tak, anuluj zgłoszenie"
+    },
+    "bulkConfirm": {
+      "title": "Potwierdź operację",
+      "description": "Czy na pewno chcesz wykonać operację na"
+    }
+  },
+  "form": {
+    "titleNew": "Nowe zgłoszenie nadgodzin",
+    "titleEdit": "Edytuj zgłoszenie nadgodzin",
+    "supervisor": "Przełożony",
+    "hours": "Godziny",
+    "hoursDescription": "Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5). Użyj wartości ujemnych (np. -2.5) aby odebrać nadgodziny.",
+    "date": "Data",
+    "reason": "Uzasadnienie",
+    "overtimeRequest": "Zlecenie godzin nadliczbowych",
+    "overtimeRequestDescription": "Planowana praca w godzinach nadliczbowych wymaga zgody przełożonego oraz dyrektora.",
+    "payment": "Wypłata",
+    "scheduledDayOff": "Data odbioru godzin nadliczbowych",
+    "managerNotFound": "Nie znaleziono kierownika.",
+    "submissionsTable": "Tabela zgłoszeń"
+  },
+  "columns": {
+    "status": "Status",
+    "payment": "Wypłata",
+    "actions": "Akcje",
+    "submittedBy": "Zgłaszający",
+    "supervisor": "Kierownik",
+    "date": "Data",
+    "hours": "Godziny",
+    "reason": "Uzasadnienie",
+    "submittedAt": "Data zgłoszenia",
+    "editedAt": "Data edycji",
+    "editedBy": "Edytował",
+    "approvedAt": "Data zatwierdzenia",
+    "approvedBy": "Zatwierdził",
+    "rejectedAt": "Data odrzucenia",
+    "rejectionReason": "Powód odrzucenia",
+    "accountedAt": "Data rozliczenia",
+    "accountedBy": "Rozliczył"
+  },
+  "bulk": {
+    "selectedOne": "Wybrałeś 1 zgłoszenie:",
+    "selectedFew": "Wybrałeś {count} zgłoszenia:",
+    "selectedMany": "Wybrałeś {count} zgłoszeń:",
+    "noCommonActions": "Brak wspólnych akcji dla zaznaczonych zgłoszeń.",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "settle": "Rozlicz",
+    "cancel": "Anuluj",
+    "rejectTitle": "Odrzuć wybrane zgłoszenia",
+    "rejectDescription": "Czy na pewno chcesz odrzucić {count} wybranych zgłoszeń? Podaj powód odrzucenia.",
+    "rejectionReasonPlaceholder": "Powód odrzucenia..."
+  },
+  "toast": {
+    "approving": "Zatwierdzanie zgłoszenia...",
+    "approved": "Zgłoszenie zostało zatwierdzone!",
+    "rejecting": "Odrzucanie zgłoszenia...",
+    "rejected": "Zgłoszenie zostało odrzucone!",
+    "markingAsAccounted": "Oznaczanie jako rozliczone...",
+    "markedAsAccounted": "Zgłoszenie oznaczone jako rozliczone!",
+    "cancelling": "Anulowanie zgłoszenia...",
+    "cancelled": "Zgłoszenie zostało anulowane!",
+    "submissionSaved": "Zgłoszenie zapisane!",
+    "submissionUpdated": "Zgłoszenie zostało zaktualizowane!",
+    "submissionAdded": "Zgłoszenie dodane!",
+    "bulkApproving": "Zatwierdzanie...",
+    "bulkApproved": "Zatwierdzono {count} z {total} zgłoszeń!",
+    "bulkRejecting": "Odrzucanie...",
+    "bulkRejected": "Odrzucono {count} z {total} zgłoszeń!",
+    "bulkSettling": "Rozliczanie...",
+    "bulkSettled": "Rozliczono {count} z {total} zgłoszeń!",
+    "bulkCancelling": "Anulowanie...",
+    "bulkCancelled": "Anulowano {count} z {total} zgłoszeń!",
+    "provideRejectionReason": "Podaj powód odrzucenia"
+  },
+  "errors": {
+    "unauthorized": "Nie masz uprawnień!",
+    "unauthorizedToApprove": "Nie masz uprawnień do zatwierdzania!",
+    "unauthorizedToReject": "Nie masz uprawnień do odrzucania!",
+    "notFound": "Nie znaleziono zgłoszenia!",
+    "invalidStatus": "Nieprawidłowy status zgłoszenia!",
+    "cannotEditApprovedOrRejected": "Nie można edytować zatwierdzonego lub odrzuconego zgłoszenia!",
+    "cannotCancel": "Nie można anulować tego zgłoszenia!",
+    "notInserted": "Nie udało się dodać zgłoszenia!",
+    "contactIT": "Skontaktuj się z IT!",
+    "onlyHRCanMarkAsAccounted": "Tylko pracownicy HR mogą oznaczać zgłoszenia jako rozliczone!",
+    "approvalError": "Błąd zatwierdzania",
+    "rejectionError": "Błąd odrzucania",
+    "settlementError": "Błąd rozliczania",
+    "cancellationError": "Błąd anulowania"
+  },
+  "validation": {
+    "rejectionReasonRequired": "Powód odrzucenia jest wymagany!",
+    "rejectionReasonTooLong": "Powód odrzucenia nie może być dłuższy niż 500 znaków!"
+  },
+  "summary": {
+    "yourOvertimeIn": "Twoje godziny nadliczbowe w",
+    "yourTotalOvertime": "Twoje godziny nadliczbowe łącznie",
+    "organizationOvertimeIn": "Nadgodziny organizacji w",
+    "overdueOvertimeToSettle": "Zaległe nadgodziny do rozliczenia",
+    "pending": "oczekuje"
+  }
+}

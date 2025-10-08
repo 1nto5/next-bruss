@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { Dictionary } from '../lib/dict';
 import { PrintLogType } from '../lib/types';
 
 interface PrintLogDialogProps {
@@ -21,6 +22,7 @@ interface PrintLogDialogProps {
   onClose: () => void;
   logs: PrintLogType[];
   lang: string;
+  dict: Dictionary;
 }
 
 export default function PrintLogDialog({
@@ -28,6 +30,7 @@ export default function PrintLogDialog({
   onClose,
   logs,
   lang,
+  dict,
 }: PrintLogDialogProps) {
   // Sort logs in reverse chronological order
   const sortedLogs = [...logs].sort((a, b) => {
@@ -40,14 +43,14 @@ export default function PrintLogDialog({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className='max-w-3xl'>
         <DialogHeader>
-          <DialogTitle>Historia drukowania</DialogTitle>
+          <DialogTitle>{dict.dialogs.printLog.title}</DialogTitle>
         </DialogHeader>
         <ScrollArea className='h-96'>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Osoba</TableHead>
+                <TableHead>{dict.dialogs.printLog.columns.date}</TableHead>
+                <TableHead>{dict.dialogs.printLog.columns.person}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -55,7 +58,7 @@ export default function PrintLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {new Date(log.printedAt).toLocaleString(process.env.DATE_TIME_LOCALE)}
+                      {new Date(log.printedAt).toLocaleString(lang)}
                     </TableCell>
                     <TableCell>{extractNameFromEmail(log.printedBy)}</TableCell>
                   </TableRow>
@@ -66,7 +69,7 @@ export default function PrintLogDialog({
                     colSpan={2}
                     className='text-muted-foreground text-center'
                   >
-                    Brak zarejestrowanych wydruków
+                    {dict.dialogs.printLog.noPrints}
                   </TableCell>
                 </TableRow>
               )}

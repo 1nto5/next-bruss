@@ -22,6 +22,7 @@ import {
 } from '../actions';
 import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';
+import { Dictionary } from '../lib/dict';
 
 const AddEmployeeSchema = z.object({
   employeesToAdd: z.array(
@@ -38,9 +39,11 @@ const AddEmployeeSchema = z.object({
 export default function AddDayOff({
   employees,
   id,
+  dict,
 }: {
   employees: EmployeeType[];
   id: string;
+  dict: Dictionary;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
@@ -53,7 +56,7 @@ export default function AddDayOff({
 
   const onSubmit = async (data: z.infer<typeof AddEmployeeSchema>) => {
     if (data.employeesToAdd.length === 0) {
-      toast.error('Wybierz co najmniej jednego pracownika!');
+      toast.error(dict.addDayOffForm.toast.selectAtLeastOne);
       return;
     }
 
@@ -67,27 +70,27 @@ export default function AddDayOff({
         );
         if ('error' in res) {
           if (res.error === 'too many employees with scheduled days off') {
-            toast.error(
-              'Przekroczono maksymalną liczbę pracowników dla tego zlecenia!',
-            );
+            toast.error(dict.addDayOffForm.toast.tooManyEmployees);
           } else if (res.error === 'unauthorized') {
-            toast.error('Brak uprawnień do modyfikacji tego zlecenia!');
+            toast.error(dict.addDayOffForm.toast.unauthorized);
           } else if (res.error === 'employee already exists') {
             toast.error(
-              `Pracownik ${employee.firstName} ${employee.lastName} został już wcześniej dodany!`,
+              dict.addDayOffForm.toast.employeeExists
+                .replace('{firstName}', employee.firstName)
+                .replace('{lastName}', employee.lastName),
             );
           } else {
             console.error(res.error);
-            toast.error('Wystąpił błąd podczas dodawania pracownika!');
+            toast.error(dict.addDayOffForm.toast.error);
           }
           return;
         }
       }
-      toast.success('Pracownicy zostali dodani!');
+      toast.success(dict.addDayOffForm.toast.success);
       redirect(id);
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.addDayOffForm.toast.contactIT);
     } finally {
       setIsPendingInserting(false);
     }
@@ -97,10 +100,10 @@ export default function AddDayOff({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Dodaj odbiór dnia wolnego</CardTitle>
+          <CardTitle>{dict.addDayOffForm.title}</CardTitle>
           <Link href={`/production-overtime/${id}`}>
             <Button variant='outline'>
-              <Table /> <span>Powrót do zlecenia</span>
+              <Table /> <span>{dict.addDayOffForm.backToRequest}</span>
             </Button>
           </Link>
         </div>
@@ -115,7 +118,8 @@ export default function AddDayOff({
             onSelectChange={(selectedEmployees) => {
               form.setValue('employeesToAdd', selectedEmployees);
             }}
-            placeholder='Wyszukaj pracownika...'
+            placeholder={dict.addDayOffForm.searchPlaceholder}
+            dict={dict}
           />
         </CardContent>
         <Separator className='mb-4' />
@@ -128,7 +132,7 @@ export default function AddDayOff({
             className='w-full sm:w-auto'
           >
             <CircleX className='' />
-            Wyczyść
+            {dict.common.clear}
           </Button>
           <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
             <Button
@@ -139,10 +143,9 @@ export default function AddDayOff({
               }
             >
               <Plus className={isPendingInsert ? 'animate-spin' : ''} />
-              Dodaj{' '}
               {form.watch('employeesToAdd').length === 1
-                ? 'pracownika'
-                : 'pracowników'}
+                ? dict.addDayOffForm.addEmployee
+                : dict.addDayOffForm.addEmployees}
             </Button>
           </div>
         </CardFooter>

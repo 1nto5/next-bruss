@@ -1,1 +1,361 @@
-{}
+{
+  "title": "Odchylenia w procesie produkcyjnym",
+  "addNew": "Nowe odchylenie",
+  "login": "Zaloguj się",
+  "refresh": "Odśwież",
+  "noResults": "Brak wyników.",
+  "filters": {
+    "showFilters": "Pokaż filtry",
+    "onlyMy": "Tylko moje",
+    "status": "Status",
+    "area": "Obszar",
+    "reason": "Powód",
+    "deviationDate": "Termin odchylenia",
+    "createdDate": "Data utworzenia",
+    "select": "wybierz",
+    "search": "Szukaj",
+    "clear": "Wyczyść"
+  },
+  "form": {
+    "title": "Nowe odchylenie",
+    "tableLink": "Tabela odchyleń",
+    "articleNumber": "Numer artykułu",
+    "articleName": "Nazwa artykułu",
+    "customerPartNumber": "Numer części klienta",
+    "customerName": "Nazwa klienta",
+    "workstation": "Stanowisko",
+    "area": "Obszar",
+    "quantity": "Ilość",
+    "unit": "Jednostka",
+    "batch": "Partia",
+    "description": "Opis odchylenia",
+    "descriptionPlaceholder": "Wprowadź dowolny tekst opisujący odchylenie",
+    "findName": "Znajdź nazwę",
+    "pcs": "szt.",
+    "kg": "kg",
+    "reason": "Wybierz powód:",
+    "periodFrom": "Rozpoczęcie",
+    "periodTo": "Zakończenie",
+    "processSpecification": "Specyfikacja procesu",
+    "processSpecificationPlaceholder": "Wprowadź specyfikację procesu gdy dotyczy",
+    "customerAuthorization": "Autoryzacja klienta",
+    "clearButton": "Wyczyść",
+    "saveDraftButton": "Zapisz szkic",
+    "addDeviationButton": "Dodaj odchylenie",
+    "enterArticleNumber": "Wprowadź numer artykułu",
+    "articleNotFound": "Nie znaleziono artykułu",
+    "enterValidArticleNumber": "Wprowadź poprawny numer artykułu",
+    "contactIT": "Skontaktuj się z IT!",
+    "deviationAdded": "Odchylenie dodane!",
+    "draftSaved": "Szkic zapisany!",
+    "editTitle": "Edytowanie odchylenia",
+    "editDraftTitle": "Edytowanie szkicu odchylenia",
+    "deviationLink": "Odchylenie",
+    "saveChangesButton": "Zapisz zmiany",
+    "deviationUpdated": "Odchylenie zaktualizowane!",
+    "notAuthorizedToEdit": "Nie masz uprawnień do edycji tego odchylenia!",
+    "deviationNotFound": "Nie znaleziono odchylenia do aktualizacji!",
+    "noChanges": "Nie dokonałeś żadnych zmian w odchyleniu!",
+    "deviationAddedFromDraft": "Odchylenie dodane ze szkicu!",
+    "draftNotFoundToUpdate": "Nie znaleziono szkicu do zaktualizowania.",
+    "notAuthorizedToEditDraft": "Nie masz uprawnień do edycji tego szkicu.",
+    "notDraft": "Ten element nie jest już szkicem.",
+    "draftDeleted": "Szkic usunięty!",
+    "deleteDraftButton": "Usuń szkic"
+  },
+  "table": {
+    "columns": {
+      "id": "ID",
+      "status": "Status",
+      "from": "Od",
+      "to": "Do",
+      "article": "Art. / Materiał",
+      "quantity": "Ilość",
+      "area": "Obszar",
+      "reason": "Powód",
+      "owner": "Właściciel",
+      "createdAt": "Utworzono"
+    },
+    "status": {
+      "inApproval": "Oczekujące",
+      "approved": "Zatwierdzone",
+      "inProgress": "Obowiązuje",
+      "closed": "Zamknięte",
+      "rejected": "Odrzucone",
+      "toApprove": "Do zatwierdzenia",
+      "draft": "Szkic"
+    },
+    "actions": {
+      "edit": "Edytuj",
+      "open": "Otwórz"
+    },
+    "units": {
+      "pcs": "szt."
+    }
+  },
+  "view": {
+    "statusBadges": {
+      "approved": "Odchylenie zatwierdzone",
+      "rejected": "Odchylenie odrzucone",
+      "inApproval": "Odchylenie w trakcie zatwierdzania",
+      "inProgress": "Odchylenie obowiązuje",
+      "closed": "Odchylenie zamknięte",
+      "deviation": "Odchylenie"
+    },
+    "buttons": {
+      "print": "Drukuj",
+      "printLog": "Historia wydruków",
+      "backToTable": "Odchylenia",
+      "editLog": "Historia",
+      "edit": "Edytuj",
+      "addCorrectiveAction": "Dodaj"
+    },
+    "sections": {
+      "details": "Szczegóły",
+      "correctiveActions": "Akcje korygujące",
+      "approvals": "Zatwierdzenia",
+      "notifications": "Wysłane powiadomienia",
+      "attachments": "Załączniki",
+      "notes": "Notatki"
+    },
+    "labels": {
+      "created": "Utworzono",
+      "owner": "Właściciel",
+      "articleNumber": "Numer artykułu.",
+      "articleName": "Nazwa artykułu.",
+      "customerNumber": "Numer części klienta",
+      "customerName": "Nazwa klienta",
+      "workplace": "Stanowisko",
+      "quantity": "Ilość",
+      "charge": "Partia",
+      "reason": "Powód",
+      "validPeriod": "Obowiązuje",
+      "area": "Obszar",
+      "description": "Opis",
+      "processSpecification": "Specyfikacja procesu",
+      "customerAuthorization": "Autoryzacja klienta",
+      "yes": "Tak",
+      "no": "Nie"
+    },
+    "correctiveActionsTable": {
+      "status": "Status",
+      "changeStatus": "Zmiana statusu",
+      "description": "Opis",
+      "assignee": "Wykonawca",
+      "deadline": "Deadline",
+      "lastChange": "Ostatnia zmiana",
+      "history": "Historia",
+      "noActions": "Brak akcji korygujących"
+    },
+    "approvalsCard": {
+      "loginMessage": "Aby uzyskać dostęp do opcji zatwierdzania,",
+      "loginLink": "zaloguj się"
+    },
+    "approvalsTable": {
+      "status": "Status",
+      "role": "Stanowisko",
+      "approve": "Zatwierdzam",
+      "person": "Osoba",
+      "date": "Data",
+      "comment": "Komentarz",
+      "history": "Historia"
+    },
+    "roles": {
+      "qualityManager": "Kierownik Jakości",
+      "productionManager": "Kierownik Produkcji",
+      "plantManager": "Dyrektor Zakładu"
+    },
+    "notificationsTable": {
+      "to": "Do",
+      "sentAt": "Data wysłania",
+      "type": "Typ",
+      "noNotifications": "Brak zarejestrowanych powiadomień."
+    },
+    "attachmentsTable": {
+      "name": "Nazwa",
+      "file": "Plik",
+      "note": "Notatka",
+      "uploadedBy": "Dodał",
+      "date": "Data",
+      "noAttachments": "Brak załączników"
+    },
+    "notesTable": {
+      "person": "Osoba",
+      "date": "Data",
+      "note": "Notatka",
+      "noNotes": "Brak notatek"
+    },
+    "toasts": {
+      "approving": "Zatwierdzanie odchylenia...",
+      "rejecting": "Odrzucanie odchylenia...",
+      "approved": "Zatwierdzono!",
+      "rejected": "Odrzucono!",
+      "generatingPdf": "Generowanie PDF...",
+      "pdfGenerated": "PDF wygenerowano pomyślnie!"
+    },
+    "errors": {
+      "contactIT": "Skontaktuj się z IT!",
+      "vacancyRequired": "Zatwierdzenie możliwe tylko dla wakatu na stanowisku!",
+      "noPermission": "Nie posiadasz uprawnień do zatwierdzenia w tej roli!",
+      "noPdfExport": "Nie można wyeksportować PDF - brak ID odchylenia",
+      "pdfGenerationError": "Błąd podczas generowania PDF"
+    },
+    "approvalStatuses": {
+      "approved": "Zatwierdził",
+      "rejected": "Odrzucił",
+      "pending": "Brak decyzji"
+    },
+    "approvalDialogs": {
+      "approveTitle": "Zatwierdź odchylenie",
+      "rejectTitle": "Odrzuć odchylenie",
+      "position": "Stanowisko",
+      "comment": "Komentarz",
+      "approveButton": "Zatwierdzam",
+      "rejectButton": "Odrzucam",
+      "history": "Historia",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Data",
+        "person": "Osoba",
+        "comment": "Komentarz"
+      }
+    },
+    "correctiveActionStatuses": {
+      "open": "Otwarta",
+      "closed": "Zakończona",
+      "overdue": "Zaległa",
+      "inProgress": "W trakcie",
+      "rejected": "Odrzucona"
+    },
+    "correctiveActionDialogs": {
+      "closedTitle": "Akcja korygująca zakończona",
+      "closedDescription": "Nie można zmienić statusu zakończonej akcji korygującej.",
+      "changeStatusTitle": "Zmiana statusu akcji korygującej",
+      "noPermissionTitle": "Brak uprawnień",
+      "noPermissionDescription": "Nie masz uprawnień do zmiany statusu akcji korygującej.",
+      "changeDate": "Data zmiany",
+      "status": "Status",
+      "selectPlaceholder": "Wybierz",
+      "additionalInfo": "Dodatkowe informacje",
+      "additionalInfoPlaceholder": "Dowolny tekst dotyczący wykonania akcji korygującej",
+      "confirmButton": "Potwierdź",
+      "history": "Historia",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Data",
+        "comment": "Komentarz",
+        "person": "Osoba",
+        "time": "Czas"
+      },
+      "errors": {
+        "noUser": "Brak użytkownika!",
+        "contactIT": "Skontaktuj się z IT!"
+      },
+      "toasts": {
+        "updating": "Aktualizowanie statusu...",
+        "updated": "Status został zaktualizowany!"
+      }
+    }
+  },
+  "dialogs": {
+    "addNote": {
+      "title": "Dodaj notatkę",
+      "triggerButton": "Dodaj",
+      "contentLabel": "Treść notatki",
+      "contentPlaceholder": "Wprowadź treść notatki...",
+      "submitButton": "Dodaj notatkę",
+      "errors": {
+        "deviationIdError": "Błąd ID odchylenia. Skontaktuj się z IT!",
+        "contactIT": "Skontaktuj się z IT!"
+      },
+      "toasts": {
+        "loading": "Dodawanie notatki...",
+        "success": "Notatka dodana pomyślnie!"
+      }
+    },
+    "addAttachment": {
+      "title": "Dodaj załącznik",
+      "triggerButton": "Dodaj",
+      "fileLabel": "Plik",
+      "nameLabel": "Nazwa",
+      "namePlaceholder": "Własna nazwa pliku",
+      "noteLabel": "Notatka",
+      "submitButton": "Dodaj załącznik",
+      "errors": {
+        "noPermission": "Nie masz uprawnień lub odchylenie jest zamknięte.",
+        "contactIT": "Skontaktuj się z IT!",
+        "unauthorized": "Brak autoryzacji",
+        "noFile": "Nie wybrano pliku",
+        "noDeviationId": "Brak ID odchylenia",
+        "fileSizeExceeded": "Plik przekracza dozwolony rozmiar (10MB)",
+        "unsupportedFileType": "Nieobsługiwany format pliku",
+        "fileAlreadyExists": "Ten plik już istnieje",
+        "databaseUpdateFailed": "Nie udało się zaktualizować bazy danych",
+        "uploadFailed": "Wystąpił błąd podczas przesyłania pliku",
+        "unknownError": "Wystąpił nieznany błąd",
+        "generalUploadError": "Wystąpił błąd podczas dodawania załącznika"
+      },
+      "toasts": {
+        "loading": "Przesyłanie załącznika...",
+        "success": "Załącznik dodany pomyślnie!"
+      }
+    },
+    "editLog": {
+      "title": "Historia zmian",
+      "columns": {
+        "date": "Data",
+        "person": "Osoba",
+        "field": "Pole",
+        "oldValue": "Poprzednia wartość",
+        "newValue": "Nowa wartość"
+      },
+      "fieldNames": {
+        "articleNumber": "Numer artykułu",
+        "articleName": "Nazwa artykułu",
+        "workplace": "Stanowisko",
+        "customerNumber": "Numer klienta",
+        "customerName": "Nazwa klienta",
+        "quantity": "Ilość",
+        "unit": "Jednostka",
+        "charge": "Partia",
+        "reason": "Powód",
+        "periodFrom": "Okres od",
+        "periodTo": "Okres do",
+        "area": "Obszar",
+        "description": "Opis",
+        "processSpecification": "Specyfikacja procesu",
+        "customerAuthorization": "Autoryzacja klienta"
+      },
+      "booleanValues": {
+        "true": "Tak",
+        "false": "Nie"
+      },
+      "noHistory": "Brak historii zmian."
+    },
+    "printLog": {
+      "title": "Historia drukowania",
+      "columns": {
+        "date": "Data",
+        "person": "Osoba"
+      },
+      "noPrints": "Brak zarejestrowanych wydruków"
+    }
+  },
+  "correctiveAction": {
+    "title": "Nowa akcja korygująca",
+    "deadline": "Termin wykonania",
+    "responsible": "Osoba odpowiedzialna",
+    "description": "Opis akcji",
+    "descriptionPlaceholder": "Wprowadź dowolny tekst opisujący akcję do podjęcia",
+    "searchPlaceholder": "Szukaj...",
+    "notFound": "Nie znaleziono.",
+    "addButton": "Dodaj akcję korygującą",
+    "toasts": {
+      "added": "Akcja korygująca dodana!"
+    },
+    "errors": {
+      "deviationNotFound": "Nie znaleziono odchylenia!",
+      "notAuthorized": "Tylko właściciel odchylenia może dodawać akcje korygujące!"
+    }
+  }
+}

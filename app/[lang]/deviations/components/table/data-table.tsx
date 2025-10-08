@@ -27,24 +27,27 @@ import { CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { DeviationAreaType, DeviationReasonType } from '../../lib/types';
+import { getColumns } from './columns';
+import type { Dictionary } from '../../lib/dict';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   lang: string;
   reasonOptions: DeviationReasonType[];
   areaOptions: DeviationAreaType[];
+  dict: Dictionary;
 }
 
 export function DataTable<TData, TValue>({
-  columns,
   data,
   fetchTimeLocaleString,
   lang,
   reasonOptions,
   areaOptions,
+  dict,
 }: DataTableProps<TData, TValue>) {
+  const columns = getColumns(dict) as ColumnDef<TData, TValue>[];
   // useEffect(() => {
   //   const interval = setInterval(() => {
   //     revalidateDeviations();
@@ -128,7 +131,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    Brak wyników.
+                    {dict.noResults}
                   </TableCell>
                 </TableRow>
               )}

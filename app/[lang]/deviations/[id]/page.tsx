@@ -1,5 +1,5 @@
 import { Locale } from '@/lib/config/i18n';
-// import { getDictionary } from '@/lib/dict';
+import { getDictionary } from '../lib/dict';
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import DeviationView from '../components/view';
@@ -16,7 +16,7 @@ export default async function EditDeviationPage(props: {
 
   const { lang, id } = params;
 
-  // const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang);
   const { fetchTime, deviation } = await getDeviation(id);
   if (deviation === null) {
     redirect('/deviations');
@@ -33,6 +33,7 @@ export default async function EditDeviationPage(props: {
       fetchTime={fetchTime}
       reasonOptions={reasonOptions}
       areaOptions={areaOptions}
+      dict={dict}
     />
   );
 }

@@ -28,24 +28,27 @@ import { CardContent, CardFooter } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
+import { getDmcColumns } from './dmc-columns';
+import type { Dictionary } from '../lib/dict';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   articles: [];
   fetchTime: Date;
   fetchTimeLocaleString: string;
   lang: Locale;
+  dict: Dictionary;
 }
 
 export function DmcDataTable<TData, TValue>({
-  columns,
   data,
   articles,
   fetchTime,
   fetchTimeLocaleString,
   lang,
+  dict,
 }: DataTableProps<TData, TValue>) {
+  const columns = getDmcColumns(dict) as ColumnDef<TData, TValue>[];
   // useEffect(() => {
   //   const interval = setInterval(() => {
   //     revalidate();

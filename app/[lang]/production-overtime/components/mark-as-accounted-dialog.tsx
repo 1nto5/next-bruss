@@ -13,12 +13,14 @@ import {
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
 import { markAsAccountedOvertimeRequest as markAsAccounted } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 interface MarkAsAccountedDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
   session: Session | null;
+  dict: Dictionary;
 }
 
 export default function MarkAsAccountedDialog({
@@ -26,15 +28,14 @@ export default function MarkAsAccountedDialog({
   onOpenChange,
   requestId,
   session,
+  dict,
 }: MarkAsAccountedDialogProps) {
   const handleMarkAsAccounted = async () => {
     // Check if user has HR role
     const isHR = session?.user?.roles?.includes('hr');
 
     if (!isHR) {
-      toast.error(
-        'Tylko pracownicy HR mogą oznaczać zlecenia jako rozliczone!',
-      );
+      toast.error(dict.markAsAccountedDialog.toast.onlyHR);
       return;
     }
 
@@ -48,16 +49,16 @@ export default function MarkAsAccountedDialog({
         return res;
       }),
       {
-        loading: 'Zapisuję zmiany...',
-        success: 'Zlecenie oznaczone jako rozliczone!',
+        loading: dict.markAsAccountedDialog.toast.loading,
+        success: dict.markAsAccountedDialog.toast.success,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+          if (errorMsg === 'unauthorized') return dict.markAsAccountedDialog.toast.unauthorized;
+          if (errorMsg === 'not found') return dict.markAsAccountedDialog.toast.notFound;
           if (errorMsg === 'invalid status')
-            return 'Nieprawidłowy status zlecenia!';
+            return dict.markAsAccountedDialog.toast.invalidStatus;
           console.error('handleMarkAsAccounted', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.markAsAccountedDialog.toast.contactIT;
         },
       },
     );
@@ -67,17 +68,15 @@ export default function MarkAsAccountedDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Oznacz jako rozliczone</AlertDialogTitle>
+          <AlertDialogTitle>{dict.markAsAccountedDialog.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz oznaczyć to zlecenie jako rozliczone? Ta akcja
-            jest nieodwracalna i oznacza, że wszystkie nadgodziny zostały
-            rozliczone w systemie płacowym.
+            {dict.markAsAccountedDialog.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.common.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={handleMarkAsAccounted}>
-            Oznacz jako rozliczone
+            {dict.markAsAccountedDialog.action}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

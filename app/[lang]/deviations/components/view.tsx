@@ -7,6 +7,7 @@ import {
   DeviationReasonType,
   DeviationType,
 } from '@/app/[lang]/deviations/lib/types';
+import { Dictionary } from '../lib/dict';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -80,6 +81,7 @@ export default function DeviationView({
   fetchTime,
   reasonOptions,
   areaOptions,
+  dict,
 }: {
   deviation: DeviationType | null;
   lang: string;
@@ -87,6 +89,7 @@ export default function DeviationView({
   fetchTime: Date;
   reasonOptions: DeviationReasonType[];
   areaOptions: DeviationAreaType[];
+  dict: Dictionary;
 }) {
   const [isPendingApproval, startApprovalTransition] = useTransition();
   const [isPendingPdfExport, startPdfExportTransition] = useTransition();
@@ -114,7 +117,7 @@ export default function DeviationView({
         startApprovalTransition(async () => {
           try {
             if (!deviation?._id) {
-              reject(new Error('Skontaktuj się z IT!'));
+              reject(new Error(dict.view.errors.contactIT));
               return;
             }
 
@@ -136,30 +139,26 @@ export default function DeviationView({
               } else if (res.error === 'vacancy_required') {
                 // New error type for plant manager trying to approve as non-vacant role
                 reject(
-                  new Error(
-                    'Zatwierdzenie możliwe tylko dla wakatu na stanowisku!',
-                  ),
+                  new Error(dict.view.errors.vacancyRequired),
                 );
               } else if (res.error) {
-                reject(new Error('Skontaktuj się z IT!'));
+                reject(new Error(dict.view.errors.contactIT));
               }
             } else {
               reject(
-                new Error(
-                  'Nie posiadasz uprawnień do zatwierdzenia w tej roli!',
-                ),
+                new Error(dict.view.errors.noPermission),
               );
             }
           } catch (error) {
-            reject(new Error('Skontaktuj się z IT!'));
+            reject(new Error(dict.view.errors.contactIT));
           }
         });
       }),
       {
         loading: isApproved
-          ? 'Zatwierdzanie odchylenia...'
-          : 'Odrzucanie odchylenia...',
-        success: isApproved ? 'Zatwierdzono!' : 'Odrzucono!',
+          ? dict.view.toasts.approving
+          : dict.view.toasts.rejecting,
+        success: isApproved ? dict.view.toasts.approved : dict.view.toasts.rejected,
         error: (err) => err.message,
       },
     );
@@ -193,7 +192,7 @@ export default function DeviationView({
 
   const handleExportToPdf = () => {
     if (!deviation?._id) {
-      toast.error('Nie można wyeksportować PDF - brak ID odchylenia');
+      toast.error(dict.view.errors.noPdfExport);
       return;
     }
 
@@ -215,7 +214,7 @@ export default function DeviationView({
             );
 
             if (!response.ok) {
-              throw new Error('Błąd podczas generowania PDF');
+              throw new Error(dict.view.errors.pdfGenerationError);
             }
 
             const blob = await response.blob();
@@ -230,13 +229,13 @@ export default function DeviationView({
             resolve();
           } catch (error) {
             console.error('Error generating PDF:', error);
-            reject(new Error('Błąd podczas generowania PDF'));
+            reject(new Error(dict.view.errors.pdfGenerationError));
           }
         });
       }),
       {
-        loading: 'Generowanie PDF...',
-        success: 'PDF wygenerowano pomyślnie!',
+        loading: dict.view.toasts.generatingPdf,
+        success: dict.view.toasts.pdfGenerated,
         error: (err) => err.message,
       },
     );
@@ -271,13 +270,13 @@ export default function DeviationView({
       case 'approved':
         return (
           <Badge variant='statusApproved' size='lg' className='text-lg'>
-            Odchylenie zatwierdzone
+            {dict.view.statusBadges.approved}
           </Badge>
         );
       case 'rejected':
         return (
           <Badge variant='statusRejected' size='lg' className='text-lg'>
-            Odchylenie odrzucone
+            {dict.view.statusBadges.rejected}
           </Badge>
         );
       case 'in approval':
@@ -287,23 +286,23 @@ export default function DeviationView({
             size='lg'
             className='text-lg text-nowrap'
           >
-            Odchylenie w trakcie zatwierdzania
+            {dict.view.statusBadges.inApproval}
           </Badge>
         );
       case 'in progress':
         return (
           <Badge variant='statusInProgress' size='lg' className='text-lg'>
-            Odchylenie obowiązuje
+            {dict.view.statusBadges.inProgress}
           </Badge>
         );
       case 'closed':
         return (
           <Badge variant='statusClosed' size='lg' className='text-lg'>
-            Odchylenie zamknięte
+            {dict.view.statusBadges.closed}
           </Badge>
         );
       default:
-        return 'Odchylenie';
+        return dict.view.statusBadges.deviation;
     }
   };
 
@@ -328,7 +327,7 @@ export default function DeviationView({
                 disabled={isPendingPdfExport}
                 className='mb-2 sm:mb-0' // Add margin bottom for stacking/wrapping on small screens
               >
-                <Printer /> Drukuj
+                <Printer /> {dict.view.buttons.print}
               </Button>
             )}
             {/* Add Print Log Button */}
@@ -338,14 +337,14 @@ export default function DeviationView({
                 onClick={() => setIsPrintLogDialogOpen(true)}
                 className='mb-2 sm:mb-0'
               >
-                <PrinterCheck /> Historia wydruków
+                <PrinterCheck /> {dict.view.buttons.printLog}
               </Button>
             )}
             <Link href='/deviations'>
               <Button variant='outline' className='mb-2 sm:mb-0'>
                 {' '}
                 {/* Add margin bottom */}
-                <TableIcon /> Odchylenia
+                <TableIcon /> {dict.view.buttons.backToTable}
               </Button>
             </Link>
             {/* REMOVED: Edit button from here - moved to Details card */}
@@ -361,7 +360,7 @@ export default function DeviationView({
               <CardHeader>
                 <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
                   <CardTitle className='mb-2 flex items-center sm:mb-0'>
-                    <LayoutList className='mr-2 h-5 w-5' /> Szczegóły
+                    <LayoutList className='mr-2 h-5 w-5' /> {dict.view.sections.details}
                   </CardTitle>
                   <div className='flex flex-wrap gap-2'>
                     {/* Edit History Button */}
@@ -370,7 +369,7 @@ export default function DeviationView({
                         variant='outline'
                         onClick={() => setIsEditLogDialogOpen(true)}
                       >
-                        <History /> Historia
+                        <History /> {dict.view.buttons.editLog}
                       </Button>
                     )}
                     {/* MOVED: Edit button to here */}
@@ -389,7 +388,7 @@ export default function DeviationView({
                         )) && (
                         <Link href={`/deviations/${deviation?._id}/edit`}>
                           <Button variant='outline'>
-                            <Cog /> Edytuj
+                            <Cog /> {dict.view.buttons.edit}
                           </Button>
                         </Link>
                       )}
@@ -400,16 +399,16 @@ export default function DeviationView({
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell className='font-medium'>Utworzono:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.created}:</TableCell>
                       <TableCell>
                         {deviation?.createdAt
-                          ? new Date(deviation.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE)
+                          ? new Date(deviation.createdAt).toLocaleString(lang)
                           : '-'}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Właściciel:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.owner}:</TableCell>
                       <TableCell>
                         {extractNameFromEmail(deviation?.owner || '') || '-'}
                       </TableCell>
@@ -417,51 +416,51 @@ export default function DeviationView({
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Numer artykułu.:
+                        {dict.view.labels.articleNumber}:
                       </TableCell>
                       <TableCell>{deviation?.articleNumber || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Nazwa artykułu.:
+                        {dict.view.labels.articleName}:
                       </TableCell>
                       <TableCell>{deviation?.articleName || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Numer części klienta:
+                        {dict.view.labels.customerNumber}:
                       </TableCell>
                       <TableCell>{deviation?.customerNumber || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Nazwa klienta:
+                        {dict.view.labels.customerName}:
                       </TableCell>
                       <TableCell>{deviation?.customerName || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Stanowisko:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.workplace}:</TableCell>
                       <TableCell>{deviation?.workplace || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Ilość:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.quantity}:</TableCell>
                       <TableCell>
-                        {`${deviation?.quantity?.value || '-'} ${deviation?.quantity?.unit === 'pcs' ? 'szt.' : deviation?.quantity?.unit || ''}`}
+                        {`${deviation?.quantity?.value || '-'} ${deviation?.quantity?.unit === 'pcs' ? dict.table.units.pcs : deviation?.quantity?.unit || ''}`}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Partia:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.charge}:</TableCell>
                       <TableCell>{deviation?.charge || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Powód:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.reason}:</TableCell>
                       <TableCell>
                         {deviation?.reason
                           ? reasonOptions.find(
@@ -480,7 +479,7 @@ export default function DeviationView({
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Obowiązuje:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.validPeriod}:</TableCell>
                       <TableCell>
                         {deviation?.timePeriod?.from &&
                         deviation?.timePeriod?.to
@@ -490,7 +489,7 @@ export default function DeviationView({
                     </TableRow>
 
                     <TableRow>
-                      <TableCell className='font-medium'>Obszar:</TableCell>
+                      <TableCell className='font-medium'>{dict.view.labels.area}:</TableCell>
                       <TableCell>
                         {deviation?.area
                           ? areaOptions.find(
@@ -509,21 +508,21 @@ export default function DeviationView({
                     </TableRow>
 
                     <TableRow>
-                      <TableCell>Opis:</TableCell>
+                      <TableCell>{dict.view.labels.description}:</TableCell>
                       <TableCell>{deviation?.description || '-'}</TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell>Specyfikacja procesu:</TableCell>
+                      <TableCell>{dict.view.labels.processSpecification}:</TableCell>
                       <TableCell>
                         {deviation?.processSpecification || '-'}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
-                      <TableCell>Autoryzacja klienta:</TableCell>
+                      <TableCell>{dict.view.labels.customerAuthorization}:</TableCell>
                       <TableCell>
-                        {deviation?.customerAuthorization ? 'Tak' : 'Nie'}
+                        {deviation?.customerAuthorization ? dict.view.labels.yes : dict.view.labels.no}
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -535,7 +534,7 @@ export default function DeviationView({
                 <CardHeader>
                   <div className='flex justify-between'>
                     <CardTitle className='flex items-center'>
-                      <Wrench className='mr-2 h-5 w-5' /> Akcje korygujące
+                      <Wrench className='mr-2 h-5 w-5' /> {dict.view.sections.correctiveActions}
                     </CardTitle>
                     {(session?.user?.roles?.some((role) =>
                       [
@@ -552,7 +551,7 @@ export default function DeviationView({
                         href={`/deviations/${deviation?._id}/corrective/add`}
                       >
                         <Button variant='outline'>
-                          <Hammer /> Dodaj
+                          <Hammer /> {dict.view.buttons.addCorrectiveAction}
                         </Button>
                       </Link>
                     )}
@@ -563,13 +562,13 @@ export default function DeviationView({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Zmiana statusu</TableHead>
-                        <TableHead className='min-w-[250px]'>Opis</TableHead>
-                        <TableHead>Wykonawca</TableHead>
-                        <TableHead>Deadline</TableHead>
-                        <TableHead>Ostatnia zmiana</TableHead>
-                        <TableHead>Historia</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.status}</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.changeStatus}</TableHead>
+                        <TableHead className='min-w-[250px]'>{dict.view.correctiveActionsTable.description}</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.assignee}</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.deadline}</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.lastChange}</TableHead>
+                        <TableHead>{dict.view.correctiveActionsTable.history}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -586,6 +585,7 @@ export default function DeviationView({
                                 user={session?.user?.email}
                                 userRoles={session?.user?.roles}
                                 deviationOwner={deviation?.owner}
+                                dict={dict}
                               />
                             </TableRow>
                           ),
@@ -596,7 +596,7 @@ export default function DeviationView({
                             colSpan={7}
                             className='text-muted-foreground text-center'
                           >
-                            Brak akcji korygujących
+                            {dict.view.correctiveActionsTable.noActions}
                           </TableCell>
                         </TableRow>
                       )}
@@ -607,17 +607,17 @@ export default function DeviationView({
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center'>
-                    <CheckCheck className='mr-2 h-5 w-5' /> Zatwierdzenia
+                    <CheckCheck className='mr-2 h-5 w-5' /> {dict.view.sections.approvals}
                   </CardTitle>
                   <CardDescription>
                     {!session && (
                       <span>
-                        Aby uzyskać dostęp do opcji zatwierdzania,{' '}
+                        {dict.view.approvalsCard.loginMessage}{' '}
                         <Link
                           href={`/${lang}/auth?callbackUrl=${encodeURIComponent(`/${lang}/deviations/${deviation?._id}`)}`}
                           className='text-blue-600 underline hover:text-blue-800'
                         >
-                          zaloguj się
+                          {dict.view.approvalsCard.loginLink}
                         </Link>
                         .
                       </span>
@@ -628,13 +628,13 @@ export default function DeviationView({
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Stanowisko</TableHead>
-                        <TableHead>Zatwierdzam</TableHead>
-                        <TableHead>Osoba</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Komentarz</TableHead>
-                        <TableHead>Historia</TableHead>
+                        <TableHead>{dict.view.approvalsTable.status}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.role}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.approve}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.person}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.date}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.comment}</TableHead>
+                        <TableHead>{dict.view.approvalsTable.history}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -653,11 +653,12 @@ export default function DeviationView({
                           reason={deviation?.groupLeaderApproval?.reason}
                           history={deviation?.groupLeaderApproval?.history}
                           deviationStatus={deviation?.status}
+                          dict={dict}
                         />
                       </TableRow>
                       <TableRow>
                         <TableCellsApprove
-                          roleText='Kierownik Jakości'
+                          roleText={dict.view.roles.qualityManager}
                           deviationUserRoles={deviationUserRoles}
                           role='quality-manager'
                           approved={deviation?.qualityManagerApproval?.approved}
@@ -674,12 +675,13 @@ export default function DeviationView({
                           reason={deviation?.qualityManagerApproval?.reason}
                           history={deviation?.qualityManagerApproval?.history}
                           deviationStatus={deviation?.status}
+                          dict={dict}
                         />
                       </TableRow>
 
                       <TableRow>
                         <TableCellsApprove
-                          roleText='Kierownik Produkcji'
+                          roleText={dict.view.roles.productionManager}
                           deviationUserRoles={deviationUserRoles}
                           role='production-manager'
                           approved={
@@ -700,11 +702,12 @@ export default function DeviationView({
                             deviation?.productionManagerApproval?.history
                           }
                           deviationStatus={deviation?.status}
+                          dict={dict}
                         />
                       </TableRow>
                       <TableRow>
                         <TableCellsApprove
-                          roleText='Dyrektor Zakładu'
+                          roleText={dict.view.roles.plantManager}
                           deviationUserRoles={deviationUserRoles}
                           role='plant-manager'
                           approved={deviation?.plantManagerApproval?.approved}
@@ -717,6 +720,7 @@ export default function DeviationView({
                           reason={deviation?.plantManagerApproval?.reason}
                           history={deviation?.plantManagerApproval?.history}
                           deviationStatus={deviation?.status}
+                          dict={dict}
                         />
                       </TableRow>
                     </TableBody>
@@ -726,7 +730,7 @@ export default function DeviationView({
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center'>
-                    <MailCheck className='mr-2 h-5 w-5' /> Wysłane powiadomienia
+                    <MailCheck className='mr-2 h-5 w-5' /> {dict.view.sections.notifications}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -736,9 +740,9 @@ export default function DeviationView({
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Do</TableHead>
-                          <TableHead>Data wysłania</TableHead>
-                          <TableHead>Typ</TableHead>
+                          <TableHead>{dict.view.notificationsTable.to}</TableHead>
+                          <TableHead>{dict.view.notificationsTable.sentAt}</TableHead>
+                          <TableHead>{dict.view.notificationsTable.type}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -757,7 +761,7 @@ export default function DeviationView({
                                   {extractNameFromEmail(log.to)}
                                 </TableCell>
                                 <TableCell>
-                                  {new Date(log.sentAt).toLocaleString(process.env.DATE_TIME_LOCALE)}
+                                  {new Date(log.sentAt).toLocaleString(lang)}
                                 </TableCell>
                                 <TableCell>{log.type}</TableCell>
                               </TableRow>
@@ -768,7 +772,7 @@ export default function DeviationView({
                               colSpan={3}
                               className='text-muted-foreground text-center'
                             >
-                              Brak zarejestrowanych powiadomień.
+                              {dict.view.notificationsTable.noNotifications}
                             </TableCell>
                           </TableRow>
                         )}
@@ -785,7 +789,7 @@ export default function DeviationView({
               <CardHeader>
                 <div className='flex justify-between'>
                   <CardTitle className='flex items-center'>
-                    <Paperclip className='mr-2 h-5 w-5' /> Załączniki
+                    <Paperclip className='mr-2 h-5 w-5' /> {dict.view.sections.attachments}
                   </CardTitle>
                   {deviation?._id &&
                     canAddAttachment && ( // Use the new check here
@@ -794,6 +798,7 @@ export default function DeviationView({
                         deviationStatus={deviation.status} // Pass status
                         deviationOwner={deviation.owner} // Pass owner
                         session={session} // Pass session
+                        dict={dict}
                       />
                     )}
                 </div>
@@ -802,11 +807,11 @@ export default function DeviationView({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Nazwa</TableHead>
-                      <TableHead>Plik</TableHead>
-                      <TableHead>Notatka</TableHead>
-                      <TableHead>Dodał</TableHead>
-                      <TableHead>Data</TableHead>
+                      <TableHead>{dict.view.attachmentsTable.name}</TableHead>
+                      <TableHead>{dict.view.attachmentsTable.file}</TableHead>
+                      <TableHead>{dict.view.attachmentsTable.note}</TableHead>
+                      <TableHead>{dict.view.attachmentsTable.uploadedBy}</TableHead>
+                      <TableHead>{dict.view.attachmentsTable.date}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -852,7 +857,7 @@ export default function DeviationView({
                           colSpan={6}
                           className='text-muted-foreground text-center'
                         >
-                          Brak załączników
+                          {dict.view.attachmentsTable.noAttachments}
                         </TableCell>
                       </TableRow>
                     )}
@@ -868,10 +873,10 @@ export default function DeviationView({
               <CardHeader>
                 <div className='flex justify-between'>
                   <CardTitle className='flex items-center'>
-                    <StickyNote className='mr-2 h-5 w-5' /> Notatki
+                    <StickyNote className='mr-2 h-5 w-5' /> {dict.view.sections.notes}
                   </CardTitle>
                   {deviation?._id && session && (
-                    <AddNoteDialog deviationId={deviation._id.toString()} />
+                    <AddNoteDialog deviationId={deviation._id.toString()} dict={dict} />
                   )}
                 </div>
               </CardHeader>
@@ -879,9 +884,9 @@ export default function DeviationView({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Osoba</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Notatka</TableHead>
+                      <TableHead>{dict.view.notesTable.person}</TableHead>
+                      <TableHead>{dict.view.notesTable.date}</TableHead>
+                      <TableHead>{dict.view.notesTable.note}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -898,7 +903,7 @@ export default function DeviationView({
                               {extractNameFromEmail(note.createdBy)}
                             </TableCell>
                             <TableCell>
-                              {new Date(note.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE)}
+                              {new Date(note.createdAt).toLocaleString(lang)}
                             </TableCell>
                             <TableCell className='whitespace-pre-line'>
                               {note.content}
@@ -911,7 +916,7 @@ export default function DeviationView({
                           colSpan={3}
                           className='text-muted-foreground text-center'
                         >
-                          Brak notatek
+                          {dict.view.notesTable.noNotes}
                         </TableCell>
                       </TableRow>
                     )}
@@ -929,6 +934,7 @@ export default function DeviationView({
         onClose={() => setIsEditLogDialogOpen(false)} // RENAMED: Setter
         logs={deviation?.editLogs || []} // RENAMED: Prop name and source
         lang={lang}
+        dict={dict}
       />
 
       {/* NEW: Print Log Dialog */}
@@ -937,6 +943,7 @@ export default function DeviationView({
         onClose={() => setIsPrintLogDialogOpen(false)}
         logs={deviation?.printLogs || []}
         lang={lang}
+        dict={dict}
       />
     </Card>
   );

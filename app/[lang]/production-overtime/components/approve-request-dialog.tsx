@@ -13,12 +13,14 @@ import {
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
 import { approveOvertimeRequest as approve } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 interface ApproveRequestDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
   session: Session | null;
+  dict: Dictionary;
 }
 
 export default function ApproveRequestDialog({
@@ -26,6 +28,7 @@ export default function ApproveRequestDialog({
   onOpenChange,
   requestId,
   session,
+  dict,
 }: ApproveRequestDialogProps) {
   const handleApprove = async () => {
     // Check if user has plant-manager or admin role
@@ -33,7 +36,7 @@ export default function ApproveRequestDialog({
     const isAdmin = session?.user?.roles?.includes('admin');
 
     if (!isPlantManager && !isAdmin) {
-      toast.error('Tylko plant manager może zatwierdzać zlecenia!');
+      toast.error(dict.approveRequestDialog.toast.onlyPlantManager);
       return;
     }
 
@@ -47,14 +50,14 @@ export default function ApproveRequestDialog({
         return res;
       }),
       {
-        loading: 'Zapisuję zmiany...',
-        success: 'Zlecenie zatwierdzone!',
+        loading: dict.approveRequestDialog.toast.loading,
+        success: dict.approveRequestDialog.toast.success,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+          if (errorMsg === 'unauthorized') return dict.approveRequestDialog.toast.unauthorized;
+          if (errorMsg === 'not found') return dict.approveRequestDialog.toast.notFound;
           console.error('handleApprove', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.approveRequestDialog.toast.contactIT;
         },
       },
     );
@@ -64,16 +67,15 @@ export default function ApproveRequestDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Zatwierdź zlecenie</AlertDialogTitle>
+          <AlertDialogTitle>{dict.approveRequestDialog.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz zatwierdzić to zlecenie wykonania pracy w
-            godzinach nadliczbowych?
+            {dict.approveRequestDialog.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.common.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={handleApprove}>
-            Zatwierdź zlecenie
+            {dict.approveRequestDialog.action}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

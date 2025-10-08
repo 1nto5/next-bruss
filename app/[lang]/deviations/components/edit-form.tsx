@@ -42,6 +42,7 @@ import {
   redirectToDeviation,
   updateDeviation,
 } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 export default function EditForm({
   reasonOptions,
@@ -49,12 +50,14 @@ export default function EditForm({
   deviation,
   id,
   lang,
+  dict,
 }: {
   reasonOptions: DeviationReasonType[];
   areaOptions: DeviationAreaType[];
   deviation: DeviationType;
   id: string;
   lang: Locale;
+  dict: Dictionary;
 }) {
   const [isPendingUpdate, setIsPendingUpdate] = useState(false); // Renamed state for clarity
   const [isPendingFindArticleName, startFindArticleNameTransition] =
@@ -90,7 +93,7 @@ export default function EditForm({
       try {
         const articleNumber = form.getValues('articleNumber');
         if (!articleNumber) {
-          toast.error('Wprowadź numer artykułu');
+          toast.error(dict.form.enterArticleNumber);
           return;
         }
         if (articleNumber.length === 5) {
@@ -98,17 +101,17 @@ export default function EditForm({
           if (res.success) {
             form.setValue('articleName', res.success);
           } else if (res.error === 'not found') {
-            toast.error('Nie znaleziono artykułu');
+            toast.error(dict.form.articleNotFound);
           } else if (res.error) {
             console.error(res.error);
-            toast.error('Skontaktuj się z IT!');
+            toast.error(dict.form.contactIT);
           }
         } else {
-          toast.error('Wprowadź poprawny numer artykułu');
+          toast.error(dict.form.enterValidArticleNumber);
         }
       } catch (error) {
         console.error('handleFindArticleName', error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     });
   };
@@ -120,23 +123,21 @@ export default function EditForm({
       const updateRes = await updateDeviation(id, data); // Call updateDeviation with id and data
 
       if (updateRes.success) {
-        toast.success('Odchylenie zaktualizowane!'); // Updated success message
+        toast.success(dict.form.deviationUpdated); // Updated success message
         redirectToDeviation(id);
       } else if (updateRes.error === 'not authorized') {
-        toast.error('Nie masz uprawnień do edycji tego odchylenia!');
+        toast.error(dict.form.notAuthorizedToEdit);
       } else if (updateRes.error === 'not found') {
-        toast.error('Nie znaleziono odchylenia do aktualizacji!');
+        toast.error(dict.form.deviationNotFound);
       } else if (updateRes.error === 'no changes') {
-        toast.warning('Nie dokonałeś żadnych zmian w odchyleniu!');
+        toast.warning(dict.form.noChanges);
       } else if (updateRes.error) {
         console.error('onSubmit - updateDeviation error:', updateRes.error);
-        toast.error(
-          'Błąd podczas aktualizacji odchylenia. Skontaktuj się z IT!', // Updated error message
-        );
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('onSubmit error:', error);
-      toast.error('Wystąpił nieoczekiwany błąd. Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingUpdate(false); // Use the renamed state setter
     }
@@ -147,12 +148,12 @@ export default function EditForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           {/* <div> */}
-          <CardTitle>Edytowanie odchylenia</CardTitle>
+          <CardTitle>{dict.form.editTitle}</CardTitle>
           {/* <CardDescription>ID: {deviation?._id}</CardDescription> */}
           {/* </div> */}
           <Link href={`/deviations/${id}`}>
             <Button variant='outline'>
-              <ArrowLeftFromLine /> <span>Odchylenie</span>
+              <ArrowLeftFromLine /> <span>{dict.form.deviationLink}</span>
             </Button>
           </Link>
         </div>
@@ -166,7 +167,7 @@ export default function EditForm({
               name='articleNumber'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Numer artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleNumber}</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -180,7 +181,7 @@ export default function EditForm({
               name='articleName'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Nazwa artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleName}</FormLabel>
                   <div className='flex items-center space-x-2'>
                     <FormControl>
                       <Input {...field} />
@@ -196,7 +197,7 @@ export default function EditForm({
                           isPendingFindArticleName ? 'animate-spin' : ''
                         }
                       />{' '}
-                      <span>Znajdź nazwę</span>
+                      <span>{dict.form.findName}</span>
                     </Button>
                   </div>
                   <FormMessage />
@@ -210,7 +211,7 @@ export default function EditForm({
                 name='customerNumber'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Numer części klienta</FormLabel>
+                    <FormLabel>{dict.form.customerPartNumber}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -224,7 +225,7 @@ export default function EditForm({
                 name='customerName'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Nazwa klienta</FormLabel>
+                    <FormLabel>{dict.form.customerName}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -239,7 +240,7 @@ export default function EditForm({
               name='workplace'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Stanowisko</FormLabel>
+                  <FormLabel>{dict.form.workstation}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -253,7 +254,7 @@ export default function EditForm({
               name='area'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Obszar</FormLabel>
+                  <FormLabel>{dict.form.area}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -286,7 +287,7 @@ export default function EditForm({
                 name='quantity'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Ilość</FormLabel>
+                    <FormLabel>{dict.form.quantity}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -300,7 +301,7 @@ export default function EditForm({
                 name='unit'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Jednostka</FormLabel>
+                    <FormLabel>{dict.form.unit}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -314,7 +315,7 @@ export default function EditForm({
                           <FormControl>
                             <RadioGroupItem value='pcs' />
                           </FormControl>
-                          <FormLabel className='font-normal'>szt.</FormLabel>
+                          <FormLabel className='font-normal'>{dict.form.pcs}</FormLabel>
                         </FormItem>
                         <FormItem
                           key={'kg'}
@@ -323,7 +324,7 @@ export default function EditForm({
                           <FormControl>
                             <RadioGroupItem value='kg' />
                           </FormControl>
-                          <FormLabel className='font-normal'>kg</FormLabel>
+                          <FormLabel className='font-normal'>{dict.form.kg}</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -338,7 +339,7 @@ export default function EditForm({
               name='charge'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Partia</FormLabel>
+                  <FormLabel>{dict.form.batch}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -352,10 +353,10 @@ export default function EditForm({
               name='description'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opis odchylenia</FormLabel>
+                  <FormLabel>{dict.form.description}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      placeholder={dict.form.descriptionPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -368,7 +369,7 @@ export default function EditForm({
               name='reason'
               render={({ field }) => (
                 <FormItem className='space-y-3'>
-                  <FormLabel>Wybierz powód:</FormLabel>
+                  <FormLabel>{dict.form.reason}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -401,7 +402,7 @@ export default function EditForm({
                 name='periodFrom'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Rozpoczęcie</FormLabel>
+                    <FormLabel>{dict.form.periodFrom}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -442,7 +443,7 @@ export default function EditForm({
                 name='periodTo'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Zakończenie</FormLabel>
+                    <FormLabel>{dict.form.periodTo}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -479,10 +480,10 @@ export default function EditForm({
               name='processSpecification'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Specyfikacja procesu</FormLabel>
+                  <FormLabel>{dict.form.processSpecification}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź specyfikację procesu gdy dotyczy`}
+                      placeholder={dict.form.processSpecificationPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -497,7 +498,7 @@ export default function EditForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='space-y-0.5'>
-                    <FormLabel>Autoryzacja klienta</FormLabel>
+                    <FormLabel>{dict.form.customerAuthorization}</FormLabel>
                   </div>
                   <FormControl>
                     <Switch
@@ -524,7 +525,7 @@ export default function EditForm({
               >
                 <Plus className={isPendingUpdate ? 'animate-spin' : ''} />{' '}
                 {/* Use renamed state */}
-                Zapisz zmiany {/* Renamed button */}
+                {dict.form.saveChangesButton} {/* Renamed button */}
               </Button>
             </div>
           </CardFooter>

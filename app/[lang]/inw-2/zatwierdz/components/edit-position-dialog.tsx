@@ -34,11 +34,14 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { updatePosition as update } from '../actions';
+import { Dictionary } from '../../lib/dict';
 
 export default function EditPositionDialog({
   position,
+  dict,
 }: {
   position: PositionType;
+  dict?: Dictionary;
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
@@ -245,10 +248,10 @@ export default function EditPositionDialog({
               {isPendingUpdate ? (
                 <Button disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Zapisz
+                  {dict?.editDialog?.save || 'Zapisz'}
                 </Button>
               ) : (
-                <Button type='submit'>Zapisz</Button>
+                <Button type='submit'>{dict?.editDialog?.save || 'Zapisz'}</Button>
               )}
             </DialogFooter>
           </form>

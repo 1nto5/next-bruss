@@ -5,12 +5,14 @@ import { Locale } from '@/lib/config/i18n';
 import { notFound, redirect } from 'next/navigation';
 import EditOvertimeRequestForm from '../../components/edit-overtime-request-form';
 import { getOvertimeRequestForEdit } from '../../actions';
+import { getDictionary } from '../../lib/dict';
 
 export default async function EditOvertimeRequestPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
 }) {
   const params = await props.params;
-  const { id } = params;
+  const { lang, id } = params;
+  const dict = await getDictionary(lang);
   
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -35,6 +37,7 @@ export default async function EditOvertimeRequestPage(props: {
       employees={employees}
       users={users}
       overtimeRequest={overtimeRequest}
+      dict={dict}
     />
   );
 }

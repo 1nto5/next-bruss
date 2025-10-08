@@ -1,10 +1,17 @@
 import { auth } from '@/lib/auth';
 import getEmployees from '@/lib/data/get-employees';
 import { getUsers } from '@/lib/data/get-users';
+import { Locale } from '@/lib/config/i18n';
 import { redirect } from 'next/navigation';
 import NewOvertimeRequestForm from '../components/new-overtime-request-form';
+import { getDictionary } from '../lib/dict';
 
-export default async function AddDeviationPage() {
+export default async function AddDeviationPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const params = await props.params;
+  const { lang } = params;
+  const dict = await getDictionary(lang);
   const employees = await getEmployees();
   const users = await getUsers();
   const session = await auth();
@@ -29,6 +36,7 @@ export default async function AddDeviationPage() {
       employees={employees}
       users={users}
       loggedInUserEmail={session.user.email ?? ''}
+      dict={dict}
     />
   );
 }

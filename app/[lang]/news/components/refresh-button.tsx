@@ -28,9 +28,7 @@ export function RefreshButton({ dict }: RefreshButtonProps) {
       }
     } catch (error) {
       console.error('Refresh error:', error);
-      toast.error(
-        dict.messages.refreshError || 'Wystąpił błąd podczas odświeżania',
-      );
+      toast.error(dict.messages.refreshError);
     } finally {
       setIsRefreshing(false);
     }
@@ -44,7 +42,7 @@ export function RefreshButton({ dict }: RefreshButtonProps) {
       disabled={isRefreshing}
     >
       <RefreshCw className={`${isRefreshing ? 'animate-spin' : ''}`} />
-      <span>{dict.refresh || 'Odśwież'}</span>
+      <span>{dict.refresh}</span>
     </Button>
   );
 }

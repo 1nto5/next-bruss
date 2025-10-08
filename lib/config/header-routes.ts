@@ -16,12 +16,7 @@ export const ROUTE_PATHS = {
   failuresLv: '/failures/lv',
   inw2spis: '/inw-2/spis',
   inw2zatwierdz: '/inw-2/zatwierdz',
-  proOldRework: '/pro-old/rework',
-  adminUsers: '/admin/users',
-  adminEmployees: '/admin/employees',
-  adminEmployeesAddMany: '/admin/employees/add-many',
-  adminDmcheckArticles: '/admin/dmcheck-articles',
-  adminReworkMany: '/admin/rework-many',
+
   newsAdd: '/news/add',
   productionOvertime: '/production-overtime',
   overtimeSubmissions: '/overtime-submissions',
@@ -95,10 +90,6 @@ export const deHeaderRoutes: HeaderRoute[] = [
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
       },
-      {
-        href: ROUTE_PATHS.proOldRework,
-        title: 'Rework',
-      },
     ],
   },
 ];
@@ -165,26 +156,6 @@ export const adminHeaderRoutes: HeaderRoute[] = [
     title: 'Admin',
     href: '',
     submenu: [
-      {
-        href: ROUTE_PATHS.adminUsers,
-        title: 'Users management',
-      },
-      {
-        href: ROUTE_PATHS.adminEmployees,
-        title: 'Employees',
-      },
-      {
-        href: ROUTE_PATHS.adminEmployeesAddMany,
-        title: 'Add many employees',
-      },
-      {
-        href: ROUTE_PATHS.adminDmcheckArticles,
-        title: 'DMCheck configs',
-      },
-      {
-        href: ROUTE_PATHS.adminReworkMany,
-        title: 'DMCheck rework many',
-      },
       {
         href: ROUTE_PATHS.projects,
         title: 'Projects',

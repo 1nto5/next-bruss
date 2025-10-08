@@ -47,6 +47,7 @@ import {
   redirectToDeviations,
   updateDraftDeviation,
 } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 export default function EditDraftForm({
   reasonOptions,
@@ -54,12 +55,14 @@ export default function EditDraftForm({
   deviation,
   id,
   lang,
+  dict,
 }: {
   reasonOptions: DeviationReasonType[];
   areaOptions: DeviationAreaType[];
   deviation: DeviationType;
   id: string;
   lang: Locale;
+  dict: Dictionary;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [isPendingUpdateDraft, setIsPendingUpdatingDraft] = useState(false);
@@ -97,7 +100,7 @@ export default function EditDraftForm({
       try {
         const articleNumber = form.getValues('articleNumber');
         if (!articleNumber) {
-          toast.error('Wprowadź numer artykułu');
+          toast.error(dict.form.enterArticleNumber);
           return;
         }
         if (articleNumber.length === 5) {
@@ -105,17 +108,17 @@ export default function EditDraftForm({
           if (res.success) {
             form.setValue('articleName', res.success);
           } else if (res.error === 'not found') {
-            toast.error('Nie znaleziono artykułu');
+            toast.error(dict.form.articleNotFound);
           } else if (res.error) {
             console.error(res.error);
-            toast.error('Skontaktuj się z IT!');
+            toast.error(dict.form.contactIT);
           }
         } else {
-          toast.error('Wprowadź poprawny numer artykułu');
+          toast.error(dict.form.enterValidArticleNumber);
         }
       } catch (error) {
         console.error('handleFindArticleName', error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     });
   };
@@ -129,15 +132,15 @@ export default function EditDraftForm({
       if (insertRes.success) {
         // 2. If insertion is successful, DO NOT delete the original draft
         // const deleteRes = await deleteDraftDeviation(id); // Removed deletion
-        toast.success('Odchylenie dodane ze szkicu!'); // Updated message
+        toast.success(dict.form.deviationAddedFromDraft); // Updated message
         redirectToDeviations();
       } else if (insertRes.error) {
         console.error('onSubmit - insertDeviation error:', insertRes.error);
-        toast.error('Błąd podczas dodawania odchylenia. Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('onSubmit error:', error);
-      toast.error('Wystąpił nieoczekiwany błąd. Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingInserting(false); // Ensure loading state is always reset
     }
@@ -152,25 +155,25 @@ export default function EditDraftForm({
       const validatedData = addDeviationDraftSchema.parse(data);
       const res = await updateDraftDeviation(id, validatedData);
       if (res.success) {
-        toast.success('Szkic zapisany!');
+        toast.success(dict.form.draftSaved);
         // form.reset(); // Consider if resetting is desired after saving draft
         // redirectToDeviations(); // Removed redirection
       } else if (res.error) {
         console.error('handleDraftUpdate', res.error);
         // Provide more specific error messages if possible
         if (res.error === 'not found') {
-          toast.error('Nie znaleziono szkicu do zaktualizowania.');
+          toast.error(dict.form.draftNotFoundToUpdate);
         } else if (res.error === 'not authorized') {
-          toast.error('Nie masz uprawnień do edycji tego szkicu.');
+          toast.error(dict.form.notAuthorizedToEditDraft);
         } else if (res.error === 'not draft') {
-          toast.error('Ten element nie jest już szkicem.');
+          toast.error(dict.form.notDraft);
         } else {
-          toast.error('Błąd podczas zapisywania szkicu. Skontaktuj się z IT!');
+          toast.error(dict.form.contactIT);
         }
       }
     } catch (error) {
       console.error('handleDraftUpdate error:', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingUpdatingDraft(false);
     }
@@ -181,15 +184,15 @@ export default function EditDraftForm({
     try {
       const res = await deleteDraftDeviation(id);
       if (res.success) {
-        toast.success('Szkic usunięty!');
+        toast.success(dict.form.draftDeleted);
         redirectToDeviations();
       } else if (res.error) {
         console.error('handleDeleteDraft', res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('handleDeleteDraft', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingDeleteDraft(false);
     }
@@ -200,12 +203,12 @@ export default function EditDraftForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           {/* <div> */}
-          <CardTitle>Edytowanie szkicu odchylenia</CardTitle>
+          <CardTitle>{dict.form.editDraftTitle}</CardTitle>
           {/* <CardDescription>ID: {deviation?._id}</CardDescription> */}
           {/* </div> */}
           <Link href='/deviations'>
             <Button variant='outline'>
-              <Table /> <span>Tabela odchyleń</span>
+              <Table /> <span>{dict.form.tableLink}</span>
             </Button>
           </Link>
         </div>
@@ -219,7 +222,7 @@ export default function EditDraftForm({
               name='articleNumber'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Numer artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleNumber}</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -233,7 +236,7 @@ export default function EditDraftForm({
               name='articleName'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Nazwa artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleName}</FormLabel>
                   <div className='flex items-center space-x-2'>
                     <FormControl>
                       <Input {...field} />
@@ -249,7 +252,7 @@ export default function EditDraftForm({
                           isPendingFindArticleName ? 'animate-spin' : ''
                         }
                       />{' '}
-                      <span>Znajdź nazwę</span>
+                      <span>{dict.form.findName}</span>
                     </Button>
                   </div>
                   <FormMessage />
@@ -263,7 +266,7 @@ export default function EditDraftForm({
                 name='customerNumber'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Numer części klienta</FormLabel>
+                    <FormLabel>{dict.form.customerPartNumber}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -277,7 +280,7 @@ export default function EditDraftForm({
                 name='customerName'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Nazwa klienta</FormLabel>
+                    <FormLabel>{dict.form.customerName}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -292,7 +295,7 @@ export default function EditDraftForm({
               name='workplace'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Stanowisko</FormLabel>
+                  <FormLabel>{dict.form.workstation}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -306,7 +309,7 @@ export default function EditDraftForm({
               name='area'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Obszar</FormLabel>
+                  <FormLabel>{dict.form.area}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -339,7 +342,7 @@ export default function EditDraftForm({
                 name='quantity'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Ilość</FormLabel>
+                    <FormLabel>{dict.form.quantity}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -353,7 +356,7 @@ export default function EditDraftForm({
                 name='unit'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Jednostka</FormLabel>
+                    <FormLabel>{dict.form.unit}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -367,7 +370,7 @@ export default function EditDraftForm({
                           <FormControl>
                             <RadioGroupItem value='pcs' />
                           </FormControl>
-                          <FormLabel className='font-normal'>szt.</FormLabel>
+                          <FormLabel className='font-normal'>{dict.form.pcs}</FormLabel>
                         </FormItem>
                         <FormItem
                           key={'kg'}
@@ -376,7 +379,7 @@ export default function EditDraftForm({
                           <FormControl>
                             <RadioGroupItem value='kg' />
                           </FormControl>
-                          <FormLabel className='font-normal'>kg</FormLabel>
+                          <FormLabel className='font-normal'>{dict.form.kg}</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -390,7 +393,7 @@ export default function EditDraftForm({
               name='charge'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Partia</FormLabel>
+                  <FormLabel>{dict.form.batch}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -404,10 +407,10 @@ export default function EditDraftForm({
               name='description'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opis odchylenia</FormLabel>
+                  <FormLabel>{dict.form.description}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      placeholder={dict.form.descriptionPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -421,7 +424,7 @@ export default function EditDraftForm({
               name='reason'
               render={({ field }) => (
                 <FormItem className='space-y-3'>
-                  <FormLabel>Wybierz powód:</FormLabel>
+                  <FormLabel>{dict.form.reason}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -454,7 +457,7 @@ export default function EditDraftForm({
                 name='periodFrom'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Rozpoczęcie</FormLabel>
+                    <FormLabel>{dict.form.periodFrom}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -495,7 +498,7 @@ export default function EditDraftForm({
                 name='periodTo'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Zakończenie</FormLabel>
+                    <FormLabel>{dict.form.periodTo}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -532,10 +535,10 @@ export default function EditDraftForm({
               name='processSpecification'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Specyfikacja procesu</FormLabel>
+                  <FormLabel>{dict.form.processSpecification}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź specyfikację procesu gdy dotyczy`}
+                      placeholder={dict.form.processSpecificationPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -550,7 +553,7 @@ export default function EditDraftForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='space-y-0.5'>
-                    <FormLabel>Autoryzacja klienta</FormLabel>
+                    <FormLabel>{dict.form.customerAuthorization}</FormLabel>
                   </div>
                   <FormControl>
                     <Switch
@@ -573,7 +576,7 @@ export default function EditDraftForm({
                 className='w-full sm:w-auto'
               >
                 <Eraser className='' />
-                Wyczyść
+                {dict.form.clearButton}
               </Button>
               <Button
                 variant='destructive'
@@ -583,7 +586,7 @@ export default function EditDraftForm({
                 className='w-full sm:w-auto'
               >
                 <Trash className={isPendingDeleteDraft ? 'animate-spin' : ''} />
-                Usuń szkic
+                {dict.form.deleteDraftButton}
               </Button>
             </div>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
@@ -597,7 +600,7 @@ export default function EditDraftForm({
                 <Pencil
                   className={isPendingUpdateDraft ? 'animate-spin' : ''}
                 />
-                Zapisz szkic
+                {dict.form.saveDraftButton}
               </Button>
 
               <Button
@@ -610,7 +613,7 @@ export default function EditDraftForm({
                 className='w-full sm:w-auto'
               >
                 <Plus className={isPendingInsert ? 'animate-spin' : ''} />
-                Dodaj odchylenie
+                {dict.form.addDeviationButton}
               </Button>
             </div>
           </CardFooter>

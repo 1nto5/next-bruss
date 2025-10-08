@@ -1,1 +1,71 @@
-{}
+{
+  "title": "DMCheck Data",
+  "lastSync": "Last sync",
+  "columns": {
+    "status": "Status",
+    "dmc": "DMC",
+    "time": "Time",
+    "article": "Article",
+    "operator": "Operator",
+    "workplace": "Workplace",
+    "hydraBatch": "HYDRA Batch",
+    "hydraOperator": "HYDRA Operator",
+    "hydraTime": "HYDRA Time",
+    "palletBatch": "Pallet Batch",
+    "palletOperator": "Pallet Operator",
+    "palletTime": "Pallet Time",
+    "reworkReason": "Rework Reason",
+    "reworkUser": "Rework User",
+    "reworkTime": "Rework Time"
+  },
+  "filters": {
+    "from": "From:",
+    "to": "To:",
+    "workplace": "Workplace",
+    "article": "Article",
+    "status": "Status",
+    "dmc": "DMC",
+    "hydraBatch": "HYDRA Batch",
+    "palletBatch": "Pallet Batch",
+    "select": "Select...",
+    "search": "search...",
+    "notFound": "not found",
+    "clickToAdd": "Click to add...",
+    "value": "value",
+    "values": "values",
+    "pasteTitle": "Click to paste values from Excel or edit manually",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "export": "Export",
+    "search_button": "Search",
+    "refresh": "Refresh"
+  },
+  "statusOptions": {
+    "box": "box - scanned",
+    "pallet": "pallet - confirmed with hydra label",
+    "warehouse": "warehouse - confirmed with pallet label",
+    "rework": "rework - all rework attempts"
+  },
+  "pasteDialog": {
+    "manageTitle": "Manage Values",
+    "valuesLabel": "Values (one per line)",
+    "clearAll": "Clear All",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "errorApplying": "Error applying values",
+    "clearedFilter": "Cleared filter",
+    "appliedValues": "Applied values to filter",
+    "invalidDmc": "Invalid DMC format (should be 12-13 characters)",
+    "invalidHydraBatch": "Invalid HYDRA Batch format (must be 10 characters)",
+    "invalidPalletBatch": "Invalid Pallet Batch format",
+    "placeholderDmc": "Paste your DMC values here, for example:\nC9E0C25175A12400GK2Q\n6K301 AA 1021310071895021025070710279\np32298714#tpp0000212667#vexrga",
+    "placeholderHydraBatch": "Paste your HYDRA Batch values here (10 characters), for example:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatch": "Paste your Pallet Batch values here, for example:\nPAL001\nPAL002\nPAL003",
+    "placeholderDmcCurrent": "Current values are shown below. You can edit them or paste new values:\nC9E0C25175A12400GK2Q\n6K301 AA 1021310071895021025070710279\np32298714#tpp0000212667#vexrga",
+    "placeholderHydraBatchCurrent": "Current values are shown below. You can edit them or paste new values:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatchCurrent": "Current values are shown below. You can edit them or paste new values:\nPAL001\nPAL002\nPAL003"
+  },
+  "editDialog": {
+    "save": "Save"
+  }
+}

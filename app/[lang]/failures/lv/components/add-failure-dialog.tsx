@@ -1,6 +1,7 @@
 'use client';
 
 import { AddFailureSchema } from '@/app/[lang]/failures/lv/lib/failures-zod';
+import { Dictionary } from '../../lib/dict';
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -55,9 +56,11 @@ import { FailureOptionType } from '../lib/failures-types';
 export default function AddFailureDialog({
   failuresOptions,
   line,
+  dict,
 }: {
   failuresOptions: FailureOptionType[];
   line: string;
+  dict: Dictionary;
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingInsert, setIsPendingInserting] = useState(false);
@@ -113,14 +116,14 @@ export default function AddFailureDialog({
     try {
       const res = await insertFailure(data);
       if (res.success) {
-        toast.success('Awaria dodana!');
+        toast.success(dict.toasts.failureAdded);
       } else if (res.error) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingInserting(false);
       form.reset();
@@ -131,15 +134,15 @@ export default function AddFailureDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' title='dodaj awarię'>
-          <CopyPlus /> <span>Dodaj awarię</span>
+        <Button variant='outline' title={dict.addFailure}>
+          <CopyPlus /> <span>{dict.addFailure}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[700px]'>
         <DialogHeader>
           <DialogTitle>
-            Nowa awaria{' '}
-            {selectedLine && 'na lini: ' + selectedLine.toUpperCase()}
+            {dict.form.newFailure}{' '}
+            {selectedLine && dict.form.onLine + ' ' + selectedLine.toUpperCase()}
           </DialogTitle>
           {/* <DialogDescription>
             Make changes to your profile here. Click save when you're done.
@@ -155,7 +158,7 @@ export default function AddFailureDialog({
                     name='line'
                     render={({ field }) => (
                       <FormItem className='mb-2 space-y-3'>
-                        <FormLabel>Linia</FormLabel>
+                        <FormLabel>{dict.form.line}</FormLabel>
                         <FormControl>
                           <RadioGroup
                             onValueChange={field.onChange}
@@ -189,7 +192,7 @@ export default function AddFailureDialog({
                       render={({ field }) => (
                         <FormItem className=''>
                           <div className='flex flex-col items-start space-y-2'>
-                            <FormLabel>Stacja</FormLabel>
+                            <FormLabel>{dict.form.station}</FormLabel>
                             <FormControl>
                               <Popover
                                 open={openStation}
@@ -209,7 +212,7 @@ export default function AddFailureDialog({
                                   >
                                     {selectedStation
                                       ? selectedStation
-                                      : 'wybierz'}
+                                      : dict.form.select}
                                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                   </Button>
                                 </PopoverTrigger>
@@ -219,10 +222,10 @@ export default function AddFailureDialog({
                                   align='start'
                                 >
                                   <Command>
-                                    <CommandInput placeholder='wyszukaj...' />
+                                    <CommandInput placeholder={dict.form.searchPlaceholder} />
                                     <CommandList>
                                       <CommandEmpty>
-                                        Nie znaleziono.
+                                        {dict.form.notFound}
                                       </CommandEmpty>
                                       <CommandGroup>
                                         <CommandItem
@@ -233,7 +236,7 @@ export default function AddFailureDialog({
                                           }}
                                         >
                                           <Check className='mr-2 h-4 w-4 opacity-0' />
-                                          nie wybrano
+                                          {dict.form.notSelected}
                                         </CommandItem>
                                         {filteredStations.map((option) => (
                                           <CommandItem
@@ -277,7 +280,7 @@ export default function AddFailureDialog({
                       render={({ field }) => (
                         <FormItem className=' '>
                           <div className='flex flex-col items-start space-y-2'>
-                            <FormLabel>Awaria</FormLabel>
+                            <FormLabel>{dict.form.failure}</FormLabel>
                             <FormControl>
                               <Popover
                                 open={openFailure}
@@ -297,7 +300,7 @@ export default function AddFailureDialog({
                                   >
                                     {selectedFailure
                                       ? selectedFailure
-                                      : 'wybierz'}
+                                      : dict.form.select}
                                     <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                   </Button>
                                 </PopoverTrigger>
@@ -307,10 +310,10 @@ export default function AddFailureDialog({
                                   className='p-0'
                                 >
                                   <Command>
-                                    <CommandInput placeholder='wyszukaj...' />
+                                    <CommandInput placeholder={dict.form.searchPlaceholder} />
                                     <CommandList>
                                       <CommandEmpty>
-                                        Nie znaleziono.
+                                        {dict.form.notFound}
                                       </CommandEmpty>
                                       <CommandGroup>
                                         <CommandItem
@@ -321,7 +324,7 @@ export default function AddFailureDialog({
                                           }}
                                         >
                                           <Check className='mr-2 h-4 w-4 opacity-0' />
-                                          nie wybrano
+                                          {dict.form.notSelected}
                                         </CommandItem>
                                         {filteredFailures.map((failure) => (
                                           <CommandItem
@@ -364,7 +367,7 @@ export default function AddFailureDialog({
                       name='from'
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Rozpoczęcie</FormLabel>
+                          <FormLabel>{dict.form.start}</FormLabel>
                           <FormControl>
                             <DateTimePicker
                               max={new Date(Date.now())}
@@ -395,7 +398,7 @@ export default function AddFailureDialog({
                       render={({ field }) => (
                         <FormItem>
                           <div className='space-y-2'>
-                            <FormLabel>Nadzorujący</FormLabel>
+                            <FormLabel>{dict.form.supervisor}</FormLabel>
                             <FormControl>
                               <Input placeholder='' {...field} />
                             </FormControl>
@@ -412,7 +415,7 @@ export default function AddFailureDialog({
                       name='responsible'
                       render={({ field }) => (
                         <FormItem className=' '>
-                          <FormLabel>Odpowiedzialny</FormLabel>
+                          <FormLabel>{dict.form.responsible}</FormLabel>
                           <FormControl>
                             <Input placeholder='' {...field} />
                           </FormControl>
@@ -429,7 +432,7 @@ export default function AddFailureDialog({
                       name='solution'
                       render={({ field }) => (
                         <FormItem className=' '>
-                          <FormLabel>Rozwiązanie</FormLabel>
+                          <FormLabel>{dict.form.solution}</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
                           </FormControl>
@@ -443,7 +446,7 @@ export default function AddFailureDialog({
                       name='comment'
                       render={({ field }) => (
                         <FormItem className=' '>
-                          <FormLabel>Komentarz</FormLabel>
+                          <FormLabel>{dict.form.comment}</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
                           </FormControl>
@@ -459,11 +462,11 @@ export default function AddFailureDialog({
               {isPendingInsert ? (
                 <Button className='w-full' disabled>
                   <CopyPlus className='animate-spin' />
-                  Dodawanie awarii...
+                  {dict.addingFailure}
                 </Button>
               ) : (
                 <Button className='w-full' type='submit'>
-                  <CopyPlus /> Dodaj awarię
+                  <CopyPlus /> {dict.addFailure}
                 </Button>
               )}
             </DialogFooter>

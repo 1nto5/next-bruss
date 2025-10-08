@@ -7,6 +7,7 @@ import { Table } from 'lucide-react';
 import Link from 'next/link';
 import { ProjectsLocaleStringType } from '../lib/types';
 import { ProjectsType } from '../lib/zod';
+import { getDictionary } from '../lib/dict';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -62,6 +63,7 @@ export default async function ProductionOvertimePage(props: {
   const params = await props.params;
   const { lang } = params;
   const searchParams = await props.searchParams;
+  const dict = await getDictionary(lang);
 
   let fetchTime, fetchTimeLocaleString, dataLocaleString;
   ({ fetchTime, fetchTimeLocaleString, dataLocaleString } =
@@ -95,6 +97,7 @@ export default async function ProductionOvertimePage(props: {
         data={dataLocaleString}
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
+        dict={dict}
       />
     </Card>
   );

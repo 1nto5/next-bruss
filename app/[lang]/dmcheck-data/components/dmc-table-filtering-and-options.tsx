@@ -15,13 +15,16 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { usePlatform } from '@/lib/hooks/use-platform';
 import { revalidateDmcheckTableData as revalidate } from '../actions';
 import PasteValuesDialog from './paste-values-dialog';
+import type { Dictionary } from '../lib/dict';
 
 export default function DmcTableFilteringAndOptions({
   articles,
   fetchTime,
+  dict,
 }: {
   articles: ArticleConfigType[];
   fetchTime: Date;
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -228,10 +231,10 @@ export default function DmcTableFilteringAndOptions({
 
 
   const statusOptions = [
-    { value: 'box', label: 'box - scanned' },
-    { value: 'pallet', label: 'pallet - confirmed with hydra label' },
-    { value: 'warehouse', label: 'warehouse - confirmed with pallet label' },
-    { value: 'rework', label: 'rework - all rework attempts' },
+    { value: 'box', label: dict.statusOptions.box },
+    { value: 'pallet', label: dict.statusOptions.pallet },
+    { value: 'warehouse', label: dict.statusOptions.warehouse },
+    { value: 'rework', label: dict.statusOptions.rework },
   ];
 
   const workplaceOptions = Array.from(
@@ -269,7 +272,7 @@ export default function DmcTableFilteringAndOptions({
           {/* Row 1: Date filters - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div className='flex flex-col space-y-1'>
-              <Label>From:</Label>
+              <Label>{dict.filters.from}</Label>
               <DateTimePicker
                 value={fromFilter || undefined}
                 onChange={(date) => setFromFilter(date || null)}
@@ -287,7 +290,7 @@ export default function DmcTableFilteringAndOptions({
               />
             </div>
             <div className='flex flex-col space-y-1'>
-              <Label>To:</Label>
+              <Label>{dict.filters.to}</Label>
               <DateTimePicker
                 value={toFilter || undefined}
                 onChange={(date) => setToFilter(date || null)}
@@ -310,40 +313,40 @@ export default function DmcTableFilteringAndOptions({
           {/* Row 2: Workplace, Article, Status - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
             <div className='flex flex-col space-y-1'>
-              <Label>Workplace</Label>
+              <Label>{dict.filters.workplace}</Label>
               <MultiSelect
                 options={workplaceOptions}
                 value={workplaceFilter}
                 onValueChange={setWorkplaceFilter}
-                placeholder='Select...'
-                searchPlaceholder='search...'
-                emptyText='not found'
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
                 className='w-full'
               />
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>Article</Label>
+              <Label>{dict.filters.article}</Label>
               <MultiSelect
                 options={articleOptions}
                 value={articleFilter}
                 onValueChange={setArticleFilter}
-                placeholder='Select...'
-                searchPlaceholder='search...'
-                emptyText='not found'
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
                 className='w-full'
               />
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>Status</Label>
+              <Label>{dict.filters.status}</Label>
               <MultiSelect
                 options={statusOptions}
                 value={statusFilter}
                 onValueChange={setStatusFilter}
-                placeholder='Select...'
-                searchPlaceholder='search...'
-                emptyText='not found'
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
                 className='w-full'
               />
             </div>
@@ -352,27 +355,27 @@ export default function DmcTableFilteringAndOptions({
           {/* Row 3: DMC, HYDRA Batch, Pallet Batch - Full width */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
             <div className='flex flex-col space-y-1'>
-              <Label>DMC</Label>
+              <Label>{dict.filters.dmc}</Label>
               <PasteValuesDialog
                 fieldType='dmc'
-                fieldLabel='DMC'
+                fieldLabel={dict.filters.dmc}
                 currentValue={dmcFilter}
                 currentCount={getValueCount(dmcFilter)}
                 onApplyValues={setDmcFilter}
+                dict={dict}
               >
                 <Button
                   variant='outline'
                   className='w-full justify-start'
-                  title='Click to paste values from Excel or edit manually'
+                  title={dict.filters.pasteTitle}
                 >
                   {dmcFilter ? (
                     <span className='text-left'>
-                      DMC ({getValueCount(dmcFilter)} value
-                      {getValueCount(dmcFilter) !== 1 ? 's' : ''})
+                      {dict.filters.dmc} ({getValueCount(dmcFilter)} {getValueCount(dmcFilter) !== 1 ? dict.filters.values : dict.filters.value})
                     </span>
                   ) : (
                     <span className='text-muted-foreground'>
-                      Click to add...
+                      {dict.filters.clickToAdd}
                     </span>
                   )}
                 </Button>
@@ -380,27 +383,27 @@ export default function DmcTableFilteringAndOptions({
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>HYDRA Batch</Label>
+              <Label>{dict.filters.hydraBatch}</Label>
               <PasteValuesDialog
                 fieldType='hydra_batch'
-                fieldLabel='HYDRA Batch'
+                fieldLabel={dict.filters.hydraBatch}
                 currentValue={hydraFilter}
                 currentCount={getValueCount(hydraFilter)}
                 onApplyValues={setHydraFilter}
+                dict={dict}
               >
                 <Button
                   variant='outline'
                   className='w-full justify-start'
-                  title='Click to paste values from Excel or edit manually'
+                  title={dict.filters.pasteTitle}
                 >
                   {hydraFilter ? (
                     <span className='text-left'>
-                      HYDRA Batch ({getValueCount(hydraFilter)} value
-                      {getValueCount(hydraFilter) !== 1 ? 's' : ''})
+                      {dict.filters.hydraBatch} ({getValueCount(hydraFilter)} {getValueCount(hydraFilter) !== 1 ? dict.filters.values : dict.filters.value})
                     </span>
                   ) : (
                     <span className='text-muted-foreground'>
-                      Click to add...
+                      {dict.filters.clickToAdd}
                     </span>
                   )}
                 </Button>
@@ -408,27 +411,27 @@ export default function DmcTableFilteringAndOptions({
             </div>
 
             <div className='flex flex-col space-y-1'>
-              <Label>Pallet Batch</Label>
+              <Label>{dict.filters.palletBatch}</Label>
               <PasteValuesDialog
                 fieldType='pallet_batch'
-                fieldLabel='Pallet Batch'
+                fieldLabel={dict.filters.palletBatch}
                 currentValue={palletFilter}
                 currentCount={getValueCount(palletFilter)}
                 onApplyValues={setPalletFilter}
+                dict={dict}
               >
                 <Button
                   variant='outline'
                   className='w-full justify-start'
-                  title='Click to paste values from Excel or edit manually'
+                  title={dict.filters.pasteTitle}
                 >
                   {palletFilter ? (
                     <span className='text-left'>
-                      Pallet Batch ({getValueCount(palletFilter)} value
-                      {getValueCount(palletFilter) !== 1 ? 's' : ''})
+                      {dict.filters.palletBatch} ({getValueCount(palletFilter)} {getValueCount(palletFilter) !== 1 ? dict.filters.values : dict.filters.value})
                     </span>
                   ) : (
                     <span className='text-muted-foreground'>
-                      Click to add...
+                      {dict.filters.clickToAdd}
                     </span>
                   )}
                 </Button>
@@ -442,11 +445,11 @@ export default function DmcTableFilteringAndOptions({
               type='button'
               variant='destructive'
               onClick={handleClearFilters}
-              title='Clear filters'
+              title={dict.filters.clearFilters}
               disabled={isPendingSearch}
               className='order-3 w-full justify-start sm:order-1'
             >
-              <CircleX /> <span>Clear</span>
+              <CircleX /> <span>{dict.filters.clear}</span>
             </Button>
 
             <Button
@@ -459,7 +462,7 @@ export default function DmcTableFilteringAndOptions({
               ) : (
                 <FileSpreadsheet />
               )}
-              <span>Export</span>
+              <span>{dict.filters.export}</span>
             </Button>
 
             <Button
@@ -473,7 +476,7 @@ export default function DmcTableFilteringAndOptions({
               ) : (
                 <Search />
               )}
-              <span>{isRefresh ? 'Refresh' : 'Search'}</span>
+              <span>{isRefresh ? dict.filters.refresh : dict.filters.search_button}</span>
               <CommandShortcut>
                 {isClient ? (isMac ? '⌘↵' : 'Ctrl+↵') : ''}
               </CommandShortcut>

@@ -80,15 +80,15 @@ export default async function OvenOeePage({
               {dict.oeeDescription}
             </CardDescription>
           </div>
-          <OeeHeaderButtons lang={lang} />
+          <OeeHeaderButtons lang={lang} dict={dict} />
         </div>
-        <OeeFilteringAndOptions />
+        <OeeFilteringAndOptions dict={dict} />
       </CardHeader>
       <CardContent className='space-y-6'>
         {oeeParams && (
           <>
-            <OeeSummaryCards params={oeeParams} />
-            <OeeUtilizationChart params={oeeParams} lang={lang} />
+            <OeeSummaryCards params={oeeParams} dict={dict} />
+            <OeeUtilizationChart params={oeeParams} lang={lang} dict={dict} />
           </>
         )}
       </CardContent>

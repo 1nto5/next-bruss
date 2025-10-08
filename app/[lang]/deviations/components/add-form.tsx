@@ -44,15 +44,18 @@ import {
   insertDraftDeviation,
   redirectToDeviations,
 } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 export default function AddDeviationForm({
   reasonOptions,
   areaOptions,
   lang,
+  dict,
 }: {
   reasonOptions: DeviationReasonType[];
   areaOptions: DeviationAreaType[];
   lang: Locale;
+  dict: Dictionary;
 }) {
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingInsert, setIsPendingInserting] = useState(false);
@@ -87,7 +90,7 @@ export default function AddDeviationForm({
       try {
         const articleNumber = form.getValues('articleNumber');
         if (!articleNumber) {
-          toast.error('Wprowadź numer artykułu');
+          toast.error(dict.form.enterArticleNumber);
           return;
         }
         if (articleNumber.length === 5) {
@@ -95,17 +98,17 @@ export default function AddDeviationForm({
           if (res.success) {
             form.setValue('articleName', res.success);
           } else if (res.error === 'not found') {
-            toast.error('Nie znaleziono artykułu');
+            toast.error(dict.form.articleNotFound);
           } else if (res.error) {
             console.error(res.error);
-            toast.error('Skontaktuj się z IT!');
+            toast.error(dict.form.contactIT);
           }
         } else {
-          toast.error('Wprowadź poprawny numer artykułu');
+          toast.error(dict.form.enterValidArticleNumber);
         }
       } catch (error) {
         console.error('handleFindArticleName', error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     });
   };
@@ -116,16 +119,16 @@ export default function AddDeviationForm({
     try {
       const res = await insertDeviation(data);
       if (res.success) {
-        toast.success('Odchylenie dodane!');
+        toast.success(dict.form.deviationAdded);
         // form.reset()
         redirectToDeviations();
       } else if (res.error) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingInserting(false);
     }
@@ -138,16 +141,16 @@ export default function AddDeviationForm({
     try {
       const res = await insertDraftDeviation(data);
       if (res.success) {
-        toast.success('Szkic zapisany!');
+        toast.success(dict.form.draftSaved);
         // form.reset();
         redirectToDeviations();
       } else if (res.error) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('handleDraftInsert', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingInsertingDraft(false);
     }
@@ -157,10 +160,10 @@ export default function AddDeviationForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Nowe odchylenie</CardTitle>
+          <CardTitle>{dict.form.title}</CardTitle>
           <Link href='/deviations'>
             <Button variant='outline'>
-              <Table /> <span>Tabela odchyleń</span>
+              <Table /> <span>{dict.form.tableLink}</span>
             </Button>
           </Link>
         </div>
@@ -175,7 +178,7 @@ export default function AddDeviationForm({
               name='articleNumber'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Numer artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleNumber}</FormLabel>
                   <FormControl>
                     <Input autoFocus {...field} />
                   </FormControl>
@@ -190,7 +193,7 @@ export default function AddDeviationForm({
               name='articleName'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Nazwa artykułu</FormLabel>
+                  <FormLabel>{dict.form.articleName}</FormLabel>
                   <div className='flex items-center space-x-2'>
                     <FormControl>
                       <Input {...field} />
@@ -206,7 +209,7 @@ export default function AddDeviationForm({
                           isPendingFindArticleName ? 'animate-spin' : ''
                         }
                       />{' '}
-                      <span>Znajdź nazwę</span>
+                      <span>{dict.form.findName}</span>
                     </Button>
                   </div>
                   <FormMessage />
@@ -221,7 +224,7 @@ export default function AddDeviationForm({
                 name='customerNumber'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Numer części klienta</FormLabel>
+                    <FormLabel>{dict.form.customerPartNumber}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -235,7 +238,7 @@ export default function AddDeviationForm({
                 name='customerName'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Nazwa klienta</FormLabel>
+                    <FormLabel>{dict.form.customerName}</FormLabel>
                     <FormControl>
                       <Input placeholder='' {...field} />
                     </FormControl>
@@ -250,7 +253,7 @@ export default function AddDeviationForm({
               name='workplace'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Stanowisko</FormLabel>
+                  <FormLabel>{dict.form.workstation}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -263,7 +266,7 @@ export default function AddDeviationForm({
               name='area'
               render={({ field }) => (
                 <FormItem className='w-full'>
-                  <FormLabel>Obszar</FormLabel>
+                  <FormLabel>{dict.form.area}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -296,7 +299,7 @@ export default function AddDeviationForm({
                 name='quantity'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Ilość</FormLabel>
+                    <FormLabel>{dict.form.quantity}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -310,7 +313,7 @@ export default function AddDeviationForm({
                 name='unit'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Jednostka</FormLabel>
+                    <FormLabel>{dict.form.unit}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -324,7 +327,9 @@ export default function AddDeviationForm({
                           <FormControl>
                             <RadioGroupItem value='pcs' />
                           </FormControl>
-                          <FormLabel className='font-normal'>szt.</FormLabel>
+                          <FormLabel className='font-normal'>
+                            {dict.form.pcs}
+                          </FormLabel>
                         </FormItem>
                         <FormItem
                           key={'kg'}
@@ -333,7 +338,9 @@ export default function AddDeviationForm({
                           <FormControl>
                             <RadioGroupItem value='kg' />
                           </FormControl>
-                          <FormLabel className='font-normal'>kg</FormLabel>
+                          <FormLabel className='font-normal'>
+                            {dict.form.kg}
+                          </FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -347,7 +354,7 @@ export default function AddDeviationForm({
               name='charge'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Partia</FormLabel>
+                  <FormLabel>{dict.form.batch}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -361,10 +368,10 @@ export default function AddDeviationForm({
               name='description'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opis odchylenia</FormLabel>
+                  <FormLabel>{dict.form.description}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź dowolny tekst opisujący odchylenie`}
+                      placeholder={dict.form.descriptionPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -378,7 +385,7 @@ export default function AddDeviationForm({
               name='reason'
               render={({ field }) => (
                 <FormItem className='space-y-3'>
-                  <FormLabel>Wybierz powód:</FormLabel>
+                  <FormLabel>{dict.form.reason}</FormLabel>
                   <FormControl>
                     <RadioGroup
                       onValueChange={field.onChange}
@@ -411,7 +418,7 @@ export default function AddDeviationForm({
                 name='periodFrom'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Rozpoczęcie</FormLabel>
+                    <FormLabel>{dict.form.periodFrom}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -452,7 +459,7 @@ export default function AddDeviationForm({
                 name='periodTo'
                 render={({ field }) => (
                   <FormItem className='w-full'>
-                    <FormLabel>Zakończenie</FormLabel>
+                    <FormLabel>{dict.form.periodTo}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -489,10 +496,10 @@ export default function AddDeviationForm({
               name='processSpecification'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Specyfikacja procesu</FormLabel>
+                  <FormLabel>{dict.form.processSpecification}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź specyfikację procesu gdy dotyczy`}
+                      placeholder={dict.form.processSpecificationPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -507,7 +514,7 @@ export default function AddDeviationForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='space-y-0.5'>
-                    <FormLabel>Autoryzacja klienta</FormLabel>
+                    <FormLabel>{dict.form.customerAuthorization}</FormLabel>
                     {/* <FormDescription>
                     Receive emails about your account security.
                   </FormDescription> */}
@@ -534,7 +541,7 @@ export default function AddDeviationForm({
               className='w-full sm:w-auto'
             >
               <Eraser className='' />
-              Wyczyść
+              {dict.form.clearButton}
             </Button>
             <div className='flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:space-x-2'>
               <Button
@@ -547,7 +554,7 @@ export default function AddDeviationForm({
                 <Pencil
                   className={isPendingInsertDraft ? 'animate-spin' : ''}
                 />
-                Zapisz szkic
+                {dict.form.saveDraftButton}
               </Button>
 
               <Button
@@ -556,7 +563,7 @@ export default function AddDeviationForm({
                 className='w-full sm:w-auto'
               >
                 <Plus className={isPendingInsert ? 'animate-spin' : ''} />
-                Dodaj odchylenie
+                {dict.form.addDeviationButton}
               </Button>
             </div>
           </CardFooter>

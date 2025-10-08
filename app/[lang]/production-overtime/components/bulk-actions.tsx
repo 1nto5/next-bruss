@@ -22,14 +22,20 @@ import {
   bulkCancelOvertimeRequests,
   bulkMarkAsAccountedOvertimeRequests,
 } from '../actions';
+import { Dictionary } from '../lib/dict';
 import { OvertimeType } from '../lib/types';
 
 interface BulkActionsProps {
   table: Table<OvertimeType>;
   session: Session | null;
+  dict: Dictionary;
 }
 
-export default function BulkActions({ table, session }: BulkActionsProps) {
+export default function BulkActions({
+  table,
+  session,
+  dict,
+}: BulkActionsProps) {
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [actionType, setActionType] = useState<
     'approve' | 'cancel' | 'account' | null
@@ -99,20 +105,20 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
     switch (type) {
       case 'approve':
         actionPromise = bulkApproveOvertimeRequests(selectedIds);
-        successMessage = 'Zlecenia zostały zatwierdzone';
+        successMessage = dict.bulkActions.toast.approved;
         break;
       case 'cancel':
         actionPromise = bulkCancelOvertimeRequests(selectedIds);
-        successMessage = 'Zlecenia zostały anulowane';
+        successMessage = dict.bulkActions.toast.canceled;
         break;
       case 'account':
         actionPromise = bulkMarkAsAccountedOvertimeRequests(selectedIds);
-        successMessage = 'Zlecenia zostały rozliczone';
+        successMessage = dict.bulkActions.toast.accounted;
         break;
     }
 
     toast.promise(actionPromise, {
-      loading: 'Przetwarzanie...',
+      loading: dict.bulkActions.toast.processing,
       success: (result) => {
         if (result.error) {
           throw new Error(result.error);
@@ -120,7 +126,8 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
         table.resetRowSelection();
         return `${successMessage} (${result.count})`;
       },
-      error: (error) => `Błąd: ${error.message}`,
+      error: (error) =>
+        dict.bulkActions.toast.error.replace('{message}', error.message),
     });
   };
 
@@ -141,18 +148,24 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
     switch (actionType) {
       case 'approve':
         return {
-          title: 'Zatwierdź wybrane zlecenia',
-          description: `Czy na pewno chcesz zatwierdzić ${selectedCount} ${getPlural(selectedCount)}?`,
+          title: dict.bulkActions.confirmApprove.title,
+          description: dict.bulkActions.confirmApprove.description
+            .replace('{count}', selectedCount.toString())
+            .replace('{plural}', getPlural(selectedCount)),
         };
       case 'cancel':
         return {
-          title: 'Anuluj wybrane zlecenia',
-          description: `Czy na pewno chcesz anulować ${selectedCount} ${getPlural(selectedCount)}?`,
+          title: dict.bulkActions.confirmCancel.title,
+          description: dict.bulkActions.confirmCancel.description
+            .replace('{count}', selectedCount.toString())
+            .replace('{plural}', getPlural(selectedCount)),
         };
       case 'account':
         return {
-          title: 'Rozlicz wybrane zlecenia',
-          description: `Czy na pewno chcesz rozliczyć ${selectedCount} ${getPlural(selectedCount)}?`,
+          title: dict.bulkActions.confirmAccount.title,
+          description: dict.bulkActions.confirmAccount.description
+            .replace('{count}', selectedCount.toString())
+            .replace('{plural}', getPlural(selectedCount)),
         };
       default:
         return { title: '', description: '' };
@@ -170,9 +183,9 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
+            <AlertDialogCancel>{dict.common.cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirm}>
-              Potwierdź
+              {dict.common.confirm}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -181,12 +194,14 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
       <Card>
         <CardHeader className='p-4'>
           <CardDescription>
-            Wybrano {selectedCount} {getPlural(selectedCount)}
+            {dict.bulkActions.selected
+              .replace('{count}', selectedCount.toString())
+              .replace('{plural}', getPlural(selectedCount))}
             {!hasAnyAction && (
               <>
                 <br />
                 <span className='text-muted-foreground'>
-                  Brak wspólnych akcji dla zaznaczonych zleceń.
+                  {dict.bulkActions.noCommonActions}
                 </span>
               </>
             )}
@@ -200,7 +215,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                   onClick={() => openConfirmDialog('approve')}
                 >
                   <Check className='' />
-                  Zatwierdź
+                  {dict.bulkActions.approve}
                 </Button>
               )}
               {canCancel && (
@@ -210,7 +225,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                   onClick={() => openConfirmDialog('cancel')}
                 >
                   <X className='' />
-                  Anuluj
+                  {dict.bulkActions.cancel}
                 </Button>
               )}
               {canMarkAsAccounted && (
@@ -220,7 +235,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                   onClick={() => openConfirmDialog('account')}
                 >
                   <Check className='' />
-                  Rozlicz
+                  {dict.bulkActions.account}
                 </Button>
               )}
             </div>
