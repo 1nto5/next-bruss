@@ -73,7 +73,7 @@ export default function Header({ lang, dict }: HeaderProps) {
         <HeaderButton
           icon={<UserPen />}
           onClick={() => setAlertOpen(true)}
-          title={dict.header.logout || 'Wyloguj'}
+          title={dict.header.logout || 'Logout'}
         />
       )}
       <VolumeControl />
@@ -90,14 +90,14 @@ export default function Header({ lang, dict }: HeaderProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dict.header.logout || 'Wylogowanie'}
+              {dict.header.logout || 'Logout'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {dict.errors.contactIT || 'Czy na pewno chcesz wylogować?'}
+              {dict.errors.contactIT || 'Are you sure you want to logout?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Anuluj</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 logout();

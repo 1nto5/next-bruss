@@ -5,9 +5,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { getDictionary } from '../lib/dict';
 import { cardsColumns } from './cards-table/cards-columns';
 import { CardsDataTable } from './cards-table/cards-data-table';
-import { positionsColumns } from './positions-table/positions-columns';
+import { createPositionsColumns } from './positions-table/positions-columns';
 import { PositionsDataTable } from './positions-table/positions-data-table';
 
 async function getCards(
@@ -100,6 +101,7 @@ export default async function InventoryPage(props: {
   const searchParams = await props.searchParams;
 
   const { lang } = params;
+  const dict = await getDictionary(lang);
 
   let positionsFetchTime, cardsFetchTime, cards, positions;
   // const { number = '' } = searchParams;
@@ -122,7 +124,7 @@ export default async function InventoryPage(props: {
       </TabsContent>
       <TabsContent value='positions'>
         <PositionsDataTable
-          columns={positionsColumns}
+          columns={createPositionsColumns(dict)}
           fetchTime={positionsFetchTime}
           data={positions}
           lang={lang}

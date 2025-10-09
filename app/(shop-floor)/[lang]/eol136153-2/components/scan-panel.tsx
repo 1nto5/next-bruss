@@ -85,7 +85,7 @@ export default function ScanPanel({
         }
       },
       {
-        loading: dict.scanning.scanning || 'Zapisywanie...',
+        loading: dict.scanning.scanning || 'Saving...',
         success: (msg) => msg,
         error: (err) => err.message,
       },
@@ -129,7 +129,7 @@ export default function ScanPanel({
           }
         },
         {
-          loading: dict.pallet.messages.success || 'Zapisywanie...',
+          loading: dict.pallet.messages.success || 'Saving...',
           success: (msg) => msg,
           error: (err) => err.message,
         },

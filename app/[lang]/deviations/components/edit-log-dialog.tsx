@@ -19,9 +19,9 @@ import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Dictionary } from '../lib/dict';
 
 // Helper to format values for display
-const formatValue = (value: any, lang?: string, dict?: Dictionary): string => {
+const formatValue = (value: any, dict: Dictionary, lang?: string): string => {
   if (value === null || value === undefined) return '-';
-  if (typeof value === 'boolean') return value ? (dict?.dialogs.editLog.booleanValues.true || 'Tak') : (dict?.dialogs.editLog.booleanValues.false || 'Nie');
+  if (typeof value === 'boolean') return value ? dict.dialogs.editLog.booleanValues.true : dict.dialogs.editLog.booleanValues.false;
 
   // Handle Date objects
   if (value instanceof Date) return value.toLocaleDateString(lang || 'pl-PL');
@@ -115,8 +115,8 @@ export default function EditLogDialog({
                     <TableCell>
                       {fieldNameTranslations[log.fieldName] || log.fieldName}
                     </TableCell>
-                    <TableCell>{formatValue(log.oldValue, lang, dict)}</TableCell>
-                    <TableCell>{formatValue(log.newValue, lang, dict)}</TableCell>
+                    <TableCell>{formatValue(log.oldValue, dict, lang)}</TableCell>
+                    <TableCell>{formatValue(log.newValue, dict, lang)}</TableCell>
                   </TableRow>
                 ))
               ) : (

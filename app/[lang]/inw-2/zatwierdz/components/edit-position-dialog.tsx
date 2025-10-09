@@ -41,7 +41,7 @@ export default function EditPositionDialog({
   dict,
 }: {
   position: PositionType;
-  dict?: Dictionary;
+  dict: Dictionary;
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
@@ -248,10 +248,10 @@ export default function EditPositionDialog({
               {isPendingUpdate ? (
                 <Button disabled>
                   <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  {dict?.editDialog?.save || 'Zapisz'}
+                  {dict.editDialog.save}
                 </Button>
               ) : (
-                <Button type='submit'>{dict?.editDialog?.save || 'Zapisz'}</Button>
+                <Button type='submit'>{dict.editDialog.save}</Button>
               )}
             </DialogFooter>
           </form>

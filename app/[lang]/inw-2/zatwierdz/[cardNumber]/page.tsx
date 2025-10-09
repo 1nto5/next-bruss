@@ -1,7 +1,8 @@
 import { CardPositionsTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { columns } from './card-positions-table/columns';
+import { getDictionary } from '../../lib/dict';
+import { createColumns } from './card-positions-table/columns';
 import { DataTable } from './card-positions-table/data-table';
 
 async function getCardPositions(
@@ -68,12 +69,13 @@ export default async function InventoryCardPage(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const { cardNumber, lang } = params;
+  const dict = await getDictionary(lang);
   const { fetchTime, positions, cardSector, cardWarehouse, cardCreators } =
     await getCardPositions(lang, cardNumber, searchParams);
 
   return (
     <DataTable
-      columns={columns}
+      columns={createColumns(dict)}
       data={positions}
       fetchTime={fetchTime}
       lang={lang}
