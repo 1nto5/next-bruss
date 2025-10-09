@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { getDictionary } from '@/lib/dict';
+import { getDictionary } from './news/lib/dict';
 import { NewsList } from './news/components/news-list';
 import { RefreshButton } from './news/components/refresh-button';
 import { PaginationControls } from './news/components/pagination-controls';
@@ -44,7 +44,7 @@ export default async function HomePage(props: {
       <Card>
         <CardHeader>
           <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-            <CardTitle>{dict.news?.title || 'Aktualności'}</CardTitle>
+            <CardTitle>{dict.title}</CardTitle>
             {isAdmin && (
               <RefreshButton dict={dict} />
             )}
@@ -52,7 +52,7 @@ export default async function HomePage(props: {
         </CardHeader>
         <CardContent className='text-center py-12'>
           <p className='text-muted-foreground'>
-            {dict.news?.noNews || 'Brak aktualności'}
+            {dict.noNews}
           </p>
         </CardContent>
       </Card>
@@ -63,7 +63,7 @@ export default async function HomePage(props: {
     <Card>
       <CardHeader>
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>{dict.news?.title || 'Aktualności'}</CardTitle>
+          <CardTitle>{dict.title}</CardTitle>
           {isAdmin && (
             <RefreshButton dict={dict} />
           )}

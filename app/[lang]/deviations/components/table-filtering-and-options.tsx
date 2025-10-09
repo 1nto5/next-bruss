@@ -18,6 +18,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 // Import useRef for initial mount check if needed, but direct navigation is simpler here
 import { useEffect, useState } from 'react';
 import { DeviationAreaType, DeviationReasonType } from '../lib/types';
+import { Dictionary } from '../lib/dict';
 
 export default function TableFilteringAndOptions({
   fetchTime, // Keep fetchTime prop for useEffect dependency
@@ -25,12 +26,14 @@ export default function TableFilteringAndOptions({
   userEmail,
   areaOptions, // Add areaOptions prop
   reasonOptions, // Add reasonOptions prop
+  dict,
 }: {
   fetchTime: Date;
   isLogged: boolean;
   userEmail?: string;
   areaOptions: DeviationAreaType[]; // Define type for areaOptions
   reasonOptions: DeviationReasonType[]; // Define type for reasonOptions
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -200,7 +203,7 @@ export default function TableFilteringAndOptions({
               checked={showFilters}
               onCheckedChange={setShowFilters}
             />
-            <Label htmlFor='show-filters'>Pokaż filtry</Label>
+            <Label htmlFor='show-filters'>{dict.filters.showFilters}</Label>
             {isLogged && (
               <>
                 <Switch
@@ -208,7 +211,7 @@ export default function TableFilteringAndOptions({
                   checked={showOnlyMine}
                   onCheckedChange={handleShowOnlyMineChange}
                 />
-                <Label htmlFor='only-my-requests'>Tylko moje</Label>
+                <Label htmlFor='only-my-requests'>{dict.filters.onlyMy}</Label>
               </>
             )}
           </div>
@@ -229,21 +232,21 @@ export default function TableFilteringAndOptions({
               <div className='flex flex-col space-y-1'>
                 {' '}
                 {/* Stack label and select vertically */}
-                <Label>Status</Label>
+                <Label>{dict.filters.status}</Label>
                 <Select
                   onValueChange={(value) => handleSelectChange('status', value)} // Use simplified handler
                   value={statusFilter}
                 >
                   <SelectTrigger className='w-[150px]'>
-                    <SelectValue placeholder='wybierz' />
+                    <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='in approval'>Oczekuje</SelectItem>
-                    <SelectItem value='in progress'>Obowiązuje</SelectItem>
-                    <SelectItem value='rejected'>Odrzucone</SelectItem>
-                    <SelectItem value='draft'>Szkic</SelectItem>
-                    <SelectItem value='closed'>Zamknięte</SelectItem>
-                    <SelectItem value='approved'>Zatwierdzone</SelectItem>
+                    <SelectItem value='in approval'>{dict.table.status.inApproval}</SelectItem>
+                    <SelectItem value='in progress'>{dict.table.status.inProgress}</SelectItem>
+                    <SelectItem value='rejected'>{dict.table.status.rejected}</SelectItem>
+                    <SelectItem value='draft'>{dict.table.status.draft}</SelectItem>
+                    <SelectItem value='closed'>{dict.table.status.closed}</SelectItem>
+                    <SelectItem value='approved'>{dict.table.status.approved}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -251,7 +254,7 @@ export default function TableFilteringAndOptions({
               <div className='flex flex-col space-y-1'>
                 {' '}
                 {/* Stack label and select vertically */}
-                <Label>Obszar</Label>
+                <Label>{dict.filters.area}</Label>
                 <Select
                   onValueChange={(value) => handleSelectChange('area', value)} // Use simplified handler
                   value={areaFilter}
@@ -259,7 +262,7 @@ export default function TableFilteringAndOptions({
                   <SelectTrigger className='w-[150px]'>
                     {' '}
                     {/* Adjust width as needed */}
-                    <SelectValue placeholder='wybierz' />
+                    <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
                     {areaOptions.map((option) => (
@@ -274,7 +277,7 @@ export default function TableFilteringAndOptions({
               <div className='flex flex-col space-y-1'>
                 {' '}
                 {/* Stack label and select vertically */}
-                <Label>Powód</Label>
+                <Label>{dict.filters.reason}</Label>
                 <Select
                   onValueChange={(value) => handleSelectChange('reason', value)} // Use simplified handler
                   value={reasonFilter}
@@ -282,7 +285,7 @@ export default function TableFilteringAndOptions({
                   <SelectTrigger className='w-[180px]'>
                     {' '}
                     {/* Adjust width as needed */}
-                    <SelectValue placeholder='wybierz' />
+                    <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
                     {reasonOptions.map((option) => (
@@ -303,7 +306,7 @@ export default function TableFilteringAndOptions({
               <div className='flex flex-col space-y-1'>
                 {' '}
                 {/* Stack label and input vertically */}
-                <Label>Termin odchylenia</Label>
+                <Label>{dict.filters.deviationDate}</Label>
                 <DateTimePicker
                   value={dateFilter}
                   onChange={setDateFilter} // Only updates state
@@ -324,7 +327,7 @@ export default function TableFilteringAndOptions({
               <div className='flex flex-col space-y-1'>
                 {' '}
                 {/* Stack label and input vertically */}
-                <Label>Data utworzenia</Label>
+                <Label>{dict.filters.createdDate}</Label>
                 <DateTimePicker
                   value={createdAtFilter}
                   onChange={setRequestedAtFilter} // Only updates state
@@ -353,11 +356,11 @@ export default function TableFilteringAndOptions({
                 {isPendingSearch ? (
                   <>
                     <Loader className='mr-1 animate-spin' size={16} />{' '}
-                    <span>Szukaj</span>
+                    <span>{dict.filters.search}</span>
                   </>
                 ) : (
                   <>
-                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                    <Search className='mr-1' size={16} /> <span>{dict.filters.search}</span>
                   </>
                 )}
               </Button>
@@ -366,10 +369,10 @@ export default function TableFilteringAndOptions({
                 type='button'
                 variant='destructive'
                 onClick={handleClearFilters}
-                title='Clear filters'
+                title={dict.filters.clear}
                 disabled={isPendingSearch}
               >
-                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+                <CircleX className='mr-1' size={16} /> <span>{dict.filters.clear}</span>
               </Button>
             </div>
           </form>

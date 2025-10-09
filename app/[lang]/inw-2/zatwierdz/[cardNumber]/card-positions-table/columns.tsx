@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Check } from 'lucide-react';
 import EditPositionDialog from '../../components/edit-position-dialog';
+import { Dictionary } from '../../../lib/dict';
 
-export const columns: ColumnDef<PositionType>[] = [
+export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   {
     accessorKey: 'position',
     header: ({ column }) => {
@@ -36,7 +37,7 @@ export const columns: ColumnDef<PositionType>[] = [
     id: 'actions',
     header: 'Edycja',
     cell: ({ row }) => {
-      return <EditPositionDialog position={row.original} />;
+      return <EditPositionDialog position={row.original} dict={dict} />;
     },
   },
   {

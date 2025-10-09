@@ -15,7 +15,8 @@ export default async function AddDeviationPage(props: {
 
   const { lang, id } = params;
 
-  // const dict = await getDictionary(lang);
+  const { getDictionary } = await import(`../../../dictionaries/${lang}`);
+  const dict = await getDictionary(lang);
   const users = await getUsers();
-  return <AddCorrectiveActionForm id={id} users={users} />;
+  return <AddCorrectiveActionForm id={id} users={users} dict={dict} />;
 }

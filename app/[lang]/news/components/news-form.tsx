@@ -28,7 +28,7 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
   const [isPending, setIsPending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const newsSchema = createNewsSchema(dict.news.validation);
+  const newsSchema = createNewsSchema(dict.validation);
   
   const form = useForm<z.infer<typeof newsSchema>>({
     resolver: zodResolver(newsSchema),
@@ -47,17 +47,17 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
         : await createNews(data);
         
       if (res.success) {
-        toast.success(dict.news.messages[res.success] || res.success);
+        toast.success(dict.messages[res.success] || res.success);
         redirectToHome(lang);
       } else if (res.error) {
         toast.error(res.error === 'unauthorized' 
-          ? dict.news.messages.unauthorized 
-          : dict.news.messages[res.error] || res.error
+          ? dict.messages.unauthorized 
+          : dict.messages[res.error] || res.error
         );
       }
     } catch (error) {
       console.error('onSubmit error:', error);
-      toast.error(dict.news.messages.saveError);
+      toast.error(dict.messages.saveError);
     } finally {
       setIsPending(false);
     }
@@ -66,7 +66,7 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
   return (
     <Card className='max-w-4xl mx-auto'>
       <CardHeader>
-        <CardTitle>{news ? dict.news.form.editTitle : dict.news.form.addTitle}</CardTitle>
+        <CardTitle>{news ? dict.form.editTitle : dict.form.addTitle}</CardTitle>
       </CardHeader>
       <Separator className='mb-4' />
       
@@ -78,11 +78,11 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
               name='title'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.news.form.titleLabel}</FormLabel>
+                  <FormLabel>{dict.form.titleLabel}</FormLabel>
                   <FormControl>
                     <Input 
                       autoFocus 
-                      placeholder={dict.news.form.titlePlaceholder} 
+                      placeholder={dict.form.titlePlaceholder} 
                       {...field} 
                     />
                   </FormControl>
@@ -98,11 +98,11 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
                 const { ref: fieldRef, ...fieldProps } = field;
                 return (
                   <FormItem>
-                    <FormLabel>{dict.news.form.contentLabel}</FormLabel>
+                    <FormLabel>{dict.form.contentLabel}</FormLabel>
                     <MarkdownToolbar textareaRef={textareaRef} />
                     <FormControl>
                       <Textarea
-                        placeholder={dict.news.form.contentPlaceholder}
+                        placeholder={dict.form.contentPlaceholder}
                         className="min-h-[300px]"
                         ref={(e) => {
                           fieldRef(e);
@@ -127,10 +127,10 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
                 <FormItem className='flex items-center justify-between rounded-lg border p-3'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'>
-                      {dict.news.form.pinnedLabel}
+                      {dict.form.pinnedLabel}
                     </FormLabel>
                     <div className='text-sm text-muted-foreground'>
-                      {dict.news.form.pinnedDescription}
+                      {dict.form.pinnedDescription}
                     </div>
                   </div>
                   <FormControl>
@@ -155,7 +155,7 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
               ) : (
                 <Plus />
               )}
-              {news ? dict.news.form.updateButton : dict.news.form.addButton}
+              {news ? dict.form.updateButton : dict.form.addButton}
             </Button>
           </CardFooter>
         </form>

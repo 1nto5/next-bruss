@@ -16,14 +16,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { Dictionary } from '../lib/dict';
 
 // Helper to format values for display
-const formatValue = (value: any, lang?: string): string => {
+const formatValue = (value: any, dict: Dictionary, lang?: string): string => {
   if (value === null || value === undefined) return '-';
-  if (typeof value === 'boolean') return value ? 'Tak' : 'Nie';
+  if (typeof value === 'boolean') return value ? dict.dialogs.editLog.booleanValues.true : dict.dialogs.editLog.booleanValues.false;
 
   // Handle Date objects
-  if (value instanceof Date) return value.toLocaleDateString(lang);
+  if (value instanceof Date) return value.toLocaleDateString(lang || 'pl-PL');
 
   // Handle date strings - try to detect date format
   if (typeof value === 'string') {
@@ -33,7 +34,7 @@ const formatValue = (value: any, lang?: string): string => {
         const date = new Date(value);
         // Validate that it's a valid date
         if (!isNaN(date.getTime())) {
-          return date.toLocaleDateString(lang);
+          return date.toLocaleDateString(lang || 'pl-PL');
         }
       } catch {
         // Fall through to default handling
@@ -49,7 +50,7 @@ const formatValue = (value: any, lang?: string): string => {
     typeof value.getMonth === 'function'
   ) {
     try {
-      return value.toLocaleDateString(lang);
+      return value.toLocaleDateString(lang || 'pl-PL');
     } catch {
       // Fall through to default handling
     }
@@ -59,46 +60,31 @@ const formatValue = (value: any, lang?: string): string => {
   return String(value);
 };
 
-// Optional: Polish translations for field names
-const fieldNameTranslations: Record<string, string> = {
-  articleNumber: 'Numer artykułu',
-  articleName: 'Nazwa artykułu',
-  workplace: 'Stanowisko',
-  customerNumber: 'Numer klienta',
-  customerName: 'Nazwa klienta',
-  quantity: 'Ilość',
-  unit: 'Jednostka',
-  charge: 'Partia',
-  reason: 'Powód',
-  periodFrom: 'Okres od',
-  periodTo: 'Okres do',
-  area: 'Obszar',
-  description: 'Opis',
-  processSpecification: 'Specyfikacja procesu',
-  customerAuthorization: 'Autoryzacja klienta',
-};
-
 export default function EditLogDialog({
   isOpen,
   onClose,
   logs,
   lang,
+  dict,
 }: {
   isOpen: boolean;
   onClose: () => void;
   logs: EditLogEntryType[];
   lang: string;
+  dict: Dictionary;
 }) {
   // Sort logs by date descending
   const sortedLogs = [...logs].sort(
     (a, b) => new Date(b.changedAt).getTime() - new Date(a.changedAt).getTime(),
   );
 
+  const fieldNameTranslations = dict.dialogs.editLog.fieldNames as Record<string, string>;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='sm:max-w-[768px]'>
         <DialogHeader>
-          <DialogTitle>Historia zmian</DialogTitle>
+          <DialogTitle>{dict.dialogs.editLog.title}</DialogTitle>
           {/* <DialogDescription>
             Lista zmian wprowadzonych w polach odchylenia.
             </DialogDescription> */}
@@ -108,11 +94,11 @@ export default function EditLogDialog({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Osoba</TableHead>
-                <TableHead>Pole</TableHead>
-                <TableHead>Poprzednia wartość</TableHead>
-                <TableHead>Nowa wartość</TableHead>
+                <TableHead>{dict.dialogs.editLog.columns.date}</TableHead>
+                <TableHead>{dict.dialogs.editLog.columns.person}</TableHead>
+                <TableHead>{dict.dialogs.editLog.columns.field}</TableHead>
+                <TableHead>{dict.dialogs.editLog.columns.oldValue}</TableHead>
+                <TableHead>{dict.dialogs.editLog.columns.newValue}</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -129,8 +115,8 @@ export default function EditLogDialog({
                     <TableCell>
                       {fieldNameTranslations[log.fieldName] || log.fieldName}
                     </TableCell>
-                    <TableCell>{formatValue(log.oldValue, lang)}</TableCell>
-                    <TableCell>{formatValue(log.newValue, lang)}</TableCell>
+                    <TableCell>{formatValue(log.oldValue, dict, lang)}</TableCell>
+                    <TableCell>{formatValue(log.newValue, dict, lang)}</TableCell>
                   </TableRow>
                 ))
               ) : (
@@ -139,7 +125,7 @@ export default function EditLogDialog({
                     colSpan={5}
                     className='text-muted-foreground text-center'
                   >
-                    Brak historii zmian.
+                    {dict.dialogs.editLog.noHistory}
                   </TableCell>
                 </TableRow>
               )}

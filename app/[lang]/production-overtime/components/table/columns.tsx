@@ -24,15 +24,17 @@ import {
 import { Session } from 'next-auth';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Dictionary } from '../../lib/dict';
 import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 
-// Creating a columns factory function that takes the session
+// Creating a columns factory function that takes the session and dict
 export const createColumns = (
   session: Session | null,
+  dict: Dictionary,
 ): ColumnDef<OvertimeType>[] => {
   // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
@@ -100,7 +102,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: dict.tableColumns.status,
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
         let statusLabel;
@@ -109,21 +111,21 @@ export const createColumns = (
           case 'pending':
             statusLabel = (
               <Badge variant='statusPending' className='text-nowrap'>
-                Oczekuje
+                {dict.tableColumns.statuses.pending}
               </Badge>
             );
             break;
           case 'approved':
-            statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
+            statusLabel = <Badge variant='statusApproved'>{dict.tableColumns.statuses.approved}</Badge>;
             break;
           case 'canceled':
-            statusLabel = <Badge variant='statusRejected'>Anulowane</Badge>;
+            statusLabel = <Badge variant='statusRejected'>{dict.tableColumns.statuses.canceled}</Badge>;
             break;
           case 'completed':
-            statusLabel = <Badge variant='statusClosed'>Ukończone</Badge>;
+            statusLabel = <Badge variant='statusClosed'>{dict.tableColumns.statuses.completed}</Badge>;
             break;
           case 'accounted':
-            statusLabel = <Badge variant='statusAccounted'>Rozliczone</Badge>;
+            statusLabel = <Badge variant='statusAccounted'>{dict.tableColumns.statuses.accounted}</Badge>;
             break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
@@ -134,7 +136,7 @@ export const createColumns = (
     },
     {
       id: 'actions',
-      header: 'Akcje',
+      header: dict.tableColumns.actions,
       cell: ({ row }) => {
         const request = row.original;
         // State to control the attachment dialog
@@ -229,7 +231,7 @@ export const createColumns = (
                     <Link href={`/production-overtime/${request._id}`}>
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
-                        <span>Odbiór nadgodzin</span>
+                        <span>{dict.tableColumns.overtimePickup}</span>
                       </DropdownMenuItem>
                     </Link>
                     {/* Edit button - only for author and pending/approved status */}
@@ -237,7 +239,7 @@ export const createColumns = (
                       <Link href={`/production-overtime/${request._id}/edit`}>
                         <DropdownMenuItem>
                           <Edit className='mr-2 h-4 w-4' />
-                          <span>Edytuj zlecenie</span>
+                          <span>{dict.tableColumns.editRequest}</span>
                         </DropdownMenuItem>
                       </Link>
                     )}
@@ -253,7 +255,7 @@ export const createColumns = (
                           }}
                         >
                           <Check className='mr-2 h-4 w-4' />
-                          <span>Zatwierdź</span>
+                          <span>{dict.tableColumns.approve}</span>
                         </DropdownMenuItem>
                       )}
                     {/* Mark as accounted button - only for HR and approved requests */}
@@ -265,7 +267,7 @@ export const createColumns = (
                         }}
                       >
                         <Check className='mr-2 h-4 w-4' />
-                        <span>Oznacz jako rozliczone</span>
+                        <span>{dict.tableColumns.markAsAccounted}</span>
                       </DropdownMenuItem>
                     )}
                   </>
@@ -281,7 +283,7 @@ export const createColumns = (
                     className='focus:bg-red-400 dark:focus:bg-red-700'
                   >
                     <X className='mr-2 h-4 w-4' />
-                    <span>Anuluj zlecenie</span>
+                    <span>{dict.tableColumns.cancelRequest}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -294,7 +296,7 @@ export const createColumns = (
                     }}
                   >
                     <Paperclip className='mr-2 h-4 w-4' />
-                    <span>Dodaj listę obecności</span>
+                    <span>{dict.tableColumns.addAttendanceList}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -307,7 +309,7 @@ export const createColumns = (
                   >
                     <DropdownMenuItem>
                       <Download className='mr-2 h-4 w-4' />
-                      <span>Pobierz listę obecności</span>
+                      <span>{dict.tableColumns.downloadAttachment}</span>
                     </DropdownMenuItem>
                   </Link>
                 )}
@@ -330,18 +332,21 @@ export const createColumns = (
                   isOpen={isCancelDialogOpen}
                   onOpenChange={setIsCancelDialogOpen}
                   requestId={request._id}
+                  dict={dict}
                 />
                 <ApproveRequestDialog
                   isOpen={isApproveDialogOpen}
                   onOpenChange={setIsApproveDialogOpen}
                   requestId={request._id}
                   session={session}
+                  dict={dict}
                 />
                 <MarkAsAccountedDialog
                   isOpen={isMarkAsAccountedDialogOpen}
                   onOpenChange={setIsMarkAsAccountedDialogOpen}
                   requestId={request._id}
                   session={session}
+                  dict={dict}
                 />
               </>
             )}
@@ -351,7 +356,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'approved',
-      header: 'Data zatwierdzenia',
+      header: dict.tableColumns.approvalDate,
       cell: ({ row }) => {
         const approvedAt = row.original.approvedAt;
         const approvedAtString = useClientLocaleString(approvedAt);
@@ -360,7 +365,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'fromLocaleString',
-      header: 'Od',
+      header: dict.tableColumns.from,
       cell: ({ row }) => {
         const from = row.original.from;
         const fromString = useClientLocaleString(from);
@@ -369,7 +374,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'toLocaleString',
-      header: 'Do',
+      header: dict.tableColumns.to,
       cell: ({ row }) => {
         const to = row.original.to;
         const toString = useClientLocaleString(to);
@@ -378,7 +383,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'numberOfEmployees',
-      header: 'Liczba pracowników',
+      header: dict.tableColumns.numberOfEmployees,
       cell: ({ row }) => {
         const numberOfEmployees = row.getValue('numberOfEmployees') as number;
         return <div>{numberOfEmployees || 0}</div>;
@@ -386,7 +391,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'numberOfShifts',
-      header: 'Liczba zmian',
+      header: dict.tableColumns.numberOfShifts,
       cell: ({ row }) => {
         const numberOfShifts = row.getValue('numberOfShifts') as number;
         return <div>{numberOfShifts || 1}</div>;
@@ -394,7 +399,7 @@ export const createColumns = (
     },
     {
       id: 'totalHours',
-      header: 'Liczba godzin',
+      header: dict.tableColumns.totalHours,
       cell: ({ row }) => {
         const fromDate = new Date(row.original.from);
         const toDate = new Date(row.original.to);
@@ -416,7 +421,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'employeesWithScheduledDayOff',
-      header: 'Odbiór dnia wolnego',
+      header: dict.tableColumns.dayOffPickup,
       cell: ({ row }) => {
         const employees = row.getValue('employeesWithScheduledDayOff');
         return <div>{Array.isArray(employees) ? employees.length : 0}</div>;
@@ -424,7 +429,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'reason',
-      header: 'Uzasadnienie',
+      header: dict.tableColumns.reason,
       cell: ({ row }) => {
         const reason = row.getValue('reason');
         return <div className='w-[250px] text-justify'>{reason as string}</div>;
@@ -432,7 +437,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'responsibleEmployee',
-      header: 'Osoba odpowiedzialna',
+      header: dict.tableColumns.responsibleEmployee,
       cell: ({ row }) => {
         const responsibleEmployee = row.getValue('responsibleEmployee');
         return (
@@ -445,7 +450,7 @@ export const createColumns = (
 
     {
       accessorKey: 'requestedBy',
-      header: 'Wystawione przez',
+      header: dict.tableColumns.requestedBy,
       cell: ({ row }) => {
         const requestedBy = row.getValue('requestedBy');
         return (
@@ -457,7 +462,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'requestedAtLocaleString',
-      header: 'Data wystawienia',
+      header: dict.tableColumns.requestedAt,
       cell: ({ row }) => {
         const requestedAt = row.original.requestedAt;
         const requestedAtString = useClientLocaleString(requestedAt);
@@ -467,7 +472,7 @@ export const createColumns = (
 
     {
       accessorKey: 'editedBy',
-      header: 'Ostatnia modyfikacja przez',
+      header: dict.tableColumns.editedBy,
       cell: ({ row }) => {
         const editedBy = row.original.editedBy;
         return (
@@ -479,7 +484,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'editedAtLocaleString',
-      header: 'Data modyfikacji',
+      header: dict.tableColumns.editedAt,
       cell: ({ row }) => {
         const editedAt = row.original.editedAt;
         const editedAtString = useClientLocaleString(editedAt);
@@ -489,7 +494,7 @@ export const createColumns = (
 
     {
       accessorKey: 'completedBy',
-      header: 'Lista obecności dodana przez',
+      header: dict.tableColumns.completedBy,
       cell: ({ row }) => {
         const completedBy = row.original.completedBy;
         return (
@@ -501,7 +506,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'completedAtLocaleString',
-      header: 'Data dodania listy obecności',
+      header: dict.tableColumns.completedAt,
       cell: ({ row }) => {
         const completedAt = row.original.completedAt;
         const completedAtString = useClientLocaleString(completedAt);
@@ -510,7 +515,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'accountedBy',
-      header: 'Rozliczone przez',
+      header: dict.tableColumns.accountedBy,
       cell: ({ row }) => {
         const accountedBy = row.original.accountedBy;
         return (
@@ -522,7 +527,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'accountedAtLocaleString',
-      header: 'Data rozliczenia',
+      header: dict.tableColumns.accountedAt,
       cell: ({ row }) => {
         const accountedAt = row.original.accountedAt;
         const accountedAtString = useClientLocaleString(accountedAt);
@@ -531,7 +536,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'canceledBy',
-      header: 'Anulowane przez',
+      header: dict.tableColumns.canceledBy,
       cell: ({ row }) => {
         const canceledBy = row.original.canceledBy;
         return (
@@ -543,7 +548,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'canceledAtLocaleString',
-      header: 'Data anulowania',
+      header: dict.tableColumns.canceledAt,
       cell: ({ row }) => {
         const canceledAt = row.original.canceledAt;
         const canceledAtString = useClientLocaleString(canceledAt);
@@ -552,7 +557,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'note',
-      header: 'Dod. info.',
+      header: dict.tableColumns.additionalInfo,
       cell: ({ row }) => {
         const note = row.getValue('note');
         return <div className='w-[250px] text-justify'>{note as string}</div>;

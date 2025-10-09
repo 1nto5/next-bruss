@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import { OvenProcessDataType } from '../lib/types';
+import type { Dictionary } from '../lib/dict';
 
-export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
+export const getOvenColumns = (dict: Dictionary): ColumnDef<OvenProcessDataType>[] => [
   {
     accessorKey: 'oven',
     header: ({ column }) => (
@@ -14,7 +15,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         variant='ghost'
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Oven
+        {dict.processColumns.oven}
         <ArrowUpDown className='ml-2 h-4 w-4' />
       </Button>
     ),
@@ -22,13 +23,24 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: dict.processColumns.status,
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
-      // Capitalize the first letter
-      const statusLabel = status
-        ? status.charAt(0).toUpperCase() + status.slice(1)
-        : '';
+
+      const getStatusLabel = (status: string) => {
+        switch (status) {
+          case 'running':
+            return dict.processStatus.running;
+          case 'completed':
+          case 'finished':
+            return dict.processStatus.completed;
+          case 'failed':
+          case 'deleted':
+            return dict.processStatus.failed;
+          default:
+            return status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+        }
+      };
 
       const getStatusStyles = (status: string) => {
         switch (status) {
@@ -43,11 +55,12 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
               className: 'bg-green-100 text-green-800 hover:bg-green-200',
             };
           case 'deleted':
+          case 'failed':
             return {
               variant: 'destructive' as const,
               className: 'bg-red-100 text-red-800 hover:bg-red-200',
             };
-          default: // finished
+          default: // finished/completed
             return {
               variant: 'secondary' as const,
               className: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
@@ -58,25 +71,25 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
       const styles = getStatusStyles(status);
 
       return (
-        <Badge variant={styles.variant} className={styles.className}>
-          {statusLabel}
+        <Badge variant={styles.variant} className={`${styles.className} whitespace-nowrap`}>
+          {getStatusLabel(status)}
         </Badge>
       );
     },
   },
   {
     accessorKey: 'article',
-    header: 'Article',
+    header: dict.processColumns.article,
     cell: ({ row }) => <div>{row.getValue('article')}</div>,
   },
   {
     accessorKey: 'hydraBatch',
-    header: 'Hydra Batch',
+    header: dict.processColumns.hydraBatch,
     cell: ({ row }) => <div>{row.getValue('hydraBatch')}</div>,
   },
   {
     accessorKey: 'startOperators',
-    header: 'Start Operators',
+    header: dict.processColumns.startOperators,
     cell: ({ row }) => {
       // Render start operators as a comma-separated string
       const operators = row.getValue('startOperators') as string[];
@@ -89,7 +102,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
   },
   {
     accessorKey: 'endOperators',
-    header: 'End Operators',
+    header: dict.processColumns.endOperators,
     cell: ({ row }) => {
       // Render end operators as a comma-separated string
       const operators = row.getValue('endOperators') as string[];
@@ -103,7 +116,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         variant='ghost'
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        Start Time
+        {dict.processColumns.startTime}
         <ArrowUpDown className='ml-2 h-4 w-4' />
       </Button>
     ),
@@ -125,7 +138,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
         variant='ghost'
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        End Time
+        {dict.processColumns.endTime}
         <ArrowUpDown className='ml-2 h-4 w-4' />
       </Button>
     ),
@@ -146,7 +159,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
   },
   {
     accessorKey: 'duration',
-    header: 'Duration',
+    header: dict.processColumns.duration,
     cell: ({ row }) => {
       const duration = row.getValue('duration') as number;
       if (!duration) {
@@ -163,7 +176,7 @@ export const ovenColumns: ColumnDef<OvenProcessDataType>[] = [
   },
   {
     accessorKey: 'targetTemp',
-    header: 'Target Temp',
+    header: dict.processColumns.targetTemp,
     cell: ({ row }) => {
       const targetTemp = row.original.targetTemp;
       const tempTolerance = row.original.tempTolerance;

@@ -30,17 +30,20 @@ import { Check, ChevronsUpDown, CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateOvertime as revalidate } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 export default function HrViewFilteringAndOptions({
   fetchTime,
   userRoles = [],
   users = [],
   pendingSettlementsCount = 0,
+  dict,
 }: {
   fetchTime: Date;
   userRoles?: string[];
   users: UsersListType;
   pendingSettlementsCount?: number;
+  dict: Dictionary;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -193,7 +196,7 @@ export default function HrViewFilteringAndOptions({
                 checked={showFilters}
                 onCheckedChange={setShowFilters}
               />
-              <Label htmlFor='show-filters'>Pokaż filtry</Label>
+              <Label htmlFor='show-filters'>{dict.filters.showFilters}</Label>
             </div>
             <div className='flex items-center space-x-2'>
               <Switch
@@ -209,7 +212,7 @@ export default function HrViewFilteringAndOptions({
                     : ''
                 }`}
               >
-                Do rozliczenia
+                {dict.filters.pendingSettlements}
                 {pendingSettlementsCount > 0 && ` (${pendingSettlementsCount})`}
               </Label>
             </div>
@@ -221,22 +224,22 @@ export default function HrViewFilteringAndOptions({
           <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
             <div className='flex flex-wrap items-start gap-2'>
               <div className='flex flex-col space-y-1'>
-                <Label>Status</Label>
+                <Label>{dict.filters.status}</Label>
                 <Select onValueChange={setStatusFilter} value={statusFilter}>
                   <SelectTrigger className='w-[150px]'>
-                    <SelectValue placeholder='wybierz' />
+                    <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='pending'>Oczekuje</SelectItem>
-                    <SelectItem value='approved'>Zatwierdzone</SelectItem>
-                    <SelectItem value='rejected'>Odrzucone</SelectItem>
-                    <SelectItem value='accounted'>Rozliczone</SelectItem>
+                    <SelectItem value='pending'>{dict.status.pending}</SelectItem>
+                    <SelectItem value='approved'>{dict.status.approved}</SelectItem>
+                    <SelectItem value='rejected'>{dict.status.rejected}</SelectItem>
+                    <SelectItem value='accounted'>{dict.status.accounted}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className='flex flex-col space-y-1'>
-                <Label>Pracownik</Label>
+                <Label>{dict.filters.employee}</Label>
                 <Popover open={openPerson} onOpenChange={setOpenPerson}>
                   <PopoverTrigger asChild>
                     <Button
@@ -250,7 +253,7 @@ export default function HrViewFilteringAndOptions({
                       {personFilter
                         ? users.find((user) => user.email === personFilter)
                             ?.name
-                        : 'wybierz'}
+                        : dict.filters.select}
                       <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </PopoverTrigger>
@@ -260,9 +263,9 @@ export default function HrViewFilteringAndOptions({
                     align='start'
                   >
                     <Command>
-                      <CommandInput placeholder='szukaj...' />
+                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
                       <CommandList>
-                        <CommandEmpty>nie znaleziono</CommandEmpty>
+                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
                         <CommandGroup>
                           {users.map((user) => (
                             <CommandItem
@@ -292,7 +295,7 @@ export default function HrViewFilteringAndOptions({
               </div>
 
               <div className='flex flex-col space-y-1'>
-                <Label>Rok</Label>
+                <Label>{dict.filters.year}</Label>
                 <Popover open={openYear} onOpenChange={setOpenYear}>
                   <PopoverTrigger asChild>
                     <Button
@@ -306,7 +309,7 @@ export default function HrViewFilteringAndOptions({
                       {yearFilter
                         ? yearOptions.find((year) => year.value === yearFilter)
                             ?.label
-                        : 'wybierz'}
+                        : dict.filters.select}
                       <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </PopoverTrigger>
@@ -316,9 +319,9 @@ export default function HrViewFilteringAndOptions({
                     align='start'
                   >
                     <Command>
-                      <CommandInput placeholder='szukaj...' />
+                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
                       <CommandList>
-                        <CommandEmpty>nie znaleziono</CommandEmpty>
+                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
                         <CommandGroup>
                           {yearOptions.map((year) => (
                             <CommandItem
@@ -348,7 +351,7 @@ export default function HrViewFilteringAndOptions({
               </div>
 
               <div className='flex flex-col space-y-1'>
-                <Label>Miesiąc</Label>
+                <Label>{dict.filters.month}</Label>
                 <Popover open={openMonth} onOpenChange={setOpenMonth}>
                   <PopoverTrigger asChild>
                     <Button
@@ -363,7 +366,7 @@ export default function HrViewFilteringAndOptions({
                         ? monthOptions.find(
                             (month) => month.value === monthFilter,
                           )?.label
-                        : 'wybierz'}
+                        : dict.filters.select}
                       <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </PopoverTrigger>
@@ -373,9 +376,9 @@ export default function HrViewFilteringAndOptions({
                     align='start'
                   >
                     <Command>
-                      <CommandInput placeholder='szukaj...' />
+                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
                       <CommandList>
-                        <CommandEmpty>nie znaleziono</CommandEmpty>
+                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
                         <CommandGroup>
                           {monthOptions.map((month) => (
                             <CommandItem
@@ -416,11 +419,11 @@ export default function HrViewFilteringAndOptions({
                 {isPendingSearch ? (
                   <>
                     <Loader className='mr-1 animate-spin' size={16} />{' '}
-                    <span>Szukaj</span>
+                    <span>{dict.filters.search}</span>
                   </>
                 ) : (
                   <>
-                    <Search className='mr-1' size={16} /> <span>Szukaj</span>
+                    <Search className='mr-1' size={16} /> <span>{dict.filters.search}</span>
                   </>
                 )}
               </Button>
@@ -432,7 +435,7 @@ export default function HrViewFilteringAndOptions({
                 title='Clear filters'
                 disabled={isPendingSearch}
               >
-                <CircleX className='mr-1' size={16} /> <span>Wyczyść</span>
+                <CircleX className='mr-1' size={16} /> <span>{dict.filters.clear}</span>
               </Button>
             </div>
           </form>

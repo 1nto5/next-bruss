@@ -20,10 +20,12 @@ import ApproveSubmissionDialog from '../approve-submission-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 import RejectSubmissionDialog from '../reject-submission-dialog';
+import { Dictionary } from '../../lib/dict';
 
-// Creating a columns factory function that takes the session
+// Creating a columns factory function that takes the session and dict
 export const createColumns = (
   session: Session | null,
+  dict: Dictionary,
 ): ColumnDef<OvertimeSubmissionType>[] => {
   return [
     {
@@ -79,7 +81,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: dict.columns.status,
       cell: ({ row }) => {
         const status = row.getValue('status') as string;
         let statusLabel;
@@ -88,7 +90,7 @@ export const createColumns = (
           case 'pending':
             statusLabel = (
               <Badge variant='statusPending' className='text-nowrap'>
-                Oczekuje
+                {dict.status.pending}
               </Badge>
             );
             break;
@@ -98,21 +100,21 @@ export const createColumns = (
                 variant='statusPending'
                 className='bg-yellow-400 text-nowrap text-black'
               >
-                Oczekuje
+                {dict.status.pending}
               </Badge>
             );
             break;
           case 'approved':
-            statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
+            statusLabel = <Badge variant='statusApproved'>{dict.status.approved}</Badge>;
             break;
           case 'rejected':
-            statusLabel = <Badge variant='statusRejected'>Odrzucone</Badge>;
+            statusLabel = <Badge variant='statusRejected'>{dict.status.rejected}</Badge>;
             break;
           case 'accounted':
-            statusLabel = <Badge variant='statusAccounted'>Rozliczone</Badge>;
+            statusLabel = <Badge variant='statusAccounted'>{dict.status.accounted}</Badge>;
             break;
           case 'cancelled':
-            statusLabel = <Badge variant='statusCancelled'>Anulowane</Badge>;
+            statusLabel = <Badge variant='statusCancelled'>{dict.status.cancelled}</Badge>;
             break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
@@ -124,7 +126,7 @@ export const createColumns = (
     // Payment column
     {
       accessorKey: 'payment',
-      header: 'Wypłata',
+      header: dict.columns.payment,
       cell: ({ row }) => {
         const payment = row.getValue('payment') as boolean;
         return (
@@ -140,7 +142,7 @@ export const createColumns = (
     },
     {
       id: 'actions',
-      header: 'Akcje',
+      header: dict.columns.actions,
       cell: ({ row }) => {
         const submission = row.original;
         // State to control dialogs
@@ -198,7 +200,7 @@ export const createColumns = (
                   <Link href={`/overtime-submissions/edit/${submission._id}`}>
                     <DropdownMenuItem>
                       <Edit className='mr-2 h-4 w-4' />
-                      <span>Edytuj</span>
+                      <span>{dict.actions.edit}</span>
                     </DropdownMenuItem>
                   </Link>
                 )}
@@ -213,7 +215,7 @@ export const createColumns = (
                     className='focus:bg-red-400 dark:focus:bg-red-700'
                   >
                     <X className='mr-2 h-4 w-4' />
-                    <span>Anuluj</span>
+                    <span>{dict.actions.cancel}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -226,7 +228,7 @@ export const createColumns = (
                     }}
                   >
                     <Check className='mr-2 h-4 w-4' />
-                    <span>Zatwierdź</span>
+                    <span>{dict.actions.approve}</span>
                   </DropdownMenuItem>
                 )}
                 {/* Director Approve button */}
@@ -238,7 +240,7 @@ export const createColumns = (
                     }}
                   >
                     <Check className='mr-2 h-4 w-4' />
-                    <span>Zatwierdź (Dyrektor)</span>
+                    <span>{dict.actions.approveDirector}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -252,7 +254,7 @@ export const createColumns = (
                     className='focus:bg-red-400 dark:focus:bg-red-700'
                   >
                     <X className='mr-2 h-4 w-4' />
-                    <span>Odrzuć</span>
+                    <span>{dict.actions.reject}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -265,7 +267,7 @@ export const createColumns = (
                     }}
                   >
                     <Check className='mr-2 h-4 w-4' />
-                    <span>Oznacz jako rozliczone</span>
+                    <span>{dict.actions.markAsAccounted}</span>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -277,23 +279,27 @@ export const createColumns = (
               onOpenChange={setIsApproveDialogOpen}
               submissionId={submission._id}
               session={session}
+              dict={dict}
             />
             <RejectSubmissionDialog
               isOpen={isRejectDialogOpen}
               onOpenChange={setIsRejectDialogOpen}
               submissionId={submission._id}
               session={session}
+              dict={dict}
             />
             <MarkAsAccountedDialog
               isOpen={isMarkAsAccountedDialogOpen}
               onOpenChange={setIsMarkAsAccountedDialogOpen}
               submissionId={submission._id}
               session={session}
+              dict={dict}
             />
             <CancelRequestDialog
               isOpen={isCancelDialogOpen}
               onOpenChange={setIsCancelDialogOpen}
               requestId={submission._id}
+              dict={dict}
             />
           </>
         );
@@ -301,7 +307,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'submittedBy',
-      header: 'Zgłaszający',
+      header: dict.columns.submittedBy,
       cell: ({ row }) => {
         const email = row.getValue('submittedBy') as string;
         return (
@@ -313,7 +319,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'supervisor',
-      header: 'Kierownik',
+      header: dict.columns.supervisor,
       cell: ({ row }) => {
         const email = row.getValue('supervisor') as string;
         return (
@@ -325,7 +331,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'date',
-      header: 'Data',
+      header: dict.columns.date,
       cell: ({ row }) => {
         const date = new Date(row.getValue('date') as string);
         return <span>{date.toLocaleDateString('pl-PL')}</span>;
@@ -333,7 +339,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'hours',
-      header: 'Godziny',
+      header: dict.columns.hours,
       cell: ({ row }) => {
         const hours = row.getValue('hours') as number;
         return (
@@ -345,7 +351,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'reason',
-      header: 'Uzasadnienie',
+      header: dict.columns.reason,
       cell: ({ row }) => {
         const reason = row.getValue('reason') as string;
         return <div className='w-[250px] text-justify'>{reason}</div>;
@@ -353,7 +359,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'submittedAt',
-      header: 'Data zgłoszenia',
+      header: dict.columns.submittedAt,
       cell: ({ row }) => {
         const date = new Date(row.getValue('submittedAt') as string);
         return (
@@ -369,7 +375,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'editedAt',
-      header: 'Data edycji',
+      header: dict.columns.editedAt,
       cell: ({ row }) => {
         const date = row.getValue('editedAt') as Date;
         if (!date) return <span>-</span>;
@@ -386,7 +392,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'editedBy',
-      header: 'Edytował',
+      header: dict.columns.editedBy,
       cell: ({ row }) => {
         const email = row.getValue('editedBy') as string;
         if (!email) return <span>-</span>;
@@ -399,7 +405,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'approvedAt',
-      header: 'Data zatwierdzenia',
+      header: dict.columns.approvedAt,
       cell: ({ row }) => {
         const date = row.getValue('approvedAt') as Date;
         if (!date) return <span>-</span>;
@@ -416,7 +422,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'approvedBy',
-      header: 'Zatwierdził',
+      header: dict.columns.approvedBy,
       cell: ({ row }) => {
         const email = row.getValue('approvedBy') as string;
         if (!email) return <span>-</span>;
@@ -429,7 +435,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'rejectedAt',
-      header: 'Data odrzucenia',
+      header: dict.columns.rejectedAt,
       cell: ({ row }) => {
         const date = row.getValue('rejectedAt') as Date;
         if (!date) return <span>-</span>;
@@ -447,7 +453,7 @@ export const createColumns = (
 
     {
       accessorKey: 'rejectionReason',
-      header: 'Powód odrzucenia',
+      header: dict.columns.rejectionReason,
       cell: ({ row }) => {
         const reason = row.getValue('rejectionReason') as string;
         if (!reason) return <span>-</span>;
@@ -456,7 +462,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'accountedAt',
-      header: 'Data rozliczenia',
+      header: dict.columns.accountedAt,
       cell: ({ row }) => {
         const date = row.getValue('accountedAt') as Date;
         if (!date) return <span>-</span>;
@@ -473,7 +479,7 @@ export const createColumns = (
     },
     {
       accessorKey: 'accountedBy',
-      header: 'Rozliczył',
+      header: dict.columns.accountedBy,
       cell: ({ row }) => {
         const email = row.getValue('accountedBy') as string;
         if (!email) return <span>-</span>;

@@ -49,6 +49,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { changeCorrectiveActionStatus } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 type TableCellCorrectiveActionProps = {
   correctiveAction: correctiveActionType;
@@ -58,6 +59,7 @@ type TableCellCorrectiveActionProps = {
   user: string | null | undefined;
   userRoles: string[] | null | undefined;
   deviationOwner: string;
+  dict: Dictionary;
 };
 
 const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
@@ -68,6 +70,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   user,
   userRoles,
   deviationOwner,
+  dict,
 }) => {
   const form = useForm<z.infer<typeof confirmActionExecutionSchema>>({
     resolver: zodResolver(confirmActionExecutionSchema),
@@ -89,15 +92,15 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   const getStatusBadge = (statusValue: string) => {
     switch (statusValue) {
       case 'open':
-        return <Badge variant='statusOpen'>Otwarta</Badge>; // Changed to statusOpen
+        return <Badge variant='statusOpen'>{dict.view.correctiveActionStatuses.open}</Badge>;
       case 'closed':
-        return <Badge variant='statusApproved'>Zakończona</Badge>;
+        return <Badge variant='statusApproved'>{dict.view.correctiveActionStatuses.closed}</Badge>;
       case 'overdue':
-        return <Badge variant='statusOverdue'>Zaległa</Badge>; // Changed to statusOverdue
+        return <Badge variant='statusOverdue'>{dict.view.correctiveActionStatuses.overdue}</Badge>;
       case 'in progress':
-        return <Badge variant='statusInProgress'>W trakcie</Badge>; // Changed to statusInProgress
+        return <Badge variant='statusInProgress'>{dict.view.correctiveActionStatuses.inProgress}</Badge>;
       case 'rejected':
-        return <Badge variant='statusRejected'>Odrzucona</Badge>;
+        return <Badge variant='statusRejected'>{dict.view.correctiveActionStatuses.rejected}</Badge>;
       default:
         return (
           <Badge variant='outline' className='text-nowrap'>
@@ -118,7 +121,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
         try {
           if (!user) {
             console.error('onSubmit', 'no user');
-            reject(new Error('Brak użytkownika!'));
+            reject(new Error(dict.view.correctiveActionDialogs.errors.noUser));
             return;
           }
           const status = {
@@ -139,17 +142,17 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
             resolve();
           } else if (res.error) {
             console.error('onSubmit', res.error);
-            reject(new Error('Skontaktuj się z IT!'));
+            reject(new Error(dict.view.correctiveActionDialogs.errors.contactIT));
           }
         } catch (error) {
           console.error('onSubmit', error);
-          reject(new Error('Skontaktuj się z IT!'));
+          reject(new Error(dict.view.correctiveActionDialogs.errors.contactIT));
         }
       }),
       {
-        loading: 'Aktualizowanie statusu...',
-        success: 'Status został zaktualizowany!',
-        error: (err) => err.message || 'Skontaktuj się z IT!',
+        loading: dict.view.correctiveActionDialogs.toasts.updating,
+        success: dict.view.correctiveActionDialogs.toasts.updated,
+        error: (err) => err.message || dict.view.correctiveActionDialogs.errors.contactIT,
       },
     );
   };
@@ -168,9 +171,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           <DialogContent className='sm:max-w-[425px]'>
             {correctiveAction.status.value === 'closed' ? (
               <DialogHeader>
-                <DialogTitle>Akcja korygująca zakończona</DialogTitle>
+                <DialogTitle>{dict.view.correctiveActionDialogs.closedTitle}</DialogTitle>
                 <DialogDescription>
-                  Nie można zmienić statusu zakończonej akcji korygującej.
+                  {dict.view.correctiveActionDialogs.closedDescription}
                 </DialogDescription>
               </DialogHeader>
             ) : correctiveAction.created.by === user ||
@@ -186,7 +189,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
               ) ? (
               <>
                 <DialogHeader>
-                  <DialogTitle>Zmiana statusu akcji korygującej</DialogTitle>
+                  <DialogTitle>{dict.view.correctiveActionDialogs.changeStatusTitle}</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -196,7 +199,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                         name='executedAt'
                         render={({ field }) => (
                           <FormItem className='flex flex-col'>
-                            <FormLabel>Data zmiany</FormLabel>
+                            <FormLabel>{dict.view.correctiveActionDialogs.changeDate}</FormLabel>
                             <FormControl>
                               <DateTimePicker
                                 modal
@@ -233,14 +236,14 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                         name='status'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Status</FormLabel>
+                            <FormLabel>{dict.view.correctiveActionDialogs.status}</FormLabel>
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder='Wybierz' />
+                                  <SelectValue placeholder={dict.view.correctiveActionDialogs.selectPlaceholder} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -263,10 +266,10 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                         name='comment'
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Dodatkowe informacje</FormLabel>
+                            <FormLabel>{dict.view.correctiveActionDialogs.additionalInfo}</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder={`Dowolny tekst dotyczący wykonania akcji korygującej`}
+                                placeholder={dict.view.correctiveActionDialogs.additionalInfoPlaceholder}
                                 {...field}
                               />
                             </FormControl>
@@ -278,7 +281,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                     <DialogFooter className='pt-4'>
                       <Button type='submit'>
                         <Check className={isPending ? 'animate-spin' : ''} />{' '}
-                        Potwierdź
+                        {dict.view.correctiveActionDialogs.confirmButton}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -286,9 +289,9 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
               </>
             ) : (
               <DialogHeader>
-                <DialogTitle>Brak uprawnień</DialogTitle>
+                <DialogTitle>{dict.view.correctiveActionDialogs.noPermissionTitle}</DialogTitle>
                 <DialogDescription>
-                  Nie masz uprawnień do zmiany statusu akcji korygującej.
+                  {dict.view.correctiveActionDialogs.noPermissionDescription}
                 </DialogDescription>
               </DialogHeader>
             )}
@@ -319,18 +322,18 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
           </DialogTrigger>
           <DialogContent className='sm:max-w-[768px]'>
             <DialogHeader>
-              <DialogTitle>Historia</DialogTitle>
+              <DialogTitle>{dict.view.correctiveActionDialogs.history}</DialogTitle>
             </DialogHeader>
             {/* <ScrollArea className='h-[300px]'> */}
             <div className='h-[300px] overflow-auto'>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data</TableHead>
-                    <TableHead>Komentarz</TableHead>
-                    <TableHead>Osoba</TableHead>
-                    <TableHead>Czas</TableHead>
+                    <TableHead>{dict.view.correctiveActionDialogs.historyColumns.status}</TableHead>
+                    <TableHead>{dict.view.correctiveActionDialogs.historyColumns.date}</TableHead>
+                    <TableHead>{dict.view.correctiveActionDialogs.historyColumns.comment}</TableHead>
+                    <TableHead>{dict.view.correctiveActionDialogs.historyColumns.person}</TableHead>
+                    <TableHead>{dict.view.correctiveActionDialogs.historyColumns.time}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

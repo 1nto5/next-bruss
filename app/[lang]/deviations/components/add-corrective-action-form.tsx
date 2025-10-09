@@ -48,15 +48,18 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { redirectToDeviation, updateCorrectiveAction } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 type AddCorrectiveActionPropsType = {
   id: string;
   users: UsersListType;
+  dict: Dictionary;
 };
 
 export default function AddCorrectiveActionForm({
   id,
   users,
+  dict,
 }: AddCorrectiveActionPropsType) {
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingUpdate, setIsPendingUpdating] = useState<boolean>(false);
@@ -77,22 +80,20 @@ export default function AddCorrectiveActionForm({
     try {
       const res = await updateCorrectiveAction(id, data);
       if (res.success) {
-        toast.success('Akcja korygująca dodana!');
+        toast.success(dict.correctiveAction.toasts.added);
         // form.reset()
         redirectToDeviation(id);
       } else if (res.error === 'not found') {
-        toast.error('Nie znaleziono odchylenia!');
+        toast.error(dict.correctiveAction.errors.deviationNotFound);
       } else if (res.error === 'not authorized') {
-        toast.error(
-          'Tylko właściciel odchylenia może dodawać akcje korygujące!',
-        );
+        toast.error(dict.correctiveAction.errors.notAuthorized);
       } else if (res.error) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.form.contactIT);
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.form.contactIT);
     } finally {
       setIsPendingUpdating(false);
     }
@@ -102,10 +103,10 @@ export default function AddCorrectiveActionForm({
     <Card className='w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Nowa akcja korygująca</CardTitle>
+          <CardTitle>{dict.correctiveAction.title}</CardTitle>
           <Link href={`/deviations/${id}`}>
             <Button variant='outline'>
-              <ArrowLeftToLine /> Odchylenie
+              <ArrowLeftToLine /> {dict.form.deviationLink}
             </Button>
           </Link>
         </div>
@@ -121,7 +122,7 @@ export default function AddCorrectiveActionForm({
               name='deadline'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Termin wykonania</FormLabel>
+                  <FormLabel>{dict.correctiveAction.deadline}</FormLabel>
                   <FormControl>
                     <DateTimePicker
                       modal
@@ -162,7 +163,7 @@ export default function AddCorrectiveActionForm({
               name='responsible'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Osoba odpowiedzialna</FormLabel>
+                  <FormLabel>{dict.correctiveAction.responsible}</FormLabel>
                   <Popover
                     open={responsiblePopoverOpen}
                     onOpenChange={setResponsiblePopoverOpen}
@@ -180,16 +181,16 @@ export default function AddCorrectiveActionForm({
                           {field.value
                             ? users.find((user) => user.email === field.value)
                                 ?.name
-                            : 'Wybierz'}
+                            : dict.filters.select}
                           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder='Szukaj...' />
+                        <CommandInput placeholder={dict.correctiveAction.searchPlaceholder} />
                         <CommandList>
-                          <CommandEmpty>Nie znaleziono.</CommandEmpty>
+                          <CommandEmpty>{dict.correctiveAction.notFound}</CommandEmpty>
                           {/* height of the selection window */}
                           <CommandGroup className='max-h-48 overflow-y-auto'>
                             {users.map((user) => (
@@ -227,10 +228,10 @@ export default function AddCorrectiveActionForm({
               name='description'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Opis akcji</FormLabel>
+                  <FormLabel>{dict.correctiveAction.description}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={`Wprowadź dowolny tekst opisujący akcję do podjęcia`}
+                      placeholder={dict.correctiveAction.descriptionPlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -247,12 +248,12 @@ export default function AddCorrectiveActionForm({
               onClick={() => form.reset()}
             >
               <Eraser className='mr-2 h-4 w-4' />
-              Wyczyść
+              {dict.filters.clear}
             </Button>
             <div className='flex space-x-2'>
               <Button type='submit'>
                 <Plus className={isPendingUpdate ? 'animate-spin' : ''} />
-                Dodaj akcję korygującą
+                {dict.correctiveAction.addButton}
               </Button>
             </div>
           </CardFooter>

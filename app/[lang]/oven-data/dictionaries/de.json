@@ -1,0 +1,111 @@
+{
+  "title": "Ofendaten",
+  "lastSync": "Letzte Synchronisierung",
+  "oee": "OEE",
+  "oeeTitle": "Ofen OEE",
+  "oeeDescription": "Verfolgung der Auslastung aller Öfen kombiniert",
+  "temperatureTrend": "Temperaturtrend",
+  "utilizationTrend": "Auslastungstrend",
+  "failedToLoadChart": "Diagrammdaten konnten nicht geladen werden",
+  "noDataAvailable": "Keine Daten für den ausgewählten Zeitraum verfügbar",
+  "errorLoadingData": "Fehler beim Laden der Daten",
+  "filters": "Filter",
+  "timeFilters": {
+    "day": "Tag",
+    "week": "Woche",
+    "month": "Monat",
+    "range": "Bereich",
+    "from": "Von:",
+    "to": "Bis:",
+    "clear": "Löschen",
+    "search": "Suchen",
+    "selectDate": "Datum auswählen",
+    "year": "Jahr",
+    "weekLabel": "Woche",
+    "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+  },
+  "oeeMetrics": {
+    "overallUtilization": "Gesamtauslastung",
+    "averageAcrossOvens": "Durchschnitt über alle Öfen",
+    "totalRunningTime": "Gesamte Laufzeit",
+    "actualProductionTime": "Tatsächliche Produktionszeit",
+    "availableCapacity": "Verfügbarkeit",
+    "totalOvenCapacity": "Gesamte Ofenverfügbarkeit für den Zeitraum",
+    "utilizationTrendTitle": "Auslastungstrend",
+    "percentageCapacityUsed": "Prozentsatz der genutzten Gesamtofenverfügbarkeit im Zeitverlauf"
+  },
+  "processTable": {
+    "clickToViewChart": "Klicken Sie auf eine Prozesszeile, um die Temperaturdaten im Diagramm unten anzuzeigen.",
+    "processesFound": "Prozesse gefunden.",
+    "page": "Seite",
+    "of": "von",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "processFilters": {
+    "oven": "Ofen",
+    "status": "Status",
+    "hydraBatch": "HYDRA Charge",
+    "article": "Artikel",
+    "select": "Auswählen...",
+    "clickToAdd": "Klicken zum Hinzufügen...",
+    "clickToPaste": "Klicken Sie, um Werte aus Excel einzufügen oder manuell zu bearbeiten",
+    "clear": "Löschen",
+    "export": "Exportieren",
+    "search": "Suchen",
+    "searchPlaceholder": "Suchen...",
+    "notFound": "nicht gefunden"
+  },
+  "processColumns": {
+    "oven": "Ofen",
+    "status": "Status",
+    "article": "Artikel",
+    "hydraBatch": "Hydra Charge",
+    "startOperators": "Operator Start",
+    "endOperators": "Operator Ende",
+    "startTime": "Startzeit",
+    "endTime": "Endzeit",
+    "duration": "Dauer",
+    "targetTemp": "Ziel-Temp."
+  },
+  "processStatus": {
+    "prepared": "Vorbereitet",
+    "running": "Läuft",
+    "completed": "Abgeschlossen",
+    "failed": "Fehlgeschlagen"
+  },
+  "pasteDialog": {
+    "manageTitle": "Werte verwalten",
+    "valuesLabel": "Werte (einer pro Zeile)",
+    "clearAll": "Alles löschen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "errorApplying": "Fehler beim Anwenden der Werte",
+    "clearedFilter": "Filter gelöscht",
+    "appliedValues": "Werte auf Filter angewendet",
+    "invalidArticle": "Ungültiges Artikelformat (muss 5 Ziffern sein)",
+    "invalidHydraBatch": "Ungültiges HYDRA Batch-Format (muss 10 Zeichen sein)",
+    "placeholderArticle": "Fügen Sie Ihre Artikelwerte hier ein (5 Ziffern), zum Beispiel:\n30111\n30112\n30113",
+    "placeholderHydraBatch": "Fügen Sie Ihre HYDRA Batch-Werte hier ein (10 Zeichen), zum Beispiel:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderArticleCurrent": "Aktuelle Werte werden unten angezeigt. Sie können sie bearbeiten oder neue Werte einfügen:\n30111\n30112\n30113",
+    "placeholderHydraBatchCurrent": "Aktuelle Werte werden unten angezeigt. Sie können sie bearbeiten oder neue Werte einfügen:\nHH12345678\nAB98765432\nXY11223344"
+  },
+  "oeeButtons": {
+    "backToOvenData": "Zurück zu Ofendaten",
+    "refresh": "Aktualisieren"
+  },
+  "refresh": "Aktualisieren",
+  "temperatureChart": {
+    "title": "Temperaturtrend",
+    "selectProcess": "Wählen Sie einen Prozess aus der obigen Tabelle aus, um seine Temperaturdaten anzuzeigen",
+    "noProcessSelected": "Kein Prozess ausgewählt",
+    "noDataAvailable": "Keine Temperaturdaten für diesen Prozess verfügbar",
+    "noDataFound": "Keine Temperaturdaten für diesen Prozess gefunden",
+    "loadingData": "Temperaturdaten werden geladen...",
+    "deviationAlert": "Messung wich erheblich von den erwarteten Mustern ab und wurde mit einem orangefarbenen Punkt im Diagramm markiert.",
+    "deviationAlertPlural": "Messungen wichen erheblich von den erwarteten Mustern ab und wurden mit orangefarbenen Punkten im Diagramm markiert.",
+    "temperatureLabel": "Temperatur (°C)",
+    "on": "auf",
+    "target": "Ziel"
+  }
+}

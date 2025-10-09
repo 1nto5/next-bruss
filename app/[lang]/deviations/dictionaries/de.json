@@ -1,0 +1,361 @@
+{
+  "title": "Abweichungen im Produktionsprozess",
+  "addNew": "Neue Abweichung",
+  "login": "Anmelden",
+  "refresh": "Aktualisieren",
+  "noResults": "Keine Ergebnisse.",
+  "filters": {
+    "showFilters": "Filter anzeigen",
+    "onlyMy": "Nur meine",
+    "status": "Status",
+    "area": "Bereich",
+    "reason": "Grund",
+    "deviationDate": "Abweichungstermin",
+    "createdDate": "Erstellungsdatum",
+    "select": "wählen",
+    "search": "Suchen",
+    "clear": "Löschen"
+  },
+  "form": {
+    "title": "Neue Abweichung",
+    "tableLink": "Abweichungstabelle",
+    "articleNumber": "Artikelnummer",
+    "articleName": "Artikelbezeichnung",
+    "customerPartNumber": "Kundenteilenummer",
+    "customerName": "Kundenname",
+    "workstation": "Arbeitsplatz",
+    "area": "Bereich",
+    "quantity": "Menge",
+    "unit": "Einheit",
+    "batch": "Charge",
+    "description": "Abweichungsbeschreibung",
+    "descriptionPlaceholder": "Geben Sie einen beliebigen Text ein, der die Abweichung beschreibt",
+    "findName": "Namen finden",
+    "pcs": "Stk.",
+    "kg": "kg",
+    "reason": "Grund wählen:",
+    "periodFrom": "Beginn",
+    "periodTo": "Ende",
+    "processSpecification": "Prozessspezifikation",
+    "processSpecificationPlaceholder": "Geben Sie die Prozessspezifikation ein, falls zutreffend",
+    "customerAuthorization": "Kundenautorisierung",
+    "clearButton": "Löschen",
+    "saveDraftButton": "Entwurf speichern",
+    "addDeviationButton": "Abweichung hinzufügen",
+    "enterArticleNumber": "Artikelnummer eingeben",
+    "articleNotFound": "Artikel nicht gefunden",
+    "enterValidArticleNumber": "Geben Sie eine gültige Artikelnummer ein",
+    "contactIT": "Kontaktieren Sie IT!",
+    "deviationAdded": "Abweichung hinzugefügt!",
+    "draftSaved": "Entwurf gespeichert!",
+    "editTitle": "Abweichung bearbeiten",
+    "editDraftTitle": "Entwurf der Abweichung bearbeiten",
+    "deviationLink": "Abweichung",
+    "saveChangesButton": "Änderungen speichern",
+    "deviationUpdated": "Abweichung aktualisiert!",
+    "notAuthorizedToEdit": "Sie sind nicht berechtigt, diese Abweichung zu bearbeiten!",
+    "deviationNotFound": "Abweichung für Aktualisierung nicht gefunden!",
+    "noChanges": "Sie haben keine Änderungen an der Abweichung vorgenommen!",
+    "deviationAddedFromDraft": "Abweichung aus Entwurf hinzugefügt!",
+    "draftNotFoundToUpdate": "Entwurf für Aktualisierung nicht gefunden.",
+    "notAuthorizedToEditDraft": "Sie sind nicht berechtigt, diesen Entwurf zu bearbeiten.",
+    "notDraft": "Dieses Element ist kein Entwurf mehr.",
+    "draftDeleted": "Entwurf gelöscht!",
+    "deleteDraftButton": "Entwurf löschen"
+  },
+  "table": {
+    "columns": {
+      "id": "ID",
+      "status": "Status",
+      "from": "Von",
+      "to": "Bis",
+      "article": "Art. / Material",
+      "quantity": "Menge",
+      "area": "Bereich",
+      "reason": "Grund",
+      "owner": "Eigentümer",
+      "createdAt": "Erstellt am"
+    },
+    "status": {
+      "inApproval": "Ausstehend",
+      "approved": "Genehmigt",
+      "inProgress": "In Kraft",
+      "closed": "Geschlossen",
+      "rejected": "Abgelehnt",
+      "toApprove": "Zu genehmigen",
+      "draft": "Entwurf"
+    },
+    "actions": {
+      "edit": "Bearbeiten",
+      "open": "Öffnen"
+    },
+    "units": {
+      "pcs": "Stk."
+    }
+  },
+  "view": {
+    "statusBadges": {
+      "approved": "Abweichung genehmigt",
+      "rejected": "Abweichung abgelehnt",
+      "inApproval": "Abweichung wird genehmigt",
+      "inProgress": "Abweichung in Kraft",
+      "closed": "Abweichung geschlossen",
+      "deviation": "Abweichung"
+    },
+    "buttons": {
+      "print": "Drucken",
+      "printLog": "Druckverlauf",
+      "backToTable": "Abweichungen",
+      "editLog": "Verlauf",
+      "edit": "Bearbeiten",
+      "addCorrectiveAction": "Hinzufügen"
+    },
+    "sections": {
+      "details": "Details",
+      "correctiveActions": "Korrekturmaßnahmen",
+      "approvals": "Genehmigungen",
+      "notifications": "Gesendete Benachrichtigungen",
+      "attachments": "Anhänge",
+      "notes": "Notizen"
+    },
+    "labels": {
+      "created": "Erstellt",
+      "owner": "Eigentümer",
+      "articleNumber": "Artikelnummer",
+      "articleName": "Artikelbezeichnung",
+      "customerNumber": "Kundenteilenummer",
+      "customerName": "Kundenname",
+      "workplace": "Arbeitsplatz",
+      "quantity": "Menge",
+      "charge": "Charge",
+      "reason": "Grund",
+      "validPeriod": "Gültigkeitszeitraum",
+      "area": "Bereich",
+      "description": "Beschreibung",
+      "processSpecification": "Prozessspezifikation",
+      "customerAuthorization": "Kundenautorisierung",
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "correctiveActionsTable": {
+      "status": "Status",
+      "changeStatus": "Status ändern",
+      "description": "Beschreibung",
+      "assignee": "Verantwortlicher",
+      "deadline": "Frist",
+      "lastChange": "Letzte Änderung",
+      "history": "Verlauf",
+      "noActions": "Keine Korrekturmaßnahmen"
+    },
+    "approvalsCard": {
+      "loginMessage": "Um auf Genehmigungsoptionen zuzugreifen,",
+      "loginLink": "melden Sie sich an"
+    },
+    "approvalsTable": {
+      "status": "Status",
+      "role": "Rolle",
+      "approve": "Genehmigen",
+      "person": "Person",
+      "date": "Datum",
+      "comment": "Kommentar",
+      "history": "Verlauf"
+    },
+    "roles": {
+      "qualityManager": "Qualitätsleiter",
+      "productionManager": "Produktionsleiter",
+      "plantManager": "Werksleiter"
+    },
+    "notificationsTable": {
+      "to": "An",
+      "sentAt": "Gesendet am",
+      "type": "Typ",
+      "noNotifications": "Keine registrierten Benachrichtigungen."
+    },
+    "attachmentsTable": {
+      "name": "Name",
+      "file": "Datei",
+      "note": "Notiz",
+      "uploadedBy": "Hochgeladen von",
+      "date": "Datum",
+      "noAttachments": "Keine Anhänge"
+    },
+    "notesTable": {
+      "person": "Person",
+      "date": "Datum",
+      "note": "Notiz",
+      "noNotes": "Keine Notizen"
+    },
+    "toasts": {
+      "approving": "Abweichung wird genehmigt...",
+      "rejecting": "Abweichung wird abgelehnt...",
+      "approved": "Genehmigt!",
+      "rejected": "Abgelehnt!",
+      "generatingPdf": "PDF wird generiert...",
+      "pdfGenerated": "PDF erfolgreich generiert!"
+    },
+    "errors": {
+      "contactIT": "Kontaktieren Sie IT!",
+      "vacancyRequired": "Genehmigung nur für vakante Position möglich!",
+      "noPermission": "Sie haben keine Berechtigung, in dieser Rolle zu genehmigen!",
+      "noPdfExport": "PDF-Export nicht möglich - fehlende Abweichungs-ID",
+      "pdfGenerationError": "Fehler beim Generieren des PDF"
+    },
+    "approvalStatuses": {
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "pending": "Keine Entscheidung"
+    },
+    "approvalDialogs": {
+      "approveTitle": "Abweichung genehmigen",
+      "rejectTitle": "Abweichung ablehnen",
+      "position": "Position",
+      "comment": "Kommentar",
+      "approveButton": "Ich genehmige",
+      "rejectButton": "Ich lehne ab",
+      "history": "Verlauf",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Datum",
+        "person": "Person",
+        "comment": "Kommentar"
+      }
+    },
+    "correctiveActionStatuses": {
+      "open": "Offen",
+      "closed": "Abgeschlossen",
+      "overdue": "Überfällig",
+      "inProgress": "In Bearbeitung",
+      "rejected": "Abgelehnt"
+    },
+    "correctiveActionDialogs": {
+      "closedTitle": "Korrekturmaßnahme abgeschlossen",
+      "closedDescription": "Der Status einer abgeschlossenen Korrekturmaßnahme kann nicht geändert werden.",
+      "changeStatusTitle": "Status der Korrekturmaßnahme ändern",
+      "noPermissionTitle": "Keine Berechtigung",
+      "noPermissionDescription": "Sie haben keine Berechtigung, den Status der Korrekturmaßnahme zu ändern.",
+      "changeDate": "Änderungsdatum",
+      "status": "Status",
+      "selectPlaceholder": "Wählen",
+      "additionalInfo": "Zusätzliche Informationen",
+      "additionalInfoPlaceholder": "Beliebiger Text zur Ausführung der Korrekturmaßnahme",
+      "confirmButton": "Bestätigen",
+      "history": "Verlauf",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Datum",
+        "comment": "Kommentar",
+        "person": "Person",
+        "time": "Zeit"
+      },
+      "errors": {
+        "noUser": "Kein Benutzer!",
+        "contactIT": "Kontaktieren Sie IT!"
+      },
+      "toasts": {
+        "updating": "Status wird aktualisiert...",
+        "updated": "Status erfolgreich aktualisiert!"
+      }
+    }
+  },
+  "dialogs": {
+    "addNote": {
+      "title": "Notiz hinzufügen",
+      "triggerButton": "Hinzufügen",
+      "contentLabel": "Notizinhalt",
+      "contentPlaceholder": "Notizinhalt eingeben...",
+      "submitButton": "Notiz hinzufügen",
+      "errors": {
+        "deviationIdError": "Abweichungs-ID-Fehler. Kontaktieren Sie IT!",
+        "contactIT": "Kontaktieren Sie IT!"
+      },
+      "toasts": {
+        "loading": "Notiz wird hinzugefügt...",
+        "success": "Notiz erfolgreich hinzugefügt!"
+      }
+    },
+    "addAttachment": {
+      "title": "Anhang hinzufügen",
+      "triggerButton": "Hinzufügen",
+      "fileLabel": "Datei",
+      "nameLabel": "Name",
+      "namePlaceholder": "Benutzerdefinierter Dateiname",
+      "noteLabel": "Notiz",
+      "submitButton": "Anhang hinzufügen",
+      "errors": {
+        "noPermission": "Sie haben keine Berechtigung oder die Abweichung ist geschlossen.",
+        "contactIT": "Kontaktieren Sie IT!",
+        "unauthorized": "Nicht autorisiert",
+        "noFile": "Keine Datei ausgewählt",
+        "noDeviationId": "Keine Abweichungs-ID",
+        "fileSizeExceeded": "Dateigröße überschreitet das Limit (10MB)",
+        "unsupportedFileType": "Nicht unterstützter Dateityp",
+        "fileAlreadyExists": "Diese Datei existiert bereits",
+        "databaseUpdateFailed": "Datenbankaktualisierung fehlgeschlagen",
+        "uploadFailed": "Fehler beim Hochladen der Datei",
+        "unknownError": "Unbekannter Fehler aufgetreten",
+        "generalUploadError": "Fehler beim Hinzufügen des Anhangs"
+      },
+      "toasts": {
+        "loading": "Anhang wird hochgeladen...",
+        "success": "Anhang erfolgreich hinzugefügt!"
+      }
+    },
+    "editLog": {
+      "title": "Bearbeitungsverlauf",
+      "columns": {
+        "date": "Datum",
+        "person": "Person",
+        "field": "Feld",
+        "oldValue": "Vorheriger Wert",
+        "newValue": "Neuer Wert"
+      },
+      "fieldNames": {
+        "articleNumber": "Artikelnummer",
+        "articleName": "Artikelbezeichnung",
+        "workplace": "Arbeitsplatz",
+        "customerNumber": "Kundennummer",
+        "customerName": "Kundenname",
+        "quantity": "Menge",
+        "unit": "Einheit",
+        "charge": "Charge",
+        "reason": "Grund",
+        "periodFrom": "Zeitraum von",
+        "periodTo": "Zeitraum bis",
+        "area": "Bereich",
+        "description": "Beschreibung",
+        "processSpecification": "Prozessspezifikation",
+        "customerAuthorization": "Kundenautorisierung"
+      },
+      "booleanValues": {
+        "true": "Ja",
+        "false": "Nein"
+      },
+      "noHistory": "Kein Bearbeitungsverlauf."
+    },
+    "printLog": {
+      "title": "Druckverlauf",
+      "columns": {
+        "date": "Datum",
+        "person": "Person"
+      },
+      "noPrints": "Keine registrierten Drucke"
+    }
+  },
+  "correctiveAction": {
+    "title": "Neue Korrekturmaßnahme",
+    "deadline": "Frist",
+    "responsible": "Verantwortliche Person",
+    "description": "Maßnahmenbeschreibung",
+    "descriptionPlaceholder": "Geben Sie einen beliebigen Text ein, der die zu ergreifende Maßnahme beschreibt",
+    "searchPlaceholder": "Suchen...",
+    "notFound": "Nicht gefunden.",
+    "addButton": "Korrekturmaßnahme hinzufügen",
+    "toasts": {
+      "added": "Korrekturmaßnahme hinzugefügt!"
+    },
+    "errors": {
+      "deviationNotFound": "Abweichung nicht gefunden!",
+      "notAuthorized": "Nur der Abweichungseigentümer kann Korrekturmaßnahmen hinzufügen!"
+    }
+  }
+}

@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Locale } from '@/lib/config/i18n';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { OvenProcessDataType } from '../lib/types';
+import type { Dictionary } from '../lib/dict';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   fetchTime: Date;
   fetchTimeLocaleString: string;
   lang: Locale;
+  dict: Dictionary;
   onProcessSelect?: (process: OvenProcessDataType | null) => void;
 }
 
@@ -44,6 +46,7 @@ export function OvenDataTable<TData, TValue>({
   fetchTime,
   fetchTimeLocaleString,
   lang,
+  dict,
   onProcessSelect,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -90,10 +93,6 @@ export function OvenDataTable<TData, TValue>({
 
   return (
     <div className='w-full'>
-      {/* User instruction for selecting a process */}
-      <div className='text-muted-foreground mb-2 text-sm'>
-        Click a process row to display its temperature data on the chart below.
-      </div>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -143,24 +142,17 @@ export function OvenDataTable<TData, TValue>({
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No oven processes found.
+                  {dict.noDataAvailable}
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-between space-x-2 py-4'>
-        <div className='text-muted-foreground flex-1 text-sm'>
-          {table.getFilteredRowModel().rows.length}{' '}
-          {table.getFilteredRowModel().rows.length === 1
-            ? 'process'
-            : 'processes'}{' '}
-          found.
-        </div>
+      <div className='flex items-center justify-end space-x-2 py-4'>
         <div className='flex items-center space-x-2'>
           <p className='text-sm font-medium'>
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
+            {dict.processTable.page} {table.getState().pagination.pageIndex + 1} {dict.processTable.of}{' '}
             {table.getPageCount()}
           </p>
           <Button
@@ -170,7 +162,7 @@ export function OvenDataTable<TData, TValue>({
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft className='h-4 w-4' />
-            Previous
+            {dict.processTable.previous}
           </Button>
           <Button
             variant='outline'
@@ -178,7 +170,7 @@ export function OvenDataTable<TData, TValue>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            {dict.processTable.next}
             <ChevronRight className='h-4 w-4' />
           </Button>
         </div>

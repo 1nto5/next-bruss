@@ -12,9 +12,9 @@ import {
 import { Locale } from '@/lib/config/i18n';
 import { KeyRound, Plus } from 'lucide-react'; // Import Plus icon
 import { Session } from 'next-auth';
-import Link from 'next/link'; // Import Link
+import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
-import { columns } from './components/table/columns';
+import { getDictionary } from './lib/dict';
 import { DataTable } from './components/table/data-table';
 import {
   getConfigAreaOptions,
@@ -51,7 +51,7 @@ async function getAllDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const deviations: DeviationType[] = await res.json();
   const deviationsFiltered = deviations.filter(
@@ -61,10 +61,10 @@ async function getAllDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
@@ -105,7 +105,7 @@ async function getUserDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
   const deviations: DeviationType[] = await res.json();
 
   const approvalMapping: { [key: string]: keyof DeviationType } = {
@@ -166,10 +166,10 @@ async function getUserDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(lang)
+        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
@@ -199,6 +199,7 @@ export default async function DeviationsPage(props: {
   const params = await props.params;
 
   const { lang } = params;
+  const dict = await getDictionary(lang);
 
   let fetchTime, fetchTimeLocaleString, deviations;
   const session = await auth();
@@ -223,20 +224,20 @@ export default async function DeviationsPage(props: {
     <Card>
       <CardHeader>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>Odchylenia w procesie produkcyjnym</CardTitle>
+          <CardTitle>{dict.title}</CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session ? (
-              <Link href='/deviations/add'>
+              <LocalizedLink href='/deviations/add'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <Plus /> <span>Nowe odchylenie</span>
+                  <Plus /> <span>{dict.addNew}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             ) : (
-              <Link href={`/auth?callbackUrl=/deviations`}>
+              <LocalizedLink href={`/auth?callbackUrl=/deviations`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <KeyRound /> <span>Zaloguj się</span>
+                  <KeyRound /> <span>{dict.login}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             )}
           </div>
         </div>
@@ -250,15 +251,16 @@ export default async function DeviationsPage(props: {
           userEmail={session?.user?.email || undefined}
           areaOptions={areaOptions} // Pass areaOptions
           reasonOptions={reasonOptions} // Pass reasonOptions
+          dict={dict}
         />
       </CardHeader>
       <DataTable
-        columns={columns}
         data={deviations}
         fetchTimeLocaleString={fetchTimeLocaleString} // Keep prop if DataTable needs it
         lang={lang}
         reasonOptions={reasonOptions}
         areaOptions={areaOptions}
+        dict={dict}
       />
     </Card>
   );

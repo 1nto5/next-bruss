@@ -33,13 +33,15 @@ import {
   bulkRejectOvertimeSubmissions,
 } from '../actions';
 import { OvertimeSubmissionType } from '../lib/types';
+import { Dictionary } from '../lib/dict';
 
 interface BulkActionsProps {
   table: Table<OvertimeSubmissionType>;
   session: Session | null;
+  dict: Dictionary;
 }
 
-export default function BulkActions({ table, session }: BulkActionsProps) {
+export default function BulkActions({ table, session, dict }: BulkActionsProps) {
   // All hooks at the top
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -122,20 +124,20 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
           table.resetRowSelection();
           return res;
         } else {
-          throw new Error(res.error || 'Błąd zatwierdzania');
+          throw new Error(res.error || dict.errors.approvalError);
         }
       }),
       {
-        loading: 'Zatwierdzanie... ',
-        success: (res) => `Zatwierdzono ${res.count} z ${res.total} zgłoszeń!`,
-        error: (error) => error.message || 'Błąd zatwierdzania',
+        loading: dict.toast.bulkApproving,
+        success: (res) => dict.toast.bulkApproved.replace('{count}', (res.count || 0).toString()).replace('{total}', (res.total || 0).toString()),
+        error: (error) => error.message || dict.errors.approvalError,
       },
     );
   };
 
   const handleBulkReject = async () => {
     if (!rejectionReason.trim()) {
-      toast.error('Podaj powód odrzucenia');
+      toast.error(dict.toast.provideRejectionReason);
       return;
     }
     toast.promise(
@@ -147,14 +149,14 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
             setRejectionReason('');
             return res;
           } else {
-            throw new Error(res.error || 'Błąd odrzucania');
+            throw new Error(res.error || dict.errors.rejectionError);
           }
         },
       ),
       {
-        loading: 'Odrzucanie... ',
-        success: (res) => `Odrzucono ${res.count} z ${res.total} zgłoszeń!`,
-        error: (error) => error.message || 'Błąd odrzucania',
+        loading: dict.toast.bulkRejecting,
+        success: (res) => dict.toast.bulkRejected.replace('{count}', (res.count || 0).toString()).replace('{total}', (res.total || 0).toString()),
+        error: (error) => error.message || dict.errors.rejectionError,
       },
     );
   };
@@ -166,13 +168,13 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
           table.resetRowSelection();
           return res;
         } else {
-          throw new Error(res.error || 'Błąd rozliczania');
+          throw new Error(res.error || dict.errors.settlementError);
         }
       }),
       {
-        loading: 'Rozliczanie... ',
-        success: (res) => `Rozliczono ${res.count} z ${res.total} zgłoszeń!`,
-        error: (error) => error.message || 'Błąd rozliczania',
+        loading: dict.toast.bulkSettling,
+        success: (res) => dict.toast.bulkSettled.replace('{count}', (res.count || 0).toString()).replace('{total}', (res.total || 0).toString()),
+        error: (error) => error.message || dict.errors.settlementError,
       },
     );
   };
@@ -184,13 +186,13 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
           table.resetRowSelection();
           return res;
         } else {
-          throw new Error(res.error || 'Błąd anulowania');
+          throw new Error(res.error || dict.errors.cancellationError);
         }
       }),
       {
-        loading: 'Anulowanie... ',
-        success: (res) => `Anulowano ${res.count} z ${res.total} zgłoszeń!`,
-        error: (error) => error.message || 'Błąd anulowania',
+        loading: dict.toast.bulkCancelling,
+        success: (res) => dict.toast.bulkCancelled.replace('{count}', (res.count || 0).toString()).replace('{total}', (res.total || 0).toString()),
+        error: (error) => error.message || dict.errors.cancellationError,
       },
     );
   };
@@ -200,9 +202,9 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Potwierdź operację</AlertDialogTitle>
+            <AlertDialogTitle>{dict.dialogs.bulkConfirm.title}</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz wykonać operację na {selectedCount}{' '}
+              {dict.dialogs.bulkConfirm.description} {selectedCount}{' '}
               {selectedCount === 1
                 ? 'zgłoszeniu'
                 : selectedCount % 10 >= 2 &&
@@ -215,10 +217,10 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setPendingActionType(null)}>
-              Anuluj
+              {dict.actions.cancel}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirm}>
-              Potwierdź
+              {dict.actions.confirm}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -227,20 +229,20 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
         <CardHeader className='p-4'>
           <CardDescription>
             {(() => {
-              if (selectedCount === 1) return 'Wybrałeś 1 zgłoszenie:';
+              if (selectedCount === 1) return dict.bulk.selectedOne;
               if (
                 [2, 3, 4].includes(selectedCount % 10) &&
                 ![12, 13, 14].includes(selectedCount % 100)
               ) {
-                return `Wybrałeś ${selectedCount} zgłoszenia:`;
+                return dict.bulk.selectedFew.replace('{count}', selectedCount.toString());
               }
-              return `Wybrałeś ${selectedCount} zgłoszeń:`;
+              return dict.bulk.selectedMany.replace('{count}', selectedCount.toString());
             })()}
             {!hasAnyAction && (
               <>
                 <br />
                 <span className='text-muted-foreground'>
-                  Brak wspólnych akcji dla zaznaczonych zgłoszeń.
+                  {dict.bulk.noCommonActions}
                 </span>
               </>
             )}
@@ -255,7 +257,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                 onClick={() => openConfirmDialog('approve')}
               >
                 <Check className='' />
-                Zatwierdź
+                {dict.bulk.approve}
               </Button>
             )}
             {allCanReject && (
@@ -265,7 +267,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                 onClick={() => openConfirmDialog('reject')}
               >
                 <X className='' />
-                Odrzuć
+                {dict.bulk.reject}
               </Button>
             )}
             {allCanMarkAsAccounted && (
@@ -275,7 +277,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                 onClick={() => openConfirmDialog('settle')}
               >
                 <Check className='' />
-                Rozlicz
+                {dict.bulk.settle}
               </Button>
             )}
             {allCanCancel && (
@@ -285,7 +287,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                 onClick={() => openConfirmDialog('cancel')}
               >
                 <X className='' />
-                Anuluj
+                {dict.bulk.cancel}
               </Button>
             )}
           </div>
@@ -293,15 +295,14 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
         <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Odrzuć wybrane zgłoszenia</DialogTitle>
+              <DialogTitle>{dict.bulk.rejectTitle}</DialogTitle>
               <DialogDescription>
-                Czy na pewno chcesz odrzucić {selectedCount} wybranych zgłoszeń?
-                Podaj powód odrzucenia.
+                {dict.bulk.rejectDescription.replace('{count}', selectedCount.toString())}
               </DialogDescription>
             </DialogHeader>
             <div className='space-y-4'>
               <Textarea
-                placeholder='Powód odrzucenia...'
+                placeholder={dict.bulk.rejectionReasonPlaceholder}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 className='min-h-[100px]'
@@ -315,7 +316,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                   setRejectionReason('');
                 }}
               >
-                Anuluj
+                {dict.actions.cancel}
               </Button>
               <Button
                 variant='destructive'
@@ -323,7 +324,7 @@ export default function BulkActions({ table, session }: BulkActionsProps) {
                 disabled={!rejectionReason.trim()}
               >
                 <X className='' />
-                Odrzuć
+                {dict.bulk.reject}
               </Button>
             </DialogFooter>
           </DialogContent>

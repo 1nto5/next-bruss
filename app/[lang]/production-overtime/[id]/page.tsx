@@ -4,9 +4,10 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { Table } from 'lucide-react';
 import Link from 'next/link';
-import { columns } from '../components/id-table/columns';
+import { getColumns } from '../components/id-table/columns';
 import { DataTable } from '../components/id-table/data-table';
 import { getOvertimeRequest } from '../lib/get-overtime-request';
+import { getDictionary } from '../lib/dict';
 
 export default async function ProductionOvertimePage(props: {
   params: Promise<{ lang: Locale; id: string }>;
@@ -14,6 +15,7 @@ export default async function ProductionOvertimePage(props: {
 }) {
   const params = await props.params;
   const { lang, id } = params;
+  const dict = await getDictionary(lang);
 
   let overtimeRequestLocaleString;
   ({ overtimeRequestLocaleString } = await getOvertimeRequest(lang, id));
@@ -22,13 +24,10 @@ export default async function ProductionOvertimePage(props: {
     <Card>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            Pracownicy odbierający nadgodziny w zleceniu wykonania pracy w
-            godzinach nadliczbowych - produkcja
-          </CardTitle>
-          <Link href='/production-overtime'>
+          <CardTitle>{dict.idTable.title}</CardTitle>
+          <Link href={`/${lang}/production-overtime`}>
             <Button variant='outline'>
-              <Table /> <span>Tabela zleceń</span>
+              <Table /> <span>{dict.idTable.requestsTable}</span>
             </Button>
           </Link>
         </div>
@@ -37,7 +36,7 @@ export default async function ProductionOvertimePage(props: {
       </CardHeader>
 
       <DataTable
-        columns={columns}
+        columns={getColumns(dict)}
         data={(
           overtimeRequestLocaleString.employeesWithScheduledDayOff || []
         ).map((employee) => ({
@@ -46,6 +45,7 @@ export default async function ProductionOvertimePage(props: {
         }))}
         id={id}
         status={overtimeRequestLocaleString.status}
+        dict={dict}
       />
     </Card>
   );

@@ -5,9 +5,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { getDictionary } from '../lib/dict';
 import { cardsColumns } from './cards-table/cards-columns';
 import { CardsDataTable } from './cards-table/cards-data-table';
-import { positionsColumns } from './positions-table/positions-columns';
+import { createPositionsColumns } from './positions-table/positions-columns';
 import { PositionsDataTable } from './positions-table/positions-data-table';
 
 async function getCards(
@@ -29,7 +30,7 @@ async function getCards(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const cardsFetchTime = dateFromResponse.toLocaleString(lang);
+  const cardsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let cards: CardTableDataType[] = await res.json();
 
@@ -64,7 +65,7 @@ async function getPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const positionsFetchTime = dateFromResponse.toLocaleString(lang);
+  const positionsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -78,11 +79,11 @@ async function getPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(lang),
+    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(lang),
+      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
   }));
 
   return {
@@ -100,6 +101,7 @@ export default async function InventoryPage(props: {
   const searchParams = await props.searchParams;
 
   const { lang } = params;
+  const dict = await getDictionary(lang);
 
   let positionsFetchTime, cardsFetchTime, cards, positions;
   // const { number = '' } = searchParams;
@@ -122,7 +124,7 @@ export default async function InventoryPage(props: {
       </TabsContent>
       <TabsContent value='positions'>
         <PositionsDataTable
-          columns={positionsColumns}
+          columns={createPositionsColumns(dict)}
           fetchTime={positionsFetchTime}
           data={positions}
           lang={lang}

@@ -11,10 +11,11 @@ import { Locale } from '@/lib/config/i18n';
 import { RefreshButton } from '@/components/refresh-button';
 import { Button } from '@/components/ui/button';
 import { BarChart3 } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { revalidateOvenTableData } from './actions';
 import OvenDataWithChart from './components/oven-data-with-chart';
 import OvenTableFilteringAndOptions from './components/table-filtering-and-options';
+import { getDictionary } from './lib/dict';
 
 async function getOvens() {
   const res = await fetch(`${process.env.API}oven-data/ovens`, {
@@ -59,16 +60,16 @@ async function getOvenProcesses(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let data: OvenProcessDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
     startTime: new Date(item.startTime),
     endTime: item.endTime ? new Date(item.endTime) : null,
-    startTimeLocaleString: new Date(item.startTime).toLocaleString(lang),
+    startTimeLocaleString: new Date(item.startTime).toLocaleString(process.env.DATE_TIME_LOCALE),
     endTimeLocaleString: item.endTime
-      ? new Date(item.endTime).toLocaleString(lang)
+      ? new Date(item.endTime).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };
@@ -82,6 +83,7 @@ export default async function OvenDataPage(props: {
   const searchParams = await props.searchParams;
 
   const { lang } = params;
+  const dict = await getDictionary(lang);
 
   let fetchTime, fetchTimeLocaleString, data;
   ({ fetchTime, fetchTimeLocaleString, data } = await getOvenProcesses(
@@ -95,25 +97,26 @@ export default async function OvenDataPage(props: {
       <CardHeader>
         <div className='flex items-center justify-between'>
           <div>
-            <CardTitle>Oven Data</CardTitle>
+            <CardTitle>{dict.title}</CardTitle>
             <CardDescription>
-              Last sync: {fetchTimeLocaleString}
+              {dict.lastSync}: {fetchTimeLocaleString}
             </CardDescription>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row'>
-            <Link href={`/${lang}/oven-data/oee`}>
+            <LocalizedLink href="/oven-data/oee">
               <Button variant='outline' className='w-full sm:w-auto'>
                 <BarChart3 />
-                <span>OEE</span>
+                <span>{dict.oee}</span>
               </Button>
-            </Link>
+            </LocalizedLink>
             <RefreshButton
               fetchTime={fetchTime}
               onRefresh={revalidateOvenTableData}
+              label={dict.refresh}
             />
           </div>
         </div>
-        <OvenTableFilteringAndOptions ovens={ovens} fetchTime={fetchTime} />
+        <OvenTableFilteringAndOptions ovens={ovens} fetchTime={fetchTime} dict={dict} />
       </CardHeader>
       <CardContent>
         <OvenDataWithChart
@@ -122,6 +125,7 @@ export default async function OvenDataPage(props: {
           fetchTime={fetchTime}
           fetchTimeLocaleString={fetchTimeLocaleString}
           lang={lang}
+          dict={dict}
           searchParams={searchParams}
         />
       </CardContent>

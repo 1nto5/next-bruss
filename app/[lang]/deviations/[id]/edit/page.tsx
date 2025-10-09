@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
 import { redirect } from 'next/navigation';
-// import { getDictionary } from '@/lib/dict';
+import { getDictionary } from '../../lib/dict';
 import EditForm from '../../components/edit-form';
 import {
   getConfigAreaOptions,
@@ -20,7 +20,7 @@ export default async function EditDeviationPage(props: {
 
   const { lang, id } = params;
 
-  // const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang);
   const reasonOptions = await getConfigReasonOptions();
   const areaOptions = await getConfigAreaOptions();
   const deviationData = await getDeviation(id);
@@ -31,6 +31,7 @@ export default async function EditDeviationPage(props: {
       deviation={deviationData.deviation}
       id={id}
       lang={lang}
+      dict={dict}
     />
   );
 }

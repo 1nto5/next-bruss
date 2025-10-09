@@ -1,7 +1,8 @@
 import { CardPositionsTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { columns } from './card-positions-table/columns';
+import { getDictionary } from '../../lib/dict';
+import { createColumns } from './card-positions-table/columns';
 import { DataTable } from './card-positions-table/data-table';
 
 async function getCardPositions(
@@ -30,7 +31,7 @@ async function getCardPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(lang);
+  const fetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -44,11 +45,11 @@ async function getCardPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(lang),
+    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(lang),
+      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
   }));
 
   return {
@@ -68,12 +69,13 @@ export default async function InventoryCardPage(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const { cardNumber, lang } = params;
+  const dict = await getDictionary(lang);
   const { fetchTime, positions, cardSector, cardWarehouse, cardCreators } =
     await getCardPositions(lang, cardNumber, searchParams);
 
   return (
     <DataTable
-      columns={columns}
+      columns={createColumns(dict)}
       data={positions}
       fetchTime={fetchTime}
       lang={lang}

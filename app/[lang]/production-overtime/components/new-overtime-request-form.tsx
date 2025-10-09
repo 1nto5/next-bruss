@@ -62,16 +62,19 @@ import {
   redirectToProductionOvertime as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
+import { Dictionary } from '../lib/dict';
 import { NewOvertimeRequestSchema } from '../lib/zod';
 
 export default function NewOvertimeRequestForm({
   employees,
   users,
   loggedInUserEmail,
+  dict,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
   loggedInUserEmail: string;
+  dict: Dictionary;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
@@ -120,20 +123,20 @@ export default function NewOvertimeRequestForm({
       const res = await insert(data);
       if ('success' in res) {
         if (currentActionType === 'save-and-add-another') {
-          toast.success('Zlecenie zapisane!');
+          toast.success(dict.newOvertimeRequestForm.toast.saved);
           // Do NOT reset the form here
         } else {
-          toast.success('Zlecenie dodane!');
+          toast.success(dict.newOvertimeRequestForm.toast.added);
           form.reset();
           redirect();
         }
       } else if ('error' in res) {
         console.error(res.error);
-        toast.error('Skontaktuj się z IT!');
+        toast.error(dict.newOvertimeRequestForm.toast.contactIT);
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.newOvertimeRequestForm.toast.contactIT);
     } finally {
       setIsPendingInserting(false);
     }
@@ -154,11 +157,11 @@ export default function NewOvertimeRequestForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>
-            Nowe zlecenie wykonania pracy w godzinach nadliczbowych - produkcja
+            {dict.newOvertimeRequestForm.title}
           </CardTitle>
           <Link href='/production-overtime'>
             <Button variant='outline'>
-              <Table /> <span>Tabela zleceń</span>
+              <Table /> <span>{dict.newOvertimeRequestForm.requestsTable}</span>
             </Button>
           </Link>
         </div>
@@ -178,10 +181,9 @@ export default function NewOvertimeRequestForm({
               name='from'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Rozpoczęcie pracy</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.startWork}</FormLabel>
                   <FormDescription>
-                    Początek zmiany lub pierwszej zmiany gdy ilość zmian jest
-                    większa niż 1.
+                    {dict.newOvertimeRequestForm.startWorkDescription}
                   </FormDescription>
                   <FormControl>
                     <DateTimePicker
@@ -208,10 +210,9 @@ export default function NewOvertimeRequestForm({
               name='to'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Zakończenie pracy</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.endWork}</FormLabel>
                   <FormDescription>
-                    Koniec zmiany lub ostatniej zmiany gdy ilość zmian jest
-                    większa niż 1.
+                    {dict.newOvertimeRequestForm.endWorkDescription}
                   </FormDescription>
                   <FormControl>
                     <DateTimePicker
@@ -238,10 +239,9 @@ export default function NewOvertimeRequestForm({
               name='numberOfShifts'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Liczba zmian</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.numberOfShifts}</FormLabel>
                   <FormDescription>
-                    Zakładamy, że każda zmiana ma równą długość. Jeśli długość
-                    zmian jest różna, należy dodać kolejne zlecenia.
+                    {dict.newOvertimeRequestForm.numberOfShiftsDescription}
                   </FormDescription>
                   <FormControl>
                     <Input
@@ -264,11 +264,9 @@ export default function NewOvertimeRequestForm({
               name='responsibleEmployee'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Odpowiedzialny</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.responsible}</FormLabel>
                   <FormDescription>
-                    Wybierz pracownika nadzorującego pracę w godzinach
-                    nadliczbowych – będzie zobowiązany do przesłania listy
-                    obecności.
+                    {dict.newOvertimeRequestForm.responsibleDescription}
                   </FormDescription>
                   <Popover
                     open={responsibleEmployeeOpen}
@@ -287,16 +285,16 @@ export default function NewOvertimeRequestForm({
                           {field.value
                             ? users.find((user) => user.email === field.value)
                                 ?.name
-                            : 'Wybierz odpowiedzialną osobę'}
+                            : dict.newOvertimeRequestForm.selectResponsible}
                           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder='Szukaj osoby...' />
+                        <CommandInput placeholder={dict.newOvertimeRequestForm.searchPerson} />
                         <CommandList>
-                          <CommandEmpty>Nie znaleziono osoby.</CommandEmpty>
+                          <CommandEmpty>{dict.newOvertimeRequestForm.personNotFound}</CommandEmpty>
                           <CommandGroup className='max-h-48 overflow-y-auto'>
                             {users.map((user) => (
                               <CommandItem
@@ -335,7 +333,7 @@ export default function NewOvertimeRequestForm({
               name='numberOfEmployees'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Liczba pracowników</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.numberOfEmployees}</FormLabel>
                   <FormControl>
                     <Input
                       type='number'
@@ -359,11 +357,12 @@ export default function NewOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
-                    <FormLabel>Pracownicy odbierający dni wolne</FormLabel>
+                    <FormLabel>{dict.newOvertimeRequestForm.scheduledDayOff}</FormLabel>
                     <FormControl>
                       <MultiSelectEmployees
                         employees={employees}
                         value={field.value}
+                        dict={dict}
                         onSelectChange={(selectedEmployees) => {
                           const employeesWithDays = selectedEmployees.map(
                             (emp) => ({
@@ -388,7 +387,7 @@ export default function NewOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Uzasadnienie pracy w godzinach nadliczbowych
+                    {dict.newOvertimeRequestForm.reason}
                   </FormLabel>
                   <FormControl>
                     <Textarea className='' {...field} />
@@ -402,7 +401,7 @@ export default function NewOvertimeRequestForm({
               name='note'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dodatkowe informacje</FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.note}</FormLabel>
                   <FormControl>
                     <Textarea className='' {...field} />
                   </FormControl>
@@ -414,64 +413,37 @@ export default function NewOvertimeRequestForm({
             <Accordion type='single' collapsible>
               <AccordionItem value='item-1'>
                 <AccordionTrigger>
-                  Zachowanie nieprzerwanego odpoczynku
+                  {dict.newOvertimeRequestForm.accordion.restPeriod}
                 </AccordionTrigger>
                 <AccordionContent className='text-justify'>
-                  Pracownik zachował co najmniej 11 godzin nieprzerwanego
-                  odpoczynku w każdej dobie oraz co najmniej 35 godzin
-                  nieprzerwanego odpoczynku tygodniowego (w przypadku
-                  pracowników przechodzących na inną zmianę czas odpoczynku nie
-                  może być krótszy niż 24 godziny).
+                  {dict.newOvertimeRequestForm.accordion.restPeriodContent}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value='item-2'>
-                <AccordionTrigger>Standard Bruss</AccordionTrigger>
+                <AccordionTrigger>{dict.newOvertimeRequestForm.accordion.brussStandard}</AccordionTrigger>
                 <AccordionContent className='text-justify'>
-                  Za pracę w niedzielę i święta pracownik, dla którego jest to
-                  7. dzień pracy z kolei, otrzymuje dzień wolny (zgodnie z
-                  przepisami KP – patrz: Informacje / podstawy prawne) oraz
-                  dodatek do wynagrodzenia w wysokości 100% wynagrodzenia za
-                  każdą godzinę pracy.
+                  {dict.newOvertimeRequestForm.accordion.brussStandardContent}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value='item-3'>
                 <AccordionTrigger>
-                  Informacje / podstawy prawne
+                  {dict.newOvertimeRequestForm.accordion.legalInfo}
                 </AccordionTrigger>
                 <AccordionContent className='text-justify'>
                   <p>
-                    1. Zmiany 6.00-14.00; 7.00-15.00; 8.00-16.00; 14.00-22.00;
-                    22.00 - 6.00 - norma dobowa czasu pracy 8 godzin
+                    {dict.newOvertimeRequestForm.accordion.legalInfoContent1}
                   </p>
                   <p>
-                    2. Czas pracy wraz z pracą nadliczbową nie może przekroczyć
-                    13h na dobę - powyżej 13h praca w nadgodzinach jest
-                    niedopuszczalna
+                    {dict.newOvertimeRequestForm.accordion.legalInfoContent2}
                   </p>
                   <p>
-                    3. Tygodniowy czas pracy łącznie z godzinami nadliczbowymi
-                    nie może przekraczać przeciętnie 48 godzin w przyjętym
-                    okresie rozliczeniowym
+                    {dict.newOvertimeRequestForm.accordion.legalInfoContent3}
                   </p>
                   <p>
-                    4. Zgodnie z przepisami art. 15111 kodeksu pracy pracownik
-                    wykonujący pracę w niedziele i święta powinien skorzystać z
-                    dnia wolnego od pracy w okresie sześciu dni kalendarzowych
-                    poprzedzających lub następujących po takiej niedzieli, za
-                    pracę w święto – do końca okresu rozliczeniowego, a jeżeli
-                    jest to niemożliwe pracownik ma prawo do innego dnia wolnego
-                    od pracy do końca okresu rozliczeniowego. Jeżeli udzielenie
-                    takiego dnia także i w tym okresie nie jest możliwe,
-                    pracownikowi przysługuje dodatek do wynagrodzenia w
-                    wysokości 100% wynagrodzenia za każdą godzinę pracy w
-                    niedzielę/święto.
+                    {dict.newOvertimeRequestForm.accordion.legalInfoContent4}
                   </p>
                   <p>
-                    W zakładzie funkcjonuje system podstawowy (art. 129 kp –
-                    norma dobowa 8h i tygodniowa przeciętna 40h w pięciodniowym
-                    tydzień czasu pracy). Podstawa prawna: art. 131, art. 132,
-                    art. 133, art. 151&3 i 4, art. 151(1), art. 151(11) Kodeksu
-                    pracy.
+                    {dict.newOvertimeRequestForm.accordion.legalInfoContent5}
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -487,7 +459,7 @@ export default function NewOvertimeRequestForm({
               disabled={isPendingInsert}
             >
               <CircleX className='' />
-              Wyczyść
+              {dict.common.clear}
             </Button>
             <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row'>
               <Button
@@ -504,7 +476,7 @@ export default function NewOvertimeRequestForm({
                       : ''
                   }
                 />
-                Zapisz i dodaj kolejne
+                {dict.newOvertimeRequestForm.saveAndAddAnother}
               </Button>
               <Button
                 type='button'
@@ -519,7 +491,7 @@ export default function NewOvertimeRequestForm({
                       : ''
                   }
                 />
-                Dodaj zlecenie
+                {dict.newOvertimeRequestForm.addOrder}
               </Button>
             </div>
           </CardFooter>

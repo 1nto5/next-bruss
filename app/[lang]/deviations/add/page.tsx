@@ -1,5 +1,5 @@
 import { Locale } from '@/lib/config/i18n';
-// import { getDictionary } from '@/lib/dict';
+import { getDictionary } from '../lib/dict';
 
 import AddDeviationForm from '../components/add-form';
 import {
@@ -13,7 +13,7 @@ export default async function AddDeviationPage(props: {
   const params = await props.params;
   const { lang } = params;
 
-  // const dict = await getDictionary(lang);
+  const dict = await getDictionary(lang);
   const reasonOptions = await getConfigReasonOptions();
   const areaOptions = await getConfigAreaOptions();
 
@@ -22,6 +22,7 @@ export default async function AddDeviationPage(props: {
       reasonOptions={reasonOptions}
       areaOptions={areaOptions}
       lang={lang}
+      dict={dict}
     />
   );
 }

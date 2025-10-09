@@ -125,7 +125,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         }
       },
       {
-        loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
+        loading: dict.scan.savingPlaceholder || 'Saving...',
         success: (msg) => msg,
         error: (err) => err.message,
       },
@@ -186,7 +186,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         }
       },
       {
-        loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
+        loading: dict.scan.savingPlaceholder || 'Saving...',
         success: (msg) => msg,
         error: (err) => err.message,
       },
@@ -245,7 +245,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         }
       },
       {
-        loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
+        loading: dict.scan.savingPlaceholder || 'Saving...',
         success: (msg) => msg,
         error: (err) => err.message,
       },
@@ -305,7 +305,7 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         }
       },
       {
-        loading: dict.scan.savingPlaceholder || 'Zapisywanie...',
+        loading: dict.scan.savingPlaceholder || 'Saving...',
         success: (msg) => msg,
         error: (err) => err.message,
       },

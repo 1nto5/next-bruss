@@ -1,0 +1,57 @@
+{
+  "title": "Failures",
+  "addFailure": "Add Failure",
+  "addingFailure": "Adding failure...",
+  "filters": {
+    "showFilters": "Show filters",
+    "from": "from:",
+    "to": "to:",
+    "station": "station",
+    "failure": "failure",
+    "supervisor": "supervisor",
+    "responsible": "responsible",
+    "search": "Search",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "exportToExcel": "Export to Excel",
+    "searchPlaceholder": "search...",
+    "notFound": "not found",
+    "notSet": "not set"
+  },
+  "form": {
+    "newFailure": "New Failure",
+    "onLine": "on line:",
+    "line": "Line",
+    "station": "Station",
+    "failure": "Failure",
+    "start": "Start",
+    "supervisor": "Supervisor",
+    "responsible": "Responsible",
+    "solution": "Solution",
+    "comment": "Comment",
+    "select": "select",
+    "notSelected": "not selected",
+    "searchPlaceholder": "search...",
+    "notFound": "Not found.",
+    "contactIT": "Contact IT!"
+  },
+  "toasts": {
+    "failureAdded": "Failure added!",
+    "contactIT": "Contact IT!"
+  },
+  "table": {
+    "columns": {
+      "id": "ID",
+      "line": "Line",
+      "station": "Station",
+      "failure": "Failure",
+      "from": "From",
+      "to": "To",
+      "duration": "Duration",
+      "supervisor": "Supervisor",
+      "responsible": "Responsible",
+      "solution": "Solution",
+      "comment": "Comment"
+    }
+  }
+}

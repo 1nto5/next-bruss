@@ -8,8 +8,8 @@ import {
 import { Locale } from '@/lib/config/i18n';
 import { revalidateDmcheckTableData } from './actions';
 import DmcTableFilteringAndOptions from './components/dmc-table-filtering-and-options';
-import { dmcColumns } from './dmc-table/dmc-columns';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
+import { getDictionary } from './lib/dict';
 
 async function getArticles() {
   const res = await fetch(`${process.env.API}/dmcheck-data/articles`, {
@@ -54,20 +54,20 @@ async function getScans(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   let data: TableDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
-    timeLocaleString: new Date(item.time).toLocaleString(lang),
+    timeLocaleString: new Date(item.time).toLocaleString(process.env.DATE_TIME_LOCALE),
     hydraTimeLocaleString: item.hydra_time
-      ? new Date(item.hydra_time).toLocaleString(lang)
+      ? new Date(item.hydra_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
     palletTimeLocaleString: item.pallet_time
-      ? new Date(item.pallet_time).toLocaleString(lang)
+      ? new Date(item.pallet_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
     reworkTimeLocaleString: item.rework_time
-      ? new Date(item.rework_time).toLocaleString(lang)
+      ? new Date(item.rework_time).toLocaleString(process.env.DATE_TIME_LOCALE)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };
@@ -83,6 +83,7 @@ export default async function InventoryPage(props: {
 
   const { lang } = params;
 
+  const dict = await getDictionary(lang);
   let fetchTime, fetchTimeLocaleString, data;
   ({ fetchTime, fetchTimeLocaleString, data } = await getScans(
     lang,
@@ -93,24 +94,20 @@ export default async function InventoryPage(props: {
   return (
     <Card>
       <CardHeader>
-        <div>
-          <CardTitle>DMCheck data</CardTitle>
-          <CardDescription>
-            Last sync: {fetchTimeLocaleString}
-          </CardDescription>
-        </div>
+        <CardTitle>{dict.title}</CardTitle>
         <DmcTableFilteringAndOptions
           articles={articles}
           fetchTime={fetchTime}
+          dict={dict}
         />
       </CardHeader>
       <DmcDataTable
-        columns={dmcColumns}
         data={data}
         articles={articles}
         fetchTime={fetchTime}
         fetchTimeLocaleString={fetchTimeLocaleString}
         lang={lang}
+        dict={dict}
       />
     </Card>
   );

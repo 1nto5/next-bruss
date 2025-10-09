@@ -23,11 +23,13 @@ import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { deleteDayOff } from '../../actions';
+import { Dictionary } from '../../lib/dict';
 import { overtimeRequestEmployeeType } from '../../lib/types';
 
 const handleDeleteDayOff = async (
   overtimeId: string,
   employeeIdentifier: string,
+  dict: Dictionary,
 ) => {
   toast.promise(
     deleteDayOff(overtimeId, employeeIdentifier).then((res) => {
@@ -37,18 +39,18 @@ const handleDeleteDayOff = async (
       return res;
     }),
     {
-      loading: 'Trwa usuwanie odbioru dnia wolnego...',
-      success: 'Odbiór został usunięty!',
+      loading: dict.idTable.toast.deleting,
+      success: dict.idTable.toast.deleted,
       error: (error) => {
         const errorMsg = error.message;
-        if (errorMsg === 'unauthorized') return 'Brak uprawnień!';
-        if (errorMsg === 'not found') return 'Nie znaleziono!';
+        if (errorMsg === 'unauthorized') return dict.idTable.toast.unauthorized;
+        if (errorMsg === 'not found') return dict.idTable.toast.notFound;
         if (errorMsg === 'not found employee')
-          return 'Pracownik nie znaleziony!';
+          return dict.idTable.toast.employeeNotFound;
         if (errorMsg === 'invalid status')
-          return 'Status zlecenia nie pozwala na jego edycję!';
+          return dict.idTable.toast.invalidStatus;
         console.error('handleDeleteDayOff', errorMsg);
-        return 'Skontaktuj się z IT!';
+        return dict.idTable.toast.contactIT;
       },
     },
   );
@@ -61,6 +63,7 @@ function DeleteDayOffDialog({
   firstName,
   lastName,
   identifier,
+  dict,
 }: {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -68,30 +71,33 @@ function DeleteDayOffDialog({
   firstName: string;
   lastName: string;
   identifier: string;
+  dict: Dictionary;
 }) {
   return (
     <AlertDialog open={isOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Potwierdź usunięcie odbioru dnia wolnego
+            {dict.idTable.confirmDelete.title}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz usunąć odbiór dnia wolnego dla pracownika:{' '}
-            {firstName} {lastName} ({identifier})?
+            {dict.idTable.confirmDelete.description
+              .replace('{firstName}', firstName)
+              .replace('{lastName}', lastName)
+              .replace('{identifier}', identifier)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setIsOpen(false)}>
-            Anuluj
+            {dict.common.cancel}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               setIsOpen(false);
-              handleDeleteDayOff(overtimeId, identifier);
+              handleDeleteDayOff(overtimeId, identifier, dict);
             }}
           >
-            Potwierdź
+            {dict.common.confirm}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -99,7 +105,7 @@ function DeleteDayOffDialog({
   );
 }
 
-function ActionsCell({ row }: { row: any }) {
+function ActionsCell({ row, dict }: { row: any; dict: Dictionary }) {
   const [isDeleteOpen, setDeleteOpen] = useState<boolean>(false);
 
   // assume employee properties exist on row.original
@@ -119,7 +125,7 @@ function ActionsCell({ row }: { row: any }) {
             className='focus:bg-red-400 dark:focus:bg-red-700'
           >
             <Trash2 className='mr-2 h-4 w-4' />
-            <span>Usuń odbiór dnia wolnego</span>
+            <span>{dict.idTable.deleteDayOff}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -132,32 +138,35 @@ function ActionsCell({ row }: { row: any }) {
         firstName={firstName}
         lastName={lastName}
         identifier={identifier}
+        dict={dict}
       />
     </>
   );
 }
 
-export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
+export const getColumns = (
+  dict: Dictionary,
+): ColumnDef<overtimeRequestEmployeeType>[] => [
   {
     accessorKey: 'firstName',
-    header: 'Imię',
+    header: dict.idTable.firstName,
   },
   {
     accessorKey: 'lastName',
-    header: 'Nazwisko',
+    header: dict.idTable.lastName,
   },
   {
     accessorKey: 'identifier',
-    header: 'Nr pers.',
+    header: dict.idTable.identifier,
   },
   {
     id: 'actions',
-    header: 'Akcje',
-    cell: ({ row }) => <ActionsCell row={row} />,
+    header: dict.idTable.actions,
+    cell: ({ row }) => <ActionsCell row={row} dict={dict} />,
   },
   {
     accessorKey: 'agreedReceivingAt',
-    header: 'Data odbioru dnia wolnego',
+    header: dict.idTable.agreedReceivingAt,
     cell: ({ row }) => {
       const agreedReceivingAt = row.original.agreedReceivingAt;
       const formattedDate = useClientLocaleDateString(agreedReceivingAt);
@@ -166,7 +175,7 @@ export const columns: ColumnDef<overtimeRequestEmployeeType>[] = [
   },
   {
     accessorKey: 'note',
-    header: 'Notatka',
+    header: dict.idTable.note,
     cell: ({ getValue }) => {
       const note = getValue<string>();
       return <span>{note || '-'}</span>;

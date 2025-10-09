@@ -33,6 +33,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
 import { ThemeModeToggle } from '../../../components/theme-mode-toggle';
+import LanguageSwitcher from './language-switcher';
 
 type HeaderProps = {
   dict: any;
@@ -80,7 +81,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
                       {route.submenu.map((sub) => (
                         <SheetClose key={sub.title} asChild>
                           <Link
-                            href={sub.href}
+                            href={`/${lang}${sub.href}`}
                             className='block px-2 py-1 text-lg'
                           >
                             {sub.title}
@@ -93,7 +94,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
               </nav>
             </SheetContent>
           </Sheet>
-          <Link href='/' className='flex items-center'>
+          <Link href={`/${lang}`} className='flex items-center'>
             <Logo />
           </Link>
         </div>
@@ -111,7 +112,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
                         <ListItem
                           key={subItem.title}
                           title={subItem.title}
-                          href={subItem.href}
+                          href={`/${lang}${subItem.href}`}
                         ></ListItem>
                       ))}
                     </ul>
@@ -134,7 +135,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
               <form
                 action={async () => {
                   'use server';
-                  await signOut({ redirectTo: '/' });
+                  await signOut({ redirectTo: `/${lang}` });
                 }}
               >
                 <Button variant={'ghost'} size='icon'>
@@ -146,7 +147,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
             <form
               action={async () => {
                 'use server';
-                redirect('/auth');
+                redirect(`/${lang}/auth`);
               }}
             >
               <Button variant={'ghost'} size='icon'>
@@ -156,6 +157,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
           )}
 
           <ThemeModeToggle />
+          <LanguageSwitcher currentLang={lang} />
         </div>
       </div>
     </header>

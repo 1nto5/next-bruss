@@ -5,6 +5,8 @@ import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
 import { notFound, redirect } from 'next/navigation';
 import OvertimeRequestForm from '../../../overtime-submissions/components/overtime-request-form';
+import { Locale } from '@/lib/config/i18n';
+import { getDictionary } from '../../lib/dict';
 
 // Get users with manager roles (any role containing "manager")
 async function getManagers() {
@@ -73,10 +75,11 @@ async function getOvertimeSubmission(id: string) {
 }
 
 export default async function EditOvertimeSubmissionPage(props: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ lang: Locale; id: string }>;
 }) {
   const params = await props.params;
-  const { id } = params;
+  const { lang, id } = params;
+  const dict = await getDictionary(lang);
 
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -117,6 +120,7 @@ export default async function EditOvertimeSubmissionPage(props: {
       loggedInUserEmail={session.user.email ?? ''}
       mode='edit'
       submission={submission}
+      dict={dict}
     />
   );
 }

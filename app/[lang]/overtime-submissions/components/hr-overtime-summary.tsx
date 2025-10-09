@@ -3,13 +3,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Clock } from 'lucide-react';
 import { HROvertimeSummary } from '../lib/calculate-overtime';
+import { Dictionary } from '../lib/dict';
 
 interface HROvertimeSummaryProps {
   hrOvertimeSummary: HROvertimeSummary;
+  dict: Dictionary;
 }
 
 export default function HROvertimeSummaryDisplay({
   hrOvertimeSummary,
+  dict,
 }: HROvertimeSummaryProps) {
   return (
     <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2'>
@@ -17,7 +20,7 @@ export default function HROvertimeSummaryDisplay({
         <CardHeader className='pb-2'>
           <CardTitle className='flex items-center gap-2 text-sm font-medium'>
             <Clock className='h-4 w-4' />
-            Nadgodziny organizacji w {hrOvertimeSummary.monthLabel}
+            {dict.summary.organizationOvertimeIn} {hrOvertimeSummary.monthLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -26,7 +29,7 @@ export default function HROvertimeSummaryDisplay({
             {hrOvertimeSummary.pendingCurrentMonthHours !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({hrOvertimeSummary.pendingCurrentMonthHours}h oczekuje)
+                ({hrOvertimeSummary.pendingCurrentMonthHours}h {dict.summary.pending})
               </span>
             )}
           </div>
@@ -37,7 +40,7 @@ export default function HROvertimeSummaryDisplay({
         <CardHeader className='pb-2'>
           <CardTitle className='flex items-center gap-2 text-sm font-medium'>
             <AlertTriangle className='h-4 w-4' />
-            Zaległe nadgodziny do rozliczenia
+            {dict.summary.overdueOvertimeToSettle}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -52,7 +55,7 @@ export default function HROvertimeSummaryDisplay({
             {hrOvertimeSummary.pendingOverdueHours !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({hrOvertimeSummary.pendingOverdueHours}h oczekuje)
+                ({hrOvertimeSummary.pendingOverdueHours}h {dict.summary.pending})
               </span>
             )}
           </div>

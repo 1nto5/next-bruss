@@ -12,17 +12,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { cancelOvertimeRequest } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 interface CancelRequestDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
+  dict: Dictionary;
 }
 
 export default function CancelRequestDialog({
   isOpen,
   onOpenChange,
   requestId,
+  dict,
 }: CancelRequestDialogProps) {
   const handleCancel = async () => {
     toast.promise(
@@ -33,16 +36,16 @@ export default function CancelRequestDialog({
         return res;
       }),
       {
-        loading: 'Anulowanie zlecenia...',
-        success: 'Zlecenie zostało anulowane!',
+        loading: dict.cancelRequestDialog.toast.loading,
+        success: dict.cancelRequestDialog.toast.success,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized') return 'Nie masz uprawnień!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zlecenia!';
+          if (errorMsg === 'unauthorized') return dict.cancelRequestDialog.toast.unauthorized;
+          if (errorMsg === 'not found') return dict.cancelRequestDialog.toast.notFound;
           if (errorMsg === 'cannot cancel')
-            return 'Nie można anulować tego zlecenia!';
+            return dict.cancelRequestDialog.toast.cannotCancel;
           console.error('handleCancel', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.cancelRequestDialog.toast.contactIT;
         },
       },
     );
@@ -53,16 +56,15 @@ export default function CancelRequestDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Anulować zlecenie?</AlertDialogTitle>
+          <AlertDialogTitle>{dict.cancelRequestDialog.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz anulować to zlecenie wykonania pracy w godzinach
-            nadliczbowych? Tej akcji nie można cofnąć.
+            {dict.cancelRequestDialog.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Nie, zachowaj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.cancelRequestDialog.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={handleCancel}>
-            Tak, anuluj zlecenie
+            {dict.cancelRequestDialog.action}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

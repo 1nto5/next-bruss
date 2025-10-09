@@ -59,12 +59,14 @@ import {
 } from '../actions';
 import { OvertimeSubmissionType } from '../lib/types';
 import { OvertimeSubmissionSchema } from '../lib/zod';
+import { Dictionary } from '../lib/dict';
 
 interface OvertimeRequestFormProps {
   managers: UsersListType;
   loggedInUserEmail: string;
   mode: 'new' | 'edit';
   submission?: OvertimeSubmissionType;
+  dict: Dictionary;
 }
 
 export default function OvertimeRequestForm({
@@ -72,6 +74,7 @@ export default function OvertimeRequestForm({
   loggedInUserEmail,
   mode,
   submission,
+  dict,
 }: OvertimeRequestFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
@@ -115,13 +118,13 @@ export default function OvertimeRequestForm({
 
       if ('success' in res) {
         const successMessage = isEditMode
-          ? 'Zgłoszenie zostało zaktualizowane!'
-          : 'Zgłoszenie dodane!';
+          ? dict.toast.submissionUpdated
+          : dict.toast.submissionAdded;
 
         if (!isEditMode) {
           if (currentActionType === 'save-and-add-another') {
             // Show only one toast for add another
-            toast.success('Zgłoszenie zapisane!');
+            toast.success(dict.toast.submissionSaved);
           } else {
             toast.success(successMessage);
             form.reset(); // Reset form after successful submission
@@ -136,22 +139,20 @@ export default function OvertimeRequestForm({
         // Handle specific error messages
         const errorMsg = res.error;
         if (errorMsg === 'unauthorized') {
-          toast.error('Nie masz uprawnień do wykonania tej akcji!');
+          toast.error(dict.errors.unauthorized);
         } else if (errorMsg === 'not found') {
-          toast.error('Nie znaleziono zgłoszenia!');
+          toast.error(dict.errors.notFound);
         } else if (errorMsg === 'invalid status') {
-          toast.error(
-            'Nie można edytować zatwierdzonego lub odrzuconego zgłoszenia!',
-          );
+          toast.error(dict.errors.cannotEditApprovedOrRejected);
         } else if (errorMsg === 'not inserted') {
-          toast.error('Nie udało się dodać zgłoszenia!');
+          toast.error(dict.errors.notInserted);
         } else {
-          toast.error('Skontaktuj się z IT!');
+          toast.error(dict.errors.contactIT);
         }
       }
     } catch (error) {
       console.error('onSubmit', error);
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.errors.contactIT);
     } finally {
       setIsPending(false);
     }
@@ -168,13 +169,11 @@ export default function OvertimeRequestForm({
   };
 
   const getTitle = () => {
-    return isEditMode
-      ? 'Edytuj zgłoszenie nadgodzin'
-      : 'Nowe zgłoszenie nadgodzin';
+    return isEditMode ? dict.form.titleEdit : dict.form.titleNew;
   };
 
   const getSubmitButtonText = () => {
-    return isEditMode ? 'Zapisz zmiany' : 'Dodaj zgłoszenie';
+    return isEditMode ? dict.actions.save : dict.actions.add;
   };
 
   const getSubmitButtonIcon = () => {
@@ -190,7 +189,7 @@ export default function OvertimeRequestForm({
           <CardTitle>{getTitle()}</CardTitle>
           <Link href='/overtime-submissions'>
             <Button variant='outline'>
-              <Table /> <span>Tabela zgłoszeń</span>
+              <Table /> <span>{dict.form.submissionsTable}</span>
             </Button>
           </Link>
         </div>
@@ -211,7 +210,7 @@ export default function OvertimeRequestForm({
               name='supervisor'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Przełożony</FormLabel>
+                  <FormLabel>{dict.form.supervisor}</FormLabel>
                   <Popover
                     open={supervisorOpen}
                     onOpenChange={setSupervisorOpen}
@@ -230,17 +229,17 @@ export default function OvertimeRequestForm({
                             ? managers.find(
                                 (manager) => manager.email === field.value,
                               )?.name
-                            : 'wybierz'}
+                            : dict.filters.select}
                           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder='szukaj...' />
+                        <CommandInput placeholder={dict.filters.searchPlaceholder} />
                         <CommandList>
                           <CommandEmpty>
-                            Nie znaleziono kierownika.
+                            {dict.form.managerNotFound}
                           </CommandEmpty>
                           <CommandGroup className='max-h-48 overflow-y-auto'>
                             {managers.map((manager) => (
@@ -278,10 +277,9 @@ export default function OvertimeRequestForm({
               name='hours'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Godziny</FormLabel>
+                  <FormLabel>{dict.form.hours}</FormLabel>
                   <FormDescription>
-                    Podaj liczbę godzin z dokładnością do pół godziny (np. 2.5).
-                    Użyj wartości ujemnych (np. -2.5) aby odebrać nadgodziny.
+                    {dict.form.hoursDescription}
                   </FormDescription>
                   <FormControl>
                     <Input
@@ -328,7 +326,7 @@ export default function OvertimeRequestForm({
 
                 return (
                   <FormItem>
-                    <FormLabel>Data</FormLabel>
+                    <FormLabel>{dict.form.date}</FormLabel>
                     <FormControl>
                       <DateTimePicker
                         modal
@@ -359,7 +357,7 @@ export default function OvertimeRequestForm({
               name='reason'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Uzasadnienie</FormLabel>
+                  <FormLabel>{dict.form.reason}</FormLabel>
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
@@ -374,10 +372,9 @@ export default function OvertimeRequestForm({
               name='overtimeRequest'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Zlecenie godzin nadliczbowych</FormLabel>
+                  <FormLabel>{dict.form.overtimeRequest}</FormLabel>
                   <FormDescription>
-                    Planowana praca w godzinach nadliczbowych wymaga zgody
-                    przełożonego oraz dyrektora.
+                    {dict.form.overtimeRequestDescription}
                   </FormDescription>
                   <FormControl>
                     <Switch
@@ -398,7 +395,7 @@ export default function OvertimeRequestForm({
                 name='payment'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Wypłata</FormLabel>
+                    <FormLabel>{dict.form.payment}</FormLabel>
                     <FormControl>
                       <div className='flex items-center gap-2'>
                         <Switch
@@ -424,7 +421,7 @@ export default function OvertimeRequestForm({
                   name='scheduledDayOff'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Data odbioru godzin nadliczbowych</FormLabel>
+                      <FormLabel>{dict.form.scheduledDayOff}</FormLabel>
                       <FormControl>
                         <DateTimePicker
                           modal
@@ -461,7 +458,7 @@ export default function OvertimeRequestForm({
                   className='w-full sm:w-auto'
                 >
                   <CircleX />
-                  Anuluj
+                  {dict.actions.cancel}
                 </Button>
               </Link>
             ) : (
@@ -472,7 +469,7 @@ export default function OvertimeRequestForm({
                 className='w-full sm:w-auto'
               >
                 <CircleX />
-                Wyczyść
+                {dict.filters.clear}
               </Button>
             )}
 
@@ -492,7 +489,7 @@ export default function OvertimeRequestForm({
                         : ''
                     }
                   />
-                  Zapisz i dodaj kolejne
+                  {dict.actions.saveAndAddAnother}
                 </Button>
               )}
 

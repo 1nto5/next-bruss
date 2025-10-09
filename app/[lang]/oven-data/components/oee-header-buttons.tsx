@@ -2,15 +2,17 @@
 
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Dictionary } from '../lib/dict';
 
 interface OeeHeaderButtonsProps {
   lang: string;
+  dict: Dictionary;
 }
 
-export default function OeeHeaderButtons({ lang }: OeeHeaderButtonsProps) {
+export default function OeeHeaderButtons({ lang, dict }: OeeHeaderButtonsProps) {
   const queryClient = useQueryClient();
   const [isPending, setIsPending] = useState(false);
 
@@ -30,12 +32,12 @@ export default function OeeHeaderButtons({ lang }: OeeHeaderButtonsProps) {
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
-      <Link href={`/${lang}/oven-data`}>
+      <LocalizedLink href="/oven-data">
         <Button variant="outline" className="w-full sm:w-auto">
           <ArrowLeft />
-          <span>Back to Oven Data</span>
+          <span>{dict.oeeButtons.backToOvenData}</span>
         </Button>
-      </Link>
+      </LocalizedLink>
       <Button
         onClick={handleRefresh}
         disabled={isPending}
@@ -47,7 +49,7 @@ export default function OeeHeaderButtons({ lang }: OeeHeaderButtonsProps) {
         ) : (
           <RefreshCw />
         )}
-        <span>Refresh</span>
+        <span>{dict.oeeButtons.refresh}</span>
       </Button>
     </div>
   );

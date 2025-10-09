@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import type { Dictionary } from '../lib/dict';
 
 const PasteValuesSchema = z.object({
   values: z.string(),
@@ -39,6 +40,7 @@ interface PasteValuesDialogProps {
   currentCount: number;
   onApplyValues: (values: string) => void;
   children: React.ReactNode;
+  dict: Dictionary;
 }
 
 export default function PasteValuesDialog({
@@ -48,6 +50,7 @@ export default function PasteValuesDialog({
   currentCount,
   onApplyValues,
   children,
+  dict,
 }: PasteValuesDialogProps) {
   const [open, setOpen] = useState(false);
   const [isPendingApply, setIsPendingApply] = useState(false);
@@ -108,8 +111,8 @@ export default function PasteValuesDialog({
         if (invalidValues.length > 0) {
           const errorMessage =
             fieldType === 'article'
-              ? `Invalid article format (must be 5 digits): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`
-              : `Invalid HYDRA Batch format (must be 10 characters): ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`;
+              ? `${dict.pasteDialog.invalidArticle}: ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`
+              : `${dict.pasteDialog.invalidHydraBatch}: ${invalidValues.slice(0, 3).join(', ')}${invalidValues.length > 3 ? '...' : ''}`;
 
           toast.error(errorMessage);
           return;
@@ -125,15 +128,15 @@ export default function PasteValuesDialog({
 
       const message =
         valuesList.length > 0
-          ? `Applied ${valuesList.length} values to ${fieldLabel} filter`
-          : `Cleared ${fieldLabel} filter`;
+          ? `${dict.pasteDialog.appliedValues} ${fieldLabel}: ${valuesList.length}`
+          : `${dict.pasteDialog.clearedFilter} ${fieldLabel}`;
 
       toast.success(message);
       setOpen(false);
       form.reset({ values: '' });
     } catch (error) {
       console.error('Error applying pasted values:', error);
-      toast.error('Error applying values');
+      toast.error(dict.pasteDialog.errorApplying);
     } finally {
       setIsPendingApply(false);
     }
@@ -141,7 +144,7 @@ export default function PasteValuesDialog({
 
   const handleClearAll = () => {
     onApplyValues('');
-    toast.success(`Cleared ${fieldLabel} filter`);
+    toast.success(`${dict.pasteDialog.clearedFilter} ${fieldLabel}`);
     setOpen(false);
     form.reset({ values: '' });
   };
@@ -151,7 +154,7 @@ export default function PasteValuesDialog({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
-          <DialogTitle>Manage {fieldLabel} Values</DialogTitle>
+          <DialogTitle>{dict.pasteDialog.manageTitle} {fieldLabel}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
@@ -160,29 +163,17 @@ export default function PasteValuesDialog({
               name='values'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Values (one per line)</FormLabel>
+                  <FormLabel>{dict.pasteDialog.valuesLabel}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={
                         currentCount > 0
                           ? fieldType === 'article'
-                            ? `Current values are shown below. You can edit them or paste new values:
-30111
-30112
-30113`
-                            : `Current values are shown below. You can edit them or paste new values:
-HH12345678
-AB98765432
-XY11223344`
+                            ? dict.pasteDialog.placeholderArticleCurrent
+                            : dict.pasteDialog.placeholderHydraBatchCurrent
                           : fieldType === 'article'
-                            ? `Paste your article values here (5 digits), for example:
-30111
-30112
-30113`
-                            : `Paste your HYDRA Batch values here (10 characters), for example:
-HH12345678
-AB98765432
-XY11223344`
+                            ? dict.pasteDialog.placeholderArticle
+                            : dict.pasteDialog.placeholderHydraBatch
                       }
                       className='min-h-[150px]'
                       {...field}
@@ -202,7 +193,7 @@ XY11223344`
                   className='w-full sm:w-auto'
                 >
                   <Trash2 />
-                  Clear All
+                  {dict.pasteDialog.clearAll}
                 </Button>
                 <Button
                   type='button'
@@ -213,7 +204,7 @@ XY11223344`
                   className='w-full sm:w-auto'
                 >
                   <X />
-                  Cancel
+                  {dict.pasteDialog.cancel}
                 </Button>
               </div>
               <Button type='submit' disabled={isPendingApply} className='w-full sm:w-auto'>
@@ -222,7 +213,7 @@ XY11223344`
                 ) : (
                   <Check />
                 )}
-                Confirm
+                {dict.pasteDialog.confirm}
               </Button>
             </DialogFooter>
           </form>

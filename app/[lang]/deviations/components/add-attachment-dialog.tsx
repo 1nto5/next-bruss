@@ -26,6 +26,7 @@ import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateDeviation } from '../actions';
+import { Dictionary } from '../lib/dict';
 import { DeviationStatus } from '../lib/types';
 import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
 
@@ -44,6 +45,7 @@ interface AddAttachmentDialogProps {
   deviationStatus: DeviationStatus | undefined;
   deviationOwner: string | undefined | null;
   session: Session | null;
+  dict: Dictionary;
 }
 
 export default function AddAttachmentDialog({
@@ -51,6 +53,7 @@ export default function AddAttachmentDialog({
   deviationStatus,
   deviationOwner,
   session,
+  dict,
 }: AddAttachmentDialogProps) {
   const [open, setOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -86,12 +89,12 @@ export default function AddAttachmentDialog({
         userEmail === deviationOwner);
 
     if (!canAddAttachment) {
-      toast.error('Nie masz uprawnień lub odchylenie jest zamknięte.');
+      toast.error(dict.dialogs.addAttachment.errors.noPermission);
       return;
     }
 
     if (!deviationId) {
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.dialogs.addAttachment.errors.contactIT);
       console.error('no deviationId');
       return;
     }
@@ -124,38 +127,36 @@ export default function AddAttachmentDialog({
             resolve();
           } else {
             const errorMap: { [key: string]: string } = {
-              'Unauthorized': 'Brak autoryzacji',
-              'No file': 'Nie wybrano pliku',
-              'No deviation ID': 'Brak ID odchylenia',
-              'File size exceeds the limit (10MB)':
-                'Plik przekracza dozwolony rozmiar (10MB)',
-              'Unsupported file type': 'Nieobsługiwany format pliku',
-              'File already exists': 'Plik o tej nazwie już istnieje',
-              'Failed to update deviation with attachment':
-                'Nie udało się zaktualizować bazy danych',
-              'Database update failed': 'Błąd aktualizacji bazy danych',
-              'File upload failed': 'Błąd podczas przesyłania pliku',
+              'Unauthorized': dict.dialogs.addAttachment.errors.unauthorized,
+              'No file': dict.dialogs.addAttachment.errors.noFile,
+              'No deviation ID': dict.dialogs.addAttachment.errors.noDeviationId,
+              'File size exceeds the limit (10MB)': dict.dialogs.addAttachment.errors.fileSizeExceeded,
+              'Unsupported file type': dict.dialogs.addAttachment.errors.unsupportedFileType,
+              'File already exists': dict.dialogs.addAttachment.errors.fileAlreadyExists,
+              'Failed to update deviation with attachment': dict.dialogs.addAttachment.errors.databaseUpdateFailed,
+              'Database update failed': dict.dialogs.addAttachment.errors.databaseUpdateFailed,
+              'File upload failed': dict.dialogs.addAttachment.errors.uploadFailed,
             };
 
             if (response.status === 409) {
-              reject(new Error('Ten plik już istnieje'));
+              reject(new Error(dict.dialogs.addAttachment.errors.fileAlreadyExists));
             } else if (result.error && errorMap[result.error]) {
               reject(new Error(errorMap[result.error]));
             } else if (result.error) {
               console.warn('Nieprzetłumaczony błąd:', result.error);
-              reject(new Error('Wystąpił błąd podczas dodawania załącznika'));
+              reject(new Error(dict.dialogs.addAttachment.errors.generalUploadError));
             } else {
-              reject(new Error('Wystąpił nieznany błąd'));
+              reject(new Error(dict.dialogs.addAttachment.errors.unknownError));
             }
           }
         } catch (error) {
           console.error('Upload error:', error);
-          reject(new Error('Wystąpił błąd podczas wysyłania pliku'));
+          reject(new Error(dict.dialogs.addAttachment.errors.uploadFailed));
         }
       }),
       {
-        loading: 'Przesyłanie załącznika...',
-        success: 'Załącznik dodany pomyślnie!',
+        loading: dict.dialogs.addAttachment.toasts.loading,
+        success: dict.dialogs.addAttachment.toasts.success,
         error: (err) => err.message,
       },
     );
@@ -166,12 +167,12 @@ export default function AddAttachmentDialog({
       <DialogTrigger asChild>
         <Button variant='outline'>
           <Upload className='' />
-          Dodaj
+          {dict.dialogs.addAttachment.triggerButton}
         </Button>
       </DialogTrigger>
       <DialogContent className='sm:max-w-[500px]'>
         <DialogHeader>
-          <DialogTitle>Dodaj załącznik</DialogTitle>
+          <DialogTitle>{dict.dialogs.addAttachment.title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -182,7 +183,7 @@ export default function AddAttachmentDialog({
               name='file'
               render={({ field: { onChange, value, ref, ...rest } }) => (
                 <FormItem>
-                  <FormLabel htmlFor='file'>Plik</FormLabel>
+                  <FormLabel htmlFor='file'>{dict.dialogs.addAttachment.fileLabel}</FormLabel>
                   <FormControl>
                     <Input
                       id='file'
@@ -201,11 +202,11 @@ export default function AddAttachmentDialog({
               name='name'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor='name'>Nazwa</FormLabel>
+                  <FormLabel htmlFor='name'>{dict.dialogs.addAttachment.nameLabel}</FormLabel>
                   <FormControl>
                     <Input
                       id='name'
-                      placeholder='Własna nazwa pliku'
+                      placeholder={dict.dialogs.addAttachment.namePlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -218,7 +219,7 @@ export default function AddAttachmentDialog({
               name='note'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor='note'>Notatka</FormLabel>
+                  <FormLabel htmlFor='note'>{dict.dialogs.addAttachment.noteLabel}</FormLabel>
                   <FormControl>
                     <Textarea id='note' {...field} />
                   </FormControl>
@@ -238,7 +239,7 @@ export default function AddAttachmentDialog({
               </Button> */}
               <Button type='submit' disabled={isUploading}>
                 <Paperclip className={isUploading ? 'animate-spin' : ''} />
-                Dodaj załącznik
+                {dict.dialogs.addAttachment.submitButton}
               </Button>
             </DialogFooter>
           </form>

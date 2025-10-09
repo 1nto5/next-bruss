@@ -27,10 +27,12 @@ import {
 import { useOeeData } from '../hooks/use-oee-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OeeParams } from '../lib/types';
+import type { Dictionary } from '../lib/dict';
 
 interface OeeUtilizationChartProps {
   params: OeeParams;
   lang: Locale;
+  dict: Dictionary;
 }
 
 const chartConfig = {
@@ -63,6 +65,7 @@ function getUtilizationColor(utilization: number): string {
 export default function OeeUtilizationChart({
   params,
   lang,
+  dict,
 }: OeeUtilizationChartProps) {
   const { data, isLoading, error } = useOeeData(params);
 
@@ -86,12 +89,12 @@ export default function OeeUtilizationChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Utilization Trend</CardTitle>
-          <CardDescription>Failed to load chart data</CardDescription>
+          <CardTitle>{dict.oeeMetrics.utilizationTrendTitle}</CardTitle>
+          <CardDescription>{dict.failedToLoadChart}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-            Unable to fetch OEE data. Please try again.
+            {dict.errorLoadingData}
           </div>
         </CardContent>
       </Card>
@@ -108,12 +111,12 @@ export default function OeeUtilizationChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Utilization Trend</CardTitle>
-          <CardDescription>No data available for selected period</CardDescription>
+          <CardTitle>{dict.oeeMetrics.utilizationTrendTitle}</CardTitle>
+          <CardDescription>{dict.noDataAvailable}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex h-[400px] items-center justify-center text-muted-foreground">
-            No oven processes found.
+            {dict.noDataAvailable}
           </div>
         </CardContent>
       </Card>
@@ -172,13 +175,13 @@ export default function OeeUtilizationChart({
   const getTitle = () => {
     switch (params.mode) {
       case 'day':
-        return `Utilization Trend - ${new Date(params.date).toLocaleDateString('en-US')}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.date).toLocaleDateString(lang)}`;
       case 'week':
-        return `Utilization Trend - Week ${params.week}, ${params.year}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${dict.timeFilters.weekLabel} ${params.week}, ${params.year}`;
       case 'month':
-        return `Utilization Trend - ${new Date(params.year, params.month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.year, params.month - 1).toLocaleDateString(lang, { month: 'long', year: 'numeric' })}`;
       case 'range':
-        return 'Utilization Trend';
+        return dict.oeeMetrics.utilizationTrendTitle;
     }
   };
 
@@ -187,7 +190,7 @@ export default function OeeUtilizationChart({
       <CardHeader>
         <CardTitle>{getTitle()}</CardTitle>
         <CardDescription>
-          Percentage of total oven capacity used over time
+          {dict.oeeMetrics.percentageCapacityUsed}
         </CardDescription>
       </CardHeader>
       <CardContent>

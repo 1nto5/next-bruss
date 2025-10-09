@@ -10,6 +10,7 @@ import OeeFilteringAndOptions from '../components/oee-filtering-and-options';
 import OeeHeaderButtons from '../components/oee-header-buttons';
 import OeeSummaryCards from '../components/oee-summary-cards';
 import OeeUtilizationChart from '../components/oee-utilization-chart';
+import { getDictionary } from '../lib/dict';
 
 export default async function OvenOeePage({
   params,
@@ -20,6 +21,7 @@ export default async function OvenOeePage({
 }) {
   const { lang } = await params;
   const sp = await searchParams;
+  const dict = await getDictionary(lang);
 
   // Extract time selection parameters
   const mode = sp.mode || 'range';
@@ -73,20 +75,20 @@ export default async function OvenOeePage({
       <CardHeader>
         <div className='flex items-center justify-between'>
           <div>
-            <CardTitle>Oven OEE</CardTitle>
+            <CardTitle>{dict.oeeTitle}</CardTitle>
             <CardDescription>
-              All ovens combined utilization tracking
+              {dict.oeeDescription}
             </CardDescription>
           </div>
-          <OeeHeaderButtons lang={lang} />
+          <OeeHeaderButtons lang={lang} dict={dict} />
         </div>
-        <OeeFilteringAndOptions />
+        <OeeFilteringAndOptions dict={dict} />
       </CardHeader>
       <CardContent className='space-y-6'>
         {oeeParams && (
           <>
-            <OeeSummaryCards params={oeeParams} />
-            <OeeUtilizationChart params={oeeParams} lang={lang} />
+            <OeeSummaryCards params={oeeParams} dict={dict} />
+            <OeeUtilizationChart params={oeeParams} lang={lang} dict={dict} />
           </>
         )}
       </CardContent>

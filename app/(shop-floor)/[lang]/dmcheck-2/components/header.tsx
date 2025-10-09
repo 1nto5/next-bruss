@@ -124,16 +124,16 @@ export default function Header({ lang, dict }: HeaderProps) {
         <HeaderButton
           icon={<Component />}
           onClick={clearArticle}
-          title={dict.logout?.clearArticle || 'Wyloguj artykuł'}
-          text={dict.logout?.clearArticle || 'Wyloguj artykuł'}
+          title={dict.logout?.clearArticle || 'Clear article'}
+          text={dict.logout?.clearArticle || 'Clear article'}
         />
       )}
       {loggedInOperators.length > 0 && (
         <HeaderButton
           icon={<UserPen />}
           onClick={() => setAlertOpen(true)}
-          title={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
-          text={dict.logout?.logoutOperators || 'Wyloguj operatorów'}
+          title={dict.logout?.logoutOperators || 'Logout operators'}
+          text={dict.logout?.logoutOperators || 'Logout operators'}
         />
       )}
       <VolumeControl />
@@ -158,16 +158,16 @@ export default function Header({ lang, dict }: HeaderProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dict.logout?.title || 'Wylogowanie'}
+              {dict.logout?.title || 'Logout'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {dict.logout?.description || 'Czy na pewno chcesz wylogować?'}
+              {dict.logout?.description || 'Are you sure you want to logout?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className='flex w-full flex-row gap-2'>
             <AlertDialogCancel className='flex w-1/4 items-center justify-center gap-2'>
               <X className='h-4 w-4' />
-              {dict.logout?.cancel || 'Anuluj'}
+              {dict.logout?.cancel || 'Cancel'}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
@@ -178,7 +178,7 @@ export default function Header({ lang, dict }: HeaderProps) {
               className='flex w-3/4 items-center justify-center gap-2'
             >
               <LogOut className='h-4 w-4' />
-              {dict.logout?.confirm || 'Wyloguj'}
+              {dict.logout?.confirm || 'Logout'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

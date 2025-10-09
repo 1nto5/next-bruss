@@ -21,10 +21,12 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { OvenProcessDataType } from '../lib/types';
 import { useTemperatureData } from '../hooks/use-temperature-data';
 import TemperatureChartSkeleton from './temperature-chart-skeleton';
+import type { Dictionary } from '../lib/dict';
 
 interface OvenTemperatureChartProps {
   selectedProcess: OvenProcessDataType | null;
   lang: Locale;
+  dict: Dictionary;
 }
 
 const chartConfig = {
@@ -69,13 +71,14 @@ const chartConfig = {
 export default function OvenTemperatureChart({
   selectedProcess,
   lang,
+  dict,
 }: OvenTemperatureChartProps) {
   // React Query with manual loading state management
   const { data: temperatureData, isLoading } = useTemperatureData(selectedProcess);
 
   // Show loading skeleton when data is being fetched
   if (isLoading && selectedProcess) {
-    return <TemperatureChartSkeleton />;
+    return <TemperatureChartSkeleton dict={dict} />;
   }
 
   // Show placeholder when no process is selected
@@ -83,14 +86,14 @@ export default function OvenTemperatureChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Temperature Trend</CardTitle>
+          <CardTitle>{dict.temperatureChart.title}</CardTitle>
           <CardDescription>
-            Select a process from the table above to view its temperature data
+            {dict.temperatureChart.selectProcess}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='flex h-[500px] items-center justify-center text-gray-500'>
-            No process selected
+            {dict.temperatureChart.noProcessSelected}
           </div>
         </CardContent>
       </Card>
@@ -146,14 +149,14 @@ export default function OvenTemperatureChart({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Temperature Trend</CardTitle>
+          <CardTitle>{dict.temperatureChart.title}</CardTitle>
           <CardDescription>
-            No temperature data available for this process
+            {dict.temperatureChart.noDataAvailable}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='flex h-[200px] items-center justify-center text-gray-500'>
-            No temperature data found for this process
+            {dict.temperatureChart.noDataFound}
           </div>
         </CardContent>
       </Card>
@@ -176,12 +179,12 @@ export default function OvenTemperatureChart({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Temperature Trend</CardTitle>
+          <CardTitle>{dict.temperatureChart.title}</CardTitle>
           <CardDescription>
             {selectedProcess && (
               <>
-                {selectedProcess.hydraBatch} ({selectedProcess.article}) on{' '}
-                {selectedProcess.oven.toUpperCase()} (Target:{' '}
+                {selectedProcess.hydraBatch} ({selectedProcess.article}) {dict.temperatureChart.on}{' '}
+                {selectedProcess.oven.toUpperCase()} ({dict.temperatureChart.target}:{' '}
                 {selectedProcess.targetTemp}°C ±{selectedProcess.tempTolerance}°C)
               </>
             )}
@@ -193,7 +196,7 @@ export default function OvenTemperatureChart({
             <Alert variant="destructive" className="mb-4">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                {deviationCount} measurement{deviationCount !== 1 ? 's' : ''} deviated significantly from expected patterns and {deviationCount !== 1 ? 'have' : 'has'} been marked with orange dots on the chart.
+                {deviationCount} {deviationCount !== 1 ? dict.temperatureChart.deviationAlertPlural : dict.temperatureChart.deviationAlert}
               </AlertDescription>
             </Alert>
           )}
@@ -207,7 +210,7 @@ export default function OvenTemperatureChart({
             <YAxis
               domain={yDomain}
               label={{
-                value: 'Temperature (°C)',
+                value: dict.temperatureChart.temperatureLabel,
                 angle: -90,
                 position: 'insideLeft',
                 style: { textAnchor: 'middle' },

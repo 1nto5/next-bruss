@@ -3,13 +3,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock } from 'lucide-react';
 import { OvertimeSummary } from '../lib/calculate-overtime';
+import { Dictionary } from '../lib/dict';
 
 interface OvertimeSummaryProps {
   overtimeSummary: OvertimeSummary;
+  dict: Dictionary;
 }
 
 export default function OvertimeSummaryDisplay({
   overtimeSummary,
+  dict,
 }: OvertimeSummaryProps) {
   return (
     <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2'>
@@ -17,7 +20,7 @@ export default function OvertimeSummaryDisplay({
         <CardHeader className='pb-2'>
           <CardTitle className='flex items-center gap-2 text-sm font-medium'>
             <Clock className='h-4 w-4' />
-            Twoje godziny nadliczbowe w {overtimeSummary.monthLabel}
+            {dict.summary.yourOvertimeIn} {overtimeSummary.monthLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -32,7 +35,7 @@ export default function OvertimeSummaryDisplay({
             {overtimeSummary.pendingMonthHours !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({overtimeSummary.pendingMonthHours}h oczekuje)
+                ({overtimeSummary.pendingMonthHours}h {dict.summary.pending})
               </span>
             )}
           </div>
@@ -43,7 +46,7 @@ export default function OvertimeSummaryDisplay({
         <CardHeader className='pb-2'>
           <CardTitle className='flex items-center gap-2 text-sm font-medium'>
             <Calendar className='h-4 w-4' />
-            Twoje godziny nadliczbowe łącznie
+            {dict.summary.yourTotalOvertime}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -59,7 +62,7 @@ export default function OvertimeSummaryDisplay({
             {overtimeSummary.pendingTotalHours !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({overtimeSummary.pendingTotalHours}h oczekuje)
+                ({overtimeSummary.pendingTotalHours}h {dict.summary.pending})
               </span>
             )}
           </div>

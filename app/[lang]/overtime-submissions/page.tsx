@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Locale } from '@/lib/config/i18n';
 import { getUsers } from '@/lib/data/get-users';
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
@@ -24,6 +25,7 @@ import {
   calculateUnclaimedOvertimeHours,
 } from './lib/calculate-overtime';
 import { OvertimeSubmissionType } from './lib/types';
+import { getDictionary } from './lib/dict';
 
 async function getOvertimeSubmissions(
   session: Session,
@@ -186,8 +188,12 @@ async function getOvertimeSubmissions(
 }
 
 export default async function OvertimePage(props: {
+  params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
+  const params = await props.params;
+  const { lang } = params;
+  const dict = await getDictionary(lang);
   const searchParams = await props.searchParams;
   const session = await auth();
 
@@ -219,37 +225,38 @@ export default async function OvertimePage(props: {
     <Card>
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-          <CardTitle>Zgłoszenia nadgodzin</CardTitle>
+          <CardTitle>{dict.pageTitle}</CardTitle>
           <CardDescription>
-            Aplikacja w fazie testów - wpisy nie są oficjalne
+            {dict.testWarning}
           </CardDescription>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* HR View Link for HR and admin only */}
             {(session?.user?.roles?.includes('admin') ||
               session?.user?.roles?.includes('hr')) && (
-              <Link href='/overtime-submissions/hr-view'>
+              <Link href={`/${lang}/overtime-submissions/hr-view`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Users />
-                  <span>Widok HR</span>
+                  <span>{dict.hrView}</span>
                 </Button>
               </Link>
             )}
             {session && canCreateSubmission ? (
-              <Link href='/overtime-submissions/new-request'>
+              <Link href={`/${lang}/overtime-submissions/new-request`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <Plus /> <span>Nowe zgłoszenie</span>
+                  <Plus /> <span>{dict.newSubmission}</span>
                 </Button>
               </Link>
             ) : null}
           </div>
         </div>
-        <OvertimeSummaryDisplay overtimeSummary={overtimeSummary} />
+        <OvertimeSummaryDisplay overtimeSummary={overtimeSummary} dict={dict} />
 
         <TableFilteringAndOptions
           fetchTime={fetchTime}
           userRoles={session?.user?.roles || []}
           users={users}
           pendingApprovalsCount={pendingApprovalsCount}
+          dict={dict}
         />
       </CardHeader>
 
@@ -257,6 +264,7 @@ export default async function OvertimePage(props: {
         columns={createColumns}
         data={overtimeSubmissionsLocaleString}
         session={session}
+        dict={dict}
       />
     </Card>
   );

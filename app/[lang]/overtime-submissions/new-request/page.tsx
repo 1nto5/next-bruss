@@ -3,8 +3,15 @@ import AccessDeniedAlert from '@/components/access-denied-alert';
 import { getUsers } from '@/lib/data/get-users';
 import { redirect } from 'next/navigation';
 import OvertimeRequestForm from '../components/overtime-request-form';
+import { Locale } from '@/lib/config/i18n';
+import { getDictionary } from '../lib/dict';
 
-export default async function AddOvertimeSubmissionPage() {
+export default async function AddOvertimeSubmissionPage(props: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const params = await props.params;
+  const { lang } = params;
+  const dict = await getDictionary(lang);
   const managers = await getUsers();
   const session = await auth();
   if (!session || !session.user?.email) {
@@ -21,6 +28,7 @@ export default async function AddOvertimeSubmissionPage() {
       managers={managers}
       loggedInUserEmail={session?.user?.email ?? ''}
       mode='new'
+      dict={dict}
     />
   );
 }

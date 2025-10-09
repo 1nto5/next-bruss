@@ -11,6 +11,7 @@ import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { ProjectsLocaleStringType } from './lib/types';
 import { ProjectsType } from './lib/zod';
+import { getDictionary } from './lib/dict';
 
 async function getProjects(
   lang: string,
@@ -39,14 +40,14 @@ async function getProjects(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const data: ProjectsType[] = await res.json();
   const dataLocaleString = data.map((data) => {
     return {
       ...data,
       dateLocaleString: data.date
-        ? new Date(data.date).toLocaleDateString(lang)
+        ? new Date(data.date).toLocaleDateString(process.env.DATE_TIME_LOCALE)
         : '',
     };
   });
@@ -59,6 +60,7 @@ export default async function ProductionOvertimePage(props: {
 }) {
   const params = await props.params;
   const { lang } = params;
+  const dict = await getDictionary(lang);
   const searchParams = await props.searchParams;
 
   let fetchTime, fetchTimeLocaleString, dataLocaleString;
@@ -70,9 +72,9 @@ export default async function ProductionOvertimePage(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Time Sheet - Adrian&apos;s Projects</CardTitle>
+        <CardTitle>{dict.title}</CardTitle>
         <CardDescription>
-          Last synchronization: {fetchTimeLocaleString}
+          {dict.lastSync}: {fetchTimeLocaleString}
         </CardDescription>
         <TableFilteringAndOptions fetchTime={fetchTime} />
       </CardHeader>
@@ -81,6 +83,7 @@ export default async function ProductionOvertimePage(props: {
         data={dataLocaleString}
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
+        dict={dict}
       />
     </Card>
   );

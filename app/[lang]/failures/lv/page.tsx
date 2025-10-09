@@ -1,5 +1,6 @@
 // import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
+import { getDictionary } from '../lib/dict';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { FailureOptionType, FailureType } from './lib/failures-types';
@@ -51,21 +52,21 @@ async function getFailures(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(lang);
+  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
 
   const failures: FailureType[] = await res.json();
 
   const formatTime = (failure: FailureType) => {
     return {
       ...failure,
-      fromLocaleString: new Date(failure.from).toLocaleString(lang),
+      fromLocaleString: new Date(failure.from).toLocaleString(process.env.DATE_TIME_LOCALE),
       toLocaleString: failure.to
-        ? new Date(failure.to).toLocaleString(lang)
+        ? new Date(failure.to).toLocaleString(process.env.DATE_TIME_LOCALE)
         : '',
-      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(lang),
+      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE),
 
       updatedAtLocaleString: failure.updatedAt
-        ? new Date(failure.updatedAt).toLocaleString(lang)
+        ? new Date(failure.updatedAt).toLocaleString(process.env.DATE_TIME_LOCALE)
         : '',
     };
   };
@@ -83,6 +84,8 @@ export default async function FailuresPage(props: {
 
   const { lang } = params;
 
+  const dict = await getDictionary(lang);
+
   let fetchTime, fetchTimeLocaleString, formattedFailures;
   ({ fetchTime, fetchTimeLocaleString, formattedFailures } = await getFailures(
     lang,
@@ -98,6 +101,7 @@ export default async function FailuresPage(props: {
       fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
       failuresOptions={failuresOptions}
+      dict={dict}
     />
   );
 }

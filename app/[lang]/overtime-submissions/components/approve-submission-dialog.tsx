@@ -13,12 +13,14 @@ import {
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
 import { approveOvertimeSubmission } from '../actions';
+import { Dictionary } from '../lib/dict';
 
 type ApproveSubmissionDialogProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   submissionId: string;
   session: Session | null;
+  dict: Dictionary;
 };
 
 export default function ApproveSubmissionDialog({
@@ -26,6 +28,7 @@ export default function ApproveSubmissionDialog({
   onOpenChange,
   submissionId,
   session,
+  dict,
 }: ApproveSubmissionDialogProps) {
   const handleApprove = async () => {
     toast.promise(
@@ -36,15 +39,14 @@ export default function ApproveSubmissionDialog({
         return res;
       }),
       {
-        loading: 'Zatwierdzanie zgłoszenia...',
-        success: 'Zgłoszenie zostało zatwierdzone!',
+        loading: dict.toast.approving,
+        success: dict.toast.approved,
         error: (error) => {
           const errorMsg = error.message;
-          if (errorMsg === 'unauthorized')
-            return 'Nie masz uprawnień do zatwierdzania!';
-          if (errorMsg === 'not found') return 'Nie znaleziono zgłoszenia!';
+          if (errorMsg === 'unauthorized') return dict.errors.unauthorizedToApprove;
+          if (errorMsg === 'not found') return dict.errors.notFound;
           console.error('handleApprove', errorMsg);
-          return 'Skontaktuj się z IT!';
+          return dict.errors.contactIT;
         },
       },
     );
@@ -55,15 +57,15 @@ export default function ApproveSubmissionDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Zatwierdź zgłoszenie</AlertDialogTitle>
+          <AlertDialogTitle>{dict.dialogs.approve.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            Czy na pewno chcesz zatwierdzić to zgłoszenie nadgodzin?
+            {dict.dialogs.approve.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Anuluj</AlertDialogCancel>
+          <AlertDialogCancel>{dict.actions.cancel}</AlertDialogCancel>
           <AlertDialogAction onClick={handleApprove}>
-            Zatwierdź
+            {dict.actions.approve}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

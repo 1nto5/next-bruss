@@ -1,5 +1,3 @@
-'use client';
-
 import { ColumnDef } from '@tanstack/react-table';
 
 import { DeviationType } from '@/app/[lang]/deviations/lib/types';
@@ -8,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ExternalLink, Pencil } from 'lucide-react';
 import Link from 'next/link';
+import type { Dictionary } from '../../lib/dict';
 
-export const columns: ColumnDef<DeviationType>[] = [
+export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
+  return [
   {
     accessorKey: 'internalId',
-    header: 'ID',
+    header: dict.table.columns.id,
     cell: ({ row }) => {
       const id = row.original.internalId?.toString();
 
@@ -21,7 +21,7 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: dict.table.columns.status,
     cell: ({ row }) => {
       const status = row.original.status;
       let statusLabel;
@@ -30,31 +30,31 @@ export const columns: ColumnDef<DeviationType>[] = [
         case 'in approval':
           statusLabel = (
             <Badge variant='statusPending' className='text-nowrap'>
-              Oczekujące
+              {dict.table.status.inApproval}
             </Badge>
           );
           break;
         case 'approved':
-          statusLabel = <Badge variant='statusApproved'>Zatwierdzone</Badge>;
+          statusLabel = <Badge variant='statusApproved'>{dict.table.status.approved}</Badge>;
           break;
         case 'in progress':
-          statusLabel = <Badge variant='statusInProgress'>Obowiązuje</Badge>;
+          statusLabel = <Badge variant='statusInProgress'>{dict.table.status.inProgress}</Badge>;
           break;
         case 'closed':
-          statusLabel = <Badge variant='statusClosed'>Zamknięte</Badge>;
+          statusLabel = <Badge variant='statusClosed'>{dict.table.status.closed}</Badge>;
           break;
         case 'rejected':
-          statusLabel = <Badge variant='statusRejected'>Odrzucone</Badge>;
+          statusLabel = <Badge variant='statusRejected'>{dict.table.status.rejected}</Badge>;
           break;
         case 'to approve':
           statusLabel = (
             <Badge variant='statusToApprove' className='text-nowrap'>
-              Do zatwierdzenia
+              {dict.table.status.toApprove}
             </Badge>
           );
           break;
         case 'draft':
-          statusLabel = <Badge variant='statusDraft'>Szkic</Badge>;
+          statusLabel = <Badge variant='statusDraft'>{dict.table.status.draft}</Badge>;
           break;
         default:
           statusLabel = <Badge variant='outline'>{status}</Badge>;
@@ -80,7 +80,7 @@ export const columns: ColumnDef<DeviationType>[] = [
           >
             {deviation.status === 'draft' ? <Pencil /> : <ExternalLink />}
             <span className='sr-only'>
-              {deviation.status === 'draft' ? 'Edytuj' : 'Otwórz'}
+              {deviation.status === 'draft' ? dict.table.actions.edit : dict.table.actions.open}
             </span>
           </Link>
         </Button>
@@ -89,15 +89,15 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'timePeriodLocalDateString.from',
-    header: 'Od',
+    header: dict.table.columns.from,
   },
   {
     accessorKey: 'timePeriodLocalDateString.to',
-    header: 'Do',
+    header: dict.table.columns.to,
   },
   {
     accessorKey: 'articleNumber',
-    header: 'Art. / Materiał',
+    header: dict.table.columns.article,
     cell: ({ row }) => {
       const articleNumber = row.original.articleNumber;
       const articleName = row.original.articleName;
@@ -110,7 +110,7 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'quantity.value',
-    header: 'Ilość',
+    header: dict.table.columns.quantity,
     cell: ({ row }) => {
       const quantity = row.original.quantity;
       const value = quantity?.value;
@@ -118,14 +118,14 @@ export const columns: ColumnDef<DeviationType>[] = [
 
       return (
         <span className='text-nowrap'>
-          {value} {unit && ` ${unit === 'pcs' ? 'szt.' : unit}`}
+          {value} {unit && ` ${unit === 'pcs' ? dict.table.units.pcs : unit}`}
         </span>
       );
     },
   },
   {
     accessorKey: 'area',
-    header: 'Obszar',
+    header: dict.table.columns.area,
     cell: ({ row, table }) => {
       const area = row.original.area;
       const lang = table.options.meta?.lang as string;
@@ -144,7 +144,7 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'reason',
-    header: 'Powód',
+    header: dict.table.columns.reason,
     cell: ({ row, table }) => {
       const reason = row.original.reason;
       const lang = table.options.meta?.lang as string;
@@ -169,7 +169,7 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'owner',
-    header: 'Właściciel',
+    header: dict.table.columns.owner,
     cell: ({ row }) => {
       const owner = row.original.owner;
       const name = extractNameFromEmail(owner);
@@ -178,15 +178,16 @@ export const columns: ColumnDef<DeviationType>[] = [
   },
   {
     accessorKey: 'createdAt',
-    header: 'Utworzono',
+    header: dict.table.columns.createdAt,
     cell: ({ row, table }) => {
       const createdAt = row.original.createdAt;
       const lang = table.options.meta?.lang as string;
       return (
         <span className='whitespace-nowrap'>
-          {createdAt ? new Date(createdAt).toLocaleString(lang) : ''}
+          {createdAt ? new Date(createdAt).toLocaleString(lang || 'pl-PL') : ''}
         </span>
       );
     },
   },
 ];
+}
