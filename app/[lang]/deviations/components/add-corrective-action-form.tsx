@@ -42,8 +42,8 @@ import {
   Eraser,
   Plus,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -104,11 +104,11 @@ export default function AddCorrectiveActionForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{dict.correctiveAction.title}</CardTitle>
-          <Link href={`/deviations/${id}`}>
+          <LocalizedLink href={`/deviations/${id}`}>
             <Button variant='outline'>
               <ArrowLeftToLine /> {dict.form.deviationLink}
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Form {...form}>

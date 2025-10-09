@@ -23,8 +23,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
-import Link from 'next/link';
 import * as React from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
 
 interface DataTableProps<TData, TValue> {
@@ -148,11 +148,11 @@ export function DataTable<TData, TValue>({
           </div>
           {shouldShowAddButton && (
             <div>
-              <Link href={`/production-overtime/${id}/add-day-off`}>
+              <LocalizedLink href={`/production-overtime/${id}/add-day-off`}>
                 <Button variant='outline'>
                   <AlarmClockPlus /> <span>{dict.idTable.addPickup}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             </div>
           )}
         </div>

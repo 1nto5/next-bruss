@@ -8,8 +8,8 @@ import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ArrowLeft } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import LocalizedLink from '@/components/localized-link';
 import HROvertimeSummaryDisplay from '../components/hr-overtime-summary';
 import HrViewFilteringAndOptions from '../components/hr-view-filtering-and-options';
 import { createColumns } from '../components/table/columns';
@@ -186,12 +186,12 @@ export default async function OvertimeHRViewPage(props: {
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>{dict.hrViewTitle}</CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            <Link href={`/${lang}/overtime-submissions`}>
+            <LocalizedLink href='/overtime-submissions'>
               <Button variant={'outline'} className='w-full sm:w-auto'>
                 <ArrowLeft />
                 <span>{dict.backToSubmissions}</span>
               </Button>
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
 

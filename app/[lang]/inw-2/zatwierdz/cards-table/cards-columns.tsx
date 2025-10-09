@@ -4,7 +4,7 @@ import { CardTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, List } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 
 export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   {
@@ -40,11 +40,11 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
     cell: ({ row }) => {
       const cardNumber = row.original.number;
       return (
-        <Link href={`/inw-2/zatwierdz/${cardNumber}`}>
+        <LocalizedLink href={`/inw-2/zatwierdz/${cardNumber}`}>
           <Button size='sm' type='button' variant='outline'>
             <List />
           </Button>
-        </Link>
+        </LocalizedLink>
       );
     },
   },

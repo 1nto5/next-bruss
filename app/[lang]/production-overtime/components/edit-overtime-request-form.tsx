@@ -51,8 +51,8 @@ import {
   Save,
   Table,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -125,11 +125,11 @@ export default function EditOvertimeRequestForm({
           <CardTitle>
             {dict.editOvertimeRequestForm.title}
           </CardTitle>
-          <Link href='/production-overtime'>
+          <LocalizedLink href='/production-overtime'>
             <Button variant='outline'>
               <Table /> <span>{dict.editOvertimeRequestForm.requestsTable}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Separator className='mb-4' />
@@ -412,7 +412,7 @@ export default function EditOvertimeRequestForm({
           </CardContent>
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
-            <Link href='/production-overtime'>
+            <LocalizedLink href='/production-overtime'>
               <Button
                 variant='outline'
                 type='button'
@@ -422,7 +422,7 @@ export default function EditOvertimeRequestForm({
                 <CircleX className='' />
                 {dict.common.cancel}
               </Button>
-            </Link>
+            </LocalizedLink>
             <Button
               type='submit'
               className='w-full sm:w-auto'

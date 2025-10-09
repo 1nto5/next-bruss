@@ -13,8 +13,8 @@ import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { Check, Edit, MoreHorizontal, X } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
 import { useState } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { OvertimeSubmissionType } from '../../lib/types';
 import ApproveSubmissionDialog from '../approve-submission-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
@@ -197,12 +197,12 @@ export const createColumns = (
               <DropdownMenuContent align='end'>
                 {/* Edit button for authors */}
                 {canEdit && (
-                  <Link href={`/overtime-submissions/edit/${submission._id}`}>
+                  <LocalizedLink href={`/overtime-submissions/edit/${submission._id}`}>
                     <DropdownMenuItem>
                       <Edit className='mr-2 h-4 w-4' />
                       <span>{dict.actions.edit}</span>
                     </DropdownMenuItem>
-                  </Link>
+                  </LocalizedLink>
                 )}
 
                 {/* Cancel button for authors */}

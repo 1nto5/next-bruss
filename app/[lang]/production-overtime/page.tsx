@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { KeyRound, Plus } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -89,17 +89,17 @@ export default async function ProductionOvertimePage(props: {
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
-              <Link href='/production-overtime/new-request'>
+              <LocalizedLink href='/production-overtime/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Plus /> <span>{dict.page.newRequest}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             ) : !session ? (
-              <Link href={`/auth?callbackUrl=/production-overtime`}>
+              <LocalizedLink href={`/auth?callbackUrl=/${lang}/production-overtime`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <KeyRound /> <span>{dict.page.login}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             ) : null}
           </div>
         </div>

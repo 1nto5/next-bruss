@@ -43,7 +43,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { useState, useTransition } from 'react'; // Import useState
 import { toast } from 'sonner';
 import { approveDeviation } from '../actions';
@@ -340,13 +340,13 @@ export default function DeviationView({
                 <PrinterCheck /> {dict.view.buttons.printLog}
               </Button>
             )}
-            <Link href='/deviations'>
+            <LocalizedLink href='/deviations'>
               <Button variant='outline' className='mb-2 sm:mb-0'>
                 {' '}
                 {/* Add margin bottom */}
                 <TableIcon /> {dict.view.buttons.backToTable}
               </Button>
-            </Link>
+            </LocalizedLink>
             {/* REMOVED: Edit button from here - moved to Details card */}
           </div>
         </div>
@@ -386,11 +386,11 @@ export default function DeviationView({
                             'plant-manager',
                           ].includes(role),
                         )) && (
-                        <Link href={`/deviations/${deviation?._id}/edit`}>
+                        <LocalizedLink href={`/deviations/${deviation?._id}/edit`}>
                           <Button variant='outline'>
                             <Cog /> {dict.view.buttons.edit}
                           </Button>
-                        </Link>
+                        </LocalizedLink>
                       )}
                   </div>
                 </div>
@@ -547,13 +547,13 @@ export default function DeviationView({
                       ].includes(role),
                     ) ||
                       session?.user?.email === deviation?.owner) && (
-                      <Link
+                      <LocalizedLink
                         href={`/deviations/${deviation?._id}/corrective/add`}
                       >
                         <Button variant='outline'>
                           <Hammer /> {dict.view.buttons.addCorrectiveAction}
                         </Button>
-                      </Link>
+                      </LocalizedLink>
                     )}
                   </div>
                 </CardHeader>
@@ -613,12 +613,12 @@ export default function DeviationView({
                     {!session && (
                       <span>
                         {dict.view.approvalsCard.loginMessage}{' '}
-                        <Link
-                          href={`/${lang}/auth?callbackUrl=${encodeURIComponent(`/${lang}/deviations/${deviation?._id}`)}`}
+                        <LocalizedLink
+                          href={`/auth?callbackUrl=${encodeURIComponent(`/${lang}/deviations/${deviation?._id}`)}`}
                           className='text-blue-600 underline hover:text-blue-800'
                         >
                           {dict.view.approvalsCard.loginLink}
-                        </Link>
+                        </LocalizedLink>
                         .
                       </span>
                     )}

@@ -52,7 +52,7 @@ import {
   Plus,
   Table,
 } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -159,11 +159,11 @@ export default function NewOvertimeRequestForm({
           <CardTitle>
             {dict.newOvertimeRequestForm.title}
           </CardTitle>
-          <Link href='/production-overtime'>
+          <LocalizedLink href='/production-overtime'>
             <Button variant='outline'>
               <Table /> <span>{dict.newOvertimeRequestForm.requestsTable}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Separator className='mb-4' />

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { Table } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { ProjectsLocaleStringType } from '../lib/types';
 import { ProjectsType } from '../lib/zod';
 import { getDictionary } from '../lib/dict';
@@ -81,11 +81,11 @@ export default async function ProductionOvertimePage(props: {
           <div>
             <CardTitle>Monthly Summary - Adrian&apos;s Projects</CardTitle>
           </div>
-          <Link href='/projects'>
+          <LocalizedLink href='/projects'>
             <Button variant='outline'>
               <Table /> <span>Projects</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
         <TableFilteringAndOptions fetchTime={fetchTime} />
         <Alert>

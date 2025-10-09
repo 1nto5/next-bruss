@@ -11,10 +11,10 @@ import {
   RefreshCw,
   Search,
 } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateProjects as revalidate } from '../actions';
+import LocalizedLink from '@/components/localized-link';
 
 export default function TableFilteringAndOptions({
   fetchTime,
@@ -107,16 +107,16 @@ export default function TableFilteringAndOptions({
             <CircleX /> <span>Clear</span>
           </Button>
         )}
-        <Link href='/projects/new-entry'>
+        <LocalizedLink href='/projects/new-entry'>
           <Button variant={'outline'}>
             <Plus /> <span>Add New Entry</span>
           </Button>
-        </Link>
-        <Link href='/projects/summary'>
+        </LocalizedLink>
+        <LocalizedLink href='/projects/summary'>
           <Button variant={'outline'}>
             <CalendarClock /> <span>Summary</span>
           </Button>
-        </Link>
+        </LocalizedLink>
       </div>
     </form>
   );

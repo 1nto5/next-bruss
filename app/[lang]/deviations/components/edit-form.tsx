@@ -32,8 +32,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Locale } from '@/lib/config/i18n';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeftFromLine, Plus, Search } from 'lucide-react';
-import Link from 'next/link';
 import { useState, useTransition } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -151,11 +151,11 @@ export default function EditForm({
           <CardTitle>{dict.form.editTitle}</CardTitle>
           {/* <CardDescription>ID: {deviation?._id}</CardDescription> */}
           {/* </div> */}
-          <Link href={`/deviations/${id}`}>
+          <LocalizedLink href={`/deviations/${id}`}>
             <Button variant='outline'>
               <ArrowLeftFromLine /> <span>{dict.form.deviationLink}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Separator className='mb-4' />

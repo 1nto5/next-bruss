@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ExternalLink, Pencil } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import type { Dictionary } from '../../lib/dict';
 
 export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
@@ -66,12 +66,13 @@ export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
   {
     id: 'actions',
     header: '',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const deviation = row.original;
+      const lang = table.options.meta?.lang as string;
 
       return (
         <Button variant='outline' size={'icon'} asChild>
-          <Link
+          <LocalizedLink
             href={
               deviation.status === 'draft'
                 ? `/deviations/edit/${deviation._id}`
@@ -82,7 +83,7 @@ export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
             <span className='sr-only'>
               {deviation.status === 'draft' ? dict.table.actions.edit : dict.table.actions.open}
             </span>
-          </Link>
+          </LocalizedLink>
         </Button>
       );
     },

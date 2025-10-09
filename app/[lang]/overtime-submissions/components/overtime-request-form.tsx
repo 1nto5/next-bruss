@@ -47,7 +47,7 @@ import {
   Save,
   Table,
 } from 'lucide-react';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -187,11 +187,11 @@ export default function OvertimeRequestForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{getTitle()}</CardTitle>
-          <Link href='/overtime-submissions'>
+          <LocalizedLink href='/overtime-submissions'>
             <Button variant='outline'>
               <Table /> <span>{dict.form.submissionsTable}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
 
@@ -451,7 +451,7 @@ export default function OvertimeRequestForm({
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             {isEditMode ? (
-              <Link href='/overtime-submissions'>
+              <LocalizedLink href='/overtime-submissions'>
                 <Button
                   variant='destructive'
                   type='button'
@@ -460,7 +460,7 @@ export default function OvertimeRequestForm({
                   <CircleX />
                   {dict.actions.cancel}
                 </Button>
-              </Link>
+              </LocalizedLink>
             ) : (
               <Button
                 variant='destructive'

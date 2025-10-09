@@ -21,8 +21,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleX, Plus, Table } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -74,11 +74,11 @@ export default function NewEntryForm({}: {}) {
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>New Work Entry</CardTitle>
-          <Link href='/projects'>
+          <LocalizedLink href='/projects'>
             <Button variant='outline'>
               <Table /> <span>All Entries</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Form {...form}>

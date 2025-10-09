@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 
 import { Input } from '@/components/ui/input';
 import { CircleX, RefreshCcw, Undo2 } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+import LocalizedLink from '@/components/localized-link';
 import { revalidateCardPositions as revalidate } from '../actions';
 
 export default function CardPositionsTableFilteringAndOptions({
@@ -28,11 +28,11 @@ export default function CardPositionsTableFilteringAndOptions({
 
   return (
     <div className='flex flex-wrap gap-2'>
-      <Link href='/inw-2/zatwierdz'>
+      <LocalizedLink href='/inw-2/zatwierdz'>
         <Button size='icon' variant='outline' title='wróć do kart'>
           <Undo2 />
         </Button>
-      </Link>
+      </LocalizedLink>
 
       <Input
         placeholder='id pozycji'

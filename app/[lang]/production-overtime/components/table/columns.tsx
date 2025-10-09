@@ -22,8 +22,9 @@ import {
   X,
 } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
 import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
@@ -228,20 +229,20 @@ export const createColumns = (
               <DropdownMenuContent align='end'>
                 {request.status !== 'canceled' && (
                   <>
-                    <Link href={`/production-overtime/${request._id}`}>
+                    <LocalizedLink href={`/production-overtime/${request._id}`}>
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
                         <span>{dict.tableColumns.overtimePickup}</span>
                       </DropdownMenuItem>
-                    </Link>
+                    </LocalizedLink>
                     {/* Edit button - only for author and pending/approved status */}
                     {canEdit && (
-                      <Link href={`/production-overtime/${request._id}/edit`}>
+                      <LocalizedLink href={`/production-overtime/${request._id}/edit`}>
                         <DropdownMenuItem>
                           <Edit className='mr-2 h-4 w-4' />
                           <span>{dict.tableColumns.editRequest}</span>
                         </DropdownMenuItem>
-                      </Link>
+                      </LocalizedLink>
                     )}
                     {/* Only show approve button if user can approve */}
                     {canApprove &&

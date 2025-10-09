@@ -14,8 +14,8 @@ import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Plus, Users } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import LocalizedLink from '@/components/localized-link';
 import OvertimeSummaryDisplay from './components/overtime-summary';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
@@ -233,19 +233,19 @@ export default async function OvertimePage(props: {
             {/* HR View Link for HR and admin only */}
             {(session?.user?.roles?.includes('admin') ||
               session?.user?.roles?.includes('hr')) && (
-              <Link href={`/${lang}/overtime-submissions/hr-view`}>
+              <LocalizedLink href='/overtime-submissions/hr-view'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Users />
                   <span>{dict.hrView}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             )}
             {session && canCreateSubmission ? (
-              <Link href={`/${lang}/overtime-submissions/new-request`}>
+              <LocalizedLink href='/overtime-submissions/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Plus /> <span>{dict.newSubmission}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             ) : null}
           </div>
         </div>
