@@ -37,6 +37,7 @@ export default async function AddDeviationPage(props: {
       users={users}
       loggedInUserEmail={session.user.email ?? ''}
       dict={dict}
+      lang={lang}
     />
   );
 }

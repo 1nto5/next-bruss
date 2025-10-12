@@ -23,6 +23,7 @@ import {
 import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';
 import { Dictionary } from '../lib/dict';
+import { Locale } from '@/lib/config/i18n';
 
 const AddEmployeeSchema = z.object({
   employeesToAdd: z.array(
@@ -40,10 +41,12 @@ export default function AddDayOff({
   employees,
   id,
   dict,
+  lang,
 }: {
   employees: EmployeeType[];
   id: string;
   dict: Dictionary;
+  lang: Locale;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
@@ -87,7 +90,7 @@ export default function AddDayOff({
         }
       }
       toast.success(dict.addDayOffForm.toast.success);
-      redirect(id);
+      redirect(id, lang);
     } catch (error) {
       console.error('onSubmit', error);
       toast.error(dict.addDayOffForm.toast.contactIT);

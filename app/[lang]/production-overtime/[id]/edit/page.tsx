@@ -38,6 +38,7 @@ export default async function EditOvertimeRequestPage(props: {
       users={users}
       overtimeRequest={overtimeRequest}
       dict={dict}
+      lang={lang}
     />
   );
 }

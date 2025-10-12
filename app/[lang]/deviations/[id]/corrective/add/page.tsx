@@ -3,6 +3,7 @@ import { Locale } from '@/lib/config/i18n';
 import { getUsers } from '@/lib/data/get-users';
 import { redirect } from 'next/navigation';
 import AddCorrectiveActionForm from '../../../components/add-corrective-action-form';
+import { getDictionary } from '../../../lib/dict';
 
 export default async function AddDeviationPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
@@ -15,8 +16,7 @@ export default async function AddDeviationPage(props: {
 
   const { lang, id } = params;
 
-  const { getDictionary } = await import(`../../../dictionaries/${lang}`);
   const dict = await getDictionary(lang);
   const users = await getUsers();
-  return <AddCorrectiveActionForm id={id} users={users} dict={dict} />;
+  return <AddCorrectiveActionForm id={id} users={users} dict={dict} lang={lang} />;
 }

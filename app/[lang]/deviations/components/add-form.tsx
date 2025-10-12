@@ -4,8 +4,8 @@ import {
   DeviationReasonType,
 } from '@/app/[lang]/deviations/lib/types';
 import {
-  addDeviationDraftSchema,
-  addDeviationSchema,
+  createAddDeviationSchema,
+  createAddDeviationDraftSchema,
 } from '@/app/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -62,6 +62,9 @@ export default function AddDeviationForm({
   const [isPendingInsertDraft, setIsPendingInsertingDraft] = useState(false);
   const [isPendingFindArticleName, startFindArticleNameTransition] =
     useTransition();
+
+  const addDeviationSchema = createAddDeviationSchema(dict.form.validation);
+  const addDeviationDraftSchema = createAddDeviationDraftSchema(dict.form.validation);
 
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
@@ -121,7 +124,7 @@ export default function AddDeviationForm({
       if (res.success) {
         toast.success(dict.form.deviationAdded);
         // form.reset()
-        redirectToDeviations();
+        redirectToDeviations(lang);
       } else if (res.error) {
         console.error(res.error);
         toast.error(dict.form.contactIT);
@@ -143,7 +146,7 @@ export default function AddDeviationForm({
       if (res.success) {
         toast.success(dict.form.draftSaved);
         // form.reset();
-        redirectToDeviations();
+        redirectToDeviations(lang);
       } else if (res.error) {
         console.error(res.error);
         toast.error(dict.form.contactIT);

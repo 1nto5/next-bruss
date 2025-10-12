@@ -154,7 +154,16 @@
   },
   "validation": {
     "rejectionReasonRequired": "Powód odrzucenia jest wymagany!",
-    "rejectionReasonTooLong": "Powód odrzucenia nie może być dłuższy niż 500 znaków!"
+    "rejectionReasonTooLong": "Powód odrzucenia nie może być dłuższy niż 500 znaków!",
+    "supervisorEmailInvalid": "Wybierz kierownika!",
+    "supervisorRequired": "Kierownik jest wymagany!",
+    "dateRequired": "Wybierz datę!",
+    "hoursMinRange": "Podaj wartość z zakresu -8 do 16!",
+    "hoursMaxRange": "Podaj wartość z zakresu -8 do 16!",
+    "scheduledDayOffRequired": "Wybierz dzień odbioru, jeśli nadgodziny nie są do wypłaty!",
+    "dateRangeInvalid": "Możesz dodać nadgodziny tylko z ostatnich 7 dni.",
+    "hoursIncrementInvalid": "Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, etc.)",
+    "reasonRequired": "Uzasadnienie jest wymagane!"
   },
   "summary": {
     "yourOvertimeIn": "Twoje godziny nadliczbowe w",

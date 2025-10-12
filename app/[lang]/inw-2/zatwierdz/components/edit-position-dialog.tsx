@@ -1,7 +1,7 @@
 'use client';
 
 import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
-import { UpdatePositionSchema } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
+import { createUpdatePositionSchema } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
 import { Button } from '@/components/ui/button';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
@@ -45,8 +45,11 @@ export default function EditPositionDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
-  const form = useForm<z.infer<typeof UpdatePositionSchema>>({
-    resolver: zodResolver(UpdatePositionSchema),
+
+  const updatePositionSchema = createUpdatePositionSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof updatePositionSchema>>({
+    resolver: zodResolver(updatePositionSchema),
     defaultValues: {
       articleNumber: position.articleNumber,
       quantity: position.quantity,
@@ -61,7 +64,7 @@ export default function EditPositionDialog({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof UpdatePositionSchema>) => {
+  const onSubmit = async (data: z.infer<typeof updatePositionSchema>) => {
     setIsPendingUpdate(true);
     try {
       // console.log('onSubmit', data);

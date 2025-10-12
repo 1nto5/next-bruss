@@ -121,6 +121,7 @@ export default async function EditOvertimeSubmissionPage(props: {
       mode='edit'
       submission={submission}
       dict={dict}
+      lang={lang}
     />
   );
 }

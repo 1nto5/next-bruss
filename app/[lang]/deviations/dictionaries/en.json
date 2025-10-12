@@ -61,7 +61,40 @@
     "notAuthorizedToEditDraft": "You are not authorized to edit this draft.",
     "notDraft": "This item is no longer a draft.",
     "draftDeleted": "Draft deleted!",
-    "deleteDraftButton": "Delete draft"
+    "deleteDraftButton": "Delete draft",
+    "validation": {
+      "articleNumberRequired": "Enter article number!",
+      "articleNumberMinLength": "Enter valid article number!",
+      "articleNameRequired": "Enter article name!",
+      "articleNameMinLength": "Enter valid article name!",
+      "quantityInvalid": "Enter valid positive number!",
+      "unitRequired": "Enter unit!",
+      "unitRequiredWithQuantity": "Enter unit if you entered quantity greater than 0!",
+      "descriptionRequired": "Enter deviation description!",
+      "descriptionMinLength": "Description must be at least 10 characters long!",
+      "descriptionMinLengthOrEmpty": "Description must be at least 10 characters long (or empty)!",
+      "reasonRequired": "Select reason!",
+      "dateRequired": "Select date!",
+      "periodFromMinDate": "Start date cannot be older than 7 days!",
+      "periodFromMaxDate": "Start date cannot be later than 7 days!",
+      "periodToMaxDate": "End date cannot be later than 30 days!",
+      "periodToBeforeFrom": "End date cannot be earlier than start date!",
+      "areaRequired": "Select area!",
+      "quantityInvalidOrEmpty": "Enter valid number (or leave empty)!",
+      "commentRequired": "Select status!",
+      "statusRequired": "Select status!",
+      "executedAtRequired": "Select date!",
+      "fileRequired": "File is required!",
+      "fileEmpty": "File is empty!",
+      "fileTooLarge": "File is too large (max 10MB)!",
+      "attachmentNameRequired": "Name is required!",
+      "attachmentNameTooShort": "Name is too short!",
+      "rejectReasonRequired": "Rejection reason is required!",
+      "rejectReasonMinLength": "Rejection reason must be at least 10 characters long!",
+      "rejectReasonMaxLength": "Rejection reason cannot exceed 500 characters!",
+      "noteRequired": "Note cannot be empty!",
+      "noteMaxLength": "Note cannot exceed 1000 characters!"
+    }
   },
   "table": {
     "columns": {
@@ -356,6 +389,12 @@
     "errors": {
       "deviationNotFound": "Deviation not found!",
       "notAuthorized": "Only the deviation owner can add corrective actions!"
+    },
+    "validation": {
+      "descriptionRequired": "Enter description!",
+      "descriptionMinLength": "Description must be at least 10 characters long!",
+      "responsibleRequired": "Select responsible person!",
+      "deadlineRequired": "Select deadline!"
     }
   }
 }

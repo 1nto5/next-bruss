@@ -16,12 +16,12 @@ export async function revalidateOvertimeSubmission() {
   revalidateTag('overtime-submission');
 }
 
-export async function redirectToOvertime() {
-  redirect('/overtime-submissions');
+export async function redirectToOvertime(lang: string) {
+  redirect(`/${lang}/overtime-submissions`);
 }
 
-export async function redirectToOvertimeSubmission(id: string) {
-  redirect(`/overtime-submissions/${id}`);
+export async function redirectToOvertimeSubmission(id: string, lang: string) {
+  redirect(`/${lang}/overtime-submissions/${id}`);
 }
 
 async function sendRejectionEmailToEmployee(

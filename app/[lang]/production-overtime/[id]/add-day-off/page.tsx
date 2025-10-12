@@ -39,5 +39,5 @@ export default async function AddDayOffPage(props: {
 
   const employees = await getEmployees();
   const dict = await getDictionary(lang);
-  return <AddDayOff employees={employees} id={id} dict={dict} />;
+  return <AddDayOff employees={employees} id={id} dict={dict} lang={lang} />;
 }

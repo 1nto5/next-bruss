@@ -5,7 +5,7 @@ import {
   DeviationReasonType,
   DeviationType,
 } from '@/app/[lang]/deviations/lib/types';
-import { addDeviationSchema } from '@/app/[lang]/deviations/lib/zod';
+import { createAddDeviationSchema } from '@/app/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -62,6 +62,8 @@ export default function EditForm({
   const [isPendingUpdate, setIsPendingUpdate] = useState(false); // Renamed state for clarity
   const [isPendingFindArticleName, startFindArticleNameTransition] =
     useTransition();
+
+  const addDeviationSchema = createAddDeviationSchema(dict.form.validation);
 
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
@@ -124,7 +126,7 @@ export default function EditForm({
 
       if (updateRes.success) {
         toast.success(dict.form.deviationUpdated); // Updated success message
-        redirectToDeviation(id);
+        redirectToDeviation(id, lang);
       } else if (updateRes.error === 'not authorized') {
         toast.error(dict.form.notAuthorizedToEdit);
       } else if (updateRes.error === 'not found') {

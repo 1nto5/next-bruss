@@ -154,7 +154,16 @@
   },
   "validation": {
     "rejectionReasonRequired": "Rejection reason is required!",
-    "rejectionReasonTooLong": "Rejection reason cannot be longer than 500 characters!"
+    "rejectionReasonTooLong": "Rejection reason cannot be longer than 500 characters!",
+    "supervisorEmailInvalid": "Select supervisor!",
+    "supervisorRequired": "Supervisor is required!",
+    "dateRequired": "Select date!",
+    "hoursMinRange": "Enter value from -8 to 16!",
+    "hoursMaxRange": "Enter value from -8 to 16!",
+    "scheduledDayOffRequired": "Select day off pickup if overtime is not for payment!",
+    "dateRangeInvalid": "You can only add overtime from the last 7 days.",
+    "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
+    "reasonRequired": "Justification is required!"
   },
   "summary": {
     "yourOvertimeIn": "Your overtime in",

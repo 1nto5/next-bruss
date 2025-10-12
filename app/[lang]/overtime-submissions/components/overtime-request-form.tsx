@@ -58,8 +58,9 @@ import {
   updateOvertimeSubmission as update,
 } from '../actions';
 import { OvertimeSubmissionType } from '../lib/types';
-import { OvertimeSubmissionSchema } from '../lib/zod';
+import { createOvertimeSubmissionSchema } from '../lib/zod';
 import { Dictionary } from '../lib/dict';
+import { Locale } from '@/lib/config/i18n';
 
 interface OvertimeRequestFormProps {
   managers: UsersListType;
@@ -67,6 +68,7 @@ interface OvertimeRequestFormProps {
   mode: 'new' | 'edit';
   submission?: OvertimeSubmissionType;
   dict: Dictionary;
+  lang: Locale;
 }
 
 export default function OvertimeRequestForm({
@@ -75,6 +77,7 @@ export default function OvertimeRequestForm({
   mode,
   submission,
   dict,
+  lang,
 }: OvertimeRequestFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
@@ -84,8 +87,10 @@ export default function OvertimeRequestForm({
 
   const isEditMode = mode === 'edit';
 
-  const form = useForm<z.infer<typeof OvertimeSubmissionSchema>>({
-    resolver: zodResolver(OvertimeSubmissionSchema),
+  const overtimeSubmissionSchema = createOvertimeSubmissionSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof overtimeSubmissionSchema>>({
+    resolver: zodResolver(overtimeSubmissionSchema),
     defaultValues: {
       supervisor: isEditMode ? submission!.supervisor : '',
       date: isEditMode ? new Date(submission!.date) : new Date(),
@@ -104,7 +109,7 @@ export default function OvertimeRequestForm({
   });
 
   const onSubmit = async (
-    data: z.infer<typeof OvertimeSubmissionSchema>,
+    data: z.infer<typeof overtimeSubmissionSchema>,
     currentActionType: 'save' | 'save-and-add-another' = actionType,
   ) => {
     setIsPending(true);
@@ -128,11 +133,11 @@ export default function OvertimeRequestForm({
           } else {
             toast.success(successMessage);
             form.reset(); // Reset form after successful submission
-            redirect();
+            redirect(lang);
           }
         } else {
           toast.success(successMessage);
-          redirect();
+          redirect(lang);
         }
       } else if ('error' in res) {
         console.error(res.error);

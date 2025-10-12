@@ -62,25 +62,30 @@ import {
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { Dictionary } from '../lib/dict';
-import { NewOvertimeRequestSchema } from '../lib/zod';
+import { createNewOvertimeRequestSchema } from '../lib/zod';
 import { OvertimeType } from '../lib/types';
+import { Locale } from '@/lib/config/i18n';
 
 export default function EditOvertimeRequestForm({
   employees,
   users,
   overtimeRequest,
   dict,
+  lang,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
   overtimeRequest: OvertimeType;
   dict: Dictionary;
+  lang: Locale;
 }) {
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
-    resolver: zodResolver(NewOvertimeRequestSchema),
+  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
+    resolver: zodResolver(newOvertimeRequestSchema),
     defaultValues: {
       numberOfEmployees: overtimeRequest.numberOfEmployees,
       numberOfShifts: overtimeRequest.numberOfShifts,
@@ -93,13 +98,13 @@ export default function EditOvertimeRequestForm({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof NewOvertimeRequestSchema>) => {
+  const onSubmit = async (data: z.infer<typeof newOvertimeRequestSchema>) => {
     setIsPendingUpdate(true);
     try {
       const res = await update(overtimeRequest._id, data);
       if ('success' in res) {
         toast.success(dict.editOvertimeRequestForm.toast.updated);
-        redirect();
+        redirect(lang);
       } else if ('error' in res) {
         console.error(res.error);
         if (res.error === 'unauthorized') {

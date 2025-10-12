@@ -2,5 +2,9 @@
   "title": "Please add translations",
   "editDialog": {
     "save": "Speichern"
+  },
+  "validation": {
+    "quantityMustBeNumber": "Menge muss eine Zahl sein",
+    "quantityCannotBeNegative": "Menge darf nicht negativ sein"
   }
 }

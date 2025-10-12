@@ -29,6 +29,7 @@ export default async function AddOvertimeSubmissionPage(props: {
       loggedInUserEmail={session?.user?.email ?? ''}
       mode='new'
       dict={dict}
+      lang={lang}
     />
   );
 }

@@ -154,7 +154,16 @@
   },
   "validation": {
     "rejectionReasonRequired": "Ablehnungsgrund ist erforderlich!",
-    "rejectionReasonTooLong": "Ablehnungsgrund darf nicht länger als 500 Zeichen sein!"
+    "rejectionReasonTooLong": "Ablehnungsgrund darf nicht länger als 500 Zeichen sein!",
+    "supervisorEmailInvalid": "Vorgesetzten auswählen!",
+    "supervisorRequired": "Vorgesetzter ist erforderlich!",
+    "dateRequired": "Datum auswählen!",
+    "hoursMinRange": "Wert zwischen -8 und 16 eingeben!",
+    "hoursMaxRange": "Wert zwischen -8 und 16 eingeben!",
+    "scheduledDayOffRequired": "Tag für Freizeitausgleich auswählen, wenn Überstunden nicht ausgezahlt werden!",
+    "dateRangeInvalid": "Sie können nur Überstunden der letzten 7 Tage hinzufügen.",
+    "hoursIncrementInvalid": "Stunden müssen in halben Stunden angegeben werden (0.5, 1.0, 1.5 usw.)",
+    "reasonRequired": "Begründung ist erforderlich!"
   },
   "summary": {
     "yourOvertimeIn": "Ihre Überstunden in",

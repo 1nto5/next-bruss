@@ -25,7 +25,8 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { addNote } from '../actions';
 import { Dictionary } from '../lib/dict';
-import { NoteFormSchema, NoteFormType } from '../lib/zod';
+import { createNoteFormSchema } from '../lib/zod';
+import * as z from 'zod';
 
 interface AddNoteDialogProps {
   deviationId: string;
@@ -36,14 +37,16 @@ export default function AddNoteDialog({ deviationId, dict }: AddNoteDialogProps)
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<NoteFormType>({
-    resolver: zodResolver(NoteFormSchema),
+  const noteFormSchema = createNoteFormSchema(dict.form.validation);
+
+  const form = useForm<z.infer<typeof noteFormSchema>>({
+    resolver: zodResolver(noteFormSchema),
     defaultValues: {
       content: '',
     },
   });
 
-  const onSubmit = async (data: NoteFormType) => {
+  const onSubmit = async (data: z.infer<typeof noteFormSchema>) => {
     if (!deviationId) {
       toast.error(dict.dialogs.addNote.errors.deviationIdError);
       return;
