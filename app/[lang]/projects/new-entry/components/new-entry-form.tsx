@@ -31,8 +31,9 @@ import {
   redirectToProjects as redirect,
 } from '../../actions';
 import { ProjectsSchema } from '../../lib/zod';
+import { Locale } from '@/lib/config/i18n';
 
-export default function NewEntryForm({}: {}) {
+export default function NewEntryForm({ lang }: { lang: Locale }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
   const form = useForm<z.infer<typeof ProjectsSchema>>({
@@ -56,7 +57,7 @@ export default function NewEntryForm({}: {}) {
       if ('success' in res) {
         toast.success('Entry added!');
         form.reset(); // Reset form after successful submission
-        redirect();
+        redirect(lang);
       } else if ('error' in res) {
         console.error(res.error);
         toast.error('Contact IT support!');

@@ -1,7 +1,7 @@
 // import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
 import { getDictionary } from '../lib/dict';
-import { columns } from './components/table/columns';
+import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import { FailureOptionType, FailureType } from './lib/failures-types';
 
@@ -93,6 +93,8 @@ export default async function FailuresPage(props: {
   ));
 
   const failuresOptions = await getFailuresOptions();
+
+  const columns = createColumns(dict);
 
   return (
     <DataTable

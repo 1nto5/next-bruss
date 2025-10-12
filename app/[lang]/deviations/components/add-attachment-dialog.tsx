@@ -28,7 +28,8 @@ import { toast } from 'sonner';
 import { revalidateDeviation } from '../actions';
 import { Dictionary } from '../lib/dict';
 import { DeviationStatus } from '../lib/types';
-import { AttachmentFormSchema, AttachmentFormType } from '../lib/zod';
+import { createAttachmentFormSchema } from '../lib/zod';
+import * as z from 'zod';
 
 // Define attachment roles (can be imported from view.tsx or defined here)
 const ATTACHMENT_ROLES = [
@@ -59,8 +60,10 @@ export default function AddAttachmentDialog({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<AttachmentFormType>({
-    resolver: zodResolver(AttachmentFormSchema),
+  const attachmentFormSchema = createAttachmentFormSchema(dict.form.validation);
+
+  const form = useForm<z.infer<typeof attachmentFormSchema>>({
+    resolver: zodResolver(attachmentFormSchema),
     defaultValues: {
       name: '',
       note: '',
@@ -77,7 +80,7 @@ export default function AddAttachmentDialog({
     }
   };
 
-  const onSubmit = async (data: AttachmentFormType) => {
+  const onSubmit = async (data: z.infer<typeof attachmentFormSchema>) => {
     const userRoles = session?.user?.roles || [];
     const userEmail = session?.user?.email;
 

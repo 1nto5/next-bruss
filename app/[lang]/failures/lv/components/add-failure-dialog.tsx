@@ -1,6 +1,6 @@
 'use client';
 
-import { AddFailureSchema } from '@/app/[lang]/failures/lv/lib/failures-zod';
+import { createAddFailureSchema } from '@/app/[lang]/failures/lv/lib/failures-zod';
 import { Dictionary } from '../../lib/dict';
 import { Button } from '@/components/ui/button';
 import {
@@ -67,8 +67,11 @@ export default function AddFailureDialog({
 
   const [openStation, setOpenStation] = useState(false);
   const [openFailure, setOpenFailure] = useState(false);
-  const form = useForm<z.infer<typeof AddFailureSchema>>({
-    resolver: zodResolver(AddFailureSchema),
+
+  const addFailureSchema = createAddFailureSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof addFailureSchema>>({
+    resolver: zodResolver(addFailureSchema),
     defaultValues: {
       line: line,
       responsible: '',
@@ -111,7 +114,7 @@ export default function AddFailureDialog({
       ?.options || []
   ).sort((a, b) => a.localeCompare(b));
 
-  const onSubmit = async (data: z.infer<typeof AddFailureSchema>) => {
+  const onSubmit = async (data: z.infer<typeof addFailureSchema>) => {
     setIsPendingInserting(true);
     try {
       const res = await insertFailure(data);

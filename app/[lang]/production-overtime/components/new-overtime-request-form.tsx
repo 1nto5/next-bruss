@@ -63,18 +63,21 @@ import {
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { Dictionary } from '../lib/dict';
-import { NewOvertimeRequestSchema } from '../lib/zod';
+import { createNewOvertimeRequestSchema } from '../lib/zod';
+import { Locale } from '@/lib/config/i18n';
 
 export default function NewOvertimeRequestForm({
   employees,
   users,
   loggedInUserEmail,
   dict,
+  lang,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
   loggedInUserEmail: string;
   dict: Dictionary;
+  lang: Locale;
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
@@ -101,8 +104,10 @@ export default function NewOvertimeRequestForm({
     0,
   );
 
-  const form = useForm<z.infer<typeof NewOvertimeRequestSchema>>({
-    resolver: zodResolver(NewOvertimeRequestSchema),
+  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
+    resolver: zodResolver(newOvertimeRequestSchema),
     defaultValues: {
       numberOfEmployees: 1,
       numberOfShifts: 1,
@@ -115,7 +120,7 @@ export default function NewOvertimeRequestForm({
   });
 
   const onSubmit = async (
-    data: z.infer<typeof NewOvertimeRequestSchema>,
+    data: z.infer<typeof newOvertimeRequestSchema>,
     currentActionType: 'save' | 'save-and-add-another' = actionType,
   ) => {
     setIsPendingInserting(true);
@@ -128,7 +133,7 @@ export default function NewOvertimeRequestForm({
         } else {
           toast.success(dict.newOvertimeRequestForm.toast.added);
           form.reset();
-          redirect();
+          redirect(lang);
         }
       } else if ('error' in res) {
         console.error(res.error);

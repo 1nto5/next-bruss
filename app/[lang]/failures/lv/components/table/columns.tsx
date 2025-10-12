@@ -7,8 +7,9 @@ import { Activity, Ban } from 'lucide-react';
 import { FailureType } from '../../lib/failures-types';
 import EditFailureDialog from '../edit-failure-dialog';
 import EndFailureButton from '../end-failure-button';
+import { Dictionary } from '../../../lib/dict';
 
-export const columns: ColumnDef<FailureType>[] = [
+export const createColumns = (dict: Dictionary): ColumnDef<FailureType>[] => [
   {
     accessorKey: 'line',
     header: 'Linia',
@@ -62,7 +63,7 @@ export const columns: ColumnDef<FailureType>[] = [
             <Activity />
           </Button>
         );
-      return <EditFailureDialog failure={failure} />;
+      return <EditFailureDialog failure={failure} dict={dict} />;
     },
   },
   {

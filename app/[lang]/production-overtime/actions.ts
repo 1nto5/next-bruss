@@ -17,12 +17,12 @@ export async function revalidateProductionOvertimeRequest() {
   revalidateTag('production-overtime-request');
 }
 
-export async function redirectToProductionOvertime() {
-  redirect('/production-overtime');
+export async function redirectToProductionOvertime(lang: string) {
+  redirect(`/${lang}/production-overtime`);
 }
 
-export async function redirectToProductionOvertimeDaysOff(id: string) {
-  redirect(`/production-overtime/${id}`);
+export async function redirectToProductionOvertimeDaysOff(id: string, lang: string) {
+  redirect(`/${lang}/production-overtime/${id}`);
 }
 
 async function sendEmailNotificationToRequestor(email: string, id: string) {

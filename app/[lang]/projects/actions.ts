@@ -10,8 +10,8 @@ export async function revalidateProjects() {
   revalidateTag('projects');
 }
 
-export async function redirectToProjects() {
-  redirect('/projects');
+export async function redirectToProjects(lang: string) {
+  redirect(`/${lang}/projects`);
 }
 
 export async function insertProjectsEntry(

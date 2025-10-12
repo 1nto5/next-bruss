@@ -1,5 +1,94 @@
 import * as z from 'zod';
 
+// ============================================================================
+// FACTORY FUNCTIONS FOR TRANSLATED SCHEMAS
+// ============================================================================
+
+export const createOvertimeSubmissionSchema = (validation: {
+  supervisorEmailInvalid: string;
+  supervisorRequired: string;
+  dateRequired: string;
+  hoursMinRange: string;
+  hoursMaxRange: string;
+  scheduledDayOffRequired: string;
+  dateRangeInvalid: string;
+  hoursIncrementInvalid: string;
+  reasonRequired: string;
+}) => {
+  return z
+    .object({
+      supervisor: z
+        .string()
+        .email({ message: validation.supervisorEmailInvalid })
+        .nonempty({ message: validation.supervisorRequired }),
+      date: z.date({ message: validation.dateRequired }),
+      hours: z
+        .number()
+        .min(-8, { message: validation.hoursMinRange })
+        .max(16, { message: validation.hoursMaxRange }),
+      reason: z.string().optional(),
+      overtimeRequest: z.boolean().default(false),
+      payment: z.boolean().optional(),
+      scheduledDayOff: z.date().optional(),
+    })
+    .refine(
+      (data) => {
+        if (data.overtimeRequest && data.payment === false) {
+          return !!data.scheduledDayOff;
+        }
+        return true;
+      },
+      {
+        message: validation.scheduledDayOffRequired,
+        path: ['scheduledDayOff'],
+      },
+    )
+    .refine(
+      (data) => {
+        const now = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+        sevenDaysAgo.setDate(now.getDate() - 7);
+
+        if (data.hours < 0) {
+          return data.date > now;
+        } else {
+          return data.date >= sevenDaysAgo && data.date <= now;
+        }
+      },
+      {
+        message: validation.dateRangeInvalid,
+        path: ['date'],
+      },
+    )
+    .refine(
+      (data) => {
+        const isValidIncrement = (data.hours * 2) % 1 === 0;
+        return isValidIncrement;
+      },
+      {
+        message: validation.hoursIncrementInvalid,
+        path: ['hours'],
+      },
+    )
+    .refine(
+      (data) => {
+        if (data.hours >= 0) {
+          return !!data.reason && data.reason.trim().length > 0;
+        }
+        return true;
+      },
+      {
+        message: validation.reasonRequired,
+        path: ['reason'],
+      },
+    );
+};
+
+// ============================================================================
+// OLD SCHEMAS (for backward compatibility)
+// ============================================================================
+
 export const OvertimeSubmissionSchema = z
   .object({
     supervisor: z

@@ -6,8 +6,8 @@ import {
   DeviationType,
 } from '@/app/[lang]/deviations/lib/types';
 import {
-  addDeviationDraftSchema,
-  addDeviationSchema,
+  createAddDeviationSchema,
+  createAddDeviationDraftSchema,
 } from '@/app/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
@@ -69,6 +69,9 @@ export default function EditDraftForm({
   const [isPendingDeleteDraft, setIsPendingDeleteDraft] = useState(false);
   const [isPendingFindArticleName, startFindArticleNameTransition] =
     useTransition();
+
+  const addDeviationSchema = createAddDeviationSchema(dict.form.validation);
+  const addDeviationDraftSchema = createAddDeviationDraftSchema(dict.form.validation);
 
   const form = useForm<z.infer<typeof addDeviationSchema>>({
     resolver: zodResolver(addDeviationSchema),
@@ -133,7 +136,7 @@ export default function EditDraftForm({
         // 2. If insertion is successful, DO NOT delete the original draft
         // const deleteRes = await deleteDraftDeviation(id); // Removed deletion
         toast.success(dict.form.deviationAddedFromDraft); // Updated message
-        redirectToDeviations();
+        redirectToDeviations(lang);
       } else if (insertRes.error) {
         console.error('onSubmit - insertDeviation error:', insertRes.error);
         toast.error(dict.form.contactIT);
@@ -185,7 +188,7 @@ export default function EditDraftForm({
       const res = await deleteDraftDeviation(id);
       if (res.success) {
         toast.success(dict.form.draftDeleted);
-        redirectToDeviations();
+        redirectToDeviations(lang);
       } else if (res.error) {
         console.error('handleDeleteDraft', res.error);
         toast.error(dict.form.contactIT);

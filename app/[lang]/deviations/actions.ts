@@ -761,8 +761,8 @@ export async function updateCorrectiveAction(
   }
 }
 
-export async function redirectToDeviation(id: string) {
-  redirect(`/deviations/${id}`);
+export async function redirectToDeviation(id: string, lang: string) {
+  redirect(`/${lang}/deviations/${id}`);
 }
 
 export async function revalidateReasons() {
@@ -1168,8 +1168,8 @@ export async function changeCorrectiveActionStatus(
   }
 }
 
-export async function redirectToDeviations() {
-  redirect('/deviations');
+export async function redirectToDeviations(lang: string) {
+  redirect(`/${lang}/deviations`);
 }
 
 export async function revalidateDeviationsAndDeviation() {

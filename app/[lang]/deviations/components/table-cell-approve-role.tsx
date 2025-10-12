@@ -34,7 +34,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { ApprovalHistoryType } from '../lib/types';
-import { rejectDeviationSchema } from '../lib/zod';
+import { createRejectDeviationSchema } from '../lib/zod';
 import { Dictionary } from '../lib/dict';
 
 type TableCellApproveRoleProps = {
@@ -99,6 +99,8 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
 }) => {
   const [openReject, setOpenReject] = useState(false);
   const [openApprove, setOpenApprove] = useState(false);
+
+  const rejectDeviationSchema = createRejectDeviationSchema(dict.form.validation);
 
   // Create a form for the approval dialog with comment field
   const approvalForm = useForm({

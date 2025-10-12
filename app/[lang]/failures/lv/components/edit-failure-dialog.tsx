@@ -26,7 +26,8 @@ import { Pencil, Save } from 'lucide-react';
 import { FailureType } from '../lib/failures-types';
 
 // import { Separator } from '@/components/ui/separator';
-import { UpdateFailureSchema } from '@/app/[lang]/failures/lv/lib/failures-zod';
+import { createUpdateFailureSchema } from '@/app/[lang]/failures/lv/lib/failures-zod';
+import { Dictionary } from '../../lib/dict';
 import DialogFormWithScroll from '@/components/dialog-form-with-scroll';
 import DialogScrollArea from '@/components/dialog-scroll-area';
 import { DateTimeInput } from '@/components/ui/datetime-input';
@@ -39,13 +40,18 @@ import { updateFailure } from '../actions';
 
 export default function EditFailureDialog({
   failure,
+  dict,
 }: {
   failure: FailureType;
+  dict: Dictionary;
 }) {
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
-  const form = useForm<z.infer<typeof UpdateFailureSchema>>({
-    resolver: zodResolver(UpdateFailureSchema),
+
+  const updateFailureSchema = createUpdateFailureSchema(dict.validation);
+
+  const form = useForm<z.infer<typeof updateFailureSchema>>({
+    resolver: zodResolver(updateFailureSchema),
     defaultValues: {
       from: new Date(failure.from),
       to: new Date(failure.to),
@@ -69,7 +75,7 @@ export default function EditFailureDialog({
     }
   }, [open, failure]);
 
-  const onSubmit = async (data: z.infer<typeof UpdateFailureSchema>) => {
+  const onSubmit = async (data: z.infer<typeof updateFailureSchema>) => {
     // setIsDraft(false);
     setIsPendingUpdate(true);
     try {

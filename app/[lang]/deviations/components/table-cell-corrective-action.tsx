@@ -2,7 +2,7 @@
 
 import { correctiveActionStatusOptions as statusOptions } from '@/app/[lang]/deviations/lib/options';
 import { correctiveActionType } from '@/app/[lang]/deviations/lib/types';
-import { confirmActionExecutionSchema } from '@/app/[lang]/deviations/lib/zod';
+import { createConfirmActionExecutionSchema } from '@/app/[lang]/deviations/lib/zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateTimeInput } from '@/components/ui/datetime-input';
@@ -72,6 +72,8 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
   deviationOwner,
   dict,
 }) => {
+  const confirmActionExecutionSchema = createConfirmActionExecutionSchema(dict.form.validation);
+
   const form = useForm<z.infer<typeof confirmActionExecutionSchema>>({
     resolver: zodResolver(confirmActionExecutionSchema),
     defaultValues: {

@@ -53,5 +53,17 @@
       "solution": "Rozwiązanie",
       "comment": "Komentarz"
     }
+  },
+  "validation": {
+    "lineRequired": "Wybierz linię aby dodać awarię!",
+    "supervisorRequired": "Wprowadź nadzorującego!",
+    "responsibleRequired": "Wprowadź odpowiedzialnego!",
+    "stationRequired": "Wybierz stację!",
+    "failureRequired": "Wybierz awarię!",
+    "fromDateFuture": "Nie planujemy awarii w przyszłości!",
+    "fromDatePast": "Nie możemy cofnąć się w czasie > 1h!",
+    "fromDateEditLimit": "Możliwość edycji tylko 8h wstecz!",
+    "toDateFuture": "Data nie może być z przyszłości!",
+    "toDateBeforeFrom": "Zakończenie nie może być wcześniej niż rozpoczęcie!"
   }
 }

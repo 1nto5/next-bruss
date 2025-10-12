@@ -1,5 +1,5 @@
 'use client';
-import { addCorrectiveActionSchema } from '@/app/[lang]/deviations/lib/zod';
+import { createAddCorrectiveActionSchema } from '@/app/[lang]/deviations/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -49,21 +49,28 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { redirectToDeviation, updateCorrectiveAction } from '../actions';
 import { Dictionary } from '../lib/dict';
+import { Locale } from '@/lib/config/i18n';
 
 type AddCorrectiveActionPropsType = {
   id: string;
   users: UsersListType;
   dict: Dictionary;
+  lang: Locale;
 };
 
 export default function AddCorrectiveActionForm({
   id,
   users,
   dict,
+  lang,
 }: AddCorrectiveActionPropsType) {
   // const [isDraft, setIsDraft] = useState<boolean>();
   const [isPendingUpdate, setIsPendingUpdating] = useState<boolean>(false);
   const [responsiblePopoverOpen, setResponsiblePopoverOpen] = useState(false);
+
+  const addCorrectiveActionSchema = createAddCorrectiveActionSchema(
+    dict.correctiveAction.validation
+  );
 
   const form = useForm<z.infer<typeof addCorrectiveActionSchema>>({
     resolver: zodResolver(addCorrectiveActionSchema),
@@ -82,7 +89,7 @@ export default function AddCorrectiveActionForm({
       if (res.success) {
         toast.success(dict.correctiveAction.toasts.added);
         // form.reset()
-        redirectToDeviation(id);
+        redirectToDeviation(id, lang);
       } else if (res.error === 'not found') {
         toast.error(dict.correctiveAction.errors.deviationNotFound);
       } else if (res.error === 'not authorized') {
