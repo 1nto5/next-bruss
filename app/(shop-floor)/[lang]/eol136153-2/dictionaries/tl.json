@@ -36,7 +36,19 @@
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Mga kahon sa pallet",
     "palletFull": "Puno ang pallet",
-    "scanPallet": "I-scan ang pallet"
+    "scanPallet": "I-scan ang pallet",
+    "pallet": "PALLET",
+    "boxes": "kahon",
+    "time": "Oras",
+    "noScans": "Wala",
+    "deleteBox": "Tanggalin ang kahon",
+    "deleteBoxConfirm": "Sigurado ka bang gusto mong tanggalin ang kahon na ito mula sa pallet?",
+    "cancel": "Kanselahin",
+    "delete": "Tanggalin",
+    "deletingBox": "Tinatanggal ang kahon...",
+    "boxDeleted": "Natanggal na ang kahon mula sa pallet",
+    "boxNotFound": "Hindi nahanap ang kahon",
+    "deleteError": "May error sa pagtanggal"
   },
   "scanning": {
     "title": "I-scan ang Hydra code",

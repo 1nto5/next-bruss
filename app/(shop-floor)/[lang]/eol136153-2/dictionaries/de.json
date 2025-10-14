@@ -36,7 +36,19 @@
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Kartons auf Palette",
     "palletFull": "Palette voll",
-    "scanPallet": "Palette scannen"
+    "scanPallet": "Palette scannen",
+    "pallet": "PALETTE",
+    "boxes": "Box",
+    "time": "Zeit",
+    "noScans": "Keine",
+    "deleteBox": "Box löschen",
+    "deleteBoxConfirm": "Möchten Sie diese Box wirklich von der Palette löschen?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "deletingBox": "Box wird gelöscht...",
+    "boxDeleted": "Box wurde von der Palette entfernt",
+    "boxNotFound": "Box nicht gefunden",
+    "deleteError": "Fehler beim Löschen"
   },
   "scanning": {
     "title": "Hydra-Code scannen",

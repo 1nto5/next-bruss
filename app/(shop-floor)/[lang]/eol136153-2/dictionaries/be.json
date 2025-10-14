@@ -36,7 +36,19 @@
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Скрынак на палеце",
     "palletFull": "Палета поўная",
-    "scanPallet": "Сканаваць палету"
+    "scanPallet": "Сканаваць палету",
+    "pallet": "ПАЛЕТА",
+    "boxes": "скрынка",
+    "time": "Час",
+    "noScans": "Няма",
+    "deleteBox": "Выдаліць скрынку",
+    "deleteBoxConfirm": "Ці ўпэўненыя вы, што хочаце выдаліць гэтую скрынку з палеты?",
+    "cancel": "Адмяніць",
+    "delete": "Выдаліць",
+    "deletingBox": "Выдаленне скрынкі...",
+    "boxDeleted": "Скрынка выдалена з палеты",
+    "boxNotFound": "Скрынка не знойдзена",
+    "deleteError": "Памылка пры выдаленні"
   },
   "scanning": {
     "title": "Сканаваць код Hydra",

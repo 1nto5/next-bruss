@@ -36,7 +36,19 @@
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Kartonów na palecie",
     "palletFull": "Pełna paleta",
-    "scanPallet": "Skanuj paletę"
+    "scanPallet": "Skanuj paletę",
+    "pallet": "PALETA",
+    "boxes": "box",
+    "time": "Czas",
+    "noScans": "Brak",
+    "deleteBox": "Usuń box",
+    "deleteBoxConfirm": "Czy na pewno chcesz usunąć ten box z palety?",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "deletingBox": "Usuwanie boxa...",
+    "boxDeleted": "Box został usunięty z palety",
+    "boxNotFound": "Nie znaleziono boxa",
+    "deleteError": "Błąd podczas usuwania"
   },
   "scanning": {
     "title": "Skanuj kod Hydra",

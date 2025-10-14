@@ -13,8 +13,8 @@ import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dict';
 import { useOperatorStore, useScanStore } from '../lib/stores';
 import StatusCard from '@/app/(shop-floor)/[lang]/components/status-card';
-import DeleteConfirmDialog from './delete-confirm-dialog';
-import ItemListDialog from './item-list-dialog';
+import DeleteConfirmDialog from '@/app/(shop-floor)/[lang]/components/delete-confirm-dialog';
+import ItemListDialog from '@/app/(shop-floor)/[lang]/components/item-list-dialog';
 
 interface StatusBarProps {
   dict: Dictionary['statusBar'];

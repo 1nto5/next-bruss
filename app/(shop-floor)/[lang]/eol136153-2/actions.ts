@@ -1,7 +1,6 @@
 'use server';
 
 import { dbc } from '@/lib/db/mongo';
-import { revalidateTag } from 'next/cache';
 import { v4 as uuidv4 } from 'uuid';
 import type {
   ArticleStatus,
@@ -165,8 +164,6 @@ export async function saveHydraBatch(
       hydra_operator: operator,
     });
 
-    revalidateTag('eol136153-status');
-
     return {
       status: 'saved',
       article: qrArticle,
@@ -264,7 +261,6 @@ export async function savePalletBatch(
     );
 
     if (updateResult.modifiedCount > 0) {
-      revalidateTag('eol136153-status');
       return {
         status: 'success',
         palletBatch: qrBatch,
@@ -341,5 +337,85 @@ export async function printPalletLabel(
   } catch (error) {
     console.error('Print error:', error);
     return { success: false };
+  }
+}
+
+// Get list of hydra batches (boxes) on pallet for a specific article
+export async function getPalletBoxes(
+  article: string,
+): Promise<{ hydra: string; time: string }[]> {
+  try {
+    const collection = await dbc('scans_no_dmc');
+
+    const boxes = await collection
+      .find({
+        status: 'pallet',
+        workplace: 'eol136153',
+        article,
+      })
+      .sort({ time: -1 })
+      .toArray();
+
+    return boxes.map((box) => ({
+      hydra: box.hydra_batch as string,
+      time: (box.time as Date).toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching pallet boxes:', error);
+    return [];
+  }
+}
+
+// Delete hydra batch from pallet (set status to rework)
+export async function deleteHydraBatch(
+  hydraBatch: string,
+  operator: string,
+): Promise<{ message: string }> {
+  try {
+    if (!hydraBatch || !operator) {
+      console.error('Invalid parameters for deleteHydraBatch:', {
+        hydraBatch,
+        operator,
+      });
+      return { message: 'invalid parameters' };
+    }
+
+    const collection = await dbc('scans_no_dmc');
+
+    // Check if the hydra batch exists in pallet status
+    const batchRecord = await collection.findOne({
+      hydra_batch: hydraBatch,
+      status: 'pallet',
+    });
+
+    if (!batchRecord) {
+      console.warn(`Hydra batch ${hydraBatch} not found in pallet status`);
+      return { message: 'not found' };
+    }
+
+    // Update the single record to rework status
+    const result = await collection.updateOne(
+      { _id: batchRecord._id },
+      {
+        $set: {
+          status: 'rework',
+          rework_time: new Date(),
+          rework_reason: 'removed from pallet by operator',
+          rework_user: `personal number: ${operator}`,
+        },
+      },
+    );
+
+    if (result.modifiedCount === 1) {
+      return { message: 'deleted' };
+    }
+
+    console.error(
+      `Failed to delete hydra batch ${hydraBatch} - no documents modified`,
+    );
+    return { message: 'update failed' };
+  } catch (error) {
+    console.error('Error in deleteHydraBatch:', error);
+    return { message: 'error' };
   }
 }
