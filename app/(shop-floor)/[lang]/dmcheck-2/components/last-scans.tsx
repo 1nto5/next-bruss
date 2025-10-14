@@ -2,14 +2,9 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import type { Locale } from '@/lib/config/i18n';
 import { useScanStore } from '../lib/stores';
 
-interface LastScansProps {
-  lang: Locale;
-}
-
-export default function LastScans({ lang }: LastScansProps) {
+export default function LastScans() {
   const { lastScans } = useScanStore();
 
   if (lastScans.length === 0) {

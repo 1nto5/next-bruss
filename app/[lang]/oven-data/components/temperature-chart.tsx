@@ -120,11 +120,11 @@ export default function OvenTemperatureChart({
 
     return {
       timestamp: isSingleDay
-        ? new Date(log.timestamp).toLocaleTimeString(lang, {
+        ? new Date(log.timestamp).toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
             hour: '2-digit',
             minute: '2-digit',
           })
-        : new Date(log.timestamp).toLocaleString(lang, {
+        : new Date(log.timestamp).toLocaleString(process.env.DATE_TIME_LOCALE!, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',

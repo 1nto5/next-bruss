@@ -110,7 +110,7 @@ export default function App({ dict, lang }: AppProps) {
   // Main app interface
   return (
     <div className='space-y-2'>
-      <StatusBar dict={dict.status} lang={lang} />
+      <StatusBar dict={dict.status} />
       <ScanPanel
         dict={dict}
         operator={operator.identifier}
@@ -119,7 +119,7 @@ export default function App({ dict, lang }: AppProps) {
         currentMode={currentMode}
         onScanSuccess={refreshStatuses}
       />
-      <LastScans lang={lang} />
+      <LastScans />
     </div>
   );
 }

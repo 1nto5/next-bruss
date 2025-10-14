@@ -175,11 +175,11 @@ export default function OeeUtilizationChart({
   const getTitle = () => {
     switch (params.mode) {
       case 'day':
-        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.date).toLocaleDateString(lang)}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.date).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}`;
       case 'week':
         return `${dict.oeeMetrics.utilizationTrendTitle} - ${dict.timeFilters.weekLabel} ${params.week}, ${params.year}`;
       case 'month':
-        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.year, params.month - 1).toLocaleDateString(lang, { month: 'long', year: 'numeric' })}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.year, params.month - 1).toLocaleDateString(process.env.DATE_TIME_LOCALE!, { month: 'long', year: 'numeric' })}`;
       case 'range':
         return dict.oeeMetrics.utilizationTrendTitle;
     }

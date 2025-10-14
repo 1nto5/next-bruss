@@ -3,7 +3,6 @@
 import StatusCard from '@/app/(shop-floor)/[lang]/components/status-card';
 import DeleteConfirmDialog from '@/app/(shop-floor)/[lang]/components/delete-confirm-dialog';
 import ItemListDialog from '@/app/(shop-floor)/[lang]/components/item-list-dialog';
-import type { Locale } from '@/lib/config/i18n';
 import { Forklift } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -33,10 +32,9 @@ interface StatusBarProps {
     boxNotFound: string;
     deleteError: string;
   };
-  lang: Locale;
 }
 
-export default function StatusBar({ dict, lang }: StatusBarProps) {
+export default function StatusBar({ dict }: StatusBarProps) {
   const { operator } = useOperatorStore();
   const queryClient = useQueryClient();
 

@@ -1,6 +1,5 @@
 'use client';
 
-import type { Locale } from '@/lib/config/i18n';
 import { Forklift, Package } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -18,10 +17,9 @@ import ItemListDialog from '@/app/(shop-floor)/[lang]/components/item-list-dialo
 
 interface StatusBarProps {
   dict: Dictionary['statusBar'];
-  lang: Locale;
 }
 
-export default function StatusBar({ dict, lang }: StatusBarProps) {
+export default function StatusBar({ dict }: StatusBarProps) {
   const { selectedArticle, removeScan } = useScanStore();
   const { operator1, operator2, operator3 } = useOperatorStore();
   const queryClient = useQueryClient();
