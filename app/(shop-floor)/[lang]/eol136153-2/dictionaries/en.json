@@ -1,20 +1,25 @@
 {
   "login": {
-    "title": "EOL136153 Login",
-    "operator1Label": "Personal number",
-    "operator2Label": "",
-    "operator3Label": "",
-    "personalNumber2Label": "",
-    "personalNumber3Label": "",
-    "placeholder": "tap to enter...",
+    "title": "Login - EOL136153",
+    "operator1Label": "Personal number 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal number 2",
+    "personalNumber3Label": "Personal number 3",
+    "placeholder": "touch to enter...",
     "loginButton": "Login",
     "clearButton": "Clear",
-    "keypadTitle": "Enter personal number",
+    "keypadTitle": "Enter operator personal number",
+    "keypadReset": "Reset",
+    "keypadSave": "Save",
     "errors": {
-      "wrongNumber1": "Invalid personal number",
-      "wrongNumber2": "",
-      "wrongNumber3": "",
-      "loginError": "Login error"
+      "wrongNumber1": "Invalid personal number!",
+      "wrongNumber2": "Invalid personal number!",
+      "wrongNumber3": "Invalid personal number!",
+      "requiredNumber1": "Personal number 1 is required!",
+      "requiredNumber2": "Personal number 2 is required!",
+      "requiredNumber3": "Personal number 3 is required!",
+      "loginError": "Contact IT!"
     }
   },
   "header": {
@@ -25,8 +30,8 @@
     "volume": "Volume"
   },
   "status": {
-    "article136": "136 (28067)",
-    "article153": "153 (28042)",
+    "article136": "28067",
+    "article153": "28042",
     "article136Name": "M-136-K-1-A",
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Boxes on pallet",
@@ -49,16 +54,18 @@
     }
   },
   "pallet": {
-    "title": "Scan pallet code",
-    "placeholder": "PALLET CODE",
+    "title": "Scan QR pallet",
+    "placeholder": "Pallet QR",
     "generateBatch": "Generate pallet batch",
-    "print": "Print label",
+    "print": "Print collective label",
     "printing": "Printing...",
     "nextPallet": "Next pallet",
     "messages": {
       "success": "Pallet saved!",
-      "invalid": "Invalid pallet code!",
-      "error": "Pallet save error!"
+      "invalid": "Invalid pallet QR!",
+      "error": "Pallet save error!",
+      "printSuccess": "Label printed!",
+      "printError": "Label printing error!"
     }
   },
   "lastScans": {
@@ -69,5 +76,12 @@
     "somethingWrong": "Something went wrong",
     "fetchError": "Failed to fetch data",
     "contactIT": "Contact IT"
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Are you sure you want to logout?",
+    "cancel": "Cancel",
+    "confirm": "Logout",
+    "logoutOperators": "Logout"
   }
 }

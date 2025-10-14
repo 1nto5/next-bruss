@@ -103,7 +103,7 @@ export default function App({ dict, lang }: AppProps) {
 
   // Main app interface
   return (
-    <div className='space-y-4'>
+    <div className='space-y-2'>
       <StatusBar
         dict={dict.status}
         article136Status={article136Status}

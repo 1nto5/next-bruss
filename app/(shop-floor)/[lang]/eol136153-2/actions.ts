@@ -200,10 +200,11 @@ export async function generatePalletBatch(article: string): Promise<string> {
     const batchId = uuidv4().slice(0, 10).toUpperCase();
 
     const palletQr = [
-      `P:${article}`,
+      `A:${article}`,
       `O:${articleConfig.palletProc}`,
-      `Q:${totalQuantity.toString().padStart(4, '0')}`,
+      `Q:${totalQuantity}`,
       `B:${batchId}`,
+      `C:G`,
     ].join('|');
 
     return palletQr;
@@ -274,6 +275,50 @@ export async function savePalletBatch(
   } catch (error) {
     console.error(error);
     return { status: 'error' };
+  }
+}
+
+export async function getPalletQr(article: string): Promise<string | null> {
+  try {
+    const articleConfig = articleConfigs[article as '28067' | '28042'];
+    if (!articleConfig) {
+      return null;
+    }
+
+    const collection = await dbc('scans_no_dmc');
+
+    // Count boxes on pallet
+    const boxesOnPallet = await collection.countDocuments({
+      status: 'pallet',
+      workplace: 'eol136153',
+      article,
+    });
+
+    const totalQuantity = boxesOnPallet * articleConfig.boxSize;
+
+    // Generate unique batch number by checking against existing batches
+    let batch = '';
+    let isUnique = false;
+
+    while (!isUnique) {
+      batch = `EE${uuidv4().slice(0, 8).toUpperCase()}`;
+
+      // Check if batch exists in scans_no_dmc collection
+      const existingBatch = await collection.findOne({
+        pallet_batch: batch,
+      });
+
+      // If batch doesn't exist, it's unique
+      if (!existingBatch) {
+        isUnique = true;
+      }
+    }
+
+    // Generate QR code string in the format expected by the system
+    return `A:${article}|O:${articleConfig.palletProc}|Q:${totalQuantity}|B:${batch}|C:G`;
+  } catch (error) {
+    console.error('Error generating pallet QR:', error);
+    return null;
   }
 }
 

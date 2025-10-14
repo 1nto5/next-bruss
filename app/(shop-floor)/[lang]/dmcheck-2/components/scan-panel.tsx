@@ -1,17 +1,23 @@
 'use client';
 
+import { PrintPalletLabel } from '@/app/(shop-floor)/[lang]/components/print-pallet-label';
 import { useVolumeStore } from '@/app/(shop-floor)/[lang]/components/volume-control';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import { saveDmc, saveDmcRework, saveHydra, savePallet } from '../actions';
+import {
+  getPalletQr,
+  saveDmc,
+  saveDmcRework,
+  saveHydra,
+  savePallet,
+} from '../actions';
 import { useGetBoxStatus } from '../data/get-box-status';
 import { useGetPalletStatus } from '../data/get-pallet-status';
 import type { Dictionary } from '../lib/dict';
 import { useOperatorStore, useScanStore } from '../lib/stores';
-import { PrintPalletLabel } from './print-pallet-label';
 import DmcPartVerifyDialog from './dmc-part-verify-dialog';
 
 interface ScanPanelProps {
@@ -24,7 +30,9 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
   const { volume } = useVolumeStore();
 
   // Local state for DMC part verification
-  const [pendingDmcVerification, setPendingDmcVerification] = useState<string | null>(null);
+  const [pendingDmcVerification, setPendingDmcVerification] = useState<
+    string | null
+  >(null);
 
   // Get operators array
   const operators = useMemo(
@@ -56,91 +64,94 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [boxStatus.boxIsFull, palletStatus.palletIsFull]);
 
-  const handleDmcScan = useCallback(async (dmcToProcess?: string) => {
-    const dmcValue = dmcToProcess || inputValue;
-    if (!dmcValue.trim() || !selectedArticle) return;
+  const handleDmcScan = useCallback(
+    async (dmcToProcess?: string) => {
+      const dmcValue = dmcToProcess || inputValue;
+      if (!dmcValue.trim() || !selectedArticle) return;
 
-    // Check if we need DMC part verification on first scan in box
+      // Check if we need DMC part verification on first scan in box
 
-    if (
-      !dmcToProcess &&
-      selectedArticle.requireDmcPartVerification &&
-      boxStatus.piecesInBox === 0
-    ) {
-      setPendingDmcVerification(dmcValue);
-      setInputValue('');
-      return;
-    }
+      if (
+        !dmcToProcess &&
+        selectedArticle.requireDmcPartVerification &&
+        boxStatus.piecesInBox === 0
+      ) {
+        setPendingDmcVerification(dmcValue);
+        setInputValue('');
+        return;
+      }
 
-    if (!dmcToProcess) {
-      setInputValue('');
-    }
+      if (!dmcToProcess) {
+        setInputValue('');
+      }
 
-    toast.dismiss();
-    toast.promise(
-      async () => {
-        const result = await saveDmc(dmcValue, selectedArticle.id, operators);
+      toast.dismiss();
+      toast.promise(
+        async () => {
+          const result = await saveDmc(dmcValue, selectedArticle.id, operators);
 
-        if (result.message === 'dmc saved') {
-          playOk();
-          if (result.dmc) {
-            addScan(result.dmc);
+          if (result.message === 'dmc saved') {
+            playOk();
+            if (result.dmc) {
+              addScan(result.dmc);
+            }
+            // Refetch box status to update piece count
+            await refetchBoxStatus();
+            setTimeout(() => inputRef.current?.focus(), 50);
+            return dict.scan.messages.dmcSaved;
+          } else if (result.message === 'dmc saved smart unknown') {
+            playOk();
+            if (result.dmc) {
+              addScan(result.dmc);
+            }
+            // Refetch box status to update piece count
+            await refetchBoxStatus();
+            setTimeout(() => inputRef.current?.focus(), 50);
+            return dict.scan.messages.smartUnknown;
+          } else {
+            playNok();
+            // Map error messages
+            const errorMessages: Record<string, string> = {
+              'dmc exists': dict.scan.messages.dmcExists,
+              'dmc not valid': dict.scan.messages.dmcNotValid,
+              'article not found': dict.scan.messages.articleNotFound,
+              'ford date not valid': dict.scan.messages.fordDateNotValid,
+              'bmw date not valid': dict.scan.messages.bmwDateNotValid,
+              '40040 nok': dict.scan.messages['40040Nok'],
+              'bri pg saving error': dict.scan.messages.briPgError,
+              'smart not found': dict.scan.messages.smartNotFound,
+              'smart nok': dict.scan.messages.smartNok,
+              'smart pattern': dict.scan.messages.smartPattern,
+              'smart fetch error': dict.scan.messages.smartFetchError,
+            };
+            // Clear the input value on error
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 50);
+            throw new Error(
+              errorMessages[result.message] || dict.scan.messages.saveError,
+            );
           }
-          // Refetch box status to update piece count
-          await refetchBoxStatus();
-          setTimeout(() => inputRef.current?.focus(), 50);
-          return dict.scan.messages.dmcSaved;
-        } else if (result.message === 'dmc saved smart unknown') {
-          playOk();
-          if (result.dmc) {
-            addScan(result.dmc);
-          }
-          // Refetch box status to update piece count
-          await refetchBoxStatus();
-          setTimeout(() => inputRef.current?.focus(), 50);
-          return dict.scan.messages.smartUnknown;
-        } else {
-          playNok();
-          // Map error messages
-          const errorMessages: Record<string, string> = {
-            'dmc exists': dict.scan.messages.dmcExists,
-            'dmc not valid': dict.scan.messages.dmcNotValid,
-            'article not found': dict.scan.messages.articleNotFound,
-            'ford date not valid': dict.scan.messages.fordDateNotValid,
-            'bmw date not valid': dict.scan.messages.bmwDateNotValid,
-            '40040 nok': dict.scan.messages['40040Nok'],
-            'bri pg saving error': dict.scan.messages.briPgError,
-            'smart not found': dict.scan.messages.smartNotFound,
-            'smart nok': dict.scan.messages.smartNok,
-            'smart pattern': dict.scan.messages.smartPattern,
-            'smart fetch error': dict.scan.messages.smartFetchError,
-          };
-          // Clear the input value on error
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, 50);
-          throw new Error(
-            errorMessages[result.message] || dict.scan.messages.saveError,
-          );
-        }
-      },
-      {
-        loading: dict.scan.savingPlaceholder || 'Saving...',
-        success: (msg) => msg,
-        error: (err) => err.message,
-      },
-    );
-  }, [
-    inputValue,
-    selectedArticle,
-    operators,
-    playOk,
-    playNok,
-    addScan,
-    dict.scan,
-    refetchBoxStatus,
-    boxStatus.piecesInBox,
-  ]);
+        },
+        {
+          loading: dict.scan.savingPlaceholder || 'Saving...',
+          success: (msg) => msg,
+          error: (err) => err.message,
+        },
+      );
+    },
+    [
+      inputValue,
+      selectedArticle,
+      operators,
+      playOk,
+      playNok,
+      addScan,
+      dict.scan,
+      refetchBoxStatus,
+      boxStatus.piecesInBox,
+    ],
+  );
 
   const handleDmcReworkScan = useCallback(async () => {
     if (!inputValue.trim() || !selectedArticle) return;
@@ -151,7 +162,11 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
     toast.dismiss();
     toast.promise(
       async () => {
-        const result = await saveDmcRework(dmcValue, selectedArticle.id, operators);
+        const result = await saveDmcRework(
+          dmcValue,
+          selectedArticle.id,
+          operators,
+        );
 
         if (result.message === 'rework dmc saved') {
           playOk();
@@ -405,8 +420,19 @@ export default function ScanPanel({ dict }: ScanPanelProps) {
         </CardHeader>
       </Card>
       {/* Show print button when pallet is full */}
-      {palletStatus.palletIsFull && isPalletWorkplace && (
-        <PrintPalletLabel dict={dict.scan} />
+      {palletStatus.palletIsFull && isPalletWorkplace && selectedArticle && (
+        <PrintPalletLabel
+          article={selectedArticle.articleNumber}
+          articleName={selectedArticle.articleName}
+          totalQuantity={
+            selectedArticle.piecesPerBox * (selectedArticle.boxesPerPallet ?? 0)
+          }
+          buttonText={dict.scan.printPalletButton}
+          loadingText={dict.scan.generatingLabel}
+          successText={dict.scan.labelGenerated}
+          errorText={dict.scan.labelGenerationError}
+          getPalletQrFn={() => getPalletQr(selectedArticle.id)}
+        />
       )}
 
       {/* DMC Part Verification Dialog - only render if feature is enabled */}

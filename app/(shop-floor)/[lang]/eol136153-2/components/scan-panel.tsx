@@ -1,19 +1,13 @@
 'use client';
 
+import { PrintPalletLabel } from '@/app/(shop-floor)/[lang]/components/print-pallet-label';
 import { useVolumeStore } from '@/app/(shop-floor)/[lang]/components/volume-control';
-import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Printer, QrCode } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
-import {
-  generatePalletBatch,
-  printPalletLabel,
-  saveHydraBatch,
-  savePalletBatch,
-} from '../actions';
+import { getPalletQr, saveHydraBatch, savePalletBatch } from '../actions';
 import type { Dictionary } from '../lib/dict';
 import { useEOLStore } from '../lib/stores';
 import type { ArticleStatus } from '../lib/types';
@@ -39,8 +33,6 @@ export default function ScanPanel({
   const { volume } = useVolumeStore();
 
   const [inputValue, setInputValue] = useState('');
-  const [generatedQr, setGeneratedQr] = useState('');
-  const [isPrinting, setIsPrinting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [playOk] = useSound('/ok.wav', { volume });
@@ -140,50 +132,6 @@ export default function ScanPanel({
     [inputValue, operator, playOk, playNok, dict.pallet, onScanSuccess],
   );
 
-  const handleGenerateBatch = useCallback(
-    async (article: string) => {
-      try {
-        const qr = await generatePalletBatch(article);
-        setGeneratedQr(qr);
-        setInputValue(qr);
-        toast.success(dict.pallet.generateBatch);
-        setTimeout(() => inputRef.current?.focus(), 50);
-      } catch (error) {
-        console.error('Generate error:', error);
-        toast.error('Failed to generate batch');
-        playNok();
-      }
-    },
-    [dict.pallet.generateBatch, playNok],
-  );
-
-  const handlePrint = useCallback(
-    async (article: string, articleName: string) => {
-      setIsPrinting(true);
-      try {
-        const result = await printPalletLabel(
-          'eol136153',
-          article,
-          articleName,
-        );
-        if (result.success) {
-          toast.success('Label printed successfully');
-          playOk();
-        } else {
-          toast.error('Failed to print label');
-          playNok();
-        }
-      } catch (error) {
-        console.error('Print error:', error);
-        toast.error('Print error');
-        playNok();
-      } finally {
-        setIsPrinting(false);
-      }
-    },
-    [playOk, playNok],
-  );
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
@@ -201,72 +149,56 @@ export default function ScanPanel({
     [currentMode, handleHydraScan, handlePalletScan],
   );
 
-  // Determine placeholder based on mode
+  // Determine placeholder and article info based on mode
   let placeholder = dict.scanning.placeholder;
-  let showGenerate = false;
   let showPrint = false;
   let currentArticle = '';
   let currentArticleName = '';
+  let totalQuantity = 0;
 
   if (currentMode === 'pallet136' && article136Status) {
     placeholder = dict.pallet.placeholder;
-    showGenerate = true;
     showPrint = true;
     currentArticle = '28067';
     currentArticleName = 'M-136-K-1-A';
+    totalQuantity = article136Status.boxesOnPallet * 12; // 12 pieces per box
   } else if (currentMode === 'pallet153' && article153Status) {
     placeholder = dict.pallet.placeholder;
-    showGenerate = true;
     showPrint = true;
     currentArticle = '28042';
     currentArticleName = 'M-153-K-C';
+    totalQuantity = article153Status.boxesOnPallet * 10; // 10 pieces per box
   }
 
   return (
     <>
       <Card>
         <CardHeader>
-          <div className='flex gap-2'>
-            <Input
-              ref={inputRef}
-              type='text'
-              name='scan'
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder={placeholder}
-              autoComplete='off'
-              className='text-center text-xl font-semibold'
-              onFocus={(e) => e.target.select()}
-              onKeyDown={handleKeyDown}
-            />
-            {showGenerate && (
-              <Button
-                onClick={() => handleGenerateBatch(currentArticle)}
-                variant='outline'
-                size='default'
-              >
-                <QrCode />
-                {dict.pallet.generateBatch}
-              </Button>
-            )}
-          </div>
+          <Input
+            ref={inputRef}
+            type='text'
+            name='scan'
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={placeholder}
+            autoComplete='off'
+            className='text-center'
+            onFocus={(e) => e.target.select()}
+            onKeyDown={handleKeyDown}
+          />
         </CardHeader>
       </Card>
       {showPrint && (
-        <Card>
-          <CardHeader>
-            <Button
-              onClick={() => handlePrint(currentArticle, currentArticleName)}
-              variant='default'
-              size='lg'
-              disabled={isPrinting}
-              className='w-full'
-            >
-              <Printer />
-              {isPrinting ? dict.pallet.printing : dict.pallet.print}
-            </Button>
-          </CardHeader>
-        </Card>
+        <PrintPalletLabel
+          article={currentArticle}
+          articleName={currentArticleName}
+          totalQuantity={totalQuantity}
+          buttonText={dict.pallet.print}
+          loadingText={dict.pallet.printing}
+          successText={dict.pallet.messages.printSuccess}
+          errorText={dict.pallet.messages.printError}
+          getPalletQrFn={() => getPalletQr(currentArticle)}
+        />
       )}
     </>
   );

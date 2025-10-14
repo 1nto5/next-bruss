@@ -5,9 +5,10 @@ import { ThemeProvider } from '@/lib/providers/theme-provider';
 import { Metadata } from 'next';
 import Header from './components/header';
 import { getDictionary } from './lib/dict';
+import Providers from './lib/query-provider';
 
 export const metadata: Metadata = {
-  title: 'EOL136153 | DMC System',
+  title: 'EOL136153 (BRUSS)',
 };
 
 export default async function EOL136153Layout(props: {
@@ -22,9 +23,11 @@ export default async function EOL136153Layout(props: {
 
   return (
     <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
-      <ProLayout header={<Header lang={locale} dict={dict} />}>
-        {children}
-      </ProLayout>
+      <Providers>
+        <ProLayout header={<Header lang={locale} dict={dict} />}>
+          {children}
+        </ProLayout>
+      </Providers>
     </ThemeProvider>
   );
 }

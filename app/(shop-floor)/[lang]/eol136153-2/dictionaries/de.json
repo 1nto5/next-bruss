@@ -1,21 +1,26 @@
 {
   "login": {
-    "title": "EOL136153 Anmeldung",
-    "operator1Label": "Personalnummer",
-    "placeholder": "tap to enter...",
+    "title": "Anmeldung - EOL136153",
+    "operator1Label": "Personalnummer 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personalnummer 2",
+    "personalNumber3Label": "Personalnummer 3",
+    "placeholder": "zum Eingeben berühren...",
     "loginButton": "Anmelden",
     "clearButton": "Löschen",
-    "keypadTitle": "Personalnummer eingeben",
+    "keypadTitle": "Personalnummer des Operators eingeben",
+    "keypadReset": "Zurücksetzen",
+    "keypadSave": "Speichern",
     "errors": {
-      "wrongNumber1": "Ungültige Personalnummer",
-      "loginError": "Anmeldefehler",
-      "wrongNumber2": "",
-      "wrongNumber3": ""
-    },
-    "operator2Label": "",
-    "operator3Label": "",
-    "personalNumber2Label": "",
-    "personalNumber3Label": ""
+      "wrongNumber1": "Ungültige Personalnummer!",
+      "wrongNumber2": "Ungültige Personalnummer!",
+      "wrongNumber3": "Ungültige Personalnummer!",
+      "requiredNumber1": "Personalnummer 1 ist erforderlich!",
+      "requiredNumber2": "Personalnummer 2 ist erforderlich!",
+      "requiredNumber3": "Personalnummer 3 ist erforderlich!",
+      "loginError": "Kontaktieren Sie die IT!"
+    }
   },
   "header": {
     "title": "EOL136153",
@@ -25,8 +30,8 @@
     "volume": "Lautstärke"
   },
   "status": {
-    "article136": "136 (28067)",
-    "article153": "153 (28042)",
+    "article136": "28067",
+    "article153": "28042",
     "article136Name": "M-136-K-1-A",
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Kartons auf Palette",
@@ -49,16 +54,18 @@
     }
   },
   "pallet": {
-    "title": "Palettencode scannen",
-    "placeholder": "PALETTENCODE",
+    "title": "QR-Palette scannen",
+    "placeholder": "Palette QR",
     "generateBatch": "Palettenbatch generieren",
-    "print": "Etikett drucken",
+    "print": "Sammeletikett drucken",
     "printing": "Drucken...",
     "nextPallet": "Nächste Palette",
     "messages": {
       "success": "Palette gespeichert!",
       "invalid": "Ungültiger Palettencode!",
-      "error": "Palettenspeicherfehler!"
+      "error": "Palettenspeicherfehler!",
+      "printSuccess": "Etikett gedruckt!",
+      "printError": "Druckfehler!"
     }
   },
   "lastScans": {
@@ -69,5 +76,12 @@
     "somethingWrong": "Etwas ist schiefgelaufen",
     "fetchError": "Daten konnten nicht abgerufen werden",
     "contactIT": "IT kontaktieren"
+  },
+  "logout": {
+    "title": "Abmelden",
+    "description": "Möchten Sie sich wirklich abmelden?",
+    "cancel": "Abbrechen",
+    "confirm": "Abmelden",
+    "logoutOperators": "Abmelden"
   }
 }

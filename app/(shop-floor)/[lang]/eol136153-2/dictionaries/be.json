@@ -1,21 +1,26 @@
 {
   "login": {
-    "title": "Уваход EOL136153",
-    "operator1Label": "Асабісты нумар",
-    "placeholder": "tap to enter...",
+    "title": "Уваход - EOL136153",
+    "operator1Label": "Персанальны нумар 1",
+    "operator2Label": "Аператар 2",
+    "operator3Label": "Аператар 3",
+    "personalNumber2Label": "Персанальны нумар 2",
+    "personalNumber3Label": "Персанальны нумар 3",
+    "placeholder": "дакраніцеся для ўводу...",
     "loginButton": "Увайсці",
     "clearButton": "Ачысціць",
-    "keypadTitle": "Увядзіце асабісты нумар",
+    "keypadTitle": "Увядзіце персанальны нумар аператара",
+    "keypadReset": "Скінуць",
+    "keypadSave": "Захаваць",
     "errors": {
-      "wrongNumber1": "Няправільны асабісты нумар",
-      "loginError": "Памылка ўваходу",
-      "wrongNumber2": "",
-      "wrongNumber3": ""
-    },
-    "operator2Label": "",
-    "operator3Label": "",
-    "personalNumber2Label": "",
-    "personalNumber3Label": ""
+      "wrongNumber1": "Няправільны персанальны нумар!",
+      "wrongNumber2": "Няправільны персанальны нумар!",
+      "wrongNumber3": "Няправільны персанальны нумар!",
+      "requiredNumber1": "Персанальны нумар 1 абавязковы!",
+      "requiredNumber2": "Персанальны нумар 2 абавязковы!",
+      "requiredNumber3": "Персанальны нумар 3 абавязковы!",
+      "loginError": "Звярніцеся да IT!"
+    }
   },
   "header": {
     "title": "EOL136153",
@@ -25,8 +30,8 @@
     "volume": "Гучнасць"
   },
   "status": {
-    "article136": "136 (28067)",
-    "article153": "153 (28042)",
+    "article136": "28067",
+    "article153": "28042",
     "article136Name": "M-136-K-1-A",
     "article153Name": "M-153-K-C",
     "boxesOnPallet": "Скрынак на палеце",
@@ -49,16 +54,18 @@
     }
   },
   "pallet": {
-    "title": "Сканаваць код палеты",
-    "placeholder": "КОД ПАЛЕТЫ",
+    "title": "Сканаваць QR палета",
+    "placeholder": "Палета QR",
     "generateBatch": "Згенераваць партыю палеты",
-    "print": "Друкаваць этыкетку",
+    "print": "Друкаваць зборную этыкетку",
     "printing": "Друкаванне...",
     "nextPallet": "Наступная палета",
     "messages": {
       "success": "Палета захавана!",
       "invalid": "Няправільны код палеты!",
-      "error": "Памылка захавання палеты!"
+      "error": "Памылка захавання палеты!",
+      "printSuccess": "Этыкетка надрукавана!",
+      "printError": "Памылка друкавання!"
     }
   },
   "lastScans": {
@@ -69,5 +76,12 @@
     "somethingWrong": "Нешта пайшло не так",
     "fetchError": "Не ўдалося атрымаць даныя",
     "contactIT": "Звярніцеся да ІТ"
+  },
+  "logout": {
+    "title": "Выйсці",
+    "description": "Вы ўпэўнены, што хочаце выйсці?",
+    "cancel": "Скасаваць",
+    "confirm": "Выйсці",
+    "logoutOperators": "Выйсці"
   }
 }
