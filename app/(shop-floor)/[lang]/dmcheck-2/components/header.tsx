@@ -47,13 +47,13 @@ export default function Header({ lang, dict }: HeaderProps) {
   const leftContent = (
     <>
       {workplace && (
-        <Badge variant='default' className='flex items-center gap-2'>
+        <Badge variant='default' className='pointer-events-none flex items-center gap-2 whitespace-nowrap'>
           <Factory className='h-4 w-4' />
           {workplace.toUpperCase()}
         </Badge>
       )}
       {selectedArticle && (
-        <Badge variant='secondary' className='flex items-center gap-2'>
+        <Badge variant='secondary' className='pointer-events-none flex items-center gap-2 whitespace-nowrap'>
           <Component className='h-4 w-4' />
           {selectedArticle.articleNumber} - {selectedArticle.articleName}
         </Badge>
@@ -67,8 +67,8 @@ export default function Header({ lang, dict }: HeaderProps) {
           }
           className={
             boxStatus.piecesInBox === selectedArticle?.piecesPerBox
-              ? 'animate-pulse bg-green-600 hover:bg-green-700'
-              : ''
+              ? 'pointer-events-none animate-pulse bg-green-600 whitespace-nowrap'
+              : 'pointer-events-none whitespace-nowrap'
           }
         >
           {dict.statusBar.box}: {boxStatus.piecesInBox}/
@@ -84,8 +84,8 @@ export default function Header({ lang, dict }: HeaderProps) {
           }
           className={
             palletStatus.boxesOnPallet === selectedArticle?.boxesPerPallet
-              ? 'animate-pulse bg-green-600 hover:bg-green-700'
-              : ''
+              ? 'pointer-events-none animate-pulse bg-green-600 whitespace-nowrap'
+              : 'pointer-events-none whitespace-nowrap'
           }
         >
           {dict.statusBar.pallet}: {palletStatus.boxesOnPallet}/
@@ -98,7 +98,7 @@ export default function Header({ lang, dict }: HeaderProps) {
             <Badge
               key={operator.identifier}
               variant='secondary'
-              className='flex items-center gap-2'
+              className='pointer-events-none flex items-center gap-2 whitespace-nowrap'
             >
               <User className='h-4 w-4' />
               {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.

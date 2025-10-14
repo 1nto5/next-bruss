@@ -4,9 +4,11 @@ import ErrorAlert from '@/app/(shop-floor)/[lang]/components/error-alert';
 import Loading from '@/app/(shop-floor)/[lang]/components/loading';
 import LoginWithKeypad from '@/app/(shop-floor)/[lang]/components/login-with-keypad';
 import type { Locale } from '@/lib/config/i18n';
-import { useEffect, useState } from 'react';
-import { getArticleStatuses, login } from '../actions';
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { login } from '../actions';
 import type { Dictionary } from '../lib/dict';
+import { useGetArticleStatus } from '../data/get-article-status';
 import { useEOLStore, useOperatorStore } from '../lib/stores';
 import LastScans from './last-scans';
 import ScanPanel from './scan-panel';
@@ -18,7 +20,8 @@ interface AppProps {
 }
 
 export default function App({ dict, lang }: AppProps) {
-  const { operator, setOperator, logout } = useOperatorStore();
+  const { operator, setOperator } = useOperatorStore();
+  const queryClient = useQueryClient();
   const {
     article136Status,
     article153Status,
@@ -26,50 +29,49 @@ export default function App({ dict, lang }: AppProps) {
     setArticle153Status,
     currentMode,
     setCurrentMode,
-    reset,
   } = useEOLStore();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Get article statuses from React Query
+  const {
+    data: article136Data,
+    isLoading: isLoading136,
+    error: error136,
+  } = useGetArticleStatus('28067');
 
-  // Load article statuses
-  const loadStatuses = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const statuses = await getArticleStatuses();
-      const status136 = statuses.find((s) => s.article === '28067');
-      const status153 = statuses.find((s) => s.article === '28042');
+  const {
+    data: article153Data,
+    isLoading: isLoading153,
+    error: error153,
+  } = useGetArticleStatus('28042');
 
-      if (status136) setArticle136Status(status136);
-      if (status153) setArticle153Status(status153);
-
-      // Determine current mode based on status
-      if (status136?.isFull) {
-        setCurrentMode('pallet136');
-      } else if (status153?.isFull) {
-        setCurrentMode('pallet153');
-      } else {
-        setCurrentMode('scanning');
-      }
-    } catch (err) {
-      console.error('Failed to load statuses:', err);
-      setError(dict.errors.fetchError);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Load statuses on mount and when operator changes
+  // Update store when React Query data changes
   useEffect(() => {
-    if (operator) {
-      loadStatuses();
+    if (article136Data) {
+      setArticle136Status(article136Data);
     }
-  }, [operator]);
+  }, [article136Data, setArticle136Status]);
 
-  // Refresh statuses
-  const refreshStatuses = async () => {
-    await loadStatuses();
+  useEffect(() => {
+    if (article153Data) {
+      setArticle153Status(article153Data);
+    }
+  }, [article153Data, setArticle153Status]);
+
+  // Determine current mode based on status
+  useEffect(() => {
+    if (article136Data?.isFull) {
+      setCurrentMode('pallet136');
+    } else if (article153Data?.isFull) {
+      setCurrentMode('pallet153');
+    } else {
+      setCurrentMode('scanning');
+    }
+  }, [article136Data, article153Data, setCurrentMode]);
+
+  // Refresh statuses by invalidating queries
+  const refreshStatuses = () => {
+    queryClient.invalidateQueries({ queryKey: ['article-status', '28067'] });
+    queryClient.invalidateQueries({ queryKey: ['article-status', '28042'] });
   };
 
   // Check if operator is logged in
@@ -86,30 +88,29 @@ export default function App({ dict, lang }: AppProps) {
   }
 
   // Loading state
-  if (isLoading && !article136Status && !article153Status) {
+  const isLoading = isLoading136 || isLoading153;
+  const hasData = article136Status || article153Status;
+
+  if (isLoading && !hasData) {
     return <Loading />;
   }
 
   // Error state
+  const error = error136 || error153;
   if (error) {
     return (
       <ErrorAlert
         title={dict.errors.somethingWrong}
-        description={error}
-        refetch={loadStatuses}
+        description={dict.errors.fetchError}
+        refetch={refreshStatuses}
       />
     );
   }
 
   // Main app interface
   return (
-    <div className='space-y-4'>
-      <StatusBar
-        dict={dict.status}
-        article136Status={article136Status}
-        article153Status={article153Status}
-        onRefresh={refreshStatuses}
-      />
+    <div className='space-y-2'>
+      <StatusBar dict={dict.status} lang={lang} />
       <ScanPanel
         dict={dict}
         operator={operator.identifier}

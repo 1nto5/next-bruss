@@ -54,10 +54,10 @@ export function HeaderButton({ icon, onClick, title, text, variant = 'ghost' }: 
         variant={variant}
         onClick={onClick}
         title={title}
-        className="h-10 px-3 flex items-center gap-2"
+        className="h-10 w-10 lg:w-auto lg:px-3 flex items-center justify-center lg:gap-2"
       >
         {icon}
-        <span className="text-sm">{text}</span>
+        <span className="text-sm hidden lg:inline">{text}</span>
       </Button>
     );
   }

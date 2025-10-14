@@ -7,7 +7,6 @@ import {
 import LanguageSwitcher from '@/app/(shop-floor)/[lang]/components/language-switcher';
 import { ThemeToggle } from '@/app/(shop-floor)/[lang]/components/theme-toggle';
 import VolumeControl from '@/app/(shop-floor)/[lang]/components/volume-control';
-import { Badge } from '@/components/ui/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,8 +17,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import type { Locale } from '@/lib/config/i18n';
-import { Factory, Package, User, UserPen } from 'lucide-react';
+import { Factory, LogOut, User, UserPen, X } from 'lucide-react';
 import { useState } from 'react';
 import type { Dictionary } from '../lib/dict';
 import { useEOLStore, useOperatorStore } from '../lib/stores';
@@ -31,35 +31,17 @@ interface HeaderProps {
 
 export default function Header({ lang, dict }: HeaderProps) {
   const { operator, logout } = useOperatorStore();
-  const { article136Status, article153Status, reset } = useEOLStore();
+  const { reset } = useEOLStore();
   const [alertOpen, setAlertOpen] = useState(false);
 
   const leftContent = (
     <>
-      <Badge variant='default' className='flex items-center gap-2'>
+      <Badge variant='default' className='pointer-events-none flex items-center gap-2 whitespace-nowrap'>
         <Factory className='h-4 w-4' />
         EOL136153
       </Badge>
-      {article136Status && (
-        <Badge
-          variant={article136Status.isFull ? 'destructive' : 'secondary'}
-          className={article136Status.isFull ? 'animate-pulse' : ''}
-        >
-          <Package className='mr-1 h-4 w-4' />
-          136: {article136Status.boxesOnPallet}/{article136Status.palletSize}
-        </Badge>
-      )}
-      {article153Status && (
-        <Badge
-          variant={article153Status.isFull ? 'destructive' : 'secondary'}
-          className={article153Status.isFull ? 'animate-pulse' : ''}
-        >
-          <Package className='mr-1 h-4 w-4' />
-          153: {article153Status.boxesOnPallet}/{article153Status.palletSize}
-        </Badge>
-      )}
       {operator && (
-        <Badge variant='secondary' className='flex items-center gap-2'>
+        <Badge variant='secondary' className='pointer-events-none flex items-center gap-2 whitespace-nowrap'>
           <User className='h-4 w-4' />
           {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
         </Badge>
@@ -73,7 +55,8 @@ export default function Header({ lang, dict }: HeaderProps) {
         <HeaderButton
           icon={<UserPen />}
           onClick={() => setAlertOpen(true)}
-          title={dict.header.logout || 'Logout'}
+          title={dict.logout?.logoutOperators || 'Logout'}
+          text={dict.logout?.logoutOperators || 'Logout'}
         />
       )}
       <VolumeControl />
@@ -90,22 +73,27 @@ export default function Header({ lang, dict }: HeaderProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {dict.header.logout || 'Logout'}
+              {dict.logout?.title || 'Logout'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {dict.errors.contactIT || 'Are you sure you want to logout?'}
+              {dict.logout?.description || 'Are you sure you want to logout?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className='flex w-full flex-row gap-2'>
+            <AlertDialogCancel className='flex w-1/4 items-center justify-center gap-2'>
+              <X className='h-4 w-4' />
+              {dict.logout?.cancel || 'Cancel'}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 logout();
                 reset();
                 setAlertOpen(false);
               }}
+              className='flex w-3/4 items-center justify-center gap-2'
             >
-              Wyloguj
+              <LogOut className='h-4 w-4' />
+              {dict.logout?.confirm || 'Logout'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
