@@ -1,4 +1,5 @@
 import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { formatDateTime } from '@/lib/utils/date-format';
 import ExcelJS from 'exceljs';
 
 export interface ExportData {
@@ -42,14 +43,10 @@ export const generateExcelBuffer = async (
     positions.forEach((position) => {
       const warehouseForPosition = position.wip ? '999' : card.warehouse;
       const beleg = `${card.number.toString().padStart(3, '0')}${position.position.toString().padStart(2, '0')}`;
-      const entered = new Date(position.time)
-        .toLocaleString(process.env.DATE_TIME_LOCALE!)
-        .replace(',', '');
+      const entered = formatDateTime(position.time).replace(',', '');
       const countedBy = `${card.sector} (${card.creators})`;
       const deliveryDate = position.deliveryDate
-        ? new Date(position.deliveryDate)
-            .toLocaleString(process.env.DATE_TIME_LOCALE!)
-            .replace(',', '')
+        ? formatDateTime(position.deliveryDate).replace(',', '')
         : '';
 
       worksheet.addRow([

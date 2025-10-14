@@ -4,6 +4,7 @@ import { Forklift, Package } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { formatTime } from '@/lib/utils/date-format';
 import { deleteDmcFromBox, deleteHydraFromPallet } from '../actions';
 import { useGetBoxScans } from '../data/get-box-scans';
 import { useGetBoxStatus } from '../data/get-box-status';
@@ -80,10 +81,6 @@ export default function StatusBar({ dict }: StatusBarProps) {
   if (!selectedArticle) return null;
 
   const { piecesPerBox, boxesPerPallet } = selectedArticle;
-
-  const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString(process.env.DATE_TIME_LOCALE!);
-  };
 
   // Handle delete actions
   const handleDeleteDmc = async (dmc: string) => {

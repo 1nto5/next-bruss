@@ -27,6 +27,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import {
   CheckCheck, // Import CheckCheck
   Cog,
@@ -402,7 +403,7 @@ export default function DeviationView({
                       <TableCell className='font-medium'>{dict.view.labels.created}:</TableCell>
                       <TableCell>
                         {deviation?.createdAt
-                          ? new Date(deviation.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE!)
+                          ? formatDateTime(deviation.createdAt)
                           : '-'}
                       </TableCell>
                     </TableRow>
@@ -483,7 +484,7 @@ export default function DeviationView({
                       <TableCell>
                         {deviation?.timePeriod?.from &&
                         deviation?.timePeriod?.to
-                          ? `${new Date(deviation?.timePeriod?.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)} - ${new Date(deviation?.timePeriod?.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)}`
+                          ? `${formatDate(deviation?.timePeriod?.from)} - ${formatDate(deviation?.timePeriod?.to)}`
                           : '-'}
                       </TableCell>
                     </TableRow>
@@ -761,7 +762,7 @@ export default function DeviationView({
                                   {extractNameFromEmail(log.to)}
                                 </TableCell>
                                 <TableCell>
-                                  {new Date(log.sentAt).toLocaleString(process.env.DATE_TIME_LOCALE!)}
+                                  {formatDateTime(log.sentAt)}
                                 </TableCell>
                                 <TableCell>{log.type}</TableCell>
                               </TableRow>
@@ -845,9 +846,7 @@ export default function DeviationView({
                               {extractNameFromEmail(attachment.uploadedBy)}
                             </TableCell>
                             <TableCell>
-                              {new Date(attachment.uploadedAt).toLocaleString(
-                                process.env.DATE_TIME_LOCALE!,
-                              )}
+                              {formatDateTime(attachment.uploadedAt)}
                             </TableCell>
                           </TableRow>
                         ))
@@ -903,7 +902,7 @@ export default function DeviationView({
                               {extractNameFromEmail(note.createdBy)}
                             </TableCell>
                             <TableCell>
-                              {new Date(note.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE!)}
+                              {formatDateTime(note.createdAt)}
                             </TableCell>
                             <TableCell className='whitespace-pre-line'>
                               {note.content}

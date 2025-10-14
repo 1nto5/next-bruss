@@ -13,6 +13,7 @@ import { auth } from '@/lib/auth';
 import mailer from '@/lib/services/mailer'; // Import the mailer utility
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate } from '@/lib/utils/date-format';
 import { Collection, ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -451,7 +452,7 @@ async function sendCorrectiveActionAssignmentNotification(
       <div>
         <p>Zostałeś/aś wyznaczony/a jako osoba odpowiedzialna za wykonanie akcji korygującej w odchyleniu [${internalId}].</p>
         <p><strong>Opis akcji:</strong> ${correctiveAction.description}</p>
-        <p><strong>Termin wykonania:</strong> ${new Date(correctiveAction.deadline).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}</p>
+        <p><strong>Termin wykonania:</strong> ${formatDate(correctiveAction.deadline)}</p>
         <p>
           <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
         </p>

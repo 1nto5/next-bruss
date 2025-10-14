@@ -5,6 +5,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { getDictionary } from '../lib/dict';
 import { cardsColumns } from './cards-table/cards-columns';
 import { CardsDataTable } from './cards-table/cards-data-table';
@@ -30,7 +31,7 @@ async function getCards(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const cardsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const cardsFetchTime = formatDateTime(dateFromResponse);
 
   let cards: CardTableDataType[] = await res.json();
 
@@ -65,7 +66,7 @@ async function getPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const positionsFetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const positionsFetchTime = formatDateTime(dateFromResponse);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -79,11 +80,11 @@ async function getPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
+    timeLocaleString: formatDateTime(position.time),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
+      formatDate(position.deliveryDate),
   }));
 
   return {

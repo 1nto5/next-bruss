@@ -1,5 +1,6 @@
 // import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { getDictionary } from '../lib/dict';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -52,21 +53,21 @@ async function getFailures(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const failures: FailureType[] = await res.json();
 
   const formatTime = (failure: FailureType) => {
     return {
       ...failure,
-      fromLocaleString: new Date(failure.from).toLocaleString(process.env.DATE_TIME_LOCALE),
+      fromLocaleString: formatDateTime(failure.from),
       toLocaleString: failure.to
-        ? new Date(failure.to).toLocaleString(process.env.DATE_TIME_LOCALE)
+        ? formatDateTime(failure.to)
         : '',
-      createdAtLocaleString: new Date(failure.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE),
+      createdAtLocaleString: formatDateTime(failure.createdAt),
 
       updatedAtLocaleString: failure.updatedAt
-        ? new Date(failure.updatedAt).toLocaleString(process.env.DATE_TIME_LOCALE)
+        ? formatDateTime(failure.updatedAt)
         : '',
     };
   };

@@ -1,5 +1,6 @@
 'use server';
 
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { overtimeRequestEmployeeType, OvertimeType } from './types';
 
 export async function getOvertimeRequest(
@@ -25,7 +26,7 @@ export async function getOvertimeRequest(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const overtimeRequest = await res.json();
 
@@ -42,7 +43,7 @@ export async function getOvertimeRequest(
         (employee: overtimeRequestEmployeeType) => ({
           ...employee,
           agreedReceivingAtLocaleString: employee.agreedReceivingAt
-            ? new Date(employee.agreedReceivingAt).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+            ? formatDate(employee.agreedReceivingAt)
             : null,
         }),
       );
@@ -55,7 +56,7 @@ export async function getOvertimeRequest(
       (employee: overtimeRequestEmployeeType) => ({
         ...employee,
         agreedReceivingAtLocaleString: employee.agreedReceivingAt
-          ? new Date(employee.agreedReceivingAt).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+          ? formatDate(employee.agreedReceivingAt)
           : null,
       }),
     );

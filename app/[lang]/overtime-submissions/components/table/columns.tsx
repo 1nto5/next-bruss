@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { Check, Edit, MoreHorizontal, X } from 'lucide-react';
 import { Session } from 'next-auth';
@@ -333,8 +334,8 @@ export const createColumns = (
       accessorKey: 'date',
       header: dict.columns.date,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('date') as string);
-        return <span>{date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}</span>;
+        const date = row.getValue('date') as string;
+        return <span>{formatDate(date)}</span>;
       },
     },
     {
@@ -361,11 +362,11 @@ export const createColumns = (
       accessorKey: 'submittedAt',
       header: dict.columns.submittedAt,
       cell: ({ row }) => {
-        const date = new Date(row.getValue('submittedAt') as string);
+        const date = row.getValue('submittedAt') as string;
         return (
           <span>
-            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
-            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
+            {formatDate(date)}{' '}
+            {formatTime(date, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -381,8 +382,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
-            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
+            {formatDate(date)}{' '}
+            {formatTime(date, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -411,8 +412,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
-            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
+            {formatDate(date)}{' '}
+            {formatTime(date, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -441,8 +442,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
-            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
+            {formatDate(date)}{' '}
+            {formatTime(date, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -468,8 +469,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
-            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
+            {formatDate(date)}{' '}
+            {formatTime(date, {
               hour: '2-digit',
               minute: '2-digit',
             })}

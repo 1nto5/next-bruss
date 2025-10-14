@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 
 import { RefreshButton } from '@/components/refresh-button';
 import { Button } from '@/components/ui/button';
@@ -60,16 +61,16 @@ async function getOvenProcesses(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   let data: OvenProcessDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
     startTime: new Date(item.startTime),
     endTime: item.endTime ? new Date(item.endTime) : null,
-    startTimeLocaleString: new Date(item.startTime).toLocaleString(process.env.DATE_TIME_LOCALE),
+    startTimeLocaleString: formatDateTime(item.startTime),
     endTimeLocaleString: item.endTime
-      ? new Date(item.endTime).toLocaleString(process.env.DATE_TIME_LOCALE)
+      ? formatDateTime(item.endTime)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };

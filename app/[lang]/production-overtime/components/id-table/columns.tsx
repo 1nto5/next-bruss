@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useClientLocaleDateString } from '@/lib/utils/client-date';
+import { formatDate } from '@/lib/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -169,7 +169,7 @@ export const getColumns = (
     header: dict.idTable.agreedReceivingAt,
     cell: ({ row }) => {
       const agreedReceivingAt = row.original.agreedReceivingAt;
-      const formattedDate = useClientLocaleDateString(agreedReceivingAt);
+      const formattedDate = formatDate(agreedReceivingAt);
       return <span>{formattedDate}</span>;
     },
   },

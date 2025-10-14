@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { formatTime } from '@/lib/utils/date-format';
 import { useEOLStore } from '../lib/stores';
 
 export default function LastScans() {
@@ -26,7 +27,7 @@ export default function LastScans() {
                   {scan.batch} ({getArticleName(scan.article)})
                 </TableCell>
                 <TableCell className='text-muted-foreground text-right'>
-                  {new Date(scan.time).toLocaleTimeString(process.env.DATE_TIME_LOCALE!)}
+                  {formatTime(scan.time)}
                 </TableCell>
               </TableRow>
             ))}

@@ -28,6 +28,7 @@ import { useOeeData } from '../hooks/use-oee-data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OeeParams } from '../lib/types';
 import type { Dictionary } from '../lib/dict';
+import { formatDate } from '@/lib/utils/date-format';
 
 interface OeeUtilizationChartProps {
   params: OeeParams;
@@ -175,11 +176,11 @@ export default function OeeUtilizationChart({
   const getTitle = () => {
     switch (params.mode) {
       case 'day':
-        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.date).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${formatDate(params.date)}`;
       case 'week':
         return `${dict.oeeMetrics.utilizationTrendTitle} - ${dict.timeFilters.weekLabel} ${params.week}, ${params.year}`;
       case 'month':
-        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.year, params.month - 1).toLocaleDateString(process.env.DATE_TIME_LOCALE!, { month: 'long', year: 'numeric' })}`;
+        return `${dict.oeeMetrics.utilizationTrendTitle} - ${new Date(params.year, params.month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
       case 'range':
         return dict.oeeMetrics.utilizationTrendTitle;
     }

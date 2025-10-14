@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { Dictionary } from '../lib/dict';
 import { PrintLogType } from '../lib/types';
 
@@ -56,7 +57,7 @@ export default function PrintLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {new Date(log.printedAt).toLocaleString(process.env.DATE_TIME_LOCALE!)}
+                      {formatDateTime(log.printedAt)}
                     </TableCell>
                     <TableCell>{extractNameFromEmail(log.printedBy)}</TableCell>
                   </TableRow>

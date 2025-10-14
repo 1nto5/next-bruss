@@ -7,6 +7,7 @@ import { Forklift } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { formatTime } from '@/lib/utils/date-format';
 import { deleteHydraBatch } from '../actions';
 import { useGetArticleStatus } from '../data/get-article-status';
 import { useGetPalletBoxes } from '../data/get-pallet-boxes';
@@ -76,10 +77,6 @@ export default function StatusBar({ dict }: StatusBarProps) {
     },
     [refetchArticle153Boxes],
   );
-
-  const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString(process.env.DATE_TIME_LOCALE!);
-  };
 
   // Handle delete actions
   const handleDeleteBox = async (hydraBatch: string, article: string) => {

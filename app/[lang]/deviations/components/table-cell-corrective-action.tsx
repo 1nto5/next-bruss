@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ClipboardCheck, History } from 'lucide-react';
 import { useState } from 'react';
@@ -306,12 +307,12 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
         {extractNameFromEmail(correctiveAction.responsible)}
       </TableCell>
       <TableCell>
-        {new Date(correctiveAction.deadline).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}
+        {formatDate(correctiveAction.deadline)}
       </TableCell>
 
       <TableCell className='whitespace-nowrap'>
         {correctiveAction.status?.changed?.at
-          ? new Date(correctiveAction.status.changed.at).toLocaleString(process.env.DATE_TIME_LOCALE!)
+          ? formatDateTime(correctiveAction.status.changed.at)
           : '-'}
       </TableCell>
 
@@ -344,18 +345,14 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                       {getStatusBadge(correctiveAction.status.value)}
                     </TableCell>
                     <TableCell>
-                      {new Date(
-                        correctiveAction.status.executedAt,
-                      ).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}
+                      {formatDate(correctiveAction.status.executedAt)}
                     </TableCell>
                     <TableCell>{correctiveAction.status.comment}</TableCell>
                     <TableCell>
                       {extractNameFromEmail(correctiveAction.created.by)}
                     </TableCell>
                     <TableCell className='text-right'>
-                      {new Date(
-                        correctiveAction.status.changed.at,
-                      ).toLocaleString(process.env.DATE_TIME_LOCALE!)}
+                      {formatDateTime(correctiveAction.status.changed.at)}
                     </TableCell>
                   </TableRow>
                   {correctiveAction.history &&
@@ -365,18 +362,14 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
                           {getStatusBadge(historyItem.value)}
                         </TableCell>
                         <TableCell>
-                          {new Date(historyItem.executedAt).toLocaleDateString(
-                            process.env.DATE_TIME_LOCALE!,
-                          )}
+                          {formatDate(historyItem.executedAt)}
                         </TableCell>
                         <TableCell>{historyItem.comment}</TableCell>
                         <TableCell>
                           {extractNameFromEmail(historyItem.changed.by)}
                         </TableCell>
                         <TableCell className='text-right'>
-                          {new Date(historyItem.changed.at).toLocaleString(
-                            process.env.DATE_TIME_LOCALE!,
-                          )}
+                          {formatDateTime(historyItem.changed.at)}
                         </TableCell>
                       </TableRow>
                     ))}
