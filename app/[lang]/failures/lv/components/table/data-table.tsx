@@ -40,7 +40,7 @@ import { FailureOptionType } from '../../lib/failures-types';
 import TableFilteringAndOptions from '../table-filtering-and-options';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: (dict: Dictionary) => ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
   fetchTime: Date;
@@ -64,9 +64,15 @@ export function DataTable<TData, TValue>({
   );
   const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
+  // Use useMemo to call the columns function with dict
+  const tableColumns = React.useMemo(
+    () => columns(dict),
+    [columns, dict],
+  );
+
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -143,7 +149,7 @@ export function DataTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={tableColumns.length}
                     className='h-24 text-center'
                   >
                     {dict.filters.notFound}

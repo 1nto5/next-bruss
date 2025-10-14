@@ -95,11 +95,9 @@ export default async function FailuresPage(props: {
 
   const failuresOptions = await getFailuresOptions();
 
-  const columns = createColumns(dict);
-
   return (
     <DataTable
-      columns={columns}
+      columns={createColumns}
       data={formattedFailures}
       fetchTimeLocaleString={fetchTimeLocaleString}
       fetchTime={fetchTime}
