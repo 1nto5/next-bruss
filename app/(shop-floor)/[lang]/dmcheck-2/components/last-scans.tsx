@@ -2,21 +2,15 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import type { Locale } from '@/lib/config/i18n';
+import { formatTime } from '@/lib/utils/date-format';
 import { useScanStore } from '../lib/stores';
 
-interface LastScansProps {
-  lang: Locale;
-}
-
-export default function LastScans({ lang }: LastScansProps) {
+export default function LastScans() {
   const { lastScans } = useScanStore();
 
   if (lastScans.length === 0) {
     return null;
   }
-
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
 
   return (
     <Card>
@@ -27,7 +21,7 @@ export default function LastScans({ lang }: LastScansProps) {
               <TableRow key={index}>
                 <TableCell className='font-mono'>{scan.dmc}</TableCell>
                 <TableCell className='text-muted-foreground text-right'>
-                  {new Date(scan.time).toLocaleTimeString(locale)}
+                  {formatTime(scan.time)}
                 </TableCell>
               </TableRow>
             ))}

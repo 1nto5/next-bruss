@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { KeyRound, Plus } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
@@ -47,7 +48,7 @@ async function getOvertimeRequests(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString();
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const overtimeRequests: OvertimeType[] = await res.json();
   const overtimeRequestsLocaleString = overtimeRequests.map(

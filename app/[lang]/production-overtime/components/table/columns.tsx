@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useClientLocaleString } from '@/lib/utils/client-date';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -360,7 +360,7 @@ export const createColumns = (
       header: dict.tableColumns.approvalDate,
       cell: ({ row }) => {
         const approvedAt = row.original.approvedAt;
-        const approvedAtString = useClientLocaleString(approvedAt);
+        const approvedAtString = formatDateTime(approvedAt);
         return <div>{approvedAtString}</div>;
       },
     },
@@ -369,7 +369,7 @@ export const createColumns = (
       header: dict.tableColumns.from,
       cell: ({ row }) => {
         const from = row.original.from;
-        const fromString = useClientLocaleString(from);
+        const fromString = formatDateTime(from);
         return <div>{fromString}</div>;
       },
     },
@@ -378,7 +378,7 @@ export const createColumns = (
       header: dict.tableColumns.to,
       cell: ({ row }) => {
         const to = row.original.to;
-        const toString = useClientLocaleString(to);
+        const toString = formatDateTime(to);
         return <div>{toString}</div>;
       },
     },
@@ -466,7 +466,7 @@ export const createColumns = (
       header: dict.tableColumns.requestedAt,
       cell: ({ row }) => {
         const requestedAt = row.original.requestedAt;
-        const requestedAtString = useClientLocaleString(requestedAt);
+        const requestedAtString = formatDateTime(requestedAt);
         return <div>{requestedAtString}</div>;
       },
     },
@@ -488,7 +488,7 @@ export const createColumns = (
       header: dict.tableColumns.editedAt,
       cell: ({ row }) => {
         const editedAt = row.original.editedAt;
-        const editedAtString = useClientLocaleString(editedAt);
+        const editedAtString = formatDateTime(editedAt);
         return <div>{editedAtString}</div>;
       },
     },
@@ -510,7 +510,7 @@ export const createColumns = (
       header: dict.tableColumns.completedAt,
       cell: ({ row }) => {
         const completedAt = row.original.completedAt;
-        const completedAtString = useClientLocaleString(completedAt);
+        const completedAtString = formatDateTime(completedAt);
         return <div>{completedAtString}</div>;
       },
     },
@@ -531,7 +531,7 @@ export const createColumns = (
       header: dict.tableColumns.accountedAt,
       cell: ({ row }) => {
         const accountedAt = row.original.accountedAt;
-        const accountedAtString = useClientLocaleString(accountedAt);
+        const accountedAtString = formatDateTime(accountedAt);
         return <div>{accountedAtString}</div>;
       },
     },
@@ -552,7 +552,7 @@ export const createColumns = (
       header: dict.tableColumns.canceledAt,
       cell: ({ row }) => {
         const canceledAt = row.original.canceledAt;
-        const canceledAtString = useClientLocaleString(canceledAt);
+        const canceledAtString = formatDateTime(canceledAt);
         return <div>{canceledAtString}</div>;
       },
     },

@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { NewsType } from '../lib/types';
 import { useState } from 'react';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate } from '@/lib/utils/date-format';
 
 interface NewsCardProps {
   news: NewsType;
@@ -70,7 +71,7 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
               {news.title}
             </CardTitle>
             <CardDescription className='text-sm'>
-              {new Date(news.createdAt).toLocaleDateString(lang === 'pl' ? 'pl-PL' : lang === 'de' ? 'de-DE' : 'en-US')} • {extractNameFromEmail(news.author)}
+              {formatDate(news.createdAt)} • {extractNameFromEmail(news.author)}
             </CardDescription>
           </div>
           {isAdmin && (

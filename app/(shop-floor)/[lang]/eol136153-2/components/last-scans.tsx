@@ -2,21 +2,15 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import type { Locale } from '@/lib/config/i18n';
+import { formatTime } from '@/lib/utils/date-format';
 import { useEOLStore } from '../lib/stores';
 
-interface LastScansProps {
-  lang: Locale;
-}
-
-export default function LastScans({ lang }: LastScansProps) {
+export default function LastScans() {
   const { lastScans } = useEOLStore();
 
   if (lastScans.length === 0) {
     return null;
   }
-
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
 
   const getArticleName = (article: string) => {
     return article === '28067' ? 'M-136-K-1-A' : 'M-153-K-C';
@@ -33,7 +27,7 @@ export default function LastScans({ lang }: LastScansProps) {
                   {scan.batch} ({getArticleName(scan.article)})
                 </TableCell>
                 <TableCell className='text-muted-foreground text-right'>
-                  {new Date(scan.time).toLocaleTimeString(locale)}
+                  {formatTime(scan.time)}
                 </TableCell>
               </TableRow>
             ))}

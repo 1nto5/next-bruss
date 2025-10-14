@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { revalidateDmcheckTableData } from './actions';
 import DmcTableFilteringAndOptions from './components/dmc-table-filtering-and-options';
 import { DmcDataTable } from './dmc-table/dmc-data-table';
@@ -54,20 +55,20 @@ async function getScans(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   let data: TableDataType[] = await res.json();
   data = data.map((item) => ({
     ...item,
-    timeLocaleString: new Date(item.time).toLocaleString(process.env.DATE_TIME_LOCALE),
+    timeLocaleString: formatDateTime(item.time),
     hydraTimeLocaleString: item.hydra_time
-      ? new Date(item.hydra_time).toLocaleString(process.env.DATE_TIME_LOCALE)
+      ? formatDateTime(item.hydra_time)
       : '',
     palletTimeLocaleString: item.pallet_time
-      ? new Date(item.pallet_time).toLocaleString(process.env.DATE_TIME_LOCALE)
+      ? formatDateTime(item.pallet_time)
       : '',
     reworkTimeLocaleString: item.rework_time
-      ? new Date(item.rework_time).toLocaleString(process.env.DATE_TIME_LOCALE)
+      ? formatDateTime(item.rework_time)
       : '',
   }));
   return { fetchTimeLocaleString, fetchTime, data };

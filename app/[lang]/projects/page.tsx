@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { columns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
@@ -40,14 +41,14 @@ async function getProjects(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const data: ProjectsType[] = await res.json();
   const dataLocaleString = data.map((data) => {
     return {
       ...data,
       dateLocaleString: data.date
-        ? new Date(data.date).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(data.date)
         : '',
     };
   });

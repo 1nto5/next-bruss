@@ -3,6 +3,7 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { Table } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import { ProjectsLocaleStringType } from '../lib/types';
@@ -42,14 +43,14 @@ async function getMonthlyProjectsSummary(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const data: ProjectsType[] = await res.json();
   const dataLocaleString = data.map((data) => {
     return {
       ...data,
       dateLocaleString: data.date
-        ? new Date(data.date).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(data.date)
         : '',
     };
   });

@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, CircleX, History, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
@@ -303,7 +304,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
         {(by && extractNameFromEmail(by)) || '-'}
       </TableCell>
       <TableCell className='whitespace-nowrap'>
-        {at ? new Date(at).toLocaleString(lang) : '-'}
+        {at ? formatDateTime(at) : '-'}
       </TableCell>
       <TableCell className='min-w-[250px]'>{reason ? reason : '-'}</TableCell>
       <TableCell>
@@ -341,7 +342,7 @@ const TableCellsApprove: React.FC<TableCellApproveRoleProps> = ({
                         </TableCell>
                         <TableCell>
                           <span className='whitespace-nowrap'>
-                            {new Date(item.at).toLocaleString(lang)}
+                            {formatDateTime(item.at)}
                           </span>
                         </TableCell>
                         <TableCell>

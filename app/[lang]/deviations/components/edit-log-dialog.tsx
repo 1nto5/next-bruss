@@ -16,15 +16,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { Dictionary } from '../lib/dict';
 
 // Helper to format values for display
-const formatValue = (value: any, dict: Dictionary, lang?: string): string => {
+const formatValue = (value: any, dict: Dictionary): string => {
   if (value === null || value === undefined) return '-';
   if (typeof value === 'boolean') return value ? dict.dialogs.editLog.booleanValues.true : dict.dialogs.editLog.booleanValues.false;
 
   // Handle Date objects
-  if (value instanceof Date) return value.toLocaleDateString(lang || 'pl-PL');
+  if (value instanceof Date) return formatDate(value);
 
   // Handle date strings - try to detect date format
   if (typeof value === 'string') {
@@ -34,7 +35,7 @@ const formatValue = (value: any, dict: Dictionary, lang?: string): string => {
         const date = new Date(value);
         // Validate that it's a valid date
         if (!isNaN(date.getTime())) {
-          return date.toLocaleDateString(lang || 'pl-PL');
+          return formatDate(date);
         }
       } catch {
         // Fall through to default handling
@@ -50,7 +51,7 @@ const formatValue = (value: any, dict: Dictionary, lang?: string): string => {
     typeof value.getMonth === 'function'
   ) {
     try {
-      return value.toLocaleDateString(lang || 'pl-PL');
+      return formatDate(value);
     } catch {
       // Fall through to default handling
     }
@@ -64,13 +65,11 @@ export default function EditLogDialog({
   isOpen,
   onClose,
   logs,
-  lang,
   dict,
 }: {
   isOpen: boolean;
   onClose: () => void;
   logs: EditLogEntryType[];
-  lang: string;
   dict: Dictionary;
 }) {
   // Sort logs by date descending
@@ -107,7 +106,7 @@ export default function EditLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell className='whitespace-nowrap'>
-                      {new Date(log.changedAt).toLocaleString(lang)}
+                      {formatDateTime(log.changedAt)}
                     </TableCell>
                     <TableCell className='whitespace-nowrap'>
                       {extractNameFromEmail(log.changedBy)}
@@ -115,8 +114,8 @@ export default function EditLogDialog({
                     <TableCell>
                       {fieldNameTranslations[log.fieldName] || log.fieldName}
                     </TableCell>
-                    <TableCell>{formatValue(log.oldValue, dict, lang)}</TableCell>
-                    <TableCell>{formatValue(log.newValue, dict, lang)}</TableCell>
+                    <TableCell>{formatValue(log.oldValue, dict)}</TableCell>
+                    <TableCell>{formatValue(log.newValue, dict)}</TableCell>
                   </TableRow>
                 ))
               ) : (

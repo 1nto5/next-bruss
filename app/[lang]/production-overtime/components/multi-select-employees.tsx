@@ -44,6 +44,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils/cn';
+import { formatDate } from '@/lib/utils/date-format';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ChevronsUpDown, CircleX, CopyPlus } from 'lucide-react';
@@ -306,7 +307,7 @@ export const MultiSelectEmployees = ({
                 <TableCell>{employee.identifier}</TableCell>
                 <TableCell>
                   {employee.agreedReceivingAt
-                    ? employee.agreedReceivingAt.toLocaleDateString('pl')
+                    ? formatDate(employee.agreedReceivingAt)
                     : '-'}
                 </TableCell>
                 <TableCell>{employee.note || '-'}</TableCell>

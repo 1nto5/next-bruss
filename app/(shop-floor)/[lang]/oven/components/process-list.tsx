@@ -35,6 +35,7 @@ import {
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import useSound from 'use-sound';
+import { formatDateTime } from '@/lib/utils/date-format';
 import {
   completeAllOvenProcesses,
   completeOvenProcess,
@@ -68,13 +69,11 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       ? tempData.avgTemp
       : null;
 
-  const formatDateTime = (date: Date | string | null | undefined): string => {
+  const formatDateTimeLocal = (date: Date | string | null | undefined): string => {
     if (!date) return '-';
     const dateObj = new Date(date);
     if (isNaN(dateObj.getTime())) return '-';
-    return dateObj.toLocaleString('pl-PL', {
-      timeZone: 'Europe/Warsaw',
-    });
+    return formatDateTime(dateObj);
   };
 
   const [startDialogOpen, setStartDialogOpen] = useState(false);
@@ -119,9 +118,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
       startTime.getTime() + targetDuration * 1000,
     );
 
-    return expectedCompletion.toLocaleString('pl-PL', {
-      timeZone: 'Europe/Warsaw',
-    });
+    return formatDateTime(expectedCompletion);
   };
 
   const translateError = useCallback(
@@ -378,7 +375,7 @@ export default function ProcessList({ dict, lang }: ProcessListProps) {
                   </TableHeader>
                   <TableBody>
                     {data.success.map((process) => {
-                      const startString = formatDateTime(process.startTime);
+                      const startString = formatDateTimeLocal(process.startTime);
 
                       return (
                         <TableRow key={process.id}>

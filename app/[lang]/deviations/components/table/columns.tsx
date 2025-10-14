@@ -4,6 +4,7 @@ import { DeviationType } from '@/app/[lang]/deviations/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { ExternalLink, Pencil } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import type { Dictionary } from '../../lib/dict';
@@ -185,7 +186,7 @@ export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
       const lang = table.options.meta?.lang as string;
       return (
         <span className='whitespace-nowrap'>
-          {createdAt ? new Date(createdAt).toLocaleString(lang || 'pl-PL') : ''}
+          {createdAt ? formatDateTime(createdAt) : ''}
         </span>
       );
     },

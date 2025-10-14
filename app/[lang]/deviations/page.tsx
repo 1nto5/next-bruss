@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { KeyRound, Plus } from 'lucide-react'; // Import Plus icon
 import { Session } from 'next-auth';
 import LocalizedLink from '@/components/localized-link';
@@ -51,7 +52,7 @@ async function getAllDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const deviations: DeviationType[] = await res.json();
   const deviationsFiltered = deviations.filter(
@@ -61,10 +62,10 @@ async function getAllDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(deviation.timePeriod.from)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(deviation.timePeriod.to)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };
@@ -105,7 +106,7 @@ async function getUserDeviations(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
   const deviations: DeviationType[] = await res.json();
 
   const approvalMapping: { [key: string]: keyof DeviationType } = {
@@ -166,10 +167,10 @@ async function getUserDeviations(
   const formatDeviation = (deviation: DeviationType) => {
     const formattedTimePeriod = {
       from: deviation.timePeriod?.from
-        ? new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(deviation.timePeriod.from)
         : '',
       to: deviation.timePeriod?.to
-        ? new Date(deviation.timePeriod.to).toLocaleDateString(process.env.DATE_TIME_LOCALE)
+        ? formatDate(deviation.timePeriod.to)
         : '',
     };
     return { ...deviation, timePeriodLocalDateString: formattedTimePeriod };

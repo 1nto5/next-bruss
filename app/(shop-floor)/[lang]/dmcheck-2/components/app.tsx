@@ -113,9 +113,9 @@ export default function App({ dict, lang }: AppProps) {
   // Main scanning interface
   return (
     <div className='space-y-2'>
-      <StatusBar dict={dict.statusBar} lang={lang} />
+      <StatusBar dict={dict.statusBar} />
       <ScanPanel dict={dict} />
-      <LastScans lang={lang} />
+      <LastScans />
     </div>
   );
 }

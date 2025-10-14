@@ -1,6 +1,7 @@
 import { CardPositionsTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { getDictionary } from '../../lib/dict';
 import { createColumns } from './card-positions-table/columns';
 import { DataTable } from './card-positions-table/data-table';
@@ -31,7 +32,7 @@ async function getCardPositions(
   }
 
   const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = dateFromResponse.toLocaleString(process.env.DATE_TIME_LOCALE);
+  const fetchTime = formatDateTime(dateFromResponse);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -45,11 +46,11 @@ async function getCardPositions(
   const cardCreators = resJson.cardCreators;
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: new Date(position.time).toLocaleString(process.env.DATE_TIME_LOCALE),
+    timeLocaleString: formatDateTime(position.time),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
     deliveryDateLocaleString:
       position.deliveryDate &&
-      new Date(position.deliveryDate).toLocaleDateString(process.env.DATE_TIME_LOCALE),
+      formatDate(position.deliveryDate),
   }));
 
   return {

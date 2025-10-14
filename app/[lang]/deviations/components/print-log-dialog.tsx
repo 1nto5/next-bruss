@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { Dictionary } from '../lib/dict';
 import { PrintLogType } from '../lib/types';
 
@@ -21,7 +22,6 @@ interface PrintLogDialogProps {
   isOpen: boolean;
   onClose: () => void;
   logs: PrintLogType[];
-  lang: string;
   dict: Dictionary;
 }
 
@@ -29,7 +29,6 @@ export default function PrintLogDialog({
   isOpen,
   onClose,
   logs,
-  lang,
   dict,
 }: PrintLogDialogProps) {
   // Sort logs in reverse chronological order
@@ -58,7 +57,7 @@ export default function PrintLogDialog({
                 sortedLogs.map((log, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {new Date(log.printedAt).toLocaleString(lang)}
+                      {formatDateTime(log.printedAt)}
                     </TableCell>
                     <TableCell>{extractNameFromEmail(log.printedBy)}</TableCell>
                   </TableRow>

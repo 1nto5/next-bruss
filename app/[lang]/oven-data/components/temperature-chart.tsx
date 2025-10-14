@@ -22,6 +22,7 @@ import { OvenProcessDataType } from '../lib/types';
 import { useTemperatureData } from '../hooks/use-temperature-data';
 import TemperatureChartSkeleton from './temperature-chart-skeleton';
 import type { Dictionary } from '../lib/dict';
+import { formatTime, formatDateTime } from '@/lib/utils/date-format';
 
 interface OvenTemperatureChartProps {
   selectedProcess: OvenProcessDataType | null;
@@ -120,17 +121,8 @@ export default function OvenTemperatureChart({
 
     return {
       timestamp: isSingleDay
-        ? new Date(log.timestamp).toLocaleTimeString(lang, {
-            hour: '2-digit',
-            minute: '2-digit',
-          })
-        : new Date(log.timestamp).toLocaleString(lang, {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-          }),
+        ? formatTime(log.timestamp, { hour: '2-digit', minute: '2-digit' })
+        : formatDateTime(log.timestamp),
       // Only include sensor data if it's not an outlier
       z0: outlierSensors.includes('z0') ? null : (log.sensorData?.z0 || null),
       z1: outlierSensors.includes('z1') ? null : (log.sensorData?.z1 || null),

@@ -3,11 +3,11 @@
 import StatusCard from '@/app/(shop-floor)/[lang]/components/status-card';
 import DeleteConfirmDialog from '@/app/(shop-floor)/[lang]/components/delete-confirm-dialog';
 import ItemListDialog from '@/app/(shop-floor)/[lang]/components/item-list-dialog';
-import type { Locale } from '@/lib/config/i18n';
 import { Forklift } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { formatTime } from '@/lib/utils/date-format';
 import { deleteHydraBatch } from '../actions';
 import { useGetArticleStatus } from '../data/get-article-status';
 import { useGetPalletBoxes } from '../data/get-pallet-boxes';
@@ -33,10 +33,9 @@ interface StatusBarProps {
     boxNotFound: string;
     deleteError: string;
   };
-  lang: Locale;
 }
 
-export default function StatusBar({ dict, lang }: StatusBarProps) {
+export default function StatusBar({ dict }: StatusBarProps) {
   const { operator } = useOperatorStore();
   const queryClient = useQueryClient();
 
@@ -78,12 +77,6 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
     },
     [refetchArticle153Boxes],
   );
-
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
-
-  const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString(locale);
-  };
 
   // Handle delete actions
   const handleDeleteBox = async (hydraBatch: string, article: string) => {

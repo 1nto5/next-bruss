@@ -3,6 +3,7 @@ import AccessDeniedAlert from '@/components/access-denied-alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { getUsers } from '@/lib/data/get-users';
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
@@ -129,7 +130,7 @@ async function getOvertimeSubmissionsForHR(
     );
 
     const fetchTime = new Date();
-    const fetchTimeLocaleString = fetchTime.toLocaleString();
+    const fetchTimeLocaleString = formatDateTime(fetchTime);
 
     // Calculate overtime summary for HR view
     const selectedMonth = searchParams.month;

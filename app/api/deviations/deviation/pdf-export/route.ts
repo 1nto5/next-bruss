@@ -7,6 +7,7 @@ import {
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate } from '@/lib/utils/date-format';
 import fs from 'fs';
 import { jsPDF } from 'jspdf';
 import { ObjectId } from 'mongodb';
@@ -196,7 +197,7 @@ async function generateDeviationPdf({
     }
   };
 
-  printLine('created', new Date(deviation.createdAt).toLocaleDateString(lang));
+  printLine('created', formatDate(deviation.createdAt));
   printLine('owner', extractNameFromEmail(deviation.owner));
   printLine('article', deviation.articleName || '-');
   printLine('number', deviation.articleNumber || '-');
@@ -213,9 +214,7 @@ async function generateDeviationPdf({
   printLine(
     'period',
     deviation.timePeriod?.from && deviation.timePeriod?.to
-      ? `${new Date(deviation.timePeriod.from).toLocaleDateString(lang)} - ${new Date(
-          deviation.timePeriod.to,
-        ).toLocaleDateString(lang)}`
+      ? `${formatDate(deviation.timePeriod.from)} - ${formatDate(deviation.timePeriod.to)}`
       : '-',
   );
   const reasonOpt = reasonOptions.find((o) => o.value === deviation.reason);
@@ -313,7 +312,7 @@ async function generateDeviationPdf({
     doc.text(approval?.by ? extractNameFromEmail(approval.by) : '-', x, y);
     x += colW[1];
     doc.text(
-      approval?.at ? new Date(approval.at).toLocaleDateString(lang) : '-',
+      approval?.at ? formatDate(approval.at) : '-',
       x,
       y,
     );

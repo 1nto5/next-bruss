@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { getUsers } from '@/lib/data/get-users';
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
@@ -165,7 +166,7 @@ async function getOvertimeSubmissions(
     );
 
     const fetchTime = new Date();
-    const fetchTimeLocaleString = fetchTime.toLocaleString();
+    const fetchTimeLocaleString = formatDateTime(fetchTime);
 
     // Calculate overtime summary for the user
     const selectedMonth = searchParams.month;
