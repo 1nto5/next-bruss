@@ -43,12 +43,12 @@ export const generateExcelBuffer = async (
       const warehouseForPosition = position.wip ? '999' : card.warehouse;
       const beleg = `${card.number.toString().padStart(3, '0')}${position.position.toString().padStart(2, '0')}`;
       const entered = new Date(position.time)
-        .toLocaleString('pl-PL')
+        .toLocaleString(process.env.DATE_TIME_LOCALE!)
         .replace(',', '');
       const countedBy = `${card.sector} (${card.creators})`;
       const deliveryDate = position.deliveryDate
         ? new Date(position.deliveryDate)
-            .toLocaleString('pl-PL')
+            .toLocaleString(process.env.DATE_TIME_LOCALE!)
             .replace(',', '')
         : '';
 

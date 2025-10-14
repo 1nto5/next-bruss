@@ -306,7 +306,7 @@ export const MultiSelectEmployees = ({
                 <TableCell>{employee.identifier}</TableCell>
                 <TableCell>
                   {employee.agreedReceivingAt
-                    ? employee.agreedReceivingAt.toLocaleDateString('pl')
+                    ? employee.agreedReceivingAt.toLocaleDateString(process.env.DATE_TIME_LOCALE!)
                     : '-'}
                 </TableCell>
                 <TableCell>{employee.note || '-'}</TableCell>

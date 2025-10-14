@@ -16,8 +16,6 @@ export default function LastScans({ lang }: LastScansProps) {
     return null;
   }
 
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
-
   const getArticleName = (article: string) => {
     return article === '28067' ? 'M-136-K-1-A' : 'M-153-K-C';
   };
@@ -33,7 +31,7 @@ export default function LastScans({ lang }: LastScansProps) {
                   {scan.batch} ({getArticleName(scan.article)})
                 </TableCell>
                 <TableCell className='text-muted-foreground text-right'>
-                  {new Date(scan.time).toLocaleTimeString(locale)}
+                  {new Date(scan.time).toLocaleTimeString(process.env.DATE_TIME_LOCALE!)}
                 </TableCell>
               </TableRow>
             ))}

@@ -402,7 +402,7 @@ export default function DeviationView({
                       <TableCell className='font-medium'>{dict.view.labels.created}:</TableCell>
                       <TableCell>
                         {deviation?.createdAt
-                          ? new Date(deviation.createdAt).toLocaleString(lang)
+                          ? new Date(deviation.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE!)
                           : '-'}
                       </TableCell>
                     </TableRow>
@@ -761,7 +761,7 @@ export default function DeviationView({
                                   {extractNameFromEmail(log.to)}
                                 </TableCell>
                                 <TableCell>
-                                  {new Date(log.sentAt).toLocaleString(lang)}
+                                  {new Date(log.sentAt).toLocaleString(process.env.DATE_TIME_LOCALE!)}
                                 </TableCell>
                                 <TableCell>{log.type}</TableCell>
                               </TableRow>
@@ -846,7 +846,7 @@ export default function DeviationView({
                             </TableCell>
                             <TableCell>
                               {new Date(attachment.uploadedAt).toLocaleString(
-                                lang,
+                                process.env.DATE_TIME_LOCALE!,
                               )}
                             </TableCell>
                           </TableRow>
@@ -903,7 +903,7 @@ export default function DeviationView({
                               {extractNameFromEmail(note.createdBy)}
                             </TableCell>
                             <TableCell>
-                              {new Date(note.createdAt).toLocaleString(lang)}
+                              {new Date(note.createdAt).toLocaleString(process.env.DATE_TIME_LOCALE!)}
                             </TableCell>
                             <TableCell className='whitespace-pre-line'>
                               {note.content}
@@ -933,7 +933,6 @@ export default function DeviationView({
         isOpen={isEditLogDialogOpen} // RENAMED: State variable
         onClose={() => setIsEditLogDialogOpen(false)} // RENAMED: Setter
         logs={deviation?.editLogs || []} // RENAMED: Prop name and source
-        lang={lang}
         dict={dict}
       />
 
@@ -942,7 +941,6 @@ export default function DeviationView({
         isOpen={isPrintLogDialogOpen}
         onClose={() => setIsPrintLogDialogOpen(false)}
         logs={deviation?.printLogs || []}
-        lang={lang}
         dict={dict}
       />
     </Card>

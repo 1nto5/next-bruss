@@ -334,7 +334,7 @@ export const createColumns = (
       header: dict.columns.date,
       cell: ({ row }) => {
         const date = new Date(row.getValue('date') as string);
-        return <span>{date.toLocaleDateString('pl-PL')}</span>;
+        return <span>{date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}</span>;
       },
     },
     {
@@ -364,8 +364,8 @@ export const createColumns = (
         const date = new Date(row.getValue('submittedAt') as string);
         return (
           <span>
-            {date.toLocaleDateString('pl-PL')}{' '}
-            {date.toLocaleTimeString('pl-PL', {
+            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
+            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -381,8 +381,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString('pl-PL')}{' '}
-            {date.toLocaleTimeString('pl-PL', {
+            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
+            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -411,8 +411,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString('pl-PL')}{' '}
-            {date.toLocaleTimeString('pl-PL', {
+            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
+            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -441,8 +441,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString('pl-PL')}{' '}
-            {date.toLocaleTimeString('pl-PL', {
+            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
+            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
               hour: '2-digit',
               minute: '2-digit',
             })}
@@ -468,8 +468,8 @@ export const createColumns = (
         if (!date) return <span>-</span>;
         return (
           <span>
-            {date.toLocaleDateString('pl-PL')}{' '}
-            {date.toLocaleTimeString('pl-PL', {
+            {date.toLocaleDateString(process.env.DATE_TIME_LOCALE!)}{' '}
+            {date.toLocaleTimeString(process.env.DATE_TIME_LOCALE!, {
               hour: '2-digit',
               minute: '2-digit',
             })}

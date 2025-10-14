@@ -185,7 +185,7 @@ export function getColumns(dict: Dictionary): ColumnDef<DeviationType>[] {
       const lang = table.options.meta?.lang as string;
       return (
         <span className='whitespace-nowrap'>
-          {createdAt ? new Date(createdAt).toLocaleString(lang || 'pl-PL') : ''}
+          {createdAt ? new Date(createdAt).toLocaleString(process.env.DATE_TIME_LOCALE!) : ''}
         </span>
       );
     },

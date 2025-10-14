@@ -79,10 +79,8 @@ export default function StatusBar({ dict, lang }: StatusBarProps) {
     [refetchArticle153Boxes],
   );
 
-  const locale = lang === 'de' ? 'de-DE' : lang === 'en' ? 'en-US' : 'pl-PL';
-
   const formatTime = (time: string) => {
-    return new Date(time).toLocaleTimeString(locale);
+    return new Date(time).toLocaleTimeString(process.env.DATE_TIME_LOCALE!);
   };
 
   // Handle delete actions

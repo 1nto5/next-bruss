@@ -451,7 +451,7 @@ async function sendCorrectiveActionAssignmentNotification(
       <div>
         <p>Zostałeś/aś wyznaczony/a jako osoba odpowiedzialna za wykonanie akcji korygującej w odchyleniu [${internalId}].</p>
         <p><strong>Opis akcji:</strong> ${correctiveAction.description}</p>
-        <p><strong>Termin wykonania:</strong> ${new Date(correctiveAction.deadline).toLocaleDateString('pl')}</p>
+        <p><strong>Termin wykonania:</strong> ${new Date(correctiveAction.deadline).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}</p>
         <p>
           <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
         </p>

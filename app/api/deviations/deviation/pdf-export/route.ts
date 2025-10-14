@@ -196,7 +196,7 @@ async function generateDeviationPdf({
     }
   };
 
-  printLine('created', new Date(deviation.createdAt).toLocaleDateString(lang));
+  printLine('created', new Date(deviation.createdAt).toLocaleDateString(process.env.DATE_TIME_LOCALE!));
   printLine('owner', extractNameFromEmail(deviation.owner));
   printLine('article', deviation.articleName || '-');
   printLine('number', deviation.articleNumber || '-');
@@ -213,9 +213,9 @@ async function generateDeviationPdf({
   printLine(
     'period',
     deviation.timePeriod?.from && deviation.timePeriod?.to
-      ? `${new Date(deviation.timePeriod.from).toLocaleDateString(lang)} - ${new Date(
+      ? `${new Date(deviation.timePeriod.from).toLocaleDateString(process.env.DATE_TIME_LOCALE!)} - ${new Date(
           deviation.timePeriod.to,
-        ).toLocaleDateString(lang)}`
+        ).toLocaleDateString(process.env.DATE_TIME_LOCALE!)}`
       : '-',
   );
   const reasonOpt = reasonOptions.find((o) => o.value === deviation.reason);
@@ -313,7 +313,7 @@ async function generateDeviationPdf({
     doc.text(approval?.by ? extractNameFromEmail(approval.by) : '-', x, y);
     x += colW[1];
     doc.text(
-      approval?.at ? new Date(approval.at).toLocaleDateString(lang) : '-',
+      approval?.at ? new Date(approval.at).toLocaleDateString(process.env.DATE_TIME_LOCALE!) : '-',
       x,
       y,
     );

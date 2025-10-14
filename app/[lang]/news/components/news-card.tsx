@@ -70,7 +70,7 @@ export function NewsCard({ news, isAdmin, lang, dict }: NewsCardProps) {
               {news.title}
             </CardTitle>
             <CardDescription className='text-sm'>
-              {new Date(news.createdAt).toLocaleDateString(lang === 'pl' ? 'pl-PL' : lang === 'de' ? 'de-DE' : 'en-US')} • {extractNameFromEmail(news.author)}
+              {new Date(news.createdAt).toLocaleDateString(process.env.DATE_TIME_LOCALE!)} • {extractNameFromEmail(news.author)}
             </CardDescription>
           </div>
           {isAdmin && (
