@@ -1,4 +1,4 @@
-import { dbc } from '@/lib/mongo';
+import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import { NextResponse, type NextRequest } from 'next/server';
 

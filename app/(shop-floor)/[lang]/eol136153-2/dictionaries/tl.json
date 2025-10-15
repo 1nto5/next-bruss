@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Pag-login - EOL136153",
+    "operator1Label": "Personal na numero 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal na numero 2",
+    "personalNumber3Label": "Personal na numero 3",
+    "placeholder": "pindutin upang maglagay...",
+    "loginButton": "Mag-login",
+    "clearButton": "I-clear",
+    "keypadTitle": "Ilagay ang personal na numero ng operator",
+    "keypadReset": "I-reset",
+    "keypadSave": "I-save",
+    "errors": {
+      "wrongNumber1": "Hindi wastong personal na numero!",
+      "wrongNumber2": "Hindi wastong personal na numero!",
+      "wrongNumber3": "Hindi wastong personal na numero!",
+      "requiredNumber1": "Kailangan ang personal na numero 1!",
+      "requiredNumber2": "Kailangan ang personal na numero 2!",
+      "requiredNumber3": "Kailangan ang personal na numero 3!",
+      "loginError": "Makipag-ugnayan sa IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Operator",
+    "logout": "Mag-logout",
+    "changeArticle": "Palitan",
+    "volume": "Lakas ng tunog"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Mga kahon sa pallet",
+    "palletFull": "Puno ang pallet",
+    "scanPallet": "I-scan ang pallet",
+    "pallet": "PALLET",
+    "boxes": "kahon",
+    "time": "Oras",
+    "noScans": "Wala",
+    "deleteBox": "Tanggalin ang kahon",
+    "deleteBoxConfirm": "Sigurado ka bang gusto mong tanggalin ang kahon na ito mula sa pallet?",
+    "cancel": "Kanselahin",
+    "delete": "Tanggalin",
+    "deletingBox": "Tinatanggal ang kahon...",
+    "boxDeleted": "Natanggal na ang kahon mula sa pallet",
+    "boxNotFound": "Hindi nahanap ang kahon",
+    "deleteError": "May error sa pagtanggal"
+  },
+  "scanning": {
+    "title": "I-scan ang Hydra code",
+    "placeholder": "HYDRA QR",
+    "scanning": "Nag-i-scan...",
+    "messages": {
+      "saved": "Na-save ang batch!",
+      "exists": "Umiiral na ang batch!",
+      "invalid": "Hindi wastong code!",
+      "wrongArticle": "Maling artikulo!",
+      "wrongQuantity": "Maling dami!",
+      "wrongProcess": "Maling proseso!",
+      "fullPallet": "Puno ang pallet!",
+      "error": "Error! Makipag-ugnayan sa IT"
+    }
+  },
+  "pallet": {
+    "title": "I-scan ang QR pallet",
+    "placeholder": "Pallet QR",
+    "generateBatch": "Gumawa ng pallet batch",
+    "print": "I-print ang collective label",
+    "printing": "Nag-p-print...",
+    "nextPallet": "Susunod na pallet",
+    "messages": {
+      "success": "Na-save ang pallet!",
+      "invalid": "Hindi wastong pallet code!",
+      "error": "Error sa pag-save ng pallet!",
+      "printSuccess": "Na-print ang label!",
+      "printError": "Error sa pag-print!"
+    }
+  },
+  "lastScans": {
+    "title": "Huling mga scan",
+    "empty": "Walang mga scan"
+  },
+  "errors": {
+    "somethingWrong": "May nangyaring mali",
+    "fetchError": "Hindi nakuha ang data",
+    "contactIT": "Makipag-ugnayan sa IT"
+  },
+  "logout": {
+    "title": "Mag-logout",
+    "description": "Sigurado ka bang gusto mong mag-logout?",
+    "cancel": "Kanselahin",
+    "confirm": "Mag-logout",
+    "logoutOperators": "Mag-logout"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "title": "Please add translations",
+  "editDialog": {
+    "save": "Save"
+  },
+  "validation": {
+    "quantityMustBeNumber": "Quantity must be a number",
+    "quantityCannotBeNegative": "Quantity cannot be negative"
+  }
+}

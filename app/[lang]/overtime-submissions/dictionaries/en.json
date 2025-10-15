@@ -1,0 +1,175 @@
+{
+  "title": "Overtime Submissions",
+  "pageTitle": "Overtime Submissions",
+  "testWarning": "Application in testing phase - entries are not official",
+  "hrView": "HR View",
+  "hrViewTitle": "HR View - Overtime Submissions",
+  "backToSubmissions": "Back to submissions",
+  "newSubmission": "New submission",
+  "filters": {
+    "showFilters": "Show filters",
+    "select": "select",
+    "search": "Search",
+    "searchPlaceholder": "search...",
+    "notFound": "not found",
+    "clear": "Clear",
+    "status": "Status",
+    "employee": "Employee",
+    "year": "Year",
+    "month": "Month",
+    "manager": "Manager",
+    "pendingSettlements": "Pending settlements",
+    "pendingApprovals": "Pending approvals"
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "accounted": "Settled",
+    "cancelled": "Cancelled"
+  },
+  "actions": {
+    "approve": "Approve",
+    "approveDirector": "Approve (Director)",
+    "reject": "Reject",
+    "markAsAccounted": "Mark as settled",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "save": "Save changes",
+    "add": "Add submission",
+    "saveAndAddAnother": "Save and add another"
+  },
+  "dialogs": {
+    "approve": {
+      "title": "Approve submission",
+      "description": "Are you sure you want to approve this overtime submission?"
+    },
+    "reject": {
+      "title": "Reject submission",
+      "description": "Provide a reason for rejecting this overtime submission.",
+      "reasonLabel": "Rejection reason",
+      "reasonPlaceholder": "Enter rejection reason...",
+      "buttonText": "Reject submission"
+    },
+    "markAsAccounted": {
+      "title": "Mark as settled",
+      "description": "Are you sure you want to mark this submission as settled? This action is irreversible and means that all overtime has been processed in the payroll system."
+    },
+    "cancel": {
+      "title": "Cancel submission?",
+      "description": "Are you sure you want to cancel this overtime submission? This action cannot be undone.",
+      "cancelButton": "No, keep it",
+      "confirmButton": "Yes, cancel submission"
+    },
+    "bulkConfirm": {
+      "title": "Confirm operation",
+      "description": "Are you sure you want to perform this operation on"
+    }
+  },
+  "form": {
+    "titleNew": "New overtime submission",
+    "titleEdit": "Edit overtime submission",
+    "supervisor": "Supervisor",
+    "hours": "Hours",
+    "hoursDescription": "Enter the number of hours with half-hour precision (e.g., 2.5). Use negative values (e.g., -2.5) to deduct overtime.",
+    "date": "Date",
+    "reason": "Justification",
+    "overtimeRequest": "Overtime work order",
+    "overtimeRequestDescription": "Planned overtime work requires approval from both supervisor and director.",
+    "payment": "Payment",
+    "scheduledDayOff": "Scheduled day off for overtime",
+    "managerNotFound": "Manager not found.",
+    "submissionsTable": "Submissions table"
+  },
+  "columns": {
+    "status": "Status",
+    "payment": "Payment",
+    "actions": "Actions",
+    "submittedBy": "Submitted by",
+    "supervisor": "Supervisor",
+    "date": "Date",
+    "hours": "Hours",
+    "reason": "Justification",
+    "submittedAt": "Submission date",
+    "editedAt": "Edit date",
+    "editedBy": "Edited by",
+    "approvedAt": "Approval date",
+    "approvedBy": "Approved by",
+    "rejectedAt": "Rejection date",
+    "rejectionReason": "Rejection reason",
+    "accountedAt": "Settlement date",
+    "accountedBy": "Settled by"
+  },
+  "bulk": {
+    "selectedOne": "You have selected 1 submission:",
+    "selectedFew": "You have selected {count} submissions:",
+    "selectedMany": "You have selected {count} submissions:",
+    "noCommonActions": "No common actions available for selected submissions.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "settle": "Settle",
+    "cancel": "Cancel",
+    "rejectTitle": "Reject selected submissions",
+    "rejectDescription": "Are you sure you want to reject {count} selected submissions? Provide a rejection reason.",
+    "rejectionReasonPlaceholder": "Rejection reason..."
+  },
+  "toast": {
+    "approving": "Approving submission...",
+    "approved": "Submission has been approved!",
+    "rejecting": "Rejecting submission...",
+    "rejected": "Submission has been rejected!",
+    "markingAsAccounted": "Marking as settled...",
+    "markedAsAccounted": "Submission marked as settled!",
+    "cancelling": "Cancelling submission...",
+    "cancelled": "Submission has been cancelled!",
+    "submissionSaved": "Submission saved!",
+    "submissionUpdated": "Submission has been updated!",
+    "submissionAdded": "Submission added!",
+    "bulkApproving": "Approving...",
+    "bulkApproved": "Approved {count} of {total} submissions!",
+    "bulkRejecting": "Rejecting...",
+    "bulkRejected": "Rejected {count} of {total} submissions!",
+    "bulkSettling": "Settling...",
+    "bulkSettled": "Settled {count} of {total} submissions!",
+    "bulkCancelling": "Cancelling...",
+    "bulkCancelled": "Cancelled {count} of {total} submissions!",
+    "provideRejectionReason": "Provide rejection reason"
+  },
+  "errors": {
+    "unauthorized": "You don't have permission!",
+    "unauthorizedToApprove": "You don't have permission to approve!",
+    "unauthorizedToReject": "You don't have permission to reject!",
+    "notFound": "Submission not found!",
+    "invalidStatus": "Invalid submission status!",
+    "cannotEditApprovedOrRejected": "Cannot edit approved or rejected submission!",
+    "cannotCancel": "Cannot cancel this submission!",
+    "notInserted": "Failed to add submission!",
+    "contactIT": "Contact IT!",
+    "onlyHRCanMarkAsAccounted": "Only HR employees can mark submissions as settled!",
+    "approvalError": "Approval error",
+    "rejectionError": "Rejection error",
+    "settlementError": "Settlement error",
+    "cancellationError": "Cancellation error"
+  },
+  "validation": {
+    "rejectionReasonRequired": "Rejection reason is required!",
+    "rejectionReasonTooLong": "Rejection reason cannot be longer than 500 characters!",
+    "supervisorEmailInvalid": "Select supervisor!",
+    "supervisorRequired": "Supervisor is required!",
+    "dateRequired": "Select date!",
+    "hoursMinRange": "Enter value from -8 to 16!",
+    "hoursMaxRange": "Enter value from -8 to 16!",
+    "scheduledDayOffRequired": "Select day off pickup if overtime is not for payment!",
+    "dateRangeInvalid": "You can only add overtime from the last 7 days.",
+    "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
+    "reasonRequired": "Justification is required!"
+  },
+  "summary": {
+    "yourOvertimeIn": "Your overtime in",
+    "yourTotalOvertime": "Your total overtime",
+    "organizationOvertimeIn": "Organization overtime in",
+    "overdueOvertimeToSettle": "Overdue overtime to settle",
+    "pending": "pending"
+  }
+}

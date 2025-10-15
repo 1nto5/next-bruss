@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Вхід - EOL136153",
+    "operator1Label": "Персональний номер 1",
+    "operator2Label": "Оператор 2",
+    "operator3Label": "Оператор 3",
+    "personalNumber2Label": "Персональний номер 2",
+    "personalNumber3Label": "Персональний номер 3",
+    "placeholder": "торкніться для введення...",
+    "loginButton": "Увійти",
+    "clearButton": "Очистити",
+    "keypadTitle": "Введіть персональний номер оператора",
+    "keypadReset": "Скинути",
+    "keypadSave": "Зберегти",
+    "errors": {
+      "wrongNumber1": "Неправильний персональний номер!",
+      "wrongNumber2": "Неправильний персональний номер!",
+      "wrongNumber3": "Неправильний персональний номер!",
+      "requiredNumber1": "Персональний номер 1 обов'язковий!",
+      "requiredNumber2": "Персональний номер 2 обов'язковий!",
+      "requiredNumber3": "Персональний номер 3 обов'язковий!",
+      "loginError": "Зверніться до IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Оператор",
+    "logout": "Вийти",
+    "changeArticle": "Змінити",
+    "volume": "Гучність"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Коробок на палеті",
+    "palletFull": "Палета повна",
+    "scanPallet": "Сканувати палету",
+    "pallet": "ПАЛЕТА",
+    "boxes": "коробка",
+    "time": "Час",
+    "noScans": "Немає",
+    "deleteBox": "Видалити коробку",
+    "deleteBoxConfirm": "Ви впевнені, що хочете видалити цю коробку з палети?",
+    "cancel": "Скасувати",
+    "delete": "Видалити",
+    "deletingBox": "Видалення коробки...",
+    "boxDeleted": "Коробку видалено з палети",
+    "boxNotFound": "Коробку не знайдено",
+    "deleteError": "Помилка при видаленні"
+  },
+  "scanning": {
+    "title": "Сканувати код Hydra",
+    "placeholder": "HYDRA QR",
+    "scanning": "Сканування...",
+    "messages": {
+      "saved": "Партію збережено!",
+      "exists": "Партія вже існує!",
+      "invalid": "Недійсний код!",
+      "wrongArticle": "Неправильний артикул!",
+      "wrongQuantity": "Неправильна кількість!",
+      "wrongProcess": "Неправильний процес!",
+      "fullPallet": "Палета повна!",
+      "error": "Помилка! Зверніться до ІТ"
+    }
+  },
+  "pallet": {
+    "title": "Сканувати QR палета",
+    "placeholder": "Палета QR",
+    "generateBatch": "Згенерувати партію палети",
+    "print": "Друкувати збірну етикетку",
+    "printing": "Друкування...",
+    "nextPallet": "Наступна палета",
+    "messages": {
+      "success": "Палету збережено!",
+      "invalid": "Недійсний код палети!",
+      "error": "Помилка збереження палети!",
+      "printSuccess": "Етикетку надруковано!",
+      "printError": "Помилка друкування!"
+    }
+  },
+  "lastScans": {
+    "title": "Останні сканування",
+    "empty": "Немає сканувань"
+  },
+  "errors": {
+    "somethingWrong": "Щось пішло не так",
+    "fetchError": "Не вдалося отримати дані",
+    "contactIT": "Зверніться до ІТ"
+  },
+  "logout": {
+    "title": "Вийти",
+    "description": "Ви впевнені, що хочете вийти?",
+    "cancel": "Скасувати",
+    "confirm": "Вийти",
+    "logoutOperators": "Вийти"
+  }
+}

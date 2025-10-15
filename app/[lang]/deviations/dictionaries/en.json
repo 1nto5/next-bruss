@@ -1,0 +1,400 @@
+{
+  "title": "Production Process Deviations",
+  "addNew": "New Deviation",
+  "login": "Log In",
+  "refresh": "Refresh",
+  "noResults": "No results.",
+  "filters": {
+    "showFilters": "Show filters",
+    "onlyMy": "Only mine",
+    "status": "Status",
+    "area": "Area",
+    "reason": "Reason",
+    "deviationDate": "Deviation date",
+    "createdDate": "Created date",
+    "select": "select",
+    "search": "Search",
+    "clear": "Clear"
+  },
+  "form": {
+    "title": "New Deviation",
+    "tableLink": "Deviations Table",
+    "articleNumber": "Article number",
+    "articleName": "Article name",
+    "customerPartNumber": "Customer part number",
+    "customerName": "Customer name",
+    "workstation": "Workstation",
+    "area": "Area",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "batch": "Batch",
+    "description": "Deviation description",
+    "descriptionPlaceholder": "Enter any text describing the deviation",
+    "findName": "Find name",
+    "pcs": "pcs",
+    "kg": "kg",
+    "reason": "Select reason:",
+    "periodFrom": "Start",
+    "periodTo": "End",
+    "processSpecification": "Process specification",
+    "processSpecificationPlaceholder": "Enter process specification when applicable",
+    "customerAuthorization": "Customer authorization",
+    "clearButton": "Clear",
+    "saveDraftButton": "Save draft",
+    "addDeviationButton": "Add deviation",
+    "enterArticleNumber": "Enter article number",
+    "articleNotFound": "Article not found",
+    "enterValidArticleNumber": "Enter a valid article number",
+    "contactIT": "Contact IT!",
+    "deviationAdded": "Deviation added!",
+    "draftSaved": "Draft saved!",
+    "editTitle": "Edit Deviation",
+    "editDraftTitle": "Edit Deviation Draft",
+    "deviationLink": "Deviation",
+    "saveChangesButton": "Save changes",
+    "deviationUpdated": "Deviation updated!",
+    "notAuthorizedToEdit": "You are not authorized to edit this deviation!",
+    "deviationNotFound": "Deviation not found for update!",
+    "noChanges": "You haven't made any changes to the deviation!",
+    "deviationAddedFromDraft": "Deviation added from draft!",
+    "draftNotFoundToUpdate": "Draft not found for update.",
+    "notAuthorizedToEditDraft": "You are not authorized to edit this draft.",
+    "notDraft": "This item is no longer a draft.",
+    "draftDeleted": "Draft deleted!",
+    "deleteDraftButton": "Delete draft",
+    "validation": {
+      "articleNumberRequired": "Enter article number!",
+      "articleNumberMinLength": "Enter valid article number!",
+      "articleNameRequired": "Enter article name!",
+      "articleNameMinLength": "Enter valid article name!",
+      "quantityInvalid": "Enter valid positive number!",
+      "unitRequired": "Enter unit!",
+      "unitRequiredWithQuantity": "Enter unit if you entered quantity greater than 0!",
+      "descriptionRequired": "Enter deviation description!",
+      "descriptionMinLength": "Description must be at least 10 characters long!",
+      "descriptionMinLengthOrEmpty": "Description must be at least 10 characters long (or empty)!",
+      "reasonRequired": "Select reason!",
+      "dateRequired": "Select date!",
+      "periodFromMinDate": "Start date cannot be older than 7 days!",
+      "periodFromMaxDate": "Start date cannot be later than 7 days!",
+      "periodToMaxDate": "End date cannot be later than 30 days!",
+      "periodToBeforeFrom": "End date cannot be earlier than start date!",
+      "areaRequired": "Select area!",
+      "quantityInvalidOrEmpty": "Enter valid number (or leave empty)!",
+      "commentRequired": "Select status!",
+      "statusRequired": "Select status!",
+      "executedAtRequired": "Select date!",
+      "fileRequired": "File is required!",
+      "fileEmpty": "File is empty!",
+      "fileTooLarge": "File is too large (max 10MB)!",
+      "attachmentNameRequired": "Name is required!",
+      "attachmentNameTooShort": "Name is too short!",
+      "rejectReasonRequired": "Rejection reason is required!",
+      "rejectReasonMinLength": "Rejection reason must be at least 10 characters long!",
+      "rejectReasonMaxLength": "Rejection reason cannot exceed 500 characters!",
+      "noteRequired": "Note cannot be empty!",
+      "noteMaxLength": "Note cannot exceed 1000 characters!"
+    }
+  },
+  "table": {
+    "columns": {
+      "id": "ID",
+      "status": "Status",
+      "from": "From",
+      "to": "To",
+      "article": "Art. / Material",
+      "quantity": "Quantity",
+      "area": "Area",
+      "reason": "Reason",
+      "owner": "Owner",
+      "createdAt": "Created At"
+    },
+    "status": {
+      "inApproval": "Pending",
+      "approved": "Approved",
+      "inProgress": "In Effect",
+      "closed": "Closed",
+      "rejected": "Rejected",
+      "toApprove": "To Approve",
+      "draft": "Draft"
+    },
+    "actions": {
+      "edit": "Edit",
+      "open": "Open"
+    },
+    "units": {
+      "pcs": "pcs"
+    }
+  },
+  "view": {
+    "statusBadges": {
+      "approved": "Deviation Approved",
+      "rejected": "Deviation Rejected",
+      "inApproval": "Deviation Pending Approval",
+      "inProgress": "Deviation In Effect",
+      "closed": "Deviation Closed",
+      "deviation": "Deviation"
+    },
+    "buttons": {
+      "print": "Print",
+      "printLog": "Print History",
+      "backToTable": "Deviations",
+      "editLog": "History",
+      "edit": "Edit",
+      "addCorrectiveAction": "Add"
+    },
+    "sections": {
+      "details": "Details",
+      "correctiveActions": "Corrective Actions",
+      "approvals": "Approvals",
+      "notifications": "Sent Notifications",
+      "attachments": "Attachments",
+      "notes": "Notes"
+    },
+    "labels": {
+      "created": "Created",
+      "owner": "Owner",
+      "articleNumber": "Article Number",
+      "articleName": "Article Name",
+      "customerNumber": "Customer Part Number",
+      "customerName": "Customer Name",
+      "workplace": "Workstation",
+      "quantity": "Quantity",
+      "charge": "Batch",
+      "reason": "Reason",
+      "validPeriod": "Valid Period",
+      "area": "Area",
+      "description": "Description",
+      "processSpecification": "Process Specification",
+      "customerAuthorization": "Customer Authorization",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "correctiveActionsTable": {
+      "status": "Status",
+      "changeStatus": "Change Status",
+      "description": "Description",
+      "assignee": "Assignee",
+      "deadline": "Deadline",
+      "lastChange": "Last Change",
+      "history": "History",
+      "noActions": "No corrective actions"
+    },
+    "approvalsCard": {
+      "loginMessage": "To access approval options,",
+      "loginLink": "log in"
+    },
+    "approvalsTable": {
+      "status": "Status",
+      "role": "Role",
+      "approve": "Approve",
+      "person": "Person",
+      "date": "Date",
+      "comment": "Comment",
+      "history": "History"
+    },
+    "roles": {
+      "qualityManager": "Quality Manager",
+      "productionManager": "Production Manager",
+      "plantManager": "Plant Manager"
+    },
+    "notificationsTable": {
+      "to": "To",
+      "sentAt": "Sent At",
+      "type": "Type",
+      "noNotifications": "No registered notifications."
+    },
+    "attachmentsTable": {
+      "name": "Name",
+      "file": "File",
+      "note": "Note",
+      "uploadedBy": "Uploaded By",
+      "date": "Date",
+      "noAttachments": "No attachments"
+    },
+    "notesTable": {
+      "person": "Person",
+      "date": "Date",
+      "note": "Note",
+      "noNotes": "No notes"
+    },
+    "toasts": {
+      "approving": "Approving deviation...",
+      "rejecting": "Rejecting deviation...",
+      "approved": "Approved!",
+      "rejected": "Rejected!",
+      "generatingPdf": "Generating PDF...",
+      "pdfGenerated": "PDF generated successfully!"
+    },
+    "errors": {
+      "contactIT": "Contact IT!",
+      "vacancyRequired": "Approval only possible for vacant position!",
+      "noPermission": "You do not have permission to approve in this role!",
+      "noPdfExport": "Cannot export PDF - missing deviation ID",
+      "pdfGenerationError": "Error generating PDF"
+    },
+    "approvalStatuses": {
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "pending": "No decision"
+    },
+    "approvalDialogs": {
+      "approveTitle": "Approve deviation",
+      "rejectTitle": "Reject deviation",
+      "position": "Position",
+      "comment": "Comment",
+      "approveButton": "I approve",
+      "rejectButton": "I reject",
+      "history": "History",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Date",
+        "person": "Person",
+        "comment": "Comment"
+      }
+    },
+    "correctiveActionStatuses": {
+      "open": "Open",
+      "closed": "Closed",
+      "overdue": "Overdue",
+      "inProgress": "In progress",
+      "rejected": "Rejected"
+    },
+    "correctiveActionDialogs": {
+      "closedTitle": "Corrective action completed",
+      "closedDescription": "Cannot change status of a completed corrective action.",
+      "changeStatusTitle": "Change corrective action status",
+      "noPermissionTitle": "No permission",
+      "noPermissionDescription": "You do not have permission to change the corrective action status.",
+      "changeDate": "Change date",
+      "status": "Status",
+      "selectPlaceholder": "Select",
+      "additionalInfo": "Additional information",
+      "additionalInfoPlaceholder": "Any text regarding the corrective action execution",
+      "confirmButton": "Confirm",
+      "history": "History",
+      "historyColumns": {
+        "status": "Status",
+        "date": "Date",
+        "comment": "Comment",
+        "person": "Person",
+        "time": "Time"
+      },
+      "errors": {
+        "noUser": "No user!",
+        "contactIT": "Contact IT!"
+      },
+      "toasts": {
+        "updating": "Updating status...",
+        "updated": "Status updated successfully!"
+      }
+    }
+  },
+  "dialogs": {
+    "addNote": {
+      "title": "Add Note",
+      "triggerButton": "Add",
+      "contentLabel": "Note Content",
+      "contentPlaceholder": "Enter note content...",
+      "submitButton": "Add Note",
+      "errors": {
+        "deviationIdError": "Deviation ID error. Contact IT!",
+        "contactIT": "Contact IT!"
+      },
+      "toasts": {
+        "loading": "Adding note...",
+        "success": "Note added successfully!"
+      }
+    },
+    "addAttachment": {
+      "title": "Add Attachment",
+      "triggerButton": "Add",
+      "fileLabel": "File",
+      "nameLabel": "Name",
+      "namePlaceholder": "Custom file name",
+      "noteLabel": "Note",
+      "submitButton": "Add Attachment",
+      "errors": {
+        "noPermission": "You don't have permission or deviation is closed.",
+        "contactIT": "Contact IT!",
+        "unauthorized": "Unauthorized",
+        "noFile": "No file selected",
+        "noDeviationId": "No deviation ID",
+        "fileSizeExceeded": "File size exceeds the limit (10MB)",
+        "unsupportedFileType": "Unsupported file type",
+        "fileAlreadyExists": "This file already exists",
+        "databaseUpdateFailed": "Failed to update database",
+        "uploadFailed": "Error uploading file",
+        "unknownError": "Unknown error occurred",
+        "generalUploadError": "Error adding attachment"
+      },
+      "toasts": {
+        "loading": "Uploading attachment...",
+        "success": "Attachment added successfully!"
+      }
+    },
+    "editLog": {
+      "title": "Edit History",
+      "columns": {
+        "date": "Date",
+        "person": "Person",
+        "field": "Field",
+        "oldValue": "Previous Value",
+        "newValue": "New Value"
+      },
+      "fieldNames": {
+        "articleNumber": "Article Number",
+        "articleName": "Article Name",
+        "workplace": "Workstation",
+        "customerNumber": "Customer Number",
+        "customerName": "Customer Name",
+        "quantity": "Quantity",
+        "unit": "Unit",
+        "charge": "Batch",
+        "reason": "Reason",
+        "periodFrom": "Period From",
+        "periodTo": "Period To",
+        "area": "Area",
+        "description": "Description",
+        "processSpecification": "Process Specification",
+        "customerAuthorization": "Customer Authorization"
+      },
+      "booleanValues": {
+        "true": "Yes",
+        "false": "No"
+      },
+      "noHistory": "No edit history."
+    },
+    "printLog": {
+      "title": "Print History",
+      "columns": {
+        "date": "Date",
+        "person": "Person"
+      },
+      "noPrints": "No registered prints"
+    }
+  },
+  "correctiveAction": {
+    "title": "New Corrective Action",
+    "deadline": "Deadline",
+    "responsible": "Responsible Person",
+    "description": "Action Description",
+    "descriptionPlaceholder": "Enter any text describing the action to be taken",
+    "searchPlaceholder": "Search...",
+    "notFound": "Not found.",
+    "addButton": "Add Corrective Action",
+    "toasts": {
+      "added": "Corrective action added!"
+    },
+    "errors": {
+      "deviationNotFound": "Deviation not found!",
+      "notAuthorized": "Only the deviation owner can add corrective actions!"
+    },
+    "validation": {
+      "descriptionRequired": "Enter description!",
+      "descriptionMinLength": "Description must be at least 10 characters long!",
+      "responsibleRequired": "Select responsible person!",
+      "deadlineRequired": "Select deadline!"
+    }
+  }
+}

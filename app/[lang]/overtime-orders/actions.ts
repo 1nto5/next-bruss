@@ -1,0 +1,865 @@
+'use server';
+
+import { auth } from '@/lib/auth';
+import mailer from '@/lib/services/mailer';
+import { dbc } from '@/lib/db/mongo';
+import { ObjectId } from 'mongodb';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { overtimeRequestEmployeeType } from './lib/types';
+import { NewOvertimeRequestType } from './lib/zod';
+
+export async function revalidateOvertimeOrders() {
+  revalidateTag('overtime-orders');
+}
+
+export async function revalidateOvertimeOrdersRequest() {
+  revalidateTag('overtime-orders-request');
+}
+
+// Helper function to generate the next internal ID
+async function generateNextInternalId(): Promise<string> {
+  try {
+    const collection = await dbc('overtime_orders');
+    const currentYear = new Date().getFullYear();
+    const shortYear = currentYear.toString().slice(-2);
+
+    // Regex to match and extract the numeric part of IDs like "123/25"
+    const yearRegex = new RegExp(`^(\\d+)\/${shortYear}$`);
+
+    // Fetch all overtime internalIds for the current year.
+    // We only need the internalId field for this operation.
+    const overtimeThisYear = await collection
+      .find(
+        { internalId: { $regex: `\/${shortYear}$` } }, // Filter for IDs ending with "/YY"
+        { projection: { internalId: 1 } }, // Only fetch the internalId field
+      )
+      .toArray();
+
+    let maxNumber = 0;
+    for (const doc of overtimeThisYear) {
+      if (doc.internalId) {
+        const match = doc.internalId.match(yearRegex);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      }
+    }
+
+    const nextNumber = maxNumber + 1;
+    return `${nextNumber}/${shortYear}`;
+  } catch (error) {
+    console.error('Failed to generate internal ID:', error);
+    // Fallback to a timestamp-based ID if there's an error.
+    return `${Date.now()}/${new Date().getFullYear().toString().slice(-2)}`;
+  }
+}
+
+export async function redirectToOvertimeOrders(lang: string) {
+  redirect(`/${lang}/overtime-orders`);
+}
+
+export async function redirectToOvertimeOrdersDaysOff(id: string, lang: string) {
+  redirect(`/${lang}/overtime-orders/${id}/employees`);
+}
+
+async function sendEmailNotificationToRequestor(email: string, id: string) {
+  const mailOptions = {
+    to: email,
+    subject:
+      'Zatwierdzone zlecanie wykonania pracy w godzinach nadliczbowych - produkcja',
+    html: `<div style="font-family: sans-serif;">
+          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
+          <p>
+          <a href="${process.env.BASE_URL}/overtime-orders/${id}" 
+             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
+            Otwórz zlecenie
+          </a>
+          </p>
+        </div>`,
+  };
+  await mailer(mailOptions);
+}
+
+export async function approveOvertimeRequest(id: string) {
+  console.log('approveOvertimeRequest', id);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  const isPlantManager = (session.user?.roles ?? []).includes('plant-manager');
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+
+  if (!isPlantManager && !isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: 'approved',
+          approvedAt: new Date(),
+          approvedBy: session.user.email,
+        },
+      },
+    );
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+    revalidateOvertimeOrders();
+    await sendEmailNotificationToRequestor(session.user.email, id);
+    return { success: 'approved' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'approveOvertimeRequest server action error' };
+  }
+}
+
+export async function insertOvertimeRequest(
+  data: NewOvertimeRequestType,
+): Promise<{ success: 'inserted' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // Generate internal ID
+    const internalId = await generateNextInternalId();
+
+    // Determine status based on date
+    const today = new Date();
+    const sevenDaysFromNow = new Date(
+      today.getTime() + 7 * 24 * 60 * 60 * 1000,
+    );
+    const status = data.from > sevenDaysFromNow ? 'forecast' : 'pending';
+
+    const overtimeRequestToInsert = {
+      internalId,
+      status,
+      ...data,
+      requestedAt: new Date(),
+      requestedBy: session.user.email,
+      editedAt: new Date(),
+      editedBy: session.user.email,
+    };
+
+    const res = await coll.insertOne(overtimeRequestToInsert);
+    if (res) {
+      revalidateTag('overtime-orders');
+      return { success: 'inserted' };
+    } else {
+      return { error: 'not inserted' };
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: 'insertOvertimeRequest server action error' };
+  }
+}
+
+export async function deleteDayOff(
+  overtimeId: string,
+  employeeIdentifier: string,
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // Check if the user is authorized to modify this request
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Check if status allows modifications
+    if (request.status === 'completed' || request.status === 'rejected') {
+      return { error: 'invalid status' };
+    }
+
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('admin') &&
+      !session.user.roles?.includes('production-manager') &&
+      !session.user.roles?.includes('group-leader') &&
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('hr')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    // Use $pull to remove the employee with specified identifier from the employeesWithScheduledDayOff array
+    const update = await coll.updateOne(
+      { _id: new ObjectId(overtimeId) },
+      {
+        $pull: {
+          employeesWithScheduledDayOff: { identifier: employeeIdentifier },
+        },
+        $set: {
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    if (update.modifiedCount === 0) {
+      return { error: 'not found employee' };
+    }
+
+    revalidateOvertimeOrders();
+    return { success: 'deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteTimeOffRequest server action error' };
+  }
+}
+
+// Keep deleteEmployee for backward compatibility but make it call the new function
+export async function deleteEmployee(
+  overtimeId: string,
+  employeeIndex: number,
+) {
+  // This is a temporary compatibility function
+  // Get the identifier from the document and delegate to deleteTimeOffRequest
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('overtime_orders');
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Get employee at the specified index
+    const employee = request.employeesWithScheduledDayOff[employeeIndex];
+    if (!employee) {
+      return { error: 'not found employee' };
+    }
+
+    // Call the new function with the identifier
+    return await deleteDayOff(overtimeId, employee.identifier);
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteEmployee server action error' };
+  }
+}
+
+export async function addEmployeeDayOff(
+  overtimeId: string,
+  newEmployee: overtimeRequestEmployeeType,
+) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // Check if the user is authorized to modify this request
+    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('admin') &&
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('hr')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    // Check if an employee with the same identifier already exists in the employeesWithScheduledDayOff array
+    const employeeExists = request.employeesWithScheduledDayOff?.some(
+      (employee: overtimeRequestEmployeeType) =>
+        employee.identifier === newEmployee.identifier,
+    );
+
+    if (employeeExists) {
+      return { error: 'employee already exists' };
+    }
+
+    // Check if the number of employees with scheduled days off doesn't exceed the total number
+    const employeesWithDaysOffCount =
+      request.employeesWithScheduledDayOff?.length || 0;
+
+    // Check if adding another employee would exceed the total number of employees
+    if (employeesWithDaysOffCount + 1 > request.numberOfEmployees) {
+      return { error: 'too many employees with scheduled days off' };
+    }
+
+    // Add the new employee to the employeesWithScheduledDayOff array
+    const update = await coll.updateOne(
+      { _id: new ObjectId(overtimeId) },
+      {
+        $push: {
+          employeesWithScheduledDayOff: newEmployee,
+        },
+        $set: {
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateOvertimeOrders();
+    revalidateOvertimeOrdersRequest();
+    return { success: 'added' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'addEmployeeDayOff server action error' };
+  }
+}
+
+export async function cancelOvertimeRequest(id: string) {
+  console.log('cancelOvertimeRequest', id);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // Handle both ObjectId and string ID formats
+    let convertedId: ObjectId;
+    try {
+      convertedId = new ObjectId(id);
+    } catch {
+      // If conversion fails, return error as this shouldn't happen
+      return { error: 'invalid id format' };
+    }
+
+    // First check if the request exists and get its current status
+    const request = await coll.findOne({ _id: convertedId });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Don't allow canceling if status is completed, accounted, or already canceled
+    if (
+      request.status === 'completed' ||
+      request.status === 'accounted' ||
+      request.status === 'canceled'
+    ) {
+      return { error: 'cannot cancel' };
+    }
+
+    // Check if user has permission to cancel (requestor, plant manager, admin, group leader, production manager, or HR)
+    if (
+      request.requestedBy !== session.user.email &&
+      !session.user.roles?.includes('plant-manager') &&
+      !session.user.roles?.includes('admin') &&
+      !session.user.roles?.includes('group-leader') &&
+      !session.user.roles?.includes('production-manager') &&
+      !session.user.roles?.includes('hr')
+    ) {
+      return { error: 'unauthorized' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: convertedId },
+      {
+        $set: {
+          status: 'canceled',
+          canceledAt: new Date(),
+          canceledBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateOvertimeOrders();
+    return { success: 'canceled' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'cancelOvertimeRequest server action error' };
+  }
+}
+
+export async function markAsAccountedOvertimeRequest(id: string) {
+  console.log('markAsAccountedOvertimeRequest', id);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  const isHR = (session.user?.roles ?? []).includes('hr');
+
+  if (!isHR) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // First check if the request exists and get its current status
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Only allow marking as accounted if status is completed
+    if (request.status !== 'completed') {
+      return { error: 'invalid status' };
+    }
+
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status: 'accounted',
+          accountedAt: new Date(),
+          accountedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateOvertimeOrders();
+    return { success: 'accounted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'markAsAccountedOvertimeRequest server action error' };
+  }
+}
+
+// Bulk Actions
+export async function bulkApproveOvertimeRequests(ids: string[]) {
+  console.log('bulkApproveOvertimeRequests', ids);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  const isPlantManager = (session.user?.roles ?? []).includes('plant-manager');
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+
+  if (!isPlantManager && !isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    const update = await coll.updateMany(
+      {
+        _id: { $in: objectIds },
+        status: 'pending',
+      },
+      {
+        $set: {
+          status: 'approved',
+          approvedAt: new Date(),
+          approvedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertimeOrders();
+
+    return {
+      success: `${update.modifiedCount} requests approved`,
+      count: update.modifiedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkApproveOvertimeRequests server action error' };
+  }
+}
+
+export async function bulkCancelOvertimeRequests(ids: string[]) {
+  console.log('bulkCancelOvertimeRequests', ids);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    // First get all requests to check permissions
+    const requests = await coll.find({ _id: { $in: objectIds } }).toArray();
+
+    // Filter requests that the user can cancel
+    const cancellableRequests = requests.filter((request) => {
+      // Don't allow canceling if status is completed, accounted, or already canceled
+      if (
+        request.status === 'completed' ||
+        request.status === 'accounted' ||
+        request.status === 'canceled'
+      ) {
+        return false;
+      }
+
+      // Check if user has permission to cancel
+      return (
+        request.requestedBy === session.user.email ||
+        session.user.roles?.includes('plant-manager') ||
+        session.user.roles?.includes('admin') ||
+        session.user.roles?.includes('group-leader') ||
+        session.user.roles?.includes('production-manager') ||
+        session.user.roles?.includes('hr')
+      );
+    });
+
+    if (cancellableRequests.length === 0) {
+      return { error: 'no requests can be canceled' };
+    }
+
+    const cancellableIds = cancellableRequests.map((req) => req._id);
+
+    const update = await coll.updateMany(
+      { _id: { $in: cancellableIds } },
+      {
+        $set: {
+          status: 'canceled',
+          canceledAt: new Date(),
+          canceledBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertimeOrders();
+
+    return {
+      success: `${update.modifiedCount} requests canceled`,
+      count: update.modifiedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkCancelOvertimeRequests server action error' };
+  }
+}
+
+export async function bulkMarkAsAccountedOvertimeRequests(ids: string[]) {
+  console.log('bulkMarkAsAccountedOvertimeRequests', ids);
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    return { error: 'unauthorized' };
+  }
+
+  const isHR = (session.user?.roles ?? []).includes('hr');
+
+  if (!isHR) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    const update = await coll.updateMany(
+      {
+        _id: { $in: objectIds },
+        status: 'completed',
+      },
+      {
+        $set: {
+          status: 'accounted',
+          accountedAt: new Date(),
+          accountedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    revalidateOvertimeOrders();
+
+    return {
+      success: `${update.modifiedCount} requests marked as accounted`,
+      count: update.modifiedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkMarkAsAccountedOvertimeRequests server action error' };
+  }
+}
+
+export async function getOvertimeRequestForEdit(id: string) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+
+    if (!request) {
+      return null;
+    }
+
+    // Check if user has permission to edit
+    const isAdmin = session.user.roles?.includes('admin');
+    const isHR = session.user.roles?.includes('hr');
+    const isPlantManager = session.user.roles?.includes('plant-manager');
+    const isAuthor = request.requestedBy === session.user.email;
+
+    // For canceled and accounted statuses - only admin can edit
+    if (request.status === 'canceled' || request.status === 'accounted') {
+      if (!isAdmin) {
+        return null;
+      }
+    } else {
+      // For other statuses:
+      // Admin, HR, and plant-manager can edit always
+      // Author can edit only pending status
+      const canEdit =
+        isAdmin ||
+        isHR ||
+        isPlantManager ||
+        (isAuthor && request.status === 'pending');
+
+      if (!canEdit) {
+        return null;
+      }
+    }
+
+    // Convert MongoDB document to OvertimeType
+    return {
+      _id: request._id.toString(),
+      status: request.status,
+      numberOfEmployees: request.numberOfEmployees,
+      numberOfShifts: request.numberOfShifts,
+      responsibleEmployee: request.responsibleEmployee,
+      employeesWithScheduledDayOff: request.employeesWithScheduledDayOff || [],
+      from: request.from,
+      to: request.to,
+      reason: request.reason,
+      note: request.note || '',
+      requestedAt: request.requestedAt,
+      requestedBy: request.requestedBy,
+      editedAt: request.editedAt,
+      editedBy: request.editedBy,
+      approvedAt: request.approvedAt,
+      approvedBy: request.approvedBy,
+      canceledAt: request.canceledAt,
+      canceledBy: request.canceledBy,
+      completedAt: request.completedAt,
+      completedBy: request.completedBy,
+      accountedAt: request.accountedAt,
+      accountedBy: request.accountedBy,
+      hasAttachment: request.hasAttachment,
+      attachmentFilename: request.attachmentFilename,
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function updateOvertimeRequest(
+  id: string,
+  data: NewOvertimeRequestType,
+): Promise<{ success: 'updated' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+
+    // First check if the request exists and get its current data
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
+    }
+
+    // Check if user has permission to edit
+    const isAdmin = session.user.roles?.includes('admin');
+    const isHR = session.user.roles?.includes('hr');
+    const isPlantManager = session.user.roles?.includes('plant-manager');
+    const isAuthor = request.requestedBy === session.user.email;
+
+    // For canceled and accounted statuses - only admin can edit
+    if (request.status === 'canceled' || request.status === 'accounted') {
+      if (!isAdmin) {
+        return {
+          error:
+            'unauthorized - only admin can edit canceled or accounted requests',
+        };
+      }
+    } else {
+      // For other statuses:
+      // Admin, HR, and plant-manager can edit always
+      // Author can edit only pending status
+      const canEdit =
+        isAdmin ||
+        isHR ||
+        isPlantManager ||
+        (isAuthor && request.status === 'pending');
+
+      if (!canEdit) {
+        return { error: 'unauthorized' };
+      }
+    }
+
+    // Update the request
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...data,
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateOvertimeOrders();
+    revalidateOvertimeOrdersRequest();
+    return { success: 'updated' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'updateOvertimeRequest server action error' };
+  }
+}
+
+export async function bulkDeleteOvertimeRequests(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  // Only admins can delete orders
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  if (!isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    
+    // Handle both ObjectIds and string IDs
+    const convertedIds: ObjectId[] = ids.map((id) => {
+      try {
+        // Try to convert to ObjectId first
+        return new ObjectId(id);
+      } catch {
+        // If it fails, create a new ObjectId (this should rarely happen)
+        // In production, all IDs should be valid ObjectId strings
+        throw new Error(`Invalid ObjectId format: ${id}`);
+      }
+    });
+
+    const deleteResult = await coll.deleteMany({ _id: { $in: convertedIds } });
+
+    revalidateOvertimeOrders();
+    return {
+      success: 'deleted',
+      count: deleteResult.deletedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkDeleteOvertimeRequests server action error' };
+  }
+}
+
+export async function bulkReactivateOvertimeRequests(ids: string[]) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  // Only admins can reactivate orders
+  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  if (!isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_orders');
+    
+    // Handle both ObjectIds and string IDs
+    const convertedIds: ObjectId[] = ids.map((id) => {
+      try {
+        // Try to convert to ObjectId first
+        return new ObjectId(id);
+      } catch {
+        // If it fails, throw error (all IDs should be valid ObjectId strings)
+        throw new Error(`Invalid ObjectId format: ${id}`);
+      }
+    });
+
+    // First get all requests to check which ones can be reactivated
+    const requests = await coll.find({ _id: { $in: convertedIds } }).toArray();
+    
+    // Filter to only canceled requests
+    const reactivatableIds = requests
+      .filter(req => req.status === 'canceled')
+      .map(req => req._id);
+
+    if (reactivatableIds.length === 0) {
+      return { error: 'no canceled requests found' };
+    }
+
+    // Update canceled requests back to pending
+    const update = await coll.updateMany(
+      { _id: { $in: reactivatableIds } },
+      { 
+        $set: { 
+          status: 'pending',
+          reactivatedAt: new Date(),
+          reactivatedBy: session.user.email
+        },
+        $unset: { 
+          canceledAt: "",
+          canceledBy: ""
+        }
+      }
+    );
+
+    revalidateOvertimeOrders();
+    return {
+      success: 'reactivated',
+      count: update.modifiedCount,
+    };
+  } catch (error) {
+    console.error(error);
+    return { error: 'bulkReactivateOvertimeRequests server action error' };
+  }
+}

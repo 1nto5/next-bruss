@@ -1,0 +1,175 @@
+{
+  "title": "Überstunden-Meldungen",
+  "pageTitle": "Überstunden-Meldungen",
+  "testWarning": "Anwendung in Testphase - Einträge sind nicht offiziell",
+  "hrView": "HR-Ansicht",
+  "hrViewTitle": "HR-Ansicht - Überstunden-Meldungen",
+  "backToSubmissions": "Zurück zu Meldungen",
+  "newSubmission": "Neue Meldung",
+  "filters": {
+    "showFilters": "Filter anzeigen",
+    "select": "auswählen",
+    "search": "Suchen",
+    "searchPlaceholder": "suchen...",
+    "notFound": "nicht gefunden",
+    "clear": "Löschen",
+    "status": "Status",
+    "employee": "Mitarbeiter",
+    "year": "Jahr",
+    "month": "Monat",
+    "manager": "Vorgesetzter",
+    "pendingSettlements": "Zur Abrechnung",
+    "pendingApprovals": "Zur Genehmigung"
+  },
+  "status": {
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "accounted": "Abgerechnet",
+    "cancelled": "Storniert"
+  },
+  "actions": {
+    "approve": "Genehmigen",
+    "approveDirector": "Genehmigen (Direktor)",
+    "reject": "Ablehnen",
+    "markAsAccounted": "Als abgerechnet markieren",
+    "cancel": "Abbrechen",
+    "edit": "Bearbeiten",
+    "confirm": "Bestätigen",
+    "save": "Änderungen speichern",
+    "add": "Meldung hinzufügen",
+    "saveAndAddAnother": "Speichern und weitere hinzufügen"
+  },
+  "dialogs": {
+    "approve": {
+      "title": "Meldung genehmigen",
+      "description": "Möchten Sie diese Überstunden-Meldung wirklich genehmigen?"
+    },
+    "reject": {
+      "title": "Meldung ablehnen",
+      "description": "Geben Sie einen Grund für die Ablehnung dieser Überstunden-Meldung an.",
+      "reasonLabel": "Ablehnungsgrund",
+      "reasonPlaceholder": "Ablehnungsgrund eingeben...",
+      "buttonText": "Meldung ablehnen"
+    },
+    "markAsAccounted": {
+      "title": "Als abgerechnet markieren",
+      "description": "Möchten Sie diese Meldung wirklich als abgerechnet markieren? Diese Aktion ist unwiderruflich und bedeutet, dass alle Überstunden im Abrechnungssystem verarbeitet wurden."
+    },
+    "cancel": {
+      "title": "Meldung stornieren?",
+      "description": "Möchten Sie diese Überstunden-Meldung wirklich stornieren? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancelButton": "Nein, behalten",
+      "confirmButton": "Ja, Meldung stornieren"
+    },
+    "bulkConfirm": {
+      "title": "Vorgang bestätigen",
+      "description": "Möchten Sie diesen Vorgang wirklich durchführen für"
+    }
+  },
+  "form": {
+    "titleNew": "Neue Überstunden-Meldung",
+    "titleEdit": "Überstunden-Meldung bearbeiten",
+    "supervisor": "Vorgesetzter",
+    "hours": "Stunden",
+    "hoursDescription": "Geben Sie die Stundenanzahl mit halbstündiger Genauigkeit ein (z.B. 2,5). Verwenden Sie negative Werte (z.B. -2,5), um Überstunden abzuziehen.",
+    "date": "Datum",
+    "reason": "Begründung",
+    "overtimeRequest": "Überstunden-Arbeitsauftrag",
+    "overtimeRequestDescription": "Geplante Überstunden erfordern die Genehmigung von Vorgesetztem und Direktor.",
+    "payment": "Zahlung",
+    "scheduledDayOff": "Geplanter freier Tag für Überstunden",
+    "managerNotFound": "Vorgesetzter nicht gefunden.",
+    "submissionsTable": "Meldungstabelle"
+  },
+  "columns": {
+    "status": "Status",
+    "payment": "Zahlung",
+    "actions": "Aktionen",
+    "submittedBy": "Gemeldet von",
+    "supervisor": "Vorgesetzter",
+    "date": "Datum",
+    "hours": "Stunden",
+    "reason": "Begründung",
+    "submittedAt": "Meldungsdatum",
+    "editedAt": "Bearbeitungsdatum",
+    "editedBy": "Bearbeitet von",
+    "approvedAt": "Genehmigungsdatum",
+    "approvedBy": "Genehmigt von",
+    "rejectedAt": "Ablehnungsdatum",
+    "rejectionReason": "Ablehnungsgrund",
+    "accountedAt": "Abrechnungsdatum",
+    "accountedBy": "Abgerechnet von"
+  },
+  "bulk": {
+    "selectedOne": "Sie haben 1 Meldung ausgewählt:",
+    "selectedFew": "Sie haben {count} Meldungen ausgewählt:",
+    "selectedMany": "Sie haben {count} Meldungen ausgewählt:",
+    "noCommonActions": "Keine gemeinsamen Aktionen für ausgewählte Meldungen verfügbar.",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "settle": "Abrechnen",
+    "cancel": "Abbrechen",
+    "rejectTitle": "Ausgewählte Meldungen ablehnen",
+    "rejectDescription": "Möchten Sie wirklich {count} ausgewählte Meldungen ablehnen? Geben Sie einen Ablehnungsgrund an.",
+    "rejectionReasonPlaceholder": "Ablehnungsgrund..."
+  },
+  "toast": {
+    "approving": "Meldung wird genehmigt...",
+    "approved": "Meldung wurde genehmigt!",
+    "rejecting": "Meldung wird abgelehnt...",
+    "rejected": "Meldung wurde abgelehnt!",
+    "markingAsAccounted": "Als abgerechnet markieren...",
+    "markedAsAccounted": "Meldung als abgerechnet markiert!",
+    "cancelling": "Meldung wird storniert...",
+    "cancelled": "Meldung wurde storniert!",
+    "submissionSaved": "Meldung gespeichert!",
+    "submissionUpdated": "Meldung wurde aktualisiert!",
+    "submissionAdded": "Meldung hinzugefügt!",
+    "bulkApproving": "Genehmigen...",
+    "bulkApproved": "{count} von {total} Meldungen genehmigt!",
+    "bulkRejecting": "Ablehnen...",
+    "bulkRejected": "{count} von {total} Meldungen abgelehnt!",
+    "bulkSettling": "Abrechnen...",
+    "bulkSettled": "{count} von {total} Meldungen abgerechnet!",
+    "bulkCancelling": "Stornieren...",
+    "bulkCancelled": "{count} von {total} Meldungen storniert!",
+    "provideRejectionReason": "Ablehnungsgrund angeben"
+  },
+  "errors": {
+    "unauthorized": "Sie haben keine Berechtigung!",
+    "unauthorizedToApprove": "Sie haben keine Berechtigung zum Genehmigen!",
+    "unauthorizedToReject": "Sie haben keine Berechtigung zum Ablehnen!",
+    "notFound": "Meldung nicht gefunden!",
+    "invalidStatus": "Ungültiger Meldungsstatus!",
+    "cannotEditApprovedOrRejected": "Genehmigte oder abgelehnte Meldung kann nicht bearbeitet werden!",
+    "cannotCancel": "Diese Meldung kann nicht storniert werden!",
+    "notInserted": "Meldung konnte nicht hinzugefügt werden!",
+    "contactIT": "Kontaktieren Sie die IT!",
+    "onlyHRCanMarkAsAccounted": "Nur HR-Mitarbeiter können Meldungen als abgerechnet markieren!",
+    "approvalError": "Genehmigungsfehler",
+    "rejectionError": "Ablehnungsfehler",
+    "settlementError": "Abrechnungsfehler",
+    "cancellationError": "Stornierungsfehler"
+  },
+  "validation": {
+    "rejectionReasonRequired": "Ablehnungsgrund ist erforderlich!",
+    "rejectionReasonTooLong": "Ablehnungsgrund darf nicht länger als 500 Zeichen sein!",
+    "supervisorEmailInvalid": "Vorgesetzten auswählen!",
+    "supervisorRequired": "Vorgesetzter ist erforderlich!",
+    "dateRequired": "Datum auswählen!",
+    "hoursMinRange": "Wert zwischen -8 und 16 eingeben!",
+    "hoursMaxRange": "Wert zwischen -8 und 16 eingeben!",
+    "scheduledDayOffRequired": "Tag für Freizeitausgleich auswählen, wenn Überstunden nicht ausgezahlt werden!",
+    "dateRangeInvalid": "Sie können nur Überstunden der letzten 7 Tage hinzufügen.",
+    "hoursIncrementInvalid": "Stunden müssen in halben Stunden angegeben werden (0.5, 1.0, 1.5 usw.)",
+    "reasonRequired": "Begründung ist erforderlich!"
+  },
+  "summary": {
+    "yourOvertimeIn": "Ihre Überstunden in",
+    "yourTotalOvertime": "Ihre gesamten Überstunden",
+    "organizationOvertimeIn": "Überstunden der Organisation in",
+    "overdueOvertimeToSettle": "Überfällige Überstunden zur Abrechnung",
+    "pending": "ausstehend"
+  }
+}

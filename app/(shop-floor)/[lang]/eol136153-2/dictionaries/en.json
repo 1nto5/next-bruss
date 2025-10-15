@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Login - EOL136153",
+    "operator1Label": "Personal number 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personal number 2",
+    "personalNumber3Label": "Personal number 3",
+    "placeholder": "touch to enter...",
+    "loginButton": "Login",
+    "clearButton": "Clear",
+    "keypadTitle": "Enter operator personal number",
+    "keypadReset": "Reset",
+    "keypadSave": "Save",
+    "errors": {
+      "wrongNumber1": "Invalid personal number!",
+      "wrongNumber2": "Invalid personal number!",
+      "wrongNumber3": "Invalid personal number!",
+      "requiredNumber1": "Personal number 1 is required!",
+      "requiredNumber2": "Personal number 2 is required!",
+      "requiredNumber3": "Personal number 3 is required!",
+      "loginError": "Contact IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Operator",
+    "logout": "Logout",
+    "changeArticle": "Change",
+    "volume": "Volume"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Boxes on pallet",
+    "palletFull": "Pallet full",
+    "scanPallet": "Scan pallet",
+    "pallet": "PALLET",
+    "boxes": "box",
+    "time": "Time",
+    "noScans": "None",
+    "deleteBox": "Delete box",
+    "deleteBoxConfirm": "Are you sure you want to delete this box from the pallet?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deletingBox": "Deleting box...",
+    "boxDeleted": "Box has been removed from pallet",
+    "boxNotFound": "Box not found",
+    "deleteError": "Error while deleting"
+  },
+  "scanning": {
+    "title": "Scan Hydra code",
+    "placeholder": "HYDRA QR",
+    "scanning": "Scanning...",
+    "messages": {
+      "saved": "Batch saved!",
+      "exists": "Batch already exists!",
+      "invalid": "Invalid code!",
+      "wrongArticle": "Wrong article!",
+      "wrongQuantity": "Wrong quantity!",
+      "wrongProcess": "Wrong process!",
+      "fullPallet": "Pallet full!",
+      "error": "Error! Contact IT"
+    }
+  },
+  "pallet": {
+    "title": "Scan QR pallet",
+    "placeholder": "Pallet QR",
+    "generateBatch": "Generate pallet batch",
+    "print": "Print collective label",
+    "printing": "Printing...",
+    "nextPallet": "Next pallet",
+    "messages": {
+      "success": "Pallet saved!",
+      "invalid": "Invalid pallet QR!",
+      "error": "Pallet save error!",
+      "printSuccess": "Label printed!",
+      "printError": "Label printing error!"
+    }
+  },
+  "lastScans": {
+    "title": "Last scans",
+    "empty": "No scans"
+  },
+  "errors": {
+    "somethingWrong": "Something went wrong",
+    "fetchError": "Failed to fetch data",
+    "contactIT": "Contact IT"
+  },
+  "logout": {
+    "title": "Logout",
+    "description": "Are you sure you want to logout?",
+    "cancel": "Cancel",
+    "confirm": "Logout",
+    "logoutOperators": "Logout"
+  }
+}

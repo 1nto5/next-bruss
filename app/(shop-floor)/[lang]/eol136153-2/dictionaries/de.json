@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Anmeldung - EOL136153",
+    "operator1Label": "Personalnummer 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Personalnummer 2",
+    "personalNumber3Label": "Personalnummer 3",
+    "placeholder": "zum Eingeben berühren...",
+    "loginButton": "Anmelden",
+    "clearButton": "Löschen",
+    "keypadTitle": "Personalnummer des Operators eingeben",
+    "keypadReset": "Zurücksetzen",
+    "keypadSave": "Speichern",
+    "errors": {
+      "wrongNumber1": "Ungültige Personalnummer!",
+      "wrongNumber2": "Ungültige Personalnummer!",
+      "wrongNumber3": "Ungültige Personalnummer!",
+      "requiredNumber1": "Personalnummer 1 ist erforderlich!",
+      "requiredNumber2": "Personalnummer 2 ist erforderlich!",
+      "requiredNumber3": "Personalnummer 3 ist erforderlich!",
+      "loginError": "Kontaktieren Sie die IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Bediener",
+    "logout": "Abmelden",
+    "changeArticle": "Ändern",
+    "volume": "Lautstärke"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Kartons auf Palette",
+    "palletFull": "Palette voll",
+    "scanPallet": "Palette scannen",
+    "pallet": "PALETTE",
+    "boxes": "Box",
+    "time": "Zeit",
+    "noScans": "Keine",
+    "deleteBox": "Box löschen",
+    "deleteBoxConfirm": "Möchten Sie diese Box wirklich von der Palette löschen?",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "deletingBox": "Box wird gelöscht...",
+    "boxDeleted": "Box wurde von der Palette entfernt",
+    "boxNotFound": "Box nicht gefunden",
+    "deleteError": "Fehler beim Löschen"
+  },
+  "scanning": {
+    "title": "Hydra-Code scannen",
+    "placeholder": "HYDRA QR",
+    "scanning": "Scannen...",
+    "messages": {
+      "saved": "Batch gespeichert!",
+      "exists": "Batch existiert bereits!",
+      "invalid": "Ungültiger Code!",
+      "wrongArticle": "Falscher Artikel!",
+      "wrongQuantity": "Falsche Menge!",
+      "wrongProcess": "Falscher Prozess!",
+      "fullPallet": "Palette voll!",
+      "error": "Fehler! IT kontaktieren"
+    }
+  },
+  "pallet": {
+    "title": "QR-Palette scannen",
+    "placeholder": "Palette QR",
+    "generateBatch": "Palettenbatch generieren",
+    "print": "Sammeletikett drucken",
+    "printing": "Drucken...",
+    "nextPallet": "Nächste Palette",
+    "messages": {
+      "success": "Palette gespeichert!",
+      "invalid": "Ungültiger Palettencode!",
+      "error": "Palettenspeicherfehler!",
+      "printSuccess": "Etikett gedruckt!",
+      "printError": "Druckfehler!"
+    }
+  },
+  "lastScans": {
+    "title": "Letzte Scans",
+    "empty": "Keine Scans"
+  },
+  "errors": {
+    "somethingWrong": "Etwas ist schiefgelaufen",
+    "fetchError": "Daten konnten nicht abgerufen werden",
+    "contactIT": "IT kontaktieren"
+  },
+  "logout": {
+    "title": "Abmelden",
+    "description": "Möchten Sie sich wirklich abmelden?",
+    "cancel": "Abbrechen",
+    "confirm": "Abmelden",
+    "logoutOperators": "Abmelden"
+  }
+}

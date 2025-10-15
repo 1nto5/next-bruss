@@ -7,9 +7,10 @@ import { useEffect, useRef, useState } from 'react';
 interface RefreshButtonProps {
   fetchTime: Date;
   onRefresh: () => Promise<void>;
+  label?: string;
 }
 
-export function RefreshButton({ fetchTime, onRefresh }: RefreshButtonProps) {
+export function RefreshButton({ fetchTime, onRefresh, label = 'Refresh' }: RefreshButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const [lastFetchTime, setLastFetchTime] = useState(fetchTime);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -58,7 +59,6 @@ export function RefreshButton({ fetchTime, onRefresh }: RefreshButtonProps) {
     <Button
       onClick={handleRefresh}
       disabled={isPending}
-      size="sm"
       variant="outline"
     >
       {isPending ? (
@@ -66,7 +66,7 @@ export function RefreshButton({ fetchTime, onRefresh }: RefreshButtonProps) {
       ) : (
         <RefreshCw />
       )}
-      Refresh
+      <span>{label}</span>
     </Button>
   );
 }

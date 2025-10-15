@@ -1,0 +1,71 @@
+{
+  "title": "Dane DMCheck",
+  "lastSync": "Ostatnia synchronizacja",
+  "columns": {
+    "status": "Status",
+    "dmc": "DMC",
+    "time": "Czas",
+    "article": "Artykuł",
+    "operator": "Operator",
+    "workplace": "Stanowisko",
+    "hydraBatch": "Partia HYDRA",
+    "hydraOperator": "Operator HYDRA",
+    "hydraTime": "Czas HYDRA",
+    "palletBatch": "Partia palety",
+    "palletOperator": "Operator palety",
+    "palletTime": "Czas palety",
+    "reworkReason": "Powód przeróbki",
+    "reworkUser": "Użytkownik przeróbki",
+    "reworkTime": "Czas przeróbki"
+  },
+  "filters": {
+    "from": "Od:",
+    "to": "Do:",
+    "workplace": "Stanowisko",
+    "article": "Artykuł",
+    "status": "Status",
+    "dmc": "DMC",
+    "hydraBatch": "Partia HYDRA",
+    "palletBatch": "Partia palety",
+    "select": "Wybierz...",
+    "search": "szukaj...",
+    "notFound": "nie znaleziono",
+    "clickToAdd": "Kliknij, aby dodać...",
+    "value": "wartość",
+    "values": "wartości",
+    "pasteTitle": "Kliknij, aby wkleić wartości z Excel lub edytuj ręcznie",
+    "clear": "Wyczyść",
+    "clearFilters": "Wyczyść filtry",
+    "export": "Eksportuj",
+    "search_button": "Szukaj",
+    "refresh": "Odśwież"
+  },
+  "statusOptions": {
+    "box": "box - zeskanowane",
+    "pallet": "pallet - potwierdzone etykietą hydra",
+    "warehouse": "warehouse - potwierdzone etykietą palety",
+    "rework": "rework - wszystkie próby przeróbki"
+  },
+  "pasteDialog": {
+    "manageTitle": "Zarządzaj wartościami",
+    "valuesLabel": "Wartości (jedna na linię)",
+    "clearAll": "Wyczyść wszystko",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "errorApplying": "Błąd podczas aplikowania wartości",
+    "clearedFilter": "Wyczyszczono filtr",
+    "appliedValues": "Zastosowano wartości do filtra",
+    "invalidDmc": "Nieprawidłowy format DMC (powinien mieć 12-13 znaków)",
+    "invalidHydraBatch": "Nieprawidłowy format HYDRA Batch (musi mieć 10 znaków)",
+    "invalidPalletBatch": "Nieprawidłowy format Partii palety",
+    "placeholderDmc": "Wklej wartości DMC tutaj (12-13 znaków), na przykład:\n123456789012\nABC1234567890\nXY12345678901",
+    "placeholderHydraBatch": "Wklej wartości HYDRA Batch tutaj (10 znaków), na przykład:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatch": "Wklej wartości Partii palety tutaj, na przykład:\nPAL001\nPAL002\nPAL003",
+    "placeholderDmcCurrent": "Aktualne wartości są pokazane poniżej. Możesz je edytować lub wkleić nowe:\n123456789012\nABC1234567890\nXY12345678901",
+    "placeholderHydraBatchCurrent": "Aktualne wartości są pokazane poniżej. Możesz je edytować lub wkleić nowe:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatchCurrent": "Aktualne wartości są pokazane poniżej. Możesz je edytować lub wkleić nowe:\nPAL001\nPAL002\nPAL003"
+  },
+  "editDialog": {
+    "save": "Zapisz"
+  }
+}

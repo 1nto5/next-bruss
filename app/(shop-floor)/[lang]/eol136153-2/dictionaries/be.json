@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Уваход - EOL136153",
+    "operator1Label": "Персанальны нумар 1",
+    "operator2Label": "Аператар 2",
+    "operator3Label": "Аператар 3",
+    "personalNumber2Label": "Персанальны нумар 2",
+    "personalNumber3Label": "Персанальны нумар 3",
+    "placeholder": "дакраніцеся для ўводу...",
+    "loginButton": "Увайсці",
+    "clearButton": "Ачысціць",
+    "keypadTitle": "Увядзіце персанальны нумар аператара",
+    "keypadReset": "Скінуць",
+    "keypadSave": "Захаваць",
+    "errors": {
+      "wrongNumber1": "Няправільны персанальны нумар!",
+      "wrongNumber2": "Няправільны персанальны нумар!",
+      "wrongNumber3": "Няправільны персанальны нумар!",
+      "requiredNumber1": "Персанальны нумар 1 абавязковы!",
+      "requiredNumber2": "Персанальны нумар 2 абавязковы!",
+      "requiredNumber3": "Персанальны нумар 3 абавязковы!",
+      "loginError": "Звярніцеся да IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Аператар",
+    "logout": "Выйсці",
+    "changeArticle": "Змяніць",
+    "volume": "Гучнасць"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Скрынак на палеце",
+    "palletFull": "Палета поўная",
+    "scanPallet": "Сканаваць палету",
+    "pallet": "ПАЛЕТА",
+    "boxes": "скрынка",
+    "time": "Час",
+    "noScans": "Няма",
+    "deleteBox": "Выдаліць скрынку",
+    "deleteBoxConfirm": "Ці ўпэўненыя вы, што хочаце выдаліць гэтую скрынку з палеты?",
+    "cancel": "Адмяніць",
+    "delete": "Выдаліць",
+    "deletingBox": "Выдаленне скрынкі...",
+    "boxDeleted": "Скрынка выдалена з палеты",
+    "boxNotFound": "Скрынка не знойдзена",
+    "deleteError": "Памылка пры выдаленні"
+  },
+  "scanning": {
+    "title": "Сканаваць код Hydra",
+    "placeholder": "HYDRA QR",
+    "scanning": "Сканаванне...",
+    "messages": {
+      "saved": "Партыя захавана!",
+      "exists": "Партыя ўжо існуе!",
+      "invalid": "Няправільны код!",
+      "wrongArticle": "Няправільны артыкул!",
+      "wrongQuantity": "Няправільная колькасць!",
+      "wrongProcess": "Няправільны працэс!",
+      "fullPallet": "Палета поўная!",
+      "error": "Памылка! Звярніцеся да ІТ"
+    }
+  },
+  "pallet": {
+    "title": "Сканаваць QR палета",
+    "placeholder": "Палета QR",
+    "generateBatch": "Згенераваць партыю палеты",
+    "print": "Друкаваць зборную этыкетку",
+    "printing": "Друкаванне...",
+    "nextPallet": "Наступная палета",
+    "messages": {
+      "success": "Палета захавана!",
+      "invalid": "Няправільны код палеты!",
+      "error": "Памылка захавання палеты!",
+      "printSuccess": "Этыкетка надрукавана!",
+      "printError": "Памылка друкавання!"
+    }
+  },
+  "lastScans": {
+    "title": "Апошнія сканаванні",
+    "empty": "Няма сканаванняў"
+  },
+  "errors": {
+    "somethingWrong": "Нешта пайшло не так",
+    "fetchError": "Не ўдалося атрымаць даныя",
+    "contactIT": "Звярніцеся да ІТ"
+  },
+  "logout": {
+    "title": "Выйсці",
+    "description": "Вы ўпэўнены, што хочаце выйсці?",
+    "cancel": "Скасаваць",
+    "confirm": "Выйсці",
+    "logoutOperators": "Выйсці"
+  }
+}

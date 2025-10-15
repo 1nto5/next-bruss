@@ -1,0 +1,69 @@
+{
+  "title": "Failures",
+  "addFailure": "Add Failure",
+  "addingFailure": "Adding failure...",
+  "filters": {
+    "showFilters": "Show filters",
+    "from": "from:",
+    "to": "to:",
+    "station": "station",
+    "failure": "failure",
+    "supervisor": "supervisor",
+    "responsible": "responsible",
+    "search": "Search",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "exportToExcel": "Export to Excel",
+    "searchPlaceholder": "search...",
+    "notFound": "not found",
+    "notSet": "not set"
+  },
+  "form": {
+    "newFailure": "New Failure",
+    "onLine": "on line:",
+    "line": "Line",
+    "station": "Station",
+    "failure": "Failure",
+    "start": "Start",
+    "supervisor": "Supervisor",
+    "responsible": "Responsible",
+    "solution": "Solution",
+    "comment": "Comment",
+    "select": "select",
+    "notSelected": "not selected",
+    "searchPlaceholder": "search...",
+    "notFound": "Not found.",
+    "contactIT": "Contact IT!"
+  },
+  "toasts": {
+    "failureAdded": "Failure added!",
+    "contactIT": "Contact IT!"
+  },
+  "table": {
+    "columns": {
+      "id": "ID",
+      "line": "Line",
+      "station": "Station",
+      "failure": "Failure",
+      "from": "From",
+      "to": "To",
+      "duration": "Duration",
+      "supervisor": "Supervisor",
+      "responsible": "Responsible",
+      "solution": "Solution",
+      "comment": "Comment"
+    }
+  },
+  "validation": {
+    "lineRequired": "Select line to add failure!",
+    "supervisorRequired": "Enter supervisor!",
+    "responsibleRequired": "Enter responsible person!",
+    "stationRequired": "Select station!",
+    "failureRequired": "Select failure!",
+    "fromDateFuture": "We don't plan failures in the future!",
+    "fromDatePast": "Cannot go back in time > 1h!",
+    "fromDateEditLimit": "Editing possible only 8h back!",
+    "toDateFuture": "Date cannot be in the future!",
+    "toDateBeforeFrom": "End cannot be before start!"
+  }
+}

@@ -1,6 +1,6 @@
 import '@/app/globals.css';
-import { i18n } from '@/i18n.config';
-import { ThemeProvider } from '@/lib/theme-provider';
+import { i18n } from '@/lib/config/i18n';
+import { ThemeProvider } from '@/lib/providers/theme-provider';
 import { Metadata } from 'next';
 // import { Toaster } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
@@ -10,9 +10,7 @@ export const metadata: Metadata = {
   // description: 'Company helper applications',
 };
 
-export default async function RootLayout(props: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
   return (

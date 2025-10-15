@@ -1,0 +1,71 @@
+{
+  "title": "DMCheck Daten",
+  "lastSync": "Letzte Synchronisierung",
+  "columns": {
+    "status": "Status",
+    "dmc": "DMC",
+    "time": "Zeit",
+    "article": "Artikel",
+    "operator": "Operator",
+    "workplace": "Arbeitsplatz",
+    "hydraBatch": "HYDRA Charge",
+    "hydraOperator": "HYDRA Operator",
+    "hydraTime": "HYDRA Zeit",
+    "palletBatch": "Paletten Charge",
+    "palletOperator": "Paletten Operator",
+    "palletTime": "Paletten Zeit",
+    "reworkReason": "Nacharbeitsgrund",
+    "reworkUser": "Nacharbeitsbenutzer",
+    "reworkTime": "Nacharbeitszeit"
+  },
+  "filters": {
+    "from": "Von:",
+    "to": "Bis:",
+    "workplace": "Arbeitsplatz",
+    "article": "Artikel",
+    "status": "Status",
+    "dmc": "DMC",
+    "hydraBatch": "HYDRA Charge",
+    "palletBatch": "Paletten Charge",
+    "select": "Auswählen...",
+    "search": "suchen...",
+    "notFound": "nicht gefunden",
+    "clickToAdd": "Klicken zum Hinzufügen...",
+    "value": "Wert",
+    "values": "Werte",
+    "pasteTitle": "Klicken Sie, um Werte aus Excel einzufügen oder manuell zu bearbeiten",
+    "clear": "Löschen",
+    "clearFilters": "Filter löschen",
+    "export": "Exportieren",
+    "search_button": "Suchen",
+    "refresh": "Aktualisieren"
+  },
+  "statusOptions": {
+    "box": "box - gescannt",
+    "pallet": "pallet - mit Hydra-Etikett bestätigt",
+    "warehouse": "warehouse - mit Paletten-Etikett bestätigt",
+    "rework": "rework - alle Nacharbeitsversuche"
+  },
+  "pasteDialog": {
+    "manageTitle": "Werte verwalten",
+    "valuesLabel": "Werte (einer pro Zeile)",
+    "clearAll": "Alles löschen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "errorApplying": "Fehler beim Anwenden von Werten",
+    "clearedFilter": "Filter gelöscht",
+    "appliedValues": "Werte auf Filter angewendet",
+    "invalidDmc": "Ungültiges DMC-Format (sollte 12-13 Zeichen haben)",
+    "invalidHydraBatch": "Ungültiges HYDRA-Charge-Format (muss 10 Zeichen haben)",
+    "invalidPalletBatch": "Ungültiges Paletten-Charge-Format",
+    "placeholderDmc": "Fügen Sie hier Ihre DMC-Werte ein, zum Beispiel:\nC9E0C25175A12400GK2Q\n6K301 AA 1021310071895021025070710279\np32298714#tpp0000212667#vexrga",
+    "placeholderHydraBatch": "Fügen Sie hier Ihre HYDRA-Charge-Werte ein (10 Zeichen), zum Beispiel:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatch": "Fügen Sie hier Ihre Paletten-Charge-Werte ein, zum Beispiel:\nPAL001\nPAL002\nPAL003",
+    "placeholderDmcCurrent": "Aktuelle Werte werden unten angezeigt. Sie können sie bearbeiten oder neue Werte einfügen:\nC9E0C25175A12400GK2Q\n6K301 AA 1021310071895021025070710279\np32298714#tpp0000212667#vexrga",
+    "placeholderHydraBatchCurrent": "Aktuelle Werte werden unten angezeigt. Sie können sie bearbeiten oder neue Werte einfügen:\nHH12345678\nAB98765432\nXY11223344",
+    "placeholderPalletBatchCurrent": "Aktuelle Werte werden unten angezeigt. Sie können sie bearbeiten oder neue Werte einfügen:\nPAL001\nPAL002\nPAL003"
+  },
+  "editDialog": {
+    "save": "Speichern"
+  }
+}

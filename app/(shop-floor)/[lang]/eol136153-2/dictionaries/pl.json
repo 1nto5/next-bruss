@@ -1,0 +1,99 @@
+{
+  "login": {
+    "title": "Logowanie - EOL136153",
+    "operator1Label": "Numer personalny 1",
+    "operator2Label": "Operator 2",
+    "operator3Label": "Operator 3",
+    "personalNumber2Label": "Numer personalny 2",
+    "personalNumber3Label": "Numer personalny 3",
+    "placeholder": "dotknij aby wprowadzić...",
+    "loginButton": "Zaloguj",
+    "clearButton": "Wyczyść",
+    "keypadTitle": "Wprowadź numer personalny operatora",
+    "keypadReset": "Resetuj",
+    "keypadSave": "Zapisz",
+    "errors": {
+      "wrongNumber1": "Nieprawidłowy nr personalny!",
+      "wrongNumber2": "Nieprawidłowy nr personalny!",
+      "wrongNumber3": "Nieprawidłowy nr personalny!",
+      "requiredNumber1": "Nr personalny 1 jest wymagany!",
+      "requiredNumber2": "Nr personalny 2 jest wymagany!",
+      "requiredNumber3": "Nr personalny 3 jest wymagany!",
+      "loginError": "Skontaktuj się z IT!"
+    }
+  },
+  "header": {
+    "title": "EOL136153",
+    "operator": "Operator",
+    "logout": "Wyloguj",
+    "changeArticle": "Zmień",
+    "volume": "Głośność"
+  },
+  "status": {
+    "article136": "28067",
+    "article153": "28042",
+    "article136Name": "M-136-K-1-A",
+    "article153Name": "M-153-K-C",
+    "boxesOnPallet": "Kartonów na palecie",
+    "palletFull": "Pełna paleta",
+    "scanPallet": "Skanuj paletę",
+    "pallet": "PALETA",
+    "boxes": "box",
+    "time": "Czas",
+    "noScans": "Brak",
+    "deleteBox": "Usuń box",
+    "deleteBoxConfirm": "Czy na pewno chcesz usunąć ten box z palety?",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "deletingBox": "Usuwanie boxa...",
+    "boxDeleted": "Box został usunięty z palety",
+    "boxNotFound": "Nie znaleziono boxa",
+    "deleteError": "Błąd podczas usuwania"
+  },
+  "scanning": {
+    "title": "Skanuj kod Hydra",
+    "placeholder": "HYDRA QR",
+    "scanning": "Skanowanie...",
+    "messages": {
+      "saved": "Batch zapisany!",
+      "exists": "Batch już istnieje!",
+      "invalid": "Nieprawidłowy kod!",
+      "wrongArticle": "Błędny artykuł!",
+      "wrongQuantity": "Błędna ilość!",
+      "wrongProcess": "Błędny proces!",
+      "fullPallet": "Paleta pełna!",
+      "error": "Błąd! Zgłoś się do IT"
+    }
+  },
+  "pallet": {
+    "title": "Skanuj QR paleta",
+    "placeholder": "Paleta QR",
+    "generateBatch": "Generuj batch palety",
+    "print": "Drukuj etykietę zbiorczą",
+    "printing": "Drukowanie...",
+    "nextPallet": "Następna paleta",
+    "messages": {
+      "success": "Paleta zapisana!",
+      "invalid": "Nieprawidłowy kod palety!",
+      "error": "Błąd zapisu palety!",
+      "printSuccess": "Etykieta wydrukowana!",
+      "printError": "Błąd drukowania etykiety!"
+    }
+  },
+  "lastScans": {
+    "title": "Ostatnie skanowania",
+    "empty": "Brak skanowań"
+  },
+  "errors": {
+    "somethingWrong": "Coś poszło nie tak",
+    "fetchError": "Nie udało się pobrać danych",
+    "contactIT": "Skontaktuj się z IT"
+  },
+  "logout": {
+    "title": "Wyloguj",
+    "description": "Czy na pewno chcesz się wylogować?",
+    "cancel": "Anuluj",
+    "confirm": "Wyloguj",
+    "logoutOperators": "Wyloguj"
+  }
+}
