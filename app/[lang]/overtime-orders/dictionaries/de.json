@@ -1,7 +1,7 @@
 {
-  "title": "Produktions-Überstundenaufträge",
+  "title": "Überstundenaufträge",
   "page": {
-    "title": "Produktions-Überstundenaufträge",
+    "title": "Überstundenaufträge",
     "newRequest": "Neuer Auftrag",
     "login": "Anmelden"
   },
@@ -80,6 +80,22 @@
       "description": "Möchten Sie diesen Überstundenauftrag wirklich stornieren? Diese Aktion kann nicht rückgängig gemacht werden.",
       "cancelButton": "Nein, behalten",
       "confirmButton": "Ja, Auftrag stornieren"
+    },
+    "delete": {
+      "title": "Auftrag löschen?",
+      "description": "Möchten Sie diesen Überstundenauftrag wirklich DAUERHAFT löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "cancelButton": "Nein, behalten",
+      "confirmButton": "Ja, Auftrag löschen",
+      "deleting": "Auftrag wird gelöscht...",
+      "deleted": "Auftrag wurde gelöscht!"
+    },
+    "reactivate": {
+      "title": "Auftrag reaktivieren?",
+      "description": "Möchten Sie diesen stornierten Überstundenauftrag wirklich reaktivieren?",
+      "cancelButton": "Nein, storniert belassen",
+      "confirmButton": "Ja, Auftrag reaktivieren",
+      "reactivating": "Auftrag wird reaktiviert...",
+      "reactivated": "Auftrag wurde reaktiviert!"
     }
   },
   "toast": {
@@ -93,7 +109,7 @@
     "contactIT": "Bitte kontaktieren Sie die IT!"
   },
   "newOvertimeRequestForm": {
-    "title": "Neuer Produktions-Überstundenauftrag",
+    "title": "Neuer Überstundenauftrag",
     "requestsTable": "Auftragtabelle",
     "startWork": "Arbeitsbeginn",
     "startWorkDescription": "Beginn der Schicht oder ersten Schicht, wenn die Anzahl der Schichten größer als 1 ist.",
@@ -134,7 +150,7 @@
     }
   },
   "editOvertimeRequestForm": {
-    "title": "Produktions-Überstundenauftrag bearbeiten",
+    "title": "Überstundenauftrag bearbeiten",
     "requestsTable": "Auftragtabelle",
     "startWork": "Arbeitsbeginn",
     "startWorkDescription": "Beginn der Schicht oder ersten Schicht, wenn die Anzahl der Schichten größer als 1 ist.",
@@ -154,6 +170,7 @@
     "noteDescription": "Zusätzliche Informationen zum Auftrag.",
     "scheduledDayOff": "Mitarbeiter mit Freizeitausgleich",
     "scheduledDayOffDescription": "Mitarbeiter, die einen Freizeitausgleich für Überstundenarbeit nehmen.",
+    "discardChanges": "Änderungen verwerfen",
     "saveChanges": "Änderungen speichern",
     "accordion": {
       "restPeriod": "Einhaltung der ununterbrochenen Ruhezeit",
@@ -269,7 +286,7 @@
     }
   },
   "idTable": {
-    "title": "Mitarbeiter mit Überstundenausgleich im Produktions-Überstundenauftrag",
+    "title": "Mitarbeiter mit Überstundenausgleich",
     "requestsTable": "Auftragtabelle",
     "firstName": "Vorname",
     "lastName": "Nachname",
@@ -316,6 +333,128 @@
     "invalidFile": "Ungültige Datei!",
     "filesMinOne": "Wählen Sie mindestens eine Datei aus!",
     "filesMaxTen": "Sie können maximal 10 Dateien hochladen!",
-    "totalFileSizeExceeds": "Gesamtdateigröße überschreitet 50MB!"
+    "totalFileSizeExceeds": "Gesamtdateigröße überschreitet 50MB!",
+    "pendingArticleNotAdded": "Sie haben den ausgewählten Artikel nicht hinzugefügt! Klicken Sie auf \"+\", um ihn hinzuzufügen, oder löschen Sie die Felder.",
+    "departmentRequired": "Abteilung auswählen!"
+  },
+  "multiArticleManager": {
+    "label": "Geplante Produktion",
+    "placeholder": "Artikel auswählen",
+    "articleNumber": "Artikelnummer",
+    "articleName": "Name",
+    "quantity": "Menge",
+    "actions": "Aktionen",
+    "loading": "Laden...",
+    "unknownArticle": "Unbekannter Artikel",
+    "fetchError": "Fehler beim Abrufen",
+    "quantityPlaceholder": "Stk.",
+    "clearFields": "Felder löschen",
+    "addArticle": "Artikel hinzufügen"
+  },
+  "articleSearch": {
+    "placeholder": "Artikel auswählen",
+    "searchPlaceholder": "Nach Nummer oder Name suchen...",
+    "minCharsRequired": "Mindestens 2 Zeichen eingeben",
+    "notFound": "Keine Artikel gefunden",
+    "notSelected": "Nicht ausgewählt"
+  },
+  "department": {
+    "label": "Abteilung",
+    "description": "Wählen Sie die Abteilung aus, für die Überstunden angeordnet werden.",
+    "placeholder": "Abteilung auswählen",
+    "unknown": "Unbekannt"
+  },
+  "tableColumnsExtra": {
+    "date": "Datum",
+    "orderDetails": "Auftragsdetails",
+    "closeOrder": "Auftrag schließen",
+    "reactivateOrder": "Auftrag reaktivieren",
+    "deleteOrder": "Auftrag löschen",
+    "confirmDelete": "Möchten Sie diesen Auftrag wirklich DAUERHAFT löschen? Dieser Vorgang ist unwiderruflich.",
+    "deleted": "Auftrag wurde gelöscht",
+    "reactivated": "Auftrag wurde reaktiviert",
+    "error": "Fehler: {message}"
+  },
+  "detailsPage": {
+    "attendanceList": "Anwesenheitsliste",
+    "overtimePickup": "Überstundenausgleich",
+    "orderDetails": "Auftragsdetails",
+    "orders": "Aufträge",
+    "created": "Erstellt:",
+    "requestedBy": "Erstellt von:",
+    "responsiblePerson": "Verantwortliche Person:",
+    "department": "Abteilung:",
+    "startTime": "Beginn:",
+    "endTime": "Ende:",
+    "duration": "Dauer:",
+    "numberOfShifts": "Anzahl der Schichten:",
+    "plannedEmployees": "Geplante Mitarbeiteranzahl:",
+    "actualEmployees": "Tatsächliche Mitarbeiteranzahl:",
+    "employeesPickingUpDaysOff": "Mitarbeiter mit Freizeitausgleich:",
+    "totalHours": "Gesamtstunden:",
+    "reason": "Begründung:",
+    "additionalInfo": "Zusätzliche Informationen:",
+    "productionInfo": "Produktionsinformationen",
+    "plannedProduction": "Geplante Produktion",
+    "actualProduction": "Tatsächliche Produktion",
+    "article": "Artikel",
+    "quantity": "Menge",
+    "pcs": "Stk.",
+    "employeesWithDayOff": "Mitarbeiter mit Freizeitausgleich",
+    "manage": "Verwalten",
+    "employee": "Mitarbeiter",
+    "persNo": "Pers.-Nr.",
+    "pickupDate": "Abholdatum",
+    "notes": "Notizen",
+    "notSet": "Nicht festgelegt",
+    "history": "Historie",
+    "status": "Status",
+    "person": "Person",
+    "date": "Datum",
+    "statusLabels": {
+      "forecast": "Prognose",
+      "pending": "Wartet auf Genehmigung",
+      "canceled": "Storniert",
+      "accounted": "Abgerechnet",
+      "completed": "Abgeschlossen",
+      "approved": "Genehmigt",
+      "created": "Erstellt"
+    }
+  },
+  "completeOrderForm": {
+    "title": "Auftrag schließen",
+    "backToOrders": "Zurück zur Auftragsliste",
+    "description": "Das Schließen des Auftrags umfasst das Hochladen der Anwesenheitsliste und die Angabe der tatsächlichen Anzahl der Mitarbeiter und produzierten Artikel. Nach dem Schließen ändert sich der Auftragsstatus auf abgeschlossen.",
+    "attendanceList": "Anwesenheitsliste",
+    "selectedFiles": "Ausgewählte Dateien ({count}):",
+    "actualProduction": "Tatsächliche Produktion",
+    "actualEmployees": "Tatsächliche Mitarbeiteranzahl (geplant: {planned})",
+    "submitButton": "Auftrag schließen",
+    "toast": {
+      "unauthorized": "Sie haben keine Berechtigung, die Anwesenheitsliste hinzuzufügen.",
+      "contactIT": "Bitte kontaktieren Sie die IT!",
+      "uploading": "Dateien werden hochgeladen...",
+      "successSingle": "Auftrag erfolgreich geschlossen! {count} Datei hochgeladen und in PDF konvertiert. Auftragsstatus auf abgeschlossen geändert.",
+      "successMultiple": "Auftrag erfolgreich geschlossen! {count} Dateien hochgeladen und zu PDF zusammengeführt. Auftragsstatus auf abgeschlossen geändert.",
+      "invalidResponse": "Ungültige Antwort vom Server",
+      "fileAlreadyExists": "Eine der Dateien existiert bereits",
+      "noPermission": "Keine Berechtigung zum Hinzufügen von Anhängen",
+      "untranslatedError": "Fehler beim Hinzufügen von Anhängen",
+      "unknownError": "Ein unbekannter Fehler ist aufgetreten",
+      "uploadError": "Fehler beim Hochladen der Dateien"
+    },
+    "errors": {
+      "unauthorized": "Nicht autorisiert",
+      "insufficientPermissions": "Keine Berechtigung zum Hinzufügen von Anhängen",
+      "noFiles": "Keine Dateien ausgewählt",
+      "noRequestId": "Keine Auftrags-ID",
+      "fileTooLarge": "Eine der Dateien überschreitet die zulässige Größe (10MB)",
+      "totalSizeExceeds": "Gesamtdateigröße überschreitet das zulässige Limit (50MB)",
+      "unsupportedFileType": "Nicht unterstütztes Dateiformat",
+      "fileExists": "Eine Datei mit diesem Namen existiert bereits",
+      "updateFailed": "Datenbank konnte nicht aktualisiert werden",
+      "databaseUpdateFailed": "Fehler bei der Datenbankaktualisierung",
+      "uploadFailed": "Fehler beim Hochladen der Dateien"
+    }
   }
 }

@@ -34,7 +34,8 @@ interface DataTableProps<TData, TValue> {
   columns: (
     session: Session | null,
     dict: Dictionary,
-    departments?: DepartmentConfig[]
+    departments?: DepartmentConfig[],
+    lang?: string
   ) => ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTimeLocaleString: string;
@@ -42,6 +43,7 @@ interface DataTableProps<TData, TValue> {
   session: Session | null;
   dict: Dictionary;
   departments?: DepartmentConfig[];
+  lang?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -50,6 +52,7 @@ export function DataTable<TData, TValue>({
   session,
   dict,
   departments,
+  lang,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -57,10 +60,10 @@ export function DataTable<TData, TValue>({
   );
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
-  // Use the session, dict, and departments to create the columns
+  // Use the session, dict, departments, and lang to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session, dict, departments),
-    [columns, session, dict, departments],
+    () => columns(session, dict, departments, lang),
+    [columns, session, dict, departments, lang],
   );
 
   const table = useReactTable({

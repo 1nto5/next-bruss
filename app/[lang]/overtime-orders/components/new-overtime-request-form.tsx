@@ -144,7 +144,7 @@ export default function NewOvertimeRequestForm({
     if (pendingArticle.articleNumber && pendingArticle.quantity) {
       form.setError('plannedArticles', {
         type: 'manual',
-        message: 'Nie dodałeś wybranego artykułu! Kliknij "+" aby dodać lub wyczyść pola.',
+        message: dict.validation.pendingArticleNotAdded,
       });
       return;
     }
@@ -187,10 +187,10 @@ export default function NewOvertimeRequestForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Nowe zlecenie godzin nadliczbowych</CardTitle>
+          <CardTitle>{dict.newOvertimeRequestForm.title}</CardTitle>
           <LocalizedLink href='/overtime-orders' lang={lang}>
             <Button variant='outline'>
-              <Table /> <span>Zlecenia</span>
+              <Table /> <span>{dict.newOvertimeRequestForm.requestsTable}</span>
             </Button>
           </LocalizedLink>
         </div>
@@ -210,23 +210,30 @@ export default function NewOvertimeRequestForm({
               name='department'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dział</FormLabel>
+                  <FormLabel>{dict.department.label}</FormLabel>
                   <FormDescription>
-                    Wybierz dział, dla którego zlecane są godziny nadliczbowe.
+                    {dict.department.description}
                   </FormDescription>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Wybierz dział" />
+                        <SelectValue placeholder={dict.department.placeholder} />
                       </SelectTrigger>
                       <SelectContent>
                         {departments
-                          .sort((a, b) => a.namePl.localeCompare(b.namePl, 'pl'))
-                          .map((dept) => (
-                            <SelectItem key={dept.value} value={dept.value}>
-                              {dept.namePl}
-                            </SelectItem>
-                          ))}
+                          .sort((a, b) => {
+                            const aName = lang === 'pl' ? a.namePl : lang === 'de' ? a.nameDe : a.name;
+                            const bName = lang === 'pl' ? b.namePl : lang === 'de' ? b.nameDe : b.name;
+                            return aName.localeCompare(bName, lang);
+                          })
+                          .map((dept) => {
+                            const displayName = lang === 'pl' ? dept.namePl : lang === 'de' ? dept.nameDe : dept.name;
+                            return (
+                              <SelectItem key={dept.value} value={dept.value}>
+                                {displayName}
+                              </SelectItem>
+                            );
+                          })}
                       </SelectContent>
                     </Select>
                   </FormControl>
@@ -511,6 +518,7 @@ export default function NewOvertimeRequestForm({
                   <MultiArticleManager
                     value={field.value || []}
                     onChange={field.onChange}
+                    dict={dict}
                     onPendingChange={setPendingArticle}
                     onClearError={() => form.clearErrors('plannedArticles')}
                   />

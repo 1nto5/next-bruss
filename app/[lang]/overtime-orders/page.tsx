@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { formatDateTime } from '@/lib/utils/date-format';
 import getOvertimeDepartments from '@/lib/get-overtime-departments';
-import { KeyRound, Plus, TrendingUp } from 'lucide-react';
+import { KeyRound, Plus } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
@@ -91,16 +91,6 @@ export default async function OvertimeOrdersPage(props: {
           <CardTitle>{dict.page.title}</CardTitle>
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            {session && (
-              <LocalizedLink
-                href='/forecast'
-                className='w-full sm:w-auto'
-              >
-                <Button variant={'outline'} className='w-full'>
-                  <TrendingUp /> <span>Forecast</span>
-                </Button>
-              </LocalizedLink>
-            )}
             {session && canCreateRequest ? (
               <LocalizedLink href='/overtime-orders/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
@@ -122,6 +112,8 @@ export default async function OvertimeOrdersPage(props: {
           isLogged={!!session}
           userEmail={session?.user?.email || undefined}
           dict={dict}
+          departments={departments}
+          lang={lang}
         />
       </CardHeader>
       <DataTable

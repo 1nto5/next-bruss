@@ -7,8 +7,8 @@
   "backToSubmissions": "Zurück zu Meldungen",
   "newSubmission": "Neue Meldung",
   "filters": {
-    "showFilters": "Filter anzeigen",
     "select": "auswählen",
+    "clearFilter": "Filter löschen",
     "search": "Suchen",
     "searchPlaceholder": "suchen...",
     "notFound": "nicht gefunden",
@@ -19,10 +19,12 @@
     "month": "Monat",
     "manager": "Vorgesetzter",
     "pendingSettlements": "Zur Abrechnung",
-    "pendingApprovals": "Zur Genehmigung"
+    "pendingApprovals": "Zur Genehmigung",
+    "onlyMySubmissions": "Nur meine"
   },
   "status": {
-    "pending": "Ausstehend",
+    "pending": "Ausstehend - Vorgesetzter",
+    "pendingPlantManager": "Ausstehend - Plant Manager",
     "approved": "Genehmigt",
     "rejected": "Abgelehnt",
     "accounted": "Abgerechnet",
@@ -30,7 +32,7 @@
   },
   "actions": {
     "approve": "Genehmigen",
-    "approveDirector": "Genehmigen (Direktor)",
+    "approvePlantManager": "Genehmigen (Plant Manager)",
     "reject": "Ablehnen",
     "markAsAccounted": "Als abgerechnet markieren",
     "cancel": "Abbrechen",
@@ -38,7 +40,8 @@
     "confirm": "Bestätigen",
     "save": "Änderungen speichern",
     "add": "Meldung hinzufügen",
-    "saveAndAddAnother": "Speichern und weitere hinzufügen"
+    "saveAndAddAnother": "Speichern und weitere hinzufügen",
+    "viewDetails": "Details anzeigen"
   },
   "dialogs": {
     "approve": {
@@ -76,7 +79,7 @@
     "date": "Datum",
     "reason": "Begründung",
     "overtimeRequest": "Überstunden-Arbeitsauftrag",
-    "overtimeRequestDescription": "Geplante Überstunden erfordern die Genehmigung von Vorgesetztem und Direktor.",
+    "overtimeRequestDescription": "Geplante Überstunden erfordern die Genehmigung von Vorgesetztem und Plant Manager.",
     "payment": "Zahlung",
     "scheduledDayOff": "Geplanter freier Tag für Überstunden",
     "managerNotFound": "Vorgesetzter nicht gefunden.",
@@ -161,9 +164,10 @@
     "hoursMinRange": "Wert zwischen -8 und 16 eingeben!",
     "hoursMaxRange": "Wert zwischen -8 und 16 eingeben!",
     "scheduledDayOffRequired": "Tag für Freizeitausgleich auswählen, wenn Überstunden nicht ausgezahlt werden!",
-    "dateRangeInvalid": "Sie können nur Überstunden der letzten 7 Tage hinzufügen.",
+    "dateRangeInvalid": "Sie können nur Überstunden der letzten 3 Tage des aktuellen Monats hinzufügen.",
     "hoursIncrementInvalid": "Stunden müssen in halben Stunden angegeben werden (0.5, 1.0, 1.5 usw.)",
-    "reasonRequired": "Begründung ist erforderlich!"
+    "reasonRequired": "Begründung ist erforderlich!",
+    "previousMonthNotAllowed": "Überstunden aus dem Vormonat können nicht hinzugefügt werden."
   },
   "summary": {
     "yourOvertimeIn": "Ihre Überstunden in",
@@ -171,5 +175,40 @@
     "organizationOvertimeIn": "Überstunden der Organisation in",
     "overdueOvertimeToSettle": "Überfällige Überstunden zur Abrechnung",
     "pending": "ausstehend"
+  },
+  "detailsPage": {
+    "title": "Meldungsdetails",
+    "backToSubmissions": "Zurück zu Meldungen",
+    "submissionDetails": "Meldungsdetails",
+    "status": "Status:",
+    "submittedBy": "Gemeldet von:",
+    "supervisor": "Vorgesetzter:",
+    "date": "Überstundendatum:",
+    "hours": "Stunden:",
+    "reason": "Begründung:",
+    "overtimeRequest": "Überstunden-Arbeitsauftrag:",
+    "payment": "Zahlung:",
+    "scheduledDayOff": "Datum Freizeitausgleich:",
+    "yes": "Ja",
+    "no": "Nein",
+    "notSet": "Nicht festgelegt",
+    "history": "Änderungsverlauf",
+    "statusColumn": "Status",
+    "person": "Person",
+    "dateTime": "Datum und Uhrzeit",
+    "statusLabels": {
+      "created": "Erstellt",
+      "edited": "Bearbeitet",
+      "approved": "Genehmigt",
+      "supervisorApproved": "Gen. - Vorgesetzter",
+      "plantManagerApproved": "Gen. - Plant Manager",
+      "rejected": "Abgelehnt",
+      "accounted": "Abgerechnet",
+      "cancelled": "Storniert",
+      "pending": "Ausstehend - Vorgesetzter",
+      "pendingPlantManager": "Ausstehend - Plant Manager"
+    },
+    "rejectionReason": "Ablehnungsgrund:",
+    "rejectionDetails": "Ablehnungsdetails"
   }
 }

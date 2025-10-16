@@ -7,8 +7,8 @@
   "backToSubmissions": "Powrót do zgłoszeń",
   "newSubmission": "Nowe zgłoszenie",
   "filters": {
-    "showFilters": "Pokaż filtry",
     "select": "wybierz",
+    "clearFilter": "wyczyść filtr",
     "search": "Szukaj",
     "searchPlaceholder": "szukaj...",
     "notFound": "nie znaleziono",
@@ -19,10 +19,12 @@
     "month": "Miesiąc",
     "manager": "Kierownik",
     "pendingSettlements": "Do rozliczenia",
-    "pendingApprovals": "Do zatwierdzenia"
+    "pendingApprovals": "Do zatwierdzenia",
+    "onlyMySubmissions": "Tylko moje"
   },
   "status": {
-    "pending": "Oczekuje",
+    "pending": "Oczekuje - Przełożony",
+    "pendingPlantManager": "Oczekuje - Plant Manager",
     "approved": "Zatwierdzone",
     "rejected": "Odrzucone",
     "accounted": "Rozliczone",
@@ -30,7 +32,7 @@
   },
   "actions": {
     "approve": "Zatwierdź",
-    "approveDirector": "Zatwierdź (Dyrektor)",
+    "approvePlantManager": "Zatwierdź (Plant Manager)",
     "reject": "Odrzuć",
     "markAsAccounted": "Oznacz jako rozliczone",
     "cancel": "Anuluj",
@@ -38,7 +40,8 @@
     "confirm": "Potwierdź",
     "save": "Zapisz zmiany",
     "add": "Dodaj zgłoszenie",
-    "saveAndAddAnother": "Zapisz i dodaj kolejne"
+    "saveAndAddAnother": "Zapisz i dodaj kolejne",
+    "viewDetails": "Zobacz szczegóły"
   },
   "dialogs": {
     "approve": {
@@ -76,7 +79,7 @@
     "date": "Data",
     "reason": "Uzasadnienie",
     "overtimeRequest": "Zlecenie godzin nadliczbowych",
-    "overtimeRequestDescription": "Planowana praca w godzinach nadliczbowych wymaga zgody przełożonego oraz dyrektora.",
+    "overtimeRequestDescription": "Planowana praca w godzinach nadliczbowych wymaga zgody przełożonego oraz plant managera.",
     "payment": "Wypłata",
     "scheduledDayOff": "Data odbioru godzin nadliczbowych",
     "managerNotFound": "Nie znaleziono kierownika.",
@@ -161,9 +164,10 @@
     "hoursMinRange": "Podaj wartość z zakresu -8 do 16!",
     "hoursMaxRange": "Podaj wartość z zakresu -8 do 16!",
     "scheduledDayOffRequired": "Wybierz dzień odbioru, jeśli nadgodziny nie są do wypłaty!",
-    "dateRangeInvalid": "Możesz dodać nadgodziny tylko z ostatnich 7 dni.",
-    "hoursIncrementInvalid": "Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, etc.)",
-    "reasonRequired": "Uzasadnienie jest wymagane!"
+    "dateRangeInvalid": "Możesz dodać nadgodziny tylko z ostatnich 3 dni bieżącego miesiąca.",
+    "hoursIncrementInvalid": "Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, itd.)",
+    "reasonRequired": "Uzasadnienie jest wymagane!",
+    "previousMonthNotAllowed": "Nie można dodać nadgodzin z poprzedniego miesiąca."
   },
   "summary": {
     "yourOvertimeIn": "Twoje godziny nadliczbowe w",
@@ -171,5 +175,40 @@
     "organizationOvertimeIn": "Nadgodziny organizacji w",
     "overdueOvertimeToSettle": "Zaległe nadgodziny do rozliczenia",
     "pending": "oczekuje"
+  },
+  "detailsPage": {
+    "title": "Szczegóły zgłoszenia",
+    "backToSubmissions": "Powrót do zgłoszeń",
+    "submissionDetails": "Szczegóły zgłoszenia",
+    "status": "Status:",
+    "submittedBy": "Zgłaszający:",
+    "supervisor": "Przełożony:",
+    "date": "Data nadgodzin:",
+    "hours": "Liczba godzin:",
+    "reason": "Uzasadnienie:",
+    "overtimeRequest": "Zlecenie nadgodzin:",
+    "payment": "Wypłata:",
+    "scheduledDayOff": "Data odbioru wolnego:",
+    "yes": "Tak",
+    "no": "Nie",
+    "notSet": "Nie ustalono",
+    "history": "Historia zmian",
+    "statusColumn": "Status",
+    "person": "Osoba",
+    "dateTime": "Data i czas",
+    "statusLabels": {
+      "created": "Utworzone",
+      "edited": "Edytowane",
+      "approved": "Zatwierdzone",
+      "supervisorApproved": "Zatw. - Przełożony",
+      "plantManagerApproved": "Zatw. - Plant Manager",
+      "rejected": "Odrzucone",
+      "accounted": "Rozliczone",
+      "cancelled": "Anulowane",
+      "pending": "Oczekuje - Przełożony",
+      "pendingPlantManager": "Oczekuje - Plant Manager"
+    },
+    "rejectionReason": "Powód odrzucenia:",
+    "rejectionDetails": "Szczegóły odrzucenia"
   }
 }

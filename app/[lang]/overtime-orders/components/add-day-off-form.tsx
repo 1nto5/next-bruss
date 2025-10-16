@@ -11,7 +11,6 @@ import { Separator } from '@/components/ui/separator';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, CircleX, Plus } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
@@ -104,12 +103,12 @@ export default function AddDayOff({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Dodaj odbiór dnia wolnego</CardTitle>
-          <Link href={`/overtime-orders/${id}/employees`}>
+          <CardTitle>{dict.addDayOffForm.title}</CardTitle>
+          <LocalizedLink href={`/overtime-orders/${id}/employees`}>
             <Button variant='outline'>
-              <ArrowLeft /> <span>Powrót do pracowników</span>
+              <ArrowLeft /> <span>{dict.addDayOffForm.backToRequest}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Separator className='mb-4' />
@@ -133,6 +132,7 @@ export default function AddDayOff({
             variant='destructive'
             type='button'
             onClick={() => form.reset()}
+            disabled={form.watch('employeesToAdd').length === 0}
             className='w-full sm:w-auto'
           >
             <CircleX className='' />

@@ -80,6 +80,38 @@ export async function updateOvertimeSubmission(
     // Prevent editing the payment field after submission
     const updateData = { ...data, payment: submission.payment };
 
+    // Build edit history entry with only changed fields
+    const changes: any = {};
+    if (updateData.supervisor !== submission.supervisor) {
+      changes.supervisor = { from: submission.supervisor, to: updateData.supervisor };
+    }
+    if (new Date(updateData.date).getTime() !== new Date(submission.date).getTime()) {
+      changes.date = { from: submission.date, to: updateData.date };
+    }
+    if (updateData.hours !== submission.hours) {
+      changes.hours = { from: submission.hours, to: updateData.hours };
+    }
+    if (updateData.reason !== submission.reason) {
+      changes.reason = { from: submission.reason, to: updateData.reason };
+    }
+    if (updateData.overtimeRequest !== submission.overtimeRequest) {
+      changes.overtimeRequest = { from: submission.overtimeRequest, to: updateData.overtimeRequest };
+    }
+    if (updateData.payment !== submission.payment) {
+      changes.payment = { from: submission.payment, to: updateData.payment };
+    }
+    const oldScheduledDayOff = submission.scheduledDayOff ? new Date(submission.scheduledDayOff).getTime() : undefined;
+    const newScheduledDayOff = updateData.scheduledDayOff ? new Date(updateData.scheduledDayOff).getTime() : undefined;
+    if (oldScheduledDayOff !== newScheduledDayOff) {
+      changes.scheduledDayOff = { from: submission.scheduledDayOff, to: updateData.scheduledDayOff };
+    }
+
+    const editHistoryEntry = {
+      editedAt: new Date(),
+      editedBy: session.user.email,
+      changes,
+    };
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -87,6 +119,9 @@ export async function updateOvertimeSubmission(
           ...updateData,
           editedAt: new Date(),
           editedBy: session.user.email,
+        },
+        $push: {
+          editHistory: editHistoryEntry,
         },
       },
     );
@@ -100,6 +135,110 @@ export async function updateOvertimeSubmission(
   } catch (error) {
     console.error(error);
     return { error: 'updateOvertimeSubmission server action error' };
+  }
+}
+
+export async function editOvertimeSubmission(
+  id: string,
+  data: OvertimeSubmissionType,
+): Promise<{ success: 'updated' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirect('/auth');
+  }
+
+  // Only HR or admin can use this function
+  const userRoles = session.user?.roles ?? [];
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
+
+  if (!isHR && !isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_submissions');
+
+    // Check if the submission exists
+    const submission = await coll.findOne({ _id: new ObjectId(id) });
+    if (!submission) {
+      return { error: 'not found' };
+    }
+
+    // HR/Admin can edit submissions in any status
+
+    // Build edit history entry with only changed fields
+    const changes: any = {};
+    if (data.supervisor !== submission.supervisor) {
+      changes.supervisor = { from: submission.supervisor, to: data.supervisor };
+    }
+    if (new Date(data.date).getTime() !== new Date(submission.date).getTime()) {
+      changes.date = { from: submission.date, to: data.date };
+    }
+    if (data.hours !== submission.hours) {
+      changes.hours = { from: submission.hours, to: data.hours };
+    }
+    if (data.reason !== submission.reason) {
+      changes.reason = { from: submission.reason, to: data.reason };
+    }
+    if (data.overtimeRequest !== submission.overtimeRequest) {
+      changes.overtimeRequest = { from: submission.overtimeRequest, to: data.overtimeRequest };
+    }
+    if (data.payment !== submission.payment) {
+      changes.payment = { from: submission.payment, to: data.payment };
+    }
+    const oldScheduledDayOff = submission.scheduledDayOff ? new Date(submission.scheduledDayOff).getTime() : undefined;
+    const newScheduledDayOff = data.scheduledDayOff ? new Date(data.scheduledDayOff).getTime() : undefined;
+    if (oldScheduledDayOff !== newScheduledDayOff) {
+      changes.scheduledDayOff = { from: submission.scheduledDayOff, to: data.scheduledDayOff };
+    }
+    // Track status change to pending
+    if (submission.status !== 'pending') {
+      changes.status = { from: submission.status, to: 'pending' };
+    }
+
+    const editHistoryEntry = {
+      editedAt: new Date(),
+      editedBy: session.user.email,
+      changes,
+    };
+
+    // Update submission and reset status to pending for re-approval
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...data,
+          status: 'pending',
+          editedAt: new Date(),
+          editedBy: session.user.email,
+        },
+        $unset: {
+          approvedAt: '',
+          approvedBy: '',
+          plantManagerApprovedAt: '',
+          plantManagerApprovedBy: '',
+          supervisorApprovedAt: '',
+          supervisorApprovedBy: '',
+          rejectedAt: '',
+          rejectedBy: '',
+          rejectionReason: '',
+        },
+        $push: {
+          editHistory: editHistoryEntry,
+        },
+      },
+    );
+
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateTag('overtime');
+    return { success: 'updated' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'editOvertimeSubmission server action error' };
   }
 }
 
@@ -166,7 +305,7 @@ export async function approveOvertimeSubmission(id: string) {
   const userRoles = session.user?.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
-  const isDirector = userRoles.includes('director');
+  const isPlantManager = userRoles.includes('plant-manager');
 
   try {
     const coll = await dbc('overtime_submissions');
@@ -177,10 +316,10 @@ export async function approveOvertimeSubmission(id: string) {
       return { error: 'not found' };
     }
 
-    // Dual approval logic for payment requests
-    if (submission.payment) {
+    // Dual approval logic for overtime requests
+    if (submission.overtimeRequest) {
       if (submission.status === 'pending') {
-        // Supervisor approval: move to pending-director
+        // Supervisor approval: move to pending-plant-manager
         if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
           return { error: 'unauthorized' };
         }
@@ -188,7 +327,7 @@ export async function approveOvertimeSubmission(id: string) {
           { _id: new ObjectId(id) },
           {
             $set: {
-              status: 'pending-director',
+              status: 'pending-plant-manager',
               supervisorApprovedAt: new Date(),
               supervisorApprovedBy: session.user.email,
               editedAt: new Date(),
@@ -201,9 +340,9 @@ export async function approveOvertimeSubmission(id: string) {
         }
         revalidateTag('overtime');
         return { success: 'supervisor-approved' };
-      } else if (submission.status === 'pending-director') {
-        // Only director can approve
-        if (!isDirector && !isAdmin) {
+      } else if (submission.status === 'pending-plant-manager') {
+        // Only plant manager can approve
+        if (!isPlantManager && !isAdmin) {
           return { error: 'unauthorized' };
         }
         const update = await coll.updateOne(
@@ -211,8 +350,8 @@ export async function approveOvertimeSubmission(id: string) {
           {
             $set: {
               status: 'approved',
-              directorApprovedAt: new Date(),
-              directorApprovedBy: session.user.email,
+              plantManagerApprovedAt: new Date(),
+              plantManagerApprovedBy: session.user.email,
               approvedAt: new Date(),
               approvedBy: session.user.email,
               editedAt: new Date(),
@@ -224,7 +363,7 @@ export async function approveOvertimeSubmission(id: string) {
           return { error: 'not found' };
         }
         revalidateTag('overtime');
-        return { success: 'director-approved' };
+        return { success: 'plant-manager-approved' };
       } else {
         return { error: 'invalid status' };
       }
@@ -325,6 +464,46 @@ export async function rejectOvertimeSubmission(
   }
 }
 
+async function generateNextInternalId(): Promise<string> {
+  try {
+    const collection = await dbc('overtime_submissions');
+    const currentYear = new Date().getFullYear();
+    const shortYear = currentYear.toString().slice(-2);
+
+    // Regex to match and extract the numeric part of IDs like "123/25"
+    const yearRegex = new RegExp(`^(\\d+)\\/${shortYear}$`);
+
+    // Fetch all overtime internalIds for the current year.
+    // We only need the internalId field for this operation.
+    const overtimeThisYear = await collection
+      .find(
+        { internalId: { $regex: `\\/${shortYear}$` } }, // Filter for IDs ending with "/YY"
+        { projection: { internalId: 1 } }, // Only fetch the internalId field
+      )
+      .toArray();
+
+    let maxNumber = 0;
+    for (const doc of overtimeThisYear) {
+      if (doc.internalId) {
+        const match = doc.internalId.match(yearRegex);
+        if (match && match[1]) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      }
+    }
+
+    const nextNumber = maxNumber + 1;
+    return `${nextNumber}/${shortYear}`;
+  } catch (error) {
+    console.error('Failed to generate internal ID:', error);
+    // Fallback to a timestamp-based ID if there's an error.
+    return `${Date.now()}/${new Date().getFullYear().toString().slice(-2)}`;
+  }
+}
+
 export async function insertOvertimeSubmission(
   data: OvertimeSubmissionType,
 ): Promise<{ success: 'inserted' } | { error: string }> {
@@ -335,7 +514,10 @@ export async function insertOvertimeSubmission(
   try {
     const coll = await dbc('overtime_submissions');
 
+    const internalId = await generateNextInternalId();
+
     const overtimeSubmissionToInsert = {
+      internalId,
       status: 'pending',
       ...data,
       payment: data.payment ?? false,
@@ -406,6 +588,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
   const userRoles = session.user?.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
+  const isPlantManager = userRoles.includes('plant-manager');
 
   try {
     const coll = await dbc('overtime_submissions');
@@ -414,37 +597,103 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
     // First, check permissions for each submission
     const submissions = await coll.find({ _id: { $in: objectIds } }).toArray();
 
-    const allowedIds = submissions
+    // Group submissions by required action
+    // Group 1: overtimeRequest + pending → supervisor approval (move to pending-plant-manager)
+    const supervisorApprovalIds = submissions
       .filter((submission) => {
-        // Allow approval if user is supervisor, HR, or admin
         return (
-          (submission.supervisor === session.user.email || isHR || isAdmin) &&
-          submission.status === 'pending'
+          submission.overtimeRequest &&
+          submission.status === 'pending' &&
+          (submission.supervisor === session.user.email || isHR || isAdmin)
         );
       })
       .map((submission) => submission._id);
 
-    if (allowedIds.length === 0) {
-      return { error: 'no valid submissions' };
+    // Group 2: overtimeRequest + pending-plant-manager → plant manager approval (move to approved)
+    const plantManagerApprovalIds = submissions
+      .filter((submission) => {
+        return (
+          submission.overtimeRequest &&
+          submission.status === 'pending-plant-manager' &&
+          (isPlantManager || isAdmin)
+        );
+      })
+      .map((submission) => submission._id);
+
+    // Group 3: non-overtimeRequest + pending → normal approval (move to approved)
+    const normalApprovalIds = submissions
+      .filter((submission) => {
+        return (
+          !submission.overtimeRequest &&
+          submission.status === 'pending' &&
+          (submission.supervisor === session.user.email || isHR || isAdmin)
+        );
+      })
+      .map((submission) => submission._id);
+
+    let totalModified = 0;
+
+    // Execute supervisor approvals (pending → pending-plant-manager)
+    if (supervisorApprovalIds.length > 0) {
+      const result = await coll.updateMany(
+        { _id: { $in: supervisorApprovalIds } },
+        {
+          $set: {
+            status: 'pending-plant-manager',
+            supervisorApprovedAt: new Date(),
+            supervisorApprovedBy: session.user.email,
+            editedAt: new Date(),
+            editedBy: session.user.email,
+          },
+        },
+      );
+      totalModified += result.modifiedCount;
     }
 
-    const updateResult = await coll.updateMany(
-      { _id: { $in: allowedIds } },
-      {
-        $set: {
-          status: 'approved',
-          approvedAt: new Date(),
-          approvedBy: session.user.email,
-          editedAt: new Date(),
-          editedBy: session.user.email,
+    // Execute plant manager approvals (pending-plant-manager → approved)
+    if (plantManagerApprovalIds.length > 0) {
+      const result = await coll.updateMany(
+        { _id: { $in: plantManagerApprovalIds } },
+        {
+          $set: {
+            status: 'approved',
+            plantManagerApprovedAt: new Date(),
+            plantManagerApprovedBy: session.user.email,
+            approvedAt: new Date(),
+            approvedBy: session.user.email,
+            editedAt: new Date(),
+            editedBy: session.user.email,
+          },
         },
-      },
-    );
+      );
+      totalModified += result.modifiedCount;
+    }
+
+    // Execute normal approvals (pending → approved)
+    if (normalApprovalIds.length > 0) {
+      const result = await coll.updateMany(
+        { _id: { $in: normalApprovalIds } },
+        {
+          $set: {
+            status: 'approved',
+            approvedAt: new Date(),
+            approvedBy: session.user.email,
+            editedAt: new Date(),
+            editedBy: session.user.email,
+          },
+        },
+      );
+      totalModified += result.modifiedCount;
+    }
+
+    if (totalModified === 0) {
+      return { error: 'no valid submissions' };
+    }
 
     revalidateOvertime();
     return {
       success: 'approved',
-      count: updateResult.modifiedCount,
+      count: totalModified,
       total: ids.length,
     };
   } catch (error) {

@@ -1,0 +1,3 @@
+- "test" = use chrome-devtools MCP
+- "check in database" = use mongodb MCP
+- git operations = git or gh commands

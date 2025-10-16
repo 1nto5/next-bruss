@@ -26,9 +26,9 @@ import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
 import * as React from 'react';
 import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
+import { getColumns } from './columns';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   id: string;
   status?: string;
@@ -36,12 +36,13 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({
-  columns,
   data,
   id,
   status,
   dict,
 }: DataTableProps<TData, TValue>) {
+  const columns = getColumns(dict) as ColumnDef<TData, TValue>[];
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -100,28 +101,28 @@ export function DataTable<TData, TValue>({
   return (
     <>
       <CardContent>
-        <div className='mb-4 flex flex-wrap gap-2'>
-          <div>
+        <div className='mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-wrap'>
+          <div className='flex flex-col space-y-1 lg:w-auto lg:flex-1 lg:min-w-[150px]'>
             <Input
               placeholder={dict.idTable.firstName.toLowerCase()}
               value={firstNameFilter}
               onChange={(event) =>
                 table.getColumn('firstName')?.setFilterValue(event.target.value)
               }
-              className='w-[150px]'
+              className='w-full'
             />
           </div>
-          <div>
+          <div className='flex flex-col space-y-1 lg:w-auto lg:flex-1 lg:min-w-[150px]'>
             <Input
               placeholder={dict.idTable.lastName.toLowerCase()}
               value={lastNameFilter}
               onChange={(event) =>
                 table.getColumn('lastName')?.setFilterValue(event.target.value)
               }
-              className='w-[150px]'
+              className='w-full'
             />
           </div>
-          <div>
+          <div className='flex flex-col space-y-1 lg:w-auto lg:flex-1 lg:min-w-[150px]'>
             <Input
               placeholder={dict.idTable.identifier.toLowerCase()}
               value={identifierFilter}
@@ -130,28 +131,18 @@ export function DataTable<TData, TValue>({
                   .getColumn('identifier')
                   ?.setFilterValue(event.target.value)
               }
-              className='w-[150px]'
+              className='w-full'
             />
           </div>
-          <div>
-            <Button
-              variant='destructive'
-              title='Clear filters'
-              onClick={clearFilters}
-              disabled={!hasActiveFilters}
-            >
-              <CircleX /> <span>{dict.common.clear}</span>
-            </Button>
-          </div>
-          {shouldShowActions && (
-            <div>
-              <LocalizedLink href={`/overtime-orders/${id}/add-day-off`}>
-                <Button variant='outline'>
-                  <AlarmClockPlus /> <span>{dict.idTable.addPickup}</span>
-                </Button>
-              </LocalizedLink>
-            </div>
-          )}
+          <Button
+            variant='destructive'
+            title='Clear filters'
+            onClick={clearFilters}
+            disabled={!hasActiveFilters}
+            className='flex-1 sm:flex-none'
+          >
+            <CircleX /> <span>{dict.common.clear}</span>
+          </Button>
         </div>
 
         <div className='rounded-md border'>

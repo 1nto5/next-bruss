@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
 import { AlarmClockPlus, ArrowLeft, Table } from 'lucide-react';
-import Link from 'next/link';
-import { columns } from '../../components/id-table/columns';
+import LocalizedLink from '@/components/localized-link';
 import { DataTable } from '../../components/id-table/data-table';
+import { getDictionary } from '../../lib/dict';
 import { getOvertimeRequest } from '../../lib/get-overtime-request';
 
 export default async function ProductionOvertimePage(props: {
@@ -19,6 +19,8 @@ export default async function ProductionOvertimePage(props: {
 }) {
   const params = await props.params;
   const { lang, id } = params;
+
+  const dict = await getDictionary(lang);
 
   let overtimeRequestLocaleString;
   ({ overtimeRequestLocaleString } = await getOvertimeRequest(lang, id));
@@ -34,41 +36,40 @@ export default async function ProductionOvertimePage(props: {
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <CardTitle>Pracownicy odbierający nadgodziny</CardTitle>
+            <CardTitle>{dict.idTable.title}</CardTitle>
             <CardDescription>
               ID zlecenia: {overtimeRequestLocaleString.internalId}
             </CardDescription>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            <Link
+            <LocalizedLink
               href={`/overtime-orders/${id}`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
-                <ArrowLeft /> <span>Szczegóły zlecenia</span>
+                <ArrowLeft /> <span>{dict.addDayOffForm.backToRequest}</span>
               </Button>
-            </Link>
+            </LocalizedLink>
             {shouldShowAddButton && (
-              <Link
+              <LocalizedLink
                 href={`/overtime-orders/${id}/add-day-off`}
                 className='w-full sm:w-auto'
               >
                 <Button variant='outline' className='w-full'>
-                  <AlarmClockPlus /> <span>Dodaj odbiór</span>
+                  <AlarmClockPlus /> <span>{dict.idTable.addPickup}</span>
                 </Button>
-              </Link>
+              </LocalizedLink>
             )}
-            <Link href={`/overtime-orders`} className='w-full sm:w-auto'>
+            <LocalizedLink href={`/overtime-orders`} className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
-                <Table /> <span>Zlecenia</span>
+                <Table /> <span>{dict.idTable.requestsTable}</span>
               </Button>
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
       </CardHeader>
 
       <DataTable
-        columns={columns}
         data={(
           overtimeRequestLocaleString.employeesWithScheduledDayOff || []
         ).map((employee) => ({
@@ -77,6 +78,7 @@ export default async function ProductionOvertimePage(props: {
         }))}
         id={id}
         status={overtimeRequestLocaleString.status}
+        dict={dict}
       />
     </Card>
   );

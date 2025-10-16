@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Locale } from '@/i18n.config';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import {
   CalendarClock,
   Clock,
@@ -26,50 +27,52 @@ import {
   LayoutList,
   Package,
   Table as TableIcon,
-  TrendingUp,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { redirect } from 'next/navigation';
+import { getDictionary } from '../lib/dict';
 import { getOvertimeRequest } from '../lib/get-overtime-request';
 import { getDepartmentDisplayName } from '../lib/types';
+import type { Dictionary } from '../lib/dict';
 
-function getStatusBadge(status: string) {
+function getStatusBadge(status: string, dict: Dictionary) {
   switch (status) {
     case 'forecast':
       return (
         <Badge variant='statusForecast' size='lg' className='text-lg'>
-          Forecast
+          {dict.detailsPage.statusLabels.forecast}
         </Badge>
       );
     case 'pending':
       return (
         <Badge variant='statusPending' size='lg' className='text-lg'>
-          Oczekuje na zatwierdzenie
+          {dict.detailsPage.statusLabels.pending}
         </Badge>
       );
     case 'approved':
       return (
         <Badge variant='statusApproved' size='lg' className='text-lg'>
-          Zatwierdzone
+          {dict.detailsPage.statusLabels.approved}
         </Badge>
       );
     case 'canceled':
       return (
         <Badge variant='statusRejected' size='lg' className='text-lg'>
-          Anulowane
+          {dict.detailsPage.statusLabels.canceled}
         </Badge>
       );
     case 'completed':
       return (
         <Badge variant='statusClosed' size='lg' className='text-lg'>
-          Ukończone
+          {dict.detailsPage.statusLabels.completed}
         </Badge>
       );
     case 'accounted':
       return (
         <Badge variant='statusAccounted' size='lg' className='text-lg'>
-          Rozliczone
+          {dict.detailsPage.statusLabels.accounted}
         </Badge>
       );
     default:
@@ -104,6 +107,8 @@ export default async function OvertimeDetailsPage(props: {
   const params = await props.params;
   const { lang, id } = params;
 
+  const dict = await getDictionary(lang);
+
   const session = await auth();
   if (!session || !session.user?.email) {
     redirect('/auth');
@@ -124,7 +129,7 @@ export default async function OvertimeDetailsPage(props: {
       <CardHeader>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle className='mb-2 sm:mb-0'>
-            {getStatusBadge(request.status)}
+            {getStatusBadge(request.status, dict)}
           </CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* Download attachment button */}
@@ -136,37 +141,27 @@ export default async function OvertimeDetailsPage(props: {
                 className='w-full sm:w-auto'
               >
                 <Button variant='outline' className='w-full'>
-                  <Download /> Lista obecności
+                  <Download /> {dict.detailsPage.attendanceList}
                 </Button>
               </Link>
             )}
 
             {/* Manage employees button */}
-            <Link
+            <LocalizedLink
               href={`/overtime-orders/${id}/employees`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
-                <Users /> Obiór nadgodzin
+                <Users /> {dict.detailsPage.overtimePickup}
               </Button>
-            </Link>
-
-            {/* Analytics button */}
-            <Link
-              href={`/forecast`}
-              className='w-full sm:w-auto'
-            >
-              <Button variant='outline' className='w-full'>
-                <TrendingUp /> Forecast
-              </Button>
-            </Link>
+            </LocalizedLink>
 
             {/* Back to table button */}
-            <Link href={`/overtime-orders`} className='w-full sm:w-auto'>
+            <LocalizedLink href='/overtime-orders' className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
-                <TableIcon /> Zlecenia
+                <TableIcon /> {dict.detailsPage.orders}
               </Button>
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
         <CardDescription>ID: {request.internalId}</CardDescription>
@@ -181,7 +176,7 @@ export default async function OvertimeDetailsPage(props: {
               <CardHeader>
                 <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
                   <CardTitle className='mb-2 flex items-center sm:mb-0'>
-                    <LayoutList className='mr-2 h-5 w-5' /> Szczegóły zlecenia
+                    <LayoutList className='mr-2 h-5 w-5' /> {dict.detailsPage.orderDetails}
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -189,15 +184,15 @@ export default async function OvertimeDetailsPage(props: {
                 <Table>
                   <TableBody>
                     <TableRow>
-                      <TableCell className='font-medium'>Utworzono:</TableCell>
+                      <TableCell className='font-medium'>{dict.detailsPage.created}</TableCell>
                       <TableCell>
-                        {new Date(request.requestedAt).toLocaleString(lang)}
+                        {formatDateTime(request.requestedAt)}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Wystawione przez:
+                        {dict.detailsPage.requestedBy}
                       </TableCell>
                       <TableCell>
                         {extractNameFromEmail(request.requestedBy)}
@@ -206,7 +201,7 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Osoba odpowiedzialna:
+                        {dict.detailsPage.responsiblePerson}
                       </TableCell>
                       <TableCell>
                         {extractNameFromEmail(request.responsibleEmployee)}
@@ -216,7 +211,7 @@ export default async function OvertimeDetailsPage(props: {
                     {request.department && (
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Dział:
+                          {dict.detailsPage.department}
                         </TableCell>
                         <TableCell>
                           {getDepartmentDisplayName(request.department)}
@@ -226,25 +221,25 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Rozpoczęcie:
+                        {dict.detailsPage.startTime}
                       </TableCell>
                       <TableCell>
-                        {new Date(request.from).toLocaleString(lang)}
+                        {formatDateTime(request.from)}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Zakończenie:
+                        {dict.detailsPage.endTime}
                       </TableCell>
                       <TableCell>
-                        {new Date(request.to).toLocaleString(lang)}
+                        {formatDateTime(request.to)}
                       </TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Czas trwania:
+                        {dict.detailsPage.duration}
                       </TableCell>
                       <TableCell>
                         {formatDuration(
@@ -256,14 +251,14 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Liczba zmian:
+                        {dict.detailsPage.numberOfShifts}
                       </TableCell>
                       <TableCell>{request.numberOfShifts || 1}</TableCell>
                     </TableRow>
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Planowana liczba pracowników:
+                        {dict.detailsPage.plannedEmployees}
                       </TableCell>
                       <TableCell>{request.numberOfEmployees}</TableCell>
                     </TableRow>
@@ -271,7 +266,7 @@ export default async function OvertimeDetailsPage(props: {
                     {request.actualEmployeesWorked !== undefined && (
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Rzeczywista liczba pracowników:
+                          {dict.detailsPage.actualEmployees}
                         </TableCell>
                         <TableCell>{request.actualEmployeesWorked}</TableCell>
                       </TableRow>
@@ -279,7 +274,7 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Pracownicy odbierający dni wolne:
+                        {dict.detailsPage.employeesPickingUpDaysOff}
                       </TableCell>
                       <TableCell>
                         {request.employeesWithScheduledDayOff?.length || 0}
@@ -288,7 +283,7 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Łączna liczba godzin:
+                        {dict.detailsPage.totalHours}
                       </TableCell>
                       <TableCell>
                         {calculateTotalHours(
@@ -302,7 +297,7 @@ export default async function OvertimeDetailsPage(props: {
 
                     <TableRow>
                       <TableCell className='font-medium'>
-                        Uzasadnienie:
+                        {dict.detailsPage.reason}
                       </TableCell>
                       <TableCell className='max-w-[200px] break-words'>
                         {request.reason}
@@ -312,7 +307,7 @@ export default async function OvertimeDetailsPage(props: {
                     {request.note && (
                       <TableRow>
                         <TableCell className='font-medium'>
-                          Dodatkowe informacje:
+                          {dict.detailsPage.additionalInfo}
                         </TableCell>
                         <TableCell className='max-w-[200px] break-words'>
                           {request.note}
@@ -334,8 +329,7 @@ export default async function OvertimeDetailsPage(props: {
                 <Card>
                   <CardHeader>
                     <CardTitle className='flex items-center'>
-                      <Package className='mr-2 h-5 w-5' /> Informacje o
-                      produkcji
+                      <Package className='mr-2 h-5 w-5' /> {dict.detailsPage.productionInfo}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -345,14 +339,14 @@ export default async function OvertimeDetailsPage(props: {
                         request.plannedArticles.length > 0 && (
                           <div>
                             <h4 className='mb-3 text-lg font-medium'>
-                              Planowana produkcja
+                              {dict.detailsPage.plannedProduction}
                             </h4>
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Artykuł</TableHead>
+                                  <TableHead>{dict.detailsPage.article}</TableHead>
                                   <TableHead className='text-right'>
-                                    Ilość
+                                    {dict.detailsPage.quantity}
                                   </TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -364,7 +358,7 @@ export default async function OvertimeDetailsPage(props: {
                                         {article.articleNumber}
                                       </TableCell>
                                       <TableCell className='text-right'>
-                                        {article.quantity} szt.
+                                        {article.quantity} {dict.detailsPage.pcs}
                                       </TableCell>
                                     </TableRow>
                                   ),
@@ -379,14 +373,14 @@ export default async function OvertimeDetailsPage(props: {
                         request.actualArticles.length > 0 && (
                           <div>
                             <h4 className='mb-3 text-lg font-medium'>
-                              Rzeczywista produkcja
+                              {dict.detailsPage.actualProduction}
                             </h4>
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Artykuł</TableHead>
+                                  <TableHead>{dict.detailsPage.article}</TableHead>
                                   <TableHead className='text-right'>
-                                    Ilość
+                                    {dict.detailsPage.quantity}
                                   </TableHead>
                                 </TableRow>
                               </TableHeader>
@@ -398,7 +392,7 @@ export default async function OvertimeDetailsPage(props: {
                                         {article.articleNumber}
                                       </TableCell>
                                       <TableCell className='text-right'>
-                                        {article.quantity} szt.
+                                        {article.quantity} {dict.detailsPage.pcs}
                                       </TableCell>
                                     </TableRow>
                                   ),
@@ -419,27 +413,26 @@ export default async function OvertimeDetailsPage(props: {
                     <CardHeader>
                       <div className='flex justify-between'>
                         <CardTitle className='flex items-center'>
-                          <CalendarClock className='mr-2 h-5 w-5' /> Pracownicy
-                          odbierający dni wolne
+                          <CalendarClock className='mr-2 h-5 w-5' /> {dict.detailsPage.employeesWithDayOff}
                         </CardTitle>
-                        <Link
+                        <LocalizedLink
                           href={`/overtime-orders/${id}/employees`}
                           className='w-full sm:w-auto'
                         >
                           <Button variant='outline' className='w-full'>
-                            <Users /> Zarządzaj
+                            <Users /> {dict.detailsPage.manage}
                           </Button>
-                        </Link>
+                        </LocalizedLink>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Pracownik</TableHead>
-                            <TableHead>Nr pers.</TableHead>
-                            <TableHead>Data odbioru</TableHead>
-                            <TableHead>Uwagi</TableHead>
+                            <TableHead>{dict.detailsPage.employee}</TableHead>
+                            <TableHead>{dict.detailsPage.persNo}</TableHead>
+                            <TableHead>{dict.detailsPage.pickupDate}</TableHead>
+                            <TableHead>{dict.detailsPage.notes}</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -452,10 +445,8 @@ export default async function OvertimeDetailsPage(props: {
                                 <TableCell>{employee.identifier}</TableCell>
                                 <TableCell>
                                   {employee.agreedReceivingAt
-                                    ? new Date(
-                                        employee.agreedReceivingAt,
-                                      ).toLocaleDateString(lang)
-                                    : 'Nie ustalono'}
+                                    ? formatDate(employee.agreedReceivingAt)
+                                    : dict.detailsPage.notSet}
                                 </TableCell>
                                 <TableCell className='max-w-[150px] truncate'>
                                   {employee.note || '-'}
@@ -473,16 +464,16 @@ export default async function OvertimeDetailsPage(props: {
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center'>
-                    <Clock className='mr-2 h-5 w-5' /> Historia
+                    <Clock className='mr-2 h-5 w-5' /> {dict.detailsPage.history}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Osoba</TableHead>
-                        <TableHead>Data</TableHead>
+                        <TableHead>{dict.detailsPage.status}</TableHead>
+                        <TableHead>{dict.detailsPage.person}</TableHead>
+                        <TableHead>{dict.detailsPage.date}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -490,13 +481,13 @@ export default async function OvertimeDetailsPage(props: {
                       {request.canceledAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusRejected'>Anulowane</Badge>
+                            <Badge variant='statusRejected'>{dict.detailsPage.statusLabels.canceled}</Badge>
                           </TableCell>
                           <TableCell>
                             {extractNameFromEmail(request.canceledBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.canceledAt).toLocaleString(lang)}
+                            {formatDateTime(request.canceledAt)}
                           </TableCell>
                         </TableRow>
                       )}
@@ -505,13 +496,13 @@ export default async function OvertimeDetailsPage(props: {
                       {request.accountedAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusAccounted'>Rozliczone</Badge>
+                            <Badge variant='statusAccounted'>{dict.detailsPage.statusLabels.accounted}</Badge>
                           </TableCell>
                           <TableCell>
                             {extractNameFromEmail(request.accountedBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.accountedAt).toLocaleString(lang)}
+                            {formatDateTime(request.accountedAt)}
                           </TableCell>
                         </TableRow>
                       )}
@@ -520,13 +511,13 @@ export default async function OvertimeDetailsPage(props: {
                       {request.completedAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusClosed'>Ukończone</Badge>
+                            <Badge variant='statusClosed'>{dict.detailsPage.statusLabels.completed}</Badge>
                           </TableCell>
                           <TableCell>
                             {extractNameFromEmail(request.completedBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.completedAt).toLocaleString(lang)}
+                            {formatDateTime(request.completedAt)}
                           </TableCell>
                         </TableRow>
                       )}
@@ -535,13 +526,13 @@ export default async function OvertimeDetailsPage(props: {
                       {request.approvedAt && (
                         <TableRow>
                           <TableCell>
-                            <Badge variant='statusApproved'>Zatwierdzone</Badge>
+                            <Badge variant='statusApproved'>{dict.detailsPage.statusLabels.approved}</Badge>
                           </TableCell>
                           <TableCell>
                             {extractNameFromEmail(request.approvedBy || '')}
                           </TableCell>
                           <TableCell>
-                            {new Date(request.approvedAt).toLocaleString(lang)}
+                            {formatDateTime(request.approvedAt)}
                           </TableCell>
                         </TableRow>
                       )}
@@ -549,13 +540,13 @@ export default async function OvertimeDetailsPage(props: {
                       {/* Created */}
                       <TableRow>
                         <TableCell>
-                          <Badge variant='outline'>Utworzone</Badge>
+                          <Badge variant='outline'>{dict.detailsPage.statusLabels.created}</Badge>
                         </TableCell>
                         <TableCell>
                           {extractNameFromEmail(request.requestedBy)}
                         </TableCell>
                         <TableCell>
-                          {new Date(request.requestedAt).toLocaleString(lang)}
+                          {formatDateTime(request.requestedAt)}
                         </TableCell>
                       </TableRow>
                     </TableBody>

@@ -1,7 +1,7 @@
 {
-  "title": "Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja",
+  "title": "Zlecenia wykonania pracy w godzinach nadliczbowych",
   "page": {
-    "title": "Zlecenia wykonania pracy w godzinach nadliczbowych - produkcja",
+    "title": "Zlecenia wykonania pracy w godzinach nadliczbowych",
     "newRequest": "Nowe zlecenie",
     "login": "Zaloguj się"
   },
@@ -80,6 +80,22 @@
       "description": "Czy na pewno chcesz anulować to zlecenie wykonania pracy w godzinach nadliczbowych? Tej akcji nie można cofnąć.",
       "cancelButton": "Nie, zachowaj",
       "confirmButton": "Tak, anuluj zlecenie"
+    },
+    "delete": {
+      "title": "Usunąć zlecenie?",
+      "description": "Czy na pewno chcesz TRWALE usunąć to zlecenie wykonania pracy w godzinach nadliczbowych? Tej operacji nie można cofnąć.",
+      "cancelButton": "Nie, zachowaj",
+      "confirmButton": "Tak, usuń zlecenie",
+      "deleting": "Usuwanie zlecenia...",
+      "deleted": "Zlecenie zostało usunięte!"
+    },
+    "reactivate": {
+      "title": "Reaktywować zlecenie?",
+      "description": "Czy na pewno chcesz reaktywować to anulowane zlecenie wykonania pracy w godzinach nadliczbowych?",
+      "cancelButton": "Nie, zachowaj anulowane",
+      "confirmButton": "Tak, reaktywuj zlecenie",
+      "reactivating": "Reaktywacja zlecenia...",
+      "reactivated": "Zlecenie zostało reaktywowane!"
     }
   },
   "toast": {
@@ -93,7 +109,7 @@
     "contactIT": "Skontaktuj się z IT!"
   },
   "newOvertimeRequestForm": {
-    "title": "Nowe zlecenie wykonania pracy w godzinach nadliczbowych - produkcja",
+    "title": "Nowe zlecenie wykonania pracy w godzinach nadliczbowych",
     "requestsTable": "Tabela zleceń",
     "startWork": "Rozpoczęcie pracy",
     "startWorkDescription": "Początek zmiany lub pierwszej zmiany gdy ilość zmian jest większa niż 1.",
@@ -134,7 +150,7 @@
     }
   },
   "editOvertimeRequestForm": {
-    "title": "Edycja zlecenia wykonania pracy w godzinach nadliczbowych - produkcja",
+    "title": "Edycja zlecenia wykonania pracy w godzinach nadliczbowych",
     "requestsTable": "Tabela zleceń",
     "startWork": "Rozpoczęcie pracy",
     "startWorkDescription": "Początek zmiany lub pierwszej zmiany gdy ilość zmian jest większa niż 1.",
@@ -154,6 +170,7 @@
     "noteDescription": "Dodatkowe informacje dotyczące zlecenia.",
     "scheduledDayOff": "Pracownicy odbierający dni wolne",
     "scheduledDayOffDescription": "Pracownicy, którzy odbierają dzień wolny za pracę w godzinach nadliczbowych.",
+    "discardChanges": "Nie zapisuj zmian",
     "saveChanges": "Zapisz zmiany",
     "accordion": {
       "restPeriod": "Zachowanie nieprzerwanego odpoczynku",
@@ -269,7 +286,7 @@
     }
   },
   "idTable": {
-    "title": "Pracownicy odbierający nadgodziny w zleceniu wykonania pracy w godzinach nadliczbowych - produkcja",
+    "title": "Pracownicy odbierający nadgodziny",
     "requestsTable": "Tabela zleceń",
     "firstName": "Imię",
     "lastName": "Nazwisko",
@@ -316,6 +333,126 @@
     "invalidFile": "Nieprawidłowy plik!",
     "filesMinOne": "Wybierz co najmniej jeden plik!",
     "filesMaxTen": "Możesz przesłać maksymalnie 10 plików!",
-    "totalFileSizeExceeds": "Łączny rozmiar plików przekracza 50MB!"
+    "totalFileSizeExceeds": "Łączny rozmiar plików przekracza 50MB!",
+    "pendingArticleNotAdded": "Nie dodałeś wybranego artykułu! Kliknij \"+\" aby dodać lub wyczyść pola.",
+    "departmentRequired": "Wybierz dział!"
+  },
+  "multiArticleManager": {
+    "label": "Planowana produkcja",
+    "placeholder": "Wybierz artykuł",
+    "articleNumber": "Numer artykułu",
+    "articleName": "Nazwa",
+    "quantity": "Ilość",
+    "actions": "Akcje",
+    "loading": "Ładowanie...",
+    "unknownArticle": "Nieznany artykuł",
+    "fetchError": "Błąd pobierania",
+    "quantityPlaceholder": "szt.",
+    "clearFields": "Wyczyść pola",
+    "addArticle": "Dodaj artykuł"
+  },
+  "articleSearch": {
+    "placeholder": "Wybierz artykuł",
+    "searchPlaceholder": "Wyszukaj po numerze lub nazwie...",
+    "minCharsRequired": "Wprowadź co najmniej 2 znaki",
+    "notFound": "Nie znaleziono artykułów",
+    "notSelected": "Nie wybrano"
+  },
+  "department": {
+    "label": "Dział",
+    "description": "Wybierz dział, dla którego zlecane są godziny nadliczbowe.",
+    "placeholder": "Wybierz dział",
+    "unknown": "Nieznany"
+  },
+  "tableColumnsExtra": {
+    "date": "Data",
+    "orderDetails": "Szczegóły zlecenia",
+    "closeOrder": "Zamknij zlecenie",
+    "reactivateOrder": "Reaktywuj zlecenie",
+    "deleteOrder": "Usuń zlecenie",
+    "confirmDelete": "Czy na pewno chcesz TRWALE usunąć to zlecenie? Ta operacja jest nieodwracalna.",
+    "deleted": "Zlecenie zostało usunięte",
+    "reactivated": "Zlecenie zostało reaktywowane",
+    "error": "Błąd: {message}"
+  },
+  "detailsPage": {
+    "attendanceList": "Lista obecności",
+    "overtimePickup": "Odbiór nadgodzin",
+    "orderDetails": "Szczegóły zlecenia",
+    "created": "Utworzono:",
+    "requestedBy": "Wystawione przez:",
+    "responsiblePerson": "Osoba odpowiedzialna:",
+    "department": "Dział:",
+    "startTime": "Rozpoczęcie:",
+    "endTime": "Zakończenie:",
+    "duration": "Czas trwania:",
+    "numberOfShifts": "Liczba zmian:",
+    "plannedEmployees": "Planowana liczba pracowników:",
+    "actualEmployees": "Rzeczywista liczba pracowników:",
+    "employeesPickingUpDaysOff": "Pracownicy odbierający dni wolne:",
+    "totalHours": "Łączna liczba godzin:",
+    "reason": "Uzasadnienie:",
+    "additionalInfo": "Dodatkowe informacje:",
+    "productionInfo": "Informacje o produkcji",
+    "plannedProduction": "Planowana produkcja",
+    "actualProduction": "Rzeczywista produkcja",
+    "article": "Artykuł",
+    "quantity": "Ilość",
+    "pcs": "szt.",
+    "employeesWithDayOff": "Pracownicy odbierający dni wolne",
+    "manage": "Zarządzaj",
+    "employee": "Pracownik",
+    "persNo": "Nr pers.",
+    "pickupDate": "Data odbioru",
+    "notes": "Uwagi",
+    "notSet": "Nie ustalono",
+    "history": "Historia",
+    "status": "Status",
+    "person": "Osoba",
+    "date": "Data",
+    "statusLabels": {
+      "canceled": "Anulowane",
+      "accounted": "Rozliczone",
+      "completed": "Ukończone",
+      "approved": "Zatwierdzone",
+      "created": "Utworzone",
+      "forecast": "Prognoza"
+    }
+  },
+  "completeOrderForm": {
+    "title": "Zamykanie zlecenia",
+    "backToOrders": "Powrót do listy zleceń",
+    "description": "Zamykanie zlecenia obejmuje przesłanie listy obecności oraz podanie rzeczywistej liczby pracowników i wyprodukowanych artykułów. Po zamknięciu status zlecenia zmieni się na ukończony.",
+    "attendanceList": "Lista obecności",
+    "selectedFiles": "Wybrane pliki ({count}):",
+    "actualProduction": "Zrealizowana produkcja",
+    "actualEmployees": "Rzeczywista liczba pracowników (planowano: {planned})",
+    "submitButton": "Zamknij zlecenie",
+    "toast": {
+      "unauthorized": "Nie masz uprawnień do dodania listy obecności.",
+      "contactIT": "Skontaktuj się z IT!",
+      "uploading": "Przesyłanie plików...",
+      "successSingle": "Zlecenie zamknięte pomyślnie! {count} plik przesłany oraz przekonwertowany do PDF. Status zlecenia zmieniony na ukończony.",
+      "successMultiple": "Zlecenie zamknięte pomyślnie! {count} pliki przesłane oraz scalone do pliku PDF. Status zlecenia zmieniony na ukończony.",
+      "invalidResponse": "Nieprawidłowa odpowiedź z serwera",
+      "fileAlreadyExists": "Jeden z plików już istnieje",
+      "noPermission": "Brak uprawnień do dodania załączników",
+      "untranslatedError": "Wystąpił błąd podczas dodawania załączników",
+      "unknownError": "Wystąpił nieznany błąd",
+      "uploadError": "Wystąpił błąd podczas wysyłania plików"
+    },
+    "errors": {
+      "unauthorized": "Brak autoryzacji",
+      "insufficientPermissions": "Brak uprawnień do dodania załącznika",
+      "noFiles": "Nie wybrano plików",
+      "noRequestId": "Brak ID zlecenia",
+      "fileTooLarge": "Jeden z plików przekracza dozwolony rozmiar (10MB)",
+      "totalSizeExceeds": "Łączny rozmiar plików przekracza dozwolony limit (50MB)",
+      "unsupportedFileType": "Nieobsługiwany format pliku",
+      "fileExists": "Plik o tej nazwie już istnieje",
+      "updateFailed": "Nie udało się zaktualizować bazy danych",
+      "databaseUpdateFailed": "Błąd aktualizacji bazy danych",
+      "uploadFailed": "Błąd podczas przesyłania plików"
+    }
   }
 }

@@ -1,32 +1,13 @@
 'use client';
 
+import { ClearableCombobox } from '@/components/clearable-combobox';
+import { ClearableSelect } from '@/components/clearable-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils/cn';
 import { UsersListType } from '@/lib/types/user';
-import { Check, ChevronsUpDown, CircleX, Loader, Search } from 'lucide-react';
+import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateOvertime as revalidate } from '../actions';
@@ -221,221 +202,104 @@ export default function HrViewFilteringAndOptions({
       </CardHeader>
       {showFilters && (
         <CardContent className='p-4 pt-0'>
-          <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-            <div className='flex flex-wrap items-start gap-2'>
+          <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+            {/* Row 1: Status and Employee */}
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.filters.status}</Label>
-                <Select onValueChange={setStatusFilter} value={statusFilter}>
-                  <SelectTrigger className='w-[150px]'>
-                    <SelectValue placeholder={dict.filters.select} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='pending'>{dict.status.pending}</SelectItem>
-                    <SelectItem value='approved'>{dict.status.approved}</SelectItem>
-                    <SelectItem value='rejected'>{dict.status.rejected}</SelectItem>
-                    <SelectItem value='accounted'>{dict.status.accounted}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <ClearableSelect
+                  value={statusFilter}
+                  onValueChange={setStatusFilter}
+                  placeholder={dict.filters.select}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={[
+                    { value: 'pending', label: dict.status.pending },
+                    { value: 'approved', label: dict.status.approved },
+                    { value: 'rejected', label: dict.status.rejected },
+                    { value: 'accounted', label: dict.status.accounted },
+                  ]}
+                />
               </div>
-
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.filters.employee}</Label>
-                <Popover open={openPerson} onOpenChange={setOpenPerson}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'min-w-[200px] justify-between',
-                        !personFilter && 'opacity-50',
-                      )}
-                    >
-                      {personFilter
-                        ? users.find((user) => user.email === personFilter)
-                            ?.name
-                        : dict.filters.select}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='min-w-[300px] p-0'
-                    side='bottom'
-                    align='start'
-                  >
-                    <Command>
-                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                      <CommandList>
-                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                        <CommandGroup>
-                          {users.map((user) => (
-                            <CommandItem
-                              key={user.email}
-                              value={user.email}
-                              onSelect={(currentValue) => {
-                                setPersonFilter(currentValue);
-                                setOpenPerson(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  personFilter === user.email
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {user.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className='flex flex-col space-y-1'>
-                <Label>{dict.filters.year}</Label>
-                <Popover open={openYear} onOpenChange={setOpenYear}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'w-[150px] justify-between',
-                        !yearFilter && 'opacity-50',
-                      )}
-                    >
-                      {yearFilter
-                        ? yearOptions.find((year) => year.value === yearFilter)
-                            ?.label
-                        : dict.filters.select}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='w-[150px] p-0'
-                    side='bottom'
-                    align='start'
-                  >
-                    <Command>
-                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                      <CommandList>
-                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                        <CommandGroup>
-                          {yearOptions.map((year) => (
-                            <CommandItem
-                              key={year.value}
-                              value={year.value}
-                              onSelect={(currentValue) => {
-                                setYearFilter(currentValue);
-                                setOpenYear(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  yearFilter === year.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {year.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className='flex flex-col space-y-1'>
-                <Label>{dict.filters.month}</Label>
-                <Popover open={openMonth} onOpenChange={setOpenMonth}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'w-[150px] justify-between',
-                        !monthFilter && 'opacity-50',
-                      )}
-                    >
-                      {monthFilter
-                        ? monthOptions.find(
-                            (month) => month.value === monthFilter,
-                          )?.label
-                        : dict.filters.select}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='w-[150px] p-0'
-                    side='bottom'
-                    align='start'
-                  >
-                    <Command>
-                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                      <CommandList>
-                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                        <CommandGroup>
-                          {monthOptions.map((month) => (
-                            <CommandItem
-                              key={month.value}
-                              value={month.value}
-                              onSelect={(currentValue) => {
-                                setMonthFilter(currentValue);
-                                setOpenMonth(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  monthFilter === month.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {month.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <ClearableCombobox
+                  value={personFilter}
+                  onValueChange={setPersonFilter}
+                  placeholder={dict.filters.select}
+                  searchPlaceholder={dict.filters.searchPlaceholder}
+                  notFoundText={dict.filters.notFound}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={users.map((user) => ({
+                    value: user.email,
+                    label: user.name,
+                  }))}
+                  open={openPerson}
+                  onOpenChange={setOpenPerson}
+                />
               </div>
             </div>
 
-            {/* Row 2: Action buttons */}
-            <div className='flex flex-wrap gap-2'>
-              <Button
-                type='submit'
-                variant='secondary'
-                className='justify-start'
-                disabled={isPendingSearch}
-              >
-                {isPendingSearch ? (
-                  <>
-                    <Loader className='mr-1 animate-spin' size={16} />{' '}
-                    <span>{dict.filters.search}</span>
-                  </>
-                ) : (
-                  <>
-                    <Search className='mr-1' size={16} /> <span>{dict.filters.search}</span>
-                  </>
-                )}
-              </Button>
+            {/* Row 2: Year and Month */}
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+              <div className='flex flex-col space-y-1'>
+                <Label>{dict.filters.year}</Label>
+                <ClearableCombobox
+                  value={yearFilter}
+                  onValueChange={setYearFilter}
+                  placeholder={dict.filters.select}
+                  searchPlaceholder={dict.filters.searchPlaceholder}
+                  notFoundText={dict.filters.notFound}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={yearOptions}
+                  open={openYear}
+                  onOpenChange={setOpenYear}
+                />
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>{dict.filters.month}</Label>
+                <ClearableCombobox
+                  value={monthFilter}
+                  onValueChange={setMonthFilter}
+                  placeholder={dict.filters.select}
+                  searchPlaceholder={dict.filters.searchPlaceholder}
+                  notFoundText={dict.filters.notFound}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={monthOptions}
+                  open={openMonth}
+                  onOpenChange={setOpenMonth}
+                />
+              </div>
+            </div>
 
+            {/* Row 3: Action buttons */}
+            <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4'>
               <Button
                 type='button'
                 variant='destructive'
                 onClick={handleClearFilters}
-                title='Clear filters'
+                title={dict.filters.clear}
                 disabled={isPendingSearch}
+                className='order-2 w-full sm:order-1'
               >
-                <CircleX className='mr-1' size={16} /> <span>{dict.filters.clear}</span>
+                <CircleX /> <span>{dict.filters.clear}</span>
+              </Button>
+
+              <Button
+                type='submit'
+                variant='secondary'
+                disabled={isPendingSearch}
+                className='order-1 w-full sm:order-2'
+              >
+                {isPendingSearch ? (
+                  <Loader className='animate-spin' />
+                ) : (
+                  <Search />
+                )}
+                <span>{dict.filters.search}</span>
               </Button>
             </div>
           </form>

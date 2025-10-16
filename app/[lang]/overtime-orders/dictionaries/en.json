@@ -1,7 +1,7 @@
 {
-  "title": "Production Overtime Work Orders",
+  "title": "Overtime Work Orders",
   "page": {
-    "title": "Production Overtime Work Orders",
+    "title": "Overtime Work Orders",
     "newRequest": "New Request",
     "login": "Log In"
   },
@@ -80,6 +80,22 @@
       "description": "Are you sure you want to cancel this overtime work order? This action cannot be undone.",
       "cancelButton": "No, keep it",
       "confirmButton": "Yes, cancel order"
+    },
+    "delete": {
+      "title": "Delete Order?",
+      "description": "Are you sure you want to PERMANENTLY delete this overtime work order? This operation cannot be undone.",
+      "cancelButton": "No, keep it",
+      "confirmButton": "Yes, delete order",
+      "deleting": "Deleting order...",
+      "deleted": "Order has been deleted!"
+    },
+    "reactivate": {
+      "title": "Reactivate Order?",
+      "description": "Are you sure you want to reactivate this canceled overtime work order?",
+      "cancelButton": "No, keep canceled",
+      "confirmButton": "Yes, reactivate order",
+      "reactivating": "Reactivating order...",
+      "reactivated": "Order has been reactivated!"
     }
   },
   "toast": {
@@ -93,7 +109,7 @@
     "contactIT": "Please contact IT!"
   },
   "newOvertimeRequestForm": {
-    "title": "New Production Overtime Work Order",
+    "title": "New Overtime Work Order",
     "requestsTable": "Orders Table",
     "startWork": "Work Start",
     "startWorkDescription": "Start of shift or first shift when number of shifts is greater than 1.",
@@ -134,7 +150,7 @@
     }
   },
   "editOvertimeRequestForm": {
-    "title": "Edit Production Overtime Work Order",
+    "title": "Edit Overtime Work Order",
     "requestsTable": "Orders Table",
     "startWork": "Work Start",
     "startWorkDescription": "Start of shift or first shift when number of shifts is greater than 1.",
@@ -154,6 +170,7 @@
     "noteDescription": "Additional information about the order.",
     "scheduledDayOff": "Employees Picking Up Days Off",
     "scheduledDayOffDescription": "Employees who are picking up a day off for overtime work.",
+    "discardChanges": "Discard Changes",
     "saveChanges": "Save Changes",
     "accordion": {
       "restPeriod": "Maintaining Uninterrupted Rest",
@@ -269,7 +286,7 @@
     }
   },
   "idTable": {
-    "title": "Employees Picking Up Overtime in Production Overtime Work Order",
+    "title": "Employees Picking Up Overtime",
     "requestsTable": "Orders Table",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -316,6 +333,128 @@
     "invalidFile": "Invalid file!",
     "filesMinOne": "Select at least one file!",
     "filesMaxTen": "You can upload maximum 10 files!",
-    "totalFileSizeExceeds": "Total file size exceeds 50MB!"
+    "totalFileSizeExceeds": "Total file size exceeds 50MB!",
+    "pendingArticleNotAdded": "You haven't added the selected article! Click \"+\" to add or clear the fields.",
+    "departmentRequired": "Select department!"
+  },
+  "multiArticleManager": {
+    "label": "Planned Production",
+    "placeholder": "Select article",
+    "articleNumber": "Article Number",
+    "articleName": "Name",
+    "quantity": "Quantity",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "unknownArticle": "Unknown article",
+    "fetchError": "Fetch error",
+    "quantityPlaceholder": "pcs.",
+    "clearFields": "Clear fields",
+    "addArticle": "Add article"
+  },
+  "articleSearch": {
+    "placeholder": "Select article",
+    "searchPlaceholder": "Search by number or name...",
+    "minCharsRequired": "Enter at least 2 characters",
+    "notFound": "No articles found",
+    "notSelected": "Not selected"
+  },
+  "department": {
+    "label": "Department",
+    "description": "Select the department for which overtime is ordered.",
+    "placeholder": "Select department",
+    "unknown": "Unknown"
+  },
+  "tableColumnsExtra": {
+    "date": "Date",
+    "orderDetails": "Order Details",
+    "closeOrder": "Close Order",
+    "reactivateOrder": "Reactivate Order",
+    "deleteOrder": "Delete Order",
+    "confirmDelete": "Are you sure you want to PERMANENTLY delete this order? This operation is irreversible.",
+    "deleted": "Order has been deleted",
+    "reactivated": "Order has been reactivated",
+    "error": "Error: {message}"
+  },
+  "detailsPage": {
+    "attendanceList": "Attendance List",
+    "overtimePickup": "Overtime Pickup",
+    "orderDetails": "Order Details",
+    "orders": "Orders",
+    "created": "Created:",
+    "requestedBy": "Requested By:",
+    "responsiblePerson": "Responsible Person:",
+    "department": "Department:",
+    "startTime": "Start Time:",
+    "endTime": "End Time:",
+    "duration": "Duration:",
+    "numberOfShifts": "Number of Shifts:",
+    "plannedEmployees": "Planned Number of Employees:",
+    "actualEmployees": "Actual Number of Employees:",
+    "employeesPickingUpDaysOff": "Employees Picking Up Days Off:",
+    "totalHours": "Total Hours:",
+    "reason": "Reason:",
+    "additionalInfo": "Additional Information:",
+    "productionInfo": "Production Information",
+    "plannedProduction": "Planned Production",
+    "actualProduction": "Actual Production",
+    "article": "Article",
+    "quantity": "Quantity",
+    "pcs": "pcs.",
+    "employeesWithDayOff": "Employees Picking Up Days Off",
+    "manage": "Manage",
+    "employee": "Employee",
+    "persNo": "Pers. No.",
+    "pickupDate": "Pickup Date",
+    "notes": "Notes",
+    "notSet": "Not Set",
+    "history": "History",
+    "status": "Status",
+    "person": "Person",
+    "date": "Date",
+    "statusLabels": {
+      "forecast": "Forecast",
+      "pending": "Awaiting Approval",
+      "canceled": "Canceled",
+      "accounted": "Accounted",
+      "completed": "Completed",
+      "approved": "Approved",
+      "created": "Created"
+    }
+  },
+  "completeOrderForm": {
+    "title": "Close Order",
+    "backToOrders": "Back to Orders List",
+    "description": "Closing the order includes uploading the attendance list and providing the actual number of employees and produced articles. After closing, the order status will change to completed.",
+    "attendanceList": "Attendance List",
+    "selectedFiles": "Selected files ({count}):",
+    "actualProduction": "Actual Production",
+    "actualEmployees": "Actual Number of Employees (planned: {planned})",
+    "submitButton": "Close Order",
+    "toast": {
+      "unauthorized": "You don't have permission to add the attendance list.",
+      "contactIT": "Please contact IT!",
+      "uploading": "Uploading files...",
+      "successSingle": "Order closed successfully! {count} file uploaded and converted to PDF. Order status changed to completed.",
+      "successMultiple": "Order closed successfully! {count} files uploaded and merged to PDF. Order status changed to completed.",
+      "invalidResponse": "Invalid response from server",
+      "fileAlreadyExists": "One of the files already exists",
+      "noPermission": "No permission to add attachments",
+      "untranslatedError": "An error occurred while adding attachments",
+      "unknownError": "An unknown error occurred",
+      "uploadError": "An error occurred while uploading files"
+    },
+    "errors": {
+      "unauthorized": "Unauthorized",
+      "insufficientPermissions": "Insufficient permissions to add attachment",
+      "noFiles": "No files selected",
+      "noRequestId": "No request ID",
+      "fileTooLarge": "One of the files exceeds the allowed size (10MB)",
+      "totalSizeExceeds": "Total file size exceeds the allowed limit (50MB)",
+      "unsupportedFileType": "Unsupported file type",
+      "fileExists": "A file with this name already exists",
+      "updateFailed": "Failed to update database",
+      "databaseUpdateFailed": "Database update error",
+      "uploadFailed": "File upload error"
+    }
   }
 }

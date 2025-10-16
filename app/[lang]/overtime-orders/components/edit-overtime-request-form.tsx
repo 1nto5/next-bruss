@@ -38,6 +38,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils/cn';
@@ -61,32 +68,40 @@ import {
   redirectToOvertimeOrders as redirect,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
+import { MultiArticleManager } from './multi-article-manager';
 import { Dictionary } from '../lib/dict';
 import { createNewOvertimeRequestSchema } from '../lib/zod';
-import { OvertimeType } from '../lib/types';
+import { DepartmentConfig, OvertimeType } from '../lib/types';
 import { Locale } from '@/lib/config/i18n';
 
 export default function EditOvertimeRequestForm({
   employees,
   users,
+  departments,
   overtimeRequest,
   dict,
   lang,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
+  departments: DepartmentConfig[];
   overtimeRequest: OvertimeType;
   dict: Dictionary;
   lang: Locale;
 }) {
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
+  const [pendingArticle, setPendingArticle] = useState<{
+    articleNumber: string;
+    quantity: string;
+  }>({ articleNumber: '', quantity: '' });
 
   const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
 
   const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
     resolver: zodResolver(newOvertimeRequestSchema),
     defaultValues: {
+      department: overtimeRequest.department || '',
       numberOfEmployees: overtimeRequest.numberOfEmployees,
       numberOfShifts: overtimeRequest.numberOfShifts,
       responsibleEmployee: overtimeRequest.responsibleEmployee,
@@ -95,10 +110,20 @@ export default function EditOvertimeRequestForm({
       to: new Date(overtimeRequest.to),
       reason: overtimeRequest.reason,
       note: overtimeRequest.note || '',
+      plannedArticles: overtimeRequest.plannedArticles || [],
     },
   });
 
   const onSubmit = async (data: z.infer<typeof newOvertimeRequestSchema>) => {
+    // Check if there's a pending article that hasn't been added
+    if (pendingArticle.articleNumber && pendingArticle.quantity) {
+      form.setError('plannedArticles', {
+        type: 'manual',
+        message: dict.validation.pendingArticleNotAdded,
+      });
+      return;
+    }
+
     setIsPendingUpdate(true);
     try {
       const res = await update(overtimeRequest._id, data);
@@ -142,6 +167,42 @@ export default function EditOvertimeRequestForm({
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
+            <FormField
+              control={form.control}
+              name='department'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{dict.department.label}</FormLabel>
+                  <FormDescription>
+                    {dict.department.description}
+                  </FormDescription>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={dict.department.placeholder} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {departments
+                          .sort((a, b) => {
+                            const aName = lang === 'pl' ? a.namePl : lang === 'de' ? a.nameDe : a.name;
+                            const bName = lang === 'pl' ? b.namePl : lang === 'de' ? b.nameDe : b.name;
+                            return aName.localeCompare(bName, lang);
+                          })
+                          .map((dept) => {
+                            const displayName = lang === 'pl' ? dept.namePl : lang === 'de' ? dept.nameDe : dept.name;
+                            return (
+                              <SelectItem key={dept.value} value={dept.value}>
+                                {displayName}
+                              </SelectItem>
+                            );
+                          })}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name='from'
@@ -376,6 +437,23 @@ export default function EditOvertimeRequestForm({
               )}
             />
 
+            <FormField
+              control={form.control}
+              name='plannedArticles'
+              render={({ field }) => (
+                <FormItem>
+                  <MultiArticleManager
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    dict={dict}
+                    onPendingChange={setPendingArticle}
+                    onClearError={() => form.clearErrors('plannedArticles')}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Accordion type='single' collapsible>
               <AccordionItem value='item-1'>
                 <AccordionTrigger>
@@ -419,13 +497,13 @@ export default function EditOvertimeRequestForm({
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
             <LocalizedLink href='/overtime-orders'>
               <Button
-                variant='outline'
+                variant='destructive'
                 type='button'
                 className='w-full sm:w-auto'
                 disabled={isPendingUpdate}
               >
                 <CircleX className='' />
-                {dict.common.cancel}
+                {dict.editOvertimeRequestForm.discardChanges}
               </Button>
             </LocalizedLink>
             <Button

@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth';
-import AccessDeniedAlert from '@/components/access-denied-alert';
 import { dbc } from '@/lib/db/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
@@ -85,12 +84,6 @@ export default async function EditOvertimeSubmissionPage(props: {
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
-  // Tester role check
-  const userRoles = session.user?.roles || [];
-  const isTester = userRoles.includes('tester');
-  if (!isTester) {
-    return <AccessDeniedAlert />;
-  }
 
   const [managers, submission] = await Promise.all([
     getManagers(),
@@ -103,16 +96,21 @@ export default async function EditOvertimeSubmissionPage(props: {
 
   // Check if user can edit this submission
   const isAuthor = submission.submittedBy === session.user.email;
-  const isHR = session.user.roles.includes('hr');
-  const isAdmin = session.user.roles.includes('admin');
+  const isHR = session.user.roles?.includes('hr') ?? false;
+  const isAdmin = session.user.roles?.includes('admin') ?? false;
+
+  // Edit permissions:
+  // - Author can edit when status is pending
+  // - HR/Admin can edit regardless of status
   const canEdit =
-    isAuthor &&
-    submission.status === 'pending' &&
-    (isHR || isAdmin || submission.supervisor === session.user.email);
+    (isAuthor && submission.status === 'pending') || isHR || isAdmin;
 
   if (!canEdit) {
     redirect('/overtime-submissions');
   }
+
+  // When HR/Admin edits a non-pending submission, it requires re-approval
+  const requiresReapproval = !isAuthor && (isHR || isAdmin) && submission.status !== 'pending';
 
   return (
     <OvertimeRequestForm
@@ -122,6 +120,7 @@ export default async function EditOvertimeSubmissionPage(props: {
       submission={submission}
       dict={dict}
       lang={lang}
+      requiresReapproval={requiresReapproval}
     />
   );
 }

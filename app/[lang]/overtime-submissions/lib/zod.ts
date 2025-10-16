@@ -14,6 +14,7 @@ export const createOvertimeSubmissionSchema = (validation: {
   dateRangeInvalid: string;
   hoursIncrementInvalid: string;
   reasonRequired: string;
+  previousMonthNotAllowed: string;
 }) => {
   return z
     .object({
@@ -46,14 +47,46 @@ export const createOvertimeSubmissionSchema = (validation: {
     .refine(
       (data) => {
         const now = new Date();
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setHours(0, 0, 0, 0);
-        sevenDaysAgo.setDate(now.getDate() - 7);
+        const selectedDate = new Date(data.date);
+
+        // Check if selected date is from previous month
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const selectedYear = selectedDate.getFullYear();
+        const selectedMonth = selectedDate.getMonth();
+
+        // If year is earlier OR (same year but month is earlier) = previous month
+        if (selectedYear < currentYear || (selectedYear === currentYear && selectedMonth < currentMonth)) {
+          return false; // Cannot add overtime from previous month
+        }
+
+        return true;
+      },
+      {
+        message: validation.previousMonthNotAllowed,
+        path: ['date'],
+      },
+    )
+    .refine(
+      (data) => {
+        const now = new Date();
+        now.setHours(23, 59, 59, 999);
+
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setHours(0, 0, 0, 0);
+        threeDaysAgo.setDate(now.getDate() - 3);
+
+        const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        startOfCurrentMonth.setHours(0, 0, 0, 0);
 
         if (data.hours < 0) {
+          // Overtime pickup: any time after now
           return data.date > now;
         } else {
-          return data.date >= sevenDaysAgo && data.date <= now;
+          // Adding overtime: within last 3 days (+ today = 4 days total) BUT only from current month
+          // Effective start date is the later of: (3 days ago) or (start of current month)
+          const effectiveStartDate = threeDaysAgo > startOfCurrentMonth ? threeDaysAgo : startOfCurrentMonth;
+          return data.date >= effectiveStartDate && data.date <= now;
         }
       },
       {
@@ -121,21 +154,28 @@ export const OvertimeSubmissionSchema = z
   .refine(
     (data) => {
       const now = new Date();
-      // 7 days ago
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setHours(0, 0, 0, 0);
-      sevenDaysAgo.setDate(now.getDate() - 7);
+      now.setHours(23, 59, 59, 999);
+
+      // 3 days ago (+ today = 4 days total)
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setHours(0, 0, 0, 0);
+      threeDaysAgo.setDate(now.getDate() - 3);
+
+      const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      startOfCurrentMonth.setHours(0, 0, 0, 0);
 
       if (data.hours < 0) {
         // Overtime pickup: any time after now (including later today)
         return data.date > now;
       } else {
-        // Adding overtime: date >= 7 days ago, date <= today
-        return data.date >= sevenDaysAgo && data.date <= now;
+        // Adding overtime: within last 3 days (+ today = 4 days total) BUT only from current month
+        // Effective start date is the later of: (3 days ago) or (start of current month)
+        const effectiveStartDate = threeDaysAgo > startOfCurrentMonth ? threeDaysAgo : startOfCurrentMonth;
+        return data.date >= effectiveStartDate && data.date <= now;
       }
     },
     {
-      message: 'Możesz dodać nadgodziny tylko z ostatnich 7 dni.',
+      message: 'Możesz dodać nadgodziny tylko z ostatnich 3 dni bieżącego miesiąca.',
       path: ['date'],
     },
   )
@@ -147,7 +187,7 @@ export const OvertimeSubmissionSchema = z
     },
     {
       message:
-        'Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, etc.)',
+        'Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, itd.)',
       path: ['hours'],
     },
   )

@@ -1,4 +1,5 @@
 import { ForecastFilterType, ForecastResponse } from './types';
+import { formatDateTime } from '@/lib/utils/date-format';
 
 export async function getForecastData(
   filterType: ForecastFilterType,
@@ -42,7 +43,7 @@ export async function getForecastData(
   }
 
   const fetchTime = new Date(res.headers.get('date') || '');
-  const fetchTimeLocaleString = fetchTime.toLocaleString();
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const forecastData: ForecastResponse = await res.json();
 

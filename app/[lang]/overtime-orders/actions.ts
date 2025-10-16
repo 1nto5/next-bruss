@@ -657,7 +657,9 @@ export async function getOvertimeRequestForEdit(id: string) {
     // Convert MongoDB document to OvertimeType
     return {
       _id: request._id.toString(),
+      internalId: request.internalId,
       status: request.status,
+      department: request.department,
       numberOfEmployees: request.numberOfEmployees,
       numberOfShifts: request.numberOfShifts,
       responsibleEmployee: request.responsibleEmployee,
@@ -666,6 +668,9 @@ export async function getOvertimeRequestForEdit(id: string) {
       to: request.to,
       reason: request.reason,
       note: request.note || '',
+      plannedArticles: request.plannedArticles || [],
+      actualArticles: request.actualArticles,
+      actualEmployeesWorked: request.actualEmployeesWorked,
       requestedAt: request.requestedAt,
       requestedBy: request.requestedBy,
       editedAt: request.editedAt,
@@ -735,11 +740,23 @@ export async function updateOvertimeRequest(
     }
 
     // Update the request
+    // Preserve fields that shouldn't be overwritten
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...data,
+          // Only update user-editable fields from the form
+          department: data.department,
+          numberOfEmployees: data.numberOfEmployees,
+          numberOfShifts: data.numberOfShifts,
+          responsibleEmployee: data.responsibleEmployee,
+          employeesWithScheduledDayOff: data.employeesWithScheduledDayOff,
+          from: data.from,
+          to: data.to,
+          reason: data.reason,
+          note: data.note,
+          plannedArticles: data.plannedArticles,
+          // Update metadata
           editedAt: new Date(),
           editedBy: session.user.email,
         },
@@ -799,67 +816,61 @@ export async function bulkDeleteOvertimeRequests(ids: string[]) {
   }
 }
 
-export async function bulkReactivateOvertimeRequests(ids: string[]) {
+export async function reactivateOvertimeRequest(id: string) {
+  console.log('reactivateOvertimeRequest', id);
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    return { error: 'unauthorized' };
   }
 
-  // Only admins can reactivate orders
+  // Only admins and HR can reactivate orders
   const isAdmin = (session.user?.roles ?? []).includes('admin');
-  if (!isAdmin) {
+  const isHR = (session.user?.roles ?? []).includes('hr');
+  if (!isAdmin && !isHR) {
     return { error: 'unauthorized' };
   }
 
   try {
     const coll = await dbc('overtime_orders');
-    
-    // Handle both ObjectIds and string IDs
-    const convertedIds: ObjectId[] = ids.map((id) => {
-      try {
-        // Try to convert to ObjectId first
-        return new ObjectId(id);
-      } catch {
-        // If it fails, throw error (all IDs should be valid ObjectId strings)
-        throw new Error(`Invalid ObjectId format: ${id}`);
-      }
-    });
 
-    // First get all requests to check which ones can be reactivated
-    const requests = await coll.find({ _id: { $in: convertedIds } }).toArray();
-    
-    // Filter to only canceled requests
-    const reactivatableIds = requests
-      .filter(req => req.status === 'canceled')
-      .map(req => req._id);
-
-    if (reactivatableIds.length === 0) {
-      return { error: 'no canceled requests found' };
+    // First check if the request exists and get its current status
+    const request = await coll.findOne({ _id: new ObjectId(id) });
+    if (!request) {
+      return { error: 'not found' };
     }
 
-    // Update canceled requests back to pending
-    const update = await coll.updateMany(
-      { _id: { $in: reactivatableIds } },
-      { 
-        $set: { 
+    // Only allow reactivating if status is canceled
+    if (request.status !== 'canceled') {
+      return { error: 'invalid status' };
+    }
+
+    // Update the request back to pending status
+    const update = await coll.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
           status: 'pending',
           reactivatedAt: new Date(),
-          reactivatedBy: session.user.email
+          reactivatedBy: session.user.email,
+          editedAt: new Date(),
+          editedBy: session.user.email,
         },
-        $unset: { 
-          canceledAt: "",
-          canceledBy: ""
-        }
-      }
+        $unset: {
+          canceledAt: '',
+          canceledBy: '',
+        },
+      },
     );
 
+    if (update.matchedCount === 0) {
+      return { error: 'not found' };
+    }
+
     revalidateOvertimeOrders();
-    return {
-      success: 'reactivated',
-      count: update.modifiedCount,
-    };
+    revalidateOvertimeOrdersRequest();
+    return { success: 'reactivated' };
   } catch (error) {
     console.error(error);
-    return { error: 'bulkReactivateOvertimeRequests server action error' };
+    return { error: 'reactivateOvertimeRequest server action error' };
   }
 }

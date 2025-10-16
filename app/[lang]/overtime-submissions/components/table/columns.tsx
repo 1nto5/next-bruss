@@ -12,7 +12,7 @@ import {
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { Check, Edit, MoreHorizontal, X } from 'lucide-react';
+import { Check, Edit, FileText, MoreHorizontal, X } from 'lucide-react';
 import { Session } from 'next-auth';
 import { useState } from 'react';
 import LocalizedLink from '@/components/localized-link';
@@ -81,6 +81,14 @@ export const createColumns = (
       enableHiding: false,
     },
     {
+      accessorKey: 'internalId',
+      header: 'ID',
+      cell: ({ row }) => {
+        const internalId = row.getValue('internalId') as string;
+        return <div>{internalId || ''}</div>;
+      },
+    },
+    {
       accessorKey: 'status',
       header: dict.columns.status,
       cell: ({ row }) => {
@@ -95,13 +103,13 @@ export const createColumns = (
               </Badge>
             );
             break;
-          case 'pending-director':
+          case 'pending-plant-manager':
             statusLabel = (
               <Badge
                 variant='statusPending'
                 className='bg-yellow-400 text-nowrap text-black'
               >
-                {dict.status.pending}
+                {dict.status.pendingPlantManager}
               </Badge>
             );
             break;
@@ -166,11 +174,15 @@ export const createColumns = (
         const canApproveReject =
           (submission.supervisor === userEmail || isHR || isAdmin) &&
           submission.status === 'pending';
-        const canApproveDirector =
-          (userRoles.includes('director') || isAdmin) &&
-          (submission.status as string) === 'pending-director';
+        const canApprovePlantManager =
+          (userRoles.includes('plant-manager') || isAdmin) &&
+          (submission.status as string) === 'pending-plant-manager';
 
-        const canEdit = isAuthor && submission.status === 'pending';
+        // Edit permissions:
+        // - Author can edit when status is pending
+        // - HR/Admin can edit regardless of status
+        const canEdit =
+          (isAuthor && submission.status === 'pending') || isHR || isAdmin;
         const canDelete = isAuthor && submission.status === 'pending';
 
         const hasMarkAsAccountedAction =
@@ -180,7 +192,7 @@ export const createColumns = (
           canEdit ||
           canDelete ||
           canApproveReject ||
-          canApproveDirector ||
+          canApprovePlantManager ||
           hasMarkAsAccountedAction;
 
         if (!hasActions) {
@@ -196,6 +208,14 @@ export const createColumns = (
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
+                {/* View Details - always available as first option */}
+                <LocalizedLink href={`/overtime-submissions/${submission._id}`}>
+                  <DropdownMenuItem>
+                    <FileText className='mr-2 h-4 w-4' />
+                    <span>{dict.actions.viewDetails}</span>
+                  </DropdownMenuItem>
+                </LocalizedLink>
+
                 {/* Edit button for authors */}
                 {canEdit && (
                   <LocalizedLink href={`/overtime-submissions/edit/${submission._id}`}>
@@ -232,8 +252,8 @@ export const createColumns = (
                     <span>{dict.actions.approve}</span>
                   </DropdownMenuItem>
                 )}
-                {/* Director Approve button */}
-                {canApproveDirector && (
+                {/* Plant Manager Approve button */}
+                {canApprovePlantManager && (
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
@@ -241,7 +261,7 @@ export const createColumns = (
                     }}
                   >
                     <Check className='mr-2 h-4 w-4' />
-                    <span>{dict.actions.approveDirector}</span>
+                    <span>{dict.actions.approvePlantManager}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -354,141 +374,12 @@ export const createColumns = (
       accessorKey: 'reason',
       header: dict.columns.reason,
       cell: ({ row }) => {
-        const reason = row.getValue('reason') as string;
-        return <div className='w-[250px] text-justify'>{reason}</div>;
-      },
-    },
-    {
-      accessorKey: 'submittedAt',
-      header: dict.columns.submittedAt,
-      cell: ({ row }) => {
-        const date = row.getValue('submittedAt') as string;
-        return (
-          <span>
-            {formatDate(date)}{' '}
-            {formatTime(date, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'editedAt',
-      header: dict.columns.editedAt,
-      cell: ({ row }) => {
-        const date = row.getValue('editedAt') as Date;
-        if (!date) return <span>-</span>;
-        return (
-          <span>
-            {formatDate(date)}{' '}
-            {formatTime(date, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'editedBy',
-      header: dict.columns.editedBy,
-      cell: ({ row }) => {
-        const email = row.getValue('editedBy') as string;
-        if (!email) return <span>-</span>;
-        return (
-          <span className='whitespace-nowrap'>
-            {extractNameFromEmail(email)}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'approvedAt',
-      header: dict.columns.approvedAt,
-      cell: ({ row }) => {
-        const date = row.getValue('approvedAt') as Date;
-        if (!date) return <span>-</span>;
-        return (
-          <span>
-            {formatDate(date)}{' '}
-            {formatTime(date, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'approvedBy',
-      header: dict.columns.approvedBy,
-      cell: ({ row }) => {
-        const email = row.getValue('approvedBy') as string;
-        if (!email) return <span>-</span>;
-        return (
-          <span className='whitespace-nowrap'>
-            {extractNameFromEmail(email)}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'rejectedAt',
-      header: dict.columns.rejectedAt,
-      cell: ({ row }) => {
-        const date = row.getValue('rejectedAt') as Date;
-        if (!date) return <span>-</span>;
-        return (
-          <span>
-            {formatDate(date)}{' '}
-            {formatTime(date, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        );
-      },
-    },
-
-    {
-      accessorKey: 'rejectionReason',
-      header: dict.columns.rejectionReason,
-      cell: ({ row }) => {
-        const reason = row.getValue('rejectionReason') as string;
-        if (!reason) return <span>-</span>;
-        return <div className='w-[250px] text-justify'>{reason}</div>;
-      },
-    },
-    {
-      accessorKey: 'accountedAt',
-      header: dict.columns.accountedAt,
-      cell: ({ row }) => {
-        const date = row.getValue('accountedAt') as Date;
-        if (!date) return <span>-</span>;
-        return (
-          <span>
-            {formatDate(date)}{' '}
-            {formatTime(date, {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: 'accountedBy',
-      header: dict.columns.accountedBy,
-      cell: ({ row }) => {
-        const email = row.getValue('accountedBy') as string;
-        if (!email) return <span>-</span>;
-        return (
-          <span className='whitespace-nowrap'>
-            {extractNameFromEmail(email)}
-          </span>
-        );
+        const reason = row.getValue('reason') as string | undefined;
+        if (!reason) return <div className='max-w-[200px]'>-</div>;
+        const truncated = reason.length > 80
+          ? `${reason.substring(0, 80)}...`
+          : reason;
+        return <div className='max-w-[200px]'>{truncated}</div>;
       },
     },
   ];

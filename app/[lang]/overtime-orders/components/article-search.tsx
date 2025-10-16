@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils/cn';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { Dictionary } from '../lib/dict';
 
 type Article = {
   _id: string;
@@ -28,6 +29,7 @@ type Article = {
 interface ArticleSearchProps {
   value?: string;
   onSelect: (articleNumber: string) => void;
+  dict: Dictionary;
   placeholder?: string;
 }
 
@@ -36,10 +38,7 @@ export interface ArticleSearchRef {
 }
 
 export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
-  function ArticleSearch(
-    { value, onSelect, placeholder = 'Wybierz artykuł' },
-    ref,
-  ) {
+  function ArticleSearch({ value, onSelect, dict, placeholder }, ref) {
     const [open, setOpen] = useState(false);
     const [articles, setArticles] = useState<Article[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -85,22 +84,22 @@ export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
           >
             {selectedArticle
               ? `${selectedArticle.number} - ${selectedArticle.name}`
-              : placeholder}
+              : placeholder || dict.articleSearch.placeholder}
             <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-[300px] p-0' side='bottom' align='start'>
           <Command>
             <CommandInput
-              placeholder='Wyszukaj po numerze lub nazwie...'
+              placeholder={dict.articleSearch.searchPlaceholder}
               value={searchQuery}
               onValueChange={setSearchQuery}
             />
             <CommandList>
               <CommandEmpty>
                 {searchQuery.length < 2
-                  ? 'Wprowadź co najmniej 2 znaki'
-                  : 'Nie znaleziono artykułów'}
+                  ? dict.articleSearch.minCharsRequired
+                  : dict.articleSearch.notFound}
               </CommandEmpty>
               <CommandGroup>
                 <CommandItem
@@ -111,7 +110,7 @@ export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
                   }}
                 >
                   <Check className='mr-2 h-4 w-4 opacity-0' />
-                  Nie wybrano
+                  {dict.articleSearch.notSelected}
                 </CommandItem>
                 {articles.map((article) => (
                   <CommandItem

@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth';
-import AccessDeniedAlert from '@/components/access-denied-alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
@@ -104,6 +103,7 @@ async function getOvertimeSubmissionsForHR(
       (submission) =>
         ({
           _id: submission._id.toString(),
+          internalId: submission.internalId,
           status: submission.status,
           supervisor: submission.supervisor,
           date: submission.date,
@@ -162,13 +162,6 @@ export default async function OvertimeHRViewPage(props: {
 
   if (!session?.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
-  }
-
-  // Tester role check
-  const userRoles = session.user?.roles || [];
-  const isTester = userRoles.includes('tester');
-  if (!isTester) {
-    return <AccessDeniedAlert />;
   }
 
   // Fetch all users for person filter

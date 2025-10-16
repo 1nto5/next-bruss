@@ -22,12 +22,13 @@ import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle, Table, X } from 'lucide-react';
 import { Session } from 'next-auth';
-import Link from 'next/link';
+import LocalizedLink from '@/components/localized-link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { revalidateOvertimeOrders as revalidate } from '../actions';
+import { Dictionary } from '../lib/dict';
 import { OvertimeType } from '../lib/types';
 import {
   MultipleAttachmentFormSchema,
@@ -48,12 +49,14 @@ interface CompleteOrderFormProps {
   id: string;
   session: Session | null;
   overtimeRequest: OvertimeType;
+  dict: Dictionary;
 }
 
 export default function CompleteOrderForm({
   id,
   session,
   overtimeRequest,
+  dict,
 }: CompleteOrderFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -110,12 +113,12 @@ export default function CompleteOrderForm({
       userEmail === overtimeRequest.responsibleEmployee;
 
     if (!canAddAttachment) {
-      toast.error('Nie masz uprawnień do dodania listy obecności.');
+      toast.error(dict.completeOrderForm.toast.unauthorized);
       return;
     }
 
     if (!id) {
-      toast.error('Skontaktuj się z IT!');
+      toast.error(dict.completeOrderForm.toast.contactIT);
       console.error('no overTimeRequestId');
       return;
     }
@@ -163,7 +166,7 @@ export default function CompleteOrderForm({
             result = JSON.parse(responseText);
           } catch (e) {
             console.error('Failed to parse response as JSON:', e);
-            reject(new Error('Nieprawidłowa odpowiedź z serwera'));
+            reject(new Error(dict.completeOrderForm.toast.invalidResponse));
             return;
           }
 
@@ -182,48 +185,50 @@ export default function CompleteOrderForm({
             resolve();
           } else {
             const errorMap: { [key: string]: string } = {
-              'Unauthorized': 'Brak autoryzacji',
+              'Unauthorized': dict.completeOrderForm.errors.unauthorized,
               'Insufficient permissions to add attachment':
-                'Brak uprawnień do dodania załącznika',
-              'No files': 'Nie wybrano plików',
-              'No overTimeRequest ID': 'Brak ID zlecenia',
+                dict.completeOrderForm.errors.insufficientPermissions,
+              'No files': dict.completeOrderForm.errors.noFiles,
+              'No overTimeRequest ID': dict.completeOrderForm.errors.noRequestId,
               'File size exceeds the limit (10MB)':
-                'Jeden z plików przekracza dozwolony rozmiar (10MB)',
+                dict.completeOrderForm.errors.fileTooLarge,
               'Total file size exceeds the limit (50MB)':
-                'Łączny rozmiar plików przekracza dozwolony limit (50MB)',
-              'Unsupported file type': 'Nieobsługiwany format pliku',
-              'File already exists': 'Plik o tej nazwie już istnieje',
+                dict.completeOrderForm.errors.totalSizeExceeds,
+              'Unsupported file type': dict.completeOrderForm.errors.unsupportedFileType,
+              'File already exists': dict.completeOrderForm.errors.fileExists,
               'Failed to update overTimeRequest with attachments':
-                'Nie udało się zaktualizować bazy danych',
-              'Database update failed': 'Błąd aktualizacji bazy danych',
-              'File upload failed': 'Błąd podczas przesyłania plików',
+                dict.completeOrderForm.errors.updateFailed,
+              'Database update failed': dict.completeOrderForm.errors.databaseUpdateFailed,
+              'File upload failed': dict.completeOrderForm.errors.uploadFailed,
             };
 
             if (response.status === 409) {
-              reject(new Error('Jeden z plików już istnieje'));
+              reject(new Error(dict.completeOrderForm.toast.fileAlreadyExists));
             } else if (response.status === 403) {
-              reject(new Error('Brak uprawnień do dodania załączników'));
+              reject(new Error(dict.completeOrderForm.toast.noPermission));
             } else if (result.error && errorMap[result.error]) {
               reject(new Error(errorMap[result.error]));
             } else if (result.error) {
               console.warn('Nieprzetłumaczony błąd:', result.error);
-              reject(new Error('Wystąpił błąd podczas dodawania załączników'));
+              reject(new Error(dict.completeOrderForm.toast.untranslatedError));
             } else {
-              reject(new Error('Wystąpił nieznany błąd'));
+              reject(new Error(dict.completeOrderForm.toast.unknownError));
             }
           }
         } catch (error) {
           console.error('Upload error:', error);
-          reject(new Error('Wystąpił błąd podczas wysyłania plików'));
+          reject(new Error(dict.completeOrderForm.toast.uploadError));
         } finally {
           setIsUploading(false);
         }
       }),
       {
-        loading: 'Przesyłanie plików...',
+        loading: dict.completeOrderForm.toast.uploading,
         success: (data) => {
           const count = selectedFiles.length;
-          return `Zlecenie zamknięte pomyślnie! ${count} ${count === 1 ? 'plik przesłany oraz przekonwertowany do PDF' : 'pliki przesłane oraz scalone do pliku PDF'}. Status zlecenia zmieniony na ukończony.`;
+          return count === 1
+            ? dict.completeOrderForm.toast.successSingle.replace('{count}', count.toString())
+            : dict.completeOrderForm.toast.successMultiple.replace('{count}', count.toString());
         },
         error: (err) => err.message,
       },
@@ -234,12 +239,12 @@ export default function CompleteOrderForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>Zamykanie zlecenia</CardTitle>
-          <Link href={`/overtime-orders`}>
+          <CardTitle>{dict.completeOrderForm.title}</CardTitle>
+          <LocalizedLink href={`/overtime-orders`}>
             <Button variant='outline'>
-              <Table /> <span>Powrót do listy zleceń</span>
+              <Table /> <span>{dict.completeOrderForm.backToOrders}</span>
             </Button>
-          </Link>
+          </LocalizedLink>
         </div>
       </CardHeader>
       <Separator className='mb-4' />
@@ -248,9 +253,7 @@ export default function CompleteOrderForm({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='space-y-6'>
             <p className='text-muted-foreground text-sm'>
-              Zamykanie zlecenia obejmuje przesłanie listy obecności oraz
-              podanie rzeczywistej liczby pracowników i wyprodukowanych
-              artykułów. Po zamknięciu status zlecenia zmieni się na ukończony.
+              {dict.completeOrderForm.description}
             </p>
 
             <FormField
@@ -258,7 +261,7 @@ export default function CompleteOrderForm({
               name='files'
               render={({ field: { onChange, value, ref, ...rest } }) => (
                 <FormItem>
-                  <FormLabel htmlFor='files'>Lista obecności</FormLabel>
+                  <FormLabel htmlFor='files'>{dict.completeOrderForm.attendanceList}</FormLabel>
                   <FormControl>
                     <Input
                       id='files'
@@ -278,7 +281,7 @@ export default function CompleteOrderForm({
             {/* Display selected files */}
             {selectedFiles.length > 0 && (
               <div className='space-y-2'>
-                <Label>Wybrane pliki ({selectedFiles.length}):</Label>
+                <Label>{dict.completeOrderForm.selectedFiles.replace('{count}', selectedFiles.length.toString())}</Label>
                 <div className='max-h-40 space-y-2 overflow-y-auto'>
                   {selectedFiles.map((file, index) => (
                     <div
@@ -317,7 +320,8 @@ export default function CompleteOrderForm({
                   <MultiArticleManager
                     value={field.value || []}
                     onChange={field.onChange}
-                    label='Zrealizowana produkcja'
+                    dict={dict}
+                    label={dict.completeOrderForm.actualProduction}
                     initialValues={overtimeRequest.plannedArticles || []}
                   />
                   <FormMessage />
@@ -331,8 +335,7 @@ export default function CompleteOrderForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Rzeczywista liczba pracowników (planowano:{' '}
-                    {overtimeRequest.numberOfEmployees})
+                    {dict.completeOrderForm.actualEmployees.replace('{planned}', overtimeRequest.numberOfEmployees.toString())}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -364,7 +367,7 @@ export default function CompleteOrderForm({
               className='w-full sm:w-auto'
             >
               <CheckCircle className={isUploading ? 'animate-spin' : ''} />
-              Zamknij zlecenie
+              {dict.completeOrderForm.submitButton}
             </Button>
           </CardFooter>
         </form>

@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDateTime } from '@/lib/utils/date-format';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { formatDate } from '@/lib/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   ArrowUpDown,
@@ -38,12 +38,15 @@ import {
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
+import DeleteRequestDialog from '../delete-request-dialog';
+import ReactivateRequestDialog from '../reactivate-request-dialog';
 
-// Creating a columns factory function that takes the session, dict, and departments
+// Creating a columns factory function that takes the session, dict, departments, and lang
 export const createColumns = (
   session: Session | null,
   dict: Dictionary,
   departments?: DepartmentConfig[],
+  lang?: string,
 ): ColumnDef<OvertimeType>[] => {
   // Check if the user has plant-manager or admin role
   const isPlantManager = session?.user?.roles?.includes('plant-manager');
@@ -147,14 +150,17 @@ export const createColumns = (
     },
     {
       accessorKey: 'department',
-      header: 'Dział',
+      header: dict.department.label,
       cell: ({ row }) => {
         const department = row.getValue('department') as string;
         const departmentConfig = departments?.find(
           (dept) => dept.value === department,
         );
-        const displayName =
-          departmentConfig?.namePl || department || 'Nieznany';
+        const displayName = lang === 'pl'
+          ? departmentConfig?.namePl
+          : lang === 'de'
+          ? departmentConfig?.nameDe
+          : departmentConfig?.name || department || dict.department.unknown;
         return <div>{displayName}</div>;
       },
     },
@@ -213,6 +219,10 @@ export const createColumns = (
           useState(false);
         // State to control the approve dialog
         const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
+        // State to control the delete dialog
+        const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+        // State to control the reactivate dialog
+        const [isReactivateDialogOpen, setIsReactivateDialogOpen] = useState(false);
 
         // Get user roles and email for permission checks
         const userRoles = session?.user?.roles || [];
@@ -294,7 +304,7 @@ export const createColumns = (
                 <LocalizedLink href={`/overtime-orders/${request._id}`}>
                   <DropdownMenuItem>
                     <FileText className='mr-2 h-4 w-4' />
-                    <span>Szczegóły zlecenia</span>
+                    <span>{dict.tableColumnsExtra.orderDetails}</span>
                   </DropdownMenuItem>
                 </LocalizedLink>
 
@@ -364,7 +374,7 @@ export const createColumns = (
                   <LocalizedLink href={`/overtime-orders/${request._id}/complete`}>
                     <DropdownMenuItem>
                       <CheckCircle className='mr-2 h-4 w-4' />
-                      <span>Zamknij zlecenie</span>
+                      <span>{dict.tableColumnsExtra.closeOrder}</span>
                     </DropdownMenuItem>
                   </LocalizedLink>
                 )}
@@ -383,56 +393,34 @@ export const createColumns = (
                   </Link>
                 )}
 
-                {/* Admin actions */}
-                {isAdmin && request.status === 'canceled' && (
+                {/* Admin and HR actions */}
+                {(isAdmin || isHR) && request.status === 'canceled' && (
                   <DropdownMenuItem
-                    onSelect={async (e) => {
+                    onSelect={(e) => {
                       e.preventDefault();
-                      const result = await bulkReactivateOvertimeRequests([
-                        request._id,
-                      ]);
-                      if (result.error) {
-                        alert(`Błąd: ${result.error}`);
-                      } else {
-                        alert('Zlecenie zostało reaktywowane');
-                        window.location.reload();
-                      }
+                      setIsReactivateDialogOpen(true);
                     }}
                   >
                     <RotateCcw className='mr-2 h-4 w-4' />
-                    <span>Reaktywuj zlecenie</span>
+                    <span>{dict.tableColumnsExtra.reactivateOrder}</span>
                   </DropdownMenuItem>
                 )}
                 {isAdmin && (
                   <DropdownMenuItem
-                    onSelect={async (e) => {
+                    onSelect={(e) => {
                       e.preventDefault();
-                      if (
-                        confirm(
-                          'Czy na pewno chcesz TRWALE usunąć to zlecenie? Ta operacja jest nieodwracalna.',
-                        )
-                      ) {
-                        const result = await bulkDeleteOvertimeRequests([
-                          request._id,
-                        ]);
-                        if (result.error) {
-                          alert(`Błąd: ${result.error}`);
-                        } else {
-                          alert('Zlecenie zostało usunięte');
-                          window.location.reload();
-                        }
-                      }
+                      setIsDeleteDialogOpen(true);
                     }}
                     className='text-destructive'
                   >
                     <Trash2 className='mr-2 h-4 w-4' />
-                    <span>Usuń zlecenie</span>
+                    <span>{dict.tableColumnsExtra.deleteOrder}</span>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Dialog outside of DropdownMenuContent */}
+            {/* Dialogs outside of DropdownMenuContent */}
             {request._id && (
               <>
                 <CancelRequestDialog
@@ -455,6 +443,18 @@ export const createColumns = (
                   session={session}
                   dict={dict}
                 />
+                <DeleteRequestDialog
+                  isOpen={isDeleteDialogOpen}
+                  onOpenChange={setIsDeleteDialogOpen}
+                  requestId={request._id}
+                  dict={dict}
+                />
+                <ReactivateRequestDialog
+                  isOpen={isReactivateDialogOpen}
+                  onOpenChange={setIsReactivateDialogOpen}
+                  requestId={request._id}
+                  dict={dict}
+                />
               </>
             )}
           </>
@@ -463,13 +463,13 @@ export const createColumns = (
     },
     {
       id: 'period',
-      header: 'Data',
+      header: dict.tableColumnsExtra.date,
       cell: ({ row }) => {
         const from = new Date(row.original.from);
         const to = new Date(row.original.to);
 
-        const fromDate = from.toLocaleDateString('pl-PL');
-        const toDate = to.toLocaleDateString('pl-PL');
+        const fromDate = formatDate(from);
+        const toDate = formatDate(to);
 
         // Check if it's the same day
         if (fromDate === toDate) {
@@ -549,16 +549,6 @@ export const createColumns = (
       },
     },
     {
-      accessorKey: 'reason',
-      header: dict.tableColumns.reason,
-      cell: ({ row }) => {
-        const reason = row.getValue('reason') as string;
-        const truncated =
-          reason.length > 80 ? reason.substring(0, 80) + '...' : reason;
-        return <div className='w-[200px] text-justify'>{truncated}</div>;
-      },
-    },
-    {
       accessorKey: 'responsibleEmployee',
       header: dict.tableColumns.responsibleEmployee,
       cell: ({ row }) => {
@@ -568,122 +558,6 @@ export const createColumns = (
             {extractNameFromEmail(responsibleEmployee as string)}
           </div>
         );
-      },
-    },
-
-    {
-      accessorKey: 'requestedBy',
-      header: dict.tableColumns.requestedBy,
-      cell: ({ row }) => {
-        const requestedBy = row.getValue('requestedBy');
-        return (
-          <div className='whitespace-nowrap'>
-            {extractNameFromEmail(requestedBy as string)}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'requestedAtLocaleString',
-      header: dict.tableColumns.requestedAt,
-      cell: ({ row }) => {
-        const requestedAt = row.original.requestedAt;
-        const requestedAtString = formatDateTime(requestedAt);
-        return <div>{requestedAtString}</div>;
-      },
-    },
-
-    {
-      accessorKey: 'editedBy',
-      header: dict.tableColumns.editedBy,
-      cell: ({ row }) => {
-        const editedBy = row.original.editedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {editedBy ? extractNameFromEmail(editedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'editedAtLocaleString',
-      header: dict.tableColumns.editedAt,
-      cell: ({ row }) => {
-        const editedAt = row.original.editedAt;
-        const editedAtString = formatDateTime(editedAt);
-        return <div>{editedAtString}</div>;
-      },
-    },
-
-    {
-      accessorKey: 'completedBy',
-      header: dict.tableColumns.completedBy,
-      cell: ({ row }) => {
-        const completedBy = row.original.completedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {completedBy ? extractNameFromEmail(completedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'completedAtLocaleString',
-      header: dict.tableColumns.completedAt,
-      cell: ({ row }) => {
-        const completedAt = row.original.completedAt;
-        const completedAtString = formatDateTime(completedAt);
-        return <div>{completedAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'accountedBy',
-      header: dict.tableColumns.accountedBy,
-      cell: ({ row }) => {
-        const accountedBy = row.original.accountedBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {accountedBy ? extractNameFromEmail(accountedBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'accountedAtLocaleString',
-      header: dict.tableColumns.accountedAt,
-      cell: ({ row }) => {
-        const accountedAt = row.original.accountedAt;
-        const accountedAtString = formatDateTime(accountedAt);
-        return <div>{accountedAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'canceledBy',
-      header: dict.tableColumns.canceledBy,
-      cell: ({ row }) => {
-        const canceledBy = row.original.canceledBy;
-        return (
-          <div className='whitespace-nowrap'>
-            {canceledBy ? extractNameFromEmail(canceledBy) : '-'}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'canceledAtLocaleString',
-      header: dict.tableColumns.canceledAt,
-      cell: ({ row }) => {
-        const canceledAt = row.original.canceledAt;
-        const canceledAtString = formatDateTime(canceledAt);
-        return <div>{canceledAtString}</div>;
-      },
-    },
-    {
-      accessorKey: 'note',
-      header: dict.tableColumns.additionalInfo,
-      cell: ({ row }) => {
-        const note = row.getValue('note');
-        return <div className='w-[250px] text-justify'>{note as string}</div>;
       },
     },
   ];

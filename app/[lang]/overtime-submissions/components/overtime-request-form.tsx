@@ -56,6 +56,7 @@ import {
   insertOvertimeSubmission as insert,
   redirectToOvertime as redirect,
   updateOvertimeSubmission as update,
+  editOvertimeSubmission as edit,
 } from '../actions';
 import { OvertimeSubmissionType } from '../lib/types';
 import { createOvertimeSubmissionSchema } from '../lib/zod';
@@ -69,6 +70,7 @@ interface OvertimeRequestFormProps {
   submission?: OvertimeSubmissionType;
   dict: Dictionary;
   lang: Locale;
+  requiresReapproval?: boolean;
 }
 
 export default function OvertimeRequestForm({
@@ -78,6 +80,7 @@ export default function OvertimeRequestForm({
   submission,
   dict,
   lang,
+  requiresReapproval = false,
 }: OvertimeRequestFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
@@ -116,7 +119,12 @@ export default function OvertimeRequestForm({
     try {
       let res;
       if (isEditMode) {
-        res = await update(submission!._id, data);
+        // Use edit if this requires re-approval (HR/Admin editing non-pending)
+        if (requiresReapproval) {
+          res = await edit(submission!._id, data);
+        } else {
+          res = await update(submission!._id, data);
+        }
       } else {
         res = await insert(data);
       }
@@ -130,6 +138,17 @@ export default function OvertimeRequestForm({
           if (currentActionType === 'save-and-add-another') {
             // Show only one toast for add another
             toast.success(dict.toast.submissionSaved);
+            // Keep supervisor but reset other fields
+            const currentSupervisor = form.getValues('supervisor');
+            form.reset({
+              supervisor: currentSupervisor,
+              date: new Date(),
+              hours: 1,
+              reason: '',
+              overtimeRequest: false,
+              payment: undefined,
+              scheduledDayOff: undefined,
+            });
           } else {
             toast.success(successMessage);
             form.reset(); // Reset form after successful submission
@@ -292,13 +311,10 @@ export default function OvertimeRequestForm({
                       step={0.5}
                       {...field}
                       onChange={(e) => {
-                        const value =
-                          e.target.value === ''
-                            ? 0.5
-                            : parseFloat(e.target.value);
+                        const value = e.target.value === '' ? '' : parseFloat(e.target.value);
                         field.onChange(value);
                       }}
-                      value={field.value}
+                      value={field.value === '' ? '' : field.value}
                     />
                   </FormControl>
                   <FormMessage />

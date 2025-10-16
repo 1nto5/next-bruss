@@ -93,7 +93,14 @@ export function createNewOvertimeRequestSchema(validation: {
       path: ['to'],
     })
     .refine(
-      (data) => data.to.getTime() - data.from.getTime() <= 24 * 60 * 60 * 1000,
+      (data) => {
+        const durationMs = data.to.getTime() - data.from.getTime();
+        // Round to seconds to avoid millisecond precision issues
+        const durationSeconds = Math.floor(durationMs / 1000);
+        const maxDurationSeconds = 24 * 60 * 60; // Exactly 24 hours in seconds
+        // Allow up to and including exactly 24 hours, but not more
+        return durationSeconds <= maxDurationSeconds;
+      },
       { message: validation.durationMax24h, path: ['to'] },
     )
     .refine(
@@ -196,7 +203,14 @@ export const NewOvertimeRequestSchema = z
     path: ['to'],
   })
   .refine(
-    (data) => data.to.getTime() - data.from.getTime() <= 24 * 60 * 60 * 1000,
+    (data) => {
+      const durationMs = data.to.getTime() - data.from.getTime();
+      // Round to seconds to avoid millisecond precision issues
+      const durationSeconds = Math.floor(durationMs / 1000);
+      const maxDurationSeconds = 24 * 60 * 60; // Exactly 24 hours in seconds
+      // Allow up to and including exactly 24 hours, but not more
+      return durationSeconds <= maxDurationSeconds;
+    },
     { message: 'Czas nie może przekraczać 24h (3 zmiany)!', path: ['to'] },
   )
   .refine(

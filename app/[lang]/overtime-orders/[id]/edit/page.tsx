@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import getEmployees from '@/lib/data/get-employees';
 import { getUsers } from '@/lib/data/get-users';
 import { Locale } from '@/lib/config/i18n';
+import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { notFound, redirect } from 'next/navigation';
 import EditOvertimeRequestForm from '../../components/edit-overtime-request-form';
 import { getOvertimeRequestForEdit } from '../../actions';
@@ -26,16 +27,18 @@ export default async function EditOvertimeRequestPage(props: {
     notFound();
   }
 
-  // Get employees and users lists
-  const [employees, users] = await Promise.all([
+  // Get employees, users lists, and departments
+  const [employees, users, departments] = await Promise.all([
     getEmployees(),
     getUsers(),
+    getOvertimeDepartments(),
   ]);
 
   return (
     <EditOvertimeRequestForm
       employees={employees}
       users={users}
+      departments={departments}
       overtimeRequest={overtimeRequest}
       dict={dict}
       lang={lang}

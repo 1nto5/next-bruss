@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
 import CompleteOrderForm from '../../components/complete-order-form';
+import { getDictionary } from '../../lib/dict';
 import { getOvertimeRequest } from '../../lib/get-overtime-request';
 
 // Update the attachment roles to match the specified requirements
@@ -22,6 +23,8 @@ export default async function CompleteOrderPage(props: {
   if (!session || !session.user?.email) {
     redirect('/auth');
   }
+
+  const dict = await getDictionary(lang);
 
   // Check overtime request status and get request details
   let overtimeRequestLocaleString;
@@ -56,6 +59,7 @@ export default async function CompleteOrderPage(props: {
       id={id}
       session={session}
       overtimeRequest={overtimeRequestLocaleString}
+      dict={dict}
     />
   );
 }

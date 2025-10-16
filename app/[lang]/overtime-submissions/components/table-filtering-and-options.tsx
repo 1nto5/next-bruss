@@ -1,32 +1,13 @@
 'use client';
 
+import { ClearableCombobox } from '@/components/clearable-combobox';
+import { ClearableSelect } from '@/components/clearable-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
 import { Label } from '@/components/ui/label';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { cn } from '@/lib/utils/cn';
 import { UsersListType } from '@/lib/types/user';
-import { Check, ChevronsUpDown, CircleX, Loader, Search } from 'lucide-react';
+import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { revalidateOvertime as revalidate } from '../actions';
@@ -73,10 +54,27 @@ export default function TableFilteringAndOptions({
     searchParams?.get('status') || '',
   );
 
+  const [onlyMySubmissions, setOnlyMySubmissions] = useState(() => {
+    const param = searchParams?.get('onlyMySubmissions');
+    return param === 'true';
+  });
+
   const [onlyMyPendingApprovals, setOnlyMyPendingApprovals] = useState(() => {
     const param = searchParams?.get('myPendingApprovals');
     return param === 'true';
   });
+
+  const handleOnlyMySubmissionsChange = (checked: boolean) => {
+    setOnlyMySubmissions(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('onlyMySubmissions', 'true');
+    } else {
+      params.delete('onlyMySubmissions');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const handleOnlyMyPendingApprovalsChange = (checked: boolean) => {
     setOnlyMyPendingApprovals(checked);
@@ -146,6 +144,7 @@ export default function TableFilteringAndOptions({
     setYearFilter('');
     setStatusFilter('');
     setManagerFilter('');
+    setOnlyMySubmissions(false);
     setOnlyMyPendingApprovals(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
@@ -160,6 +159,7 @@ export default function TableFilteringAndOptions({
     if (yearFilter) params.set('year', yearFilter);
     if (statusFilter) params.set('status', statusFilter);
     if (managerFilter) params.set('manager', managerFilter);
+    if (onlyMySubmissions) params.set('onlyMySubmissions', 'true');
     if (onlyMyPendingApprovals) params.set('myPendingApprovals', 'true');
     const newUrl = `${pathname}?${params.toString()}`;
     if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
@@ -175,279 +175,154 @@ export default function TableFilteringAndOptions({
     setIsPendingSearch(false);
   }, [fetchTime]);
 
-  // Determine if any filter is active
-  const anyFilterActive = Boolean(
-    monthFilter ||
-      yearFilter ||
-      statusFilter ||
-      managerFilter ||
-      onlyMyPendingApprovals,
+  // Check if user is a manager or leader
+  const isManagerOrLeader = userRoles.some(
+    (role) =>
+      role.toLowerCase().includes('manager') ||
+      role.toLowerCase().includes('leader'),
   );
-  const [showFilters, setShowFilters] = useState(anyFilterActive);
 
   return (
     <Card>
       <CardHeader className='p-4'>
-        <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-          <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2'>
+        <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2'>
+          <div className='flex items-center space-x-2'>
+            <Switch
+              id='only-my-submissions'
+              checked={onlyMySubmissions}
+              onCheckedChange={handleOnlyMySubmissionsChange}
+            />
+            <Label htmlFor='only-my-submissions'>
+              {dict.filters.onlyMySubmissions}
+            </Label>
+          </div>
+          {isManagerOrLeader && (
             <div className='flex items-center space-x-2'>
               <Switch
-                id='show-filters'
-                checked={showFilters}
-                onCheckedChange={setShowFilters}
+                id='only-my-pending-approvals'
+                checked={onlyMyPendingApprovals}
+                onCheckedChange={handleOnlyMyPendingApprovalsChange}
               />
-              <Label htmlFor='show-filters'>{dict.filters.showFilters}</Label>
+              <Label
+                htmlFor='only-my-pending-approvals'
+                className={`${
+                  pendingApprovalsCount > 0
+                    ? 'animate-pulse text-red-600 dark:text-red-400'
+                    : ''
+                }`}
+              >
+                {dict.filters.pendingApprovals}
+                {pendingApprovalsCount > 0 && ` (${pendingApprovalsCount})`}
+              </Label>
             </div>
-            {(userRoles.some((role) =>
-              role.toLowerCase().includes('manager'),
-            ) ||
-              userRoles.some((role) =>
-                role.toLowerCase().includes('leader'),
-              )) && (
-              <div className='flex items-center space-x-2'>
-                <Switch
-                  id='only-my-pending-approvals'
-                  checked={onlyMyPendingApprovals}
-                  onCheckedChange={handleOnlyMyPendingApprovalsChange}
-                />
-                <Label
-                  htmlFor='only-my-pending-approvals'
-                  className={`${
-                    pendingApprovalsCount > 0
-                      ? 'animate-pulse text-red-600 dark:text-red-400'
-                      : ''
-                  }`}
-                >
-                  {dict.filters.pendingApprovals}
-                  {pendingApprovalsCount > 0 && ` (${pendingApprovalsCount})`}
-                </Label>
-              </div>
-            )}
-          </div>
-        </form>
+          )}
+        </div>
       </CardHeader>
-      {showFilters && (
-        <CardContent className='p-4 pt-0'>
-          <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-            <div className='flex flex-wrap items-start gap-2'>
+      <CardContent className='p-4 pt-0'>
+        <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+            {/* Row 1: Status and Year */}
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.filters.status}</Label>
-                <Select onValueChange={setStatusFilter} value={statusFilter}>
-                  <SelectTrigger className='w-[150px]'>
-                    <SelectValue placeholder={dict.filters.select} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='pending'>{dict.status.pending}</SelectItem>
-                    <SelectItem value='approved'>{dict.status.approved}</SelectItem>
-                    <SelectItem value='rejected'>{dict.status.rejected}</SelectItem>
-                    <SelectItem value='accounted'>{dict.status.accounted}</SelectItem>
-                  </SelectContent>
-                </Select>
+                <ClearableSelect
+                  value={statusFilter}
+                  onValueChange={setStatusFilter}
+                  placeholder={dict.filters.select}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={[
+                    { value: 'pending', label: dict.status.pending },
+                    { value: 'approved', label: dict.status.approved },
+                    { value: 'rejected', label: dict.status.rejected },
+                    { value: 'accounted', label: dict.status.accounted },
+                  ]}
+                />
               </div>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.filters.year}</Label>
-                <Popover open={openYear} onOpenChange={setOpenYear}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'w-[150px] justify-between',
-                        !yearFilter && 'opacity-50',
-                      )}
-                    >
-                      {yearFilter
-                        ? yearOptions.find((year) => year.value === yearFilter)
-                            ?.label
-                        : dict.filters.select}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='w-[150px] p-0'
-                    side='bottom'
-                    align='start'
-                  >
-                    <Command>
-                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                      <CommandList>
-                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                        <CommandGroup>
-                          {yearOptions.map((year) => (
-                            <CommandItem
-                              key={year.value}
-                              value={year.value}
-                              onSelect={(currentValue) => {
-                                setYearFilter(currentValue);
-                                setOpenYear(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  yearFilter === year.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {year.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <ClearableCombobox
+                  value={yearFilter}
+                  onValueChange={setYearFilter}
+                  placeholder={dict.filters.select}
+                  searchPlaceholder={dict.filters.searchPlaceholder}
+                  notFoundText={dict.filters.notFound}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={yearOptions}
+                  open={openYear}
+                  onOpenChange={setOpenYear}
+                />
               </div>
+            </div>
+
+            {/* Row 2: Month and Manager */}
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.filters.month}</Label>
-                <Popover open={openMonth} onOpenChange={setOpenMonth}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      role='combobox'
-                      className={cn(
-                        'w-[150px] justify-between',
-                        !monthFilter && 'opacity-50',
-                      )}
-                    >
-                      {monthFilter
-                        ? monthOptions.find(
-                            (month) => month.value === monthFilter,
-                          )?.label
-                        : dict.filters.select}
-                      <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className='w-[150px] p-0'
-                    side='bottom'
-                    align='start'
-                  >
-                    <Command>
-                      <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                      <CommandList>
-                        <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                        <CommandGroup>
-                          {monthOptions.map((month) => (
-                            <CommandItem
-                              key={month.value}
-                              value={month.value}
-                              onSelect={(currentValue) => {
-                                setMonthFilter(currentValue);
-                                setOpenMonth(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  monthFilter === month.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0',
-                                )}
-                              />
-                              {month.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <ClearableCombobox
+                  value={monthFilter}
+                  onValueChange={setMonthFilter}
+                  placeholder={dict.filters.select}
+                  searchPlaceholder={dict.filters.searchPlaceholder}
+                  notFoundText={dict.filters.notFound}
+                  clearLabel={dict.filters.clearFilter}
+                  className='w-full'
+                  options={monthOptions}
+                  open={openMonth}
+                  onOpenChange={setOpenMonth}
+                />
               </div>
               {userRoles.includes('admin') || userRoles.includes('hr') ? (
                 <div className='flex flex-col space-y-1'>
                   <Label>{dict.filters.manager}</Label>
-                  <Popover open={openManager} onOpenChange={setOpenManager}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant='outline'
-                        role='combobox'
-                        className={cn(
-                          'min-w-[150px] justify-between',
-                          !managerFilter && 'opacity-50',
-                        )}
-                      >
-                        {managerFilter
-                          ? managerOptions.find(
-                              (mgr) => mgr.email === managerFilter,
-                            )?.name
-                          : dict.filters.select}
-                        <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      className='min-w-[250px] p-0'
-                      side='bottom'
-                      align='start'
-                    >
-                      <Command>
-                        <CommandInput placeholder={dict.filters.searchPlaceholder} />
-                        <CommandList>
-                          <CommandEmpty>{dict.filters.notFound}</CommandEmpty>
-                          <CommandGroup>
-                            {managerOptions.map((mgr) => (
-                              <CommandItem
-                                key={mgr.email}
-                                value={mgr.email}
-                                onSelect={(currentValue) => {
-                                  setManagerFilter(currentValue);
-                                  setOpenManager(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    'mr-2 h-4 w-4',
-                                    managerFilter === mgr.email
-                                      ? 'opacity-100'
-                                      : 'opacity-0',
-                                  )}
-                                />
-                                {mgr.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <ClearableCombobox
+                    value={managerFilter}
+                    onValueChange={setManagerFilter}
+                    placeholder={dict.filters.select}
+                    searchPlaceholder={dict.filters.searchPlaceholder}
+                    notFoundText={dict.filters.notFound}
+                    clearLabel={dict.filters.clearFilter}
+                    className='w-full'
+                    options={managerOptions.map((mgr) => ({
+                      value: mgr.email,
+                      label: mgr.name,
+                    }))}
+                    open={openManager}
+                    onOpenChange={setOpenManager}
+                  />
                 </div>
               ) : null}
             </div>
 
-            {/* Row 2: Action buttons */}
-            <div className='flex flex-wrap gap-2'>
-              <Button
-                type='submit'
-                variant='secondary'
-                className='justify-start'
-                disabled={isPendingSearch}
-              >
-                {isPendingSearch ? (
-                  <>
-                    <Loader className='mr-1 animate-spin' size={16} />{' '}
-                    <span>{dict.filters.search}</span>
-                  </>
-                ) : (
-                  <>
-                    <Search className='mr-1' size={16} /> <span>{dict.filters.search}</span>
-                  </>
-                )}
-              </Button>
-
+            {/* Row 3: Action buttons */}
+            <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4'>
               <Button
                 type='button'
                 variant='destructive'
                 onClick={handleClearFilters}
-                title='Clear filters'
+                title={dict.filters.clear}
                 disabled={isPendingSearch}
+                className='order-2 w-full sm:order-1'
               >
-                <CircleX className='mr-1' size={16} /> <span>{dict.filters.clear}</span>
+                <CircleX /> <span>{dict.filters.clear}</span>
+              </Button>
+
+              <Button
+                type='submit'
+                variant='secondary'
+                disabled={isPendingSearch}
+                className='order-1 w-full sm:order-2'
+              >
+                {isPendingSearch ? (
+                  <Loader className='animate-spin' />
+                ) : (
+                  <Search />
+                )}
+                <span>{dict.filters.search}</span>
               </Button>
             </div>
           </form>
-        </CardContent>
-      )}
+      </CardContent>
     </Card>
   );
 }

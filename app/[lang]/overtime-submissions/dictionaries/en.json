@@ -7,8 +7,8 @@
   "backToSubmissions": "Back to submissions",
   "newSubmission": "New submission",
   "filters": {
-    "showFilters": "Show filters",
     "select": "select",
+    "clearFilter": "clear filter",
     "search": "Search",
     "searchPlaceholder": "search...",
     "notFound": "not found",
@@ -19,10 +19,12 @@
     "month": "Month",
     "manager": "Manager",
     "pendingSettlements": "Pending settlements",
-    "pendingApprovals": "Pending approvals"
+    "pendingApprovals": "Pending approvals",
+    "onlyMySubmissions": "Only mine"
   },
   "status": {
-    "pending": "Pending",
+    "pending": "Pending - Supervisor",
+    "pendingPlantManager": "Pending - Plant Manager",
     "approved": "Approved",
     "rejected": "Rejected",
     "accounted": "Settled",
@@ -30,7 +32,7 @@
   },
   "actions": {
     "approve": "Approve",
-    "approveDirector": "Approve (Director)",
+    "approvePlantManager": "Approve (Plant Manager)",
     "reject": "Reject",
     "markAsAccounted": "Mark as settled",
     "cancel": "Cancel",
@@ -38,7 +40,8 @@
     "confirm": "Confirm",
     "save": "Save changes",
     "add": "Add submission",
-    "saveAndAddAnother": "Save and add another"
+    "saveAndAddAnother": "Save and add another",
+    "viewDetails": "View details"
   },
   "dialogs": {
     "approve": {
@@ -76,7 +79,7 @@
     "date": "Date",
     "reason": "Justification",
     "overtimeRequest": "Overtime work order",
-    "overtimeRequestDescription": "Planned overtime work requires approval from both supervisor and director.",
+    "overtimeRequestDescription": "Planned overtime work requires approval from both supervisor and plant manager.",
     "payment": "Payment",
     "scheduledDayOff": "Scheduled day off for overtime",
     "managerNotFound": "Manager not found.",
@@ -161,9 +164,10 @@
     "hoursMinRange": "Enter value from -8 to 16!",
     "hoursMaxRange": "Enter value from -8 to 16!",
     "scheduledDayOffRequired": "Select day off pickup if overtime is not for payment!",
-    "dateRangeInvalid": "You can only add overtime from the last 7 days.",
+    "dateRangeInvalid": "You can only add overtime from the last 3 days of the current month.",
     "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
-    "reasonRequired": "Justification is required!"
+    "reasonRequired": "Justification is required!",
+    "previousMonthNotAllowed": "Cannot add overtime from previous month."
   },
   "summary": {
     "yourOvertimeIn": "Your overtime in",
@@ -171,5 +175,40 @@
     "organizationOvertimeIn": "Organization overtime in",
     "overdueOvertimeToSettle": "Overdue overtime to settle",
     "pending": "pending"
+  },
+  "detailsPage": {
+    "title": "Submission details",
+    "backToSubmissions": "Back to submissions",
+    "submissionDetails": "Submission details",
+    "status": "Status:",
+    "submittedBy": "Submitted by:",
+    "supervisor": "Supervisor:",
+    "date": "Overtime date:",
+    "hours": "Hours:",
+    "reason": "Justification:",
+    "overtimeRequest": "Overtime work order:",
+    "payment": "Payment:",
+    "scheduledDayOff": "Day off pickup date:",
+    "yes": "Yes",
+    "no": "No",
+    "notSet": "Not set",
+    "history": "Change history",
+    "statusColumn": "Status",
+    "person": "Person",
+    "dateTime": "Date and time",
+    "statusLabels": {
+      "created": "Created",
+      "edited": "Edited",
+      "approved": "Approved",
+      "supervisorApproved": "Approved - Supervisor",
+      "plantManagerApproved": "Approved - Plant Manager",
+      "rejected": "Rejected",
+      "accounted": "Settled",
+      "cancelled": "Cancelled",
+      "pending": "Pending - Supervisor",
+      "pendingPlantManager": "Pending - Plant Manager"
+    },
+    "rejectionReason": "Rejection reason:",
+    "rejectionDetails": "Rejection details"
   }
 }

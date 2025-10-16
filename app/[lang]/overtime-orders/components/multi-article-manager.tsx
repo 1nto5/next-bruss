@@ -13,6 +13,7 @@ import {
 import { Plus, X, CircleX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ArticleSearch, ArticleSearchRef } from './article-search';
+import { Dictionary } from '../lib/dict';
 
 type ArticleQuantity = {
   articleNumber: string;
@@ -27,6 +28,7 @@ type ArticleWithDetails = ArticleQuantity & {
 interface MultiArticleManagerProps {
   value: ArticleQuantity[];
   onChange: (articles: ArticleQuantity[]) => void;
+  dict: Dictionary;
   label?: string;
   placeholder?: string;
   initialValues?: ArticleQuantity[];
@@ -37,8 +39,9 @@ interface MultiArticleManagerProps {
 export function MultiArticleManager({
   value,
   onChange,
-  label = 'Planowana produkcja',
-  placeholder = 'Wybierz artykuł',
+  dict,
+  label,
+  placeholder,
   initialValues = [],
   onPendingChange,
   onClearError,
@@ -96,14 +99,14 @@ export function MultiArticleManager({
           }
           return {
             ...article,
-            name: 'Nieznany artykuł',
+            name: dict.multiArticleManager.unknownArticle,
             unit: '',
           };
         } catch (error) {
           console.error('Error fetching article details:', error);
           return {
             ...article,
-            name: 'Błąd pobierania',
+            name: dict.multiArticleManager.fetchError,
             unit: '',
           };
         }
@@ -181,7 +184,11 @@ export function MultiArticleManager({
 
   return (
     <div className='space-y-4'>
-      {label && <h3 className='text-base font-semibold'>{label}</h3>}
+      {(label || dict.multiArticleManager.label) && (
+        <h3 className='text-base font-semibold'>
+          {label || dict.multiArticleManager.label}
+        </h3>
+      )}
 
       {/* Existing articles table */}
       {value.length > 0 && (
@@ -189,10 +196,14 @@ export function MultiArticleManager({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Numer artykułu</TableHead>
-                <TableHead>Nazwa</TableHead>
-                <TableHead className='w-32 text-center'>Ilość</TableHead>
-                <TableHead className='w-16 text-center'>Akcje</TableHead>
+                <TableHead>{dict.multiArticleManager.articleNumber}</TableHead>
+                <TableHead>{dict.multiArticleManager.articleName}</TableHead>
+                <TableHead className='w-32 text-center'>
+                  {dict.multiArticleManager.quantity}
+                </TableHead>
+                <TableHead className='w-16 text-center'>
+                  {dict.multiArticleManager.actions}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -202,7 +213,9 @@ export function MultiArticleManager({
                     {article.articleNumber}
                   </TableCell>
                   <TableCell>
-                    <span>{article.name || 'Ładowanie...'}</span>
+                    <span>
+                      {article.name || dict.multiArticleManager.loading}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <Input
@@ -244,6 +257,7 @@ export function MultiArticleManager({
             onSelect={(articleNumber) => {
               setNewArticle((prev) => ({ ...prev, articleNumber }));
             }}
+            dict={dict}
             placeholder={placeholder}
           />
         </div>
@@ -257,7 +271,7 @@ export function MultiArticleManager({
               setNewArticle((prev) => ({ ...prev, quantity: e.target.value }))
             }
             onKeyDown={handleKeyDown}
-            placeholder='szt.'
+            placeholder={dict.multiArticleManager.quantityPlaceholder}
             className='min-w-[80px] flex-1'
           />
           <Button
@@ -266,7 +280,7 @@ export function MultiArticleManager({
             disabled={!newArticle.articleNumber && !newArticle.quantity}
             variant='destructive'
             className='h-10 shrink-0 px-3'
-            title='Wyczyść pola'
+            title={dict.multiArticleManager.clearFields}
           >
             <CircleX />
           </Button>
@@ -275,7 +289,7 @@ export function MultiArticleManager({
             onClick={addArticle}
             disabled={!newArticle.articleNumber || !newArticle.quantity}
             className='h-10 shrink-0 px-3'
-            title='Dodaj artykuł'
+            title={dict.multiArticleManager.addArticle}
           >
             <Plus />
           </Button>

@@ -1,6 +1,4 @@
-// import { auth } from '@/lib/auth';
 import { auth } from '@/lib/auth';
-import AccessDeniedAlert from '@/components/access-denied-alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -89,6 +87,24 @@ async function getOvertimeSubmissions(
     // Apply filters from search parameters
     const filters: any = { ...baseQuery };
 
+    // Only my submissions filter - overrides baseQuery to show only user's own submissions
+    if (searchParams.onlyMySubmissions === 'true') {
+      filters.submittedBy = session.user.email;
+      // Remove the $or clause if it exists
+      delete filters.$or;
+    }
+
+    // My pending approvals filter
+    if (searchParams.myPendingApprovals === 'true') {
+      // Show only submissions that are pending and where the current user is the supervisor
+      filters.status = 'pending';
+      filters.supervisor = session.user.email;
+      // Remove submittedBy filter if it exists from onlyMySubmissions
+      delete filters.submittedBy;
+      // Remove the $or clause if it exists
+      delete filters.$or;
+    }
+
     // Status filter
     if (searchParams.status) {
       filters.status = searchParams.status;
@@ -123,13 +139,6 @@ async function getOvertimeSubmissions(
       filters.supervisor = searchParams.manager;
     }
 
-    // My pending approvals filter
-    if (searchParams.myPendingApprovals === 'true') {
-      // Show only submissions that are pending and where the current user is the supervisor
-      filters.status = 'pending';
-      filters.supervisor = session.user.email;
-    }
-
     const submissions = await coll
       .find(filters)
       .sort({ submittedAt: -1 })
@@ -140,6 +149,7 @@ async function getOvertimeSubmissions(
       (submission) =>
         ({
           _id: submission._id.toString(),
+          internalId: submission.internalId,
           status: submission.status,
           supervisor: submission.supervisor,
           date: submission.date,
@@ -200,13 +210,6 @@ export default async function OvertimePage(props: {
 
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
-  }
-
-  // Tester role check
-  const userRoles = session.user?.roles || [];
-  const isTester = userRoles.includes('tester');
-  if (!isTester) {
-    return <AccessDeniedAlert />;
   }
 
   // Anyone logged in can submit overtime hours
