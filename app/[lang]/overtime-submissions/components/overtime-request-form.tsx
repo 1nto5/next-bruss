@@ -48,7 +48,7 @@ import {
   Table,
 } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -110,6 +110,19 @@ export default function OvertimeRequestForm({
         : undefined,
     },
   });
+
+  // Watch date to determine if overtimeRequest should be available
+  const dateValue = form.watch('date');
+  const isDateInFuture = dateValue && new Date(dateValue) > new Date();
+
+  // Reset overtimeRequest when date changes to past
+  useEffect(() => {
+    if (!isDateInFuture && form.getValues('overtimeRequest')) {
+      form.setValue('overtimeRequest', false);
+      form.setValue('payment', undefined);
+      form.setValue('scheduledDayOff', undefined);
+    }
+  }, [isDateInFuture, form]);
 
   const onSubmit = async (
     data: z.infer<typeof overtimeSubmissionSchema>,
@@ -402,7 +415,10 @@ export default function OvertimeRequestForm({
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       id='overtimeRequest-switch'
-                      disabled={isEditMode && submission?.status !== 'pending'}
+                      disabled={
+                        !isDateInFuture ||
+                        (isEditMode && submission?.status !== 'pending')
+                      }
                     />
                   </FormControl>
                   <FormMessage />

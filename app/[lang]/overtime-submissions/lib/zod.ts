@@ -15,6 +15,7 @@ export const createOvertimeSubmissionSchema = (validation: {
   hoursIncrementInvalid: string;
   reasonRequired: string;
   previousMonthNotAllowed: string;
+  overtimeRequestRequiresFutureDate: string;
 }) => {
   return z
     .object({
@@ -114,6 +115,20 @@ export const createOvertimeSubmissionSchema = (validation: {
       {
         message: validation.reasonRequired,
         path: ['reason'],
+      },
+    )
+    .refine(
+      (data) => {
+        // If overtimeRequest is true, date must be in the future
+        if (data.overtimeRequest) {
+          const now = new Date();
+          return data.date > now;
+        }
+        return true;
+      },
+      {
+        message: validation.overtimeRequestRequiresFutureDate,
+        path: ['overtimeRequest'],
       },
     );
 };

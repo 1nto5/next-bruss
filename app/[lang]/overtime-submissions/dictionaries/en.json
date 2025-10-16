@@ -79,7 +79,7 @@
     "date": "Date",
     "reason": "Justification",
     "overtimeRequest": "Overtime work order",
-    "overtimeRequestDescription": "Planned overtime work requires approval from both supervisor and plant manager.",
+    "overtimeRequestDescription": "Overtime work order available only for future dates. Requires approval from both supervisor and plant manager.",
     "payment": "Payment",
     "scheduledDayOff": "Scheduled day off for overtime",
     "managerNotFound": "Manager not found.",
@@ -167,7 +167,8 @@
     "dateRangeInvalid": "You can only add overtime from the last 3 days of the current month.",
     "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
     "reasonRequired": "Justification is required!",
-    "previousMonthNotAllowed": "Cannot add overtime from previous month."
+    "previousMonthNotAllowed": "Cannot add overtime from previous month.",
+    "overtimeRequestRequiresFutureDate": "Overtime work order is available only for future dates!"
   },
   "summary": {
     "yourOvertimeIn": "Your overtime in",

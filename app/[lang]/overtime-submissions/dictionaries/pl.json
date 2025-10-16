@@ -79,7 +79,7 @@
     "date": "Data",
     "reason": "Uzasadnienie",
     "overtimeRequest": "Zlecenie godzin nadliczbowych",
-    "overtimeRequestDescription": "Planowana praca w godzinach nadliczbowych wymaga zgody przełożonego oraz plant managera.",
+    "overtimeRequestDescription": "Zlecenie nadgodzin dostępne tylko dla przyszłych dat. Wymaga zgody przełożonego oraz plant managera.",
     "payment": "Wypłata",
     "scheduledDayOff": "Data odbioru godzin nadliczbowych",
     "managerNotFound": "Nie znaleziono kierownika.",
@@ -167,7 +167,8 @@
     "dateRangeInvalid": "Możesz dodać nadgodziny tylko z ostatnich 3 dni bieżącego miesiąca.",
     "hoursIncrementInvalid": "Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, itd.)",
     "reasonRequired": "Uzasadnienie jest wymagane!",
-    "previousMonthNotAllowed": "Nie można dodać nadgodzin z poprzedniego miesiąca."
+    "previousMonthNotAllowed": "Nie można dodać nadgodzin z poprzedniego miesiąca.",
+    "overtimeRequestRequiresFutureDate": "Zlecenie nadgodzin dostępne tylko dla przyszłych dat!"
   },
   "summary": {
     "yourOvertimeIn": "Twoje godziny nadliczbowe w",
