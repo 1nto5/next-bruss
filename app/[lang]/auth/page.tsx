@@ -10,5 +10,5 @@ export default async function AuthPage(props: {
   const { lang } = params;
 
   const dict = await getDictionary(lang);
-  return <LoginForm cDict={dict.auth} />;
+  return <LoginForm cDict={dict.auth} lang={lang} />;
 }

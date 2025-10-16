@@ -28,12 +28,14 @@ import { Input } from '@/components/ui/input';
 import { KeyRound } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { Locale } from '@/lib/config/i18n';
 
-export default function LoginForm({ cDict }: { cDict: any }) {
+export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
+  const finalRedirectUrl = `/${lang}${callbackUrl}`;
 
   const formSchema = z.object({
     email: z
@@ -62,7 +64,7 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       if (res?.success) {
         toast.success(cDict.toasts.loginSuccess);
         // Use window.location for hard refresh to ensure server components update
-        window.location.href = callbackUrl;
+        window.location.href = finalRedirectUrl;
       } else if (res?.error === 'invalid credentials') {
         // Handle generic invalid credentials - show as form error on both fields
         form.setError('email', {
