@@ -14,7 +14,7 @@ import type { ArticleStatus } from '../lib/types';
 
 interface ScanPanelProps {
   dict: Dictionary;
-  operator: string;
+  operators: string[];
   article136Status: ArticleStatus | null;
   article153Status: ArticleStatus | null;
   currentMode: 'scanning' | 'pallet136' | 'pallet153';
@@ -23,7 +23,7 @@ interface ScanPanelProps {
 
 export default function ScanPanel({
   dict,
-  operator,
+  operators,
   article136Status,
   article153Status,
   currentMode,
@@ -51,7 +51,7 @@ export default function ScanPanel({
 
     toast.promise(
       async () => {
-        const result = await saveHydraBatch(hydraValue, operator);
+        const result = await saveHydraBatch(hydraValue, operators);
 
         if (result.status === 'saved') {
           playOk();
@@ -86,7 +86,7 @@ export default function ScanPanel({
     setTimeout(() => inputRef.current?.focus(), 50);
   }, [
     inputValue,
-    operator,
+    operators,
     playOk,
     playNok,
     addScan,
@@ -103,7 +103,7 @@ export default function ScanPanel({
 
       toast.promise(
         async () => {
-          const result = await savePalletBatch(palletValue, article, operator);
+          const result = await savePalletBatch(palletValue, article, operators);
 
           if (result.status === 'success') {
             playOk();
@@ -129,7 +129,7 @@ export default function ScanPanel({
 
       setTimeout(() => inputRef.current?.focus(), 50);
     },
-    [inputValue, operator, playOk, playNok, dict.pallet, onScanSuccess],
+    [inputValue, operators, playOk, playNok, dict.pallet, onScanSuccess],
   );
 
   const handleKeyDown = useCallback(

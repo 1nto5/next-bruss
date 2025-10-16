@@ -36,8 +36,13 @@ interface StatusBarProps {
 }
 
 export default function StatusBar({ dict }: StatusBarProps) {
-  const { operator } = useOperatorStore();
+  const { operator1, operator2, operator3 } = useOperatorStore();
   const queryClient = useQueryClient();
+
+  // Get operators array
+  const operators = [operator1, operator2, operator3]
+    .filter((op) => op?.identifier)
+    .map((op) => op!.identifier);
 
   // Get status from React Query for both articles
   const { data: article136Status } = useGetArticleStatus('28067');
@@ -80,11 +85,11 @@ export default function StatusBar({ dict }: StatusBarProps) {
 
   // Handle delete actions
   const handleDeleteBox = async (hydraBatch: string, article: string) => {
-    if (!operator) return;
+    if (operators.length === 0) return;
 
     toast.promise(
       async () => {
-        const res = await deleteHydraBatch(hydraBatch, operator.identifier);
+        const res = await deleteHydraBatch(hydraBatch, operators);
         if (res.message === 'deleted') {
           // Refetch pallet boxes manually
           if (article === '28067') {
@@ -136,17 +141,6 @@ export default function StatusBar({ dict }: StatusBarProps) {
     <>
       <div className='grid grid-cols-2 gap-2'>
         <StatusCard
-          title={`${dict.article136} - ${dict.article136Name}`}
-          icon={Forklift}
-          current={article136Status?.boxesOnPallet || 0}
-          max={article136Status?.palletSize || 0}
-          isFull={article136Status?.isFull || false}
-          isLoading={isLoadingArticle136Boxes}
-          disabled={(article136Status?.boxesOnPallet || 0) === 0}
-          fullLabel={dict.palletFull}
-          onViewDetails={handleArticle136IconClick}
-        />
-        <StatusCard
           title={`${dict.article153} - ${dict.article153Name}`}
           icon={Forklift}
           current={article153Status?.boxesOnPallet || 0}
@@ -156,6 +150,17 @@ export default function StatusBar({ dict }: StatusBarProps) {
           disabled={(article153Status?.boxesOnPallet || 0) === 0}
           fullLabel={dict.palletFull}
           onViewDetails={handleArticle153IconClick}
+        />
+        <StatusCard
+          title={`${dict.article136} - ${dict.article136Name}`}
+          icon={Forklift}
+          current={article136Status?.boxesOnPallet || 0}
+          max={article136Status?.palletSize || 0}
+          isFull={article136Status?.isFull || false}
+          isLoading={isLoadingArticle136Boxes}
+          disabled={(article136Status?.boxesOnPallet || 0) === 0}
+          fullLabel={dict.palletFull}
+          onViewDetails={handleArticle136IconClick}
         />
       </div>
 

@@ -23,17 +23,25 @@ type ArticleStatus = {
 };
 
 type OperatorStoreType = {
-  operator: OperatorType | null;
-  setOperator: (operator: OperatorType | null) => void;
+  operator1: OperatorType | null;
+  operator2: OperatorType | null;
+  operator3: OperatorType | null;
+  setOperator1: (operator: OperatorType | null) => void;
+  setOperator2: (operator: OperatorType | null) => void;
+  setOperator3: (operator: OperatorType | null) => void;
   logout: () => void;
 };
 
 export const useOperatorStore = create<OperatorStoreType>()(
   persist(
     (set) => ({
-      operator: null,
-      setOperator: (operator) => set({ operator }),
-      logout: () => set({ operator: null }),
+      operator1: null,
+      operator2: null,
+      operator3: null,
+      setOperator1: (operator) => set({ operator1: operator }),
+      setOperator2: (operator) => set({ operator2: operator }),
+      setOperator3: (operator) => set({ operator3: operator }),
+      logout: () => set({ operator1: null, operator2: null, operator3: null }),
     }),
     { name: 'eol136153-operator' },
   ),

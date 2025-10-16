@@ -37,23 +37,55 @@ export async function login(data: {
 }) {
   try {
     const collection = await dbc('employees');
+    let operator1 = null;
+    let operator2 = null;
+    let operator3 = null;
 
-    // For EOL136153, we only need one operator
     const person1 = await collection.findOne({
       identifier: data.identifier1,
     });
-
     if (!person1) {
       return { error: 'wrong number 1' };
+    }
+    operator1 = {
+      identifier: person1.identifier,
+      firstName: person1.firstName,
+      lastName: person1.lastName,
+    };
+
+    if (data.identifier2) {
+      const person2 = await collection.findOne({
+        identifier: data.identifier2,
+      });
+      if (!person2) {
+        return { error: 'wrong number 2' };
+      }
+      operator2 = {
+        identifier: person2.identifier,
+        firstName: person2.firstName,
+        lastName: person2.lastName,
+      };
+    }
+
+    if (data.identifier3) {
+      const person3 = await collection.findOne({
+        identifier: data.identifier3,
+      });
+      if (!person3) {
+        return { error: 'wrong number 3' };
+      }
+      operator3 = {
+        identifier: person3.identifier,
+        firstName: person3.firstName,
+        lastName: person3.lastName,
+      };
     }
 
     return {
       success: true,
-      operator1: {
-        identifier: person1.identifier,
-        firstName: person1.firstName,
-        lastName: person1.lastName,
-      },
+      operator1,
+      operator2,
+      operator3,
     };
   } catch (error) {
     console.error(error);
@@ -92,7 +124,7 @@ export async function getArticleStatuses(): Promise<ArticleStatus[]> {
 
 export async function saveHydraBatch(
   hydraQr: string,
-  operator: string,
+  operators: string[],
 ): Promise<HydraScanResult> {
   try {
     // Validate QR format
@@ -161,7 +193,7 @@ export async function saveHydraBatch(
       article: qrArticle,
       time: new Date(),
       hydra_batch: qrBatch,
-      hydra_operator: operator,
+      hydra_operator: operators,
     });
 
     return {
@@ -214,7 +246,7 @@ export async function generatePalletBatch(article: string): Promise<string> {
 export async function savePalletBatch(
   palletQr: string,
   article: string,
-  operator: string,
+  operators: string[],
 ): Promise<PalletScanResult> {
   try {
     // Validate QR format
@@ -255,7 +287,7 @@ export async function savePalletBatch(
           status: 'warehouse',
           pallet_batch: qrBatch,
           pallet_time: new Date(),
-          pallet_operator: operator,
+          pallet_operator: operators,
         },
       },
     );
@@ -369,13 +401,13 @@ export async function getPalletBoxes(
 // Delete hydra batch from pallet (set status to rework)
 export async function deleteHydraBatch(
   hydraBatch: string,
-  operator: string,
+  operators: string[],
 ): Promise<{ message: string }> {
   try {
-    if (!hydraBatch || !operator) {
+    if (!hydraBatch || !operators || operators.length === 0) {
       console.error('Invalid parameters for deleteHydraBatch:', {
         hydraBatch,
-        operator,
+        operators,
       });
       return { message: 'invalid parameters' };
     }
@@ -401,7 +433,7 @@ export async function deleteHydraBatch(
           status: 'rework',
           rework_time: new Date(),
           rework_reason: 'removed from pallet by operator',
-          rework_user: `personal number: ${operator}`,
+          rework_user: `personal number: ${operators.join(', ')}`,
         },
       },
     );

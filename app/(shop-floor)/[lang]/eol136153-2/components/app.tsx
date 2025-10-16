@@ -4,7 +4,7 @@ import ErrorAlert from '@/app/(shop-floor)/[lang]/components/error-alert';
 import Loading from '@/app/(shop-floor)/[lang]/components/loading';
 import LoginWithKeypad from '@/app/(shop-floor)/[lang]/components/login-with-keypad';
 import type { Locale } from '@/lib/config/i18n';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { login } from '../actions';
 import type { Dictionary } from '../lib/dict';
@@ -20,7 +20,7 @@ interface AppProps {
 }
 
 export default function App({ dict, lang }: AppProps) {
-  const { operator, setOperator } = useOperatorStore();
+  const { operator1, operator2, operator3, setOperator1, setOperator2, setOperator3 } = useOperatorStore();
   const queryClient = useQueryClient();
   const {
     article136Status,
@@ -30,6 +30,15 @@ export default function App({ dict, lang }: AppProps) {
     currentMode,
     setCurrentMode,
   } = useEOLStore();
+
+  // Get operators array
+  const operators = useMemo(
+    () =>
+      [operator1, operator2, operator3]
+        .filter((op) => op?.identifier)
+        .map((op) => op!.identifier),
+    [operator1, operator2, operator3],
+  );
 
   // Get article statuses from React Query
   const {
@@ -75,13 +84,15 @@ export default function App({ dict, lang }: AppProps) {
   };
 
   // Check if operator is logged in
-  if (!operator) {
+  if (!operator1) {
     return (
       <LoginWithKeypad
         {...dict.login}
         loginAction={login}
         onSuccess={(res) => {
-          setOperator(res.operator1 || null);
+          setOperator1(res.operator1 || null);
+          setOperator2(res.operator2 || null);
+          setOperator3(res.operator3 || null);
         }}
       />
     );
@@ -113,7 +124,7 @@ export default function App({ dict, lang }: AppProps) {
       <StatusBar dict={dict.status} />
       <ScanPanel
         dict={dict}
-        operator={operator.identifier}
+        operators={operators}
         article136Status={article136Status}
         article153Status={article153Status}
         currentMode={currentMode}
