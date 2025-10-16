@@ -30,9 +30,13 @@ interface HeaderProps {
 }
 
 export default function Header({ lang, dict }: HeaderProps) {
-  const { operator, logout } = useOperatorStore();
+  const { operator1, operator2, operator3, logout } = useOperatorStore();
   const { reset } = useEOLStore();
   const [alertOpen, setAlertOpen] = useState(false);
+
+  const loggedInOperators = [operator1, operator2, operator3].filter(
+    (operator): operator is NonNullable<typeof operator> => operator !== null,
+  );
 
   const leftContent = (
     <>
@@ -40,18 +44,26 @@ export default function Header({ lang, dict }: HeaderProps) {
         <Factory className='h-4 w-4' />
         EOL136153
       </Badge>
-      {operator && (
-        <Badge variant='secondary' className='pointer-events-none flex items-center gap-2 whitespace-nowrap'>
-          <User className='h-4 w-4' />
-          {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
-        </Badge>
+      {loggedInOperators.length > 0 && (
+        <div className='flex items-center gap-2'>
+          {loggedInOperators.map((operator) => (
+            <Badge
+              key={operator.identifier}
+              variant='secondary'
+              className='pointer-events-none flex items-center gap-2 whitespace-nowrap'
+            >
+              <User className='h-4 w-4' />
+              {operator.firstName} {operator.lastName.charAt(0).toUpperCase()}.
+            </Badge>
+          ))}
+        </div>
       )}
     </>
   );
 
   const rightContent = (
     <>
-      {operator && (
+      {loggedInOperators.length > 0 && (
         <HeaderButton
           icon={<UserPen />}
           onClick={() => setAlertOpen(true)}
