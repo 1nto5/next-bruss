@@ -1,0 +1,5 @@
+- "test" = use chrome-devtools MCP
+- "check in database" = use mongodb MCP
+- git operations = git or gh commands
+- for each new conversation: run `bun run dev`, retrieve the target address from bash (e.g. http://localhost:3000), and use MCP's chrome-devtools `navigate_page` to open it.
+- always reply in English, regardless of message language

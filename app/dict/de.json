@@ -215,6 +215,8 @@
     "scan": {
       "statusBar": {
         "operator": "operator",
+        "article": "artikel",
+        "onPallet": "palette",
         "boxCardDialog": {
           "cardHeader": "box",
           "timeTableHead": "stunde",
