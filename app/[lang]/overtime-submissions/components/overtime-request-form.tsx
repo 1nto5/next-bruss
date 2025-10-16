@@ -111,18 +111,20 @@ export default function OvertimeRequestForm({
     },
   });
 
-  // Watch date to determine if overtimeRequest should be available
+  // Watch date and hours to determine if overtimeRequest should be available
   const dateValue = form.watch('date');
+  const hoursValue = form.watch('hours');
   const isDateInFuture = dateValue && new Date(dateValue) > new Date();
+  const isPositiveHours = hoursValue >= 0;
 
-  // Reset overtimeRequest when date changes to past
+  // Reset overtimeRequest when date changes to past or hours becomes negative
   useEffect(() => {
-    if (!isDateInFuture && form.getValues('overtimeRequest')) {
+    if ((!isDateInFuture || !isPositiveHours) && form.getValues('overtimeRequest')) {
       form.setValue('overtimeRequest', false);
       form.setValue('payment', undefined);
       form.setValue('scheduledDayOff', undefined);
     }
-  }, [isDateInFuture, form]);
+  }, [isDateInFuture, isPositiveHours, form]);
 
   const onSubmit = async (
     data: z.infer<typeof overtimeSubmissionSchema>,
@@ -417,6 +419,7 @@ export default function OvertimeRequestForm({
                       id='overtimeRequest-switch'
                       disabled={
                         !isDateInFuture ||
+                        !isPositiveHours ||
                         (isEditMode && submission?.status !== 'pending')
                       }
                     />

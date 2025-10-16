@@ -16,6 +16,7 @@ export const createOvertimeSubmissionSchema = (validation: {
   reasonRequired: string;
   previousMonthNotAllowed: string;
   overtimeRequestRequiresFutureDate: string;
+  overtimeRequestRequiresPositiveHours: string;
 }) => {
   return z
     .object({
@@ -128,6 +129,19 @@ export const createOvertimeSubmissionSchema = (validation: {
       },
       {
         message: validation.overtimeRequestRequiresFutureDate,
+        path: ['overtimeRequest'],
+      },
+    )
+    .refine(
+      (data) => {
+        // If overtimeRequest is true, hours must be positive (not for overtime pickup)
+        if (data.overtimeRequest) {
+          return data.hours >= 0;
+        }
+        return true;
+      },
+      {
+        message: validation.overtimeRequestRequiresPositiveHours,
         path: ['overtimeRequest'],
       },
     );

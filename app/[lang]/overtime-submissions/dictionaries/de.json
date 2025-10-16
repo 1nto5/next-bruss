@@ -79,7 +79,7 @@
     "date": "Datum",
     "reason": "Begründung",
     "overtimeRequest": "Überstunden-Arbeitsauftrag",
-    "overtimeRequestDescription": "Überstunden-Arbeitsauftrag nur für zukünftige Termine verfügbar. Erfordert Genehmigung von Vorgesetztem und Plant Manager.",
+    "overtimeRequestDescription": "Nur für geplante Überstundenarbeit (positive Stunden und zukünftiges Datum). Erfordert Genehmigung von Vorgesetztem und Plant Manager.",
     "payment": "Zahlung",
     "scheduledDayOff": "Geplanter freier Tag für Überstunden",
     "managerNotFound": "Vorgesetzter nicht gefunden.",
@@ -168,7 +168,8 @@
     "hoursIncrementInvalid": "Stunden müssen in halben Stunden angegeben werden (0.5, 1.0, 1.5 usw.)",
     "reasonRequired": "Begründung ist erforderlich!",
     "previousMonthNotAllowed": "Überstunden aus dem Vormonat können nicht hinzugefügt werden.",
-    "overtimeRequestRequiresFutureDate": "Überstunden-Arbeitsauftrag nur für zukünftige Termine verfügbar!"
+    "overtimeRequestRequiresFutureDate": "Überstunden-Arbeitsauftrag nur für zukünftige Termine verfügbar!",
+    "overtimeRequestRequiresPositiveHours": "Überstunden-Arbeitsauftrag ist nur für die Planung zukünftiger Arbeit, nicht für den Abbau von Überstunden!"
   },
   "summary": {
     "yourOvertimeIn": "Ihre Überstunden in",
