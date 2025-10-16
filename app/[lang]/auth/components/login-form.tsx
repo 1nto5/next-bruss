@@ -61,7 +61,8 @@ export default function LoginForm({ cDict }: { cDict: any }) {
       // If we get here, login was successful
       if (res?.success) {
         toast.success(cDict.toasts.loginSuccess);
-        router.push(callbackUrl); // Redirect to home after successful login
+        // Use window.location for hard refresh to ensure server components update
+        window.location.href = callbackUrl;
       } else if (res?.error === 'invalid credentials') {
         // Handle generic invalid credentials - show as form error on both fields
         form.setError('email', {
