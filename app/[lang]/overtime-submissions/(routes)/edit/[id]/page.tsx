@@ -3,9 +3,32 @@ import { dbc } from '@/lib/db/mongo';
 import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { ObjectId } from 'mongodb';
 import { notFound, redirect } from 'next/navigation';
-import OvertimeRequestForm from '../../../overtime-submissions/components/overtime-request-form';
+import OvertimeRequestForm from '../../../components/overtime-request-form';
 import { Locale } from '@/lib/config/i18n';
-import { getDictionary } from '../../lib/dict';
+import { getDictionary } from '../../../lib/dict';
+import { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale; id: string }>;
+}): Promise<Metadata> {
+  const { lang, id } = await params;
+  const dict = await getDictionary(lang);
+  const submission = await getOvertimeSubmission(id);
+
+  if (!submission) {
+    return {
+      title: `${dict.form.titleEdit} (BRUSS)`,
+    };
+  }
+
+  return {
+    title: `${dict.form.titleEdit} - ${submission.internalId || id} (BRUSS)`,
+  };
+}
 
 // Get users with manager roles (any role containing "manager")
 async function getManagers() {

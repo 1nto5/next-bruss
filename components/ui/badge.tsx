@@ -17,7 +17,7 @@ const badgeVariants = cva(
         outline: 'text-foreground',
         // Status-specific variants with "status" prefix
         statusPending:
-          'border-border bg-background text-foreground', // Should adapt with global dark mode
+          'border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200',
         statusApproved:
           'border-transparent bg-[#92b34e] text-white dark:bg-green-700 dark:text-green-100',
         statusInProgress:

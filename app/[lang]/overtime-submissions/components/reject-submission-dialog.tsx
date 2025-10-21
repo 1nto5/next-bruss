@@ -23,7 +23,7 @@ import { Session } from 'next-auth';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import { rejectOvertimeSubmission } from '../actions';
+import { rejectOvertimeSubmission } from '../actions/approval';
 import { Dictionary } from '../lib/dict';
 
 type RejectSubmissionDialogProps = {

@@ -10,7 +10,7 @@ import { UsersListType } from '@/lib/types/user';
 import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateOvertime as revalidate } from '../actions';
+import { revalidateOvertime as revalidate } from '../actions/utils';
 import { Dictionary } from '../lib/dict';
 
 export default function TableFilteringAndOptions({

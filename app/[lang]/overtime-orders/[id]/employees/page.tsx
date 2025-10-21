@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Locale } from '@/i18n.config';
-import { AlarmClockPlus, ArrowLeft, Table } from 'lucide-react';
+import { AlarmClockPlus, ArrowLeft } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import { DataTable } from '../../components/id-table/data-table';
 import { getDictionary } from '../../lib/dict';
@@ -62,7 +62,7 @@ export default async function ProductionOvertimePage(props: {
             )}
             <LocalizedLink href={`/overtime-orders`} className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
-                <Table /> <span>{dict.idTable.requestsTable}</span>
+                <ArrowLeft /> <span>{dict.detailsPage.backToOrders}</span>
               </Button>
             </LocalizedLink>
           </div>

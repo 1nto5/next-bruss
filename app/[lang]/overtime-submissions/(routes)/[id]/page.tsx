@@ -23,10 +23,13 @@ import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { Clock, FileText, Table as TableIcon, X } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import { redirect } from 'next/navigation';
-import { getDictionary } from '../lib/dict';
+import { getDictionary } from '../../lib/dict';
 import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
-import type { Dictionary } from '../lib/dict';
+import type { Dictionary } from '../../lib/dict';
+import { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
 
 function getStatusBadge(status: string, dict: Dictionary) {
   switch (status) {
@@ -79,6 +82,26 @@ function getStatusBadge(status: string, dict: Dictionary) {
   }
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale; id: string }>;
+}): Promise<Metadata> {
+  const { lang, id } = await params;
+  const dict = await getDictionary(lang);
+  const submission = await getOvertimeSubmission(id);
+
+  if (!submission) {
+    return {
+      title: `${dict.detailsPage.title} (BRUSS)`,
+    };
+  }
+
+  return {
+    title: `${dict.detailsPage.title} - ${submission.internalId || id} (BRUSS)`,
+  };
+}
+
 async function getOvertimeSubmission(id: string) {
   try {
     const coll = await dbc('overtime_submissions');
@@ -100,7 +123,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
 
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    redirect(`/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/${id}`)}`);
   }
 
   const submission = await getOvertimeSubmission(id);

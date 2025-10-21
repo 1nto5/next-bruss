@@ -10,16 +10,18 @@ import { ArrowLeft } from 'lucide-react';
 import { Session } from 'next-auth';
 import { redirect } from 'next/navigation';
 import LocalizedLink from '@/components/localized-link';
-import HROvertimeSummaryDisplay from '../components/hr-overtime-summary';
-import HrViewFilteringAndOptions from '../components/hr-view-filtering-and-options';
-import { createColumns } from '../components/table/columns';
-import { DataTable } from '../components/table/data-table';
+import HROvertimeSummaryDisplay from '../../components/hr-overtime-summary';
+import HrViewFilteringAndOptions from '../../components/hr-view-filtering-and-options';
+import { createColumns } from '../../components/table/columns';
+import { DataTable } from '../../components/table/data-table';
 import {
   calculateOrganizationOvertimeHours,
   HROvertimeSummary,
-} from '../lib/calculate-overtime';
-import { OvertimeSubmissionType } from '../lib/types';
-import { getDictionary } from '../lib/dict';
+} from '../../lib/calculate-overtime';
+import { OvertimeSubmissionType } from '../../lib/types';
+import { getDictionary } from '../../lib/dict';
+
+export const dynamic = 'force-dynamic';
 
 async function getOvertimeSubmissionsForHR(
   session: Session,

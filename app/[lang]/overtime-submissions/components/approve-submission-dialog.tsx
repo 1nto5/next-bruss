@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
-import { approveOvertimeSubmission } from '../actions';
+import { approveOvertimeSubmission } from '../actions/approval';
 import { Dictionary } from '../lib/dict';
 
 type ApproveSubmissionDialogProps = {

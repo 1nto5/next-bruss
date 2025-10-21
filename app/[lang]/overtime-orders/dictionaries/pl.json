@@ -379,6 +379,7 @@
     "attendanceList": "Lista obecności",
     "overtimePickup": "Odbiór nadgodzin",
     "orderDetails": "Szczegóły zlecenia",
+    "backToOrders": "Powrót do zleceń",
     "created": "Utworzono:",
     "requestedBy": "Wystawione przez:",
     "responsiblePerson": "Osoba odpowiedzialna:",
@@ -411,6 +412,7 @@
     "person": "Osoba",
     "date": "Data",
     "statusLabels": {
+      "pending": "Oczekuje",
       "canceled": "Anulowane",
       "accounted": "Rozliczone",
       "completed": "Ukończone",

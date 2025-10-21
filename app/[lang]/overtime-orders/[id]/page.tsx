@@ -21,12 +21,12 @@ import { Locale } from '@/i18n.config';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import {
+  ArrowLeft,
   CalendarClock,
   Clock,
   Download,
   LayoutList,
   Package,
-  Table as TableIcon,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -156,10 +156,11 @@ export default async function OvertimeDetailsPage(props: {
               </Button>
             </LocalizedLink>
 
-            {/* Back to table button */}
+            {/* Back to orders button */}
             <LocalizedLink href='/overtime-orders' className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
-                <TableIcon /> {dict.detailsPage.orders}
+                <ArrowLeft />
+                <span>{dict.detailsPage.backToOrders}</span>
               </Button>
             </LocalizedLink>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import ErrorComponent from '@/components/error-component';
-import { revalidateOvertime as revalidate } from '../../actions';
+import { revalidateOvertime as revalidate } from '../../actions/utils';
 
 export default function Error({
   error,

@@ -26,6 +26,8 @@ import {
 import { OvertimeSubmissionType } from './lib/types';
 import { getDictionary } from './lib/dict';
 
+export const dynamic = 'force-dynamic';
+
 async function getOvertimeSubmissions(
   session: Session,
   searchParams: { [key: string]: string | undefined },

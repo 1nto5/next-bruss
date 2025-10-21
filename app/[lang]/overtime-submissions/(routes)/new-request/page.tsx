@@ -1,9 +1,11 @@
 import { auth } from '@/lib/auth';
 import { getUsers } from '@/lib/data/get-users';
 import { redirect } from 'next/navigation';
-import OvertimeRequestForm from '../components/overtime-request-form';
+import OvertimeRequestForm from '../../components/overtime-request-form';
 import { Locale } from '@/lib/config/i18n';
-import { getDictionary } from '../lib/dict';
+import { getDictionary } from '../../lib/dict';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AddOvertimeSubmissionPage(props: {
   params: Promise<{ lang: Locale }>;
@@ -14,7 +16,7 @@ export default async function AddOvertimeSubmissionPage(props: {
   const managers = await getUsers();
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect('/auth');
+    redirect(`/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/new-request`)}`);
   }
   return (
     <OvertimeRequestForm

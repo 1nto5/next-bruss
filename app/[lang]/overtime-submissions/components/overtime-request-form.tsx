@@ -54,10 +54,10 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import {
   insertOvertimeSubmission as insert,
-  redirectToOvertime as redirect,
   updateOvertimeSubmission as update,
   editOvertimeSubmission as edit,
-} from '../actions';
+} from '../actions/crud';
+import { redirectToOvertime as redirect } from '../actions/utils';
 import { OvertimeSubmissionType } from '../lib/types';
 import { createOvertimeSubmissionSchema } from '../lib/zod';
 import { Dictionary } from '../lib/dict';
