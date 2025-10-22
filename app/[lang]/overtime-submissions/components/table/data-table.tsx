@@ -35,10 +35,11 @@ interface TableMeta {
 }
 
 interface DataTableProps<TData, TValue> {
-  columns: (session: Session | null, dict: Dictionary) => ColumnDef<TData, TValue>[];
+  columns: (session: Session | null, dict: Dictionary, fromView?: 'hr-view') => ColumnDef<TData, TValue>[];
   data: TData[];
   session: Session | null;
   dict: Dictionary;
+  fromView?: 'hr-view';
 }
 
 export function DataTable<TData, TValue>({
@@ -46,6 +47,7 @@ export function DataTable<TData, TValue>({
   data,
   session,
   dict,
+  fromView,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -57,8 +59,8 @@ export function DataTable<TData, TValue>({
 
   // Use the session and dict to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session, dict),
-    [columns, session, dict],
+    () => columns(session, dict, fromView),
+    [columns, session, dict, fromView],
   );
 
   const table = useReactTable<TData>({

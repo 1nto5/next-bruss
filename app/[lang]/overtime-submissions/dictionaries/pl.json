@@ -8,6 +8,7 @@
   "newSubmission": "Nowe zgłoszenie",
   "filters": {
     "select": "wybierz",
+    "selected": "wybrano",
     "clearFilter": "wyczyść filtr",
     "search": "Szukaj",
     "searchPlaceholder": "szukaj...",
@@ -17,10 +18,29 @@
     "employee": "Pracownik",
     "year": "Rok",
     "month": "Miesiąc",
+    "week": "Tydzień",
+    "weekLabel": "Tydzień",
+    "monthHint": "Miesiąc - wybierz rok",
+    "weekHint": "Tydzień - wybierz rok",
     "manager": "Kierownik",
     "pendingSettlements": "Do rozliczenia",
     "pendingApprovals": "Do zatwierdzenia",
-    "onlyMySubmissions": "Tylko moje"
+    "onlyMySubmissions": "Tylko moje",
+    "assignedToMe": "Skierowane do mnie"
+  },
+  "months": {
+    "01": "Styczeń",
+    "02": "Luty",
+    "03": "Marzec",
+    "04": "Kwiecień",
+    "05": "Maj",
+    "06": "Czerwiec",
+    "07": "Lipiec",
+    "08": "Sierpień",
+    "09": "Wrzesień",
+    "10": "Październik",
+    "11": "Listopad",
+    "12": "Grudzień"
   },
   "status": {
     "pending": "Oczekuje - Przełożony",
@@ -175,9 +195,29 @@
     "yourOvertimeIn": "Twoje godziny nadliczbowe w",
     "yourTotalOvertime": "Twoje godziny nadliczbowe łącznie",
     "organizationOvertimeIn": "Nadgodziny organizacji w",
+    "employeeOvertimeIn": "Nadgodziny pracownika w",
     "overdueOvertimeToSettle": "Zaległe nadgodziny do rozliczenia",
-    "pending": "oczekuje"
+    "pending": "oczekuje",
+    "filteredResults": "Łącznie",
+    "approvedToSettle": "Do rozliczenia"
   },
+  "summaryModal": {
+    "employee": "Pracownik",
+    "date": "Data",
+    "hours": "Godziny",
+    "status": "Status",
+    "scheduledDayOff": "Data odbioru",
+    "supervisor": "Kierownik",
+    "reason": "Uzasadnienie"
+  },
+  "export": {
+    "exportCsv": "Eksportuj do CSV",
+    "exporting": "Eksportowanie...",
+    "exportSuccess": "Wyeksportowano {count} zgłoszeń",
+    "exportError": "Błąd eksportu"
+  },
+  "displayingSummary": "Wyświetlono",
+  "submissions": "zgłoszeń",
   "detailsPage": {
     "title": "Szczegóły zgłoszenia",
     "backToSubmissions": "Powrót do zgłoszeń",

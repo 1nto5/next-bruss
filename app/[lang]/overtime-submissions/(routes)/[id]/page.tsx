@@ -115,9 +115,12 @@ async function getOvertimeSubmission(id: string) {
 
 export default async function OvertimeSubmissionDetailsPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
   const { lang, id } = params;
+  const { from } = searchParams;
 
   const dict = await getDictionary(lang);
 
@@ -132,6 +135,11 @@ export default async function OvertimeSubmissionDetailsPage(props: {
     redirect(`/${lang}/overtime-submissions`);
   }
 
+  // Determine the back URL based on where the user came from
+  const backUrl = from === 'hr-view'
+    ? '/overtime-submissions/hr-view'
+    : '/overtime-submissions';
+
   return (
     <Card>
       <CardHeader>
@@ -142,7 +150,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {/* Back to submissions button */}
             <LocalizedLink
-              href='/overtime-submissions'
+              href={backUrl}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>

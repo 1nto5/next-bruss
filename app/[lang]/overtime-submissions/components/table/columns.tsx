@@ -27,6 +27,7 @@ import { Dictionary } from '../../lib/dict';
 export const createColumns = (
   session: Session | null,
   dict: Dictionary,
+  fromView?: 'hr-view',
 ): ColumnDef<OvertimeSubmissionType>[] => {
   return [
     {
@@ -209,7 +210,7 @@ export const createColumns = (
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 {/* View Details - always available as first option */}
-                <LocalizedLink href={`/overtime-submissions/${submission._id}`}>
+                <LocalizedLink href={`/overtime-submissions/${submission._id}${fromView ? `?from=${fromView}` : ''}`}>
                   <DropdownMenuItem>
                     <FileText className='mr-2 h-4 w-4' />
                     <span>{dict.actions.viewDetails}</span>

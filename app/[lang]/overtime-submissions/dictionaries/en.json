@@ -8,6 +8,7 @@
   "newSubmission": "New submission",
   "filters": {
     "select": "select",
+    "selected": "selected",
     "clearFilter": "clear filter",
     "search": "Search",
     "searchPlaceholder": "search...",
@@ -17,10 +18,29 @@
     "employee": "Employee",
     "year": "Year",
     "month": "Month",
+    "week": "Week",
+    "weekLabel": "Week",
+    "monthHint": "Month - select year",
+    "weekHint": "Week - select year",
     "manager": "Manager",
     "pendingSettlements": "Pending settlements",
     "pendingApprovals": "Pending approvals",
-    "onlyMySubmissions": "Only mine"
+    "onlyMySubmissions": "Only mine",
+    "assignedToMe": "Assigned to me"
+  },
+  "months": {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
   },
   "status": {
     "pending": "Pending - Supervisor",
@@ -175,9 +195,29 @@
     "yourOvertimeIn": "Your overtime in",
     "yourTotalOvertime": "Your total overtime",
     "organizationOvertimeIn": "Organization overtime in",
+    "employeeOvertimeIn": "Employee overtime in",
     "overdueOvertimeToSettle": "Overdue overtime to settle",
-    "pending": "pending"
+    "pending": "pending",
+    "filteredResults": "Total",
+    "approvedToSettle": "To settle"
   },
+  "summaryModal": {
+    "employee": "Employee",
+    "date": "Date",
+    "hours": "Hours",
+    "status": "Status",
+    "scheduledDayOff": "Day off",
+    "supervisor": "Supervisor",
+    "reason": "Justification"
+  },
+  "export": {
+    "exportCsv": "Export to CSV",
+    "exporting": "Exporting...",
+    "exportSuccess": "Exported {count} submissions",
+    "exportError": "Export error"
+  },
+  "displayingSummary": "Displaying",
+  "submissions": "submissions",
   "detailsPage": {
     "title": "Submission details",
     "backToSubmissions": "Back to submissions",

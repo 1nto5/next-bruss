@@ -8,6 +8,7 @@
   "newSubmission": "Neue Meldung",
   "filters": {
     "select": "auswählen",
+    "selected": "ausgewählt",
     "clearFilter": "Filter löschen",
     "search": "Suchen",
     "searchPlaceholder": "suchen...",
@@ -17,10 +18,29 @@
     "employee": "Mitarbeiter",
     "year": "Jahr",
     "month": "Monat",
+    "week": "Woche",
+    "weekLabel": "Woche",
+    "monthHint": "Monat - Jahr wählen",
+    "weekHint": "Woche - Jahr wählen",
     "manager": "Vorgesetzter",
     "pendingSettlements": "Zur Abrechnung",
     "pendingApprovals": "Zur Genehmigung",
-    "onlyMySubmissions": "Nur meine"
+    "onlyMySubmissions": "Nur meine",
+    "assignedToMe": "An mich zugewiesen"
+  },
+  "months": {
+    "01": "Januar",
+    "02": "Februar",
+    "03": "März",
+    "04": "April",
+    "05": "Mai",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "August",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Dezember"
   },
   "status": {
     "pending": "Ausstehend - Vorgesetzter",
@@ -175,9 +195,29 @@
     "yourOvertimeIn": "Ihre Überstunden in",
     "yourTotalOvertime": "Ihre gesamten Überstunden",
     "organizationOvertimeIn": "Überstunden der Organisation in",
+    "employeeOvertimeIn": "Überstunden des Mitarbeiters in",
     "overdueOvertimeToSettle": "Überfällige Überstunden zur Abrechnung",
-    "pending": "ausstehend"
+    "pending": "ausstehend",
+    "filteredResults": "Gesamt",
+    "approvedToSettle": "Zur Abrechnung"
   },
+  "summaryModal": {
+    "employee": "Mitarbeiter",
+    "date": "Datum",
+    "hours": "Stunden",
+    "status": "Status",
+    "scheduledDayOff": "Freier Tag",
+    "supervisor": "Vorgesetzter",
+    "reason": "Begründung"
+  },
+  "export": {
+    "exportCsv": "Als CSV exportieren",
+    "exporting": "Exportieren...",
+    "exportSuccess": "{count} Meldungen exportiert",
+    "exportError": "Exportfehler"
+  },
+  "displayingSummary": "Angezeigt",
+  "submissions": "Meldungen",
   "detailsPage": {
     "title": "Meldungsdetails",
     "backToSubmissions": "Zurück zu Meldungen",
