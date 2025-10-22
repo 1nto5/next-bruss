@@ -250,6 +250,7 @@
     "showFilters": "Filter anzeigen",
     "myRequests": "Meine Aufträge",
     "iAmResponsible": "Ich bin verantwortlich",
+    "pendingApproval": "Ausstehende Genehmigung",
     "status": "Status",
     "deadline": "Frist",
     "dateAdded": "Hinzugefügt am"
@@ -274,9 +275,9 @@
     },
     "toast": {
       "processing": "Wird verarbeitet...",
-      "approved": "Aufträge wurden genehmigt",
-      "canceled": "Aufträge wurden storniert",
-      "accounted": "Aufträge wurden abgerechnet",
+      "approved": "{count} {plural} wurden genehmigt",
+      "canceled": "{count} {plural} wurden storniert",
+      "accounted": "{count} {plural} wurden abgerechnet",
       "error": "Fehler: {message}"
     },
     "plural": {

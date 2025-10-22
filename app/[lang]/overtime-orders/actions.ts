@@ -72,9 +72,9 @@ async function sendEmailNotificationToRequestor(email: string, id: string) {
     subject:
       'Zatwierdzone zlecanie wykonania pracy w godzinach nadliczbowych - produkcja',
     html: `<div style="font-family: sans-serif;">
-          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
+          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych zostało zatwierdzone.</p>
           <p>
-          <a href="${process.env.BASE_URL}/overtime-orders/${id}" 
+          <a href="${process.env.BASE_URL}/overtime-orders/${id}"
              style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
             Otwórz zlecenie
           </a>
@@ -100,6 +100,13 @@ export async function approveOvertimeRequest(id: string) {
 
   try {
     const coll = await dbc('overtime_orders');
+
+    // First, get the order to retrieve requestor's email
+    const order = await coll.findOne({ _id: new ObjectId(id) });
+    if (!order) {
+      return { error: 'not found' };
+    }
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
@@ -114,7 +121,7 @@ export async function approveOvertimeRequest(id: string) {
       return { error: 'not found' };
     }
     revalidateOvertimeOrders();
-    await sendEmailNotificationToRequestor(session.user.email, id);
+    await sendEmailNotificationToRequestor(order.requestedBy, id);
     return { success: 'approved' };
   } catch (error) {
     console.error(error);
@@ -474,6 +481,14 @@ export async function bulkApproveOvertimeRequests(ids: string[]) {
     const coll = await dbc('overtime_orders');
     const objectIds = ids.map((id) => new ObjectId(id));
 
+    // First, fetch the orders to get requestor emails
+    const orders = await coll
+      .find({
+        _id: { $in: objectIds },
+        status: 'pending',
+      })
+      .toArray();
+
     const update = await coll.updateMany(
       {
         _id: { $in: objectIds },
@@ -491,6 +506,22 @@ export async function bulkApproveOvertimeRequests(ids: string[]) {
     );
 
     revalidateOvertimeOrders();
+
+    // Send email notifications to each requestor
+    for (const order of orders) {
+      try {
+        await sendEmailNotificationToRequestor(
+          order.requestedBy,
+          order._id.toString(),
+        );
+      } catch (emailError) {
+        console.error(
+          `Failed to send email for order ${order._id}:`,
+          emailError,
+        );
+        // Continue even if email fails
+      }
+    }
 
     return {
       success: `${update.modifiedCount} requests approved`,

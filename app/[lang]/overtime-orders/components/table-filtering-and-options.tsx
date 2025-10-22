@@ -56,6 +56,11 @@ export default function TableFilteringAndOptions({
     return responsibleEmployee === userEmail;
   });
 
+  const [showPendingApproval, setShowPendingApproval] = useState(() => {
+    const status = searchParams?.get('status');
+    return status === 'pending';
+  });
+
   const [dateFilter, setDateFilter] = useState(() => {
     const dateParam = searchParams?.get('date');
     return dateParam ? new Date(dateParam) : undefined;
@@ -82,6 +87,7 @@ export default function TableFilteringAndOptions({
     setIdFilter('');
     setShowOnlyMine(false);
     setShowOnlyResponsible(false);
+    setShowPendingApproval(false);
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -134,6 +140,20 @@ export default function TableFilteringAndOptions({
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const handleShowPendingApprovalChange = (checked: boolean) => {
+    setShowPendingApproval(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('status', 'pending');
+      setStatusFilter('pending');
+    } else {
+      params.delete('status');
+      setStatusFilter('');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   // Check if any filter is active
   const hasActiveFilters = Boolean(
     dateFilter ||
@@ -166,6 +186,16 @@ export default function TableFilteringAndOptions({
               />
               <Label htmlFor='only-responsible'>
                 {dict.tableFiltering.iAmResponsible}
+              </Label>
+            </div>
+            <div className='flex items-center space-x-2'>
+              <Switch
+                id='pending-approval'
+                checked={showPendingApproval}
+                onCheckedChange={handleShowPendingApprovalChange}
+              />
+              <Label htmlFor='pending-approval'>
+                {dict.tableFiltering.pendingApproval}
               </Label>
             </div>
           </div>

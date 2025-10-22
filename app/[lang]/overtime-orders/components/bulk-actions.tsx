@@ -83,17 +83,17 @@ export default function BulkActions({
 
   const hasAnyAction = canApprove || canCancel || canMarkAsAccounted;
 
-  // Helper function to get Polish pluralization
+  // Helper function to get plural form based on count
   const getPlural = (count: number) => {
-    if (count === 1) return 'zlecenie';
+    if (count === 1) return dict.bulkActions.plural.one;
     if (
       count % 10 >= 2 &&
       count % 10 <= 4 &&
       (count % 100 < 10 || count % 100 >= 20)
     ) {
-      return 'zlecenia';
+      return dict.bulkActions.plural.few;
     }
-    return 'zleceń';
+    return dict.bulkActions.plural.many;
   };
 
   const handleAction = async (type: 'approve' | 'cancel' | 'account') => {
@@ -124,7 +124,9 @@ export default function BulkActions({
           throw new Error(result.error);
         }
         table.resetRowSelection();
-        return `${successMessage} (${result.count})`;
+        return successMessage
+          .replace('{count}', result.count.toString())
+          .replace('{plural}', getPlural(result.count));
       },
       error: (error) =>
         dict.bulkActions.toast.error.replace('{message}', error.message),

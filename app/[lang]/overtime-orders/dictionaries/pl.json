@@ -250,6 +250,7 @@
     "showFilters": "Pokaż filtry",
     "myRequests": "Moje zlecenia",
     "iAmResponsible": "Jestem odpowiedzialny",
+    "pendingApproval": "Oczekujące na zatwierdzenie",
     "status": "Status",
     "deadline": "Termin",
     "dateAdded": "Data dodania"
@@ -274,9 +275,9 @@
     },
     "toast": {
       "processing": "Przetwarzanie...",
-      "approved": "Zlecenia zostały zatwierdzone",
-      "canceled": "Zlecenia zostały anulowane",
-      "accounted": "Zlecenia zostały rozliczone",
+      "approved": "Zatwierdzono {count} {plural}",
+      "canceled": "Anulowano {count} {plural}",
+      "accounted": "Rozliczono {count} {plural}",
       "error": "Błąd: {message}"
     },
     "plural": {

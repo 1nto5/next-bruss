@@ -250,6 +250,7 @@
     "showFilters": "Show Filters",
     "myRequests": "My Orders",
     "iAmResponsible": "I Am Responsible",
+    "pendingApproval": "Pending Approval",
     "status": "Status",
     "deadline": "Deadline",
     "dateAdded": "Date Added"
@@ -274,9 +275,9 @@
     },
     "toast": {
       "processing": "Processing...",
-      "approved": "Orders have been approved",
-      "canceled": "Orders have been canceled",
-      "accounted": "Orders have been accounted",
+      "approved": "{count} {plural} have been approved",
+      "canceled": "{count} {plural} have been canceled",
+      "accounted": "{count} {plural} have been accounted",
       "error": "Error: {message}"
     },
     "plural": {
