@@ -36,7 +36,7 @@ async function getOvertimeSubmissions(
   fetchTimeLocaleString: string;
   overtimeSubmissionsLocaleString: OvertimeSubmissionType[];
   overtimeSummary: OvertimeSummary;
-  pendingApprovalsCount: number;
+  assignedToMeCount: number;
 }> {
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
@@ -55,17 +55,13 @@ async function getOvertimeSubmissions(
     const isAdmin = userRoles.includes('admin');
     const isHR = userRoles.includes('hr');
 
-    // Calculate pending approvals count for current user
-    let pendingApprovalsCount = 0;
-    if (isManager || isAdmin || isHR) {
-      const pendingApprovals = await coll
-        .find({
-          status: 'pending',
-          supervisor: session.user.email,
-        })
-        .toArray();
-      pendingApprovalsCount = pendingApprovals.length;
-    }
+    // Count submissions assigned to current user as supervisor
+    const assignedToMe = await coll
+      .find({
+        supervisor: session.user.email,
+      })
+      .toArray();
+    const assignedToMeCount = assignedToMe.length;
 
     // Build base query based on user permissions
     let baseQuery: any = {};
@@ -96,49 +92,88 @@ async function getOvertimeSubmissions(
       delete filters.$or;
     }
 
-    // My pending approvals filter
-    if (searchParams.myPendingApprovals === 'true') {
-      // Show only submissions that are pending and where the current user is the supervisor
-      filters.status = 'pending';
+    // Assigned to me filter - shows all submissions where I'm the supervisor
+    if (searchParams.assignedToMe === 'true') {
+      // Show all submissions where the current user is the supervisor, regardless of status
       filters.supervisor = session.user.email;
       // Remove submittedBy filter if it exists from onlyMySubmissions
       delete filters.submittedBy;
       // Remove the $or clause if it exists
       delete filters.$or;
+      // Don't filter by status - show all
     }
 
     // Status filter
     if (searchParams.status) {
-      filters.status = searchParams.status;
+      const statuses = searchParams.status.split(',');
+      if (statuses.length > 1) {
+        filters.status = { $in: statuses };
+      } else {
+        filters.status = searchParams.status;
+      }
     }
 
     // Month filter
     if (searchParams.month) {
-      const [year, month] = searchParams.month.split('-').map(Number);
-      const startOfMonth = new Date(year, month - 1, 1);
-      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
-
-      filters.date = {
-        $gte: startOfMonth,
-        $lte: endOfMonth,
-      };
+      const months = searchParams.month.split(',');
+      if (months.length > 1) {
+        // Multiple months: create $or query with date ranges
+        filters.$or = months.map(monthStr => {
+          const [year, month] = monthStr.split('-').map(Number);
+          const startOfMonth = new Date(year, month - 1, 1);
+          const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+          return {
+            date: {
+              $gte: startOfMonth,
+              $lte: endOfMonth,
+            },
+          };
+        });
+      } else {
+        const [year, month] = searchParams.month.split('-').map(Number);
+        const startOfMonth = new Date(year, month - 1, 1);
+        const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+        filters.date = {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        };
+      }
     }
 
     // Year filter
     if (searchParams.year) {
-      const year = parseInt(searchParams.year);
-      const startOfYear = new Date(year, 0, 1);
-      const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
-
-      filters.date = {
-        $gte: startOfYear,
-        $lte: endOfYear,
-      };
+      const years = searchParams.year.split(',').map(y => parseInt(y));
+      if (years.length > 1) {
+        // Multiple years: create $or query with date ranges
+        filters.$or = years.map(year => {
+          const startOfYear = new Date(year, 0, 1);
+          const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+          return {
+            date: {
+              $gte: startOfYear,
+              $lte: endOfYear,
+            },
+          };
+        });
+      } else {
+        const year = parseInt(searchParams.year);
+        const startOfYear = new Date(year, 0, 1);
+        const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+        filters.date = {
+          $gte: startOfYear,
+          $lte: endOfYear,
+        };
+      }
     }
 
     // Supervisor (manager) filter
     if (searchParams.manager) {
-      filters.supervisor = searchParams.manager;
+      const managers = searchParams.manager.split(',');
+      if (managers.length > 1) {
+        filters.supervisor = { $in: managers };
+      } else {
+        filters.supervisor = searchParams.manager;
+      }
     }
 
     const submissions = await coll
@@ -192,7 +227,7 @@ async function getOvertimeSubmissions(
       fetchTimeLocaleString,
       overtimeSubmissionsLocaleString: transformedSubmissions,
       overtimeSummary,
-      pendingApprovalsCount,
+      assignedToMeCount,
     };
   } catch (error) {
     console.error('Error fetching overtime submissions:', error);
@@ -224,7 +259,7 @@ export default async function OvertimePage(props: {
     fetchTime,
     overtimeSubmissionsLocaleString,
     overtimeSummary,
-    pendingApprovalsCount,
+    assignedToMeCount,
   } = await getOvertimeSubmissions(session, searchParams);
 
   return (
@@ -261,7 +296,7 @@ export default async function OvertimePage(props: {
           fetchTime={fetchTime}
           userRoles={session?.user?.roles || []}
           users={users}
-          pendingApprovalsCount={pendingApprovalsCount}
+          assignedToMeCount={assignedToMeCount}
           dict={dict}
         />
       </CardHeader>

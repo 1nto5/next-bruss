@@ -88,7 +88,7 @@ export function ClearableCombobox({
                   key='__clear__'
                   value='__clear__'
                   onSelect={handleSelect}
-                  className='bg-red-100 text-red-600 hover:bg-red-200 aria-selected:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:aria-selected:bg-red-900/30'
+                  className='!bg-red-100 !text-red-600 hover:!bg-red-200 aria-selected:!bg-red-200 dark:!bg-red-900/20 dark:!text-red-400 dark:hover:!bg-red-900/30 dark:aria-selected:!bg-red-900/30'
                 >
                   <CircleX className='mr-2 h-4 w-4' />
                   {clearLabel}

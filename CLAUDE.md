@@ -1,4 +1,4 @@
 - "test": use MCP chrome-devtools
 - On login page: pause and prompt for credentials
-- "check in database": use MCP mongodb
+- "check in database": use MCP mongodb (use next_bruss_dev database)
 - For git tasks: use git or gh CLI

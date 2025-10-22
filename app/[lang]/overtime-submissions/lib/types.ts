@@ -3,6 +3,15 @@ import { OvertimeSubmissionType as BaseOvertimeSubmissionType } from './zod';
 // Update the status options for overtime submissions
 export type OvertimeStatus = 'pending' | 'pending-plant-manager' | 'approved' | 'rejected' | 'accounted' | 'cancelled';
 
+// Status values that should appear in filters (excludes 'cancelled' as it's not used in filtering)
+export const OVERTIME_FILTER_STATUSES = [
+  'pending',
+  'pending-plant-manager',
+  'approved',
+  'rejected',
+  'accounted',
+] as const satisfies readonly OvertimeStatus[];
+
 // Edit history entry - stores only changed fields
 export type EditHistoryEntry = {
   editedAt: Date;

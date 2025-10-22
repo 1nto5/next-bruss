@@ -126,6 +126,120 @@ export async function calculateUnclaimedOvertimeHours(
   }
 }
 
+export async function calculateEmployeeOvertimeHours(
+  userEmail: string,
+  selectedMonth?: string,
+): Promise<HROvertimeSummary> {
+  try {
+    const coll = await dbc('overtime_submissions');
+
+    // Determine which month to calculate for
+    let targetMonth: Date;
+    let monthLabel: string;
+
+    if (selectedMonth) {
+      // Parse selected month (format: "YYYY-MM")
+      const [year, month] = selectedMonth.split('-').map(Number);
+      targetMonth = new Date(year, month - 1, 1);
+      monthLabel = `${month.toString().padStart(2, '0')}.${year}`;
+    } else {
+      // Use current month
+      const now = new Date();
+      targetMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      monthLabel = 'bieżącym miesiącu';
+    }
+
+    const currentMonth = targetMonth.getMonth();
+    const currentYear = targetMonth.getFullYear();
+
+    // Calculate start and end of target month
+    const startOfTargetMonth = new Date(currentYear, currentMonth, 1);
+    const endOfTargetMonth = new Date(
+      currentYear,
+      currentMonth + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    // Get all overtime submissions for specific employee, excluding cancelled
+    const allRelevantSubmissions = await coll
+      .find({
+        submittedBy: userEmail,
+        status: { $nin: ['cancelled'] },
+      })
+      .toArray();
+
+    // Split into approved/accounted vs pending
+    const approvedSubmissions = allRelevantSubmissions.filter(
+      (s) => s.status === 'approved' || s.status === 'accounted',
+    );
+    const pendingSubmissions = allRelevantSubmissions.filter(
+      (s) => s.status === 'pending' || s.status === 'pending-plant-manager',
+    );
+
+    // Calculate current month hours (approved/accounted)
+    const currentMonthHours = approvedSubmissions
+      .filter((submission) => {
+        const submissionDate = new Date(submission.date);
+        return (
+          submissionDate >= startOfTargetMonth &&
+          submissionDate <= endOfTargetMonth
+        );
+      })
+      .reduce((sum, submission) => sum + submission.hours, 0);
+
+    // Calculate overdue hours (approved but not accounted from previous months)
+    const overdueHours = approvedSubmissions
+      .filter((submission) => {
+        const submissionDate = new Date(submission.date);
+        return (
+          submissionDate < startOfTargetMonth &&
+          submission.status === 'approved'
+        );
+      })
+      .reduce((sum, submission) => sum + submission.hours, 0);
+
+    // Calculate pending current month hours
+    const pendingCurrentMonthHours = pendingSubmissions
+      .filter((submission) => {
+        const submissionDate = new Date(submission.date);
+        return (
+          submissionDate >= startOfTargetMonth &&
+          submissionDate <= endOfTargetMonth
+        );
+      })
+      .reduce((sum, submission) => sum + submission.hours, 0);
+
+    // Calculate pending overdue hours (from previous months)
+    const pendingOverdueHours = pendingSubmissions
+      .filter((submission) => {
+        const submissionDate = new Date(submission.date);
+        return submissionDate < startOfTargetMonth;
+      })
+      .reduce((sum, submission) => sum + submission.hours, 0);
+
+    return {
+      currentMonthHours,
+      overdueHours,
+      pendingCurrentMonthHours,
+      pendingOverdueHours,
+      monthLabel,
+    };
+  } catch (error) {
+    console.error('Error calculating employee overtime hours:', error);
+    return {
+      currentMonthHours: 0,
+      overdueHours: 0,
+      pendingCurrentMonthHours: 0,
+      pendingOverdueHours: 0,
+      monthLabel: 'bieżącym miesiącu',
+    };
+  }
+}
+
 export async function calculateOrganizationOvertimeHours(
   selectedMonth?: string,
 ): Promise<HROvertimeSummary> {
