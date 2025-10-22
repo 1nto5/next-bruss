@@ -7,6 +7,7 @@ import { revalidateTag } from 'next/cache';
 import {
   revalidateOvertime,
   sendRejectionEmailToEmployee,
+  sendApprovalEmailToEmployee,
 } from './utils';
 import { redirectToAuth } from '@/app/[lang]/actions';
 
@@ -42,7 +43,7 @@ export async function approveOvertimeSubmission(id: string) {
     // Dual approval logic for overtime requests
     if (submission.overtimeRequest) {
       if (submission.status === 'pending') {
-        // Supervisor approval: move to pending-plant-manager
+        // Supervisor approval: move to pending-plant-manager OR directly to approved
         if (
           submission.supervisor !== session.user.email &&
           !isHR &&
@@ -50,6 +51,34 @@ export async function approveOvertimeSubmission(id: string) {
         ) {
           return { error: 'unauthorized' };
         }
+
+        // If supervisor is also a plant manager, complete approval in one step
+        if (isPlantManager || isAdmin) {
+          const update = await coll.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: 'approved',
+                supervisorApprovedAt: new Date(),
+                supervisorApprovedBy: session.user.email,
+                plantManagerApprovedAt: new Date(),
+                plantManagerApprovedBy: session.user.email,
+                approvedAt: new Date(),
+                approvedBy: session.user.email,
+                editedAt: new Date(),
+                editedBy: session.user.email,
+              },
+            },
+          );
+          if (update.matchedCount === 0) {
+            return { error: 'not found' };
+          }
+          revalidateTag('overtime');
+          await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
+          return { success: 'approved' };
+        }
+
+        // Otherwise, move to pending-plant-manager for second approval
         const update = await coll.updateOne(
           { _id: new ObjectId(id) },
           {
@@ -66,6 +95,7 @@ export async function approveOvertimeSubmission(id: string) {
           return { error: 'not found' };
         }
         revalidateTag('overtime');
+        await sendApprovalEmailToEmployee(submission.submittedBy, id, 'supervisor');
         return { success: 'supervisor-approved' };
       } else if (submission.status === 'pending-plant-manager') {
         // Only plant manager can approve
@@ -90,6 +120,7 @@ export async function approveOvertimeSubmission(id: string) {
           return { error: 'not found' };
         }
         revalidateTag('overtime');
+        await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
         return { success: 'plant-manager-approved' };
       } else {
         return { error: 'invalid status' };
@@ -121,6 +152,7 @@ export async function approveOvertimeSubmission(id: string) {
       return { error: 'not found' };
     }
     revalidateTag('overtime');
+    await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
     return { success: 'approved' };
   } catch (error) {
     console.error(error);

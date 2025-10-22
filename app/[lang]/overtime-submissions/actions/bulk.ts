@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import {
   revalidateOvertime,
   sendRejectionEmailToEmployee,
+  sendApprovalEmailToEmployee,
 } from './utils';
 import { redirectToAuth } from '@/app/[lang]/actions';
 
@@ -72,6 +73,10 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
 
     // Execute supervisor approvals (pending → pending-plant-manager)
     if (supervisorApprovalIds.length > 0) {
+      const supervisorSubmissions = submissions.filter((s) =>
+        supervisorApprovalIds.some((id) => id.equals(s._id))
+      );
+
       const result = await coll.updateMany(
         { _id: { $in: supervisorApprovalIds } },
         {
@@ -85,10 +90,23 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         },
       );
       totalModified += result.modifiedCount;
+
+      // Send supervisor approval emails
+      for (const submission of supervisorSubmissions) {
+        await sendApprovalEmailToEmployee(
+          submission.submittedBy,
+          submission._id.toString(),
+          'supervisor'
+        );
+      }
     }
 
     // Execute plant manager approvals (pending-plant-manager → approved)
     if (plantManagerApprovalIds.length > 0) {
+      const plantManagerSubmissions = submissions.filter((s) =>
+        plantManagerApprovalIds.some((id) => id.equals(s._id))
+      );
+
       const result = await coll.updateMany(
         { _id: { $in: plantManagerApprovalIds } },
         {
@@ -104,10 +122,23 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         },
       );
       totalModified += result.modifiedCount;
+
+      // Send final approval emails
+      for (const submission of plantManagerSubmissions) {
+        await sendApprovalEmailToEmployee(
+          submission.submittedBy,
+          submission._id.toString(),
+          'final'
+        );
+      }
     }
 
     // Execute normal approvals (pending → approved)
     if (normalApprovalIds.length > 0) {
+      const normalSubmissions = submissions.filter((s) =>
+        normalApprovalIds.some((id) => id.equals(s._id))
+      );
+
       const result = await coll.updateMany(
         { _id: { $in: normalApprovalIds } },
         {
@@ -121,6 +152,15 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         },
       );
       totalModified += result.modifiedCount;
+
+      // Send final approval emails
+      for (const submission of normalSubmissions) {
+        await sendApprovalEmailToEmployee(
+          submission.submittedBy,
+          submission._id.toString(),
+          'final'
+        );
+      }
     }
 
     if (totalModified === 0) {

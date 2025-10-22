@@ -107,3 +107,38 @@ export async function sendRejectionEmailToEmployee(
   };
   await mailer(mailOptions);
 }
+
+/**
+ * Send approval notification email to employee
+ * @param approvalType - 'supervisor' for first stage, 'final' for final approval
+ * @internal
+ */
+export async function sendApprovalEmailToEmployee(
+  email: string,
+  id: string,
+  approvalType: 'supervisor' | 'final' = 'final',
+) {
+  const subject =
+    approvalType === 'supervisor'
+      ? 'Nadgodziny zatwierdzone przez przełożonego'
+      : 'Zatwierdzone nadgodziny';
+  const message =
+    approvalType === 'supervisor'
+      ? '<p>Twoje zgłoszenie nadgodzin zostało zatwierdzone przez przełożonego i oczekuje na zatwierdzenie przez Plant Managera.</p>'
+      : '<p>Twoje zgłoszenie nadgodzin zostało zatwierdzone!</p>';
+
+  const mailOptions = {
+    to: email,
+    subject,
+    html: `<div style="font-family: sans-serif;">
+          ${message}
+          <p>
+          <a href="${process.env.BASE_URL}/overtime/${id}"
+             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #28a745; text-decoration: none; border-radius: 5px;">
+            Otwórz zgłoszenie
+          </a>
+          </p>
+        </div>`,
+  };
+  await mailer(mailOptions);
+}
