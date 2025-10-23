@@ -2,8 +2,6 @@
   "title": "Überstunden-Meldungen",
   "pageTitle": "Überstunden-Meldungen",
   "testWarning": "Anwendung in Testphase - Einträge sind nicht offiziell",
-  "hrView": "HR-Ansicht",
-  "hrViewTitle": "HR-Ansicht - Überstunden-Meldungen",
   "backToSubmissions": "Zurück zu Meldungen",
   "newSubmission": "Neue Meldung",
   "filters": {
@@ -26,7 +24,12 @@
     "pendingSettlements": "Zur Abrechnung",
     "pendingApprovals": "Zur Genehmigung",
     "onlyMySubmissions": "Nur meine",
-    "assignedToMe": "An mich zugewiesen"
+    "assignedToMe": "Zur Genehmigung",
+    "orders": "Aufträge",
+    "billing": "Abrechnung",
+    "billingAll": "Alle",
+    "billingYes": "Mit Abrechnung",
+    "billingNo": "Ohne Abrechnung"
   },
   "months": {
     "01": "Januar",
@@ -107,7 +110,7 @@
   },
   "columns": {
     "status": "Status",
-    "payment": "Zahlung",
+    "payment": "Auftrag",
     "actions": "Aktionen",
     "submittedBy": "Gemeldet von",
     "supervisor": "Vorgesetzter",
@@ -194,21 +197,19 @@
   "summary": {
     "yourOvertimeIn": "Ihre Überstunden in",
     "yourTotalOvertime": "Ihre gesamten Überstunden",
+    "yourFilteredOvertimeIn": "Ihre Überstunden im gefilterten Bereich",
     "organizationOvertimeIn": "Überstunden der Organisation in",
+    "organizationTotalOvertime": "Gesamtüberstunden der Organisation",
+    "ordersOvertimeIn": "Aufträge in",
+    "ordersTotalOvertime": "Aufträge insgesamt",
+    "ordersFilteredOvertimeIn": "Aufträge im gefilterten Bereich",
     "employeeOvertimeIn": "Überstunden des Mitarbeiters in",
     "overdueOvertimeToSettle": "Überfällige Überstunden zur Abrechnung",
     "pending": "ausstehend",
     "filteredResults": "Gesamt",
-    "approvedToSettle": "Zur Abrechnung"
-  },
-  "summaryModal": {
-    "employee": "Mitarbeiter",
-    "date": "Datum",
-    "hours": "Stunden",
-    "status": "Status",
-    "scheduledDayOff": "Freier Tag",
-    "supervisor": "Vorgesetzter",
-    "reason": "Begründung"
+    "approvedToSettle": "Zur Abrechnung",
+    "filteredOvertimeIn": "Überstunden im gefilterten Bereich",
+    "filteredTotalOvertime": "Gesamtüberstunden im gefilterten Bereich"
   },
   "export": {
     "exportCsv": "Als CSV exportieren",

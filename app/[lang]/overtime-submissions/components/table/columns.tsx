@@ -27,7 +27,6 @@ import { Dictionary } from '../../lib/dict';
 export const createColumns = (
   session: Session | null,
   dict: Dictionary,
-  fromView?: 'hr-view',
 ): ColumnDef<OvertimeSubmissionType>[] => {
   return [
     {
@@ -133,19 +132,25 @@ export const createColumns = (
         return statusLabel;
       },
     },
-    // Payment column
+    // Settlement type column (Zlecenie)
     {
       accessorKey: 'payment',
       header: dict.columns.payment,
       cell: ({ row }) => {
-        const payment = row.getValue('payment') as boolean;
+        const payment = row.original.payment as boolean;
+        const scheduledDayOff = row.original.scheduledDayOff;
+
+        let displayText = '-';
+        if (payment) {
+          displayText = 'wypłata';
+        } else if (scheduledDayOff) {
+          const formattedDate = formatDate(scheduledDayOff);
+          displayText = `odbiór: ${formattedDate}`;
+        }
+
         return (
-          <div className='flex h-full items-center justify-center'>
-            {payment ? (
-              <Check className='h-4 w-4' />
-            ) : (
-              <X className='h-4 w-4' />
-            )}
+          <div className='text-center text-sm'>
+            {displayText}
           </div>
         );
       },
@@ -210,7 +215,7 @@ export const createColumns = (
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
                 {/* View Details - always available as first option */}
-                <LocalizedLink href={`/overtime-submissions/${submission._id}${fromView ? `?from=${fromView}` : ''}`}>
+                <LocalizedLink href={`/overtime-submissions/${submission._id}`}>
                   <DropdownMenuItem>
                     <FileText className='mr-2 h-4 w-4' />
                     <span>{dict.actions.viewDetails}</span>

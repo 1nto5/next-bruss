@@ -35,19 +35,19 @@ interface TableMeta {
 }
 
 interface DataTableProps<TData, TValue> {
-  columns: (session: Session | null, dict: Dictionary, fromView?: 'hr-view') => ColumnDef<TData, TValue>[];
+  columns: (session: Session | null, dict: Dictionary) => ColumnDef<TData, TValue>[];
   data: TData[];
+  fetchTime: Date;
   session: Session | null;
   dict: Dictionary;
-  fromView?: 'hr-view';
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fetchTime,
   session,
   dict,
-  fromView,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -57,10 +57,15 @@ export function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // Reset row selection when fetchTime changes (after search/filter)
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [fetchTime]);
+
   // Use the session and dict to create the columns
   const tableColumns = React.useMemo(
-    () => columns(session, dict, fromView),
-    [columns, session, dict, fromView],
+    () => columns(session, dict),
+    [columns, session, dict],
   );
 
   const table = useReactTable<TData>({

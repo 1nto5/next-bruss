@@ -2,8 +2,6 @@
   "title": "Overtime Submissions",
   "pageTitle": "Overtime Submissions",
   "testWarning": "Application in testing phase - entries are not official",
-  "hrView": "HR View",
-  "hrViewTitle": "HR View - Overtime Submissions",
   "backToSubmissions": "Back to submissions",
   "newSubmission": "New submission",
   "filters": {
@@ -26,7 +24,12 @@
     "pendingSettlements": "Pending settlements",
     "pendingApprovals": "Pending approvals",
     "onlyMySubmissions": "Only mine",
-    "assignedToMe": "Assigned to me"
+    "assignedToMe": "For approval",
+    "orders": "Orders",
+    "billing": "Billing",
+    "billingAll": "All",
+    "billingYes": "With billing",
+    "billingNo": "Without billing"
   },
   "months": {
     "01": "January",
@@ -107,7 +110,7 @@
   },
   "columns": {
     "status": "Status",
-    "payment": "Payment",
+    "payment": "Order",
     "actions": "Actions",
     "submittedBy": "Submitted by",
     "supervisor": "Supervisor",
@@ -194,21 +197,19 @@
   "summary": {
     "yourOvertimeIn": "Your overtime in",
     "yourTotalOvertime": "Your total overtime",
+    "yourFilteredOvertimeIn": "Your overtime in filtered range",
     "organizationOvertimeIn": "Organization overtime in",
+    "organizationTotalOvertime": "Total organization overtime",
+    "ordersOvertimeIn": "Orders in",
+    "ordersTotalOvertime": "Total orders",
+    "ordersFilteredOvertimeIn": "Orders in filtered range",
     "employeeOvertimeIn": "Employee overtime in",
     "overdueOvertimeToSettle": "Overdue overtime to settle",
     "pending": "pending",
     "filteredResults": "Total",
-    "approvedToSettle": "To settle"
-  },
-  "summaryModal": {
-    "employee": "Employee",
-    "date": "Date",
-    "hours": "Hours",
-    "status": "Status",
-    "scheduledDayOff": "Day off",
-    "supervisor": "Supervisor",
-    "reason": "Justification"
+    "approvedToSettle": "To settle",
+    "filteredOvertimeIn": "Overtime in filtered range",
+    "filteredTotalOvertime": "Total overtime in filtered range"
   },
   "export": {
     "exportCsv": "Export to CSV",

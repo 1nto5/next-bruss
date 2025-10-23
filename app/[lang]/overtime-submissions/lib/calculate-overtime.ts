@@ -10,14 +10,6 @@ export interface OvertimeSummary {
   monthLabel: string;
 }
 
-export interface HROvertimeSummary {
-  currentMonthHours: number;
-  overdueHours: number;
-  pendingCurrentMonthHours: number;
-  pendingOverdueHours: number;
-  monthLabel: string;
-}
-
 export async function calculateUnclaimedOvertimeHours(
   userEmail: string,
   selectedMonth?: string,
@@ -65,12 +57,21 @@ export async function calculateUnclaimedOvertimeHours(
       .toArray();
 
     // Main summary: exclude 'pending' and 'pending-plant-manager'
+    // Also exclude "zlecenia" (orders with payment or scheduledDayOff)
     const mainSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status !== 'pending' && s.status !== 'pending-plant-manager',
+      (s) =>
+        s.status !== 'pending' &&
+        s.status !== 'pending-plant-manager' &&
+        !s.payment &&
+        !s.scheduledDayOff,
     );
     // Pending summary
+    // Also exclude "zlecenia" from pending
     const pendingSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'pending' || s.status === 'pending-plant-manager',
+      (s) =>
+        (s.status === 'pending' || s.status === 'pending-plant-manager') &&
+        !s.payment &&
+        !s.scheduledDayOff,
     );
 
     // Calculate total hours (excluding pending)
@@ -126,13 +127,21 @@ export async function calculateUnclaimedOvertimeHours(
   }
 }
 
-export async function calculateEmployeeOvertimeHours(
-  userEmail: string,
+/**
+ * Calculate overtime summary directly from filtered submissions array.
+ * This ensures the summary matches the filtered data being displayed.
+ */
+export async function calculateSummaryFromSubmissions(
+  submissions: Array<{
+    date: Date;
+    hours: number;
+    status: string;
+  }>,
   selectedMonth?: string,
-): Promise<HROvertimeSummary> {
+  selectedYear?: string,
+  onlyOrders?: boolean,
+): Promise<OvertimeSummary> {
   try {
-    const coll = await dbc('overtime_submissions');
-
     // Determine which month to calculate for
     let targetMonth: Date;
     let monthLabel: string;
@@ -142,6 +151,11 @@ export async function calculateEmployeeOvertimeHours(
       const [year, month] = selectedMonth.split('-').map(Number);
       targetMonth = new Date(year, month - 1, 1);
       monthLabel = `${month.toString().padStart(2, '0')}.${year}`;
+    } else if (selectedYear) {
+      // Year selected without specific month
+      const now = new Date();
+      targetMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      monthLabel = `${selectedYear}`;
     } else {
       // Use current month
       const now = new Date();
@@ -164,136 +178,52 @@ export async function calculateEmployeeOvertimeHours(
       999,
     );
 
-    // Get all overtime submissions for specific employee, excluding cancelled
-    const allRelevantSubmissions = await coll
-      .find({
-        submittedBy: userEmail,
-        status: { $nin: ['cancelled'] },
-      })
-      .toArray();
-
-    // Split into approved/accounted vs pending
-    const approvedSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'approved' || s.status === 'accounted',
-    );
-    const pendingSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'pending' || s.status === 'pending-plant-manager',
+    // Filter out cancelled submissions (if any)
+    const relevantSubmissions = submissions.filter(
+      (s) => s.status !== 'cancelled'
     );
 
-    // Calculate current month hours (approved/accounted)
-    const currentMonthHours = approvedSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return (
-          submissionDate >= startOfTargetMonth &&
-          submissionDate <= endOfTargetMonth
-        );
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+    // When onlyOrders is true, we ONLY want entries with payment or scheduledDayOff
+    // When onlyOrders is false, we EXCLUDE entries with payment or scheduledDayOff (normal overtime)
 
-    // Calculate overdue hours (approved but not accounted from previous months)
-    const overdueHours = approvedSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return (
-          submissionDate < startOfTargetMonth &&
-          submission.status === 'approved'
-        );
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+    // Main submissions: exclude 'pending' and 'pending-plant-manager'
+    const mainSubmissions = relevantSubmissions.filter((s) => {
+      if (s.status === 'pending' || s.status === 'pending-plant-manager') {
+        return false;
+      }
 
-    // Calculate pending current month hours
-    const pendingCurrentMonthHours = pendingSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return (
-          submissionDate >= startOfTargetMonth &&
-          submissionDate <= endOfTargetMonth
-        );
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+      if (onlyOrders) {
+        // For orders view: only include entries with payment OR scheduledDayOff
+        return !!(s as any).payment || !!(s as any).scheduledDayOff;
+      } else {
+        // For normal view: exclude orders (entries with payment or scheduledDayOff)
+        return !(s as any).payment && !(s as any).scheduledDayOff;
+      }
+    });
 
-    // Calculate pending overdue hours (from previous months)
-    const pendingOverdueHours = pendingSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return submissionDate < startOfTargetMonth;
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+    // Pending submissions
+    const pendingSubmissions = relevantSubmissions.filter((s) => {
+      if (s.status !== 'pending' && s.status !== 'pending-plant-manager') {
+        return false;
+      }
 
-    return {
-      currentMonthHours,
-      overdueHours,
-      pendingCurrentMonthHours,
-      pendingOverdueHours,
-      monthLabel,
-    };
-  } catch (error) {
-    console.error('Error calculating employee overtime hours:', error);
-    return {
-      currentMonthHours: 0,
-      overdueHours: 0,
-      pendingCurrentMonthHours: 0,
-      pendingOverdueHours: 0,
-      monthLabel: 'bieżącym miesiącu',
-    };
-  }
-}
+      if (onlyOrders) {
+        // For orders view: only include entries with payment OR scheduledDayOff
+        return !!(s as any).payment || !!(s as any).scheduledDayOff;
+      } else {
+        // For normal view: exclude orders (entries with payment or scheduledDayOff)
+        return !(s as any).payment && !(s as any).scheduledDayOff;
+      }
+    });
 
-export async function calculateOrganizationOvertimeHours(
-  selectedMonth?: string,
-): Promise<HROvertimeSummary> {
-  try {
-    const coll = await dbc('overtime_submissions');
-
-    // Determine which month to calculate for
-    let targetMonth: Date;
-    let monthLabel: string;
-
-    if (selectedMonth) {
-      // Parse selected month (format: "YYYY-MM")
-      const [year, month] = selectedMonth.split('-').map(Number);
-      targetMonth = new Date(year, month - 1, 1);
-      monthLabel = `${month.toString().padStart(2, '0')}.${year}`;
-    } else {
-      // Use current month
-      const now = new Date();
-      targetMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      monthLabel = 'bieżącym miesiącu';
-    }
-
-    const currentMonth = targetMonth.getMonth();
-    const currentYear = targetMonth.getFullYear();
-
-    // Calculate start and end of target month
-    const startOfTargetMonth = new Date(currentYear, currentMonth, 1);
-    const endOfTargetMonth = new Date(
-      currentYear,
-      currentMonth + 1,
+    // Calculate total hours (excluding pending)
+    const totalHours = mainSubmissions.reduce(
+      (sum, submission) => sum + submission.hours,
       0,
-      23,
-      59,
-      59,
-      999,
     );
 
-    // Get all overtime submissions excluding cancelled
-    const allRelevantSubmissions = await coll
-      .find({
-        status: { $nin: ['cancelled'] },
-      })
-      .toArray();
-
-    // Split into approved/accounted vs pending
-    const approvedSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'approved' || s.status === 'accounted',
-    );
-    const pendingSubmissions = allRelevantSubmissions.filter(
-      (s) => s.status === 'pending' || s.status === 'pending-plant-manager',
-    );
-
-    // Calculate current month hours (approved/accounted)
-    const currentMonthHours = approvedSubmissions
+    // Calculate target month hours (excluding pending)
+    const currentMonthHours = mainSubmissions
       .filter((submission) => {
         const submissionDate = new Date(submission.date);
         return (
@@ -303,50 +233,37 @@ export async function calculateOrganizationOvertimeHours(
       })
       .reduce((sum, submission) => sum + submission.hours, 0);
 
-    // Calculate overdue hours (approved but not accounted from previous months)
-    const overdueHours = approvedSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return (
-          submissionDate < startOfTargetMonth &&
-          submission.status === 'approved'
-        );
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+    // Calculate pending hours (total)
+    const pendingTotalHours = pendingSubmissions.reduce(
+      (sum, submission) => sum + submission.hours,
+      0,
+    );
 
-    // Calculate pending current month hours
-    const pendingCurrentMonthHours = pendingSubmissions
+    // Calculate pending hours (month)
+    const pendingMonthHours = pendingSubmissions
       .filter((submission) => {
         const submissionDate = new Date(submission.date);
         return (
           submissionDate >= startOfTargetMonth &&
           submissionDate <= endOfTargetMonth
         );
-      })
-      .reduce((sum, submission) => sum + submission.hours, 0);
-
-    // Calculate pending overdue hours (from previous months)
-    const pendingOverdueHours = pendingSubmissions
-      .filter((submission) => {
-        const submissionDate = new Date(submission.date);
-        return submissionDate < startOfTargetMonth;
       })
       .reduce((sum, submission) => sum + submission.hours, 0);
 
     return {
       currentMonthHours,
-      overdueHours,
-      pendingCurrentMonthHours,
-      pendingOverdueHours,
+      totalHours,
+      pendingMonthHours,
+      pendingTotalHours,
       monthLabel,
     };
   } catch (error) {
-    console.error('Error calculating organization overtime hours:', error);
+    console.error('Error calculating summary from submissions:', error);
     return {
       currentMonthHours: 0,
-      overdueHours: 0,
-      pendingCurrentMonthHours: 0,
-      pendingOverdueHours: 0,
+      totalHours: 0,
+      pendingMonthHours: 0,
+      pendingTotalHours: 0,
       monthLabel: 'bieżącym miesiącu',
     };
   }

@@ -11,7 +11,7 @@ import { formatDateTime } from '@/lib/utils/date-format';
 import { getUsers } from '@/lib/data/get-users';
 import { dbc } from '@/lib/db/mongo';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { Plus, Users } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Session } from 'next-auth';
 import { redirect } from 'next/navigation';
 import LocalizedLink from '@/components/localized-link';
@@ -21,7 +21,7 @@ import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
 import {
   OvertimeSummary,
-  calculateUnclaimedOvertimeHours,
+  calculateSummaryFromSubmissions,
 } from './lib/calculate-overtime';
 import { OvertimeSubmissionType } from './lib/types';
 import { getDictionary } from './lib/dict';
@@ -37,6 +37,10 @@ async function getOvertimeSubmissions(
   overtimeSubmissionsLocaleString: OvertimeSubmissionType[];
   overtimeSummary: OvertimeSummary;
   assignedToMeCount: number;
+  assignedToMePendingCount: number;
+  pendingSettlementsCount: number;
+  selectedEmployeeEmail: string | null;
+  hasActiveFilters: boolean;
 }> {
   if (!session || !session.user?.email) {
     redirect('/auth?callbackUrl=/overtime-submissions');
@@ -55,13 +59,8 @@ async function getOvertimeSubmissions(
     const isAdmin = userRoles.includes('admin');
     const isHR = userRoles.includes('hr');
 
-    // Count submissions assigned to current user as supervisor
-    const assignedToMe = await coll
-      .find({
-        supervisor: session.user.email,
-      })
-      .toArray();
-    const assignedToMeCount = assignedToMe.length;
+    // Note: assignedToMeCount, assignedToMePendingCount, and pendingSettlementsCount
+    // will be calculated from filtered submissions below to respect active filters
 
     // Build base query based on user permissions
     let baseQuery: any = {};
@@ -85,22 +84,51 @@ async function getOvertimeSubmissions(
     // Apply filters from search parameters
     const filters: any = { ...baseQuery };
 
-    // Only my submissions filter - overrides baseQuery to show only user's own submissions
-    if (searchParams.onlyMySubmissions === 'true') {
-      filters.submittedBy = session.user.email;
-      // Remove the $or clause if it exists
+    // Pending settlements filter - for HR/Admin only
+    if (searchParams.pendingSettlements === 'true' && (isAdmin || isHR)) {
+      filters.status = 'approved';
+      // Clear baseQuery restrictions for HR when viewing pending settlements
       delete filters.$or;
-    }
-
-    // Assigned to me filter - shows all submissions where I'm the supervisor
-    if (searchParams.assignedToMe === 'true') {
-      // Show all submissions where the current user is the supervisor, regardless of status
-      filters.supervisor = session.user.email;
-      // Remove submittedBy filter if it exists from onlyMySubmissions
       delete filters.submittedBy;
-      // Remove the $or clause if it exists
-      delete filters.$or;
-      // Don't filter by status - show all
+      delete filters.supervisor;
+    } else {
+      // Only my submissions filter - overrides baseQuery to show only user's own submissions
+      if (searchParams.onlyMySubmissions === 'true') {
+        filters.submittedBy = session.user.email;
+        // Remove the $or clause if it exists
+        delete filters.$or;
+      }
+
+      // Assigned to me filter - shows all submissions where I'm the supervisor
+      if (searchParams.assignedToMe === 'true') {
+        // Show all submissions where the current user is the supervisor, regardless of status
+        filters.supervisor = session.user.email;
+        // Remove submittedBy filter if it exists from onlyMySubmissions
+        delete filters.submittedBy;
+        // Remove the $or clause if it exists
+        delete filters.$or;
+        // Don't filter by status - show all
+      }
+
+      // Orders filter - shows only entries with payment or scheduledDayOff
+      if (searchParams.onlyOrders === 'true') {
+        filters.$or = [
+          { payment: true },
+          { scheduledDayOff: { $ne: null, $exists: true } }
+        ];
+      }
+
+      // Employee filter - for HR, Admin, and Managers
+      if (searchParams.employee && (isAdmin || isHR || isManager)) {
+        const employees = searchParams.employee.split(',');
+        if (employees.length > 1) {
+          filters.submittedBy = { $in: employees };
+        } else {
+          filters.submittedBy = searchParams.employee;
+        }
+        // Remove the $or clause if it exists
+        delete filters.$or;
+      }
     }
 
     // Status filter
@@ -113,8 +141,56 @@ async function getOvertimeSubmissions(
       }
     }
 
-    // Month filter
-    if (searchParams.month) {
+    // Week filter - for HR/Admin only (mutually exclusive with month)
+    if (searchParams.week && (isAdmin || isHR)) {
+      const weeks = searchParams.week.split(',');
+
+      // Helper function to get Monday of ISO week
+      const getFirstDayOfISOWeek = (year: number, week: number): Date => {
+        const simple = new Date(year, 0, 1 + (week - 1) * 7);
+        const dayOfWeek = simple.getDay();
+        const isoWeekStart = simple;
+        if (dayOfWeek <= 4) {
+          isoWeekStart.setDate(simple.getDate() - simple.getDay() + 1);
+        } else {
+          isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
+        }
+        return isoWeekStart;
+      };
+
+      if (weeks.length > 1) {
+        filters.$or = weeks.map((weekStr) => {
+          // Parse format: "2025-W42"
+          const [yearStr, weekPart] = weekStr.split('-W');
+          const year = parseInt(yearStr);
+          const week = parseInt(weekPart);
+          const monday = getFirstDayOfISOWeek(year, week);
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          sunday.setHours(23, 59, 59, 999);
+          return {
+            date: {
+              $gte: monday,
+              $lte: sunday,
+            },
+          };
+        });
+      } else {
+        const [yearStr, weekPart] = searchParams.week.split('-W');
+        const year = parseInt(yearStr);
+        const week = parseInt(weekPart);
+        const monday = getFirstDayOfISOWeek(year, week);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23, 59, 59, 999);
+        filters.date = {
+          $gte: monday,
+          $lte: sunday,
+        };
+      }
+    }
+    // Month filter (mutually exclusive with week)
+    else if (searchParams.month) {
       const months = searchParams.month.split(',');
       if (months.length > 1) {
         // Multiple months: create $or query with date ranges
@@ -140,8 +216,8 @@ async function getOvertimeSubmissions(
       }
     }
 
-    // Year filter
-    if (searchParams.year) {
+    // Year filter (only if no month or week filter)
+    if (searchParams.year && !searchParams.month && !searchParams.week) {
       const years = searchParams.year.split(',').map(y => parseInt(y));
       if (years.length > 1) {
         // Multiple years: create $or query with date ranges
@@ -203,6 +279,14 @@ async function getOvertimeSubmissions(
           rejectionReason: submission.rejectionReason,
           accountedAt: submission.accountedAt,
           accountedBy: submission.accountedBy,
+          payment: submission.payment,
+          scheduledDayOff: submission.scheduledDayOff,
+          overtimeRequest: submission.overtimeRequest,
+          plantManagerApprovedAt: submission.plantManagerApprovedAt,
+          plantManagerApprovedBy: submission.plantManagerApprovedBy,
+          supervisorApprovedAt: submission.supervisorApprovedAt,
+          supervisorApprovedBy: submission.supervisorApprovedBy,
+          editHistory: submission.editHistory,
           // Add display names for convenience (not part of the type but useful for table)
           submittedByName: extractNameFromEmail(submission.submittedBy),
           supervisorName: extractNameFromEmail(submission.supervisor),
@@ -215,12 +299,110 @@ async function getOvertimeSubmissions(
     const fetchTime = new Date();
     const fetchTimeLocaleString = formatDateTime(fetchTime);
 
-    // Calculate overtime summary for the user
+    // Calculate overtime summary based on filters
     const selectedMonth = searchParams.month;
-    const overtimeSummary = await calculateUnclaimedOvertimeHours(
-      session.user.email,
+    const selectedYear = searchParams.year;
+    const selectedEmployee = searchParams.employee;
+
+    // Check if a single employee is selected (not multiple)
+    const isSingleEmployee = selectedEmployee && !selectedEmployee.includes(',');
+
+    // Calculate overtime summary directly from filtered submissions
+    // This ensures the summary matches the filtered data being displayed
+    const overtimeSummary = await calculateSummaryFromSubmissions(
+      transformedSubmissions,
       selectedMonth,
+      selectedYear,
+      searchParams.onlyOrders === 'true'
     );
+
+    // Determine if any filters are active (to show appropriate labels)
+    const hasActiveFilters = !!(
+      searchParams.employee ||
+      searchParams.status ||
+      searchParams.month ||
+      searchParams.year ||
+      searchParams.week ||
+      searchParams.manager ||
+      searchParams.onlyMySubmissions ||
+      searchParams.assignedToMe ||
+      searchParams.pendingSettlements ||
+      searchParams.onlyOrders
+    );
+
+    // Check if there are filters OTHER than the toggle switches (onlyMySubmissions, assignedToMe, pendingSettlements)
+    const hasOtherFilters = !!(
+      searchParams.employee ||
+      searchParams.status ||
+      searchParams.month ||
+      searchParams.year ||
+      searchParams.week ||
+      searchParams.manager
+    );
+
+    // When time filters (year, month, or week) are active, show only ONE card
+    // Otherwise, show both cards when:
+    // 1. No filters at all, OR
+    // 2. Only "Tylko moje" (onlyMySubmissions) filter is active, OR
+    // 3. Only single employee filter (no other filters)
+    const hasTimeFilters = !!(searchParams.year || searchParams.month || searchParams.week);
+
+    const onlyMySubmissionsAlone = !!(
+      searchParams.onlyMySubmissions &&
+      !searchParams.status &&
+      !searchParams.employee &&
+      !searchParams.manager &&
+      !searchParams.assignedToMe &&
+      !searchParams.pendingSettlements &&
+      !searchParams.onlyOrders
+    );
+
+    const showBothCards = !hasTimeFilters && (
+      !hasActiveFilters ||
+      onlyMySubmissionsAlone ||
+      (
+        isSingleEmployee &&
+        !searchParams.status &&
+        !searchParams.manager &&
+        !searchParams.onlyMySubmissions &&
+        !searchParams.assignedToMe &&
+        !searchParams.pendingSettlements &&
+        !searchParams.onlyOrders
+      )
+    );
+
+    // Calculate counts from filtered submissions to respect active filters
+    const assignedToMeCount = transformedSubmissions.filter(
+      (s) => s.supervisor === session.user.email
+    ).length;
+
+    const assignedToMePendingCount = transformedSubmissions.filter(
+      (s) =>
+        s.supervisor === session.user.email &&
+        (s.status === 'pending' || s.status === 'pending-plant-manager')
+    ).length;
+
+    const pendingSettlementsCount = transformedSubmissions.filter(
+      (s) => s.status === 'approved'
+    ).length;
+
+    const ordersCount = transformedSubmissions.filter(
+      (s) => s.payment || s.scheduledDayOff
+    ).length;
+
+    const onlyMySubmissionsCount = transformedSubmissions.filter(
+      (s) => s.submittedBy === session.user.email
+    ).length;
+
+    // Determine if we're showing organization-wide data
+    // This happens when HR/Admin views all submissions without specific filters
+    const isOrganizationView =
+      (isAdmin || isHR) &&
+      !selectedEmployee &&
+      !searchParams.onlyMySubmissions &&
+      !searchParams.assignedToMe &&
+      !searchParams.pendingSettlements &&
+      !searchParams.onlyOrders;
 
     return {
       fetchTime,
@@ -228,6 +410,17 @@ async function getOvertimeSubmissions(
       overtimeSubmissionsLocaleString: transformedSubmissions,
       overtimeSummary,
       assignedToMeCount,
+      assignedToMePendingCount,
+      pendingSettlementsCount,
+      ordersCount,
+      onlyMySubmissionsCount,
+      selectedEmployeeEmail: isSingleEmployee ? selectedEmployee : null,
+      hasActiveFilters,
+      showBothCards,
+      isOrganizationView,
+      onlyMySubmissions: searchParams.onlyMySubmissions || false,
+      onlyOrders: searchParams.onlyOrders || false,
+      hasOtherFilters,
     };
   } catch (error) {
     console.error('Error fetching overtime submissions:', error);
@@ -260,6 +453,17 @@ export default async function OvertimePage(props: {
     overtimeSubmissionsLocaleString,
     overtimeSummary,
     assignedToMeCount,
+    assignedToMePendingCount,
+    pendingSettlementsCount,
+    ordersCount,
+    onlyMySubmissionsCount,
+    selectedEmployeeEmail,
+    hasActiveFilters,
+    showBothCards,
+    isOrganizationView,
+    onlyMySubmissions,
+    onlyOrders,
+    hasOtherFilters,
   } = await getOvertimeSubmissions(session, searchParams);
 
   return (
@@ -271,16 +475,6 @@ export default async function OvertimePage(props: {
             {dict.testWarning}
           </CardDescription>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            {/* HR View Link for HR and admin only */}
-            {(session?.user?.roles?.includes('admin') ||
-              session?.user?.roles?.includes('hr')) && (
-              <LocalizedLink href='/overtime-submissions/hr-view'>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <Users />
-                  <span>{dict.hrView}</span>
-                </Button>
-              </LocalizedLink>
-            )}
             {session && canCreateSubmission ? (
               <LocalizedLink href='/overtime-submissions/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
@@ -290,13 +484,27 @@ export default async function OvertimePage(props: {
             ) : null}
           </div>
         </div>
-        <OvertimeSummaryDisplay overtimeSummary={overtimeSummary} dict={dict} />
+        <OvertimeSummaryDisplay
+          overtimeSummary={overtimeSummary}
+          dict={dict}
+          selectedEmployeeEmail={selectedEmployeeEmail}
+          hasActiveFilters={hasActiveFilters}
+          showBothCards={showBothCards}
+          isOrganizationView={isOrganizationView}
+          onlyMySubmissions={onlyMySubmissions}
+          onlyOrders={onlyOrders}
+          hasOtherFilters={hasOtherFilters}
+        />
 
         <TableFilteringAndOptions
           fetchTime={fetchTime}
           userRoles={session?.user?.roles || []}
           users={users}
           assignedToMeCount={assignedToMeCount}
+          assignedToMePendingCount={assignedToMePendingCount}
+          pendingSettlementsCount={pendingSettlementsCount}
+          ordersCount={ordersCount}
+          onlyMySubmissionsCount={onlyMySubmissionsCount}
           dict={dict}
         />
       </CardHeader>
@@ -304,6 +512,7 @@ export default async function OvertimePage(props: {
       <DataTable
         columns={createColumns}
         data={overtimeSubmissionsLocaleString}
+        fetchTime={fetchTime}
         session={session}
         dict={dict}
       />

@@ -2,8 +2,6 @@
   "title": "Zgłoszenia nadgodzin",
   "pageTitle": "Zgłoszenia nadgodzin",
   "testWarning": "Aplikacja w fazie testów - wpisy nie są oficjalne",
-  "hrView": "Widok HR",
-  "hrViewTitle": "Widok HR - Zgłoszenia nadgodzin",
   "backToSubmissions": "Powrót do zgłoszeń",
   "newSubmission": "Nowe zgłoszenie",
   "filters": {
@@ -26,7 +24,12 @@
     "pendingSettlements": "Do rozliczenia",
     "pendingApprovals": "Do zatwierdzenia",
     "onlyMySubmissions": "Tylko moje",
-    "assignedToMe": "Skierowane do mnie"
+    "assignedToMe": "Do zatwierdzenia",
+    "orders": "Zlecenia",
+    "billing": "Rozliczenie",
+    "billingAll": "Wszystkie",
+    "billingYes": "Z rozliczeniem",
+    "billingNo": "Bez rozliczenia"
   },
   "months": {
     "01": "Styczeń",
@@ -107,7 +110,7 @@
   },
   "columns": {
     "status": "Status",
-    "payment": "Wypłata",
+    "payment": "Zlecenie",
     "actions": "Akcje",
     "submittedBy": "Zgłaszający",
     "supervisor": "Kierownik",
@@ -194,21 +197,19 @@
   "summary": {
     "yourOvertimeIn": "Twoje godziny nadliczbowe w",
     "yourTotalOvertime": "Twoje godziny nadliczbowe łącznie",
+    "yourFilteredOvertimeIn": "Twoje nadgodziny w filtrowanym zakresie",
     "organizationOvertimeIn": "Nadgodziny organizacji w",
+    "organizationTotalOvertime": "Nadgodziny organizacji łącznie",
+    "ordersOvertimeIn": "Zlecenia w",
+    "ordersTotalOvertime": "Zlecenia łącznie",
+    "ordersFilteredOvertimeIn": "Zlecenia w filtrowanym zakresie",
     "employeeOvertimeIn": "Nadgodziny pracownika w",
     "overdueOvertimeToSettle": "Zaległe nadgodziny do rozliczenia",
     "pending": "oczekuje",
     "filteredResults": "Łącznie",
-    "approvedToSettle": "Do rozliczenia"
-  },
-  "summaryModal": {
-    "employee": "Pracownik",
-    "date": "Data",
-    "hours": "Godziny",
-    "status": "Status",
-    "scheduledDayOff": "Data odbioru",
-    "supervisor": "Kierownik",
-    "reason": "Uzasadnienie"
+    "approvedToSettle": "Do rozliczenia",
+    "filteredOvertimeIn": "Nadgodziny w filtrowanym zakresie",
+    "filteredTotalOvertime": "Suma nadgodzin w filtrowanym zakresie"
   },
   "export": {
     "exportCsv": "Eksportuj do CSV",
