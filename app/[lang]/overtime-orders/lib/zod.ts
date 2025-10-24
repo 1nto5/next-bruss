@@ -254,10 +254,9 @@ export type NewOvertimeRequestType = z.infer<typeof NewOvertimeRequestSchema>;
 export const AttendanceCompletionSchema = z.object({
   actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
   actualEmployeesWorked: z
-    .number()
+    .number({ required_error: 'Liczba pracowników jest wymagana!' })
     .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
-    .min(0, { message: 'Liczba pracowników nie może być ujemna!' })
-    .optional(),
+    .min(0, { message: 'Liczba pracowników nie może być ujemna!' }),
 });
 
 export type AttendanceCompletionType = z.infer<
@@ -297,10 +296,9 @@ export const MultipleAttachmentFormSchema = z.object({
   mergeFiles: z.boolean().default(true),
   actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
   actualEmployeesWorked: z
-    .number()
+    .number({ required_error: 'Liczba pracowników jest wymagana!' })
     .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
-    .min(0, { message: 'Liczba pracowników nie może być ujemna!' })
-    .optional(),
+    .min(0, { message: 'Liczba pracowników nie może być ujemna!' }),
 });
 
 export type MultipleAttachmentFormType = z.infer<

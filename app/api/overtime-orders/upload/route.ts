@@ -205,8 +205,9 @@ export async function POST(req: NextRequest) {
     fs.mkdirSync(baseFolder, { recursive: true });
 
     const filesToMerge: Buffer[] = [];
+    const otherFiles: { filename: string; buffer: Buffer }[] = [];
 
-    // Process each file for merging only (don't save individual files)
+    // Process each file for merging or separate storage
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileBuffer = Buffer.from(await file.arrayBuffer());
@@ -221,18 +222,31 @@ export async function POST(req: NextRequest) {
           const pdfBuffer = await convertImageToPdf(fileBuffer, file.type);
           filesToMerge.push(pdfBuffer);
         } else {
-          // For other file types, we can't merge them into PDF
-          console.warn(
-            `Cannot merge file type ${file.type} into PDF: ${file.name}`,
+          // For other file types (CSV, DOC, XLS, etc.), save them separately
+          const extension = file.name.split('.').pop() || 'file';
+          const filename = `lista_obecnosci_${overTimeRequestId}_${i + 1}.${extension}`;
+          otherFiles.push({ filename, buffer: fileBuffer });
+          console.log(
+            `Saving non-mergeable file type ${file.type} separately: ${filename}`,
           );
         }
       } catch (error) {
-        console.error(`Error processing file ${file.name} for merging:`, error);
-        // Continue with other files, but don't include this one in merge
+        console.error(`Error processing file ${file.name}:`, error);
+        // Continue with other files
       }
     }
 
-    // Create merged PDF (this is now the main output)
+    // Save non-mergeable files separately
+    for (const { filename, buffer } of otherFiles) {
+      try {
+        const filePath = path.join(baseFolder, filename);
+        fs.writeFileSync(filePath, buffer);
+      } catch (error) {
+        console.error(`Error saving file ${filename}:`, error);
+      }
+    }
+
+    // Create merged PDF from PDFs and images
     let mergedFilename: string | null = null;
     if (filesToMerge.length > 0) {
       try {
@@ -249,9 +263,10 @@ export async function POST(req: NextRequest) {
           { status: 500 },
         );
       }
-    } else {
+    } else if (otherFiles.length === 0) {
+      // No files were processed at all
       return NextResponse.json(
-        { error: 'No files could be processed for PDF creation' },
+        { error: 'No files could be processed' },
         { status: 400 },
       );
     }
@@ -266,13 +281,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Use merged PDF filename, or first other file if no PDF was created
+      const attachmentFilename = mergedFilename || otherFiles[0]?.filename || null;
+
       // Update document with original attachment structure
       const updateResult = await collection.updateOne(
         { _id: objectId },
         {
           $set: {
             hasAttachment: true,
-            attachmentFilename: mergedFilename,
+            attachmentFilename,
             status: 'completed',
             completedAt: new Date(),
             completedBy: session.user.email,
@@ -302,13 +320,38 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Build success message based on what was saved
+      let message = '';
+      if (mergedFilename && otherFiles.length > 0) {
+        const otherFilesText =
+          otherFiles.length === 1
+            ? '1 inny plik'
+            : `${otherFiles.length} innych plików`;
+        const mergedFilesText =
+          filesToMerge.length === 1
+            ? '1 pliku'
+            : `${filesToMerge.length} plików`;
+        message = `Pliki zostały przesłane pomyślnie! Utworzono PDF z ${mergedFilesText}, dodatkowo zapisano ${otherFilesText}. Status zlecenia zmieniony na ukończony.`;
+      } else if (mergedFilename) {
+        message =
+          'Pliki zostały scalone w PDF i przesłane pomyślnie! Status zlecenia zmieniony na ukończony.';
+      } else {
+        const filesText =
+          otherFiles.length === 1
+            ? '1 plik'
+            : `${otherFiles.length} plików`;
+        message = `Pliki zostały przesłane pomyślnie! Zapisano ${filesText}. Status zlecenia zmieniony na ukończony.`;
+      }
+
       return NextResponse.json({
         success: true,
-        message:
-          'Pliki zostały scalone w PDF i przesłane pomyślnie! Status zlecenia zmieniony na ukończony.',
-        mergedFile: {
-          filename: mergedFilename,
-        },
+        message,
+        mergedFile: mergedFilename
+          ? {
+              filename: mergedFilename,
+            }
+          : undefined,
+        otherFiles: otherFiles.map((f) => ({ filename: f.filename })),
       });
     } catch (dbError) {
       console.error('Database error:', dbError);

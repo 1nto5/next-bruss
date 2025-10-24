@@ -253,7 +253,12 @@
     "pendingApproval": "Ausstehende Genehmigung",
     "status": "Status",
     "deadline": "Frist",
-    "dateAdded": "Hinzugefügt am"
+    "dateAdded": "Hinzugefügt am",
+    "createdBy": "Erstellt von",
+    "responsiblePerson": "Verantwortliche Person",
+    "searchByName": "Nach Name oder E-Mail suchen...",
+    "selected": "ausgewählt",
+    "notFound": "Nicht gefunden"
   },
   "bulkActions": {
     "selected": "{count} {plural} ausgewählt",
@@ -458,5 +463,9 @@
       "databaseUpdateFailed": "Fehler bei der Datenbankaktualisierung",
       "uploadFailed": "Fehler beim Hochladen der Dateien"
     }
+  },
+  "summary": {
+    "totalHours": "Gesamtstunden",
+    "totalCost": "Gesamtkosten"
   }
 }

@@ -46,17 +46,18 @@ export default async function CompleteOrderPage(props: {
     userEmail === responsibleEmployee;
 
   if (!canCompleteOrder) {
-    redirect(`/overtime-orders`);
+    redirect(`/${lang}/overtime-orders`);
   }
 
   // Redirect if status is not valid for completing order
   if (status !== 'approved') {
-    redirect(`/overtime-orders/${id}`);
+    redirect(`/${lang}/overtime-orders/${id}`);
   }
 
   return (
     <CompleteOrderForm
       id={id}
+      lang={lang}
       session={session}
       overtimeRequest={overtimeRequestLocaleString}
       dict={dict}

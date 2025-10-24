@@ -43,6 +43,8 @@ export type OvertimeType = {
   requestedBy: string;
   editedAt: Date;
   editedBy: string;
+  pendingAt?: Date;
+  pendingBy?: string;
   approvedAt?: Date;
   approvedBy?: string;
   canceledAt?: Date;
@@ -63,82 +65,6 @@ export type overtimeRequestEmployeeType = EmployeeType & {
   agreedReceivingAt?: Date; // Date of receiving a day off
   agreedReceivingAtLocaleString?: string;
   note?: string;
-};
-
-// Forecast types
-export type ForecastFilterType = 'week' | 'month' | 'year';
-
-export type ForecastRequestDetail = {
-  _id: string;
-  internalId?: string;
-  status: OvertimeStatus;
-  from: Date;
-  to: Date;
-  numberOfEmployees: number;
-  actualEmployeesWorked?: number;
-  responsibleEmployee: string;
-  reason: string;
-};
-
-export type DepartmentBreakdown = {
-  departmentId: string;
-  departmentName: string;
-  hours: number;
-  cost: number;
-  count: number;
-  hourlyRate: number;
-};
-
-export type ForecastPeriodData = {
-  period: string;
-  forecastCount: number;
-  historicalCount: number;
-  forecastHours: number;
-  historicalHours: number;
-  forecastCost: number;
-  historicalCost: number;
-  totalHours: number;
-  totalCost: number;
-  totalCount: number;
-  departmentBreakdown: {
-    forecast: DepartmentBreakdown[];
-    historical: DepartmentBreakdown[];
-  };
-  details: {
-    forecast: ForecastRequestDetail[];
-    historical: ForecastRequestDetail[];
-  };
-};
-
-export type DepartmentTotal = {
-  departmentId: string;
-  departmentName: string;
-  forecastHours: number;
-  forecastCost: number;
-  forecastCount: number;
-  historicalHours: number;
-  historicalCost: number;
-  historicalCount: number;
-  hourlyRate: number;
-};
-
-export type ForecastSummary = {
-  totalForecastHours: number;
-  totalHistoricalHours: number;
-  totalForecastCost: number;
-  totalHistoricalCost: number;
-  totalForecastCount: number;
-  totalHistoricalCount: number;
-  departmentTotals: DepartmentTotal[];
-  filterType: ForecastFilterType;
-  year: number;
-  startValue: number;
-  endValue: number;
-};
-
-export type ForecastResponse = {
-  data: ForecastPeriodData[];
-  summary: ForecastSummary;
 };
 
 // Helper function to display department name (returns English name as fallback)

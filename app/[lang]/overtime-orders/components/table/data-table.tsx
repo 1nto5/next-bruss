@@ -49,6 +49,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fetchTime,
   session,
   dict,
   departments,
@@ -59,6 +60,11 @@ export function DataTable<TData, TValue>({
     [],
   );
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+
+  // Reset row selection when fetchTime changes (after search/filter)
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [fetchTime]);
 
   // Use the session, dict, departments, and lang to create the columns
   const tableColumns = React.useMemo(

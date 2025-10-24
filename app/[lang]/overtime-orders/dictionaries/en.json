@@ -253,7 +253,12 @@
     "pendingApproval": "Pending Approval",
     "status": "Status",
     "deadline": "Deadline",
-    "dateAdded": "Date Added"
+    "dateAdded": "Date Added",
+    "createdBy": "Created By",
+    "responsiblePerson": "Responsible Person",
+    "searchByName": "Search by name or email...",
+    "selected": "selected",
+    "notFound": "Not found"
   },
   "bulkActions": {
     "selected": "Selected {count} {plural}",
@@ -458,5 +463,9 @@
       "databaseUpdateFailed": "Database update error",
       "uploadFailed": "File upload error"
     }
+  },
+  "summary": {
+    "totalHours": "Total Hours",
+    "totalCost": "Total Cost"
   }
 }

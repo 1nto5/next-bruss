@@ -157,6 +157,11 @@ export async function insertOvertimeRequest(
       requestedBy: session.user.email,
       editedAt: new Date(),
       editedBy: session.user.email,
+      // Set pendingAt/pendingBy if status is pending
+      ...(status === 'pending' && {
+        pendingAt: new Date(),
+        pendingBy: session.user.email,
+      }),
     };
 
     const res = await coll.insertOne(overtimeRequestToInsert);
@@ -232,38 +237,6 @@ export async function deleteDayOff(
   } catch (error) {
     console.error(error);
     return { error: 'deleteTimeOffRequest server action error' };
-  }
-}
-
-// Keep deleteEmployee for backward compatibility but make it call the new function
-export async function deleteEmployee(
-  overtimeId: string,
-  employeeIndex: number,
-) {
-  // This is a temporary compatibility function
-  // Get the identifier from the document and delegate to deleteTimeOffRequest
-  const session = await auth();
-  if (!session || !session.user?.email) {
-    redirect('/auth');
-  }
-  try {
-    const coll = await dbc('overtime_orders');
-    const request = await coll.findOne({ _id: new ObjectId(overtimeId) });
-    if (!request) {
-      return { error: 'not found' };
-    }
-
-    // Get employee at the specified index
-    const employee = request.employeesWithScheduledDayOff[employeeIndex];
-    if (!employee) {
-      return { error: 'not found employee' };
-    }
-
-    // Call the new function with the identifier
-    return await deleteDayOff(overtimeId, employee.identifier);
-  } catch (error) {
-    console.error(error);
-    return { error: 'deleteEmployee server action error' };
   }
 }
 
@@ -706,6 +679,8 @@ export async function getOvertimeRequestForEdit(id: string) {
       requestedBy: request.requestedBy,
       editedAt: request.editedAt,
       editedBy: request.editedBy,
+      pendingAt: request.pendingAt,
+      pendingBy: request.pendingBy,
       approvedAt: request.approvedAt,
       approvedBy: request.approvedBy,
       canceledAt: request.canceledAt,

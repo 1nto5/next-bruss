@@ -8,12 +8,34 @@ export async function GET(req: NextRequest) {
   const query: any = {};
   const userEmail = searchParams.get('userEmail');
 
+  // Exact match filters (for toggle switches "My Orders" and "I Am Responsible")
   if (searchParams.get('requestedBy')) {
     query.requestedBy = searchParams.get('requestedBy');
   }
 
   if (searchParams.get('responsibleEmployee')) {
     query.responsibleEmployee = searchParams.get('responsibleEmployee');
+  }
+
+  // Multi-select filters (for filter dropdowns)
+  if (searchParams.get('createdBy')) {
+    const createdByValues = searchParams.get('createdBy')!.split(',');
+    query.requestedBy = createdByValues.length === 1 ? createdByValues[0] : { $in: createdByValues };
+  }
+
+  if (searchParams.get('responsiblePerson')) {
+    const responsiblePersonValues = searchParams.get('responsiblePerson')!.split(',');
+    query.responsibleEmployee = responsiblePersonValues.length === 1 ? responsiblePersonValues[0] : { $in: responsiblePersonValues };
+  }
+
+  if (searchParams.get('status')) {
+    const statusValues = searchParams.get('status')!.split(',');
+    query.status = statusValues.length === 1 ? statusValues[0] : { $in: statusValues };
+  }
+
+  if (searchParams.get('department')) {
+    const departmentValues = searchParams.get('department')!.split(',');
+    query.department = departmentValues.length === 1 ? departmentValues[0] : { $in: departmentValues };
   }
 
   searchParams.forEach((value, key) => {
@@ -28,10 +50,6 @@ export async function GET(req: NextRequest) {
         { from: { $gte: startOfDay, $lte: endOfDay } },
         { to: { $gte: startOfDay, $lte: endOfDay } },
       ];
-    }
-
-    if (key === 'status') {
-      query.status = value;
     }
 
     if (key === 'id') {

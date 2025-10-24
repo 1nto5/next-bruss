@@ -31,10 +31,7 @@ import Link from 'next/link';
 import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
 import { DepartmentConfig, OvertimeType } from '../../lib/types';
-import {
-  bulkDeleteOvertimeRequests,
-  bulkReactivateOvertimeRequests,
-} from '../../actions';
+import { bulkDeleteOvertimeRequests } from '../../actions';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -546,6 +543,18 @@ export const createColumns = (
       cell: ({ row }) => {
         const employees = row.getValue('employeesWithScheduledDayOff');
         return <div>{Array.isArray(employees) ? employees.length : 0}</div>;
+      },
+    },
+    {
+      accessorKey: 'requestedBy',
+      header: dict.tableColumns.requestedBy,
+      cell: ({ row }) => {
+        const requestedBy = row.getValue('requestedBy');
+        return (
+          <div className='whitespace-nowrap'>
+            {extractNameFromEmail(requestedBy as string)}
+          </div>
+        );
       },
     },
     {

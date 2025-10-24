@@ -252,8 +252,13 @@
     "iAmResponsible": "Jestem odpowiedzialny",
     "pendingApproval": "Oczekujące na zatwierdzenie",
     "status": "Status",
-    "deadline": "Termin",
-    "dateAdded": "Data dodania"
+    "deadline": "Data",
+    "dateAdded": "Data dodania",
+    "createdBy": "Wystawione przez",
+    "responsiblePerson": "Osoba odpowiedzialna",
+    "searchByName": "Szukaj po nazwisku lub e-mailu...",
+    "selected": "wybranych",
+    "notFound": "Nie znaleziono"
   },
   "bulkActions": {
     "selected": "Wybrano {count} {plural}",
@@ -457,5 +462,9 @@
       "databaseUpdateFailed": "Błąd aktualizacji bazy danych",
       "uploadFailed": "Błąd podczas przesyłania plików"
     }
+  },
+  "summary": {
+    "totalHours": "Suma godzin",
+    "totalCost": "Całkowity koszt"
   }
 }

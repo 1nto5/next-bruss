@@ -1,14 +1,14 @@
 'use client';
 
-import { ClearableCombobox } from '@/components/clearable-combobox';
-import { ClearableSelect } from '@/components/clearable-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
 import { Switch } from '@/components/ui/switch';
+import { UsersListType } from '@/lib/types/user';
 import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,6 +23,7 @@ export default function TableFilteringAndOptions({
   userEmail,
   dict,
   departments,
+  users,
   lang,
 }: {
   fetchTime: Date;
@@ -31,6 +32,7 @@ export default function TableFilteringAndOptions({
   userEmail?: string;
   dict: Dictionary;
   departments?: DepartmentConfig[];
+  users: UsersListType;
   lang?: string;
 }) {
   const router = useRouter();
@@ -38,8 +40,6 @@ export default function TableFilteringAndOptions({
   const searchParams = useSearchParams();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
-  const [openStatus, setOpenStatus] = useState(false);
-  const [openDepartment, setOpenDepartment] = useState(false);
 
   useEffect(() => {
     setIsPendingSearch(false);
@@ -65,26 +65,31 @@ export default function TableFilteringAndOptions({
     const dateParam = searchParams?.get('date');
     return dateParam ? new Date(dateParam) : undefined;
   });
-  const [requestedAtFilter, setRequestedAtFilter] = useState(() => {
-    const requestedAtFilterParam = searchParams?.get('requestedAtFilter');
-    return requestedAtFilterParam
-      ? new Date(requestedAtFilterParam)
-      : undefined;
+  const [statusFilter, setStatusFilter] = useState<string[]>(() => {
+    const statusParam = searchParams?.get('status');
+    return statusParam ? statusParam.split(',') : [];
   });
-  const [statusFilter, setStatusFilter] = useState(
-    searchParams?.get('status') || '',
-  );
-  const [departmentFilter, setDepartmentFilter] = useState(
-    searchParams?.get('department') || '',
-  );
+  const [departmentFilter, setDepartmentFilter] = useState<string[]>(() => {
+    const departmentParam = searchParams?.get('department');
+    return departmentParam ? departmentParam.split(',') : [];
+  });
   const [idFilter, setIdFilter] = useState(searchParams?.get('id') || '');
+  const [createdByFilter, setCreatedByFilter] = useState<string[]>(() => {
+    const createdByParam = searchParams?.get('createdBy');
+    return createdByParam ? createdByParam.split(',') : [];
+  });
+  const [responsiblePersonFilter, setResponsiblePersonFilter] = useState<string[]>(() => {
+    const responsiblePersonParam = searchParams?.get('responsiblePerson');
+    return responsiblePersonParam ? responsiblePersonParam.split(',') : [];
+  });
 
   const handleClearFilters = () => {
     setDateFilter(undefined);
-    setRequestedAtFilter(undefined);
-    setStatusFilter('');
-    setDepartmentFilter('');
+    setStatusFilter([]);
+    setDepartmentFilter([]);
     setIdFilter('');
+    setCreatedByFilter([]);
+    setResponsiblePersonFilter([]);
     setShowOnlyMine(false);
     setShowOnlyResponsible(false);
     setShowPendingApproval(false);
@@ -98,11 +103,11 @@ export default function TableFilteringAndOptions({
     e.preventDefault();
     const params = new URLSearchParams();
     if (dateFilter) params.set('date', dateFilter.toISOString());
-    if (requestedAtFilter)
-      params.set('requestedAt', requestedAtFilter.toISOString());
-    if (statusFilter) params.set('status', statusFilter);
-    if (departmentFilter) params.set('department', departmentFilter);
+    if (statusFilter.length > 0) params.set('status', statusFilter.join(','));
+    if (departmentFilter.length > 0) params.set('department', departmentFilter.join(','));
     if (idFilter) params.set('id', idFilter);
+    if (createdByFilter.length > 0) params.set('createdBy', createdByFilter.join(','));
+    if (responsiblePersonFilter.length > 0) params.set('responsiblePerson', responsiblePersonFilter.join(','));
     if (showOnlyMine) params.set('requestedBy', userEmail || '');
     if (showOnlyResponsible)
       params.set('responsibleEmployee', userEmail || '');
@@ -145,10 +150,10 @@ export default function TableFilteringAndOptions({
     const params = new URLSearchParams(searchParams?.toString() || '');
     if (checked) {
       params.set('status', 'pending');
-      setStatusFilter('pending');
+      setStatusFilter(['pending']);
     } else {
       params.delete('status');
-      setStatusFilter('');
+      setStatusFilter([]);
     }
     setIsPendingSearch(true);
     router.push(`${pathname}?${params.toString()}`);
@@ -157,10 +162,11 @@ export default function TableFilteringAndOptions({
   // Check if any filter is active
   const hasActiveFilters = Boolean(
     dateFilter ||
-    requestedAtFilter ||
-    statusFilter ||
-    departmentFilter ||
-    idFilter
+    statusFilter.length > 0 ||
+    departmentFilter.length > 0 ||
+    idFilter ||
+    createdByFilter.length > 0 ||
+    responsiblePersonFilter.length > 0
   );
 
   return (
@@ -203,15 +209,28 @@ export default function TableFilteringAndOptions({
       </CardHeader>
       <CardContent className='p-4 pt-0'>
           <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
-            {/* Row 1: Status and Department */}
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+            {/* Row 1: ID, Status, Department */}
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+              <div className='flex flex-col space-y-1'>
+                <Label>ID</Label>
+                <Input
+                  value={idFilter}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setIdFilter(e.target.value)
+                  }
+                  className='w-full'
+                />
+              </div>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.tableFiltering.status}</Label>
-                <ClearableSelect
+                <MultiSelect
                   value={statusFilter}
                   onValueChange={setStatusFilter}
                   placeholder={dict.common.select}
+                  searchPlaceholder={dict.common.search}
+                  emptyText={dict.tableFiltering.notFound}
                   clearLabel={dict.common.clear}
+                  selectedLabel={dict.tableFiltering.selected}
                   className='w-full'
                   options={[
                     { value: 'forecast', label: 'Forecast' },
@@ -225,13 +244,14 @@ export default function TableFilteringAndOptions({
               </div>
               <div className='flex flex-col space-y-1'>
                 <Label>{dict.department.label}</Label>
-                <ClearableCombobox
+                <MultiSelect
                   value={departmentFilter}
                   onValueChange={setDepartmentFilter}
                   placeholder={dict.common.select}
                   searchPlaceholder={dict.common.search}
-                  notFoundText={dict.department.unknown}
+                  emptyText={dict.tableFiltering.notFound}
                   clearLabel={dict.common.clear}
+                  selectedLabel={dict.tableFiltering.selected}
                   className='w-full'
                   options={
                     departments?.map((dept) => ({
@@ -244,22 +264,48 @@ export default function TableFilteringAndOptions({
                           : dept.name,
                     })) || []
                   }
-                  open={openDepartment}
-                  onOpenChange={setOpenDepartment}
                 />
               </div>
             </div>
 
-            {/* Row 2: ID and Date filters */}
+            {/* Row 2: Created By, Responsible Person, Deadline */}
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
               <div className='flex flex-col space-y-1'>
-                <Label>ID</Label>
-                <Input
-                  value={idFilter}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setIdFilter(e.target.value)
-                  }
+                <Label>{dict.tableFiltering.createdBy}</Label>
+                <MultiSelect
+                  value={createdByFilter}
+                  onValueChange={setCreatedByFilter}
+                  placeholder={dict.common.select}
+                  searchPlaceholder={dict.tableFiltering.searchByName}
+                  emptyText={dict.tableFiltering.notFound}
+                  clearLabel={dict.common.clear}
+                  selectedLabel={dict.tableFiltering.selected}
                   className='w-full'
+                  options={
+                    users?.map((user) => ({
+                      value: user.email,
+                      label: user.name,
+                    })) || []
+                  }
+                />
+              </div>
+              <div className='flex flex-col space-y-1'>
+                <Label>{dict.tableFiltering.responsiblePerson}</Label>
+                <MultiSelect
+                  value={responsiblePersonFilter}
+                  onValueChange={setResponsiblePersonFilter}
+                  placeholder={dict.common.select}
+                  searchPlaceholder={dict.tableFiltering.searchByName}
+                  emptyText={dict.tableFiltering.notFound}
+                  clearLabel={dict.common.clear}
+                  selectedLabel={dict.tableFiltering.selected}
+                  className='w-full'
+                  options={
+                    users?.map((user) => ({
+                      value: user.email,
+                      label: user.name,
+                    })) || []
+                  }
                 />
               </div>
               <div className='flex flex-col space-y-1'>
@@ -272,24 +318,6 @@ export default function TableFilteringAndOptions({
                     <DateTimeInput
                       value={value}
                       onChange={(x) => !open && setDateFilter(x)}
-                      format='dd/MM/yyyy'
-                      disabled={open}
-                      onCalendarClick={() => setOpen(!open)}
-                      className='w-full'
-                    />
-                  )}
-                />
-              </div>
-              <div className='flex flex-col space-y-1'>
-                <Label>{dict.tableFiltering.dateAdded}</Label>
-                <DateTimePicker
-                  value={requestedAtFilter}
-                  onChange={setRequestedAtFilter}
-                  hideTime
-                  renderTrigger={({ value, setOpen, open }) => (
-                    <DateTimeInput
-                      value={value}
-                      onChange={(x) => !open && setRequestedAtFilter(x)}
                       format='dd/MM/yyyy'
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}

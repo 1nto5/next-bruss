@@ -47,6 +47,7 @@ const ATTACHMENT_ROLES = [
 
 interface CompleteOrderFormProps {
   id: string;
+  lang: string;
   session: Session | null;
   overtimeRequest: OvertimeType;
   dict: Dictionary;
@@ -54,6 +55,7 @@ interface CompleteOrderFormProps {
 
 export default function CompleteOrderForm({
   id,
+  lang,
   session,
   overtimeRequest,
   dict,
@@ -181,8 +183,8 @@ export default function CompleteOrderForm({
             await revalidate();
 
             // Navigate back to the production overtime list
-            router.push(`/overtime-orders`);
-            resolve();
+            router.push(`/${lang}/overtime-orders`);
+            resolve(result.message);
           } else {
             const errorMap: { [key: string]: string } = {
               'Unauthorized': dict.completeOrderForm.errors.unauthorized,
@@ -224,12 +226,7 @@ export default function CompleteOrderForm({
       }),
       {
         loading: dict.completeOrderForm.toast.uploading,
-        success: (data) => {
-          const count = selectedFiles.length;
-          return count === 1
-            ? dict.completeOrderForm.toast.successSingle.replace('{count}', count.toString())
-            : dict.completeOrderForm.toast.successMultiple.replace('{count}', count.toString());
-        },
+        success: (message) => message || dict.completeOrderForm.toast.successMultiple.replace('{count}', selectedFiles.length.toString()),
         error: (err) => err.message,
       },
     );

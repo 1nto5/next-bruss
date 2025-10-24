@@ -42,7 +42,7 @@ function getStatusBadge(status: string, dict: Dictionary) {
     case 'forecast':
       return (
         <Badge variant='statusForecast' size='lg' className='text-lg'>
-          {dict.detailsPage.statusLabels.forecast}
+          Forecast
         </Badge>
       );
     case 'pending':
@@ -534,6 +534,21 @@ export default async function OvertimeDetailsPage(props: {
                           </TableCell>
                           <TableCell>
                             {formatDateTime(request.approvedAt)}
+                          </TableCell>
+                        </TableRow>
+                      )}
+
+                      {/* Pending */}
+                      {request.pendingAt && (
+                        <TableRow>
+                          <TableCell>
+                            <Badge variant='statusPending'>{dict.detailsPage.statusLabels.pending}</Badge>
+                          </TableCell>
+                          <TableCell>
+                            {extractNameFromEmail(request.pendingBy || '')}
+                          </TableCell>
+                          <TableCell>
+                            {formatDateTime(request.pendingAt)}
                           </TableCell>
                         </TableRow>
                       )}
