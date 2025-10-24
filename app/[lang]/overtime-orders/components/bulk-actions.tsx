@@ -21,7 +21,7 @@ import {
   bulkApproveOvertimeRequests,
   bulkCancelOvertimeRequests,
   bulkMarkAsAccountedOvertimeRequests,
-} from '../actions';
+} from '../actions/bulk';
 import { Dictionary } from '../lib/dict';
 import { OvertimeType } from '../lib/types';
 
@@ -78,7 +78,7 @@ export default function BulkActions({
 
   const canMarkAsAccounted = selectedRows.every((row) => {
     const request = row.original;
-    return isHR && request.status === 'completed';
+    return (isHR || isAdmin) && request.status === 'completed';
   });
 
   const hasAnyAction = canApprove || canCancel || canMarkAsAccounted;

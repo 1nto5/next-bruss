@@ -1,9 +1,10 @@
 import { auth } from '@/lib/auth';
 import { Locale } from '@/i18n.config';
 import { redirect } from 'next/navigation';
-import CompleteOrderForm from '../../components/complete-order-form';
-import { getDictionary } from '../../lib/dict';
-import { getOvertimeRequest } from '../../lib/get-overtime-request';
+import CompleteOrderForm from '../../../components/complete-order-form';
+import { getDictionary } from '../../../lib/dict';
+import { getOvertimeRequest } from '../../../lib/get-overtime-request';
+import getAllArticles from '@/lib/data/get-all-articles';
 
 // Update the attachment roles to match the specified requirements
 const ATTACHMENT_ROLES = [
@@ -24,7 +25,10 @@ export default async function CompleteOrderPage(props: {
     redirect('/auth');
   }
 
-  const dict = await getDictionary(lang);
+  const [dict, articles] = await Promise.all([
+    getDictionary(lang),
+    getAllArticles(),
+  ]);
 
   // Check overtime request status and get request details
   let overtimeRequestLocaleString;
@@ -61,6 +65,7 @@ export default async function CompleteOrderPage(props: {
       session={session}
       overtimeRequest={overtimeRequestLocaleString}
       dict={dict}
+      articles={articles}
     />
   );
 }

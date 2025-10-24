@@ -32,10 +32,10 @@ import {
 import Link from 'next/link';
 import LocalizedLink from '@/components/localized-link';
 import { redirect } from 'next/navigation';
-import { getDictionary } from '../lib/dict';
-import { getOvertimeRequest } from '../lib/get-overtime-request';
-import { getDepartmentDisplayName } from '../lib/types';
-import type { Dictionary } from '../lib/dict';
+import { getDictionary } from '../../lib/dict';
+import { getOvertimeRequest } from '../../lib/get-overtime-request';
+import { getDepartmentDisplayName } from '../../lib/types';
+import type { Dictionary } from '../../lib/dict';
 
 function getStatusBadge(status: string, dict: Dictionary) {
   switch (status) {
@@ -148,7 +148,7 @@ export default async function OvertimeDetailsPage(props: {
 
             {/* Manage employees button */}
             <LocalizedLink
-              href={`/overtime-orders/${id}/employees`}
+              href={`/overtime-orders/${id}/pickups`}
               className='w-full sm:w-auto'
             >
               <Button variant='outline' className='w-full'>
@@ -417,7 +417,7 @@ export default async function OvertimeDetailsPage(props: {
                           <CalendarClock className='mr-2 h-5 w-5' /> {dict.detailsPage.employeesWithDayOff}
                         </CardTitle>
                         <LocalizedLink
-                          href={`/overtime-orders/${id}/employees`}
+                          href={`/overtime-orders/${id}/pickups`}
                           className='w-full sm:w-auto'
                         >
                           <Button variant='outline' className='w-full'>

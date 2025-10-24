@@ -22,7 +22,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { deleteDayOff } from '../../actions';
+import { deleteDayOff } from '../../actions/pickups';
 import { Dictionary } from '../../lib/dict';
 import { overtimeRequestEmployeeType } from '../../lib/types';
 

@@ -16,10 +16,8 @@ import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import {
-  addEmployeeDayOff,
-  redirectToOvertimeOrdersDaysOff as redirect,
-} from '../actions';
+import { addEmployeeDayOff } from '../actions/pickups';
+import { redirectToOvertimeOrdersDaysOff as redirect } from '../actions/utils';
 import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';
 import { Dictionary } from '../lib/dict';
@@ -104,7 +102,7 @@ export default function AddDayOff({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{dict.addDayOffForm.title}</CardTitle>
-          <LocalizedLink href={`/overtime-orders/${id}/employees`}>
+          <LocalizedLink href={`/overtime-orders/${id}/pickups`}>
             <Button variant='outline'>
               <ArrowLeft /> <span>{dict.addDayOffForm.backToRequest}</span>
             </Button>

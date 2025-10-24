@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { reactivateOvertimeRequest } from '../actions';
+import { reactivateOvertimeRequest } from '../actions/approval';
 import { Dictionary } from '../lib/dict';
 
 interface ReactivateRequestDialogProps {

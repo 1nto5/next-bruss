@@ -9,9 +9,9 @@ import {
 import { Locale } from '@/i18n.config';
 import { AlarmClockPlus, ArrowLeft } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
-import { DataTable } from '../../components/id-table/data-table';
-import { getDictionary } from '../../lib/dict';
-import { getOvertimeRequest } from '../../lib/get-overtime-request';
+import { DataTable } from '../../../components/id-table/data-table';
+import { getDictionary } from '../../../lib/dict';
+import { getOvertimeRequest } from '../../../lib/get-overtime-request';
 
 export default async function ProductionOvertimePage(props: {
   params: Promise<{ lang: Locale; id: string }>;

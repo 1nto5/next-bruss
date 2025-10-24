@@ -31,7 +31,7 @@ import Link from 'next/link';
 import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
 import { DepartmentConfig, OvertimeType } from '../../lib/types';
-import { bulkDeleteOvertimeRequests } from '../../actions';
+import { bulkDeleteOvertimeRequests } from '../../actions/bulk';
 import ApproveRequestDialog from '../approve-request-dialog';
 import CancelRequestDialog from '../cancel-request-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
@@ -269,7 +269,7 @@ export const createColumns = (
         // Check if there are any actions available
         const hasOvertimePickupAction = request.status !== 'canceled';
         const hasApproveAction = canApprove && request.status === 'pending'; // Only pending requests can be approved
-        const hasMarkAsAccountedAction = isHR && request.status === 'completed'; // Only completed requests can be marked as accounted
+        const hasMarkAsAccountedAction = (isHR || isAdmin) && request.status === 'completed'; // Only completed requests can be marked as accounted
         const hasAddAttachmentAction =
           request._id && request.status === 'approved' && canAddAttachment;
         const hasDownloadAttachmentAction =
@@ -307,7 +307,7 @@ export const createColumns = (
 
                 {request.status !== 'canceled' && (
                   <>
-                    <LocalizedLink href={`/overtime-orders/${request._id}/employees`}>
+                    <LocalizedLink href={`/overtime-orders/${request._id}/pickups`}>
                       <DropdownMenuItem>
                         <CalendarClock className='mr-2 h-4 w-4' />
                         <span>{dict.tableColumns.overtimePickup}</span>
@@ -352,20 +352,6 @@ export const createColumns = (
                   </>
                 )}
 
-                {/* Cancel button - show for non-completed requests */}
-                {canCancel && (
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setIsCancelDialogOpen(true);
-                    }}
-                    className='focus:bg-red-400 dark:focus:bg-red-700'
-                  >
-                    <X className='mr-2 h-4 w-4' />
-                    <span>{dict.tableColumns.cancelRequest}</span>
-                  </DropdownMenuItem>
-                )}
-
                 {/* Complete order button - only for approved orders and authorized users */}
                 {hasAddAttachmentAction && (
                   <LocalizedLink href={`/overtime-orders/${request._id}/complete`}>
@@ -402,13 +388,26 @@ export const createColumns = (
                     <span>{dict.tableColumnsExtra.reactivateOrder}</span>
                   </DropdownMenuItem>
                 )}
+                {/* Cancel button - show for non-completed requests */}
+                {canCancel && (
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setIsCancelDialogOpen(true);
+                    }}
+                    className='text-destructive focus:bg-destructive focus:text-destructive-foreground'
+                  >
+                    <X className='mr-2 h-4 w-4' />
+                    <span>{dict.tableColumns.cancelRequest}</span>
+                  </DropdownMenuItem>
+                )}
                 {isAdmin && (
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
                       setIsDeleteDialogOpen(true);
                     }}
-                    className='text-destructive'
+                    className='text-destructive focus:bg-destructive focus:text-destructive-foreground'
                   >
                     <Trash2 className='mr-2 h-4 w-4' />
                     <span>{dict.tableColumnsExtra.deleteOrder}</span>

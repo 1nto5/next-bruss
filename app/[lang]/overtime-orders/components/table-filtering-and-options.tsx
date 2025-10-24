@@ -12,7 +12,7 @@ import { UsersListType } from '@/lib/types/user';
 import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { revalidateOvertimeOrders as revalidate } from '../actions';
+import { revalidateOvertimeOrders as revalidate } from '../actions/utils';
 import { Dictionary } from '../lib/dict';
 import { DepartmentConfig } from '../lib/types';
 
@@ -44,7 +44,6 @@ export default function TableFilteringAndOptions({
   useEffect(() => {
     setIsPendingSearch(false);
   }, [fetchTime]);
-
 
   const [showOnlyMine, setShowOnlyMine] = useState(() => {
     const requestedBy = searchParams?.get('requestedBy');
@@ -82,6 +81,15 @@ export default function TableFilteringAndOptions({
     const responsiblePersonParam = searchParams?.get('responsiblePerson');
     return responsiblePersonParam ? responsiblePersonParam.split(',') : [];
   });
+
+  // Sync showPendingApproval with statusFilter changes
+  useEffect(() => {
+    if (statusFilter.length === 1 && statusFilter[0] === 'pending') {
+      setShowPendingApproval(true);
+    } else if (statusFilter.length === 0 || !statusFilter.includes('pending')) {
+      setShowPendingApproval(false);
+    }
+  }, [statusFilter]);
 
   const handleClearFilters = () => {
     setDateFilter(undefined);
@@ -159,15 +167,39 @@ export default function TableFilteringAndOptions({
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  // Check if any filter is active
+  // Check if any filter is active or if there are pending changes
   const hasActiveFilters = Boolean(
     dateFilter ||
     statusFilter.length > 0 ||
     departmentFilter.length > 0 ||
     idFilter ||
     createdByFilter.length > 0 ||
-    responsiblePersonFilter.length > 0
+    responsiblePersonFilter.length > 0 ||
+    showOnlyMine ||
+    showOnlyResponsible ||
+    showPendingApproval
   );
+
+  // Check if local state differs from URL (pending changes to apply)
+  const hasPendingChanges = (() => {
+    const urlDate = searchParams?.get('date');
+    const urlStatus = searchParams?.get('status')?.split(',') || [];
+    const urlDepartment = searchParams?.get('department')?.split(',') || [];
+    const urlId = searchParams?.get('id') || '';
+    const urlCreatedBy = searchParams?.get('createdBy')?.split(',') || [];
+    const urlResponsiblePerson = searchParams?.get('responsiblePerson')?.split(',') || [];
+
+    const dateChanged = (dateFilter?.toISOString() || '') !== (urlDate || '');
+    const statusChanged = JSON.stringify(statusFilter.sort()) !== JSON.stringify(urlStatus.sort());
+    const departmentChanged = JSON.stringify(departmentFilter.sort()) !== JSON.stringify(urlDepartment.sort());
+    const idChanged = idFilter !== urlId;
+    const createdByChanged = JSON.stringify(createdByFilter.sort()) !== JSON.stringify(urlCreatedBy.sort());
+    const responsiblePersonChanged = JSON.stringify(responsiblePersonFilter.sort()) !== JSON.stringify(urlResponsiblePerson.sort());
+
+    return dateChanged || statusChanged || departmentChanged || idChanged || createdByChanged || responsiblePersonChanged;
+  })();
+
+  const canSearch = hasActiveFilters || hasPendingChanges;
 
   return (
     <Card>
@@ -335,7 +367,7 @@ export default function TableFilteringAndOptions({
                 variant='destructive'
                 onClick={handleClearFilters}
                 title='Clear filters'
-                disabled={isPendingSearch || !hasActiveFilters}
+                disabled={isPendingSearch || !canSearch}
                 className='order-2 w-full sm:order-1'
               >
                 <CircleX /> <span>{dict.common.clear}</span>
@@ -344,7 +376,7 @@ export default function TableFilteringAndOptions({
               <Button
                 type='submit'
                 variant='secondary'
-                disabled={isPendingSearch || !hasActiveFilters}
+                disabled={isPendingSearch || !canSearch}
                 className='order-1 w-full sm:order-2'
               >
                 {isPendingSearch ? (

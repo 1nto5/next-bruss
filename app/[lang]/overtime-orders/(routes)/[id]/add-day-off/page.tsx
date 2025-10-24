@@ -2,9 +2,9 @@ import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
 import getEmployees from '@/lib/data/get-employees';
 import { redirect } from 'next/navigation';
-import AddDayOff from '../../components/add-day-off-form';
-import { getOvertimeRequest } from '../../lib/get-overtime-request';
-import { getDictionary } from '../../lib/dict';
+import AddDayOff from '../../../components/add-day-off-form';
+import { getOvertimeRequest } from '../../../lib/get-overtime-request';
+import { getDictionary } from '../../../lib/dict';
 
 export default async function AddDayOffPage(props: {
   params: Promise<{ lang: Locale; id: string }>;

@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { bulkDeleteOvertimeRequests } from '../actions';
+import { bulkDeleteOvertimeRequests } from '../actions/bulk';
 import { Dictionary } from '../lib/dict';
 
 interface DeleteRequestDialogProps {

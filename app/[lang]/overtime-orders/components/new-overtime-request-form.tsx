@@ -64,16 +64,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import {
-  insertOvertimeRequest as insert,
-  redirectToOvertimeOrders as redirect,
-} from '../actions';
+import { insertOvertimeRequest as insert } from '../actions/crud';
+import { redirectToOvertimeOrders as redirect } from '../actions/utils';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { createNewOvertimeRequestSchema } from '../lib/zod';
 import { DepartmentConfig } from '../lib/types';
 import { MultiArticleManager } from './multi-article-manager';
 import { Dictionary } from '../lib/dict';
 import { Locale } from '@/lib/config/i18n';
+import type { Article } from '@/lib/data/get-all-articles';
 
 export default function NewOvertimeRequestForm({
   employees,
@@ -82,6 +81,7 @@ export default function NewOvertimeRequestForm({
   loggedInUserEmail,
   dict,
   lang,
+  articles,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
@@ -89,6 +89,7 @@ export default function NewOvertimeRequestForm({
   loggedInUserEmail: string;
   dict: Dictionary;
   lang: Locale;
+  articles: Article[];
 }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
@@ -521,6 +522,7 @@ export default function NewOvertimeRequestForm({
                     dict={dict}
                     onPendingChange={setPendingArticle}
                     onClearError={() => form.clearErrors('plannedArticles')}
+                    articles={articles}
                   />
                   <FormMessage />
                 </FormItem>

@@ -63,16 +63,15 @@ import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
-import {
-  updateOvertimeRequest as update,
-  redirectToOvertimeOrders as redirect,
-} from '../actions';
+import { updateOvertimeRequest as update } from '../actions/crud';
+import { redirectToOvertimeOrders as redirect } from '../actions/utils';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { MultiArticleManager } from './multi-article-manager';
 import { Dictionary } from '../lib/dict';
 import { createNewOvertimeRequestSchema } from '../lib/zod';
 import { DepartmentConfig, OvertimeType } from '../lib/types';
 import { Locale } from '@/lib/config/i18n';
+import type { Article } from '@/lib/data/get-all-articles';
 
 export default function EditOvertimeRequestForm({
   employees,
@@ -81,6 +80,7 @@ export default function EditOvertimeRequestForm({
   overtimeRequest,
   dict,
   lang,
+  articles,
 }: {
   employees: EmployeeType[];
   users: UsersListType;
@@ -88,6 +88,7 @@ export default function EditOvertimeRequestForm({
   overtimeRequest: OvertimeType;
   dict: Dictionary;
   lang: Locale;
+  articles: Article[];
 }) {
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
@@ -448,6 +449,7 @@ export default function EditOvertimeRequestForm({
                     dict={dict}
                     onPendingChange={setPendingArticle}
                     onClearError={() => form.clearErrors('plannedArticles')}
+                    articles={articles}
                   />
                   <FormMessage />
                 </FormItem>

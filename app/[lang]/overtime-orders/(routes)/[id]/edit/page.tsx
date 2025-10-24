@@ -4,17 +4,17 @@ import { getUsers } from '@/lib/data/get-users';
 import { Locale } from '@/lib/config/i18n';
 import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { notFound, redirect } from 'next/navigation';
-import EditOvertimeRequestForm from '../../components/edit-overtime-request-form';
-import { getOvertimeRequestForEdit } from '../../actions';
-import { getDictionary } from '../../lib/dict';
+import EditOvertimeRequestForm from '../../../components/edit-overtime-request-form';
+import { getOvertimeRequestForEdit } from '../../../actions/crud';
+import { getDictionary } from '../../../lib/dict';
+import getAllArticles from '@/lib/data/get-all-articles';
 
 export default async function EditOvertimeRequestPage(props: {
   params: Promise<{ lang: Locale; id: string }>;
 }) {
   const params = await props.params;
   const { lang, id } = params;
-  const dict = await getDictionary(lang);
-  
+
   const session = await auth();
   if (!session || !session.user?.email) {
     redirect('/auth');
@@ -22,16 +22,18 @@ export default async function EditOvertimeRequestPage(props: {
 
   // Get the overtime request
   const overtimeRequest = await getOvertimeRequestForEdit(id);
-  
+
   if (!overtimeRequest) {
     notFound();
   }
 
-  // Get employees, users lists, and departments
-  const [employees, users, departments] = await Promise.all([
+  // Get employees, users lists, departments, and articles
+  const [dict, employees, users, departments, articles] = await Promise.all([
+    getDictionary(lang),
     getEmployees(),
     getUsers(),
     getOvertimeDepartments(),
+    getAllArticles(),
   ]);
 
   return (
@@ -42,6 +44,7 @@ export default async function EditOvertimeRequestPage(props: {
       overtimeRequest={overtimeRequest}
       dict={dict}
       lang={lang}
+      articles={articles}
     />
   );
 }

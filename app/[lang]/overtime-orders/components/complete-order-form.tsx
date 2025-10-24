@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { revalidateOvertimeOrders as revalidate } from '../actions';
+import { revalidateOvertimeOrders as revalidate } from '../actions/utils';
 import { Dictionary } from '../lib/dict';
 import { OvertimeType } from '../lib/types';
 import {
@@ -35,6 +35,7 @@ import {
   MultipleAttachmentFormType,
 } from '../lib/zod';
 import { MultiArticleManager } from './multi-article-manager';
+import type { Article } from '@/lib/data/get-all-articles';
 
 // Update the attachment roles to match the specified requirements
 const ATTACHMENT_ROLES = [
@@ -51,6 +52,7 @@ interface CompleteOrderFormProps {
   session: Session | null;
   overtimeRequest: OvertimeType;
   dict: Dictionary;
+  articles: Article[];
 }
 
 export default function CompleteOrderForm({
@@ -59,6 +61,7 @@ export default function CompleteOrderForm({
   session,
   overtimeRequest,
   dict,
+  articles,
 }: CompleteOrderFormProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -320,6 +323,7 @@ export default function CompleteOrderForm({
                     dict={dict}
                     label={dict.completeOrderForm.actualProduction}
                     initialValues={overtimeRequest.plannedArticles || []}
+                    articles={articles}
                   />
                   <FormMessage />
                 </>

@@ -4,18 +4,15 @@ import { getUsers } from '@/lib/data/get-users';
 import { Locale } from '@/lib/config/i18n';
 import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { redirect } from 'next/navigation';
-import NewOvertimeRequestForm from '../components/new-overtime-request-form';
-import { getDictionary } from '../lib/dict';
+import NewOvertimeRequestForm from '../../components/new-overtime-request-form';
+import { getDictionary } from '../../lib/dict';
+import getAllArticles from '@/lib/data/get-all-articles';
 
 export default async function AddDeviationPage(props: {
   params: Promise<{ lang: Locale }>;
 }) {
   const params = await props.params;
   const { lang } = params;
-  const dict = await getDictionary(lang);
-  const employees = await getEmployees();
-  const users = await getUsers();
-  const departments = await getOvertimeDepartments();
   const session = await auth();
 
   if (!session || !session.user?.email) {
@@ -33,6 +30,14 @@ export default async function AddDeviationPage(props: {
     redirect(`/${lang}/overtime-orders`);
   }
 
+  const [dict, employees, users, departments, articles] = await Promise.all([
+    getDictionary(lang),
+    getEmployees(),
+    getUsers(),
+    getOvertimeDepartments(),
+    getAllArticles(),
+  ]);
+
   return (
     <NewOvertimeRequestForm
       employees={employees}
@@ -41,6 +46,7 @@ export default async function AddDeviationPage(props: {
       loggedInUserEmail={session.user.email ?? ''}
       dict={dict}
       lang={lang}
+      articles={articles}
     />
   );
 }

@@ -11,9 +11,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, X, CircleX } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { ArticleSearch, ArticleSearchRef } from './article-search';
 import { Dictionary } from '../lib/dict';
+import type { Article } from '@/lib/data/get-all-articles';
 
 type ArticleQuantity = {
   articleNumber: string;
@@ -34,6 +35,7 @@ interface MultiArticleManagerProps {
   initialValues?: ArticleQuantity[];
   onPendingChange?: (pending: { articleNumber: string; quantity: string }) => void;
   onClearError?: () => void;
+  articles: Article[];
 }
 
 export function MultiArticleManager({
@@ -45,6 +47,7 @@ export function MultiArticleManager({
   initialValues = [],
   onPendingChange,
   onClearError,
+  articles,
 }: MultiArticleManagerProps) {
   const [newArticle, setNewArticle] = useState<{
     articleNumber: string;
@@ -62,9 +65,6 @@ export function MultiArticleManager({
   }, [newArticle, onPendingChange]);
 
   const [initialized, setInitialized] = useState(false);
-  const [articlesWithDetails, setArticlesWithDetails] = useState<
-    ArticleWithDetails[]
-  >([]);
   const articleSearchRef = useRef<ArticleSearchRef>(null);
 
   // Initialize with initialValues only once
@@ -75,53 +75,19 @@ export function MultiArticleManager({
     }
   }, [initialized, value.length, initialValues, onChange]);
 
-  // Fetch article details when value changes
-  useEffect(() => {
-    const fetchArticleDetails = async () => {
-      const articlePromises = value.map(async (article) => {
-        try {
-          const response = await fetch(
-            `/api/inventory-articles?query=${encodeURIComponent(article.articleNumber)}`,
-          );
-          const data = await response.json();
-
-          if (Array.isArray(data) && data.length > 0) {
-            const foundArticle = data.find(
-              (item) => item.number === article.articleNumber,
-            );
-            if (foundArticle) {
-              return {
-                ...article,
-                name: foundArticle.name,
-                unit: foundArticle.unit,
-              };
-            }
-          }
-          return {
-            ...article,
-            name: dict.multiArticleManager.unknownArticle,
-            unit: '',
-          };
-        } catch (error) {
-          console.error('Error fetching article details:', error);
-          return {
-            ...article,
-            name: dict.multiArticleManager.fetchError,
-            unit: '',
-          };
-        }
-      });
-
-      const detailedArticles = await Promise.all(articlePromises);
-      setArticlesWithDetails(detailedArticles);
-    };
-
-    if (value.length > 0) {
-      fetchArticleDetails();
-    } else {
-      setArticlesWithDetails([]);
-    }
-  }, [value]);
+  // Get article details from provided articles array
+  const articlesWithDetails = useMemo(() => {
+    return value.map((article) => {
+      const foundArticle = articles.find(
+        (a) => a.number === article.articleNumber,
+      );
+      return {
+        ...article,
+        name: foundArticle?.name || dict.multiArticleManager.unknownArticle,
+        unit: foundArticle?.unit || '',
+      };
+    });
+  }, [value, articles, dict.multiArticleManager.unknownArticle]);
 
   const addArticle = () => {
     if (newArticle.articleNumber && newArticle.quantity) {
@@ -259,6 +225,7 @@ export function MultiArticleManager({
             }}
             dict={dict}
             placeholder={placeholder}
+            articles={articles}
           />
         </div>
         <div className='flex min-w-[180px] flex-[1] gap-2'>

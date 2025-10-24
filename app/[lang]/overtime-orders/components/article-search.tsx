@@ -16,21 +16,16 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils/cn';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import { Dictionary } from '../lib/dict';
-
-type Article = {
-  _id: string;
-  number: string;
-  name: string;
-  unit: string;
-};
+import type { Article } from '@/lib/data/get-all-articles';
 
 interface ArticleSearchProps {
   value?: string;
   onSelect: (articleNumber: string) => void;
   dict: Dictionary;
   placeholder?: string;
+  articles: Article[];
 }
 
 export interface ArticleSearchRef {
@@ -38,9 +33,8 @@ export interface ArticleSearchRef {
 }
 
 export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
-  function ArticleSearch({ value, onSelect, dict, placeholder }, ref) {
+  function ArticleSearch({ value, onSelect, dict, placeholder, articles }, ref) {
     const [open, setOpen] = useState(false);
-    const [articles, setArticles] = useState<Article[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
 
     useImperativeHandle(ref, () => ({
@@ -49,26 +43,20 @@ export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
       },
     }));
 
-    useEffect(() => {
-      if (searchQuery.length >= 2) {
-        fetch(
-          `/api/inventory-articles?query=${encodeURIComponent(searchQuery)}`,
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            if (Array.isArray(data)) {
-              setArticles(data);
-            } else {
-              setArticles([]);
-            }
-          })
-          .catch(() => {
-            setArticles([]);
-          });
-      } else {
-        setArticles([]);
+    // Filter articles locally based on search query
+    const filteredArticles = useMemo(() => {
+      if (searchQuery.length < 2) {
+        return [];
       }
-    }, [searchQuery]);
+      const query = searchQuery.toLowerCase();
+      return articles
+        .filter(
+          (article) =>
+            article.number.toLowerCase().includes(query) ||
+            article.name.toLowerCase().includes(query),
+        )
+        .slice(0, 20); // Limit to 20 results
+    }, [articles, searchQuery]);
 
     const selectedArticle = articles.find(
       (article) => article.number === value,
@@ -112,7 +100,7 @@ export const ArticleSearch = forwardRef<ArticleSearchRef, ArticleSearchProps>(
                   <Check className='mr-2 h-4 w-4 opacity-0' />
                   {dict.articleSearch.notSelected}
                 </CommandItem>
-                {articles.map((article) => (
+                {filteredArticles.map((article) => (
                   <CommandItem
                     key={article._id}
                     value={article.number}
