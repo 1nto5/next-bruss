@@ -4,8 +4,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
 import { Table } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
-import { getColumns } from '../components/id-table/columns';
-import { DataTable } from '../components/id-table/data-table';
+import { DataTableWrapper } from '../components/id-table/data-table-wrapper';
 import { getOvertimeRequest } from '../lib/get-overtime-request';
 import { getDictionary } from '../lib/dict';
 
@@ -35,8 +34,7 @@ export default async function ProductionOvertimePage(props: {
         {/* <CardDescription>ID: {id}</CardDescription> */}
       </CardHeader>
 
-      <DataTable
-        columns={getColumns(dict)}
+      <DataTableWrapper
         data={(
           overtimeRequestLocaleString.employeesWithScheduledDayOff || []
         ).map((employee) => ({
