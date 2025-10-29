@@ -9,7 +9,7 @@ import { redirect } from 'next/navigation';
  * Revalidate overtime submissions cache
  */
 export async function revalidateOvertime() {
-  revalidateTag('overtime');
+  revalidateTag('overtime-submissions');
 }
 
 /**

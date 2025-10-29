@@ -357,7 +357,7 @@ export default function OvertimeRequestForm({
                   maxDate = undefined;
                 } else {
                   minDate = sevenDaysAgo;
-                  maxDate = now;
+                  maxDate = undefined;
                 }
 
                 return (
@@ -453,36 +453,41 @@ export default function OvertimeRequestForm({
                 )}
               />
             )}
-            {/* Pickup Date, only if overtimeRequest is true and payment is false */}
+            {/* Pickup Date, only if overtimeRequest is true and payment is not true */}
             {form.watch('overtimeRequest') &&
-              form.watch('payment') === false && (
+              form.watch('payment') !== true && (
                 <FormField
                   control={form.control}
                   name='scheduledDayOff'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{dict.form.scheduledDayOff}</FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          modal
-                          hideTime
-                          value={field.value}
-                          onChange={field.onChange}
-                          min={new Date()}
-                          renderTrigger={({ open, value, setOpen }) => (
-                            <DateTimeInput
-                              value={value}
-                              onChange={(x) => !open && field.onChange(x)}
-                              format='dd/MM/yyyy'
-                              disabled={open}
-                              onCalendarClick={() => setOpen(!open)}
-                            />
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const plannedWorkDate = form.watch('date');
+                    const minPickupDate = new Date(plannedWorkDate);
+                    minPickupDate.setDate(minPickupDate.getDate() + 1);
+                    return (
+                      <FormItem>
+                        <FormLabel>{dict.form.scheduledDayOff}</FormLabel>
+                        <FormControl>
+                          <DateTimePicker
+                            modal
+                            hideTime
+                            value={field.value}
+                            onChange={field.onChange}
+                            min={minPickupDate}
+                            renderTrigger={({ open, value, setOpen }) => (
+                              <DateTimeInput
+                                value={value}
+                                onChange={(x) => !open && field.onChange(x)}
+                                format='dd/MM/yyyy'
+                                disabled={open}
+                                onCalendarClick={() => setOpen(!open)}
+                              />
+                            )}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               )}
           </CardContent>

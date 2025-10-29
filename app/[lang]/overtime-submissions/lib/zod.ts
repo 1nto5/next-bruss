@@ -74,6 +74,11 @@ export const createOvertimeSubmissionSchema = (validation: {
         const now = new Date();
         now.setHours(23, 59, 59, 999);
 
+        // Overtime request (planning): only future dates
+        if (data.overtimeRequest) {
+          return data.date > now;
+        }
+
         const threeDaysAgo = new Date();
         threeDaysAgo.setHours(0, 0, 0, 0);
         threeDaysAgo.setDate(now.getDate() - 3);
