@@ -21,7 +21,6 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -41,13 +40,13 @@ import { UsersListType } from '@/lib/types/user';
 import { cn } from '@/lib/utils/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  ArrowLeft,
   Check,
   ChevronsUpDown,
   CircleX,
   Copy,
   Plus,
   Save,
-  Table,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -61,9 +60,9 @@ import {
 import { redirectToOvertime as redirect } from '../actions/utils';
 import { Dictionary } from '../lib/dict';
 import { OvertimeSubmissionType } from '../lib/types';
-import { createOvertimeSubmissionSchema } from '../lib/zod';
+import { createWorkOrderSchema } from '../lib/zod';
 
-interface OvertimeRequestFormProps {
+interface AddWorkOrderFormProps {
   managers: UsersListType;
   loggedInUserEmail: string;
   mode: 'new' | 'edit';
@@ -73,7 +72,7 @@ interface OvertimeRequestFormProps {
   requiresReapproval?: boolean;
 }
 
-export default function OvertimeRequestForm({
+export default function AddWorkOrderForm({
   managers,
   loggedInUserEmail,
   mode,
@@ -81,7 +80,7 @@ export default function OvertimeRequestForm({
   dict,
   lang,
   requiresReapproval = false,
-}: OvertimeRequestFormProps) {
+}: AddWorkOrderFormProps) {
   const [isPending, setIsPending] = useState(false);
   const [supervisorOpen, setSupervisorOpen] = useState(false);
   const [actionType, setActionType] = useState<'save' | 'save-and-add-another'>(
@@ -92,7 +91,7 @@ export default function OvertimeRequestForm({
 
   // Helper function to calculate next Saturday from a given date
   const getNextSaturday = (fromDate: Date = new Date()): Date => {
-    const saturday = 6; // 0 = Sunday, 6 = Saturday
+    const saturday = 6;
     const date = new Date(fromDate);
     const daysUntilSaturday = (saturday - date.getDay() + 7) % 7 || 7;
     date.setDate(date.getDate() + daysUntilSaturday);
@@ -100,30 +99,14 @@ export default function OvertimeRequestForm({
     return date;
   };
 
-  const overtimeSubmissionSchema = createOvertimeSubmissionSchema(
-    dict.validation,
-  );
+  const workOrderSchema = createWorkOrderSchema(dict.validation);
 
-  const form = useForm<z.infer<typeof overtimeSubmissionSchema>>({
-    resolver: zodResolver(overtimeSubmissionSchema),
+  const form = useForm<z.infer<typeof workOrderSchema>>({
+    resolver: zodResolver(workOrderSchema),
     defaultValues: {
       supervisor: isEditMode ? submission!.supervisor : '',
-      date: isEditMode
-        ? submission!.overtimeRequest && (submission as any)?.workStartTime
-          ? (() => {
-              const dateFromStart = new Date((submission as any).workStartTime);
-              dateFromStart.setHours(0, 0, 0, 0);
-              return dateFromStart;
-            })()
-          : submission!.date
-            ? new Date(submission!.date)
-            : undefined
-        : undefined,
       hours: isEditMode ? submission!.hours : 1,
       reason: isEditMode ? submission!.reason : '',
-      overtimeRequest: isEditMode
-        ? (submission!.overtimeRequest ?? false)
-        : false,
       payment: isEditMode ? submission!.payment : undefined,
       scheduledDayOff: isEditMode
         ? submission!.scheduledDayOff
@@ -143,79 +126,37 @@ export default function OvertimeRequestForm({
     },
   });
 
-  // Watch date and hours to determine if overtimeRequest should be available
-  const overtimeRequest = form.watch('overtimeRequest');
-  const dateValue = form.watch('date');
-  const hoursValue = form.watch('hours');
-  const isDateInFuture = dateValue && new Date(dateValue) > new Date();
-  const isPositiveHours = hoursValue >= 0;
-
-  // Reset overtimeRequest when date changes to past or hours becomes negative
-  useEffect(() => {
-    // Skip reset logic when overtimeRequest is true
-    // Skip reset logic when overtimeRequest is true (date is derived from workStartTime)
-    if (overtimeRequest) {
-      return;
-    }
-    if (!isDateInFuture || !isPositiveHours) {
-      form.setValue('overtimeRequest', false);
-      form.setValue('payment', undefined);
-      form.setValue('scheduledDayOff', undefined);
-    }
-  }, [isDateInFuture, isPositiveHours, overtimeRequest, form]);
-
-  // Calculate hours from time range when overtimeRequest is enabled
+  // Calculate hours from time range
   const workStartTime = form.watch('workStartTime');
   const workEndTime = form.watch('workEndTime');
 
   useEffect(() => {
-    if (overtimeRequest && workStartTime && workEndTime) {
+    if (workStartTime && workEndTime) {
       const durationMs = workEndTime.getTime() - workStartTime.getTime();
       const durationHours = durationMs / (1000 * 60 * 60);
-      // Round to nearest 0.5 hour increment
       const roundedHours = Math.round(durationHours * 2) / 2;
       form.setValue('hours', roundedHours);
-
-      // Auto-populate date from workStartTime (extract date part only)
-      const dateFromStartTime = new Date(workStartTime);
-      dateFromStartTime.setHours(0, 0, 0, 0);
-      form.setValue('date', dateFromStartTime);
-    } else if (overtimeRequest && workStartTime) {
-      // Auto-populate date from workStartTime even if workEndTime is not set yet
-      const dateFromStartTime = new Date(workStartTime);
-      dateFromStartTime.setHours(0, 0, 0, 0);
-      form.setValue('date', dateFromStartTime);
     }
-  }, [overtimeRequest, workStartTime, workEndTime, form]);
+  }, [workStartTime, workEndTime, form]);
 
   const onSubmit = async (
-    data: z.infer<typeof overtimeSubmissionSchema>,
+    data: z.infer<typeof workOrderSchema>,
     currentActionType: 'save' | 'save-and-add-another' = actionType,
   ) => {
     setIsPending(true);
     try {
-      // Ensure date is populated from workStartTime if overtimeRequest is true
       let submissionData: any = { ...data };
-      if (
-        submissionData.overtimeRequest &&
-        submissionData.workStartTime &&
-        !submissionData.date
-      ) {
-        const dateFromStartTime = new Date(submissionData.workStartTime);
-        dateFromStartTime.setHours(0, 0, 0, 0);
-        submissionData.date = dateFromStartTime;
-      }
-      // Ensure date is always set (required for non-overtime requests)
-      if (!submissionData.date) {
-        submissionData.date = new Date();
-      }
 
-      // Type assertion: we've ensured date is always set
+      // Set overtimeRequest to true for work orders
+      submissionData.overtimeRequest = true;
+      
+      // Date should not be set for overtime requests
+      delete submissionData.date;
+
       const finalData = submissionData as OvertimeSubmissionType;
 
       let res;
       if (isEditMode) {
-        // Use edit if this requires re-approval (HR/Admin editing non-pending)
         if (requiresReapproval) {
           res = await edit(submission!._id, finalData);
         } else {
@@ -232,9 +173,7 @@ export default function OvertimeRequestForm({
 
         if (!isEditMode) {
           if (currentActionType === 'save-and-add-another') {
-            // Show only one toast for add another
             toast.success(dict.toast.submissionSaved);
-            // Keep all form data except reason
             const currentValues = form.getValues();
             form.reset({
               ...currentValues,
@@ -242,7 +181,7 @@ export default function OvertimeRequestForm({
             });
           } else {
             toast.success(successMessage);
-            form.reset(); // Reset form after successful submission
+            form.reset();
             redirect(lang);
           }
         } else {
@@ -251,7 +190,6 @@ export default function OvertimeRequestForm({
         }
       } else if ('error' in res) {
         console.error(res.error);
-        // Handle specific error messages
         const errorMsg = res.error;
         if (errorMsg === 'unauthorized') {
           toast.error(dict.errors.unauthorized);
@@ -304,7 +242,7 @@ export default function OvertimeRequestForm({
           <CardTitle>{getTitle()}</CardTitle>
           <LocalizedLink href='/overtime-submissions'>
             <Button variant='outline'>
-              <Table /> <span>{dict.form.submissionsTable}</span>
+              <ArrowLeft /> <span>{dict.backToSubmissions}</span>
             </Button>
           </LocalizedLink>
         </div>
@@ -315,7 +253,6 @@ export default function OvertimeRequestForm({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            // Default to regular save when Enter is pressed
             handleRegularSave();
           }}
         >
@@ -389,54 +326,48 @@ export default function OvertimeRequestForm({
               )}
             />
 
-            {/* Overtime Request Switch */}
             <FormField
               control={form.control}
-              name='overtimeRequest'
+              name='workStartTime'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.form.overtimeRequest}</FormLabel>
-                  <FormDescription>
-                    {dict.form.overtimeRequestDescription}
-                  </FormDescription>
+                  <FormLabel>
+                    {(dict.form as any).workStartTime || 'Work Start'}
+                  </FormLabel>
                   <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      id='overtimeRequest-switch'
-                      disabled={isEditMode && submission?.status !== 'pending'}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Work Start Time and End Time, only if overtimeRequest is true */}
-            {overtimeRequest && (
-              <>
-                <FormField
-                  control={form.control}
-                  name='workStartTime'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {(dict.form as any).workStartTime || 'Work Start'}
-                      </FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          value={
-                            field.value ||
-                            (() => {
-                              const defaultDate = getNextSaturday(
-                                new Date(Date.now() + 8 * 3600 * 1000),
-                              );
-                              return defaultDate;
-                            })()
-                          }
+                    <DateTimePicker
+                      value={
+                        field.value ||
+                        (() => {
+                          const defaultDate = getNextSaturday(
+                            new Date(Date.now() + 8 * 3600 * 1000),
+                          );
+                          return defaultDate;
+                        })()
+                      }
+                      onChange={(date) => {
+                        field.onChange(date);
+                        const currentEndDate = form.getValues('workEndTime');
+                        if (date && currentEndDate && date > currentEndDate) {
+                          const newEndDate = new Date(date);
+                          newEndDate.setHours(currentEndDate.getHours());
+                          newEndDate.setMinutes(currentEndDate.getMinutes());
+                          newEndDate.setSeconds(currentEndDate.getSeconds());
+                          form.setValue('workEndTime', newEndDate);
+                        }
+                      }}
+                      min={new Date(Date.now() + 8 * 3600 * 1000)}
+                      minuteStep={30}
+                      timePicker={{
+                        hour: true,
+                        minute: true,
+                        second: false,
+                      }}
+                      renderTrigger={({ value, setOpen, open }) => (
+                        <DateTimeInput
+                          value={field.value}
                           onChange={(date) => {
                             field.onChange(date);
-                            // Check if start date is later than end date
                             const currentEndDate =
                               form.getValues('workEndTime');
                             if (
@@ -444,7 +375,6 @@ export default function OvertimeRequestForm({
                               currentEndDate &&
                               date > currentEndDate
                             ) {
-                              // Set end date to same day as start date, keeping the time
                               const newEndDate = new Date(date);
                               newEndDate.setHours(currentEndDate.getHours());
                               newEndDate.setMinutes(
@@ -456,90 +386,56 @@ export default function OvertimeRequestForm({
                               form.setValue('workEndTime', newEndDate);
                             }
                           }}
-                          min={new Date(Date.now() + 8 * 3600 * 1000)}
-                          timePicker={{
-                            hour: true,
-                            minute: true,
-                            second: false,
-                          }}
-                          renderTrigger={({ value, setOpen, open }) => (
-                            <DateTimeInput
-                              value={field.value}
-                              onChange={(date) => {
-                                field.onChange(date);
-                                // Check if start date is later than end date
-                                const currentEndDate =
-                                  form.getValues('workEndTime');
-                                if (
-                                  date &&
-                                  currentEndDate &&
-                                  date > currentEndDate
-                                ) {
-                                  // Set end date to same day as start date, keeping the time
-                                  const newEndDate = new Date(date);
-                                  newEndDate.setHours(
-                                    currentEndDate.getHours(),
-                                  );
-                                  newEndDate.setMinutes(
-                                    currentEndDate.getMinutes(),
-                                  );
-                                  newEndDate.setSeconds(
-                                    currentEndDate.getSeconds(),
-                                  );
-                                  form.setValue('workEndTime', newEndDate);
-                                }
-                              }}
-                              format='dd/MM/yyyy HH:mm'
-                              onCalendarClick={() => setOpen(!open)}
-                            />
-                          )}
+                          format='dd/MM/yyyy HH:mm'
+                          onCalendarClick={() => setOpen(!open)}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='workEndTime'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {(dict.form as any).workEndTime || 'Work End'}
-                      </FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          value={
-                            field.value ||
-                            (workStartTime
-                              ? new Date(workStartTime.getTime() + 3600 * 1000)
-                              : getNextSaturday(
-                                  new Date(Date.now() + 8 * 3600 * 1000),
-                                ))
-                          }
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='workEndTime'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {(dict.form as any).workEndTime || 'Work End'}
+                  </FormLabel>
+                  <FormControl>
+                    <DateTimePicker
+                      value={
+                        field.value ||
+                        (workStartTime
+                          ? new Date(workStartTime.getTime() + 3600 * 1000)
+                          : getNextSaturday(
+                              new Date(Date.now() + 8 * 3600 * 1000),
+                            ))
+                      }
+                      onChange={field.onChange}
+                      min={new Date(Date.now() + 8 * 3600 * 1000)}
+                      minuteStep={30}
+                      timePicker={{
+                        hour: true,
+                        minute: true,
+                        second: false,
+                      }}
+                      renderTrigger={({ value, setOpen, open }) => (
+                        <DateTimeInput
+                          value={field.value}
                           onChange={field.onChange}
-                          min={new Date(Date.now() + 8 * 3600 * 1000)}
-                          timePicker={{
-                            hour: true,
-                            minute: true,
-                            second: false,
-                          }}
-                          renderTrigger={({ value, setOpen, open }) => (
-                            <DateTimeInput
-                              value={field.value}
-                              onChange={field.onChange}
-                              format='dd/MM/yyyy HH:mm'
-                              onCalendarClick={() => setOpen(!open)}
-                            />
-                          )}
+                          format='dd/MM/yyyy HH:mm'
+                          onCalendarClick={() => setOpen(!open)}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -547,11 +443,6 @@ export default function OvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{dict.form.hours}</FormLabel>
-                  {!overtimeRequest && (
-                    <FormDescription>
-                      {dict.form.hoursDescription}
-                    </FormDescription>
-                  )}
                   <FormControl>
                     <Input
                       type='number'
@@ -569,7 +460,7 @@ export default function OvertimeRequestForm({
                           ? ''
                           : String(field.value)
                       }
-                      disabled={overtimeRequest}
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -577,33 +468,31 @@ export default function OvertimeRequestForm({
               )}
             />
 
-            {!overtimeRequest && (
+            <FormField
+              control={form.control}
+              name='reason'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{dict.form.reason}</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {form.watch('payment') !== true && (
               <FormField
                 control={form.control}
-                name='date'
+                name='scheduledDayOff'
                 render={({ field }) => {
-                  const now = new Date();
-                  now.setHours(23, 59, 59, 999);
-
-                  const hoursValue = form.watch('hours');
-
-                  let minDate, maxDate;
-                  if (hoursValue < 0) {
-                    // Overtime pickup: any time after now
-                    minDate = now;
-                    maxDate = undefined;
-                  } else {
-                    // Regular overtime entry: last 7 days (validation will enforce last 3 days of current month)
-                    const sevenDaysAgo = new Date();
-                    sevenDaysAgo.setHours(0, 0, 0, 0);
-                    sevenDaysAgo.setDate(now.getDate() - 7);
-                    minDate = sevenDaysAgo;
-                    maxDate = undefined;
-                  }
-
+                  const baseDate = workStartTime || new Date();
+                  const minPickupDate = new Date(baseDate);
+                  minPickupDate.setDate(minPickupDate.getDate() + 1);
                   return (
                     <FormItem>
-                      <FormLabel>{dict.form.date}</FormLabel>
+                      <FormLabel>{dict.form.scheduledDayOff}</FormLabel>
                       <FormControl>
                         <DateTimePicker
                           modal
@@ -617,8 +506,7 @@ export default function OvertimeRequestForm({
                                 ))
                           }
                           onChange={field.onChange}
-                          min={minDate}
-                          max={maxDate}
+                          min={minPickupDate}
                           renderTrigger={({ open, value, setOpen }) => (
                             <DateTimeInput
                               value={field.value}
@@ -639,93 +527,26 @@ export default function OvertimeRequestForm({
 
             <FormField
               control={form.control}
-              name='reason'
+              name='payment'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.form.reason}</FormLabel>
+                  <FormLabel>{dict.form.payment}</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <div className='flex items-center gap-2'>
+                      <Switch
+                        checked={!!field.value}
+                        onCheckedChange={field.onChange}
+                        id='payment-switch'
+                        disabled={
+                          isEditMode && submission?.status !== 'pending'
+                        }
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* Pickup Date, only if overtimeRequest is true and payment is not true */}
-            {form.watch('overtimeRequest') &&
-              form.watch('payment') !== true && (
-                <FormField
-                  control={form.control}
-                  name='scheduledDayOff'
-                  render={({ field }) => {
-                    const plannedWorkDate = form.watch('date');
-                    // For overtime orders, use workStartTime to determine min pickup date
-                    const baseDate =
-                      overtimeRequest && workStartTime
-                        ? workStartTime
-                        : plannedWorkDate || new Date();
-                    const minPickupDate = new Date(baseDate);
-                    minPickupDate.setDate(minPickupDate.getDate() + 1);
-                    return (
-                      <FormItem>
-                        <FormLabel>{dict.form.scheduledDayOff}</FormLabel>
-                        <FormControl>
-                          <DateTimePicker
-                            modal
-                            hideTime
-                            value={
-                              field.value ||
-                              (workStartTime
-                                ? new Date(
-                                    workStartTime.getTime() + 3600 * 1000,
-                                  )
-                                : getNextSaturday(
-                                    new Date(Date.now() + 8 * 3600 * 1000),
-                                  ))
-                            }
-                            onChange={field.onChange}
-                            min={minPickupDate}
-                            renderTrigger={({ open, value, setOpen }) => (
-                              <DateTimeInput
-                                value={field.value}
-                                onChange={(x) => !open && field.onChange(x)}
-                                format='dd/MM/yyyy'
-                                disabled={open}
-                                onCalendarClick={() => setOpen(!open)}
-                              />
-                            )}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              )}
-            {/* Payment Switch, only if overtimeRequest is true */}
-            {form.watch('overtimeRequest') && (
-              <FormField
-                control={form.control}
-                name='payment'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{dict.form.payment}</FormLabel>
-                    <FormControl>
-                      <div className='flex items-center gap-2'>
-                        <Switch
-                          checked={!!field.value}
-                          onCheckedChange={field.onChange}
-                          id='payment-switch'
-                          disabled={
-                            isEditMode && submission?.status !== 'pending'
-                          }
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
           </CardContent>
 
           <Separator className='mb-4' />

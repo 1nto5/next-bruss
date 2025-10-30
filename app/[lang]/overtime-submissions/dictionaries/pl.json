@@ -3,7 +3,8 @@
   "pageTitle": "Zgłoszenia nadgodzin",
   "testWarning": "Aplikacja w fazie testów - wpisy nie są oficjalne",
   "backToSubmissions": "Powrót do zgłoszeń",
-  "newSubmission": "Nowe zgłoszenie",
+  "addOvertime": "Dodaj nadgodziny",
+  "addWorkOrder": "Dodaj zlecenie",
   "filters": {
     "select": "wybierz",
     "selected": "wybrano",
@@ -60,8 +61,11 @@
     "markAsAccounted": "Oznacz jako rozliczone",
     "cancel": "Anuluj",
     "edit": "Edytuj",
+    "correct": "Korekta",
+    "delete": "Usuń",
     "confirm": "Potwierdź",
     "save": "Zapisz zmiany",
+    "backToList": "Powrót do zgłoszeń",
     "add": "Dodaj zgłoszenie",
     "saveAndAddAnother": "Zapisz i dodaj kolejne",
     "viewDetails": "Zobacz szczegóły"
@@ -91,6 +95,11 @@
     "bulkConfirm": {
       "title": "Potwierdź operację",
       "description": "Czy na pewno chcesz wykonać operację na"
+    },
+    "delete": {
+      "title": "Usunąć zgłoszenie?",
+      "description": "Trwałe usunięcie z bazy danych. Tej akcji nie można cofnąć.",
+      "confirmButton": "Usuń"
     }
   },
   "form": {
@@ -103,14 +112,28 @@
     "reason": "Uzasadnienie",
     "overtimeRequest": "Zlecenie godzin nadliczbowych",
     "overtimeRequestDescription": "Tylko dla planowanej pracy w godzinach nadliczbowych (dodatnie wartości godzin i przyszła data). Wymaga zgody przełożonego oraz plant managera.",
-    "payment": "Wypłata",
+    "payment": "Brak ustalonej daty odbioru",
     "scheduledDayOff": "Data odbioru godzin nadliczbowych",
+    "workStartTime": "Rozpoczęcie pracy",
+    "workStartTimeDescription": "Początek zmiany pracy.",
+    "workEndTime": "Zakończenie pracy",
+    "workEndTimeDescription": "Koniec zmiany pracy.",
     "managerNotFound": "Nie znaleziono kierownika.",
     "submissionsTable": "Tabela zgłoszeń"
   },
+  "correctPage": {
+    "title": "Korekta zgłoszenia",
+    "backToDetails": "Powrót do szczegółów",
+    "reasonLabel": "Powód korekty (wymagany)",
+    "reasonPlaceholder": "Wpisz powód korekty...",
+    "markAsCancelled": "Oznacz jako anulowane",
+    "markAsCancelledHint": "Zaznacz, jeśli chcesz anulować to zgłoszenie",
+    "saveCorrection": "Zapisz korektę",
+    "cannotCorrectAccounted": "Nie można korygować rozliczonych zgłoszeń"
+  },
   "columns": {
     "status": "Status",
-    "payment": "Zlecenie",
+    "payment": "Zlecenie odbiór",
     "actions": "Akcje",
     "submittedBy": "Zgłaszający",
     "supervisor": "Kierownik",
@@ -160,7 +183,11 @@
     "bulkSettled": "Rozliczono {count} z {total} zgłoszeń!",
     "bulkCancelling": "Anulowanie...",
     "bulkCancelled": "Anulowano {count} z {total} zgłoszeń!",
-    "provideRejectionReason": "Podaj powód odrzucenia"
+    "provideRejectionReason": "Podaj powód odrzucenia",
+    "deleting": "Usuwanie...",
+    "deleted": "Zgłoszenie usunięte!",
+    "savingCorrection": "Zapisywanie korekty...",
+    "correctionSaved": "Korekta zapisana!"
   },
   "errors": {
     "unauthorized": "Nie masz uprawnień!",
@@ -176,7 +203,11 @@
     "approvalError": "Błąd zatwierdzania",
     "rejectionError": "Błąd odrzucania",
     "settlementError": "Błąd rozliczania",
-    "cancellationError": "Błąd anulowania"
+    "cancellationError": "Błąd anulowania",
+    "cannotDelete": "Nie można usunąć tego zgłoszenia!",
+    "cannotCorrect": "Nie można korygować tego zgłoszenia!",
+    "cannotCorrectAccounted": "Nie można korygować rozliczonych zgłoszeń!",
+    "correctionReasonRequired": "Powód korekty jest wymagany!"
   },
   "validation": {
     "rejectionReasonRequired": "Powód odrzucenia jest wymagany!",
@@ -186,22 +217,28 @@
     "dateRequired": "Wybierz datę!",
     "hoursMinRange": "Podaj wartość z zakresu -8 do 16!",
     "hoursMaxRange": "Podaj wartość z zakresu -8 do 16!",
-    "scheduledDayOffRequired": "Wybierz dzień odbioru, jeśli nadgodziny nie są do wypłaty!",
+    "scheduledDayOffRequired": "Wybierz dzień odbioru lub zaznacz Brak ustalonej daty odbioru!",
     "dateRangeInvalid": "Możesz dodać nadgodziny tylko z ostatnich 3 dni bieżącego miesiąca.",
     "hoursIncrementInvalid": "Godziny muszą być wyrażone z dokładnością do pół godziny (0.5, 1.0, 1.5, itd.)",
+    "timeIncrementInvalid": "Czas musi być wyrażony z dokładnością do pół godziny (:00 lub :30)!",
     "reasonRequired": "Uzasadnienie jest wymagane!",
     "previousMonthNotAllowed": "Nie można dodać nadgodzin z poprzedniego miesiąca.",
     "overtimeRequestRequiresFutureDate": "Zlecenie nadgodzin dostępne tylko dla przyszłych dat!",
-    "overtimeRequestRequiresPositiveHours": "Zlecenie nadgodzin jest tylko do planowania przyszłej pracy, nie do odbioru nadgodzin!"
+    "overtimeRequestRequiresPositiveHours": "Zlecenie nadgodzin jest tylko do planowania przyszłej pracy, nie do odbioru nadgodzin!",
+    "workStartTimeRequired": "Rozpoczęcie pracy jest wymagane!",
+    "workEndTimeRequired": "Zakończenie pracy jest wymagane!",
+    "workEndTimeBeforeStart": "Zakończenie pracy musi być po rozpoczęciu pracy!",
+    "durationMin1h": "Czas pracy musi wynosić co najmniej 1 godzinę!",
+    "durationMax24h": "Czas pracy nie może przekraczać 24 godzin!"
   },
   "summary": {
-    "yourOvertimeIn": "Twoje godziny nadliczbowe w",
-    "yourTotalOvertime": "Twoje godziny nadliczbowe łącznie",
+    "yourOvertimeIn": "Twoje nadgodziny w",
+    "yourTotalOvertime": "Twoje łączne nadgodziny",
     "yourFilteredOvertimeIn": "Twoje nadgodziny w filtrowanym zakresie",
     "organizationOvertimeIn": "Nadgodziny organizacji w",
-    "organizationTotalOvertime": "Nadgodziny organizacji łącznie",
+    "organizationTotalOvertime": "Łączne nadgodziny organizacji",
     "ordersOvertimeIn": "Zlecenia w",
-    "ordersTotalOvertime": "Zlecenia łącznie",
+    "ordersTotalOvertime": "Łącznie zleceń",
     "ordersFilteredOvertimeIn": "Zlecenia w filtrowanym zakresie",
     "employeeOvertimeIn": "Nadgodziny pracownika w",
     "overdueOvertimeToSettle": "Zaległe nadgodziny do rozliczenia",
@@ -228,6 +265,8 @@
     "supervisor": "Przełożony:",
     "date": "Data nadgodzin:",
     "hours": "Liczba godzin:",
+    "workStartTime": "Rozpoczęcie pracy:",
+    "workEndTime": "Zakończenie pracy:",
     "reason": "Uzasadnienie:",
     "overtimeRequest": "Zlecenie nadgodzin:",
     "payment": "Wypłata:",
@@ -252,6 +291,11 @@
       "pendingPlantManager": "Oczekuje - Plant Manager"
     },
     "rejectionReason": "Powód odrzucenia:",
-    "rejectionDetails": "Szczegóły odrzucenia"
+    "rejectionDetails": "Szczegóły odrzucenia",
+    "corrections": "Korekty",
+    "correctionReason": "Powód",
+    "changes": "Zmiany",
+    "statusChange": "Zmiana statusu",
+    "noCorrections": "Brak korekt"
   }
 }

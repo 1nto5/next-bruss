@@ -3,7 +3,8 @@
   "pageTitle": "Overtime Submissions",
   "testWarning": "Application in testing phase - entries are not official",
   "backToSubmissions": "Back to submissions",
-  "newSubmission": "New submission",
+  "addOvertime": "Add Overtime",
+  "addWorkOrder": "Add Work Order",
   "filters": {
     "select": "select",
     "selected": "selected",
@@ -60,8 +61,11 @@
     "markAsAccounted": "Mark as settled",
     "cancel": "Cancel",
     "edit": "Edit",
+    "correct": "Correction",
+    "delete": "Delete",
     "confirm": "Confirm",
     "save": "Save changes",
+    "backToList": "Back to Submissions",
     "add": "Add submission",
     "saveAndAddAnother": "Save and add another",
     "viewDetails": "View details"
@@ -91,6 +95,11 @@
     "bulkConfirm": {
       "title": "Confirm operation",
       "description": "Are you sure you want to perform this operation on"
+    },
+    "delete": {
+      "title": "Delete submission?",
+      "description": "Permanent deletion from database. This action cannot be undone.",
+      "confirmButton": "Delete"
     }
   },
   "form": {
@@ -103,14 +112,28 @@
     "reason": "Justification",
     "overtimeRequest": "Overtime work order",
     "overtimeRequestDescription": "Only for planned overtime work (positive hours and future date). Requires approval from both supervisor and plant manager.",
-    "payment": "Payment",
+    "payment": "No agreed pickup date",
     "scheduledDayOff": "Scheduled day off for overtime",
+    "workStartTime": "Work Start",
+    "workStartTimeDescription": "Start of work shift.",
+    "workEndTime": "Work End",
+    "workEndTimeDescription": "End of work shift.",
     "managerNotFound": "Manager not found.",
     "submissionsTable": "Submissions table"
   },
+  "correctPage": {
+    "title": "Correction of submission",
+    "backToDetails": "Back to details",
+    "reasonLabel": "Correction reason (required)",
+    "reasonPlaceholder": "Enter correction reason...",
+    "markAsCancelled": "Mark as cancelled",
+    "markAsCancelledHint": "Check if you want to cancel this submission",
+    "saveCorrection": "Save correction",
+    "cannotCorrectAccounted": "Cannot correct settled submissions"
+  },
   "columns": {
     "status": "Status",
-    "payment": "Order",
+    "payment": "Receipt order",
     "actions": "Actions",
     "submittedBy": "Submitted by",
     "supervisor": "Supervisor",
@@ -160,7 +183,11 @@
     "bulkSettled": "Settled {count} of {total} submissions!",
     "bulkCancelling": "Cancelling...",
     "bulkCancelled": "Cancelled {count} of {total} submissions!",
-    "provideRejectionReason": "Provide rejection reason"
+    "provideRejectionReason": "Provide rejection reason",
+    "deleting": "Deleting...",
+    "deleted": "Submission deleted!",
+    "savingCorrection": "Saving correction...",
+    "correctionSaved": "Correction saved!"
   },
   "errors": {
     "unauthorized": "You don't have permission!",
@@ -176,7 +203,11 @@
     "approvalError": "Approval error",
     "rejectionError": "Rejection error",
     "settlementError": "Settlement error",
-    "cancellationError": "Cancellation error"
+    "cancellationError": "Cancellation error",
+    "cannotDelete": "Cannot delete this submission!",
+    "cannotCorrect": "Cannot correct this submission!",
+    "cannotCorrectAccounted": "Cannot correct settled submissions!",
+    "correctionReasonRequired": "Correction reason is required!"
   },
   "validation": {
     "rejectionReasonRequired": "Rejection reason is required!",
@@ -189,10 +220,16 @@
     "scheduledDayOffRequired": "Select day off pickup if overtime is not for payment!",
     "dateRangeInvalid": "You can only add overtime from the last 3 days of the current month.",
     "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
+    "timeIncrementInvalid": "Time must be in 30-minute increments (:00 or :30)!",
     "reasonRequired": "Justification is required!",
     "previousMonthNotAllowed": "Cannot add overtime from previous month.",
     "overtimeRequestRequiresFutureDate": "Overtime work order is available only for future dates!",
-    "overtimeRequestRequiresPositiveHours": "Overtime work order is only for scheduling future work, not for overtime pickup!"
+    "overtimeRequestRequiresPositiveHours": "Overtime work order is only for scheduling future work, not for overtime pickup!",
+    "workStartTimeRequired": "Work start time is required!",
+    "workEndTimeRequired": "Work end time is required!",
+    "workEndTimeBeforeStart": "Work end time must be after work start time!",
+    "durationMin1h": "Work duration must be at least 1 hour!",
+    "durationMax24h": "Work duration cannot exceed 24 hours!"
   },
   "summary": {
     "yourOvertimeIn": "Your overtime in",
@@ -228,6 +265,8 @@
     "supervisor": "Supervisor:",
     "date": "Overtime date:",
     "hours": "Hours:",
+    "workStartTime": "Work Start:",
+    "workEndTime": "Work End:",
     "reason": "Justification:",
     "overtimeRequest": "Overtime work order:",
     "payment": "Payment:",
@@ -252,6 +291,13 @@
       "pendingPlantManager": "Pending - Plant Manager"
     },
     "rejectionReason": "Rejection reason:",
-    "rejectionDetails": "Rejection details"
+    "rejectionDetails": "Rejection details",
+    "corrections": "Corrections",
+    "correctionReason": "Reason",
+    "changes": "Changes",
+    "statusChange": "Status change",
+    "noCorrections": "No corrections"
   }
 }
+
+

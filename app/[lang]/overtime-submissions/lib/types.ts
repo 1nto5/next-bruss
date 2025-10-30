@@ -1,7 +1,13 @@
 import { OvertimeSubmissionType as BaseOvertimeSubmissionType } from './zod';
 
 // Update the status options for overtime submissions
-export type OvertimeStatus = 'pending' | 'pending-plant-manager' | 'approved' | 'rejected' | 'accounted' | 'cancelled';
+export type OvertimeStatus =
+  | 'pending'
+  | 'pending-plant-manager'
+  | 'approved'
+  | 'rejected'
+  | 'accounted'
+  | 'cancelled';
 
 // Status values that should appear in filters (excludes 'cancelled' as it's not used in filtering)
 export const OVERTIME_FILTER_STATUSES = [
@@ -12,7 +18,7 @@ export const OVERTIME_FILTER_STATUSES = [
   'accounted',
 ] as const satisfies readonly OvertimeStatus[];
 
-// Edit history entry - stores only changed fields
+// Edit history entry - stores only changed fields (deprecated, keeping for backward compatibility)
 export type EditHistoryEntry = {
   editedAt: Date;
   editedBy: string; // Email of the user who made the edit
@@ -26,6 +32,23 @@ export type EditHistoryEntry = {
     payment?: { from: boolean; to: boolean };
     scheduledDayOff?: { from: Date | undefined; to: Date | undefined };
     status?: { from: OvertimeStatus; to: OvertimeStatus };
+  };
+};
+
+// Correction history entry - tracks all corrections with required reason
+export type CorrectionHistoryEntry = {
+  correctedAt: Date;
+  correctedBy: string; // Email of the user who made the correction
+  reason: string; // Required reason for correction
+  statusChanged?: { from: OvertimeStatus; to: OvertimeStatus }; // Track if cancelled during correction
+  changes: {
+    supervisor?: { from: string; to: string };
+    date?: { from: Date; to: Date };
+    hours?: { from: number; to: number };
+    reason?: { from: string; to: string };
+    overtimeRequest?: { from: boolean; to: boolean };
+    payment?: { from: boolean; to: boolean };
+    scheduledDayOff?: { from: Date | undefined; to: Date | undefined };
   };
 };
 
@@ -50,5 +73,8 @@ export type OvertimeSubmissionType = BaseOvertimeSubmissionType & {
   plantManagerApprovedBy?: string;
   supervisorApprovedAt?: Date;
   supervisorApprovedBy?: string;
-  editHistory?: EditHistoryEntry[]; // Unified edit history tracking only changed fields
+  editHistory?: EditHistoryEntry[]; // Deprecated, keeping for backward compatibility
+  correctionHistory?: CorrectionHistoryEntry[]; // New correction history with required reasons
+  workStartTime?: Date;
+  workEndTime?: Date;
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import LocalizedLink from '@/components/localized-link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,19 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatTime } from '@/lib/utils/date-format';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { Check, Edit, FileText, MoreHorizontal, X } from 'lucide-react';
+import { Check, Edit2, FileText, MoreHorizontal, Trash2, X } from 'lucide-react';
 import { Session } from 'next-auth';
 import { useState } from 'react';
-import LocalizedLink from '@/components/localized-link';
+import { Dictionary } from '../../lib/dict';
 import { OvertimeSubmissionType } from '../../lib/types';
 import ApproveSubmissionDialog from '../approve-submission-dialog';
-import CancelRequestDialog from '../cancel-request-dialog';
+import DeleteSubmissionDialog from '../delete-submission-dialog';
 import MarkAsAccountedDialog from '../mark-as-accounted-dialog';
 import RejectSubmissionDialog from '../reject-submission-dialog';
-import { Dictionary } from '../../lib/dict';
 
 // Creating a columns factory function that takes the session and dict
 export const createColumns = (
@@ -114,16 +114,24 @@ export const createColumns = (
             );
             break;
           case 'approved':
-            statusLabel = <Badge variant='statusApproved'>{dict.status.approved}</Badge>;
+            statusLabel = (
+              <Badge variant='statusApproved'>{dict.status.approved}</Badge>
+            );
             break;
           case 'rejected':
-            statusLabel = <Badge variant='statusRejected'>{dict.status.rejected}</Badge>;
+            statusLabel = (
+              <Badge variant='statusRejected'>{dict.status.rejected}</Badge>
+            );
             break;
           case 'accounted':
-            statusLabel = <Badge variant='statusAccounted'>{dict.status.accounted}</Badge>;
+            statusLabel = (
+              <Badge variant='statusAccounted'>{dict.status.accounted}</Badge>
+            );
             break;
           case 'cancelled':
-            statusLabel = <Badge variant='statusCancelled'>{dict.status.cancelled}</Badge>;
+            statusLabel = (
+              <Badge variant='statusCancelled'>{dict.status.cancelled}</Badge>
+            );
             break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
@@ -132,27 +140,26 @@ export const createColumns = (
         return statusLabel;
       },
     },
-    // Settlement type column (Zlecenie)
+    // Settlement type column (Zlecenie odbiór)
     {
       accessorKey: 'payment',
       header: dict.columns.payment,
       cell: ({ row }) => {
+        const overtimeRequest = row.original.overtimeRequest;
         const payment = row.original.payment as boolean;
         const scheduledDayOff = row.original.scheduledDayOff;
 
-        let displayText = '-';
-        if (payment) {
-          displayText = 'wypłata';
-        } else if (scheduledDayOff) {
-          const formattedDate = formatDate(scheduledDayOff);
-          displayText = `odbiór: ${formattedDate}`;
+        // Only show content for overtime requests
+        if (!overtimeRequest) {
+          return <div className='text-sm'></div>;
         }
 
-        return (
-          <div className='text-center text-sm'>
-            {displayText}
-          </div>
-        );
+        let displayText = 'brak';
+        if (!payment && scheduledDayOff) {
+          displayText = formatDate(scheduledDayOff);
+        }
+
+        return <div className='text-sm'>{displayText}</div>;
       },
     },
     {
@@ -165,14 +172,14 @@ export const createColumns = (
         const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
         const [isMarkAsAccountedDialogOpen, setIsMarkAsAccountedDialogOpen] =
           useState(false);
-        const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+        const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
         // Get user email and roles for permission checks
         const userEmail = session?.user?.email;
         const userRoles = session?.user?.roles || [];
         const isAuthor = submission.submittedBy === userEmail;
 
-        // Check if user has HR or admin role for emergency override
+        // Check if user has HR or admin role
         const isHR = userRoles.includes('hr');
         const isAdmin = userRoles.includes('admin');
 
@@ -184,18 +191,23 @@ export const createColumns = (
           (userRoles.includes('plant-manager') || isAdmin) &&
           (submission.status as string) === 'pending-plant-manager';
 
-        // Edit permissions:
-        // - Author can edit when status is pending
-        // - HR/Admin can edit regardless of status
-        const canEdit =
-          (isAuthor && submission.status === 'pending') || isHR || isAdmin;
-        const canDelete = isAuthor && submission.status === 'pending';
+        // Correction permissions:
+        // - Author: only when status is pending
+        // - HR: when status is pending or approved
+        // - Admin: all statuses except accounted
+        const canCorrect =
+          (isAuthor && submission.status === 'pending') ||
+          (isHR && ['pending', 'approved'].includes(submission.status)) ||
+          (isAdmin && submission.status !== 'accounted');
+
+        // Delete permission: admin only, all statuses
+        const canDelete = isAdmin;
 
         const hasMarkAsAccountedAction =
           (isHR || isAdmin) && submission.status === 'approved';
 
         const hasActions =
-          canEdit ||
+          canCorrect ||
           canDelete ||
           canApproveReject ||
           canApprovePlantManager ||
@@ -222,27 +234,33 @@ export const createColumns = (
                   </DropdownMenuItem>
                 </LocalizedLink>
 
-                {/* Edit button for authors */}
-                {canEdit && (
-                  <LocalizedLink href={`/overtime-submissions/edit/${submission._id}`}>
+                {/* Correction button */}
+                {canCorrect && (
+                  <LocalizedLink
+                    href={`/overtime-submissions/${
+                      submission.overtimeRequest
+                        ? 'correct-work-order'
+                        : 'correct-overtime'
+                    }/${submission._id}`}
+                  >
                     <DropdownMenuItem>
-                      <Edit className='mr-2 h-4 w-4' />
-                      <span>{dict.actions.edit}</span>
+                      <Edit2 className='mr-2 h-4 w-4' />
+                      <span>{dict.actions.correct}</span>
                     </DropdownMenuItem>
                   </LocalizedLink>
                 )}
 
-                {/* Cancel button for authors */}
+                {/* Delete button for admin */}
                 {canDelete && (
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
-                      setIsCancelDialogOpen(true);
+                      setIsDeleteDialogOpen(true);
                     }}
                     className='focus:bg-red-400 dark:focus:bg-red-700'
                   >
-                    <X className='mr-2 h-4 w-4' />
-                    <span>{dict.actions.cancel}</span>
+                    <Trash2 className='mr-2 h-4 w-4' />
+                    <span>{dict.actions.delete}</span>
                   </DropdownMenuItem>
                 )}
 
@@ -322,10 +340,10 @@ export const createColumns = (
               session={session}
               dict={dict}
             />
-            <CancelRequestDialog
-              isOpen={isCancelDialogOpen}
-              onOpenChange={setIsCancelDialogOpen}
-              requestId={submission._id}
+            <DeleteSubmissionDialog
+              isOpen={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+              submissionId={submission._id}
               dict={dict}
             />
           </>
@@ -360,6 +378,41 @@ export const createColumns = (
       accessorKey: 'date',
       header: dict.columns.date,
       cell: ({ row }) => {
+        const submission = row.original;
+        // For overtime orders, show time range instead of date
+        if (
+          submission.overtimeRequest &&
+          submission.workStartTime &&
+          submission.workEndTime
+        ) {
+          const startTime = new Date(submission.workStartTime);
+          const endTime = new Date(submission.workEndTime);
+
+          // Check if same day
+          const sameDay = startTime.toDateString() === endTime.toDateString();
+
+          if (sameDay) {
+            // Same day: dd/MM/yyyy HH:mm - HH:mm
+            return (
+              <span className='whitespace-nowrap'>
+                {formatDate(startTime)}{' '}
+                {formatTime(startTime, { hour: '2-digit', minute: '2-digit' })}{' '}
+                - {formatTime(endTime, { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            );
+          } else {
+            // Different days: dd/MM/yyyy HH:mm - dd/MM/yyyy HH:mm
+            return (
+              <span className='whitespace-nowrap'>
+                {formatDate(startTime)}{' '}
+                {formatTime(startTime, { hour: '2-digit', minute: '2-digit' })}{' '}
+                - {formatDate(endTime)}{' '}
+                {formatTime(endTime, { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            );
+          }
+        }
+        // For regular submissions, show date as before
         const date = row.getValue('date') as string;
         return <span>{formatDate(date)}</span>;
       },
@@ -382,9 +435,8 @@ export const createColumns = (
       cell: ({ row }) => {
         const reason = row.getValue('reason') as string | undefined;
         if (!reason) return <div className='max-w-[200px]'>-</div>;
-        const truncated = reason.length > 80
-          ? `${reason.substring(0, 80)}...`
-          : reason;
+        const truncated =
+          reason.length > 80 ? `${reason.substring(0, 80)}...` : reason;
         return <div className='max-w-[200px]'>{truncated}</div>;
       },
     },

@@ -172,17 +172,18 @@ export default async function OvertimePage(props: {
     !searchParams.onlyOrders
   );
 
-  const showBothCards =
+  const showBothCards = Boolean(
     !hasTimeFilters &&
-    (!hasActiveFilters ||
-      onlyMySubmissionsAlone ||
-      (isSingleEmployee &&
-        !searchParams.status &&
-        !searchParams.manager &&
-        !searchParams.onlyMySubmissions &&
-        !searchParams.assignedToMe &&
-        !searchParams.pendingSettlements &&
-        !searchParams.onlyOrders));
+      (!hasActiveFilters ||
+        onlyMySubmissionsAlone ||
+        (isSingleEmployee &&
+          !searchParams.status &&
+          !searchParams.manager &&
+          !searchParams.onlyMySubmissions &&
+          !searchParams.assignedToMe &&
+          !searchParams.pendingSettlements &&
+          !searchParams.onlyOrders)),
+  );
 
   // Calculate counts from filtered submissions to respect active filters
   const assignedToMeCount = overtimeSubmissionsLocaleString.filter(
@@ -218,8 +219,8 @@ export default async function OvertimePage(props: {
     !searchParams.onlyOrders;
 
   const selectedEmployeeEmail = isSingleEmployee ? selectedEmployee : null;
-  const onlyMySubmissions = searchParams.onlyMySubmissions || false;
-  const onlyOrders = searchParams.onlyOrders || false;
+  const onlyMySubmissions = searchParams.onlyMySubmissions === 'true';
+  const onlyOrders = searchParams.onlyOrders === 'true';
 
   return (
     <Card>
@@ -229,11 +230,18 @@ export default async function OvertimePage(props: {
           <CardDescription>{dict.testWarning}</CardDescription>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateSubmission ? (
-              <LocalizedLink href='/overtime-submissions/new-request'>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
-                  <Plus /> <span>{dict.newSubmission}</span>
-                </Button>
-              </LocalizedLink>
+              <>
+                <LocalizedLink href='/overtime-submissions/add-overtime'>
+                  <Button variant={'outline'} className='w-full sm:w-auto'>
+                    <Plus /> <span>{dict.addOvertime}</span>
+                  </Button>
+                </LocalizedLink>
+                <LocalizedLink href='/overtime-submissions/add-work-order'>
+                  <Button variant={'outline'} className='w-full sm:w-auto'>
+                    <Plus /> <span>{dict.addWorkOrder}</span>
+                  </Button>
+                </LocalizedLink>
+              </>
             ) : null}
           </div>
         </div>

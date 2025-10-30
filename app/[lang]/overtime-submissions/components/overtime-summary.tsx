@@ -1,10 +1,10 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Calendar, Clock } from 'lucide-react';
 import { OvertimeSummary } from '../lib/calculate-overtime';
 import { Dictionary } from '../lib/dict';
-import { extractNameFromEmail } from '@/lib/utils/name-format';
 
 interface OvertimeSummaryProps {
   overtimeSummary: OvertimeSummary;
@@ -78,7 +78,9 @@ export default function OvertimeSummaryDisplay({
       return dict.summary.yourTotalOvertime;
     } else if (hasActiveFilters) {
       // Other filters active (without onlyMySubmissions)
-      return dict.summary.filteredTotalOvertime || 'Total overtime in filtered range';
+      return (
+        dict.summary.filteredTotalOvertime || 'Total overtime in filtered range'
+      );
     } else {
       // No filters - current user's data
       return dict.summary.yourTotalOvertime;
@@ -98,16 +100,17 @@ export default function OvertimeSummaryDisplay({
           <CardContent>
             <div
               className={`text-2xl font-bold ${
-                overtimeSummary.totalHours < 0
+                (overtimeSummary.totalHours || 0) < 0
                   ? 'animate-pulse text-red-600 dark:text-red-400'
                   : ''
               }`}
             >
-              {overtimeSummary.totalHours}h
-              {overtimeSummary.pendingTotalHours !== 0 && (
+              {overtimeSummary.totalHours ?? 0}h
+              {(overtimeSummary.pendingTotalHours || 0) !== 0 && (
                 <span className='text-base font-normal'>
                   {' '}
-                  ({overtimeSummary.pendingTotalHours}h {dict.summary.pending})
+                  ({overtimeSummary.pendingTotalHours ?? 0}h{' '}
+                  {dict.summary.pending})
                 </span>
               )}
             </div>
@@ -130,16 +133,17 @@ export default function OvertimeSummaryDisplay({
         <CardContent>
           <div
             className={`text-2xl font-bold ${
-              overtimeSummary.currentMonthHours < 0
+              (overtimeSummary.currentMonthHours || 0) < 0
                 ? 'animate-pulse text-red-600 dark:text-red-400'
                 : ''
             }`}
           >
-            {overtimeSummary.currentMonthHours}h
-            {overtimeSummary.pendingMonthHours !== 0 && (
+            {overtimeSummary.currentMonthHours ?? 0}h
+            {(overtimeSummary.pendingMonthHours || 0) !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({overtimeSummary.pendingMonthHours}h {dict.summary.pending})
+                ({overtimeSummary.pendingMonthHours ?? 0}h{' '}
+                {dict.summary.pending})
               </span>
             )}
           </div>
@@ -156,17 +160,19 @@ export default function OvertimeSummaryDisplay({
         <CardContent>
           <div
             className={`text-2xl font-bold ${
-              overtimeSummary.totalHours < 0 ||
-              overtimeSummary.totalHours > overtimeSummary.currentMonthHours
+              (overtimeSummary.totalHours || 0) < 0 ||
+              (overtimeSummary.totalHours || 0) >
+                (overtimeSummary.currentMonthHours || 0)
                 ? 'animate-pulse text-red-600 dark:text-red-400'
                 : ''
             }`}
           >
-            {overtimeSummary.totalHours}h
-            {overtimeSummary.pendingTotalHours !== 0 && (
+            {overtimeSummary.totalHours ?? 0}h
+            {(overtimeSummary.pendingTotalHours || 0) !== 0 && (
               <span className='text-base font-normal'>
                 {' '}
-                ({overtimeSummary.pendingTotalHours}h {dict.summary.pending})
+                ({overtimeSummary.pendingTotalHours ?? 0}h{' '}
+                {dict.summary.pending})
               </span>
             )}
           </div>

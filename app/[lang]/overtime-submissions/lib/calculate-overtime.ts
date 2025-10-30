@@ -76,7 +76,7 @@ export async function calculateUnclaimedOvertimeHours(
 
     // Calculate total hours (excluding pending)
     const totalHours = mainSubmissions.reduce(
-      (sum, submission) => sum + submission.hours,
+      (sum, submission) => sum + (submission.hours || 0),
       0,
     );
 
@@ -89,11 +89,11 @@ export async function calculateUnclaimedOvertimeHours(
           submissionDate <= endOfTargetMonth
         );
       })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+      .reduce((sum, submission) => sum + (submission.hours || 0), 0);
 
     // Calculate pending hours (total)
     const pendingTotalHours = pendingSubmissions.reduce(
-      (sum, submission) => sum + submission.hours,
+      (sum, submission) => sum + (submission.hours || 0),
       0,
     );
 
@@ -106,7 +106,7 @@ export async function calculateUnclaimedOvertimeHours(
           submissionDate <= endOfTargetMonth
         );
       })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+      .reduce((sum, submission) => sum + (submission.hours || 0), 0);
 
     return {
       currentMonthHours,
@@ -180,7 +180,7 @@ export async function calculateSummaryFromSubmissions(
 
     // Filter out cancelled submissions (if any)
     const relevantSubmissions = submissions.filter(
-      (s) => s.status !== 'cancelled'
+      (s) => s.status !== 'cancelled',
     );
 
     // When onlyOrders is true, we ONLY want entries with payment or scheduledDayOff
@@ -218,7 +218,7 @@ export async function calculateSummaryFromSubmissions(
 
     // Calculate total hours (excluding pending)
     const totalHours = mainSubmissions.reduce(
-      (sum, submission) => sum + submission.hours,
+      (sum, submission) => sum + (submission.hours || 0),
       0,
     );
 
@@ -231,11 +231,11 @@ export async function calculateSummaryFromSubmissions(
           submissionDate <= endOfTargetMonth
         );
       })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+      .reduce((sum, submission) => sum + (submission.hours || 0), 0);
 
     // Calculate pending hours (total)
     const pendingTotalHours = pendingSubmissions.reduce(
-      (sum, submission) => sum + submission.hours,
+      (sum, submission) => sum + (submission.hours || 0),
       0,
     );
 
@@ -248,7 +248,7 @@ export async function calculateSummaryFromSubmissions(
           submissionDate <= endOfTargetMonth
         );
       })
-      .reduce((sum, submission) => sum + submission.hours, 0);
+      .reduce((sum, submission) => sum + (submission.hours || 0), 0);
 
     return {
       currentMonthHours,

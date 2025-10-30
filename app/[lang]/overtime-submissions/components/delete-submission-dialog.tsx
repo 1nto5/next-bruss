@@ -10,40 +10,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { cancelOvertimeRequest } from '../actions/crud';
+import { deleteOvertimeSubmission } from '../actions/crud';
 import { Dictionary } from '../lib/dict';
 
-interface CancelRequestDialogProps {
+interface DeleteSubmissionDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  requestId: string;
+  submissionId: string;
   dict: Dictionary;
+  redirectAfterDelete?: boolean;
 }
 
-export default function CancelRequestDialog({
+export default function DeleteSubmissionDialog({
   isOpen,
   onOpenChange,
-  requestId,
+  submissionId,
   dict,
-}: CancelRequestDialogProps) {
-  const handleCancel = async () => {
+  redirectAfterDelete = false,
+}: DeleteSubmissionDialogProps) {
+  const router = useRouter();
+
+  const handleDelete = async () => {
     toast.promise(
-      cancelOvertimeRequest(requestId).then((res) => {
+      deleteOvertimeSubmission(submissionId).then((res) => {
         if (res.error) {
           throw new Error(res.error);
+        }
+        if (redirectAfterDelete) {
+          router.push('/overtime-submissions');
         }
         return res;
       }),
       {
-        loading: dict.toast.cancelling,
-        success: dict.toast.cancelled,
+        loading: dict.toast.deleting,
+        success: dict.toast.deleted,
         error: (error) => {
           const errorMsg = error.message;
           if (errorMsg === 'unauthorized') return dict.errors.unauthorized;
           if (errorMsg === 'not found') return dict.errors.notFound;
-          if (errorMsg === 'cannot cancel') return dict.errors.cannotCancel;
-          console.error('handleCancel', errorMsg);
+          if (errorMsg === 'cannot delete') return dict.errors.cannotDelete;
+          console.error('handleDelete', errorMsg);
           return dict.errors.contactIT;
         },
       },
@@ -55,18 +63,22 @@ export default function CancelRequestDialog({
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{dict.dialogs.cancel.title}</AlertDialogTitle>
+          <AlertDialogTitle>{dict.dialogs.delete.title}</AlertDialogTitle>
           <AlertDialogDescription>
-            {dict.dialogs.cancel.description}
+            {dict.dialogs.delete.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{dict.dialogs.cancel.cancelButton}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCancel}>
-            {dict.dialogs.cancel.confirmButton}
+          <AlertDialogCancel>{dict.actions.cancel}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+          >
+            {dict.dialogs.delete.confirmButton}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
+

@@ -1,13 +1,13 @@
 import { auth } from '@/lib/auth';
+import { Locale } from '@/lib/config/i18n';
 import { getUsers } from '@/lib/data/get-users';
 import { redirect } from 'next/navigation';
-import OvertimeRequestForm from '../../components/overtime-request-form';
-import { Locale } from '@/lib/config/i18n';
+import AddWorkOrderForm from '../../components/add-work-order-form';
 import { getDictionary } from '../../lib/dict';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AddOvertimeSubmissionPage(props: {
+export default async function AddWorkOrderPage(props: {
   params: Promise<{ lang: Locale }>;
 }) {
   const params = await props.params;
@@ -16,10 +16,12 @@ export default async function AddOvertimeSubmissionPage(props: {
   const managers = await getUsers();
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect(`/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/new-request`)}`);
+    redirect(
+      `/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/add-work-order`)}`,
+    );
   }
   return (
-    <OvertimeRequestForm
+    <AddWorkOrderForm
       managers={managers}
       loggedInUserEmail={session?.user?.email ?? ''}
       mode='new'

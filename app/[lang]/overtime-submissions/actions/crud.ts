@@ -1,15 +1,12 @@
 'use server';
 
+import { redirectToAuth } from '@/app/[lang]/actions';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
-import { OvertimeSubmissionType } from '../lib/zod';
-import {
-  generateNextInternalId,
-  revalidateOvertime,
-} from './utils';
-import { redirectToAuth } from '@/app/[lang]/actions';
+import { OvertimeSubmissionType } from '../lib/types';
+import { generateNextInternalId, revalidateOvertime } from './utils';
 
 /**
  * Insert new overtime submission
@@ -22,20 +19,34 @@ export async function insertOvertimeSubmission(
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  // TypeScript narrowing: session is guaranteed to be non-null after redirectToAuth()
+  const userEmail = session!.user!.email;
   try {
     const coll = await dbc('overtime_submissions');
 
     const internalId = await generateNextInternalId();
 
+    // Date is only required for regular overtime (not work orders/overtime requests)
+    if (!data.overtimeRequest && !data.date) {
+      throw new Error('Date is required');
+    }
+    
+    // Exclude date field for overtime requests
+    if (data.overtimeRequest) {
+      delete data.date;
+    }
+
+    // Exclude _id from insert (MongoDB will generate it)
+    const { _id, ...dataWithoutId } = data;
     const overtimeSubmissionToInsert = {
       internalId,
-      status: 'pending',
-      ...data,
+      ...dataWithoutId,
+      status: 'pending', // Always set to pending for new submissions
       payment: data.payment ?? false,
       submittedAt: new Date(),
-      submittedBy: session.user.email,
+      submittedBy: userEmail,
       editedAt: new Date(),
-      editedBy: session.user.email,
+      editedBy: userEmail,
     };
 
     const res = await coll.insertOne(overtimeSubmissionToInsert);
@@ -63,6 +74,8 @@ export async function updateOvertimeSubmission(
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  // TypeScript narrowing: session is guaranteed to be non-null after redirectToAuth()
+  const userEmail = session!.user!.email;
 
   try {
     const coll = await dbc('overtime_submissions');
@@ -74,12 +87,22 @@ export async function updateOvertimeSubmission(
     }
 
     // Only the submitter can edit their own submission, and only if it's pending
-    if (submission.submittedBy !== session.user.email) {
+    if (submission.submittedBy !== userEmail) {
       return { error: 'unauthorized' };
     }
 
     if (submission.status !== 'pending') {
       return { error: 'invalid status' };
+    }
+
+    // Date is only required for regular overtime (not work orders/overtime requests)
+    if (!data.overtimeRequest && !data.date) {
+      throw new Error('Date is required');
+    }
+    
+    // Exclude date field for overtime requests
+    if (data.overtimeRequest) {
+      delete data.date;
     }
 
     // Prevent editing the payment field after submission
@@ -129,7 +152,7 @@ export async function updateOvertimeSubmission(
 
     const editHistoryEntry = {
       editedAt: new Date(),
-      editedBy: session.user.email,
+      editedBy: userEmail,
       changes,
     };
 
@@ -139,7 +162,7 @@ export async function updateOvertimeSubmission(
         $set: {
           ...updateData,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
         $push: {
           editHistory: editHistoryEntry,
@@ -171,9 +194,11 @@ export async function editOvertimeSubmission(
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  // TypeScript narrowing: session is guaranteed to be non-null after redirectToAuth()
+  const userEmail = session!.user!.email;
 
   // Only HR or admin can use this function
-  const userRoles = session.user?.roles ?? [];
+  const userRoles = session!.user!.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
 
@@ -190,6 +215,16 @@ export async function editOvertimeSubmission(
       return { error: 'not found' };
     }
 
+    // Date is only required for regular overtime (not work orders/overtime requests)
+    if (!data.overtimeRequest && !data.date) {
+      throw new Error('Date is required');
+    }
+    
+    // Exclude date field for overtime requests
+    if (data.overtimeRequest) {
+      delete data.date;
+    }
+
     // HR/Admin can edit submissions in any status
 
     // Build edit history entry with only changed fields
@@ -197,9 +232,7 @@ export async function editOvertimeSubmission(
     if (data.supervisor !== submission.supervisor) {
       changes.supervisor = { from: submission.supervisor, to: data.supervisor };
     }
-    if (
-      new Date(data.date).getTime() !== new Date(submission.date).getTime()
-    ) {
+    if (new Date(data.date).getTime() !== new Date(submission.date).getTime()) {
       changes.date = { from: submission.date, to: data.date };
     }
     if (data.hours !== submission.hours) {
@@ -236,7 +269,7 @@ export async function editOvertimeSubmission(
 
     const editHistoryEntry = {
       editedAt: new Date(),
-      editedBy: session.user.email,
+      editedBy: userEmail,
       changes,
     };
 
@@ -248,7 +281,7 @@ export async function editOvertimeSubmission(
           ...data,
           status: 'pending',
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
         $unset: {
           approvedAt: '',
@@ -280,57 +313,182 @@ export async function editOvertimeSubmission(
 }
 
 /**
- * Cancel overtime request
- * Only submitter can cancel, only when status is 'pending'
+ * Unified correction action for overtime submissions
+ * Replaces updateOvertimeSubmission and editOvertimeSubmission
+ * 
+ * Permissions:
+ * - Employee (author): status must be 'pending'
+ * - HR: status must be 'pending' or 'approved'
+ * - Admin: all statuses except 'accounted'
  */
-export async function cancelOvertimeRequest(id: string) {
-  // Log the cancellation attempt for debugging purposes
-  console.log('cancelOvertimeRequest', id);
+export async function correctOvertimeSubmission(
+  id: string,
+  data: OvertimeSubmissionType,
+  reason: string,
+  markAsCancelled?: boolean,
+): Promise<{ success: 'corrected' } | { error: string }> {
   const session = await auth();
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
+  const userRoles = session!.user!.roles ?? [];
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
 
   try {
     const coll = await dbc('overtime_submissions');
 
-    // Check if the submission exists and get its details
+    // Check if the submission exists
     const submission = await coll.findOne({ _id: new ObjectId(id) });
     if (!submission) {
       return { error: 'not found' };
     }
 
-    // Only the submitter can cancel their own submission, and only if it's still pending
-    if (submission.submittedBy !== session.user.email) {
+    const isAuthor = submission.submittedBy === userEmail;
+
+    // Check permissions based on status and role
+    if (submission.status === 'accounted') {
+      return { error: 'cannot correct accounted' };
+    }
+
+    if (!isAdmin && !isHR && !isAuthor) {
       return { error: 'unauthorized' };
     }
 
-    if (submission.status !== 'pending') {
-      return { error: 'cannot cancel' };
+    if (isAuthor && !isHR && !isAdmin && submission.status !== 'pending') {
+      return { error: 'unauthorized' };
     }
 
-    // Mark the submission as canceled instead of deleting it
-    const updateResult = await coll.updateOne(
+    if (isHR && !isAdmin && !['pending', 'approved'].includes(submission.status)) {
+      return { error: 'unauthorized' };
+    }
+
+    // Ensure date is set
+    if (data.overtimeRequest && data.workStartTime && !data.date) {
+      const dateFromStart = new Date(data.workStartTime);
+      dateFromStart.setHours(0, 0, 0, 0);
+      data.date = dateFromStart;
+    }
+    if (!data.date) {
+      throw new Error('Date is required');
+    }
+
+    // Build correction history entry with only changed fields
+    const changes: any = {};
+    if (data.supervisor !== submission.supervisor) {
+      changes.supervisor = { from: submission.supervisor, to: data.supervisor };
+    }
+    if (new Date(data.date).getTime() !== new Date(submission.date).getTime()) {
+      changes.date = { from: submission.date, to: data.date };
+    }
+    if (data.hours !== submission.hours) {
+      changes.hours = { from: submission.hours, to: data.hours };
+    }
+    if (data.reason !== submission.reason) {
+      changes.reason = { from: submission.reason, to: data.reason };
+    }
+    if (data.overtimeRequest !== submission.overtimeRequest) {
+      changes.overtimeRequest = {
+        from: submission.overtimeRequest,
+        to: data.overtimeRequest,
+      };
+    }
+    if (data.payment !== submission.payment) {
+      changes.payment = { from: submission.payment, to: data.payment };
+    }
+    const oldScheduledDayOff = submission.scheduledDayOff
+      ? new Date(submission.scheduledDayOff).getTime()
+      : undefined;
+    const newScheduledDayOff = data.scheduledDayOff
+      ? new Date(data.scheduledDayOff).getTime()
+      : undefined;
+    if (oldScheduledDayOff !== newScheduledDayOff) {
+      changes.scheduledDayOff = {
+        from: submission.scheduledDayOff,
+        to: data.scheduledDayOff,
+      };
+    }
+
+    const correctionHistoryEntry: any = {
+      correctedAt: new Date(),
+      correctedBy: userEmail,
+      reason: reason,
+      changes,
+    };
+
+    // Handle cancellation if requested
+    let newStatus = submission.status;
+    if (markAsCancelled) {
+      correctionHistoryEntry.statusChanged = {
+        from: submission.status,
+        to: 'cancelled',
+      };
+      newStatus = 'cancelled';
+    }
+
+    const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          status: 'cancelled',
-          cancelledAt: new Date(),
-          cancelledBy: session.user.email,
+          ...data,
+          status: newStatus,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
+          ...(markAsCancelled && {
+            cancelledAt: new Date(),
+            cancelledBy: userEmail,
+          }),
+        },
+        $push: {
+          correctionHistory: correctionHistoryEntry,
         },
       },
     );
 
-    if (updateResult.matchedCount === 0) {
+    if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
 
-    revalidateOvertime();
-    return { success: 'cancelled' };
+    revalidateTag('overtime');
+    return { success: 'corrected' };
   } catch (error) {
     console.error(error);
-    return { error: 'cancelOvertimeRequest server action error' };
+    return { error: 'correctOvertimeSubmission server action error' };
+  }
+}
+
+/**
+ * Delete overtime submission (Admin only)
+ * Hard delete from database - available for all statuses
+ */
+export async function deleteOvertimeSubmission(
+  id: string,
+): Promise<{ success: 'deleted' } | { error: string }> {
+  const session = await auth();
+  if (!session || !session.user?.email) {
+    redirectToAuth();
+  }
+  const userRoles = session!.user!.roles ?? [];
+  const isAdmin = userRoles.includes('admin');
+
+  if (!isAdmin) {
+    return { error: 'unauthorized' };
+  }
+
+  try {
+    const coll = await dbc('overtime_submissions');
+
+    const deleteResult = await coll.deleteOne({ _id: new ObjectId(id) });
+
+    if (deleteResult.deletedCount === 0) {
+      return { error: 'not found' };
+    }
+
+    revalidateTag('overtime');
+    return { success: 'deleted' };
+  } catch (error) {
+    console.error(error);
+    return { error: 'deleteOvertimeSubmission server action error' };
   }
 }

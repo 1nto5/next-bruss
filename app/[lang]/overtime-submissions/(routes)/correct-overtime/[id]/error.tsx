@@ -12,3 +12,4 @@ export default function Error({
 }) {
   return <ErrorComponent error={error} reset={reset} revalidate={revalidate} />;
 }
+

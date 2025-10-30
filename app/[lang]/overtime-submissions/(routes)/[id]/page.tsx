@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import LocalizedLink from '@/components/localized-link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,17 +17,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
-import { extractNameFromEmail } from '@/lib/utils/name-format';
-import { formatDate, formatDateTime } from '@/lib/utils/date-format';
-import { Clock, FileText, Table as TableIcon, X } from 'lucide-react';
-import LocalizedLink from '@/components/localized-link';
-import { redirect } from 'next/navigation';
-import { getDictionary } from '../../lib/dict';
 import { dbc } from '@/lib/db/mongo';
+import {
+  formatDate,
+  formatDateTime,
+  formatTime,
+} from '@/lib/utils/date-format';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
+import { Clock, Edit2, FileText, Table as TableIcon, X } from 'lucide-react';
 import { ObjectId } from 'mongodb';
-import type { Dictionary } from '../../lib/dict';
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import type { Dictionary } from '../../lib/dict';
+import { getDictionary } from '../../lib/dict';
 
 export const dynamic = 'force-dynamic';
 
@@ -123,7 +127,9 @@ export default async function OvertimeSubmissionDetailsPage(props: {
 
   const session = await auth();
   if (!session || !session.user?.email) {
-    redirect(`/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/${id}`)}`);
+    redirect(
+      `/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/${id}`)}`,
+    );
   }
 
   const submission = await getOvertimeSubmission(id);
@@ -134,6 +140,26 @@ export default async function OvertimeSubmissionDetailsPage(props: {
 
   const backUrl = '/overtime-submissions';
 
+  // Check if user can correct this submission
+  const userEmail = session.user.email ?? '';
+  const userRoles = session.user.roles ?? [];
+  const isAuthor = submission.submittedBy === userEmail;
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
+
+  // Correction permissions:
+  // - Author: only when status is pending
+  // - HR: when status is pending or approved
+  // - Admin: all statuses except accounted
+  const canCorrect =
+    (isAuthor && submission.status === 'pending') ||
+    (isHR && ['pending', 'approved'].includes(submission.status)) ||
+    (isAdmin && submission.status !== 'accounted');
+
+  const correctionUrl = submission.overtimeRequest
+    ? `/overtime-submissions/correct-work-order/${id}?from=details`
+    : `/overtime-submissions/correct-overtime/${id}?from=details`;
+
   return (
     <Card>
       <CardHeader>
@@ -142,11 +168,16 @@ export default async function OvertimeSubmissionDetailsPage(props: {
             {getStatusBadge(submission.status, dict)}
           </CardTitle>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            {/* Correction button */}
+            {canCorrect && (
+              <LocalizedLink href={correctionUrl} className='w-full sm:w-auto'>
+                <Button variant='outline' className='w-full'>
+                  <Edit2 /> {dict.actions.correct}
+                </Button>
+              </LocalizedLink>
+            )}
             {/* Back to submissions button */}
-            <LocalizedLink
-              href={backUrl}
-              className='w-full sm:w-auto'
-            >
+            <LocalizedLink href={backUrl} className='w-full sm:w-auto'>
               <Button variant='outline' className='w-full'>
                 <TableIcon /> {dict.detailsPage.backToSubmissions}
               </Button>
@@ -161,7 +192,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
 
       <CardContent>
         <div className='flex-col space-y-4'>
-          <div className='space-y-4 lg:flex lg:justify-between lg:space-x-4 lg:space-y-0'>
+          <div className='space-y-4 lg:flex lg:justify-between lg:space-y-0 lg:space-x-4'>
             {/* Left Column - Submission Details */}
             <Card className='lg:w-5/12'>
               <CardHeader>
@@ -191,12 +222,44 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                       </TableCell>
                     </TableRow>
 
-                    <TableRow>
-                      <TableCell className='font-medium'>
-                        {dict.detailsPage.date}
-                      </TableCell>
-                      <TableCell>{formatDate(submission.date)}</TableCell>
-                    </TableRow>
+                    {/* Show time range for orders, date for regular submissions */}
+                    {submission.overtimeRequest &&
+                    submission.workStartTime &&
+                    submission.workEndTime ? (
+                      <>
+                        <TableRow>
+                          <TableCell className='font-medium'>
+                            {dict.detailsPage.workStartTime}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(submission.workStartTime)}{' '}
+                            {formatTime(submission.workStartTime, {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className='font-medium'>
+                            {dict.detailsPage.workEndTime}
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(submission.workEndTime)}{' '}
+                            {formatTime(submission.workEndTime, {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    ) : (
+                      <TableRow>
+                        <TableCell className='font-medium'>
+                          {dict.detailsPage.date}
+                        </TableCell>
+                        <TableCell>{formatDate(submission.date)}</TableCell>
+                      </TableRow>
+                    )}
 
                     <TableRow>
                       <TableCell className='font-medium'>
@@ -256,7 +319,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                     {/* Show reason if it exists (for both positive and negative hours) */}
                     {submission.reason && (
                       <TableRow>
-                        <TableCell className='font-medium align-top'>
+                        <TableCell className='align-top font-medium'>
                           {dict.detailsPage.reason}
                         </TableCell>
                         <TableCell className='whitespace-pre-wrap'>
@@ -275,7 +338,8 @@ export default async function OvertimeSubmissionDetailsPage(props: {
               <Card>
                 <CardHeader>
                   <CardTitle className='flex items-center'>
-                    <Clock className='mr-2 h-5 w-5' /> {dict.detailsPage.history}
+                    <Clock className='mr-2 h-5 w-5' />{' '}
+                    {dict.detailsPage.history}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -327,7 +391,10 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                         <TableRow>
                           <TableCell>
                             <Badge variant='statusApproved'>
-                              {dict.detailsPage.statusLabels.plantManagerApproved}
+                              {
+                                dict.detailsPage.statusLabels
+                                  .plantManagerApproved
+                              }
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -436,7 +503,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
               {submission.rejectionReason && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className='flex items-center text-destructive'>
+                    <CardTitle className='text-destructive flex items-center'>
                       <X className='mr-2 h-5 w-5' />{' '}
                       {dict.detailsPage.rejectionDetails}
                     </CardTitle>
@@ -450,7 +517,7 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                           </TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell className='max-w-[400px] break-words text-justify'>
+                          <TableCell className='max-w-[400px] text-justify break-words'>
                             {submission.rejectionReason}
                           </TableCell>
                         </TableRow>
@@ -459,6 +526,155 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Corrections History Card */}
+              {submission.correctionHistory &&
+                submission.correctionHistory.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center'>
+                        <Edit2 className='mr-2 h-5 w-5' />{' '}
+                        {dict.detailsPage.corrections}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>{dict.detailsPage.dateTime}</TableHead>
+                            <TableHead>{dict.detailsPage.person}</TableHead>
+                            <TableHead>
+                              {dict.detailsPage.correctionReason}
+                            </TableHead>
+                            <TableHead>{dict.detailsPage.changes}</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {[...submission.correctionHistory]
+                            .reverse()
+                            .map((correction, index) => (
+                              <TableRow key={index}>
+                                <TableCell className='whitespace-nowrap'>
+                                  {formatDateTime(correction.correctedAt)}
+                                </TableCell>
+                                <TableCell className='whitespace-nowrap'>
+                                  {extractNameFromEmail(correction.correctedBy)}
+                                </TableCell>
+                                <TableCell className='max-w-[200px]'>
+                                  {correction.reason}
+                                </TableCell>
+                                <TableCell>
+                                  <div className='space-y-1 text-sm'>
+                                    {correction.statusChanged && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.detailsPage.statusChange}:
+                                        </span>{' '}
+                                        {correction.statusChanged.from} →{' '}
+                                        {correction.statusChanged.to}
+                                      </div>
+                                    )}
+                                    {correction.changes.supervisor && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.supervisor}:
+                                        </span>{' '}
+                                        {extractNameFromEmail(
+                                          correction.changes.supervisor.from,
+                                        )}{' '}
+                                        →{' '}
+                                        {extractNameFromEmail(
+                                          correction.changes.supervisor.to,
+                                        )}
+                                      </div>
+                                    )}
+                                    {correction.changes.date && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.date}:
+                                        </span>{' '}
+                                        {formatDate(
+                                          correction.changes.date.from,
+                                        )}{' '}
+                                        →{' '}
+                                        {formatDate(correction.changes.date.to)}
+                                      </div>
+                                    )}
+                                    {correction.changes.hours !== undefined && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.hours}:
+                                        </span>{' '}
+                                        {correction.changes.hours.from}h →{' '}
+                                        {correction.changes.hours.to}h
+                                      </div>
+                                    )}
+                                    {correction.changes.reason && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.reason}:
+                                        </span>{' '}
+                                        {correction.changes.reason.from
+                                          .substring(0, 30)
+                                          .trim()}
+                                        ... →{' '}
+                                        {correction.changes.reason.to
+                                          .substring(0, 30)
+                                          .trim()}
+                                        ...
+                                      </div>
+                                    )}
+                                    {correction.changes.payment !==
+                                      undefined && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.payment}:
+                                        </span>{' '}
+                                        {correction.changes.payment.from
+                                          ? dict.detailsPage.yes
+                                          : dict.detailsPage.no}{' '}
+                                        →{' '}
+                                        {correction.changes.payment.to
+                                          ? dict.detailsPage.yes
+                                          : dict.detailsPage.no}
+                                      </div>
+                                    )}
+                                    {correction.changes.scheduledDayOff && (
+                                      <div>
+                                        <span className='font-medium'>
+                                          {dict.form.scheduledDayOff}:
+                                        </span>{' '}
+                                        {correction.changes.scheduledDayOff.from
+                                          ? formatDate(
+                                              correction.changes.scheduledDayOff
+                                                .from,
+                                            )
+                                          : dict.detailsPage.notSet}{' '}
+                                        →{' '}
+                                        {correction.changes.scheduledDayOff.to
+                                          ? formatDate(
+                                              correction.changes.scheduledDayOff
+                                                .to,
+                                            )
+                                          : dict.detailsPage.notSet}
+                                      </div>
+                                    )}
+                                    {Object.keys(correction.changes).length ===
+                                      0 &&
+                                      !correction.statusChanged && (
+                                        <div className='text-muted-foreground'>
+                                          {dict.detailsPage.noCorrections}
+                                        </div>
+                                      )}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                )}
             </div>
           </div>
         </div>
