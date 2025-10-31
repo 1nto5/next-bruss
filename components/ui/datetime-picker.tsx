@@ -19,6 +19,7 @@
 'use client';
 
 // import { CalendarIcon } from '@radix-ui/react-icons';
+import type { Locale } from 'date-fns';
 import {
   addHours,
   addMonths,
@@ -74,9 +75,9 @@ import { cn } from '@/lib/utils/cn';
 
 // Locale mapping for date-fns
 const localeMap = {
-  pl: plLocale.default || plLocale,
-  de: deLocale.default || deLocale,
-  en: enUSLocale.default || enUSLocale,
+  pl: (plLocale as any).default || (plLocale as Locale),
+  de: (deLocale as any).default || (deLocale as Locale),
+  en: (enUSLocale as any).default || (enUSLocale as Locale),
 } as const;
 
 // Helper function to capitalize first letter
