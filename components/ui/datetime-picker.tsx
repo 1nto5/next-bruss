@@ -75,9 +75,9 @@ import { cn } from '@/lib/utils/cn';
 
 // Locale mapping for date-fns
 const localeMap = {
-  pl: (plLocale as any).default || (plLocale as Locale),
-  de: (deLocale as any).default || (deLocale as Locale),
-  en: (enUSLocale as any).default || (enUSLocale as Locale),
+  pl: (plLocale as any).default || (plLocale as unknown as Locale),
+  de: (deLocale as any).default || (deLocale as unknown as Locale),
+  en: (enUSLocale as any).default || (enUSLocale as unknown as Locale),
 } as const;
 
 // Helper function to capitalize first letter
