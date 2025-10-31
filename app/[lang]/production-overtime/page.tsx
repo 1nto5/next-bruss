@@ -1,20 +1,16 @@
-import AccessDeniedAlert from '@/components/access-denied-alert';
-import LocalizedLink from '@/components/localized-link';
+// import { auth } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
-import { getUsers } from '@/lib/data/get-users';
-import getOvertimeDepartments from '@/lib/get-overtime-departments';
 import { formatDateTime } from '@/lib/utils/date-format';
 import { KeyRound, Plus } from 'lucide-react';
-import OrdersSummaryCards from './components/orders-summary-cards';
+import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { calculateOrdersSummary } from './lib/calculate-summary';
-import { getDictionary } from './lib/dict';
 import { OvertimeType } from './lib/types';
+import { getDictionary } from './lib/dict';
 
 async function getOvertimeRequests(
   lang: string,
@@ -37,9 +33,12 @@ async function getOvertimeRequests(
   }
 
   const queryParams = new URLSearchParams(filteredSearchParams).toString();
-  const res = await fetch(`${process.env.API}/overtime-orders?${queryParams}`, {
-    next: { revalidate: 0, tags: ['overtime-orders'] },
-  });
+  const res = await fetch(
+    `${process.env.API}/production-overtime?${queryParams}`,
+    {
+      next: { revalidate: 0, tags: ['production-overtime'] },
+    },
+  );
 
   if (!res.ok) {
     const json = await res.json();
@@ -62,7 +61,7 @@ async function getOvertimeRequests(
   return { fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString };
 }
 
-export default async function OvertimeOrdersPage(props: {
+export default async function ProductionOvertimePage(props: {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
@@ -71,33 +70,17 @@ export default async function OvertimeOrdersPage(props: {
   const searchParams = await props.searchParams;
   const dict = await getDictionary(lang);
   const session = await auth();
-
-  // Allow access only for admin and hr roles (testing phase)
-  const isAdmin = session?.user?.roles?.includes('admin') || false;
-  const isHR = session?.user?.roles?.includes('hr') || false;
-  if (!isAdmin && !isHR) {
-    return <AccessDeniedAlert lang={lang} />;
-  }
-
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
   // Users with any role containing 'manager' (e.g., plant manager, logistics manager, etc.) can create requests
   const isManager =
     session?.user?.roles?.some((role) => role.includes('manager')) || false;
-  const canCreateRequest = isGroupLeader || isManager;
+  const isAdmin = session?.user?.roles?.includes('admin') || false;
+  const canCreateRequest = isGroupLeader || isManager || isAdmin;
   const userEmail = session?.user?.email || undefined;
 
   let fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString;
   ({ fetchTime, fetchTimeLocaleString, overtimeRequestsLocaleString } =
     await getOvertimeRequests(lang, searchParams, userEmail));
-
-  const departments = await getOvertimeDepartments();
-  const users = await getUsers();
-
-  // Calculate summary from filtered orders
-  const ordersSummary = calculateOrdersSummary(
-    overtimeRequestsLocaleString,
-    departments,
-  );
 
   return (
     <Card>
@@ -107,15 +90,13 @@ export default async function OvertimeOrdersPage(props: {
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
-              <LocalizedLink href='/overtime-orders/new-request'>
+              <LocalizedLink href='/production-overtime/new-request'>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <Plus /> <span>{dict.page.newRequest}</span>
                 </Button>
               </LocalizedLink>
             ) : !session ? (
-              <LocalizedLink
-                href={`/auth?callbackUrl=/${lang}/overtime-orders`}
-              >
+              <LocalizedLink href={`/auth?callbackUrl=/${lang}/production-overtime`}>
                 <Button variant={'outline'} className='w-full sm:w-auto'>
                   <KeyRound /> <span>{dict.page.login}</span>
                 </Button>
@@ -123,16 +104,12 @@ export default async function OvertimeOrdersPage(props: {
             ) : null}
           </div>
         </div>
-        <OrdersSummaryCards summary={ordersSummary} dict={dict} />
         <TableFilteringAndOptions
           fetchTime={fetchTime}
           isGroupLeader={isGroupLeader}
           isLogged={!!session}
           userEmail={session?.user?.email || undefined}
           dict={dict}
-          departments={departments}
-          users={users}
-          lang={lang}
         />
       </CardHeader>
       <DataTable
@@ -141,8 +118,6 @@ export default async function OvertimeOrdersPage(props: {
         fetchTimeLocaleString={fetchTimeLocaleString}
         fetchTime={fetchTime}
         session={session}
-        lang={lang}
-        departments={departments}
         dict={dict}
       />
     </Card>

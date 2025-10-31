@@ -1,3 +1,4 @@
+import AccessDeniedAlert from '@/components/access-denied-alert';
 import LocalizedLink from '@/components/localized-link';
 import { Button } from '@/components/ui/button';
 import {
@@ -91,6 +92,13 @@ export default async function OvertimePage(props: {
     redirect('/auth?callbackUrl=/overtime-submissions');
   }
 
+  // Allow access only for admin and hr roles (testing phase)
+  const isAdmin = session?.user?.roles?.includes('admin') || false;
+  const isHR = session?.user?.roles?.includes('hr') || false;
+  if (!isAdmin && !isHR) {
+    return <AccessDeniedAlert lang={lang} />;
+  }
+
   // Anyone logged in can submit overtime hours
   const canCreateSubmission = !!session?.user?.email;
 
@@ -107,8 +115,6 @@ export default async function OvertimePage(props: {
       role.toLowerCase().includes('manager') ||
       role.toLowerCase().includes('group-leader'),
   );
-  const isAdmin = userRoles.includes('admin');
-  const isHR = userRoles.includes('hr');
 
   // Calculate overtime summary based on filters
   const selectedMonth = searchParams.month;
@@ -227,7 +233,6 @@ export default async function OvertimePage(props: {
       <CardHeader className='pb-2'>
         <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <CardTitle>{dict.pageTitle}</CardTitle>
-          <CardDescription>{dict.testWarning}</CardDescription>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateSubmission ? (
               <>
