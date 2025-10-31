@@ -21,7 +21,7 @@ export async function createNews(data: NewsFormData) {
       createdAt: new Date(),
     });
 
-    revalidateTag('news');
+    revalidateTag('news', 'max');
     return { success: 'createSuccess' };
   } catch (error) {
     console.error('createNews error:', error);
@@ -44,7 +44,7 @@ export async function updateNews(id: string, data: NewsFormData) {
       await collection.updateOne({ _id: id as any }, { $set: data });
     }
 
-    revalidateTag('news');
+    revalidateTag('news', 'max');
     return { success: 'updateSuccess' };
   } catch (error) {
     console.error('updateNews error:', error);
@@ -66,7 +66,7 @@ export async function deleteNews(id: string) {
     } else {
       await collection.deleteOne({ _id: id as any });
     }
-    revalidateTag('news');
+    revalidateTag('news', 'max');
     return { success: 'deleteSuccess' };
   } catch (error) {
     console.error('deleteNews error:', error);
@@ -92,7 +92,7 @@ export async function togglePin(id: string, isPinned: boolean) {
       await collection.updateOne({ _id: id as any }, { $set: { isPinned } });
     }
 
-    revalidateTag('news');
+    revalidateTag('news', 'max');
     return { success: isPinned ? 'pinSuccess' : 'unpinSuccess' };
   } catch (error) {
     console.error('togglePin error:', error);
@@ -107,7 +107,7 @@ export async function refreshNews() {
   }
 
   try {
-    revalidateTag('news');
+    revalidateTag('news', 'max');
     return { success: 'refreshSuccess' };
   } catch (error) {
     console.error('refreshNews error:', error);

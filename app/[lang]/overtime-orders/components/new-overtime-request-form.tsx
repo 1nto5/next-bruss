@@ -189,7 +189,7 @@ export default function NewOvertimeRequestForm({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{dict.newOvertimeRequestForm.title}</CardTitle>
-          <LocalizedLink href='/overtime-orders' lang={lang}>
+          <LocalizedLink href='/overtime-orders'>
             <Button variant='outline'>
               <Table /> <span>{dict.newOvertimeRequestForm.requestsTable}</span>
             </Button>

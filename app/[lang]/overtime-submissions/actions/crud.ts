@@ -6,7 +6,7 @@ import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { OvertimeSubmissionType } from '../lib/types';
-import { generateNextInternalId, revalidateOvertime } from './utils';
+import { generateNextInternalId } from './utils';
 
 /**
  * Insert new overtime submission
@@ -30,17 +30,18 @@ export async function insertOvertimeSubmission(
     if (!data.overtimeRequest && !data.date) {
       throw new Error('Date is required');
     }
-    
-    // Exclude date field for overtime requests
-    if (data.overtimeRequest) {
-      delete data.date;
-    }
 
     // Exclude _id from insert (MongoDB will generate it)
     const { _id, ...dataWithoutId } = data;
+
+    // For overtime requests, exclude the date field
+    const submissionData = data.overtimeRequest
+      ? { ...dataWithoutId, date: undefined }
+      : dataWithoutId;
+
     const overtimeSubmissionToInsert = {
       internalId,
-      ...dataWithoutId,
+      ...submissionData,
       status: 'pending', // Always set to pending for new submissions
       payment: data.payment ?? false,
       submittedAt: new Date(),
@@ -51,7 +52,7 @@ export async function insertOvertimeSubmission(
 
     const res = await coll.insertOne(overtimeSubmissionToInsert);
     if (res) {
-      revalidateTag('overtime');
+      revalidateTag('overtime', 'max');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
@@ -99,14 +100,11 @@ export async function updateOvertimeSubmission(
     if (!data.overtimeRequest && !data.date) {
       throw new Error('Date is required');
     }
-    
-    // Exclude date field for overtime requests
-    if (data.overtimeRequest) {
-      delete data.date;
-    }
 
-    // Prevent editing the payment field after submission
-    const updateData = { ...data, payment: submission.payment };
+    // Prevent editing the payment field after submission, handle date for overtime requests
+    const updateData = data.overtimeRequest
+      ? { ...data, payment: submission.payment, date: undefined }
+      : { ...data, payment: submission.payment };
 
     // Build edit history entry with only changed fields
     const changes: any = {};
@@ -117,8 +115,9 @@ export async function updateOvertimeSubmission(
       };
     }
     if (
+      updateData.date &&
       new Date(updateData.date).getTime() !==
-      new Date(submission.date).getTime()
+        new Date(submission.date).getTime()
     ) {
       changes.date = { from: submission.date, to: updateData.date };
     }
@@ -174,7 +173,7 @@ export async function updateOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime');
+    revalidateTag('overtime', 'max');
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
@@ -219,36 +218,46 @@ export async function editOvertimeSubmission(
     if (!data.overtimeRequest && !data.date) {
       throw new Error('Date is required');
     }
-    
-    // Exclude date field for overtime requests
-    if (data.overtimeRequest) {
-      delete data.date;
-    }
+
+    // For overtime requests, set date to undefined
+    const submissionData = data.overtimeRequest
+      ? { ...data, date: undefined }
+      : data;
 
     // HR/Admin can edit submissions in any status
 
     // Build edit history entry with only changed fields
     const changes: any = {};
-    if (data.supervisor !== submission.supervisor) {
-      changes.supervisor = { from: submission.supervisor, to: data.supervisor };
-    }
-    if (new Date(data.date).getTime() !== new Date(submission.date).getTime()) {
-      changes.date = { from: submission.date, to: data.date };
-    }
-    if (data.hours !== submission.hours) {
-      changes.hours = { from: submission.hours, to: data.hours };
-    }
-    if (data.reason !== submission.reason) {
-      changes.reason = { from: submission.reason, to: data.reason };
-    }
-    if (data.overtimeRequest !== submission.overtimeRequest) {
-      changes.overtimeRequest = {
-        from: submission.overtimeRequest,
-        to: data.overtimeRequest,
+    if (submissionData.supervisor !== submission.supervisor) {
+      changes.supervisor = {
+        from: submission.supervisor,
+        to: submissionData.supervisor,
       };
     }
-    if (data.payment !== submission.payment) {
-      changes.payment = { from: submission.payment, to: data.payment };
+    if (
+      submissionData.date &&
+      new Date(submissionData.date).getTime() !==
+        new Date(submission.date).getTime()
+    ) {
+      changes.date = { from: submission.date, to: submissionData.date };
+    }
+    if (submissionData.hours !== submission.hours) {
+      changes.hours = { from: submission.hours, to: submissionData.hours };
+    }
+    if (submissionData.reason !== submission.reason) {
+      changes.reason = { from: submission.reason, to: submissionData.reason };
+    }
+    if (submissionData.overtimeRequest !== submission.overtimeRequest) {
+      changes.overtimeRequest = {
+        from: submission.overtimeRequest,
+        to: submissionData.overtimeRequest,
+      };
+    }
+    if (submissionData.payment !== submission.payment) {
+      changes.payment = {
+        from: submission.payment,
+        to: submissionData.payment,
+      };
     }
     const oldScheduledDayOff = submission.scheduledDayOff
       ? new Date(submission.scheduledDayOff).getTime()
@@ -278,7 +287,7 @@ export async function editOvertimeSubmission(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...data,
+          ...submissionData,
           status: 'pending',
           editedAt: new Date(),
           editedBy: userEmail,
@@ -304,7 +313,7 @@ export async function editOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime');
+    revalidateTag('overtime', 'max');
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
@@ -315,7 +324,7 @@ export async function editOvertimeSubmission(
 /**
  * Unified correction action for overtime submissions
  * Replaces updateOvertimeSubmission and editOvertimeSubmission
- * 
+ *
  * Permissions:
  * - Employee (author): status must be 'pending'
  * - HR: status must be 'pending' or 'approved'
@@ -360,7 +369,11 @@ export async function correctOvertimeSubmission(
       return { error: 'unauthorized' };
     }
 
-    if (isHR && !isAdmin && !['pending', 'approved'].includes(submission.status)) {
+    if (
+      isHR &&
+      !isAdmin &&
+      !['pending', 'approved'].includes(submission.status)
+    ) {
       return { error: 'unauthorized' };
     }
 
@@ -450,7 +463,7 @@ export async function correctOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime');
+    revalidateTag('overtime', 'max');
     return { success: 'corrected' };
   } catch (error) {
     console.error(error);
@@ -485,7 +498,7 @@ export async function deleteOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime');
+    revalidateTag('overtime', 'max');
     return { success: 'deleted' };
   } catch (error) {
     console.error(error);

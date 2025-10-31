@@ -6,7 +6,7 @@ import { revalidateTag } from 'next/cache';
 import { InsertFailureType, UpdateFailureType } from './lib/failures-types';
 
 export async function revalidateFailures() {
-  revalidateTag('failures-lv');
+  revalidateTag('failures-lv', 'max');
 }
 
 export async function insertFailure(failureInsertData: InsertFailureType) {
@@ -19,7 +19,7 @@ export async function insertFailure(failureInsertData: InsertFailureType) {
     };
     const res = await collection.insertOne(failureWithDate);
     if (res) {
-      revalidateTag('failures-lv');
+      revalidateTag('failures-lv', 'max');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
@@ -43,7 +43,7 @@ export async function updateFailure(failureUpdateData: UpdateFailureType) {
     );
 
     if (res.matchedCount > 0) {
-      revalidateTag('failures-lv');
+      revalidateTag('failures-lv', 'max');
       return { success: 'updated' };
     } else {
       return { error: 'not updated' };
@@ -69,7 +69,7 @@ export async function endFailure(id: string) {
     );
 
     if (res.matchedCount > 0) {
-      revalidateTag('failures-lv');
+      revalidateTag('failures-lv', 'max');
       return { success: 'ended' };
     }
     return { error: 'not ended' };

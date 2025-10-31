@@ -1,5 +1,3 @@
-import { OvertimeSubmissionType as BaseOvertimeSubmissionType } from './zod';
-
 // Update the status options for overtime submissions
 export type OvertimeStatus =
   | 'pending'
@@ -52,15 +50,23 @@ export type CorrectionHistoryEntry = {
   };
 };
 
-// Extend the Zod schema type with additional fields needed for the complete submission
-export type OvertimeSubmissionType = BaseOvertimeSubmissionType & {
+// Complete overtime submission type with all database fields
+export type OvertimeSubmissionType = {
   _id: string;
+  supervisor: string;
+  date: Date;
+  hours: number;
+  reason?: string;
+  overtimeRequest?: boolean;
+  scheduledDayOff?: Date;
+  workStartTime?: Date;
+  workEndTime?: Date;
   internalId?: string; // Format: "N/YY", e.g. "1/25" - Optional as existing submissions don't have it
   status: OvertimeStatus;
   submittedAt: Date;
   submittedBy: string; // Email of the employee who submitted
-  editedAt: Date;
-  editedBy: string;
+  editedAt?: Date;
+  editedBy?: string;
   rejectedAt?: Date;
   rejectedBy?: string;
   rejectionReason?: string;
@@ -75,6 +81,4 @@ export type OvertimeSubmissionType = BaseOvertimeSubmissionType & {
   supervisorApprovedBy?: string;
   editHistory?: EditHistoryEntry[]; // Deprecated, keeping for backward compatibility
   correctionHistory?: CorrectionHistoryEntry[]; // New correction history with required reasons
-  workStartTime?: Date;
-  workEndTime?: Date;
 };

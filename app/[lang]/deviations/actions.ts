@@ -10,10 +10,10 @@ import {
   NotificationLogType, // Import NotificationLogType
 } from '@/app/[lang]/deviations/lib/types';
 import { auth } from '@/lib/auth';
-import mailer from '@/lib/services/mailer'; // Import the mailer utility
 import { dbc } from '@/lib/db/mongo';
-import { extractNameFromEmail } from '@/lib/utils/name-format';
+import mailer from '@/lib/services/mailer'; // Import the mailer utility
 import { formatDate } from '@/lib/utils/date-format';
+import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Collection, ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -630,7 +630,7 @@ async function sendTeamLeaderNotificationForPrint(
 }
 
 export async function revalidateDeviations() {
-  revalidateTag('deviations');
+  revalidateTag('deviations', 'max');
 }
 
 // Helper function to add 12 hours to a date
@@ -713,7 +713,7 @@ export async function updateCorrectiveAction(
         console.error(
           `Failed to fetch deviation [${id}] after adding corrective action.`,
         );
-        revalidateTag('deviation'); // Still revalidate
+        revalidateTag('deviation', 'max'); // Still revalidate
         return { success: 'updated', warning: 'notification_failed' };
       }
 
@@ -749,7 +749,7 @@ export async function updateCorrectiveAction(
         );
       }
 
-      revalidateTag('deviation'); // Revalidate the specific deviation page
+      revalidateTag('deviation', 'max'); // Revalidate the specific deviation page
       return { success: 'updated' };
     } else {
       // Handle case where the update didn't modify (e.g., concurrent update)
@@ -767,7 +767,7 @@ export async function redirectToDeviation(id: string, lang: string) {
 }
 
 export async function revalidateReasons() {
-  revalidateTag('deviationReasons');
+  revalidateTag('deviationReasons', 'max');
 }
 
 export async function approveDeviation(
@@ -1174,12 +1174,12 @@ export async function redirectToDeviations(lang: string) {
 }
 
 export async function revalidateDeviationsAndDeviation() {
-  revalidateTag('deviation');
-  revalidateTag('deviations');
+  revalidateTag('deviation', 'max');
+  revalidateTag('deviations', 'max');
 }
 
 export async function revalidateDeviation() {
-  revalidateTag('deviation');
+  revalidateTag('deviation', 'max');
 }
 
 // Helper function to generate the next internal ID
@@ -1270,7 +1270,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
 
     const res = await collection.insertOne(deviationToInsert);
     if (res.insertedId) {
-      revalidateTag('deviations');
+      revalidateTag('deviations', 'max');
 
       // Call the centralized notification handler for creation
       await handleNotifications(deviationToInsert, res.insertedId, 'creation'); // Pass 'creation' context
@@ -1370,7 +1370,7 @@ export async function deleteDraftDeviation(id: string) {
       status: 'draft',
     });
     if (res) {
-      revalidateTag('deviations');
+      revalidateTag('deviations', 'max');
       return { success: 'deleted' };
     } else {
       return { error: 'not deleted' };
@@ -1850,7 +1850,7 @@ export async function notifyRejectorsAfterAttachment(deviationId: string) {
       );
     }
 
-    revalidateTag('deviation'); // Revalidate the specific deviation page
+    revalidateTag('deviation', 'max'); // Revalidate the specific deviation page
     return { success: 'notified' };
   } catch (error) {
     console.error('notifyRejectorsAfterAttachment server action error:', error);
@@ -1891,7 +1891,7 @@ export async function addNote(deviationId: string, content: string) {
       return { error: 'not updated' };
     }
 
-    revalidateTag('deviation');
+    revalidateTag('deviation', 'max');
     return { success: 'added' };
   } catch (error) {
     console.error('addNote server action error:', error);

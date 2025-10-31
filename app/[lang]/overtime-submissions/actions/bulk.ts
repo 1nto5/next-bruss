@@ -1,14 +1,14 @@
 'use server';
 
+import { redirectToAuth } from '@/app/[lang]/actions';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import {
   revalidateOvertime,
-  sendRejectionEmailToEmployee,
   sendApprovalEmailToEmployee,
+  sendRejectionEmailToEmployee,
 } from './utils';
-import { redirectToAuth } from '@/app/[lang]/actions';
 
 /**
  * Bulk approve overtime submissions
@@ -22,8 +22,9 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
-  const userRoles = session.user?.roles ?? [];
+  const userRoles = session!.user!.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
   const isPlantManager = userRoles.includes('plant-manager');
@@ -42,7 +43,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         return (
           submission.overtimeRequest &&
           submission.status === 'pending' &&
-          (submission.supervisor === session.user.email || isHR || isAdmin)
+          (submission.supervisor === userEmail || isHR || isAdmin)
         );
       })
       .map((submission) => submission._id);
@@ -64,7 +65,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         return (
           !submission.overtimeRequest &&
           submission.status === 'pending' &&
-          (submission.supervisor === session.user.email || isHR || isAdmin)
+          (submission.supervisor === userEmail || isHR || isAdmin)
         );
       })
       .map((submission) => submission._id);
@@ -74,7 +75,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
     // Execute supervisor approvals (pending → pending-plant-manager)
     if (supervisorApprovalIds.length > 0) {
       const supervisorSubmissions = submissions.filter((s) =>
-        supervisorApprovalIds.some((id) => id.equals(s._id))
+        supervisorApprovalIds.some((id) => id.equals(s._id)),
       );
 
       const result = await coll.updateMany(
@@ -83,9 +84,9 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
           $set: {
             status: 'pending-plant-manager',
             supervisorApprovedAt: new Date(),
-            supervisorApprovedBy: session.user.email,
+            supervisorApprovedBy: userEmail,
             editedAt: new Date(),
-            editedBy: session.user.email,
+            editedBy: userEmail,
           },
         },
       );
@@ -96,7 +97,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         await sendApprovalEmailToEmployee(
           submission.submittedBy,
           submission._id.toString(),
-          'supervisor'
+          'supervisor',
         );
       }
     }
@@ -104,7 +105,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
     // Execute plant manager approvals (pending-plant-manager → approved)
     if (plantManagerApprovalIds.length > 0) {
       const plantManagerSubmissions = submissions.filter((s) =>
-        plantManagerApprovalIds.some((id) => id.equals(s._id))
+        plantManagerApprovalIds.some((id) => id.equals(s._id)),
       );
 
       const result = await coll.updateMany(
@@ -113,11 +114,11 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
           $set: {
             status: 'approved',
             plantManagerApprovedAt: new Date(),
-            plantManagerApprovedBy: session.user.email,
+            plantManagerApprovedBy: userEmail,
             approvedAt: new Date(),
-            approvedBy: session.user.email,
+            approvedBy: userEmail,
             editedAt: new Date(),
-            editedBy: session.user.email,
+            editedBy: userEmail,
           },
         },
       );
@@ -128,7 +129,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         await sendApprovalEmailToEmployee(
           submission.submittedBy,
           submission._id.toString(),
-          'final'
+          'final',
         );
       }
     }
@@ -136,7 +137,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
     // Execute normal approvals (pending → approved)
     if (normalApprovalIds.length > 0) {
       const normalSubmissions = submissions.filter((s) =>
-        normalApprovalIds.some((id) => id.equals(s._id))
+        normalApprovalIds.some((id) => id.equals(s._id)),
       );
 
       const result = await coll.updateMany(
@@ -145,9 +146,9 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
           $set: {
             status: 'approved',
             approvedAt: new Date(),
-            approvedBy: session.user.email,
+            approvedBy: userEmail,
             editedAt: new Date(),
-            editedBy: session.user.email,
+            editedBy: userEmail,
           },
         },
       );
@@ -158,7 +159,7 @@ export async function bulkApproveOvertimeSubmissions(ids: string[]) {
         await sendApprovalEmailToEmployee(
           submission.submittedBy,
           submission._id.toString(),
-          'final'
+          'final',
         );
       }
     }
@@ -191,8 +192,9 @@ export async function bulkRejectOvertimeSubmissions(
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
-  const userRoles = session.user?.roles ?? [];
+  const userRoles = session!.user!.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
 
@@ -206,7 +208,7 @@ export async function bulkRejectOvertimeSubmissions(
     const allowedSubmissions = submissions.filter((submission) => {
       // Allow rejection if user is supervisor, HR, or admin
       return (
-        (submission.supervisor === session.user.email || isHR || isAdmin) &&
+        (submission.supervisor === userEmail || isHR || isAdmin) &&
         submission.status === 'pending'
       );
     });
@@ -223,10 +225,10 @@ export async function bulkRejectOvertimeSubmissions(
         $set: {
           status: 'rejected',
           rejectedAt: new Date(),
-          rejectedBy: session.user.email,
+          rejectedBy: userEmail,
           rejectionReason: rejectionReason,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );
@@ -262,9 +264,10 @@ export async function bulkMarkAsAccountedOvertimeSubmissions(ids: string[]) {
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
-  const isHR = (session.user?.roles ?? []).includes('hr');
-  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  const isHR = (session!.user!.roles ?? []).includes('hr');
+  const isAdmin = (session!.user!.roles ?? []).includes('admin');
 
   if (!isHR && !isAdmin) {
     return { error: 'unauthorized' };
@@ -283,9 +286,9 @@ export async function bulkMarkAsAccountedOvertimeSubmissions(ids: string[]) {
         $set: {
           status: 'accounted',
           accountedAt: new Date(),
-          accountedBy: session.user.email,
+          accountedBy: userEmail,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );
@@ -313,6 +316,7 @@ export async function bulkCancelOvertimeRequests(ids: string[]) {
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
   try {
     const coll = await dbc('overtime_submissions');
@@ -322,16 +326,16 @@ export async function bulkCancelOvertimeRequests(ids: string[]) {
     const updateResult = await coll.updateMany(
       {
         _id: { $in: objectIds },
-        submittedBy: session.user.email,
+        submittedBy: userEmail,
         status: 'pending',
       },
       {
         $set: {
           status: 'cancelled',
           cancelledAt: new Date(),
-          cancelledBy: session.user.email,
+          cancelledBy: userEmail,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );

@@ -7,12 +7,6 @@ import path from 'path';
 // Import the notification action
 import { notifyRejectorsAfterAttachment } from '@/app/[lang]/deviations/actions';
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable the default body parser
-  },
-};
-
 const BASE_PATH = process.env.UPLOAD_BASE_PATH || './public';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit
 

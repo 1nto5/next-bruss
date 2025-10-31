@@ -59,7 +59,7 @@ export function OvertimeExportButton({
       extractNameFromEmail(submission.submittedBy),
       new Date(submission.date).toLocaleDateString('pl-PL'),
       submission.hours.toString(),
-      statusDict[submission.status],
+      statusDict[submission.status as keyof typeof statusDict],
       submission.scheduledDayOff
         ? new Date(submission.scheduledDayOff).toLocaleDateString('pl-PL')
         : '',

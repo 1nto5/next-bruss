@@ -10,11 +10,11 @@ import { overtimeRequestEmployeeType } from './lib/types';
 import { NewOvertimeRequestType } from './lib/zod';
 
 export async function revalidateProductionOvertime() {
-  revalidateTag('production-overtime');
+  revalidateTag('production-overtime', 'max');
 }
 
 export async function revalidateProductionOvertimeRequest() {
-  revalidateTag('production-overtime-request');
+  revalidateTag('production-overtime-request', 'max');
 }
 
 export async function redirectToProductionOvertime(lang: string) {
@@ -102,7 +102,7 @@ export async function insertOvertimeRequest(
 
     const res = await coll.insertOne(overtimeRequestToInsert);
     if (res) {
-      revalidateTag('production-overtime');
+      revalidateTag('production-overtime', 'max');
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };

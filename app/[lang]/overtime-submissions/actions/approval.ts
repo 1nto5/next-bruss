@@ -24,9 +24,11 @@ export async function approveOvertimeSubmission(id: string) {
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  // TypeScript narrowing: session is guaranteed to be non-null after redirectToAuth()
+  const userEmail = session!.user!.email;
 
   // Check if user has HR or admin role for emergency override
-  const userRoles = session.user?.roles ?? [];
+  const userRoles = session!.user!.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
   const isPlantManager = userRoles.includes('plant-manager');
@@ -45,7 +47,7 @@ export async function approveOvertimeSubmission(id: string) {
       if (submission.status === 'pending') {
         // Supervisor approval: move to pending-plant-manager OR directly to approved
         if (
-          submission.supervisor !== session.user.email &&
+          submission.supervisor !== userEmail &&
           !isHR &&
           !isAdmin
         ) {
@@ -60,20 +62,20 @@ export async function approveOvertimeSubmission(id: string) {
               $set: {
                 status: 'approved',
                 supervisorApprovedAt: new Date(),
-                supervisorApprovedBy: session.user.email,
+                supervisorApprovedBy: userEmail,
                 plantManagerApprovedAt: new Date(),
-                plantManagerApprovedBy: session.user.email,
+                plantManagerApprovedBy: userEmail,
                 approvedAt: new Date(),
-                approvedBy: session.user.email,
+                approvedBy: userEmail,
                 editedAt: new Date(),
-                editedBy: session.user.email,
+                editedBy: userEmail,
               },
             },
           );
           if (update.matchedCount === 0) {
             return { error: 'not found' };
           }
-          revalidateTag('overtime');
+          revalidateTag('overtime', 'max');
           await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
           return { success: 'approved' };
         }
@@ -85,16 +87,16 @@ export async function approveOvertimeSubmission(id: string) {
             $set: {
               status: 'pending-plant-manager',
               supervisorApprovedAt: new Date(),
-              supervisorApprovedBy: session.user.email,
+              supervisorApprovedBy: userEmail,
               editedAt: new Date(),
-              editedBy: session.user.email,
+              editedBy: userEmail,
             },
           },
         );
         if (update.matchedCount === 0) {
           return { error: 'not found' };
         }
-        revalidateTag('overtime');
+        revalidateTag('overtime', 'max');
         await sendApprovalEmailToEmployee(submission.submittedBy, id, 'supervisor');
         return { success: 'supervisor-approved' };
       } else if (submission.status === 'pending-plant-manager') {
@@ -108,18 +110,18 @@ export async function approveOvertimeSubmission(id: string) {
             $set: {
               status: 'approved',
               plantManagerApprovedAt: new Date(),
-              plantManagerApprovedBy: session.user.email,
+              plantManagerApprovedBy: userEmail,
               approvedAt: new Date(),
-              approvedBy: session.user.email,
+              approvedBy: userEmail,
               editedAt: new Date(),
-              editedBy: session.user.email,
+              editedBy: userEmail,
             },
           },
         );
         if (update.matchedCount === 0) {
           return { error: 'not found' };
         }
-        revalidateTag('overtime');
+        revalidateTag('overtime', 'max');
         await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
         return { success: 'plant-manager-approved' };
       } else {
@@ -131,7 +133,7 @@ export async function approveOvertimeSubmission(id: string) {
     // 1. User is the assigned supervisor, OR
     // 2. User has HR role, OR
     // 3. User has admin role
-    if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
+    if (submission.supervisor !== userEmail && !isHR && !isAdmin) {
       return {
         error: 'unauthorized',
       };
@@ -142,16 +144,16 @@ export async function approveOvertimeSubmission(id: string) {
         $set: {
           status: 'approved',
           approvedAt: new Date(),
-          approvedBy: session.user.email,
+          approvedBy: userEmail,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
-    revalidateTag('overtime');
+        revalidateTag('overtime', 'max');
     await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
     return { success: 'approved' };
   } catch (error) {
@@ -173,9 +175,10 @@ export async function rejectOvertimeSubmission(
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
   // Check if user has HR or admin role for emergency override
-  const userRoles = session.user?.roles ?? [];
+  const userRoles = session!.user!.roles ?? [];
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
 
@@ -192,7 +195,7 @@ export async function rejectOvertimeSubmission(
     // 1. User is the assigned supervisor, OR
     // 2. User has HR role, OR
     // 3. User has admin role
-    if (submission.supervisor !== session.user.email && !isHR && !isAdmin) {
+    if (submission.supervisor !== userEmail && !isHR && !isAdmin) {
       return {
         error: 'unauthorized',
       };
@@ -204,10 +207,10 @@ export async function rejectOvertimeSubmission(
         $set: {
           status: 'rejected',
           rejectedAt: new Date(),
-          rejectedBy: session.user.email,
+          rejectedBy: userEmail,
           rejectionReason: rejectionReason,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );
@@ -236,9 +239,10 @@ export async function markAsAccountedOvertimeSubmission(id: string) {
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
+  const userEmail = session!.user!.email;
 
-  const isHR = (session.user?.roles ?? []).includes('hr');
-  const isAdmin = (session.user?.roles ?? []).includes('admin');
+  const isHR = (session!.user!.roles ?? []).includes('hr');
+  const isAdmin = (session!.user!.roles ?? []).includes('admin');
 
   if (!isHR && !isAdmin) {
     return { error: 'unauthorized' };
@@ -252,9 +256,9 @@ export async function markAsAccountedOvertimeSubmission(id: string) {
         $set: {
           status: 'accounted',
           accountedAt: new Date(),
-          accountedBy: session.user.email,
+          accountedBy: userEmail,
           editedAt: new Date(),
-          editedBy: session.user.email,
+          editedBy: userEmail,
         },
       },
     );

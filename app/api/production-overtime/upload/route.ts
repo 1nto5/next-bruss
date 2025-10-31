@@ -7,12 +7,6 @@ import path from 'path';
 import { PDFDocument } from 'pdf-lib';
 import sharp from 'sharp';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 const BASE_PATH = process.env.UPLOAD_BASE_PATH || './public';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit per file
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB total limit

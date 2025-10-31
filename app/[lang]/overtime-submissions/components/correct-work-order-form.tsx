@@ -73,7 +73,9 @@ export default function CorrectWorkOrderForm({
   const [markAsCancelled, setMarkAsCancelled] = useState(false);
   const [correctionReason, setCorrectionReason] = useState('');
 
-  const workOrderCorrectionSchema = createWorkOrderCorrectionSchema(dict.validation);
+  const workOrderCorrectionSchema = createWorkOrderCorrectionSchema(
+    dict.validation,
+  );
 
   const form = useForm<z.infer<typeof workOrderCorrectionSchema>>({
     resolver: zodResolver(workOrderCorrectionSchema),
@@ -107,7 +109,9 @@ export default function CorrectWorkOrderForm({
     }
   }, [workStartTime, workEndTime, form]);
 
-  const onSubmit = async (values: z.infer<typeof workOrderCorrectionSchema>) => {
+  const onSubmit = async (
+    values: z.infer<typeof workOrderCorrectionSchema>,
+  ) => {
     if (!correctionReason.trim()) {
       toast.error(dict.errors.correctionReasonRequired);
       return;
@@ -134,7 +138,7 @@ export default function CorrectWorkOrderForm({
 
     setIsPending(false);
 
-    if (result.error) {
+    if ('error' in result) {
       let errorMessage = dict.errors.contactIT;
       if (result.error === 'unauthorized') {
         errorMessage = dict.errors.unauthorized;
@@ -249,7 +253,11 @@ export default function CorrectWorkOrderForm({
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className='p-0' side='bottom' align='start'>
+                        <PopoverContent
+                          className='p-0'
+                          side='bottom'
+                          align='start'
+                        >
                           <Command>
                             <CommandInput placeholder={dict.filters.search} />
                             <CommandList>
@@ -262,7 +270,10 @@ export default function CorrectWorkOrderForm({
                                     value={manager.name}
                                     key={manager.email}
                                     onSelect={() => {
-                                      form.setValue('supervisor', manager.email);
+                                      form.setValue(
+                                        'supervisor',
+                                        manager.email,
+                                      );
                                       setSupervisorOpen(false);
                                     }}
                                   >
@@ -299,7 +310,11 @@ export default function CorrectWorkOrderForm({
                           value={field.value}
                           onChange={field.onChange}
                           minuteStep={30}
-                          timePicker={{ hour: true, minute: true, second: false }}
+                          timePicker={{
+                            hour: true,
+                            minute: true,
+                            second: false,
+                          }}
                           renderTrigger={({ value, setOpen, open }) => (
                             <DateTimeInput
                               value={field.value}
@@ -330,7 +345,11 @@ export default function CorrectWorkOrderForm({
                           value={field.value}
                           onChange={field.onChange}
                           minuteStep={30}
-                          timePicker={{ hour: true, minute: true, second: false }}
+                          timePicker={{
+                            hour: true,
+                            minute: true,
+                            second: false,
+                          }}
                           renderTrigger={({ value, setOpen, open }) => (
                             <DateTimeInput
                               value={field.value}
@@ -425,7 +444,6 @@ export default function CorrectWorkOrderForm({
                                 format='dd/MM/yyyy'
                                 disabled={open}
                                 onCalendarClick={() => setOpen(!open)}
-                                granularity='day'
                               />
                             )}
                           />
@@ -464,4 +482,3 @@ export default function CorrectWorkOrderForm({
     </Card>
   );
 }
-

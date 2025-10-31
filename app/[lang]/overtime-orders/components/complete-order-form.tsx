@@ -229,7 +229,7 @@ export default function CompleteOrderForm({
       }),
       {
         loading: dict.completeOrderForm.toast.uploading,
-        success: (message) => message || dict.completeOrderForm.toast.successMultiple.replace('{count}', selectedFiles.length.toString()),
+        success: () => dict.completeOrderForm.toast.successMultiple.replace('{count}', selectedFiles.length.toString()),
         error: (err) => err.message,
       },
     );

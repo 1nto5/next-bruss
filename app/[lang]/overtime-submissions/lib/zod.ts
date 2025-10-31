@@ -163,7 +163,7 @@ export const createWorkOrderSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workStartTime'],
       },
@@ -179,7 +179,7 @@ export const createWorkOrderSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workEndTime'],
       },
@@ -373,7 +373,7 @@ export const createWorkOrderCorrectionSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workStartTime'],
       },
@@ -389,7 +389,7 @@ export const createWorkOrderCorrectionSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workEndTime'],
       },
@@ -476,6 +476,7 @@ export const createOvertimeSubmissionSchema = (validation: {
   workEndTimeBeforeStart?: string;
   durationMax24h?: string;
   durationMin1h?: string;
+  timeIncrementInvalid?: string;
 }) => {
   return z
     .object({
@@ -556,6 +557,9 @@ export const createOvertimeSubmissionSchema = (validation: {
         if (data.overtimeRequest) {
           return true;
         }
+
+        const effectiveDate = new Date(data.date);
+        effectiveDate.setHours(0, 0, 0, 0);
 
         const threeDaysAgo = new Date();
         threeDaysAgo.setHours(0, 0, 0, 0);
@@ -665,7 +669,7 @@ export const createOvertimeSubmissionSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workStartTime'],
       },
@@ -694,7 +698,7 @@ export const createOvertimeSubmissionSchema = (validation: {
       },
       {
         message:
-          validation.timeIncrementInvalid ||
+          validation.timeIncrementInvalid ??
           'Time must be in 30-minute increments (:00 or :30)!',
         path: ['workEndTime'],
       },

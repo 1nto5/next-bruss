@@ -35,7 +35,7 @@ export default function DeleteSubmissionDialog({
   const handleDelete = async () => {
     toast.promise(
       deleteOvertimeSubmission(submissionId).then((res) => {
-        if (res.error) {
+        if ('error' in res) {
           throw new Error(res.error);
         }
         if (redirectAfterDelete) {

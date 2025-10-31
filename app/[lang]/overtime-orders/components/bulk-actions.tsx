@@ -125,8 +125,8 @@ export default function BulkActions({
         }
         table.resetRowSelection();
         return successMessage
-          .replace('{count}', result.count.toString())
-          .replace('{plural}', getPlural(result.count));
+          .replace('{count}', (result.count ?? 0).toString())
+          .replace('{plural}', getPlural(result.count ?? 0));
       },
       error: (error) =>
         dict.bulkActions.toast.error.replace('{message}', error.message),

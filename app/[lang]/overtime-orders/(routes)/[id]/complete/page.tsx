@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { Locale } from '@/i18n.config';
+import { Locale } from '@/lib/config/i18n';
 import { redirect } from 'next/navigation';
 import CompleteOrderForm from '../../../components/complete-order-form';
 import { getDictionary } from '../../../lib/dict';

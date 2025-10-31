@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Locale } from '@/i18n.config';
+import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import {

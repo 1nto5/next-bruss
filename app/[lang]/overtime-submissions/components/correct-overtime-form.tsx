@@ -109,7 +109,7 @@ export default function CorrectOvertimeForm({
 
     setIsPending(false);
 
-    if (result.error) {
+    if ('error' in result) {
       let errorMessage = dict.errors.contactIT;
       if (result.error === 'unauthorized') {
         errorMessage = dict.errors.unauthorized;
@@ -280,7 +280,6 @@ export default function CorrectOvertimeForm({
                               format='dd/MM/yyyy'
                               disabled={open}
                               onCalendarClick={() => setOpen(!open)}
-                              granularity='day'
                             />
                           )}
                         />

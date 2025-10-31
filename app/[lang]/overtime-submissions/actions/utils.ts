@@ -9,14 +9,14 @@ import { redirect } from 'next/navigation';
  * Revalidate overtime submissions cache
  */
 export async function revalidateOvertime() {
-  revalidateTag('overtime-submissions');
+  revalidateTag('overtime-submissions', 'max');
 }
 
 /**
  * Revalidate individual overtime submission cache
  */
 export async function revalidateOvertimeSubmission() {
-  revalidateTag('overtime-submission');
+  revalidateTag('overtime-submission', 'max');
 }
 
 /**
