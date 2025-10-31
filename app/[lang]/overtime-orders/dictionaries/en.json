@@ -1,0 +1,492 @@
+{
+  "title": "Overtime Work Orders",
+  "page": {
+    "title": "Overtime Work Orders",
+    "newRequest": "New Request",
+    "login": "Log In"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "clear": "Clear",
+    "search": "Search",
+    "select": "select",
+    "save": "Save",
+    "edit": "Edit"
+  },
+  "table": {
+    "noResults": "No results."
+  },
+  "markAsAccountedDialog": {
+    "title": "Mark as Accounted",
+    "description": "Are you sure you want to mark this order as accounted? This action is irreversible and means that all overtime has been accounted for in the payroll system.",
+    "action": "Mark as Accounted",
+    "toast": {
+      "onlyHR": "Only HR employees can mark orders as accounted!",
+      "loading": "Saving changes...",
+      "success": "Order marked as accounted!",
+      "unauthorized": "You don't have permission!",
+      "notFound": "Order not found!",
+      "invalidStatus": "Invalid order status!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "addDayOffForm": {
+    "title": "Add Day Off Pickup",
+    "backToRequest": "Back to Order",
+    "searchPlaceholder": "Search employee...",
+    "addEmployee": "Add",
+    "addEmployees": "Add Employees",
+    "toast": {
+      "selectAtLeastOne": "Select at least one employee!",
+      "tooManyEmployees": "Maximum number of employees exceeded for this order!",
+      "unauthorized": "No permission to modify this order!",
+      "employeeExists": "Employee {firstName} {lastName} has already been added!",
+      "error": "An error occurred while adding employee!",
+      "success": "Employees have been added!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "approveRequestDialog": {
+    "title": "Approve Order",
+    "description": "Are you sure you want to approve this overtime work order?",
+    "action": "Approve Order",
+    "toast": {
+      "onlyPlantManager": "Only plant manager can approve orders!",
+      "loading": "Saving changes...",
+      "success": "Order approved!",
+      "unauthorized": "You don't have permission!",
+      "notFound": "Order not found!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "cancelRequestDialog": {
+    "title": "Cancel Order?",
+    "description": "Are you sure you want to cancel this overtime work order? This action cannot be undone.",
+    "cancel": "No, keep it",
+    "action": "Yes, cancel order",
+    "toast": {
+      "loading": "Canceling order...",
+      "success": "Order has been canceled!",
+      "unauthorized": "You don't have permission!",
+      "notFound": "Order not found!",
+      "cannotCancel": "Cannot cancel this order!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "dialogs": {
+    "cancel": {
+      "title": "Cancel Order?",
+      "description": "Are you sure you want to cancel this overtime work order? This action cannot be undone.",
+      "cancelButton": "No, keep it",
+      "confirmButton": "Yes, cancel order"
+    },
+    "delete": {
+      "title": "Delete Order?",
+      "description": "Are you sure you want to PERMANENTLY delete this overtime work order? This operation cannot be undone.",
+      "cancelButton": "No, keep it",
+      "confirmButton": "Yes, delete order",
+      "deleting": "Deleting order...",
+      "deleted": "Order has been deleted!"
+    },
+    "reactivate": {
+      "title": "Reactivate Order?",
+      "description": "Are you sure you want to reactivate this canceled overtime work order?",
+      "cancelButton": "No, keep canceled",
+      "confirmButton": "Yes, reactivate order",
+      "reactivating": "Reactivating order...",
+      "reactivated": "Order has been reactivated!"
+    }
+  },
+  "toast": {
+    "cancelling": "Canceling order...",
+    "cancelled": "Order has been canceled!"
+  },
+  "errors": {
+    "unauthorized": "You don't have permission!",
+    "notFound": "Order not found!",
+    "cannotCancel": "Cannot cancel this order!",
+    "contactIT": "Please contact IT!"
+  },
+  "newOvertimeRequestForm": {
+    "title": "New Overtime Work Order",
+    "requestsTable": "Orders Table",
+    "startWork": "Work Start",
+    "startWorkDescription": "Start of shift or first shift when number of shifts is greater than 1.",
+    "endWork": "Work End",
+    "endWorkDescription": "End of shift or last shift when number of shifts is greater than 1.",
+    "numberOfShifts": "Number of Shifts",
+    "numberOfShiftsDescription": "We assume each shift has equal length. If shift lengths differ, add separate orders.",
+    "responsible": "Responsible Person",
+    "responsibleDescription": "Select the person supervising overtime work – they will be required to submit the attendance list.",
+    "selectResponsible": "Select responsible person",
+    "searchPerson": "Search person...",
+    "personNotFound": "Person not found.",
+    "numberOfEmployees": "Number of Employees",
+    "reason": "Reason for Overtime Work",
+    "reasonDescription": "Provide the reason for overtime work.",
+    "note": "Additional Information",
+    "noteDescription": "Additional information about the order.",
+    "scheduledDayOff": "Employees Picking Up Days Off",
+    "scheduledDayOffDescription": "Employees who are picking up a day off for overtime work.",
+    "addOrder": "Add Order",
+    "saveAndAddAnother": "Save and Add Another",
+    "accordion": {
+      "restPeriod": "Maintaining Uninterrupted Rest",
+      "restPeriodContent": "The employee maintained at least 11 hours of uninterrupted rest in each 24-hour period and at least 35 hours of uninterrupted weekly rest (for employees changing shifts, the rest period cannot be shorter than 24 hours).",
+      "brussStandard": "Bruss Standard",
+      "brussStandardContent": "For work on Sundays and holidays, an employee for whom this is the 7th consecutive working day receives a day off (in accordance with Labor Code regulations – see: Information / legal basis) and a wage supplement of 100% of the wage for each hour of work.",
+      "legalInfo": "Information / Legal Basis",
+      "legalInfoContent1": "1. Shifts 6:00-14:00; 7:00-15:00; 8:00-16:00; 14:00-22:00; 22:00-6:00 - daily working time standard 8 hours",
+      "legalInfoContent2": "2. Working time including overtime cannot exceed 13 hours per day - overtime above 13 hours is not permitted",
+      "legalInfoContent3": "3. Weekly working time including overtime cannot exceed an average of 48 hours in the adopted settlement period",
+      "legalInfoContent4": "4. In accordance with Article 15111 of the Labor Code, an employee working on Sundays and holidays should take a day off from work within six calendar days preceding or following such Sunday, for work on a holiday – by the end of the settlement period, and if this is not possible, the employee has the right to another day off from work by the end of the settlement period. If granting such a day is also not possible in this period, the employee is entitled to a wage supplement of 100% of the wage for each hour of work on Sunday/holiday.",
+      "legalInfoContent5": "The facility operates a basic system (Article 129 of the Labor Code – daily standard 8h and average weekly 40h in a five-day work week). Legal basis: Article 131, Article 132, Article 133, Article 151§3 and 4, Article 151(1), Article 151(11) of the Labor Code."
+    },
+    "toast": {
+      "saved": "Order saved!",
+      "added": "Order added!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "editOvertimeRequestForm": {
+    "title": "Edit Overtime Work Order",
+    "requestsTable": "Orders Table",
+    "startWork": "Work Start",
+    "startWorkDescription": "Start of shift or first shift when number of shifts is greater than 1.",
+    "endWork": "Work End",
+    "endWorkDescription": "End of shift or last shift when number of shifts differs from 1.",
+    "numberOfShifts": "Number of Shifts",
+    "numberOfShiftsDescription": "We assume each shift has equal length. If shift lengths differ, add separate orders.",
+    "responsible": "Responsible Person",
+    "responsibleDescription": "Select the person supervising overtime work – they will be required to submit the attendance list.",
+    "selectResponsible": "Select responsible person",
+    "searchPerson": "Search person...",
+    "personNotFound": "Person not found.",
+    "numberOfEmployees": "Number of Employees",
+    "reason": "Reason for Overtime Work",
+    "reasonDescription": "Provide the reason for overtime work.",
+    "note": "Additional Information",
+    "noteDescription": "Additional information about the order.",
+    "scheduledDayOff": "Employees Picking Up Days Off",
+    "scheduledDayOffDescription": "Employees who are picking up a day off for overtime work.",
+    "discardChanges": "Discard Changes",
+    "saveChanges": "Save Changes",
+    "accordion": {
+      "restPeriod": "Maintaining Uninterrupted Rest",
+      "restPeriodContent": "The employee maintained at least 11 hours of uninterrupted rest in each 24-hour period and at least 35 hours of uninterrupted weekly rest (for employees changing shifts, the rest period cannot be shorter than 24 hours).",
+      "brussStandard": "Bruss Standard",
+      "brussStandardContent": "For work on Sundays and holidays, an employee for whom this is the 7th consecutive working day receives a day off (in accordance with Labor Code regulations – see: Information / legal basis) and a wage supplement of 100% of the wage for each hour of work.",
+      "legalInfo": "Information / Legal Basis",
+      "legalInfoContent1": "1. Shifts 6:00-14:00; 7:00-15:00; 8:00-16:00; 14:00-22:00; 22:00-6:00 - daily working time standard 8 hours",
+      "legalInfoContent2": "2. Working time including overtime cannot exceed 13 hours per day - overtime above 13 hours is not permitted",
+      "legalInfoContent3": "3. Weekly working time including overtime cannot exceed an average of 48 hours in the adopted settlement period",
+      "legalInfoContent4": "4. In accordance with Article 15111 of the Labor Code, an employee working on Sundays and holidays should take a day off from work within six calendar days preceding or following such Sunday, for work on a holiday – by the end of the settlement period, and if this is not possible, the employee has the right to another day off from work by the end of the settlement period. If granting such a day is also not possible in this period, the employee is entitled to a wage supplement of 100% of the wage for each hour of work on Sunday/holiday.",
+      "legalInfoContent5": "The facility operates a basic system (Article 129 of the Labor Code – daily standard 8h and average weekly 40h in a five-day work week). Legal basis: Article 131, Article 132, Article 133, Article 151§3 and 4, Article 151(1), Article 151(11) of the Labor Code."
+    },
+    "toast": {
+      "updated": "Order updated!",
+      "unauthorized": "You don't have permission to edit this order",
+      "invalidStatus": "Cannot edit order in this status",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "tableColumns": {
+    "status": "Status",
+    "actions": "Actions",
+    "overtimePickup": "Overtime Pickup",
+    "editRequest": "Edit Order",
+    "approve": "Approve",
+    "markAsAccounted": "Mark as Accounted",
+    "cancelRequest": "Cancel Order",
+    "addAttendanceList": "Add Attendance List",
+    "downloadAttachment": "Download Attendance List",
+    "approvalDate": "Approval Date",
+    "from": "From",
+    "to": "To",
+    "numberOfEmployees": "Number of Employees",
+    "numberOfShifts": "Number of Shifts",
+    "totalHours": "Total Hours",
+    "dayOffPickup": "Day Off Pickup",
+    "reason": "Reason",
+    "responsibleEmployee": "Responsible Person",
+    "requestedBy": "Requested By",
+    "requestedAt": "Request Date",
+    "editedBy": "Last Modified By",
+    "editedAt": "Modification Date",
+    "completedBy": "Attendance List Added By",
+    "completedAt": "Attendance List Date",
+    "accountedBy": "Accounted By",
+    "accountedAt": "Accounting Date",
+    "canceledBy": "Canceled By",
+    "canceledAt": "Cancellation Date",
+    "additionalInfo": "Add. Info",
+    "statuses": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "canceled": "Canceled",
+      "completed": "Completed",
+      "accounted": "Accounted"
+    }
+  },
+  "multiSelectEmployees": {
+    "placeholder": "Select employees...",
+    "searchPlaceholder": "Search employees...",
+    "notFound": "No employees found.",
+    "selected": "selected {count} {plural}",
+    "removeAll": "remove all",
+    "dialogTitle": "Agreed day off pickup date for: {firstName} {lastName}",
+    "agreedDate": "Pickup Date",
+    "agreedDateError": "Select pickup date!",
+    "notes": "Notes",
+    "addDayOff": "Add Day Off Pickup",
+    "plural": {
+      "one": "employee",
+      "few": "employees",
+      "many": "employees"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Show Filters",
+    "myRequests": "My Orders",
+    "iAmResponsible": "I Am Responsible",
+    "pendingApproval": "Pending Approval",
+    "status": "Status",
+    "deadline": "Deadline",
+    "dateAdded": "Date Added",
+    "createdBy": "Created By",
+    "responsiblePerson": "Responsible Person",
+    "searchByName": "Search by name or email...",
+    "selected": "selected",
+    "notFound": "Not found",
+    "year": "Year",
+    "month": "Month",
+    "monthHint": "Month - select year",
+    "week": "Week",
+    "weekHint": "Week - select year",
+    "weekLabel": "Week",
+    "department": "Department"
+  },
+  "months": {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "bulkActions": {
+    "selected": "Selected {count} {plural}",
+    "noCommonActions": "No common actions for selected orders.",
+    "approve": "Approve",
+    "cancel": "Cancel",
+    "account": "Account",
+    "confirmApprove": {
+      "title": "Approve Selected Orders",
+      "description": "Are you sure you want to approve {count} {plural}?"
+    },
+    "confirmCancel": {
+      "title": "Cancel Selected Orders",
+      "description": "Are you sure you want to cancel {count} {plural}?"
+    },
+    "confirmAccount": {
+      "title": "Account Selected Orders",
+      "description": "Are you sure you want to account {count} {plural}?"
+    },
+    "toast": {
+      "processing": "Processing...",
+      "approved": "{count} {plural} have been approved",
+      "canceled": "{count} {plural} have been canceled",
+      "accounted": "{count} {plural} have been accounted",
+      "error": "Error: {message}"
+    },
+    "plural": {
+      "one": "order",
+      "few": "orders",
+      "many": "orders"
+    }
+  },
+  "idTable": {
+    "title": "Employees Picking Up Overtime",
+    "requestsTable": "Orders Table",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "identifier": "Pers. No.",
+    "actions": "Actions",
+    "agreedReceivingAt": "Day Off Pickup Date",
+    "note": "Note",
+    "noResults": "No results.",
+    "addPickup": "Add Pickup",
+    "deleteDayOff": "Delete Day Off Pickup",
+    "confirmDelete": {
+      "title": "Confirm Day Off Pickup Deletion",
+      "description": "Are you sure you want to delete the day off pickup for employee: {firstName} {lastName} ({identifier})?"
+    },
+    "toast": {
+      "deleting": "Deleting day off pickup...",
+      "deleted": "Pickup has been deleted!",
+      "unauthorized": "No permission!",
+      "notFound": "Not found!",
+      "employeeNotFound": "Employee not found!",
+      "invalidStatus": "Order status doesn't allow editing!",
+      "contactIT": "Please contact IT!"
+    }
+  },
+  "validation": {
+    "numberOfEmployeesMin": "Number of employees must be at least 1!",
+    "numberOfShiftsMin": "Number of shifts must be at least 1!",
+    "responsibleEmailInvalid": "Select responsible person!",
+    "responsibleRequired": "Responsible person is required!",
+    "dayOffDateRequired": "Select day off pickup date!",
+    "fromDateRequired": "Select start date!",
+    "toDateRequired": "Select end date!",
+    "reasonRequired": "No reason entered!",
+    "fromDateInPast": "Start cannot be in the past!",
+    "toDateInPast": "End cannot be in the past!",
+    "toDateBeforeFrom": "End cannot be before start!",
+    "durationMax24h": "Duration cannot exceed 24h (3 shifts)!",
+    "durationMin1h": "Scheduled work time must be at least 1h!",
+    "employeesExceedsTotal": "Number of employees picking up days off cannot exceed total number of employees!",
+    "durationNotWholeOrHalf": "Work time must be expressed in whole hours or accurate to half an hour!",
+    "fileRequired": "File is required!",
+    "fileEmpty": "File is empty!",
+    "fileTooLarge": "File is too large (max 10MB)!",
+    "invalidFile": "Invalid file!",
+    "filesMinOne": "Select at least one file!",
+    "filesMaxTen": "You can upload maximum 10 files!",
+    "totalFileSizeExceeds": "Total file size exceeds 50MB!",
+    "pendingArticleNotAdded": "You haven't added the selected article! Click \"+\" to add or clear the fields.",
+    "departmentRequired": "Select department!"
+  },
+  "multiArticleManager": {
+    "label": "Planned Production",
+    "placeholder": "Select article",
+    "articleNumber": "Article Number",
+    "articleName": "Name",
+    "quantity": "Quantity",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "unknownArticle": "Unknown article",
+    "fetchError": "Fetch error",
+    "quantityPlaceholder": "pcs.",
+    "clearFields": "Clear fields",
+    "addArticle": "Add article"
+  },
+  "articleSearch": {
+    "placeholder": "Select article",
+    "searchPlaceholder": "Search by number or name...",
+    "minCharsRequired": "Enter at least 2 characters",
+    "notFound": "No articles found",
+    "notSelected": "Not selected"
+  },
+  "department": {
+    "label": "Department",
+    "description": "Select the department for which overtime is ordered.",
+    "placeholder": "Select department",
+    "unknown": "Unknown"
+  },
+  "tableColumnsExtra": {
+    "date": "Date",
+    "orderDetails": "Order Details",
+    "closeOrder": "Close Order",
+    "reactivateOrder": "Reactivate Order",
+    "deleteOrder": "Delete Order",
+    "confirmDelete": "Are you sure you want to PERMANENTLY delete this order? This operation is irreversible.",
+    "deleted": "Order has been deleted",
+    "reactivated": "Order has been reactivated",
+    "error": "Error: {message}"
+  },
+  "detailsPage": {
+    "attendanceList": "Attendance List",
+    "overtimePickup": "Overtime Pickup",
+    "orderDetails": "Order Details",
+    "orders": "Orders",
+    "backToOrders": "Back to Orders",
+    "created": "Created:",
+    "requestedBy": "Requested By:",
+    "responsiblePerson": "Responsible Person:",
+    "department": "Department:",
+    "startTime": "Start Time:",
+    "endTime": "End Time:",
+    "duration": "Duration:",
+    "numberOfShifts": "Number of Shifts:",
+    "plannedEmployees": "Planned Number of Employees:",
+    "actualEmployees": "Actual Number of Employees:",
+    "employeesPickingUpDaysOff": "Employees Picking Up Days Off:",
+    "totalHours": "Total Hours:",
+    "reason": "Reason:",
+    "additionalInfo": "Additional Information:",
+    "productionInfo": "Production Information",
+    "plannedProduction": "Planned Production",
+    "actualProduction": "Actual Production",
+    "article": "Article",
+    "quantity": "Quantity",
+    "pcs": "pcs.",
+    "employeesWithDayOff": "Employees Picking Up Days Off",
+    "manage": "Manage",
+    "employee": "Employee",
+    "persNo": "Pers. No.",
+    "pickupDate": "Pickup Date",
+    "notes": "Notes",
+    "notSet": "Not Set",
+    "history": "History",
+    "status": "Status",
+    "person": "Person",
+    "date": "Date",
+    "statusLabels": {
+      "forecast": "Forecast",
+      "pending": "Awaiting Approval",
+      "canceled": "Canceled",
+      "accounted": "Accounted",
+      "completed": "Completed",
+      "approved": "Approved",
+      "created": "Created"
+    }
+  },
+  "completeOrderForm": {
+    "title": "Close Order",
+    "backToOrders": "Back to Orders List",
+    "description": "Closing the order includes uploading the attendance list and providing the actual number of employees and produced articles. After closing, the order status will change to completed.",
+    "attendanceList": "Attendance List",
+    "selectedFiles": "Selected files ({count}):",
+    "actualProduction": "Actual Production",
+    "actualEmployees": "Actual Number of Employees (planned: {planned})",
+    "submitButton": "Close Order",
+    "toast": {
+      "unauthorized": "You don't have permission to add the attendance list.",
+      "contactIT": "Please contact IT!",
+      "uploading": "Uploading files...",
+      "successSingle": "Order closed successfully! {count} file uploaded and converted to PDF. Order status changed to completed.",
+      "successMultiple": "Order closed successfully! {count} files uploaded and merged to PDF. Order status changed to completed.",
+      "invalidResponse": "Invalid response from server",
+      "fileAlreadyExists": "One of the files already exists",
+      "noPermission": "No permission to add attachments",
+      "untranslatedError": "An error occurred while adding attachments",
+      "unknownError": "An unknown error occurred",
+      "uploadError": "An error occurred while uploading files"
+    },
+    "errors": {
+      "unauthorized": "Unauthorized",
+      "insufficientPermissions": "Insufficient permissions to add attachment",
+      "noFiles": "No files selected",
+      "noRequestId": "No request ID",
+      "fileTooLarge": "One of the files exceeds the allowed size (10MB)",
+      "totalSizeExceeds": "Total file size exceeds the allowed limit (50MB)",
+      "unsupportedFileType": "Unsupported file type",
+      "fileExists": "A file with this name already exists",
+      "updateFailed": "Failed to update database",
+      "databaseUpdateFailed": "Database update error",
+      "uploadFailed": "File upload error"
+    }
+  },
+  "summary": {
+    "totalHours": "Total Hours",
+    "totalCost": "Total Cost"
+  }
+}

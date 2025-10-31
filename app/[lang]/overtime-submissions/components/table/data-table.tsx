@@ -37,6 +37,7 @@ interface TableMeta {
 interface DataTableProps<TData, TValue> {
   columns: (session: Session | null, dict: Dictionary) => ColumnDef<TData, TValue>[];
   data: TData[];
+  fetchTime: Date;
   session: Session | null;
   dict: Dictionary;
 }
@@ -44,6 +45,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  fetchTime,
   session,
   dict,
 }: DataTableProps<TData, TValue>) {
@@ -54,6 +56,11 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  // Reset row selection when fetchTime changes (after search/filter)
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [fetchTime]);
 
   // Use the session and dict to create the columns
   const tableColumns = React.useMemo(

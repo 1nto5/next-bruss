@@ -35,7 +35,10 @@ export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale })
   const [isPending, setIsPending] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
-  const finalRedirectUrl = `/${lang}${callbackUrl}`;
+  // Login form automatically adds language prefix to callbackUrl if not already present
+  const finalRedirectUrl = callbackUrl.startsWith(`/${lang}`)
+    ? callbackUrl
+    : `/${lang}${callbackUrl}`;
 
   const formSchema = z.object({
     email: z
@@ -64,6 +67,10 @@ export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale })
       if (res?.success) {
         toast.success(cDict.toasts.loginSuccess);
         // Use window.location for hard refresh to ensure server components update
+        // NOTE: window.location.href causes "Uncaught TypeError: Error in input stream" in console
+        // because hard refresh interrupts RSC (React Server Components) streaming.
+        // Possible solution: Replace with router.push(finalRedirectUrl) + router.refresh()
+        // to avoid stream interruption while still updating server components.
         window.location.href = finalRedirectUrl;
       } else if (res?.error === 'invalid credentials') {
         // Handle generic invalid credentials - show as form error on both fields

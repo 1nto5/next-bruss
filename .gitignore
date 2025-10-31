@@ -52,3 +52,6 @@ timesheet-entries.md
 
 # playwright
 .playwright-mcp
+
+# git worktrees
+.worktrees/

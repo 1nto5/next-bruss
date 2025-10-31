@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Session } from 'next-auth';
 import { toast } from 'sonner';
-import { markAsAccountedOvertimeSubmission as markAsAccounted } from '../actions';
+import { markAsAccountedOvertimeSubmission as markAsAccounted } from '../actions/approval';
 import { Dictionary } from '../lib/dict';
 
 interface MarkAsAccountedDialogProps {

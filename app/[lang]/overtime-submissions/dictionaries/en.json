@@ -2,13 +2,13 @@
   "title": "Overtime Submissions",
   "pageTitle": "Overtime Submissions",
   "testWarning": "Application in testing phase - entries are not official",
-  "hrView": "HR View",
-  "hrViewTitle": "HR View - Overtime Submissions",
   "backToSubmissions": "Back to submissions",
-  "newSubmission": "New submission",
+  "addOvertime": "Add Overtime",
+  "addWorkOrder": "Add Work Order",
   "filters": {
-    "showFilters": "Show filters",
     "select": "select",
+    "selected": "selected",
+    "clearFilter": "clear filter",
     "search": "Search",
     "searchPlaceholder": "search...",
     "notFound": "not found",
@@ -17,12 +17,38 @@
     "employee": "Employee",
     "year": "Year",
     "month": "Month",
+    "week": "Week",
+    "weekLabel": "Week",
+    "monthHint": "Month - select year",
+    "weekHint": "Week - select year",
     "manager": "Manager",
     "pendingSettlements": "Pending settlements",
-    "pendingApprovals": "Pending approvals"
+    "pendingApprovals": "Pending approvals",
+    "onlyMySubmissions": "Only mine",
+    "assignedToMe": "For approval",
+    "orders": "Orders",
+    "billing": "Billing",
+    "billingAll": "All",
+    "billingYes": "With billing",
+    "billingNo": "Without billing"
+  },
+  "months": {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
   },
   "status": {
-    "pending": "Pending",
+    "pending": "Pending - Supervisor",
+    "pendingPlantManager": "Pending - Plant Manager",
     "approved": "Approved",
     "rejected": "Rejected",
     "accounted": "Settled",
@@ -30,15 +56,19 @@
   },
   "actions": {
     "approve": "Approve",
-    "approveDirector": "Approve (Director)",
+    "approvePlantManager": "Approve (Plant Manager)",
     "reject": "Reject",
     "markAsAccounted": "Mark as settled",
     "cancel": "Cancel",
     "edit": "Edit",
+    "correct": "Correction",
+    "delete": "Delete",
     "confirm": "Confirm",
     "save": "Save changes",
+    "backToList": "Back to Submissions",
     "add": "Add submission",
-    "saveAndAddAnother": "Save and add another"
+    "saveAndAddAnother": "Save and add another",
+    "viewDetails": "View details"
   },
   "dialogs": {
     "approve": {
@@ -65,6 +95,11 @@
     "bulkConfirm": {
       "title": "Confirm operation",
       "description": "Are you sure you want to perform this operation on"
+    },
+    "delete": {
+      "title": "Delete submission?",
+      "description": "Permanent deletion from database. This action cannot be undone.",
+      "confirmButton": "Delete"
     }
   },
   "form": {
@@ -76,15 +111,29 @@
     "date": "Date",
     "reason": "Justification",
     "overtimeRequest": "Overtime work order",
-    "overtimeRequestDescription": "Planned overtime work requires approval from both supervisor and director.",
-    "payment": "Payment",
+    "overtimeRequestDescription": "Only for planned overtime work (positive hours and future date). Requires approval from both supervisor and plant manager.",
+    "payment": "No agreed pickup date",
     "scheduledDayOff": "Scheduled day off for overtime",
+    "workStartTime": "Work Start",
+    "workStartTimeDescription": "Start of work shift.",
+    "workEndTime": "Work End",
+    "workEndTimeDescription": "End of work shift.",
     "managerNotFound": "Manager not found.",
     "submissionsTable": "Submissions table"
   },
+  "correctPage": {
+    "title": "Correction of submission",
+    "backToDetails": "Back to details",
+    "reasonLabel": "Correction reason (required)",
+    "reasonPlaceholder": "Enter correction reason...",
+    "markAsCancelled": "Mark as cancelled",
+    "markAsCancelledHint": "Check if you want to cancel this submission",
+    "saveCorrection": "Save correction",
+    "cannotCorrectAccounted": "Cannot correct settled submissions"
+  },
   "columns": {
     "status": "Status",
-    "payment": "Payment",
+    "payment": "Receipt order",
     "actions": "Actions",
     "submittedBy": "Submitted by",
     "supervisor": "Supervisor",
@@ -134,7 +183,11 @@
     "bulkSettled": "Settled {count} of {total} submissions!",
     "bulkCancelling": "Cancelling...",
     "bulkCancelled": "Cancelled {count} of {total} submissions!",
-    "provideRejectionReason": "Provide rejection reason"
+    "provideRejectionReason": "Provide rejection reason",
+    "deleting": "Deleting...",
+    "deleted": "Submission deleted!",
+    "savingCorrection": "Saving correction...",
+    "correctionSaved": "Correction saved!"
   },
   "errors": {
     "unauthorized": "You don't have permission!",
@@ -150,7 +203,11 @@
     "approvalError": "Approval error",
     "rejectionError": "Rejection error",
     "settlementError": "Settlement error",
-    "cancellationError": "Cancellation error"
+    "cancellationError": "Cancellation error",
+    "cannotDelete": "Cannot delete this submission!",
+    "cannotCorrect": "Cannot correct this submission!",
+    "cannotCorrectAccounted": "Cannot correct settled submissions!",
+    "correctionReasonRequired": "Correction reason is required!"
   },
   "validation": {
     "rejectionReasonRequired": "Rejection reason is required!",
@@ -161,15 +218,86 @@
     "hoursMinRange": "Enter value from -8 to 16!",
     "hoursMaxRange": "Enter value from -8 to 16!",
     "scheduledDayOffRequired": "Select day off pickup if overtime is not for payment!",
-    "dateRangeInvalid": "You can only add overtime from the last 7 days.",
+    "dateRangeInvalid": "You can only add overtime from the last 3 days of the current month.",
     "hoursIncrementInvalid": "Hours must be expressed in half-hour increments (0.5, 1.0, 1.5, etc.)",
-    "reasonRequired": "Justification is required!"
+    "timeIncrementInvalid": "Time must be in 30-minute increments (:00 or :30)!",
+    "reasonRequired": "Justification is required!",
+    "previousMonthNotAllowed": "Cannot add overtime from previous month.",
+    "overtimeRequestRequiresFutureDate": "Overtime work order is available only for future dates!",
+    "overtimeRequestRequiresPositiveHours": "Overtime work order is only for scheduling future work, not for overtime pickup!",
+    "workStartTimeRequired": "Work start time is required!",
+    "workEndTimeRequired": "Work end time is required!",
+    "workEndTimeBeforeStart": "Work end time must be after work start time!",
+    "durationMin1h": "Work duration must be at least 1 hour!",
+    "durationMax24h": "Work duration cannot exceed 24 hours!"
   },
   "summary": {
     "yourOvertimeIn": "Your overtime in",
     "yourTotalOvertime": "Your total overtime",
+    "yourFilteredOvertimeIn": "Your overtime in filtered range",
     "organizationOvertimeIn": "Organization overtime in",
+    "organizationTotalOvertime": "Total organization overtime",
+    "ordersOvertimeIn": "Orders in",
+    "ordersTotalOvertime": "Total orders",
+    "ordersFilteredOvertimeIn": "Orders in filtered range",
+    "employeeOvertimeIn": "Employee overtime in",
     "overdueOvertimeToSettle": "Overdue overtime to settle",
-    "pending": "pending"
+    "pending": "pending",
+    "filteredResults": "Total",
+    "approvedToSettle": "To settle",
+    "filteredOvertimeIn": "Overtime in filtered range",
+    "filteredTotalOvertime": "Total overtime in filtered range"
+  },
+  "export": {
+    "exportCsv": "Export to CSV",
+    "exporting": "Exporting...",
+    "exportSuccess": "Exported {count} submissions",
+    "exportError": "Export error"
+  },
+  "displayingSummary": "Displaying",
+  "submissions": "submissions",
+  "detailsPage": {
+    "title": "Submission details",
+    "backToSubmissions": "Back to submissions",
+    "submissionDetails": "Submission details",
+    "status": "Status:",
+    "submittedBy": "Submitted by:",
+    "supervisor": "Supervisor:",
+    "date": "Overtime date:",
+    "hours": "Hours:",
+    "workStartTime": "Work Start:",
+    "workEndTime": "Work End:",
+    "reason": "Justification:",
+    "overtimeRequest": "Overtime work order:",
+    "payment": "Payment:",
+    "scheduledDayOff": "Day off pickup date:",
+    "yes": "Yes",
+    "no": "No",
+    "notSet": "Not set",
+    "history": "Change history",
+    "statusColumn": "Status",
+    "person": "Person",
+    "dateTime": "Date and time",
+    "statusLabels": {
+      "created": "Created",
+      "edited": "Edited",
+      "approved": "Approved",
+      "supervisorApproved": "Approved - Supervisor",
+      "plantManagerApproved": "Approved - Plant Manager",
+      "rejected": "Rejected",
+      "accounted": "Settled",
+      "cancelled": "Cancelled",
+      "pending": "Pending - Supervisor",
+      "pendingPlantManager": "Pending - Plant Manager"
+    },
+    "rejectionReason": "Rejection reason:",
+    "rejectionDetails": "Rejection details",
+    "corrections": "Corrections",
+    "correctionReason": "Reason",
+    "changes": "Changes",
+    "statusChange": "Status change",
+    "noCorrections": "No corrections"
   }
 }
+
+

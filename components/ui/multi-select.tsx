@@ -30,7 +30,10 @@ interface MultiSelectProps {
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
+  clearLabel?: string;
+  selectedLabel?: string; // e.g., "items selected" or "pozycji wybranych"
   className?: string;
+  disabled?: boolean;
 }
 
 export function MultiSelect({
@@ -40,7 +43,10 @@ export function MultiSelect({
   placeholder = 'Select items...',
   searchPlaceholder = 'Search...',
   emptyText = 'No items found.',
+  clearLabel = 'Clear all',
+  selectedLabel = 'items selected',
   className,
+  disabled = false,
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -68,16 +74,17 @@ export function MultiSelect({
       );
       return selectedOption?.label || value[0];
     }
-    return `${value.length} items selected`;
+    return `${selectedLabel}: ${value.length}`;
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={disabled ? undefined : setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant='outline'
           role='combobox'
           aria-expanded={open}
+          disabled={disabled}
           className={cn(
             'w-full justify-between',
             value.length === 0 && 'opacity-50',
@@ -99,9 +106,13 @@ export function MultiSelect({
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
               {value.length > 0 && (
-                <CommandItem key='clear-all' onSelect={handleClearAll}>
-                  <CircleX className='mr-2 h-4 w-4 text-red-500' />
-                  Clear all
+                <CommandItem
+                  key='clear-all'
+                  onSelect={handleClearAll}
+                  className='!bg-red-100 !text-red-600 hover:!bg-red-200 aria-selected:!bg-red-200 dark:!bg-red-900/20 dark:!text-red-400 dark:hover:!bg-red-900/30 dark:aria-selected:!bg-red-900/30'
+                >
+                  <CircleX className='mr-2 h-4 w-4' />
+                  {clearLabel}
                 </CommandItem>
               )}
               {options.map((option) => (

@@ -28,10 +28,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import {
   bulkApproveOvertimeSubmissions,
-  bulkCancelOvertimeRequests,
   bulkMarkAsAccountedOvertimeSubmissions,
   bulkRejectOvertimeSubmissions,
-} from '../actions';
+} from '../actions/bulk';
 import { OvertimeSubmissionType } from '../lib/types';
 import { Dictionary } from '../lib/dict';
 
@@ -47,7 +46,7 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
   const [rejectionReason, setRejectionReason] = useState('');
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [pendingActionType, setPendingActionType] = useState<
-    null | 'approve' | 'reject' | 'settle' | 'cancel'
+    null | 'approve' | 'reject' | 'settle'
   >(null);
 
   const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -84,17 +83,9 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
       const submission = row.original;
       return (isHR || isAdmin) && submission.status === 'approved';
     });
-  const allCanCancel =
-    selectedRows.length > 0 &&
-    selectedRows.every((row) => {
-      const submission = row.original;
-      return (
-        submission.submittedBy === userEmail && submission.status === 'pending'
-      );
-    });
 
   const hasAnyAction =
-    allCanApprove || allCanReject || allCanMarkAsAccounted || allCanCancel;
+    allCanApprove || allCanReject || allCanMarkAsAccounted;
   // Always show the card if at least one item is selected
   if (selectedCount === 0) return null;
 
@@ -103,7 +94,6 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
     if (!pendingActionType) return;
     if (pendingActionType === 'approve') handleBulkApprove();
     if (pendingActionType === 'settle') handleBulkMarkAsAccounted();
-    if (pendingActionType === 'cancel') handleBulkCancel();
     if (pendingActionType === 'reject') setIsRejectDialogOpen(true); // Show reject dialog after confirm
     setPendingActionType(null);
     setIsAlertOpen(false);
@@ -111,7 +101,7 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
 
   // Instead of confirmAndRun, use this for all actions
   const openConfirmDialog = (
-    type: 'approve' | 'reject' | 'settle' | 'cancel',
+    type: 'approve' | 'reject' | 'settle',
   ) => {
     setPendingActionType(type);
     setIsAlertOpen(true);
@@ -179,23 +169,6 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
     );
   };
 
-  const handleBulkCancel = async () => {
-    toast.promise(
-      bulkCancelOvertimeRequests(selectedIds).then((res) => {
-        if ('success' in res) {
-          table.resetRowSelection();
-          return res;
-        } else {
-          throw new Error(res.error || dict.errors.cancellationError);
-        }
-      }),
-      {
-        loading: dict.toast.bulkCancelling,
-        success: (res) => dict.toast.bulkCancelled.replace('{count}', (res.count || 0).toString()).replace('{total}', (res.total || 0).toString()),
-        error: (error) => error.message || dict.errors.cancellationError,
-      },
-    );
-  };
 
   return (
     <>
@@ -278,16 +251,6 @@ export default function BulkActions({ table, session, dict }: BulkActionsProps) 
               >
                 <Check className='' />
                 {dict.bulk.settle}
-              </Button>
-            )}
-            {allCanCancel && (
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => openConfirmDialog('cancel')}
-              >
-                <X className='' />
-                {dict.bulk.cancel}
               </Button>
             )}
           </div>

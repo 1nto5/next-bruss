@@ -2,13 +2,13 @@
   "title": "Überstunden-Meldungen",
   "pageTitle": "Überstunden-Meldungen",
   "testWarning": "Anwendung in Testphase - Einträge sind nicht offiziell",
-  "hrView": "HR-Ansicht",
-  "hrViewTitle": "HR-Ansicht - Überstunden-Meldungen",
   "backToSubmissions": "Zurück zu Meldungen",
-  "newSubmission": "Neue Meldung",
+  "addOvertime": "Überstunden hinzufügen",
+  "addWorkOrder": "Arbeitsauftrag hinzufügen",
   "filters": {
-    "showFilters": "Filter anzeigen",
     "select": "auswählen",
+    "selected": "ausgewählt",
+    "clearFilter": "Filter löschen",
     "search": "Suchen",
     "searchPlaceholder": "suchen...",
     "notFound": "nicht gefunden",
@@ -17,12 +17,38 @@
     "employee": "Mitarbeiter",
     "year": "Jahr",
     "month": "Monat",
+    "week": "Woche",
+    "weekLabel": "Woche",
+    "monthHint": "Monat - Jahr wählen",
+    "weekHint": "Woche - Jahr wählen",
     "manager": "Vorgesetzter",
     "pendingSettlements": "Zur Abrechnung",
-    "pendingApprovals": "Zur Genehmigung"
+    "pendingApprovals": "Zur Genehmigung",
+    "onlyMySubmissions": "Nur meine",
+    "assignedToMe": "Zur Genehmigung",
+    "orders": "Aufträge",
+    "billing": "Abrechnung",
+    "billingAll": "Alle",
+    "billingYes": "Mit Abrechnung",
+    "billingNo": "Ohne Abrechnung"
+  },
+  "months": {
+    "01": "Januar",
+    "02": "Februar",
+    "03": "März",
+    "04": "April",
+    "05": "Mai",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "August",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Dezember"
   },
   "status": {
-    "pending": "Ausstehend",
+    "pending": "Ausstehend - Vorgesetzter",
+    "pendingPlantManager": "Ausstehend - Plant Manager",
     "approved": "Genehmigt",
     "rejected": "Abgelehnt",
     "accounted": "Abgerechnet",
@@ -30,15 +56,19 @@
   },
   "actions": {
     "approve": "Genehmigen",
-    "approveDirector": "Genehmigen (Direktor)",
+    "approvePlantManager": "Genehmigen (Plant Manager)",
     "reject": "Ablehnen",
     "markAsAccounted": "Als abgerechnet markieren",
     "cancel": "Abbrechen",
     "edit": "Bearbeiten",
+    "correct": "Korrektur",
+    "delete": "Löschen",
     "confirm": "Bestätigen",
     "save": "Änderungen speichern",
+    "backToList": "Zurück zu Meldungen",
     "add": "Meldung hinzufügen",
-    "saveAndAddAnother": "Speichern und weitere hinzufügen"
+    "saveAndAddAnother": "Speichern und weitere hinzufügen",
+    "viewDetails": "Details anzeigen"
   },
   "dialogs": {
     "approve": {
@@ -65,6 +95,11 @@
     "bulkConfirm": {
       "title": "Vorgang bestätigen",
       "description": "Möchten Sie diesen Vorgang wirklich durchführen für"
+    },
+    "delete": {
+      "title": "Meldung löschen?",
+      "description": "Dauerhaftes Löschen aus der Datenbank. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmButton": "Löschen"
     }
   },
   "form": {
@@ -76,15 +111,29 @@
     "date": "Datum",
     "reason": "Begründung",
     "overtimeRequest": "Überstunden-Arbeitsauftrag",
-    "overtimeRequestDescription": "Geplante Überstunden erfordern die Genehmigung von Vorgesetztem und Direktor.",
-    "payment": "Zahlung",
+    "overtimeRequestDescription": "Nur für geplante Überstundenarbeit (positive Stunden und zukünftiges Datum). Erfordert Genehmigung von Vorgesetztem und Plant Manager.",
+    "payment": "Kein vereinbarter Abholtermin",
     "scheduledDayOff": "Geplanter freier Tag für Überstunden",
+    "workStartTime": "Arbeitsbeginn",
+    "workStartTimeDescription": "Beginn der Arbeitszeit.",
+    "workEndTime": "Arbeitsende",
+    "workEndTimeDescription": "Ende der Arbeitszeit.",
     "managerNotFound": "Vorgesetzter nicht gefunden.",
     "submissionsTable": "Meldungstabelle"
   },
+  "correctPage": {
+    "title": "Korrektur der Meldung",
+    "backToDetails": "Zurück zu Details",
+    "reasonLabel": "Korrekturgrund (erforderlich)",
+    "reasonPlaceholder": "Korrekturgrund eingeben...",
+    "markAsCancelled": "Als storniert markieren",
+    "markAsCancelledHint": "Aktivieren, wenn Sie diese Meldung stornieren möchten",
+    "saveCorrection": "Korrektur speichern",
+    "cannotCorrectAccounted": "Abgerechnete Meldungen können nicht korrigiert werden"
+  },
   "columns": {
     "status": "Status",
-    "payment": "Zahlung",
+    "payment": "Abholauftrag",
     "actions": "Aktionen",
     "submittedBy": "Gemeldet von",
     "supervisor": "Vorgesetzter",
@@ -134,7 +183,11 @@
     "bulkSettled": "{count} von {total} Meldungen abgerechnet!",
     "bulkCancelling": "Stornieren...",
     "bulkCancelled": "{count} von {total} Meldungen storniert!",
-    "provideRejectionReason": "Ablehnungsgrund angeben"
+    "provideRejectionReason": "Ablehnungsgrund angeben",
+    "deleting": "Löschen...",
+    "deleted": "Meldung gelöscht!",
+    "savingCorrection": "Korrektur speichern...",
+    "correctionSaved": "Korrektur gespeichert!"
   },
   "errors": {
     "unauthorized": "Sie haben keine Berechtigung!",
@@ -150,7 +203,11 @@
     "approvalError": "Genehmigungsfehler",
     "rejectionError": "Ablehnungsfehler",
     "settlementError": "Abrechnungsfehler",
-    "cancellationError": "Stornierungsfehler"
+    "cancellationError": "Stornierungsfehler",
+    "cannotDelete": "Diese Meldung kann nicht gelöscht werden!",
+    "cannotCorrect": "Diese Meldung kann nicht korrigiert werden!",
+    "cannotCorrectAccounted": "Abgerechnete Meldungen können nicht korrigiert werden!",
+    "correctionReasonRequired": "Korrekturgrund ist erforderlich!"
   },
   "validation": {
     "rejectionReasonRequired": "Ablehnungsgrund ist erforderlich!",
@@ -161,15 +218,85 @@
     "hoursMinRange": "Wert zwischen -8 und 16 eingeben!",
     "hoursMaxRange": "Wert zwischen -8 und 16 eingeben!",
     "scheduledDayOffRequired": "Tag für Freizeitausgleich auswählen, wenn Überstunden nicht ausgezahlt werden!",
-    "dateRangeInvalid": "Sie können nur Überstunden der letzten 7 Tage hinzufügen.",
+    "dateRangeInvalid": "Sie können nur Überstunden der letzten 3 Tage des aktuellen Monats hinzufügen.",
     "hoursIncrementInvalid": "Stunden müssen in halben Stunden angegeben werden (0.5, 1.0, 1.5 usw.)",
-    "reasonRequired": "Begründung ist erforderlich!"
+    "timeIncrementInvalid": "Zeit muss in 30-Minuten-Schritten angegeben werden (:00 oder :30)!",
+    "reasonRequired": "Begründung ist erforderlich!",
+    "previousMonthNotAllowed": "Überstunden aus dem Vormonat können nicht hinzugefügt werden.",
+    "overtimeRequestRequiresFutureDate": "Überstunden-Arbeitsauftrag nur für zukünftige Termine verfügbar!",
+    "overtimeRequestRequiresPositiveHours": "Überstunden-Arbeitsauftrag ist nur für die Planung zukünftiger Arbeit, nicht für den Abbau von Überstunden!",
+    "workStartTimeRequired": "Arbeitsbeginn ist erforderlich!",
+    "workEndTimeRequired": "Arbeitsende ist erforderlich!",
+    "workEndTimeBeforeStart": "Arbeitsende muss nach Arbeitsbeginn sein!",
+    "durationMin1h": "Arbeitsdauer muss mindestens 1 Stunde betragen!",
+    "durationMax24h": "Arbeitsdauer darf 24 Stunden nicht überschreiten!"
   },
   "summary": {
     "yourOvertimeIn": "Ihre Überstunden in",
     "yourTotalOvertime": "Ihre gesamten Überstunden",
+    "yourFilteredOvertimeIn": "Ihre Überstunden im gefilterten Bereich",
     "organizationOvertimeIn": "Überstunden der Organisation in",
+    "organizationTotalOvertime": "Gesamtüberstunden der Organisation",
+    "ordersOvertimeIn": "Aufträge in",
+    "ordersTotalOvertime": "Aufträge insgesamt",
+    "ordersFilteredOvertimeIn": "Aufträge im gefilterten Bereich",
+    "employeeOvertimeIn": "Überstunden des Mitarbeiters in",
     "overdueOvertimeToSettle": "Überfällige Überstunden zur Abrechnung",
-    "pending": "ausstehend"
+    "pending": "ausstehend",
+    "filteredResults": "Gesamt",
+    "approvedToSettle": "Zur Abrechnung",
+    "filteredOvertimeIn": "Überstunden im gefilterten Bereich",
+    "filteredTotalOvertime": "Gesamtüberstunden im gefilterten Bereich"
+  },
+  "export": {
+    "exportCsv": "Als CSV exportieren",
+    "exporting": "Exportieren...",
+    "exportSuccess": "{count} Meldungen exportiert",
+    "exportError": "Exportfehler"
+  },
+  "displayingSummary": "Angezeigt",
+  "submissions": "Meldungen",
+  "detailsPage": {
+    "title": "Meldungsdetails",
+    "backToSubmissions": "Zurück zu Meldungen",
+    "submissionDetails": "Meldungsdetails",
+    "status": "Status:",
+    "submittedBy": "Gemeldet von:",
+    "supervisor": "Vorgesetzter:",
+    "date": "Überstundendatum:",
+    "hours": "Stunden:",
+    "workStartTime": "Arbeitsbeginn:",
+    "workEndTime": "Arbeitsende:",
+    "reason": "Begründung:",
+    "overtimeRequest": "Überstunden-Arbeitsauftrag:",
+    "payment": "Zahlung:",
+    "scheduledDayOff": "Datum Freizeitausgleich:",
+    "yes": "Ja",
+    "no": "Nein",
+    "notSet": "Nicht festgelegt",
+    "history": "Änderungsverlauf",
+    "statusColumn": "Status",
+    "person": "Person",
+    "dateTime": "Datum und Uhrzeit",
+    "statusLabels": {
+      "created": "Erstellt",
+      "edited": "Bearbeitet",
+      "approved": "Genehmigt",
+      "supervisorApproved": "Gen. - Vorgesetzter",
+      "plantManagerApproved": "Gen. - Plant Manager",
+      "rejected": "Abgelehnt",
+      "accounted": "Abgerechnet",
+      "cancelled": "Storniert",
+      "pending": "Ausstehend - Vorgesetzter",
+      "pendingPlantManager": "Ausstehend - Plant Manager"
+    },
+    "rejectionReason": "Ablehnungsgrund:",
+    "rejectionDetails": "Ablehnungsdetails",
+    "corrections": "Korrekturen",
+    "correctionReason": "Grund",
+    "changes": "Änderungen",
+    "statusChange": "Statusänderung",
+    "noCorrections": "Keine Korrekturen"
   }
 }
+

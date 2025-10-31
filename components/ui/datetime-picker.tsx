@@ -158,6 +158,13 @@ export type DateTimePickerProps = {
     second?: boolean;
   };
   /**
+   * The step value for minute selection.
+   * For example, 30 for half-hours (0, 30), or 15 for quarter-hours (0, 15, 30, 45).
+   * When set to a value > 1, seconds are automatically hidden.
+   * @default 1
+   */
+  minuteStep?: number;
+  /**
    * Custom render function for the trigger.
    */
   renderTrigger?: (props: DateTimeRenderTriggerProps) => React.ReactNode;
@@ -185,6 +192,7 @@ export function DateTimePicker({
   clearable,
   classNames,
   timePicker,
+  minuteStep = 1,
   modal = false,
   ...props
 }: DateTimePickerProps & CalendarProps) {
@@ -484,6 +492,7 @@ export function DateTimePicker({
               use12HourFormat={use12HourFormat}
               min={minDate}
               max={maxDate}
+              minuteStep={minuteStep}
               // If no date is selected, disable the time picker
               disabled={!date}
             />
@@ -629,6 +638,7 @@ function TimePicker({
   max,
   timePicker,
   disabled,
+  minuteStep = 1,
 }: {
   use12HourFormat?: boolean;
   value: Date;
@@ -637,6 +647,7 @@ function TimePicker({
   max?: Date;
   timePicker?: DateTimePickerProps['timePicker'];
   disabled?: boolean;
+  minuteStep?: number;
 }) {
   // hours24h = HH
   // hours12h = hh
@@ -653,8 +664,11 @@ function TimePicker({
   const [hour, setHour] = useState(
     use12HourFormat ? +format(value, 'hh') : value.getHours(),
   );
-  const [minute, setMinute] = useState(value.getMinutes());
-  const [second, setSecond] = useState(value.getSeconds());
+  const [minute, setMinute] = useState(() => {
+    const currentMinute = value.getMinutes();
+    return Math.round(currentMinute / minuteStep) * minuteStep;
+  });
+  const [second, setSecond] = useState(minuteStep > 1 ? 0 : value.getSeconds());
 
   useEffect(() => {
     onChange(
@@ -698,6 +712,8 @@ function TimePicker({
   const minutes: TimeOption[] = useMemo(() => {
     const anchorDate = setHours(value, _hourIn24h);
     return Array.from({ length: 60 }, (_, i) => {
+      if (i % minuteStep !== 0) return null;
+
       let disabled = false;
       const mDate = setMinutes(anchorDate, i);
       const mStart = startOfMinute(mDate);
@@ -709,8 +725,8 @@ function TimePicker({
         label: i.toString().padStart(2, '0'),
         disabled,
       };
-    });
-  }, [value, min, max, _hourIn24h]);
+    }).filter(Boolean) as TimeOption[];
+  }, [value, min, max, _hourIn24h, minuteStep]);
   const seconds: TimeOption[] = useMemo(() => {
     const anchorDate = setMilliseconds(
       setMinutes(setHours(value, _hourIn24h), minute),
@@ -891,6 +907,9 @@ function TimePicker({
     const arr = [];
     for (const element of ['hour', 'minute', 'second']) {
       if (!timePicker || timePicker[element as keyof typeof timePicker]) {
+        if (element === 'second' && minuteStep > 1) {
+          continue;
+        }
         if (element === 'hour') {
           arr.push(use12HourFormat ? 'hh' : 'HH');
         } else {
@@ -899,7 +918,7 @@ function TimePicker({
       }
     }
     return format(value, arr.join(':') + (use12HourFormat ? ' a' : ''));
-  }, [value, use12HourFormat, timePicker]);
+  }, [value, use12HourFormat, timePicker, minuteStep]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -959,7 +978,7 @@ function TimePicker({
                 </div>
               </ScrollArea>
             )}
-            {(!timePicker || timePicker.second) && (
+            {(!timePicker || timePicker.second) && minuteStep === 1 && (
               <ScrollArea className='h-full grow'>
                 <div className='flex grow flex-col items-stretch overflow-y-auto pe-2 pb-48'>
                   {seconds.map((v) => (

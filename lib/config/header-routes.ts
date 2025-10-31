@@ -18,7 +18,8 @@ export const ROUTE_PATHS = {
   inw2zatwierdz: '/inw-2/zatwierdz',
 
   newsAdd: '/news/add',
-  productionOvertime: '/production-overtime',
+  overtimeProduction: '/production-overtime',
+  overtimeOrders: '/overtime-orders',
   overtimeSubmissions: '/overtime-submissions',
   codesGenerator: '/codes-generator',
   projects: '/projects',
@@ -52,8 +53,12 @@ export const plHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Praca w godzinach nadliczbowych - produkcja',
+        href: ROUTE_PATHS.overtimeProduction,
+        title: 'Zlecenia godzin nadliczbowych - produkcja',
+      },
+      {
+        href: ROUTE_PATHS.overtimeOrders,
+        title: 'Zlecenia godzin nadliczbowych - test nowej wersji',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
@@ -92,6 +97,24 @@ export const deHeaderRoutes: HeaderRoute[] = [
       },
     ],
   },
+  {
+    title: 'Mitarbeiter',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.overtimeProduction,
+        title: 'Überstundenaufträge - Produktion',
+      },
+      {
+        href: ROUTE_PATHS.overtimeOrders,
+        title: 'Überstundenaufträge - Test neue Version',
+      },
+      {
+        href: ROUTE_PATHS.overtimeSubmissions,
+        title: 'Überstundenmeldungen - test',
+      },
+    ],
+  },
 ];
 
 export const enHeaderRoutes: HeaderRoute[] = [
@@ -122,12 +145,16 @@ export const enHeaderRoutes: HeaderRoute[] = [
     href: '',
     submenu: [
       {
-        href: ROUTE_PATHS.productionOvertime,
-        title: 'Production overtime work',
+        href: ROUTE_PATHS.overtimeProduction,
+        title: 'Overtime Orders - Production',
+      },
+      {
+        href: ROUTE_PATHS.overtimeOrders,
+        title: 'Overtime Orders - New Version Test',
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
-        title: 'Overtime submissions',
+        title: 'Overtime submissions - test',
       },
     ],
   },
