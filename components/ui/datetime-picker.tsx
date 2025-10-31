@@ -45,9 +45,9 @@ import {
   subHours,
   subMonths,
 } from 'date-fns';
-import de from 'date-fns/locale/de';
-import enUS from 'date-fns/locale/en-US';
-import pl from 'date-fns/locale/pl';
+import * as deLocale from 'date-fns/locale/de';
+import * as enUSLocale from 'date-fns/locale/en-US';
+import * as plLocale from 'date-fns/locale/pl';
 import {
   Calendar as CalendarIcon,
   CheckIcon,
@@ -74,9 +74,9 @@ import { cn } from '@/lib/utils/cn';
 
 // Locale mapping for date-fns
 const localeMap = {
-  pl: pl,
-  de: de,
-  en: enUS,
+  pl: plLocale.default || plLocale,
+  de: deLocale.default || deLocale,
+  en: enUSLocale.default || enUSLocale,
 } as const;
 
 // Helper function to capitalize first letter
