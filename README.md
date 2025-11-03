@@ -1,4 +1,4 @@
-# Next-Bruss
+# Bruss-Intra
 
 Industrial manufacturing web application built with Next.js 15 for production floor operations and management.
 
