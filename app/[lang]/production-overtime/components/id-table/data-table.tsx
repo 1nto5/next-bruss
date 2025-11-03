@@ -1,5 +1,6 @@
 'use client';
 
+import LocalizedLink from '@/components/localized-link';
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,7 +25,6 @@ import {
 } from '@tanstack/react-table';
 import { AlarmClockPlus, ArrowRight, CircleX } from 'lucide-react';
 import * as React from 'react';
-import LocalizedLink from '@/components/localized-link';
 import { Dictionary } from '../../lib/dict';
 
 interface DataTableProps<TData, TValue> {
@@ -148,11 +148,11 @@ export function DataTable<TData, TValue>({
           </div>
           {shouldShowAddButton && (
             <div>
-              <LocalizedLink href={`/production-overtime/${id}/add-day-off`}>
-                <Button variant='outline'>
+              <Button variant='outline' asChild>
+                <LocalizedLink href={`/production-overtime/${id}/add-day-off`}>
                   <AlarmClockPlus /> <span>{dict.idTable.addPickup}</span>
-                </Button>
-              </LocalizedLink>
+                </LocalizedLink>
+              </Button>
             </div>
           )}
         </div>

@@ -1,8 +1,8 @@
 'use server';
 
 import { auth } from '@/lib/auth';
-import mailer from '@/lib/services/mailer';
 import { dbc } from '@/lib/db/mongo';
+import mailer from '@/lib/services/mailer';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -21,7 +21,10 @@ export async function redirectToProductionOvertime(lang: string) {
   redirect(`/${lang}/production-overtime`);
 }
 
-export async function redirectToProductionOvertimeDaysOff(id: string, lang: string) {
+export async function redirectToProductionOvertimeDaysOff(
+  id: string,
+  lang: string,
+) {
   redirect(`/${lang}/production-overtime/${id}`);
 }
 
@@ -169,6 +172,7 @@ export async function deleteDayOff(
     }
 
     revalidateProductionOvertime();
+    revalidateProductionOvertimeRequest();
     return { success: 'deleted' };
   } catch (error) {
     console.error(error);
@@ -228,6 +232,8 @@ export async function addEmployeeDayOff(
     if (
       request.requestedBy !== session.user.email &&
       !session.user.roles?.includes('admin') &&
+      !session.user.roles?.includes('production-manager') &&
+      !session.user.roles?.includes('group-leader') &&
       !session.user.roles?.includes('plant-manager') &&
       !session.user.roles?.includes('hr')
     ) {

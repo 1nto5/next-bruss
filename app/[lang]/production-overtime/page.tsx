@@ -1,16 +1,16 @@
 // import { auth } from '@/lib/auth';
-import { auth } from '@/lib/auth';
+import LocalizedLink from '@/components/localized-link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
 import { formatDateTime } from '@/lib/utils/date-format';
 import { KeyRound, Plus } from 'lucide-react';
-import LocalizedLink from '@/components/localized-link';
 import TableFilteringAndOptions from './components/table-filtering-and-options';
 import { createColumns } from './components/table/columns';
 import { DataTable } from './components/table/data-table';
-import { OvertimeType } from './lib/types';
 import { getDictionary } from './lib/dict';
+import { OvertimeType } from './lib/types';
 
 async function getOvertimeRequests(
   lang: string,
@@ -90,17 +90,19 @@ export default async function ProductionOvertimePage(props: {
 
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
             {session && canCreateRequest ? (
-              <LocalizedLink href='/production-overtime/new-request'>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
+              <Button variant={'outline'} className='w-full sm:w-auto' asChild>
+                <LocalizedLink href='/production-overtime/new-request'>
                   <Plus /> <span>{dict.page.newRequest}</span>
-                </Button>
-              </LocalizedLink>
+                </LocalizedLink>
+              </Button>
             ) : !session ? (
-              <LocalizedLink href={`/auth?callbackUrl=/${lang}/production-overtime`}>
-                <Button variant={'outline'} className='w-full sm:w-auto'>
+              <Button variant={'outline'} className='w-full sm:w-auto' asChild>
+                <LocalizedLink
+                  href={`/auth?callbackUrl=/${lang}/production-overtime`}
+                >
                   <KeyRound /> <span>{dict.page.login}</span>
-                </Button>
-              </LocalizedLink>
+                </LocalizedLink>
+              </Button>
             ) : null}
           </div>
         </div>

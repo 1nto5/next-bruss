@@ -1,5 +1,6 @@
 'use client';
 
+import LocalizedLink from '@/components/localized-link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -22,9 +23,8 @@ import {
   X,
 } from 'lucide-react';
 import { Session } from 'next-auth';
-import { useState } from 'react';
 import Link from 'next/link';
-import LocalizedLink from '@/components/localized-link';
+import { useState } from 'react';
 import { Dictionary } from '../../lib/dict';
 import { OvertimeType } from '../../lib/types';
 import AddAttachmentDialog from '../add-attachment-dialog';
@@ -43,7 +43,7 @@ export const createColumns = (
   const isHR = session?.user?.roles?.includes('hr');
   const canApprove = isPlantManager || isAdmin;
 
-  return [
+  const allColumns: ColumnDef<OvertimeType>[] = [
     {
       id: 'select',
       header: ({ table }) => (
@@ -117,16 +117,32 @@ export const createColumns = (
             );
             break;
           case 'approved':
-            statusLabel = <Badge variant='statusApproved'>{dict.tableColumns.statuses.approved}</Badge>;
+            statusLabel = (
+              <Badge variant='statusApproved'>
+                {dict.tableColumns.statuses.approved}
+              </Badge>
+            );
             break;
           case 'canceled':
-            statusLabel = <Badge variant='statusRejected'>{dict.tableColumns.statuses.canceled}</Badge>;
+            statusLabel = (
+              <Badge variant='statusRejected'>
+                {dict.tableColumns.statuses.canceled}
+              </Badge>
+            );
             break;
           case 'completed':
-            statusLabel = <Badge variant='statusClosed'>{dict.tableColumns.statuses.completed}</Badge>;
+            statusLabel = (
+              <Badge variant='statusClosed'>
+                {dict.tableColumns.statuses.completed}
+              </Badge>
+            );
             break;
           case 'accounted':
-            statusLabel = <Badge variant='statusAccounted'>{dict.tableColumns.statuses.accounted}</Badge>;
+            statusLabel = (
+              <Badge variant='statusAccounted'>
+                {dict.tableColumns.statuses.accounted}
+              </Badge>
+            );
             break;
           default:
             statusLabel = <Badge variant='outline'>{status}</Badge>;
@@ -237,7 +253,9 @@ export const createColumns = (
                     </LocalizedLink>
                     {/* Edit button - only for author and pending/approved status */}
                     {canEdit && (
-                      <LocalizedLink href={`/production-overtime/${request._id}/edit`}>
+                      <LocalizedLink
+                        href={`/production-overtime/${request._id}/edit`}
+                      >
                         <DropdownMenuItem>
                           <Edit className='mr-2 h-4 w-4' />
                           <span>{dict.tableColumns.editRequest}</span>
@@ -565,4 +583,9 @@ export const createColumns = (
       },
     },
   ];
+
+  // Filter out actions column for unauthenticated users
+  return session
+    ? allColumns
+    : allColumns.filter((col) => col.id !== 'actions');
 };

@@ -1,4 +1,5 @@
 'use client';
+import LocalizedLink from '@/components/localized-link';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,11 +9,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Locale } from '@/lib/config/i18n';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleX, Plus, Table } from 'lucide-react';
 import { useState } from 'react';
-import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -20,10 +21,9 @@ import {
   addEmployeeDayOff,
   redirectToProductionOvertimeDaysOff as redirect,
 } from '../actions';
+import { Dictionary } from '../lib/dict';
 import { overtimeRequestEmployeeType } from '../lib/types';
 import { MultiSelectEmployees } from './multi-select-employees';
-import { Dictionary } from '../lib/dict';
-import { Locale } from '@/lib/config/i18n';
 
 const AddEmployeeSchema = z.object({
   employeesToAdd: z.array(
@@ -104,11 +104,11 @@ export default function AddDayOff({
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <CardTitle>{dict.addDayOffForm.title}</CardTitle>
-          <LocalizedLink href={`/production-overtime/${id}`}>
-            <Button variant='outline'>
+          <Button variant='outline' asChild>
+            <LocalizedLink href={`/production-overtime/${id}`}>
               <Table /> <span>{dict.addDayOffForm.backToRequest}</span>
-            </Button>
-          </LocalizedLink>
+            </LocalizedLink>
+          </Button>
         </div>
       </CardHeader>
       <Separator className='mb-4' />

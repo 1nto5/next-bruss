@@ -1,4 +1,5 @@
 'use client';
+import LocalizedLink from '@/components/localized-link';
 import {
   Accordion,
   AccordionContent,
@@ -40,9 +41,10 @@ import {
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils/cn';
+import { Locale } from '@/lib/config/i18n';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { UsersListType } from '@/lib/types/user';
+import { cn } from '@/lib/utils/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Check,
@@ -52,7 +54,6 @@ import {
   Plus,
   Table,
 } from 'lucide-react';
-import LocalizedLink from '@/components/localized-link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -64,7 +65,6 @@ import {
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { Dictionary } from '../lib/dict';
 import { createNewOvertimeRequestSchema } from '../lib/zod';
-import { Locale } from '@/lib/config/i18n';
 
 export default function NewOvertimeRequestForm({
   employees,
@@ -104,7 +104,9 @@ export default function NewOvertimeRequestForm({
     0,
   );
 
-  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
+  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(
+    dict.validation,
+  );
 
   const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
     resolver: zodResolver(newOvertimeRequestSchema),
@@ -161,14 +163,12 @@ export default function NewOvertimeRequestForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            {dict.newOvertimeRequestForm.title}
-          </CardTitle>
-          <LocalizedLink href='/production-overtime'>
-            <Button variant='outline'>
+          <CardTitle>{dict.newOvertimeRequestForm.title}</CardTitle>
+          <Button variant='outline' asChild>
+            <LocalizedLink href='/production-overtime'>
               <Table /> <span>{dict.newOvertimeRequestForm.requestsTable}</span>
-            </Button>
-          </LocalizedLink>
+            </LocalizedLink>
+          </Button>
         </div>
       </CardHeader>
       <Separator className='mb-4' />
@@ -244,7 +244,9 @@ export default function NewOvertimeRequestForm({
               name='numberOfShifts'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.newOvertimeRequestForm.numberOfShifts}</FormLabel>
+                  <FormLabel>
+                    {dict.newOvertimeRequestForm.numberOfShifts}
+                  </FormLabel>
                   <FormDescription>
                     {dict.newOvertimeRequestForm.numberOfShiftsDescription}
                   </FormDescription>
@@ -269,7 +271,9 @@ export default function NewOvertimeRequestForm({
               name='responsibleEmployee'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.newOvertimeRequestForm.responsible}</FormLabel>
+                  <FormLabel>
+                    {dict.newOvertimeRequestForm.responsible}
+                  </FormLabel>
                   <FormDescription>
                     {dict.newOvertimeRequestForm.responsibleDescription}
                   </FormDescription>
@@ -297,9 +301,13 @@ export default function NewOvertimeRequestForm({
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder={dict.newOvertimeRequestForm.searchPerson} />
+                        <CommandInput
+                          placeholder={dict.newOvertimeRequestForm.searchPerson}
+                        />
                         <CommandList>
-                          <CommandEmpty>{dict.newOvertimeRequestForm.personNotFound}</CommandEmpty>
+                          <CommandEmpty>
+                            {dict.newOvertimeRequestForm.personNotFound}
+                          </CommandEmpty>
                           <CommandGroup className='max-h-48 overflow-y-auto'>
                             {users.map((user) => (
                               <CommandItem
@@ -338,7 +346,9 @@ export default function NewOvertimeRequestForm({
               name='numberOfEmployees'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.newOvertimeRequestForm.numberOfEmployees}</FormLabel>
+                  <FormLabel>
+                    {dict.newOvertimeRequestForm.numberOfEmployees}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
@@ -362,7 +372,9 @@ export default function NewOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
-                    <FormLabel>{dict.newOvertimeRequestForm.scheduledDayOff}</FormLabel>
+                    <FormLabel>
+                      {dict.newOvertimeRequestForm.scheduledDayOff}
+                    </FormLabel>
                     <FormControl>
                       <MultiSelectEmployees
                         employees={employees}
@@ -391,9 +403,7 @@ export default function NewOvertimeRequestForm({
               name='reason'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {dict.newOvertimeRequestForm.reason}
-                  </FormLabel>
+                  <FormLabel>{dict.newOvertimeRequestForm.reason}</FormLabel>
                   <FormControl>
                     <Textarea className='' {...field} />
                   </FormControl>
@@ -425,7 +435,9 @@ export default function NewOvertimeRequestForm({
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value='item-2'>
-                <AccordionTrigger>{dict.newOvertimeRequestForm.accordion.brussStandard}</AccordionTrigger>
+                <AccordionTrigger>
+                  {dict.newOvertimeRequestForm.accordion.brussStandard}
+                </AccordionTrigger>
                 <AccordionContent className='text-justify'>
                   {dict.newOvertimeRequestForm.accordion.brussStandardContent}
                 </AccordionContent>

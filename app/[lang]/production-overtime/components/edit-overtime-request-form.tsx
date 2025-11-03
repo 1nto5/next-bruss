@@ -1,4 +1,5 @@
 'use client';
+import LocalizedLink from '@/components/localized-link';
 import {
   Accordion,
   AccordionContent,
@@ -40,31 +41,24 @@ import {
 } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils/cn';
+import { Locale } from '@/lib/config/i18n';
 import { EmployeeType } from '@/lib/types/employee-types';
 import { UsersListType } from '@/lib/types/user';
+import { cn } from '@/lib/utils/cn';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Check,
-  ChevronsUpDown,
-  CircleX,
-  Save,
-  Table,
-} from 'lucide-react';
+import { Check, ChevronsUpDown, CircleX, Save, Table } from 'lucide-react';
 import { useState } from 'react';
-import LocalizedLink from '@/components/localized-link';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import {
-  updateOvertimeRequest as update,
   redirectToProductionOvertime as redirect,
+  updateOvertimeRequest as update,
 } from '../actions';
 import { MultiSelectEmployees } from '../components/multi-select-employees';
 import { Dictionary } from '../lib/dict';
-import { createNewOvertimeRequestSchema } from '../lib/zod';
 import { OvertimeType } from '../lib/types';
-import { Locale } from '@/lib/config/i18n';
+import { createNewOvertimeRequestSchema } from '../lib/zod';
 
 export default function EditOvertimeRequestForm({
   employees,
@@ -82,7 +76,9 @@ export default function EditOvertimeRequestForm({
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [responsibleEmployeeOpen, setResponsibleEmployeeOpen] = useState(false);
 
-  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
+  const newOvertimeRequestSchema = createNewOvertimeRequestSchema(
+    dict.validation,
+  );
 
   const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
     resolver: zodResolver(newOvertimeRequestSchema),
@@ -90,7 +86,8 @@ export default function EditOvertimeRequestForm({
       numberOfEmployees: overtimeRequest.numberOfEmployees,
       numberOfShifts: overtimeRequest.numberOfShifts,
       responsibleEmployee: overtimeRequest.responsibleEmployee,
-      employeesWithScheduledDayOff: overtimeRequest.employeesWithScheduledDayOff || [],
+      employeesWithScheduledDayOff:
+        overtimeRequest.employeesWithScheduledDayOff || [],
       from: new Date(overtimeRequest.from),
       to: new Date(overtimeRequest.to),
       reason: overtimeRequest.reason,
@@ -118,7 +115,7 @@ export default function EditOvertimeRequestForm({
     } catch (error) {
       console.error('onSubmit', error);
       toast.error(dict.editOvertimeRequestForm.toast.contactIT);
-    } finally{
+    } finally {
       setIsPendingUpdate(false);
     }
   };
@@ -127,14 +124,13 @@ export default function EditOvertimeRequestForm({
     <Card className='sm:w-[768px]'>
       <CardHeader>
         <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
-          <CardTitle>
-            {dict.editOvertimeRequestForm.title}
-          </CardTitle>
-          <LocalizedLink href='/production-overtime'>
-            <Button variant='outline'>
-              <Table /> <span>{dict.editOvertimeRequestForm.requestsTable}</span>
-            </Button>
-          </LocalizedLink>
+          <CardTitle>{dict.editOvertimeRequestForm.title}</CardTitle>
+          <Button variant='outline' asChild>
+            <LocalizedLink href='/production-overtime'>
+              <Table />{' '}
+              <span>{dict.editOvertimeRequestForm.requestsTable}</span>
+            </LocalizedLink>
+          </Button>
         </div>
       </CardHeader>
       <Separator className='mb-4' />
@@ -147,7 +143,9 @@ export default function EditOvertimeRequestForm({
               name='from'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.editOvertimeRequestForm.startWork}</FormLabel>
+                  <FormLabel>
+                    {dict.editOvertimeRequestForm.startWork}
+                  </FormLabel>
                   <FormDescription>
                     {dict.editOvertimeRequestForm.startWorkDescription}
                   </FormDescription>
@@ -205,7 +203,9 @@ export default function EditOvertimeRequestForm({
               name='numberOfShifts'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.editOvertimeRequestForm.numberOfShifts}</FormLabel>
+                  <FormLabel>
+                    {dict.editOvertimeRequestForm.numberOfShifts}
+                  </FormLabel>
                   <FormDescription>
                     {dict.editOvertimeRequestForm.numberOfShiftsDescription}
                   </FormDescription>
@@ -230,7 +230,9 @@ export default function EditOvertimeRequestForm({
               name='responsibleEmployee'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.editOvertimeRequestForm.responsible}</FormLabel>
+                  <FormLabel>
+                    {dict.editOvertimeRequestForm.responsible}
+                  </FormLabel>
                   <FormDescription>
                     {dict.editOvertimeRequestForm.responsibleDescription}
                   </FormDescription>
@@ -258,9 +260,15 @@ export default function EditOvertimeRequestForm({
                     </PopoverTrigger>
                     <PopoverContent className='p-0' side='bottom' align='start'>
                       <Command>
-                        <CommandInput placeholder={dict.editOvertimeRequestForm.searchPerson} />
+                        <CommandInput
+                          placeholder={
+                            dict.editOvertimeRequestForm.searchPerson
+                          }
+                        />
                         <CommandList>
-                          <CommandEmpty>{dict.editOvertimeRequestForm.personNotFound}</CommandEmpty>
+                          <CommandEmpty>
+                            {dict.editOvertimeRequestForm.personNotFound}
+                          </CommandEmpty>
                           <CommandGroup className='max-h-48 overflow-y-auto'>
                             {users.map((user) => (
                               <CommandItem
@@ -299,7 +307,9 @@ export default function EditOvertimeRequestForm({
               name='numberOfEmployees'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{dict.editOvertimeRequestForm.numberOfEmployees}</FormLabel>
+                  <FormLabel>
+                    {dict.editOvertimeRequestForm.numberOfEmployees}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type='number'
@@ -323,7 +333,9 @@ export default function EditOvertimeRequestForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='flex flex-col items-start space-y-2'>
-                    <FormLabel>{dict.editOvertimeRequestForm.scheduledDayOff}</FormLabel>
+                    <FormLabel>
+                      {dict.editOvertimeRequestForm.scheduledDayOff}
+                    </FormLabel>
                     <FormControl>
                       <MultiSelectEmployees
                         employees={employees}
@@ -333,9 +345,9 @@ export default function EditOvertimeRequestForm({
                           const employeesWithDays = selectedEmployees.map(
                             (emp) => ({
                               ...emp,
-                              agreedReceivingAt: emp.agreedReceivingAt || new Date(
-                                Date.now() + 7 * 24 * 60 * 60 * 1000,
-                              ),
+                              agreedReceivingAt:
+                                emp.agreedReceivingAt ||
+                                new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                             }),
                           );
                           field.onChange(employeesWithDays);
@@ -352,9 +364,7 @@ export default function EditOvertimeRequestForm({
               name='reason'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {dict.editOvertimeRequestForm.reason}
-                  </FormLabel>
+                  <FormLabel>{dict.editOvertimeRequestForm.reason}</FormLabel>
                   <FormControl>
                     <Textarea className='' {...field} />
                   </FormControl>
@@ -386,7 +396,9 @@ export default function EditOvertimeRequestForm({
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value='item-2'>
-                <AccordionTrigger>{dict.editOvertimeRequestForm.accordion.brussStandard}</AccordionTrigger>
+                <AccordionTrigger>
+                  {dict.editOvertimeRequestForm.accordion.brussStandard}
+                </AccordionTrigger>
                 <AccordionContent className='text-justify'>
                   {dict.editOvertimeRequestForm.accordion.brussStandardContent}
                 </AccordionContent>
@@ -417,25 +429,24 @@ export default function EditOvertimeRequestForm({
           </CardContent>
 
           <CardFooter className='flex flex-col gap-2 sm:flex-row sm:justify-between'>
-            <LocalizedLink href='/production-overtime'>
-              <Button
-                variant='outline'
-                type='button'
-                className='w-full sm:w-auto'
-                disabled={isPendingUpdate}
-              >
+            <Button
+              variant='outline'
+              type='button'
+              className='w-full sm:w-auto'
+              disabled={isPendingUpdate}
+              asChild
+            >
+              <LocalizedLink href='/production-overtime'>
                 <CircleX className='' />
                 {dict.common.cancel}
-              </Button>
-            </LocalizedLink>
+              </LocalizedLink>
+            </Button>
             <Button
               type='submit'
               className='w-full sm:w-auto'
               disabled={isPendingUpdate}
             >
-              <Save
-                className={isPendingUpdate ? 'animate-spin' : ''}
-              />
+              <Save className={isPendingUpdate ? 'animate-spin' : ''} />
               {dict.editOvertimeRequestForm.saveChanges}
             </Button>
           </CardFooter>
