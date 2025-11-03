@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
       { status: 400 },
     );
   }
-  console.log('api/production-overtime/request: ' + searchParams.get('id'));
 
   try {
     const id = searchParams.get('id')!;

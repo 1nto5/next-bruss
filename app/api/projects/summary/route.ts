@@ -29,7 +29,6 @@ export async function GET(req: NextRequest) {
       .find({ date: { $gte: startDate, $lt: endDate } })
       .sort({ date: -1 })
       .toArray();
-    console.log('api/projects/summary:', entries);
     return NextResponse.json(entries);
   } catch (error) {
     console.error('api/projects/summary: ' + error);

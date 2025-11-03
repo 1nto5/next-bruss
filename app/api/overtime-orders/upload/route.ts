@@ -220,9 +220,6 @@ export async function POST(req: NextRequest) {
           const extension = file.name.split('.').pop() || 'file';
           const filename = `lista_obecnosci_${overTimeRequestId}_${i + 1}.${extension}`;
           otherFiles.push({ filename, buffer: fileBuffer });
-          console.log(
-            `Saving non-mergeable file type ${file.type} separately: ${filename}`,
-          );
         }
       } catch (error) {
         console.error(`Error processing file ${file.name}:`, error);
@@ -276,7 +273,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Use merged PDF filename, or first other file if no PDF was created
-      const attachmentFilename = mergedFilename || otherFiles[0]?.filename || null;
+      const attachmentFilename =
+        mergedFilename || otherFiles[0]?.filename || null;
 
       // Update document with original attachment structure
       const updateResult = await collection.updateOne(
@@ -331,9 +329,7 @@ export async function POST(req: NextRequest) {
           'Pliki zostały scalone w PDF i przesłane pomyślnie! Status zlecenia zmieniony na ukończony.';
       } else {
         const filesText =
-          otherFiles.length === 1
-            ? '1 plik'
-            : `${otherFiles.length} plików`;
+          otherFiles.length === 1 ? '1 plik' : `${otherFiles.length} plików`;
         message = `Pliki zostały przesłane pomyślnie! Zapisano ${filesText}. Status zlecenia zmieniony na ukończony.`;
       }
 
