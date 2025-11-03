@@ -59,7 +59,6 @@ import {
   Clock,
   XCircle,
 } from 'lucide-react';
-import { useParams } from 'next/navigation';
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DayPicker, Matcher, TZDate } from 'react-day-picker';
@@ -202,14 +201,12 @@ export function DateTimePicker({
     'month' | 'year' | false
   >(false);
 
-  // Get locale from URL params
-  const params = useParams<{ lang: string }>();
-
-  // Get the appropriate date-fns locale
+  // Get the appropriate date-fns locale from NEXT_PUBLIC_LOCALE
   const dateLocale = useMemo(() => {
-    const lang = params?.lang || 'pl';
+    const localeEnv = process.env.NEXT_PUBLIC_LOCALE || 'pl-PL';
+    const lang = localeEnv.split('-')[0] || 'pl';
     return localeMap[lang as keyof typeof localeMap] || localeMap.pl;
-  }, [params?.lang]);
+  }, []);
 
   // Only initialize with value if present, otherwise undefined
   const initDate = useMemo(
