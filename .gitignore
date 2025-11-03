@@ -39,6 +39,7 @@ next-env.d.ts
 
 # bun
 bun.lockb
+bun.lock
 
 # TODOS
 TODOS.md
