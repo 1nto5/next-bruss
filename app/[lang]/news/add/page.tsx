@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import NewsForm from '../components/news-form';
-import { getDictionary } from '@/lib/dict';
+import { getDictionary } from '../lib/dict';
 import { Locale } from '@/lib/config/i18n';
 
 export default async function AddNewsPage(props: {

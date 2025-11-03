@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth';
 import { Locale } from '@/lib/config/i18n';
-import { getDictionary } from '@/lib/dict';
+import { getDictionary } from '../../lib/dict';
 import { dbc } from '@/lib/db/mongo';
 import { ObjectId } from 'mongodb';
 import { notFound, redirect } from 'next/navigation';
