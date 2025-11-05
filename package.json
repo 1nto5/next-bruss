@@ -1,6 +1,7 @@
 {
   "name": "bruss-intra",
   "version": "2.0",
+  "description": "Industrial manufacturing management and analytics web application",
   "private": true,
   "scripts": {
     "dev": "next dev",

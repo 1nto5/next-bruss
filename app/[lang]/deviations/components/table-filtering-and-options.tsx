@@ -17,8 +17,8 @@ import { CircleX, Loader, Search } from 'lucide-react'; // Remove RefreshCw
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 // Import useRef for initial mount check if needed, but direct navigation is simpler here
 import { useEffect, useState } from 'react';
-import { DeviationAreaType, DeviationReasonType } from '../lib/types';
 import { Dictionary } from '../lib/dict';
+import { DeviationAreaType, DeviationReasonType } from '../lib/types';
 
 export default function TableFilteringAndOptions({
   fetchTime, // Keep fetchTime prop for useEffect dependency
@@ -69,12 +69,12 @@ export default function TableFilteringAndOptions({
     return createdAtParam ? new Date(createdAtParam) : undefined;
   });
   const [statusFilter, setStatusFilter] = useState(
-    searchParams?.get('status') || '',
+    searchParams?.get('status') || ''
   );
   // Add state for area and reason filters
   const [areaFilter, setAreaFilter] = useState(searchParams?.get('area') || '');
   const [reasonFilter, setReasonFilter] = useState(
-    searchParams?.get('reason') || '',
+    searchParams?.get('reason') || ''
   );
 
   // Function to build search params based on current state
@@ -100,7 +100,7 @@ export default function TableFilteringAndOptions({
   // Handler for Select changes (triggers search immediately)
   const handleSelectChange = (
     filterType: 'status' | 'area' | 'reason',
-    value: string,
+    value: string
   ) => {
     // Update local state first
     if (filterType === 'status')
@@ -193,75 +193,79 @@ export default function TableFilteringAndOptions({
     <Card>
       {' '}
       {/* Wrap filters in a Card */}
-      <CardHeader className='p-4'>
+      <CardHeader className="p-4">
         {' '}
         {/* Adjust padding */}
-        <form onSubmit={handleSearchClick} className='flex flex-col gap-2'>
-          <div className='flex items-center space-x-2'>
+        <form onSubmit={handleSearchClick} className="flex flex-col gap-2">
+          <div className="flex items-center space-x-2">
             <Switch
-              id='show-filters'
+              id="show-filters"
               checked={showFilters}
               onCheckedChange={setShowFilters}
             />
-            <Label htmlFor='show-filters'>{dict.filters.showFilters}</Label>
+            <Label htmlFor="show-filters">{dict.filters.showFilters}</Label>
             {isLogged && (
               <>
                 <Switch
-                  id='only-my-requests'
+                  id="only-my-requests"
                   checked={showOnlyMine}
                   onCheckedChange={handleShowOnlyMineChange}
                 />
-                <Label htmlFor='only-my-requests'>{dict.filters.onlyMy}</Label>
+                <Label htmlFor="only-my-requests">{dict.filters.onlyMy}</Label>
               </>
             )}
           </div>
         </form>
       </CardHeader>
       {showFilters && (
-        <CardContent className='p-4 pt-0'>
+        <CardContent className="p-4 pt-0">
           {' '}
           {/* Adjust padding */}
-          <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+          <form onSubmit={handleSearchClick} className="flex flex-col gap-4">
             {' '}
             {/* Increase gap */}
             {/* Row 1: Status, Area, Reason */}
-            <div className='flex flex-wrap items-start gap-4'>
-              {' '}
-              {/* Use items-start for alignment */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {/* Status Filter */}
-              <div className='flex flex-col space-y-1'>
-                {' '}
-                {/* Stack label and select vertically */}
+              <div className="flex flex-col space-y-1">
                 <Label>{dict.filters.status}</Label>
                 <Select
-                  onValueChange={(value) => handleSelectChange('status', value)} // Use simplified handler
+                  onValueChange={(value) => handleSelectChange('status', value)}
                   value={statusFilter}
                 >
-                  <SelectTrigger className='w-[150px]'>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='in approval'>{dict.table.status.inApproval}</SelectItem>
-                    <SelectItem value='in progress'>{dict.table.status.inProgress}</SelectItem>
-                    <SelectItem value='rejected'>{dict.table.status.rejected}</SelectItem>
-                    <SelectItem value='draft'>{dict.table.status.draft}</SelectItem>
-                    <SelectItem value='closed'>{dict.table.status.closed}</SelectItem>
-                    <SelectItem value='approved'>{dict.table.status.approved}</SelectItem>
+                    <SelectItem value="in approval">
+                      {dict.table.status.inApproval}
+                    </SelectItem>
+                    <SelectItem value="in progress">
+                      {dict.table.status.inProgress}
+                    </SelectItem>
+                    <SelectItem value="rejected">
+                      {dict.table.status.rejected}
+                    </SelectItem>
+                    <SelectItem value="draft">
+                      {dict.table.status.draft}
+                    </SelectItem>
+                    <SelectItem value="closed">
+                      {dict.table.status.closed}
+                    </SelectItem>
+                    <SelectItem value="approved">
+                      {dict.table.status.approved}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               {/* Area Filter */}
-              <div className='flex flex-col space-y-1'>
-                {' '}
-                {/* Stack label and select vertically */}
+              <div className="flex flex-col space-y-1">
                 <Label>{dict.filters.area}</Label>
                 <Select
-                  onValueChange={(value) => handleSelectChange('area', value)} // Use simplified handler
+                  onValueChange={(value) => handleSelectChange('area', value)}
                   value={areaFilter}
                 >
-                  <SelectTrigger className='w-[150px]'>
-                    {' '}
-                    {/* Adjust width as needed */}
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
@@ -274,24 +278,19 @@ export default function TableFilteringAndOptions({
                 </Select>
               </div>
               {/* Reason Filter */}
-              <div className='flex flex-col space-y-1'>
-                {' '}
-                {/* Stack label and select vertically */}
+              <div className="flex flex-col space-y-1">
                 <Label>{dict.filters.reason}</Label>
                 <Select
-                  onValueChange={(value) => handleSelectChange('reason', value)} // Use simplified handler
+                  onValueChange={(value) => handleSelectChange('reason', value)}
                   value={reasonFilter}
                 >
-                  <SelectTrigger className='w-[180px]'>
-                    {' '}
-                    {/* Adjust width as needed */}
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder={dict.filters.select} />
                   </SelectTrigger>
                   <SelectContent>
                     {reasonOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.pl}{' '}
-                        {/* Assuming 'pl' is correct, was 'label' before */}
+                        {option.pl}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -299,80 +298,75 @@ export default function TableFilteringAndOptions({
               </div>
             </div>
             {/* Row 2: Dates */}
-            <div className='flex flex-wrap items-start gap-4'>
-              {' '}
-              {/* Use items-start for alignment */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {/* Date Filter */}
-              <div className='flex flex-col space-y-1'>
-                {' '}
-                {/* Stack label and input vertically */}
+              <div className="flex flex-col space-y-1">
                 <Label>{dict.filters.deviationDate}</Label>
                 <DateTimePicker
                   value={dateFilter}
-                  onChange={setDateFilter} // Only updates state
+                  onChange={setDateFilter}
                   hideTime
                   renderTrigger={({ value, setOpen, open }) => (
                     <DateTimeInput
                       value={value}
-                      onChange={(x) => !open && setDateFilter(x)} // Only updates state
-                      format='dd/MM/yyyy'
+                      onChange={(x) => !open && setDateFilter(x)}
+                      format="dd/MM/yyyy"
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
-                      // className='w-[150px]' // Set width
+                      className="w-full"
                     />
                   )}
                 />
               </div>
               {/* CreatedAt Filter */}
-              <div className='flex flex-col space-y-1'>
-                {' '}
-                {/* Stack label and input vertically */}
+              <div className="flex flex-col space-y-1">
                 <Label>{dict.filters.createdDate}</Label>
                 <DateTimePicker
                   value={createdAtFilter}
-                  onChange={setRequestedAtFilter} // Only updates state
+                  onChange={setRequestedAtFilter}
                   hideTime
                   renderTrigger={({ value, setOpen, open }) => (
                     <DateTimeInput
                       value={value}
-                      onChange={(x) => !open && setRequestedAtFilter(x)} // Only updates state
-                      format='dd/MM/yyyy'
+                      onChange={(x) => !open && setRequestedAtFilter(x)}
+                      format="dd/MM/yyyy"
                       disabled={open}
                       onCalendarClick={() => setOpen(!open)}
-                      // className='w-[150px]' // Set width
+                      className="w-full"
                     />
                   )}
                 />
               </div>
             </div>
             {/* Row 3: Action buttons */}
-            <div className='flex flex-wrap gap-2'>
+            <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4">
               <Button
-                type='submit'
-                variant='secondary'
-                className='justify-start'
+                type="button"
+                variant="destructive"
+                onClick={handleClearFilters}
+                title={dict.filters.clear}
                 disabled={isPendingSearch}
+                className="order-2 w-full sm:order-1"
+              >
+                <CircleX /> <span>{dict.filters.clear}</span>
+              </Button>
+
+              <Button
+                type="submit"
+                variant="secondary"
+                disabled={isPendingSearch}
+                className="order-1 w-full sm:order-2"
               >
                 {isPendingSearch ? (
                   <>
-                    <Loader className='mr-1 animate-spin' size={16} />{' '}
+                    <Loader className="animate-spin" />{' '}
                     <span>{dict.filters.search}</span>
                   </>
                 ) : (
                   <>
-                    <Search className='mr-1' size={16} /> <span>{dict.filters.search}</span>
+                    <Search /> <span>{dict.filters.search}</span>
                   </>
                 )}
-              </Button>
-
-              <Button
-                type='button'
-                variant='destructive'
-                onClick={handleClearFilters}
-                title={dict.filters.clear}
-                disabled={isPendingSearch}
-              >
-                <CircleX className='mr-1' size={16} /> <span>{dict.filters.clear}</span>
               </Button>
             </div>
           </form>

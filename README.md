@@ -1,17 +1,12 @@
 # Bruss-Intra
 
-Industrial manufacturing web application built with Next.js 15 for production floor operations and management.
+Industrial manufacturing management web application built with Next.js 16.
+
+> **Note:** Shop floor applications (DMCheck-2, EOL136153-2, INW-2, Oven) have been moved to the **bruss-floor** project for dedicated production floor operations.
 
 ## 📱 Applications
 
-### Shop Floor Applications
-
-- **DMCheck-2** (`/dmcheck-2`) - Data Matrix Code scanning and validation for production tracking
-- **EOL136153-2** (`/eol136153-2`) - End-of-line process management
-- **INW-2** (`/inw-2`) - Inventory management and tracking
-- **Oven** (`/oven`) - Oven temperature monitoring and process control
-
-### Management Applications
+### Management & Analytics
 
 - **Deviations** (`/deviations`) - Quality deviation tracking and management
 - **DMCheck Data** (`/dmcheck-data`) - Analytics and reporting for DMCheck operations
@@ -22,8 +17,13 @@ Industrial manufacturing web application built with Next.js 15 for production fl
 - **Overtime Orders** (`/overtime-orders`) - Overtime order management
 - **Overtime Submissions** (`/overtime-submissions`) - Employee overtime request submissions
 - **Production Overtime** (`/production-overtime`) - Production overtime tracking and approval
-- **Inventory Approval** (`/inw-2/zatwierdz`) - Inventory operation approvals
+- **Inventory Approval** (`/inw-2/zatwierdz`) - Inventory operation approvals and management
 - **Codes Generator** (`/codes-generator`) - Production code and label generation
+
+## 🔗 Related Projects
+
+- **bruss-floor** - Dedicated shop floor applications (DMCheck-2, EOL136153-2, INW-2, Oven)
+- **bruss-cron** - Scheduled tasks, monitoring, and automation services
 
 ## 🛠️ Tech Stack
 
