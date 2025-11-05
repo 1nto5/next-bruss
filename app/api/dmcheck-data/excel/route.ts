@@ -91,8 +91,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const collScans = await dbc('scans');
-    const collScansArchive = await dbc('scans_archive');
+    const collScans = await dbc('dmcheck_scans');
+    const collScansArchive = await dbc('dmcheck_scans_archive');
     let scans = await collScans
       .find(query)
       .sort({ _id: -1 })

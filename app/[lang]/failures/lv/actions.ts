@@ -11,7 +11,7 @@ export async function revalidateFailures() {
 
 export async function insertFailure(failureInsertData: InsertFailureType) {
   try {
-    const collection = await dbc('failures_lv');
+    const collection = await dbc('failureslv');
     const failureWithDate = {
       ...failureInsertData,
       createdAt: new Date(),
@@ -31,7 +31,7 @@ export async function insertFailure(failureInsertData: InsertFailureType) {
 }
 export async function updateFailure(failureUpdateData: UpdateFailureType) {
   try {
-    const collection = await dbc('failures_lv');
+    const collection = await dbc('failureslv');
     const { _id, ...updateFields } = {
       ...failureUpdateData,
       updatedAt: new Date(),
@@ -56,7 +56,7 @@ export async function updateFailure(failureUpdateData: UpdateFailureType) {
 
 export async function endFailure(id: string) {
   try {
-    const collection = await dbc('failures_lv');
+    const collection = await dbc('failureslv');
 
     const res = await collection.updateOne(
       { _id: new ObjectId(id) },

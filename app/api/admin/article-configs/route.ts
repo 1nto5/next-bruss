@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const coll = await dbc('articles_config');
+    const coll = await dbc('dmcheck_configs');
     const configs = await coll.find({}).toArray();
     return new NextResponse(JSON.stringify(configs));
   } catch (error) {

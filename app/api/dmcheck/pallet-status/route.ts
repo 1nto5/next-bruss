@@ -3,14 +3,14 @@ import { ObjectId } from 'mongodb';
 import { NextResponse, type NextRequest } from 'next/server';
 
 async function getBoxStatus(articleConfigId: string) {
-  const articlesConfigCollection = await dbc('articles_config');
+  const articlesConfigCollection = await dbc('dmcheck_configs');
   const articleConfig = await articlesConfigCollection.findOne({
     _id: new ObjectId(articleConfigId),
   });
   if (!articleConfig) {
     return null;
   }
-  const scansCollection = await dbc('scans');
+  const scansCollection = await dbc('dmcheck_scans');
   const count = await scansCollection.countDocuments({
     status: 'pallet',
     workplace: articleConfig.workplace,

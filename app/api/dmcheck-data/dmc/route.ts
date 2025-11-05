@@ -86,11 +86,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const coll = await dbc('scans');
+    const coll = await dbc('dmcheck_scans');
     let scans = await coll.find(query).sort({ _id: -1 }).limit(1000).toArray();
 
     if (scans.length < 1000) {
-      const archiveColl = await dbc('scans_archive');
+      const archiveColl = await dbc('dmcheck_scans_archive');
       const archiveScans = await archiveColl
         .find(query)
         .sort({ _id: -1 })
