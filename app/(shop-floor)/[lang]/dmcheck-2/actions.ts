@@ -12,7 +12,7 @@ async function getNextReworkAttempt(
   dmc: string,
   workplace: string,
 ): Promise<string> {
-  const scansCollection = await dbc('scans');
+  const scansCollection = await dbc('dmcheck_scans');
 
   const existingReworks = await scansCollection
     .find({
@@ -96,7 +96,7 @@ export async function login(data: LoginType) {
 
 export async function getArticlesForWorkplace(workplace: string) {
   try {
-    const coll = await dbc('articles_config');
+    const coll = await dbc('dmcheck_configs');
     const articles = await coll.find({ workplace }).toArray();
     // Convert MongoDB documents to plain objects
     return articles.map((article) => ({
@@ -125,7 +125,7 @@ export async function getArticlesForWorkplace(workplace: string) {
 
 export async function getArticleConfigById(articleConfigId: string) {
   try {
-    const collection = await dbc('articles_config');
+    const collection = await dbc('dmcheck_configs');
     const article = await collection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -219,7 +219,7 @@ export async function saveDmc(
   operators: string[],
 ): Promise<{ message: string; dmc?: string; time?: string }> {
   try {
-    const articlesConfigCollection = await dbc('articles_config');
+    const articlesConfigCollection = await dbc('dmcheck_configs');
     const articleConfigDoc = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -253,7 +253,7 @@ export async function saveDmc(
       }
     }
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     const existingDmc = await scansCollection.findOne(
       {
@@ -375,7 +375,7 @@ export async function saveHydra(
   operators: string[],
 ): Promise<{ message: string }> {
   try {
-    const articlesConfigCollection = await dbc('articles_config');
+    const articlesConfigCollection = await dbc('dmcheck_configs');
     const articleConfig = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -430,7 +430,7 @@ export async function saveHydra(
       return { message: 'qr wrong quantity' };
     }
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     // Check if box is full before saving hydra
     const currentBoxCount = await scansCollection.countDocuments({
@@ -485,7 +485,7 @@ export async function savePallet(
   operators: string[],
 ): Promise<{ message: string }> {
   try {
-    const articlesConfigCollection = await dbc('articles_config');
+    const articlesConfigCollection = await dbc('dmcheck_configs');
     const articleConfig = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -532,7 +532,7 @@ export async function savePallet(
       return { message: 'qr not valid' };
     }
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     // Check if pallet is full before saving pallet batch
     const currentBoxesOnPallet = await scansCollection
@@ -596,7 +596,7 @@ export async function saveDmcRework(
   operators: string[],
 ): Promise<{ message: string; dmc?: string; time?: string }> {
   try {
-    const articlesConfigCollection = await dbc('articles_config');
+    const articlesConfigCollection = await dbc('dmcheck_configs');
     const articleConfigDoc = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -618,7 +618,7 @@ export async function saveDmcRework(
     }
     const validatedDmc = parse.data.dmc;
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     const existingDmc = await scansCollection.findOne(
       {
@@ -730,7 +730,7 @@ export async function save(
 
 export async function getInBoxTableData(articleConfigId: string) {
   try {
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
       return {
@@ -760,7 +760,7 @@ export async function getInBoxTableData(articleConfigId: string) {
 
 export async function getBoxesOnPalletTableData(articleConfigId: string) {
   try {
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
       return {
@@ -806,7 +806,7 @@ export async function getBoxesOnPalletTableData(articleConfigId: string) {
 // Get list of DMC scans in box
 export async function getBoxScans(articleConfigId: string) {
   try {
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
       return [];
@@ -832,7 +832,7 @@ export async function getBoxScans(articleConfigId: string) {
 // Get list of HYDRA batches (boxes) on pallet
 export async function getPalletBoxes(articleConfigId: string) {
   try {
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
     const articleConfig = await getArticleConfigById(articleConfigId);
     if (!articleConfig) {
       return [];
@@ -884,7 +884,7 @@ export async function deleteDmcFromBox(dmc: string, operators: string[]) {
       return { message: 'invalid parameters' };
     }
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     // First check if the DMC exists in box status
     const existingDmc = await scansCollection.findOne({ dmc, status: 'box' });
@@ -936,7 +936,7 @@ export async function deleteHydraFromPallet(
       return { message: 'invalid parameters' };
     }
 
-    const scansCollection = await dbc('scans');
+    const scansCollection = await dbc('dmcheck_scans');
 
     // First check if the HYDRA batch exists in pallet status
     const existingBatch = await scansCollection.findOne({
@@ -995,7 +995,7 @@ export async function deleteHydraFromPallet(
 // Generate unique pallet QR code
 export async function getPalletQr(articleConfigId: string) {
   try {
-    const articlesConfigCollection = await dbc('articles_config');
+    const articlesConfigCollection = await dbc('dmcheck_configs');
     const articleConfig = await articlesConfigCollection.findOne({
       _id: new ObjectId(articleConfigId),
     });
@@ -1006,8 +1006,8 @@ export async function getPalletQr(articleConfigId: string) {
     // Generate unique batch number by checking against existing batches
     let batch = '';
     let isUnique = false;
-    const scansCollection = await dbc('scans');
-    const scansArchiveCollection = await dbc('scans_archive');
+    const scansCollection = await dbc('dmcheck_scans');
+    const scansArchiveCollection = await dbc('dmcheck_scans_archive');
 
     while (!isUnique) {
       batch = `AA${uuidv4().slice(0, 8).toUpperCase()}`;

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const collection = await dbc('articles_config');
+    const collection = await dbc('dmcheck_configs');
     const configs = await collection.find().toArray();
     return new NextResponse(JSON.stringify(configs), { status: 200 });
   } catch (error) {

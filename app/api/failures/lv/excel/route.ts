@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
   });
   try {
-    const coll = await dbc('failures_lv');
+    const coll = await dbc('failureslv');
     const failures = await coll
       .find(query)
       .sort({ _id: -1 })

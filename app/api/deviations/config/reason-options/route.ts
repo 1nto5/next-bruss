@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const coll = await dbc('deviations_config');
+    const coll = await dbc('deviations_configs');
     const configDoc = await coll.findOne({ config: 'reason_options' });
     return new NextResponse(JSON.stringify(configDoc?.options));
   } catch (error) {

@@ -95,7 +95,7 @@ export async function login(data: {
 
 export async function getArticleStatuses(): Promise<ArticleStatus[]> {
   try {
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     const statuses: ArticleStatus[] = [];
 
@@ -166,7 +166,7 @@ export async function saveHydraBatch(
       return { status: 'invalid' };
     }
 
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     // Check if batch already exists
     const existingData = await collection.findOne({ hydra_batch: qrBatch });
@@ -214,7 +214,7 @@ export async function generatePalletBatch(article: string): Promise<string> {
       throw new Error('Invalid article');
     }
 
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
     const quantityOnPallet = await collection.countDocuments({
       status: 'pallet',
       workplace: 'eol136153',
@@ -267,7 +267,7 @@ export async function savePalletBatch(
       return { status: 'invalid' };
     }
 
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     // Check if pallet batch already exists
     const existingData = await collection.findOne({ pallet_batch: qrBatch });
@@ -313,7 +313,7 @@ export async function getPalletQr(article: string): Promise<string | null> {
       return null;
     }
 
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     // Count boxes on pallet
     const boxesOnPallet = await collection.countDocuments({
@@ -331,7 +331,7 @@ export async function getPalletQr(article: string): Promise<string | null> {
     while (!isUnique) {
       batch = `EE${uuidv4().slice(0, 8).toUpperCase()}`;
 
-      // Check if batch exists in scans_no_dmc collection
+      // Check if batch exists in eol136153_scans collection
       const existingBatch = await collection.findOne({
         pallet_batch: batch,
       });
@@ -377,7 +377,7 @@ export async function getPalletBoxes(
   article: string,
 ): Promise<{ hydra: string; time: string }[]> {
   try {
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     const boxes = await collection
       .find({
@@ -412,7 +412,7 @@ export async function deleteHydraBatch(
       return { message: 'invalid parameters' };
     }
 
-    const collection = await dbc('scans_no_dmc');
+    const collection = await dbc('eol136153_scans');
 
     // Check if the hydra batch exists in pallet status
     const batchRecord = await collection.findOne({

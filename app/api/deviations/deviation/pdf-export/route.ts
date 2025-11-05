@@ -407,7 +407,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
 
     const devCol = await dbc('deviations');
-    const cfgCol = await dbc('deviations_config');
+    const cfgCol = await dbc('deviations_configs');
 
     const deviation = await devCol.findOne({ _id: new ObjectId(deviationId) });
     if (!deviation)

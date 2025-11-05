@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
       }),
     };
 
-    const collection = db.collection('scans');
-    const archiveCollection = db.collection('scans_archive');
+    const collection = db.collection('dmcheck_scans');
+    const archiveCollection = db.collection('dmcheck_scans_archive');
 
     let data = await collection.find(query).limit(100000).toArray();
 

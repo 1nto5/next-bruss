@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const coll = await dbc('failures_lv_options');
+    const coll = await dbc('failureslv_options');
     const failures = await coll.find().toArray();
     return new NextResponse(JSON.stringify(failures));
   } catch (error) {
