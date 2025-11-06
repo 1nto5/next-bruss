@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     }
   });
   try {
-    const coll = await dbc('failureslv');
+    const coll = await dbc('failures_lv');
     const failures = await coll
       .find(query)
       .sort({ _id: -1 })
@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
     console.error('Error generating Excel file:', error);
     return NextResponse.json(
       { error: 'failures/lv/excel api' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 }

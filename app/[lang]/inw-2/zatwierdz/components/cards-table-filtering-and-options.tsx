@@ -3,7 +3,7 @@
 import {
   sectorsSelectOptions,
   warehouseSelectOptions,
-} from '@/app/(shop-floor)/[lang]/inw-2/spis/lib/options';
+} from '@/app/[lang]/inw-2/lib/options';
 import { Button } from '@/components/ui/button';
 import {
   Command,
