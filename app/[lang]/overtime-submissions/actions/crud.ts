@@ -155,11 +155,14 @@ export async function updateOvertimeSubmission(
       changes,
     };
 
+    // Remove _id from updateData to avoid MongoDB immutable field error
+    const { _id: _, ...updateDataWithoutId } = updateData;
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...updateData,
+          ...updateDataWithoutId,
           editedAt: new Date(),
           editedBy: userEmail,
         },
@@ -282,12 +285,15 @@ export async function editOvertimeSubmission(
       changes,
     };
 
+    // Remove _id from submissionData to avoid MongoDB immutable field error
+    const { _id: _, ...submissionDataWithoutId } = submissionData;
+
     // Update submission and reset status to pending for re-approval
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...submissionData,
+          ...submissionDataWithoutId,
           status: 'pending',
           editedAt: new Date(),
           editedBy: userEmail,
@@ -440,11 +446,14 @@ export async function correctOvertimeSubmission(
       newStatus = 'cancelled';
     }
 
+    // Remove _id from data to avoid MongoDB immutable field error
+    const { _id: _, ...dataWithoutId } = data;
+
     const update = await coll.updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
-          ...data,
+          ...dataWithoutId,
           status: newStatus,
           editedAt: new Date(),
           editedBy: userEmail,
