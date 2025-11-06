@@ -19,16 +19,31 @@ async function fetchLatestUserRoles(email: string) {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   logger: {
     error: (code: any, ...message: any[]) => {
-      // Suppress CredentialsSignin errors (normal user login failures)
+      // Handle CredentialsSignin errors
       if (
-        code?.name === 'SIGNIN_OAUTH_ERROR' ||
-        code?.name === 'SIGNIN_EMAIL_ERROR' ||
         code?.name === 'CredentialsSignin' ||
         (typeof message[0] === 'string' &&
           message[0].includes('CredentialsSignin'))
       ) {
-        return; // Silent - don't log expected authentication failures
+        // Check if this contains a system error (LDAP/DB connection issues)
+        const errorStr = JSON.stringify([code, ...message]);
+        if (/ldap|database|refresh/i.test(errorStr)) {
+          // System error - must be logged
+          console.error('SYSTEM AUTH ERROR:', code, ...message);
+          return;
+        }
+        // Generic credential failure (wrong password) - suppress
+        return;
       }
+
+      // Suppress other expected auth failures
+      if (
+        code?.name === 'SIGNIN_OAUTH_ERROR' ||
+        code?.name === 'SIGNIN_EMAIL_ERROR'
+      ) {
+        return;
+      }
+
       // Log all other errors normally
       console.error(code, ...message);
     },

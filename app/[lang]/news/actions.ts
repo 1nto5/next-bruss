@@ -38,10 +38,13 @@ export async function updateNews(id: string, data: NewsFormData) {
   try {
     const collection = await dbc('news');
 
+    // Remove _id from update data to avoid MongoDB immutable field error
+    const { _id, ...updateData } = data as any;
+
     if (ObjectId.isValid(id)) {
-      await collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: updateData });
     } else {
-      await collection.updateOne({ _id: id as any }, { $set: data });
+      await collection.updateOne({ _id: id as any }, { $set: updateData });
     }
 
     revalidateTag('news', 'max');
