@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const canAddAttachment =
-      userRoles.some((role) => ATTACHMENT_ROLES.includes(role)) ||
+      userRoles.some((role: string) => ATTACHMENT_ROLES.includes(role)) ||
       userEmail === order.requestedBy ||
       userEmail === order.responsibleEmployee;
 

@@ -21,10 +21,10 @@ export default async function AddDeviationPage(props: {
   }
   // Determine access based on user roles: group leader (any role containing "group-leader"), any manager, or admin
   const isGroupLeader =
-    session?.user?.roles?.some((role) => role.includes('group-leader')) ||
+    session?.user?.roles?.some((role: string) => role.includes('group-leader')) ||
     false;
   const isManager =
-    session?.user?.roles?.some((role) => role.includes('manager')) || false;
+    session?.user?.roles?.some((role: string) => role.includes('manager')) || false;
   const isAdmin = session?.user?.roles?.includes('admin') || false;
   const canCreateRequest = isGroupLeader || isManager || isAdmin;
   if (!canCreateRequest) {

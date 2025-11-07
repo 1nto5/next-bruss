@@ -211,8 +211,8 @@ export default function OvenTemperatureChart({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => `Time: ${value}`}
-                  formatter={(value, name, props) => {
+                  labelFormatter={(value: any) => `Time: ${value}`}
+                  formatter={(value: any, name: any, props: any) => {
                     const labels: { [key: string]: string } = {
                       z0: 'TL',
                       z1: 'TR',

@@ -105,7 +105,7 @@ export default function OvertimeRequestForm({
   );
 
   const form = useForm<z.infer<typeof overtimeSubmissionSchema>>({
-    resolver: zodResolver(overtimeSubmissionSchema),
+    resolver: zodResolver(overtimeSubmissionSchema) as any,
     defaultValues: {
       supervisor: isEditMode ? submission!.supervisor : '',
       date: isEditMode

@@ -187,7 +187,7 @@ export const createColumns = (
 
         // Check if user can add attachment (same logic as in AddAttachmentDialog)
         const canAddAttachment =
-          userRoles.some((role) =>
+          userRoles.some((role: string) =>
             [
               'group-leader',
               'production-manager',

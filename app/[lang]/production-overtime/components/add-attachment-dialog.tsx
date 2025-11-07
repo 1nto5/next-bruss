@@ -64,7 +64,7 @@ export default function AddAttachmentDialog({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<MultipleAttachmentFormType>({
-    resolver: zodResolver(MultipleAttachmentFormSchema),
+    resolver: zodResolver(MultipleAttachmentFormSchema) as any,
     defaultValues: {
       files: [],
       mergeFiles: true,
@@ -104,7 +104,7 @@ export default function AddAttachmentDialog({
 
     // Check if user is the request owner, responsible employee, or has one of the allowed roles
     const canAddAttachment =
-      userRoles.some((role) =>
+      userRoles.some((role: string) =>
         ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
       ) ||
       userEmail === owner ||

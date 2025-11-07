@@ -37,7 +37,7 @@ export default function NewEntryForm({ lang }: { lang: Locale }) {
   const [isPendingInsert, setIsPendingInserting] = useState(false);
 
   const form = useForm<z.infer<typeof ProjectsSchema>>({
-    resolver: zodResolver(ProjectsSchema),
+    resolver: zodResolver(ProjectsSchema) as any,
     defaultValues: {
       scope: '',
       date: (() => {

@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
           $push: {
             attachments: attachment,
           },
-        },
+        } as any,
       );
 
       if (updateResult.modifiedCount === 0) {

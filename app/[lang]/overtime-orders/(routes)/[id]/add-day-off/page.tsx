@@ -17,7 +17,7 @@ export default async function AddDayOffPage(props: {
     redirect('/auth');
   }
   const access =
-    session.user?.roles.some((role) => role.includes('group-leader')) ||
+    session.user?.roles.some((role: string) => role.includes('group-leader')) ||
     session.user?.roles.includes('plant-manager') ||
     session.user?.roles.includes('admin') ||
     session.user?.roles.includes('hr') ||
