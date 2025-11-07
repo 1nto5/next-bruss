@@ -1,9 +1,8 @@
-import { CardPositionsTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { CardPositionsTableDataType } from '@/app/[lang]/inventory/lib/types';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatDateTime } from '@/lib/utils/date-format';
-import { getDictionary } from '../../lib/dict';
-import { createColumns } from './card-positions-table/columns';
+import { getDictionary } from '../lib/dict';
 import { DataTable } from './card-positions-table/data-table';
 
 async function getCardPositions(
@@ -11,16 +10,24 @@ async function getCardPositions(
   cardNumber: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   positions: CardPositionsTableDataType[];
   cardWarehouse: string;
   cardSector: string;
   cardCreators: string[];
 }> {
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
   const res = await fetch(
-    `${process.env.API}/inventory/card-positions?card-number=${cardNumber}`,
+    `${process.env.API}/inventory/card-positions?card-number=${cardNumber}&${queryParams}`,
     {
-      next: { revalidate: 30, tags: ['inventory-card-positions'] },
+      next: { revalidate: 0, tags: ['inventory-card-positions'] },
     },
   );
 
@@ -31,8 +38,8 @@ async function getCardPositions(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const fetchTime = formatDateTime(dateFromResponse);
+  const fetchTime = new Date(res.headers.get('date') || '');
+  const fetchTimeLocaleString = formatDateTime(fetchTime);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -55,6 +62,7 @@ async function getCardPositions(
 
   return {
     fetchTime,
+    fetchTimeLocaleString,
     positions,
     cardWarehouse,
     cardSector,
@@ -71,14 +79,15 @@ export default async function InventoryCardPage(props: {
   const searchParams = await props.searchParams;
   const { cardNumber, lang } = params;
   const dict = await getDictionary(lang);
-  const { fetchTime, positions, cardSector, cardWarehouse, cardCreators } =
+  const { fetchTime, fetchTimeLocaleString, positions, cardSector, cardWarehouse, cardCreators } =
     await getCardPositions(lang, cardNumber, searchParams);
 
   return (
     <DataTable
-      columns={createColumns(dict)}
+      dict={dict}
       data={positions}
       fetchTime={fetchTime}
+      fetchTimeLocaleString={fetchTimeLocaleString}
       lang={lang}
       cardNumber={cardNumber}
       cardSector={cardSector}

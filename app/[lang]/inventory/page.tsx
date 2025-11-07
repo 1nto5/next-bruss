@@ -1,12 +1,12 @@
 import {
   CardPositionsTableDataType,
   CardTableDataType,
-} from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+} from '@/app/[lang]/inventory/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatDateTime } from '@/lib/utils/date-format';
-import { getDictionary } from '../lib/dict';
+import { getDictionary } from './lib/dict';
 import { CardsDataTable } from './cards-table/cards-data-table';
 import { PositionsDataTable } from './positions-table/positions-data-table';
 
@@ -14,11 +14,19 @@ async function getCards(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  cardsFetchTime: string;
+  cardsFetchTime: Date;
+  cardsFetchTimeLocaleString: string;
   cards: CardTableDataType[];
 }> {
-  const res = await fetch(`${process.env.API}/inventory/cards`, {
-    next: { revalidate: 30, tags: ['inventory-cards'] },
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const res = await fetch(`${process.env.API}/inventory/cards?${queryParams}`, {
+    next: { revalidate: 0, tags: ['inventory-cards'] },
   });
 
   if (!res.ok) {
@@ -28,8 +36,8 @@ async function getCards(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const cardsFetchTime = formatDateTime(dateFromResponse);
+  const cardsFetchTime = new Date(res.headers.get('date') || '');
+  const cardsFetchTimeLocaleString = formatDateTime(cardsFetchTime);
 
   let cards: CardTableDataType[] = await res.json();
 
@@ -42,18 +50,26 @@ async function getCards(
   }));
 
   cards = cards.filter((card) => card.positions && card.positions.length > 0);
-  return { cardsFetchTime, cards };
+  return { cardsFetchTime, cardsFetchTimeLocaleString, cards };
 }
 
 async function getPositions(
   lang: string,
   searchParams: { [key: string]: string | undefined },
 ): Promise<{
-  positionsFetchTime: string;
+  positionsFetchTime: Date;
+  positionsFetchTimeLocaleString: string;
   positions: CardPositionsTableDataType[];
 }> {
-  const res = await fetch(`${process.env.API}/inventory/positions`, {
-    next: { revalidate: 30, tags: ['inventory-positions'] },
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(
+      ([_, value]) => value !== undefined,
+    ) as [string, string][],
+  );
+
+  const queryParams = new URLSearchParams(filteredSearchParams).toString();
+  const res = await fetch(`${process.env.API}/inventory/positions?${queryParams}`, {
+    next: { revalidate: 0, tags: ['inventory-positions'] },
   });
 
   if (!res.ok) {
@@ -63,8 +79,8 @@ async function getPositions(
     );
   }
 
-  const dateFromResponse = new Date(res.headers.get('date') || '');
-  const positionsFetchTime = formatDateTime(dateFromResponse);
+  const positionsFetchTime = new Date(res.headers.get('date') || '');
+  const positionsFetchTimeLocaleString = formatDateTime(positionsFetchTime);
 
   const resJson: {
     positions: CardPositionsTableDataType[];
@@ -87,6 +103,7 @@ async function getPositions(
 
   return {
     positionsFetchTime,
+    positionsFetchTimeLocaleString,
     positions,
   };
 }
@@ -103,20 +120,22 @@ export default async function InventoryPage(props: {
   const dict = await getDictionary(lang);
 
   let positionsFetchTime, cardsFetchTime, cards, positions;
-  // const { number = '' } = searchParams;
-  ({ cardsFetchTime, cards } = await getCards(lang, searchParams));
-  ({ positionsFetchTime, positions } = await getPositions(lang, searchParams));
+  let cardsFetchTimeLocaleString, positionsFetchTimeLocaleString;
+  ({ cardsFetchTime, cardsFetchTimeLocaleString, cards } = await getCards(lang, searchParams));
+  ({ positionsFetchTime, positionsFetchTimeLocaleString, positions } = await getPositions(lang, searchParams));
 
   return (
     <Tabs defaultValue='cards'>
       <TabsList className='grid w-full grid-cols-2'>
-        <TabsTrigger value='cards'>Karty</TabsTrigger>
-        <TabsTrigger value='positions'>Pozycje</TabsTrigger>
+        <TabsTrigger value='cards'>{dict.tabs.cards}</TabsTrigger>
+        <TabsTrigger value='positions'>{dict.tabs.positions}</TabsTrigger>
       </TabsList>
       <TabsContent value='cards'>
         <CardsDataTable
+          dict={dict}
           data={cards}
           fetchTime={cardsFetchTime}
+          fetchTimeLocaleString={cardsFetchTimeLocaleString}
           lang={lang}
         />
       </TabsContent>
@@ -124,6 +143,7 @@ export default async function InventoryPage(props: {
         <PositionsDataTable
           dict={dict}
           fetchTime={positionsFetchTime}
+          fetchTimeLocaleString={positionsFetchTimeLocaleString}
           data={positions}
           lang={lang}
         />

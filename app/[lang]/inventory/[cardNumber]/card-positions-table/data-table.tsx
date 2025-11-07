@@ -2,11 +2,9 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -32,37 +30,40 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { ArrowRight } from 'lucide-react';
-// import { useEffect } from 'react';
-// import { revalidateCards as revalidate } from '../actions';
-import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
-import ExportButton from '../components/export-button';
-import { cardsColumns } from './cards-columns';
+import { Table as TableIcon } from 'lucide-react';
+import LocalizedLink from '@/components/localized-link';
+import CardPositionsTableFilteringAndOptions from '../components/card-positions-table-filtering-and-options';
+import { Dictionary } from '../../lib/dict';
+import { createColumns } from './columns';
 
 interface DataTableProps<TData, TValue> {
+  dict: Dictionary;
   data: TData[];
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   lang: string;
+  cardNumber: string;
+  cardWarehouse: string;
+  cardSector: string;
+  cardCreators: string[];
 }
 
-export function CardsDataTable<TData, TValue>({
+export function DataTable<TData, TValue>({
+  dict,
   data,
   fetchTime,
+  fetchTimeLocaleString,
   lang,
+  cardNumber,
+  cardWarehouse,
+  cardSector,
+  cardCreators,
 }: DataTableProps<TData, TValue>) {
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     revalidate();
-  //   }, 1000 * 30); // 30 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+  const columns = React.useMemo(
+    () => createColumns(dict) as ColumnDef<TData, TValue>[],
+    [dict],
   );
-
-  const columns = cardsColumns as ColumnDef<TData, TValue>[];
 
   const table = useReactTable({
     data,
@@ -71,15 +72,12 @@ export function CardsDataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnFilters,
     },
     initialState: {
       pagination: {
-        pageSize: 20,
+        pageSize: 25,
       },
     },
   });
@@ -87,22 +85,25 @@ export function CardsDataTable<TData, TValue>({
   return (
     <Card>
       <CardHeader>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='space-y-2 sm:flex sm:justify-between sm:gap-4'>
           <div>
-            <CardTitle>Karty</CardTitle>
-            <CardDescription>
-              Ostatnia synchronizacja: {fetchTime}
+            <CardTitle>
+              {dict.cardPositions.table.title.replace('{cardNumber}', cardNumber)}
+            </CardTitle>
+            <CardDescription className='font-bold'>
+              {dict.cardPositions.table.cardInfo
+                .replace('{warehouse}', cardWarehouse)
+                .replace('{sector}', cardSector)
+                .replace('{creators}', cardCreators.join(', '))}
             </CardDescription>
           </div>
-          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
-            <ExportButton />
-          </div>
+          <Button variant='outline' asChild>
+            <LocalizedLink href='/inventory'>
+              <TableIcon /> <span>{dict.cardPositions.table.backToCards}</span>
+            </LocalizedLink>
+          </Button>
         </div>
-        <CardsTableFilteringAndOptions
-          setFilter={(columnId, value) =>
-            table.getColumn(columnId)?.setFilterValue(value)
-          }
-        />
+        <CardPositionsTableFilteringAndOptions dict={dict} fetchTime={fetchTime} cardNumber={cardNumber} />
       </CardHeader>
       <CardContent>
         <div className='rounded-md border'>
@@ -148,7 +149,7 @@ export function CardsDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    No results.
+                    {dict.common.noResults}
                   </TableCell>
                 </TableRow>
               )}
@@ -157,7 +158,7 @@ export function CardsDataTable<TData, TValue>({
         </div>
       </CardContent>
       <CardFooter className='flex justify-between'>
-        <Button
+        {/* <Button
           variant='outline'
           size='sm'
           onClick={() => table.previousPage()}
@@ -172,7 +173,7 @@ export function CardsDataTable<TData, TValue>({
           disabled={!table.getCanNextPage()}
         >
           <ArrowRight />
-        </Button>
+        </Button> */}
       </CardFooter>
     </Card>
   );

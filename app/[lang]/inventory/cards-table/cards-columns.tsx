@@ -1,15 +1,16 @@
 'use client';
 
-import { CardTableDataType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { CardTableDataType } from '@/app/[lang]/inventory/lib/types';
+import { Dictionary } from '@/app/[lang]/inventory/lib/dict';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, List } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 
-export const cardsColumns: ColumnDef<CardTableDataType>[] = [
+export const createCardsColumns = (dict: Dictionary): ColumnDef<CardTableDataType>[] => [
   {
     accessorKey: 'sector',
-    header: 'Sektor',
+    header: dict.cards.columns.sector,
     filterFn: (row, columnId, value) => {
       return row.getValue(columnId) === value;
     },
@@ -23,7 +24,7 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
           size={'sm'}
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Numer
+          {dict.cards.columns.number}
           <ArrowUpDown className='ml-2' />
         </Button>
       );
@@ -36,11 +37,11 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   },
   {
     id: 'actions',
-    header: 'Pozycja na karcie',
+    header: dict.cards.columns.cardPosition,
     cell: ({ row }) => {
       const cardNumber = row.original.number;
       return (
-        <LocalizedLink href={`/inw-2/zatwierdz/${cardNumber}`}>
+        <LocalizedLink href={`/inventory/${cardNumber}`}>
           <Button size='sm' type='button' variant='outline'>
             <List />
           </Button>
@@ -50,7 +51,7 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   },
   {
     accessorKey: 'creators',
-    header: 'Spisujący',
+    header: dict.cards.columns.creators,
     filterFn: 'includesString',
 
     cell: ({ row }) => {
@@ -67,7 +68,7 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
           size={'sm'}
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Poz.
+          {dict.cards.columns.positions}
           <ArrowUpDown className='ml-2' />
         </Button>
       );
@@ -86,7 +87,7 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
           size={'sm'}
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Zatw. poz.
+          {dict.cards.columns.approvedPositions}
           <ArrowUpDown className='ml-2' />
         </Button>
       );
@@ -94,8 +95,6 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
     cell: ({ row }) => {
       const approvedPositions = row.original.approvedPositions;
       const totalPositions = row.original.positionsLength;
-      // Jeśli łączna liczba pozycji 3 lub mniej, nie podświetlaj gdy jest zatwierdzona przynajmniej jedna
-      // Gdy więcej niż 3, podświetlaj jeśli zatwierdzonych mniej niż 3
       const shouldHighlight =
         totalPositions <= 3 ? approvedPositions === 0 : approvedPositions < 3;
 
@@ -110,7 +109,7 @@ export const cardsColumns: ColumnDef<CardTableDataType>[] = [
   },
   {
     accessorKey: 'warehouse',
-    header: 'Magazyn',
+    header: dict.cards.columns.warehouse,
     filterFn: (row, columnId, value) => {
       return row.getValue(columnId) === value;
     },

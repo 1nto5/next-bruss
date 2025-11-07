@@ -1,7 +1,7 @@
 'use client';
 
-import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
-import { createUpdatePositionSchema } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
+import { PositionType } from '@/app/[lang]/inventory/lib/types';
+import { createUpdatePositionSchema } from '@/app/[lang]/inventory/lib/zod';
 import { Button } from '@/components/ui/button';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
@@ -34,7 +34,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { updatePosition as update } from '../actions';
-import { Dictionary } from '../../lib/dict';
+import { Dictionary } from '../lib/dict';
 
 export default function EditPositionDialog({
   position,

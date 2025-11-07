@@ -1,0 +1,116 @@
+{
+  "common": {
+    "select": "Wybierz",
+    "search": "Szukaj",
+    "clear": "Wyczyść",
+    "clearFilters": "Wyczyść filtry",
+    "notFound": "Nie znaleziono",
+    "selected": "wybranych",
+    "noResults": "Brak wyników.",
+    "searchPlaceholder": "Wyszukaj...",
+    "contactIT": "Skontaktuj się z IT!"
+  },
+  "tabs": {
+    "cards": "Karty",
+    "positions": "Pozycje"
+  },
+  "export": {
+    "button": "Export"
+  },
+  "cards": {
+    "table": {
+      "title": "Karty"
+    },
+    "columns": {
+      "sector": "Sektor",
+      "number": "Numer",
+      "cardPosition": "Pozycja na karcie",
+      "creators": "Spisujący",
+      "positions": "Poz.",
+      "approvedPositions": "Zatw. poz.",
+      "warehouse": "Magazyn"
+    },
+    "filters": {
+      "cardNumber": "Nr karty",
+      "creators": "Spisujący",
+      "warehouse": "Magazyn",
+      "sector": "Sektor"
+    }
+  },
+  "positions": {
+    "table": {
+      "title": "Pozycje",
+      "lastSync": "Ostatnia synchronizacja: {time}"
+    },
+    "columns": {
+      "positionNumber": "Poz. nr",
+      "id": "Id",
+      "edit": "Edycja",
+      "article": "Art.",
+      "articleNumber": "Nr art.",
+      "quantity": "Ilość",
+      "wip": "WIP",
+      "approved": "Zatwierdzono",
+      "comment": "Komentarz",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Data dostawy",
+      "lastChange": "Ostatnia zmiana"
+    },
+    "filters": {
+      "positionId": "ID pozycji",
+      "article": "Artykuł",
+      "articleNumber": "Nr artykułu",
+      "quantity": "Ilość"
+    }
+  },
+  "cardPositions": {
+    "table": {
+      "title": "Pozycje na karcie",
+      "cardInfo": "Magazyn: {warehouse}, sektor: {sector}, twórcy: {creators}",
+      "backToCards": "Powrót do kart"
+    },
+    "columns": {
+      "positionNumber": "Poz. nr",
+      "id": "Id",
+      "edit": "Edycja",
+      "article": "Art.",
+      "articleNumber": "Nr art.",
+      "quantity": "Ilość",
+      "wip": "WIP",
+      "approved": "Zatwierdzono",
+      "comment": "Komentarz",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Data dostawy",
+      "lastChange": "Ostatnia zmiana"
+    },
+    "filters": {
+      "positionId": "ID pozycji",
+      "article": "Artykuł",
+      "articleNumber": "Nr artykułu"
+    }
+  },
+  "editDialog": {
+    "title": "Edycja pozycji {identifier}",
+    "save": "Zapisz",
+    "positionSaved": "Pozycja zapisana!",
+    "alreadyApproved": "Pozycja została już zatwierdzona przez {approver}",
+    "fields": {
+      "article": "Artykuł",
+      "quantity": "Ilość",
+      "wip": "WIP",
+      "approve": "Zatwierdź pozycję",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Data dostawy",
+      "comment": "Komentarz"
+    },
+    "errors": {
+      "articleNotFound": "Artykuł nie istnieje",
+      "wipNotAllowed": "Niedozwolony dla S900",
+      "unauthorized": "Brak uprawnień!"
+    }
+  },
+  "validation": {
+    "quantityMustBeNumber": "Ilość musi być liczbą",
+    "quantityCannotBeNegative": "Ilość nie może być ujemna"
+  }
+}

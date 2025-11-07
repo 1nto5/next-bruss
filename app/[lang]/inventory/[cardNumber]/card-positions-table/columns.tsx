@@ -1,11 +1,11 @@
 'use client';
 
-import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { PositionType } from '@/app/[lang]/inventory/lib/types';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Check } from 'lucide-react';
 import EditPositionDialog from '../../components/edit-position-dialog';
-import { Dictionary } from '../../../lib/dict';
+import { Dictionary } from '../../lib/dict';
 
 export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   {
@@ -17,7 +17,7 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
           size={'sm'}
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Poz. nr
+          {dict.cardPositions.columns.positionNumber}
           <ArrowUpDown className='ml-2' />
         </Button>
       );
@@ -31,18 +31,18 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
 
   {
     accessorKey: 'identifier',
-    header: 'Id',
+    header: dict.cardPositions.columns.id,
   },
   {
     id: 'actions',
-    header: 'Edycja',
+    header: dict.cardPositions.columns.edit,
     cell: ({ row }) => {
       return <EditPositionDialog position={row.original} dict={dict} />;
     },
   },
   {
     accessorKey: 'articleName',
-    header: 'Art.',
+    header: dict.cardPositions.columns.article,
     cell: ({ row }) => {
       const articleName = row.original.articleName;
       const articleNumber = row.original.articleNumber;
@@ -51,24 +51,12 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'articleNumber',
-    header: 'Nr art.',
+    header: dict.cardPositions.columns.articleNumber,
   },
 
-  // export type PositionType = {
-  //   position: number;
-  //   identifier: string;
-  //   time: string;
-  //   articleNumber: string;
-  //   articleName: string;
-  //   quantity: number;
-  //   unit: string;
-  //   wip: boolean;
-  //   approver: string;
-  //   approvedAt: string;
-  // };
   {
     accessorKey: 'quantity',
-    header: 'Ilość',
+    header: dict.cardPositions.columns.quantity,
     cell: ({ row }) => {
       const quantity = row.original.quantity;
       const unit = row.original.unit;
@@ -81,7 +69,7 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'wip',
-    header: 'WIP',
+    header: dict.cardPositions.columns.wip,
     cell: ({ row }) => {
       const wip = row.original.wip;
       return wip ? <Check /> : null;
@@ -89,11 +77,11 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'approver',
-    header: 'Zatwierdzono',
+    header: dict.cardPositions.columns.approved,
   },
   {
     accessorKey: 'comment',
-    header: 'Komentarz',
+    header: dict.cardPositions.columns.comment,
     cell: ({ row }) => {
       const comment = row.getValue('comment');
       return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
@@ -101,7 +89,7 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'bin',
-    header: 'Storage Bin',
+    header: dict.cardPositions.columns.storageBin,
     cell: ({ row }) => {
       const bin = row.original.bin;
       return <div className='text-nowrap'>{bin && bin.toUpperCase()}</div>;
@@ -109,10 +97,10 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'deliveryDateLocaleString',
-    header: 'Data dostawy',
+    header: dict.cardPositions.columns.deliveryDate,
   },
   {
     accessorKey: 'timeLocaleString',
-    header: 'Ostatnia zmiana',
+    header: dict.cardPositions.columns.lastChange,
   },
 ];

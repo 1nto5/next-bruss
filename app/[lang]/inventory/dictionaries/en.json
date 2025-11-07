@@ -1,0 +1,116 @@
+{
+  "common": {
+    "select": "Select",
+    "search": "Search",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "notFound": "Not found",
+    "selected": "selected",
+    "noResults": "No results.",
+    "searchPlaceholder": "Search...",
+    "contactIT": "Contact IT!"
+  },
+  "tabs": {
+    "cards": "Cards",
+    "positions": "Positions"
+  },
+  "export": {
+    "button": "Export"
+  },
+  "cards": {
+    "table": {
+      "title": "Cards"
+    },
+    "columns": {
+      "sector": "Sector",
+      "number": "Number",
+      "cardPosition": "Card Position",
+      "creators": "Creators",
+      "positions": "Pos.",
+      "approvedPositions": "Approved Pos.",
+      "warehouse": "Warehouse"
+    },
+    "filters": {
+      "cardNumber": "Card Number",
+      "creators": "Creators",
+      "warehouse": "Warehouse",
+      "sector": "Sector"
+    }
+  },
+  "positions": {
+    "table": {
+      "title": "Positions",
+      "lastSync": "Last sync: {time}"
+    },
+    "columns": {
+      "positionNumber": "Pos. No.",
+      "id": "Id",
+      "edit": "Edit",
+      "article": "Article",
+      "articleNumber": "Article No.",
+      "quantity": "Quantity",
+      "wip": "WIP",
+      "approved": "Approved",
+      "comment": "Comment",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Delivery Date",
+      "lastChange": "Last Change"
+    },
+    "filters": {
+      "positionId": "Position ID",
+      "article": "Article",
+      "articleNumber": "Article Number",
+      "quantity": "Quantity"
+    }
+  },
+  "cardPositions": {
+    "table": {
+      "title": "Card Positions",
+      "cardInfo": "Warehouse: {warehouse}, Sector: {sector}, Creators: {creators}",
+      "backToCards": "Back to Cards"
+    },
+    "columns": {
+      "positionNumber": "Pos. No.",
+      "id": "Id",
+      "edit": "Edit",
+      "article": "Article",
+      "articleNumber": "Article No.",
+      "quantity": "Quantity",
+      "wip": "WIP",
+      "approved": "Approved",
+      "comment": "Comment",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Delivery Date",
+      "lastChange": "Last Change"
+    },
+    "filters": {
+      "positionId": "Position ID",
+      "article": "Article",
+      "articleNumber": "Article Number"
+    }
+  },
+  "editDialog": {
+    "title": "Edit Position {identifier}",
+    "save": "Save",
+    "positionSaved": "Position saved!",
+    "alreadyApproved": "Position was already approved by {approver}",
+    "fields": {
+      "article": "Article",
+      "quantity": "Quantity",
+      "wip": "WIP",
+      "approve": "Approve Position",
+      "storageBin": "Storage Bin",
+      "deliveryDate": "Delivery Date",
+      "comment": "Comment"
+    },
+    "errors": {
+      "articleNotFound": "Article not found",
+      "wipNotAllowed": "Not allowed for S900",
+      "unauthorized": "Unauthorized!"
+    }
+  },
+  "validation": {
+    "quantityMustBeNumber": "Quantity must be a number",
+    "quantityCannotBeNegative": "Quantity cannot be negative"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "common": {
+    "select": "Auswählen",
+    "search": "Suchen",
+    "clear": "Löschen",
+    "clearFilters": "Filter löschen",
+    "notFound": "Nicht gefunden",
+    "selected": "ausgewählt",
+    "noResults": "Keine Ergebnisse.",
+    "searchPlaceholder": "Suche...",
+    "contactIT": "Kontaktieren Sie den IT-Support!"
+  },
+  "tabs": {
+    "cards": "Karten",
+    "positions": "Positionen"
+  },
+  "export": {
+    "button": "Export"
+  },
+  "cards": {
+    "table": {
+      "title": "Karten"
+    },
+    "columns": {
+      "sector": "Sektor",
+      "number": "Nummer",
+      "cardPosition": "Position auf Karte",
+      "creators": "Ersteller",
+      "positions": "Pos.",
+      "approvedPositions": "Genehm. Pos.",
+      "warehouse": "Lager"
+    },
+    "filters": {
+      "cardNumber": "Kartennr.",
+      "creators": "Ersteller",
+      "warehouse": "Lager",
+      "sector": "Sektor"
+    }
+  },
+  "positions": {
+    "table": {
+      "title": "Positionen",
+      "lastSync": "Letzte Synchronisierung: {time}"
+    },
+    "columns": {
+      "positionNumber": "Pos. Nr.",
+      "id": "Id",
+      "edit": "Bearbeiten",
+      "article": "Art.",
+      "articleNumber": "Art. Nr.",
+      "quantity": "Menge",
+      "wip": "WIP",
+      "approved": "Genehmigt",
+      "comment": "Kommentar",
+      "storageBin": "Lagerfach",
+      "deliveryDate": "Lieferdatum",
+      "lastChange": "Letzte Änderung"
+    },
+    "filters": {
+      "positionId": "Positions-ID",
+      "article": "Artikel",
+      "articleNumber": "Artikelnummer",
+      "quantity": "Menge"
+    }
+  },
+  "cardPositions": {
+    "table": {
+      "title": "Positionen auf Karte",
+      "cardInfo": "Lager: {warehouse}, Sektor: {sector}, Ersteller: {creators}",
+      "backToCards": "Zurück zu Karten"
+    },
+    "columns": {
+      "positionNumber": "Pos. Nr.",
+      "id": "Id",
+      "edit": "Bearbeiten",
+      "article": "Art.",
+      "articleNumber": "Art. Nr.",
+      "quantity": "Menge",
+      "wip": "WIP",
+      "approved": "Genehmigt",
+      "comment": "Kommentar",
+      "storageBin": "Lagerfach",
+      "deliveryDate": "Lieferdatum",
+      "lastChange": "Letzte Änderung"
+    },
+    "filters": {
+      "positionId": "Positions-ID",
+      "article": "Artikel",
+      "articleNumber": "Artikelnummer"
+    }
+  },
+  "editDialog": {
+    "title": "Position {identifier} bearbeiten",
+    "save": "Speichern",
+    "positionSaved": "Position gespeichert!",
+    "alreadyApproved": "Position wurde bereits von {approver} genehmigt",
+    "fields": {
+      "article": "Artikel",
+      "quantity": "Menge",
+      "wip": "WIP",
+      "approve": "Position genehmigen",
+      "storageBin": "Lagerfach",
+      "deliveryDate": "Lieferdatum",
+      "comment": "Kommentar"
+    },
+    "errors": {
+      "articleNotFound": "Artikel nicht gefunden",
+      "wipNotAllowed": "Für S900 nicht erlaubt",
+      "unauthorized": "Keine Berechtigung!"
+    }
+  },
+  "validation": {
+    "quantityMustBeNumber": "Menge muss eine Zahl sein",
+    "quantityCannotBeNegative": "Menge darf nicht negativ sein"
+  }
+}
