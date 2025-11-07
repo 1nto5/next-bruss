@@ -7,9 +7,7 @@ import { Locale } from '@/lib/config/i18n';
 import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { formatDate, formatDateTime } from '@/lib/utils/date-format';
 import { getDictionary } from '../lib/dict';
-import { cardsColumns } from './cards-table/cards-columns';
 import { CardsDataTable } from './cards-table/cards-data-table';
-import { createPositionsColumns } from './positions-table/positions-columns';
 import { PositionsDataTable } from './positions-table/positions-data-table';
 
 async function getCards(
@@ -117,7 +115,6 @@ export default async function InventoryPage(props: {
       </TabsList>
       <TabsContent value='cards'>
         <CardsDataTable
-          columns={cardsColumns}
           data={cards}
           fetchTime={cardsFetchTime}
           lang={lang}
@@ -125,7 +122,7 @@ export default async function InventoryPage(props: {
       </TabsContent>
       <TabsContent value='positions'>
         <PositionsDataTable
-          columns={createPositionsColumns(dict)}
+          dict={dict}
           fetchTime={positionsFetchTime}
           data={positions}
           lang={lang}

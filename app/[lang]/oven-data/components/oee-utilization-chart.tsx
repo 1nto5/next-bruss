@@ -219,8 +219,8 @@ export default function OeeUtilizationChart({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => value}
-                  formatter={(value, name, props) => {
+                  labelFormatter={(value: any) => value}
+                  formatter={(value: any, name: any, props: any) => {
                     if (name === 'utilization') {
                       return [
                         <div key="utilization" className="space-y-1">

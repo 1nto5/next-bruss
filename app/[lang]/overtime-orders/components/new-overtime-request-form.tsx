@@ -123,7 +123,7 @@ export default function NewOvertimeRequestForm({
   const newOvertimeRequestSchema = createNewOvertimeRequestSchema(dict.validation);
 
   const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
-    resolver: zodResolver(newOvertimeRequestSchema),
+    resolver: zodResolver(newOvertimeRequestSchema) as any,
     defaultValues: {
       department: '',
       numberOfEmployees: 1,

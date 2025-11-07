@@ -49,7 +49,7 @@ export default function EditPositionDialog({
   const updatePositionSchema = createUpdatePositionSchema(dict.validation);
 
   const form = useForm<z.infer<typeof updatePositionSchema>>({
-    resolver: zodResolver(updatePositionSchema),
+    resolver: zodResolver(updatePositionSchema) as any,
     defaultValues: {
       articleNumber: position.articleNumber,
       quantity: position.quantity,

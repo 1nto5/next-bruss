@@ -182,7 +182,7 @@ const TableCellCorrectiveAction: React.FC<TableCellCorrectiveActionProps> = ({
             ) : correctiveAction.created.by === user ||
               user === deviationOwner ||
               user === correctiveAction.responsible ||
-              userRoles?.some((role) =>
+              userRoles?.some((role: string) =>
                 [
                   'group-leader',
                   'quality-manager',

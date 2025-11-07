@@ -424,12 +424,17 @@ async function handleNotifications(
           [],
         );
 
-        const updateOperation =
-          notificationContext === 'creation'
-            ? { $set: { notificationLogs: uniqueLogs } } // Use uniqueLogs for creation
-            : { $push: { notificationLogs: { $each: uniqueLogs } } }; // Use uniqueLogs for edit
-
-        await deviationsColl.updateOne({ _id: deviationId }, updateOperation);
+        if (notificationContext === 'creation') {
+          await deviationsColl.updateOne(
+            { _id: deviationId },
+            { $set: { notificationLogs: uniqueLogs } },
+          );
+        } else {
+          await deviationsColl.updateOne(
+            { _id: deviationId },
+            { $push: { notificationLogs: { $each: uniqueLogs } } } as any,
+          );
+        }
       } catch (e) {
         console.error(`Failed to update logs for [${internalId}]:`, e);
       }
@@ -699,7 +704,7 @@ export async function updateCorrectiveAction(
         $push: {
           correctiveActions: newCorrectiveAction,
         },
-      },
+      } as any,
     );
 
     if (res.modifiedCount > 0) {
@@ -745,7 +750,7 @@ export async function updateCorrectiveAction(
       if (allNewLogs.length > 0) {
         await collection.updateOne(
           { _id: deviationObjectId },
-          { $push: { notificationLogs: { $each: allNewLogs } } },
+          { $push: { notificationLogs: { $each: allNewLogs } } } as any,
         );
       }
 
@@ -978,7 +983,7 @@ export async function approveDeviation(
       if (ownerNotificationLog) {
         await coll.updateOne(
           { _id: deviationObjectId },
-          { $push: { notificationLogs: ownerNotificationLog } },
+          { $push: { notificationLogs: ownerNotificationLog } } as any,
         );
       }
 
@@ -1002,7 +1007,7 @@ export async function approveDeviation(
         if (teamLeaderLogs.length > 0) {
           await coll.updateOne(
             { _id: deviationObjectId },
-            { $push: { notificationLogs: { $each: teamLeaderLogs } } },
+            { $push: { notificationLogs: { $each: teamLeaderLogs } } } as any,
           );
         }
       }
@@ -1074,7 +1079,7 @@ export async function approveDeviation(
                   $push: {
                     notificationLogs: { $each: plantManagerNotificationLogs },
                   },
-                },
+                } as any,
               );
             }
           }
@@ -1124,7 +1129,7 @@ export async function changeCorrectiveActionStatus(
     const isOwner = deviation.owner === userEmail;
     const isCreator = correctiveActionToUpdate.created.by === userEmail;
     const isResponsible = correctiveActionToUpdate.responsible === userEmail;
-    const hasRequiredRole = userRoles.some((role) =>
+    const hasRequiredRole = userRoles.some((role: string) =>
       [
         'group-leader',
         'quality-manager',
@@ -1846,7 +1851,7 @@ export async function notifyRejectorsAfterAttachment(deviationId: string) {
     if (reevaluationLogs.length > 0) {
       await collection.updateOne(
         { _id: deviationObjectId },
-        { $push: { notificationLogs: { $each: reevaluationLogs } } },
+        { $push: { notificationLogs: { $each: reevaluationLogs } } } as any,
       );
     }
 
@@ -1884,7 +1889,7 @@ export async function addNote(deviationId: string, content: string) {
     // Add note to deviation
     const result = await collection.updateOne(
       { _id: deviationObjectId },
-      { $push: { notes: newNote } },
+      { $push: { notes: newNote } } as any,
     );
 
     if (result.modifiedCount === 0) {

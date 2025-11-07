@@ -247,7 +247,7 @@ export default function DeviationView({
     (deviation?.status === 'approved' ||
       deviation?.status === 'in progress' ||
       deviation?.status === 'closed') &&
-    (session?.user?.roles?.some((role) =>
+    (session?.user?.roles?.some((role: string) =>
       [
         'team-leader',
         'group-leader',
@@ -261,7 +261,7 @@ export default function DeviationView({
   // NEW: Check if user can add attachments
   const canAddAttachment =
     deviation?.status !== 'closed' &&
-    (session?.user?.roles?.some((role) =>
+    (session?.user?.roles?.some((role: string) =>
       ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
     ) ||
       session?.user?.email === deviation?.owner);
@@ -378,7 +378,7 @@ export default function DeviationView({
                       deviation?.status || '',
                     ) &&
                       (session?.user?.email === deviation?.owner ||
-                        session?.user?.roles?.some((role) =>
+                        session?.user?.roles?.some((role: string) =>
                           [
                             'admin',
                             'group-leader',
@@ -537,7 +537,7 @@ export default function DeviationView({
                     <CardTitle className='flex items-center'>
                       <Wrench className='mr-2 h-5 w-5' /> {dict.view.sections.correctiveActions}
                     </CardTitle>
-                    {(session?.user?.roles?.some((role) =>
+                    {(session?.user?.roles?.some((role: string) =>
                       [
                         'quality',
                         'team-leader',

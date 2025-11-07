@@ -82,7 +82,7 @@ export default async function OvertimeOrdersPage(props: {
   const isGroupLeader = session?.user?.roles?.includes('group-leader') || false;
   // Users with any role containing 'manager' (e.g., plant manager, logistics manager, etc.) can create requests
   const isManager =
-    session?.user?.roles?.some((role) => role.includes('manager')) || false;
+    session?.user?.roles?.some((role: string) => role.includes('manager')) || false;
   const canCreateRequest = isGroupLeader || isManager;
   const userEmail = session?.user?.email || undefined;
 

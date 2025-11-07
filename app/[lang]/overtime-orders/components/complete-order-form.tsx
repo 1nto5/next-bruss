@@ -69,7 +69,7 @@ export default function CompleteOrderForm({
   const router = useRouter();
 
   const form = useForm<MultipleAttachmentFormType>({
-    resolver: zodResolver(MultipleAttachmentFormSchema),
+    resolver: zodResolver(MultipleAttachmentFormSchema) as any,
     defaultValues: {
       files: [],
       mergeFiles: true,

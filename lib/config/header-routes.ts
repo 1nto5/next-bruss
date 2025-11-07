@@ -14,7 +14,6 @@ export const ROUTE_PATHS = {
   ovenData: '/oven-data',
   deviations: '/deviations',
   failuresLv: '/failures/lv',
-  inw2spis: '/inw-2/spis',
   inw2zatwierdz: '/inw-2/zatwierdz',
 
   newsAdd: '/news/add',
@@ -73,10 +72,6 @@ export const plHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.codesGenerator,
         title: 'Generator QR/Barcode/DMC',
-      },
-      {
-        href: ROUTE_PATHS.inw2spis,
-        title: 'Inwentaryzacja - spis',
       },
       {
         href: ROUTE_PATHS.inw2zatwierdz,
@@ -165,10 +160,6 @@ export const enHeaderRoutes: HeaderRoute[] = [
       {
         href: ROUTE_PATHS.codesGenerator,
         title: 'QR/Barcode/DMC Generator',
-      },
-      {
-        href: ROUTE_PATHS.inw2spis,
-        title: 'Inventory - count',
       },
       {
         href: ROUTE_PATHS.inw2zatwierdz,

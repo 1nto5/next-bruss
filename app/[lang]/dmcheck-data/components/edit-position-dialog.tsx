@@ -45,7 +45,7 @@ export default function EditPositionDialog({
   const [open, setOpen] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const form = useForm<z.infer<typeof UpdatePositionSchema>>({
-    resolver: zodResolver(UpdatePositionSchema),
+    resolver: zodResolver(UpdatePositionSchema) as any,
     defaultValues: {
       articleNumber: position.articleNumber,
       quantity: position.quantity,

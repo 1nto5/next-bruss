@@ -29,13 +29,14 @@ export default function NewsForm({ news, lang, dict }: NewsFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const newsSchema = createNewsSchema(dict.validation);
-  
-  const form = useForm<z.infer<typeof newsSchema>>({
-    resolver: zodResolver(newsSchema),
+
+  type NewsFormType = z.infer<typeof newsSchema>;
+  const form = useForm<NewsFormType>({
+    resolver: zodResolver(newsSchema) as any,
     defaultValues: {
       title: news?.title || '',
       content: news?.content || '',
-      isPinned: news?.isPinned || false
+      isPinned: news?.isPinned ?? false
     }
   });
   

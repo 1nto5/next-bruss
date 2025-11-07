@@ -37,16 +37,19 @@ import { ArrowRight } from 'lucide-react';
 // import { revalidateCardPositions as revalidate } from '../actions';
 import ExportButton from '../components/export-button';
 import PositionsTableFilteringAndOptions from '../components/positions-table-filtering-and-options';
+import { createPositionsColumns } from './positions-columns';
+import { Dictionary } from '../../lib/dict';
+import { CardPositionsTableDataType } from '../lib/types';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  dict: Dictionary;
   data: TData[];
   fetchTime: string;
   lang: string;
 }
 
 export function PositionsDataTable<TData, TValue>({
-  columns,
+  dict,
   data,
   fetchTime,
   lang,
@@ -61,6 +64,11 @@ export function PositionsDataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
+  );
+
+  const columns = React.useMemo(
+    () => createPositionsColumns(dict) as ColumnDef<TData, TValue>[],
+    [dict],
   );
 
   const table = useReactTable({

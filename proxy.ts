@@ -9,7 +9,12 @@ import Negotiator from 'negotiator';
 function isValidLocale(locale: string): boolean {
   try {
     // Filter out wildcards and obviously invalid values
-    if (!locale || locale === '*' || locale.length < 2 || /^\d+$/.test(locale)) {
+    if (
+      !locale ||
+      locale === '*' ||
+      locale.length < 2 ||
+      /^\d+$/.test(locale)
+    ) {
       return false;
     }
 
@@ -27,7 +32,9 @@ function getLocale(request: NextRequest): string | undefined {
 
   // @ts-ignore locales are readonly
   const locales: string[] = i18n.locales;
-  const allLanguages = new Negotiator({ headers: negotiatorHeaders }).languages();
+  const allLanguages = new Negotiator({
+    headers: negotiatorHeaders,
+  }).languages();
 
   // Filter out invalid locale identifiers to prevent Intl errors
   const validLanguages = allLanguages.filter(isValidLocale);
@@ -51,11 +58,6 @@ export function proxy(request: NextRequest) {
   if (
     [
       '/logo.png',
-      '/ok.wav',
-      '/nok.mp3',
-      '/oven-in.wav',
-      '/oven-out.wav',
-      '/eol74_dmc.png',
       // Your other files in `public`
     ].includes(pathname) ||
     pathname.startsWith('/flags/')
@@ -63,8 +65,7 @@ export function proxy(request: NextRequest) {
     return;
 
   const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
   // Redirect if there is no locale
@@ -82,8 +83,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(
       new URL(
         `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}${search}`,
-        request.url,
-      ),
+        request.url
+      )
     );
   }
 }

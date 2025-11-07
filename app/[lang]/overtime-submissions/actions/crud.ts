@@ -169,7 +169,7 @@ export async function updateOvertimeSubmission(
         $push: {
           editHistory: editHistoryEntry,
         },
-      },
+      } as any,
     );
 
     if (update.matchedCount === 0) {
@@ -312,7 +312,7 @@ export async function editOvertimeSubmission(
         $push: {
           editHistory: editHistoryEntry,
         },
-      },
+      } as any,
     );
 
     if (update.matchedCount === 0) {
@@ -465,7 +465,7 @@ export async function correctOvertimeSubmission(
         $push: {
           correctionHistory: correctionHistoryEntry,
         },
-      },
+      } as any,
     );
 
     if (update.matchedCount === 0) {

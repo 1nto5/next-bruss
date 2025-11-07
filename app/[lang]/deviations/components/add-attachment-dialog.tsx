@@ -86,7 +86,7 @@ export default function AddAttachmentDialog({
 
     const canAddAttachment =
       deviationStatus !== 'closed' &&
-      (userRoles.some((role) =>
+      (userRoles.some((role: string) =>
         ATTACHMENT_ROLES.includes(role as (typeof ATTACHMENT_ROLES)[number]),
       ) ||
         userEmail === deviationOwner);

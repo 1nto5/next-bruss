@@ -37,16 +37,15 @@ import { ArrowRight } from 'lucide-react';
 // import { revalidateCards as revalidate } from '../actions';
 import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
 import ExportButton from '../components/export-button';
+import { cardsColumns } from './cards-columns';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   fetchTime: string;
   lang: string;
 }
 
 export function CardsDataTable<TData, TValue>({
-  columns,
   data,
   fetchTime,
   lang,
@@ -62,6 +61,8 @@ export function CardsDataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
+
+  const columns = cardsColumns as ColumnDef<TData, TValue>[];
 
   const table = useReactTable({
     data,

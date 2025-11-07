@@ -38,11 +38,9 @@ export function createNewOvertimeRequestSchema(validation: {
           val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
         )
         .pipe(
-          z
-            .number()
-            .min(1, {
-              message: validation.numberOfEmployeesMin,
-            }),
+          z.number().min(1, {
+            message: validation.numberOfEmployeesMin,
+          }),
         ),
       numberOfShifts: z
         .union([z.number(), z.string()])
@@ -50,9 +48,9 @@ export function createNewOvertimeRequestSchema(validation: {
           val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
         )
         .pipe(
-          z
-            .number()
-            .min(1, { message: validation.numberOfShiftsMin }),
+          z.number().min(1, {
+            message: validation.numberOfShiftsMin,
+          }),
         ),
       responsibleEmployee: z
         .string()
@@ -148,11 +146,9 @@ export const NewOvertimeRequestSchema = z
         val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
       )
       .pipe(
-        z
-          .number()
-          .min(1, {
-            message: 'Liczba pracowników musi wynosić co najmniej 1!',
-          }),
+        z.number().min(1, {
+          message: 'Liczba pracowników musi wynosić co najmniej 1!',
+        }),
       ),
     numberOfShifts: z
       .union([z.number(), z.string()])
@@ -160,9 +156,9 @@ export const NewOvertimeRequestSchema = z
         val === '' ? 1 : typeof val === 'string' ? parseInt(val) || 1 : val,
       )
       .pipe(
-        z
-          .number()
-          .min(1, { message: 'Liczba zmian musi wynosić co najmniej 1!' }),
+        z.number().min(1, {
+          message: 'Liczba zmian musi wynosić co najmniej 1!',
+        }),
       ),
     responsibleEmployee: z
       .string()
@@ -254,7 +250,7 @@ export type NewOvertimeRequestType = z.infer<typeof NewOvertimeRequestSchema>;
 export const AttendanceCompletionSchema = z.object({
   actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
   actualEmployeesWorked: z
-    .number({ required_error: 'Liczba pracowników jest wymagana!' })
+    .number()
     .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
     .min(0, { message: 'Liczba pracowników nie może być ujemna!' }),
 });
@@ -293,10 +289,10 @@ export const MultipleAttachmentFormSchema = z.object({
       },
       { message: 'Łączny rozmiar plików przekracza 50MB!' },
     ),
-  mergeFiles: z.boolean().default(true),
-  actualArticles: z.array(ArticleQuantitySchema).optional().default([]),
+  mergeFiles: z.boolean().default(true).catch(true),
+  actualArticles: z.array(ArticleQuantitySchema).default([]).catch([]),
   actualEmployeesWorked: z
-    .number({ required_error: 'Liczba pracowników jest wymagana!' })
+    .number()
     .int({ message: 'Liczba pracowników musi być liczbą całkowitą!' })
     .min(0, { message: 'Liczba pracowników nie może być ujemna!' }),
 });

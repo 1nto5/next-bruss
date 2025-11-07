@@ -83,7 +83,7 @@ export const MultiSelectEmployees = ({
   });
 
   const form = useForm<z.infer<typeof dayOffSchema>>({
-    resolver: zodResolver(dayOffSchema),
+    resolver: zodResolver(dayOffSchema) as any,
     defaultValues: {
       date: undefined,
       note: '',

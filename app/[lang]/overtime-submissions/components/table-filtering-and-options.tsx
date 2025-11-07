@@ -414,7 +414,7 @@ export default function TableFilteringAndOptions({
 
   const isHR = userRoles.includes('hr');
   const isAdmin = userRoles.includes('admin');
-  const isManager = userRoles.some((role) => role.toLowerCase().includes('manager'));
+  const isManager = userRoles.some((role: string) => role.toLowerCase().includes('manager'));
 
   // Only show toggles if user has assignments as supervisor
   const showToggles = canSupervise && assignedToMeCount > 0;

@@ -433,7 +433,7 @@ export async function POST(request: Request) {
     // Add print log to the deviation
     await devCol.updateOne(
       { _id: new ObjectId(deviationId) },
-      { $push: { printLogs: printLog } },
+      { $push: { printLogs: printLog } } as any,
     );
 
     return new NextResponse(new Uint8Array(pdfBuffer), {

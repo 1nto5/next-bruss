@@ -46,16 +46,16 @@ const formSchema = z
         message: 'List cannot be empty',
       }),
     title: z.string().optional(),
-    pageSize: z.enum(['standard', 'label70x100', 'a4', 'a3']).default('standard'),
-    codeSize: z.number().int().default(85),
-    fontSize: z.number().int().default(48),
-    spacing: z.number().int().default(22),
-    codeType: z.enum(['qr', 'barcode', 'dmc']).default('qr'),
-    orientation: z.enum(['portrait', 'landscape']).default('portrait'),
+    pageSize: z.enum(['standard', 'label70x100', 'a4', 'a3']),
+    codeSize: z.number().int(),
+    fontSize: z.number().int(),
+    spacing: z.number().int(),
+    codeType: z.enum(['qr', 'barcode', 'dmc']),
+    orientation: z.enum(['portrait', 'landscape']),
     // DMC range fields
     dmcRangeStart: z.string().optional(), // Changed to string to preserve leading zeros
     dmcRangeEnd: z.string().optional(), // Changed to string to preserve leading zeros
-    dmcUseRange: z.boolean().default(false),
+    dmcUseRange: z.boolean(),
   })
   .refine(
     (data) => {

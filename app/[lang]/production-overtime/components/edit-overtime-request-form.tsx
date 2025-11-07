@@ -81,7 +81,7 @@ export default function EditOvertimeRequestForm({
   );
 
   const form = useForm<z.infer<typeof newOvertimeRequestSchema>>({
-    resolver: zodResolver(newOvertimeRequestSchema),
+    resolver: zodResolver(newOvertimeRequestSchema) as any,
     defaultValues: {
       numberOfEmployees: overtimeRequest.numberOfEmployees,
       numberOfShifts: overtimeRequest.numberOfShifts,

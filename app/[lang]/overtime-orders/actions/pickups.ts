@@ -51,7 +51,7 @@ export async function deleteDayOff(
           editedAt: new Date(),
           editedBy: session.user.email,
         },
-      },
+      } as any,
     );
 
     if (update.matchedCount === 0) {
@@ -126,7 +126,7 @@ export async function addEmployeeDayOff(
           editedAt: new Date(),
           editedBy: session.user.email,
         },
-      },
+      } as any,
     );
 
     if (update.matchedCount === 0) {
