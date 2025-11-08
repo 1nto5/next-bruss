@@ -22,6 +22,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Handle CredentialsSignin errors
       if (
         code?.name === 'CredentialsSignin' ||
+        code?.type === 'CredentialsSignin' ||
+        (typeof code === 'object' && code?.code === 'credentials') ||
         (typeof message[0] === 'string' &&
           message[0].includes('CredentialsSignin'))
       ) {
