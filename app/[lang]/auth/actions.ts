@@ -2,8 +2,13 @@
 
 import { auth, signIn, signOut } from '@/lib/auth';
 
-export async function logout() {
-  await signOut();
+export async function logout(redirectTo?: string) {
+  await signOut({ redirectTo });
+}
+
+export async function logoutWithRedirect(formData: FormData) {
+  const redirectTo = formData.get('redirectTo') as string;
+  await signOut({ redirectTo });
 }
 
 export async function login(email: string, password: string) {
