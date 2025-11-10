@@ -8,9 +8,10 @@
     "selected": "wybranych",
     "noResults": "Brak wyników.",
     "searchPlaceholder": "Wyszukaj...",
-    "contactIT": "Skontaktuj się z IT!"
+    "contactIT": "Skontaktuj się z IT!",
+    "cancel": "Anuluj"
   },
-  "tabs": {
+  "navigation": {
     "cards": "Karty",
     "positions": "Pozycje"
   },
@@ -65,9 +66,9 @@
   },
   "cardPositions": {
     "table": {
-      "title": "Pozycje na karcie",
+      "title": "Pozycje na karcie {cardNumber}",
       "cardInfo": "Magazyn: {warehouse}, sektor: {sector}, twórcy: {creators}",
-      "backToCards": "Powrót do kart"
+      "backToCards": "Powrót"
     },
     "columns": {
       "positionNumber": "Poz. nr",

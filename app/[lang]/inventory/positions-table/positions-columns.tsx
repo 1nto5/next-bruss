@@ -3,9 +3,31 @@
 import { PositionType } from '@/app/[lang]/inventory/lib/types';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Check } from 'lucide-react';
-import EditPositionDialog from '../components/edit-position-dialog';
+import { ArrowUpDown, Check, Pencil } from 'lucide-react';
 import { Dictionary } from '../lib/dict';
+import LocalizedLink from '@/components/localized-link';
+import { usePathname, useSearchParams } from 'next/navigation';
+
+const EditPositionButton = ({ position }: { position: PositionType }) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Build return URL with current filters and tab
+  const currentParams = new URLSearchParams(searchParams);
+  const returnTab = currentParams.get('tab') || 'positions';
+  const returnUrl = pathname;
+
+  // Use catch-all route: identifier "162/1" works directly in URL
+  const editUrl = `/inventory/positions/${position.identifier}/edit?returnUrl=${encodeURIComponent(returnUrl)}&returnTab=${returnTab}`;
+
+  return (
+    <LocalizedLink href={editUrl}>
+      <Button size='sm' variant='outline'>
+        <Pencil />
+      </Button>
+    </LocalizedLink>
+  );
+};
 
 export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   {
@@ -37,7 +59,7 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
     id: 'actions',
     header: dict.positions.columns.edit,
     cell: ({ row }) => {
-      return <EditPositionDialog position={row.original} dict={dict} />;
+      return <EditPositionButton position={row.original} />;
     },
   },
   {

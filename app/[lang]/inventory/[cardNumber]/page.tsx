@@ -82,6 +82,8 @@ export default async function InventoryCardPage(props: {
   const { fetchTime, fetchTimeLocaleString, positions, cardSector, cardWarehouse, cardCreators } =
     await getCardPositions(lang, cardNumber, searchParams);
 
+  const returnTab = searchParams?.returnTab || 'cards';
+
   return (
     <DataTable
       dict={dict}
@@ -93,6 +95,7 @@ export default async function InventoryCardPage(props: {
       cardSector={cardSector}
       cardWarehouse={cardWarehouse}
       cardCreators={cardCreators}
+      returnTab={returnTab}
     />
   );
 }

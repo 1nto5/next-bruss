@@ -8,9 +8,10 @@
     "selected": "ausgewählt",
     "noResults": "Keine Ergebnisse.",
     "searchPlaceholder": "Suche...",
-    "contactIT": "Kontaktieren Sie den IT-Support!"
+    "contactIT": "Kontaktieren Sie den IT-Support!",
+    "cancel": "Abbrechen"
   },
-  "tabs": {
+  "navigation": {
     "cards": "Karten",
     "positions": "Positionen"
   },
@@ -65,9 +66,9 @@
   },
   "cardPositions": {
     "table": {
-      "title": "Positionen auf Karte",
+      "title": "Positionen auf Karte {cardNumber}",
       "cardInfo": "Lager: {warehouse}, Sektor: {sector}, Ersteller: {creators}",
-      "backToCards": "Zurück zu Karten"
+      "backToCards": "Zurück"
     },
     "columns": {
       "positionNumber": "Pos. Nr.",

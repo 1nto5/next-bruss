@@ -24,24 +24,23 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, List } from 'lucide-react';
 import ExportButton from '../components/export-button';
 import PositionsTableFilteringAndOptions from '../components/positions-table-filtering-and-options';
 import { createPositionsColumns } from './positions-columns';
 import { Dictionary } from '../lib/dict';
 import { CardPositionsTableDataType } from '../lib/types';
+import LocalizedLink from '@/components/localized-link';
 
 interface DataTableProps<TData, TValue> {
   dict: Dictionary;
   data: TData[];
   fetchTime: Date;
-  fetchTimeLocaleString: string;
   lang: string;
 }
 
@@ -49,7 +48,6 @@ export function PositionsDataTable<TData, TValue>({
   dict,
   data,
   fetchTime,
-  fetchTimeLocaleString,
   lang,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -78,15 +76,18 @@ export function PositionsDataTable<TData, TValue>({
 
   return (
     <Card>
-      <CardHeader>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+      <CardHeader className='pb-2'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <CardTitle>{dict.positions.table.title}</CardTitle>
-            <CardDescription>
-              {dict.positions.table.lastSync.replace('{time}', fetchTimeLocaleString)}
-            </CardDescription>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <LocalizedLink href='/inventory'>
+              <Button variant='outline' size='sm'>
+                <List className='mr-2 h-4 w-4' />
+                {dict.navigation?.cards || 'Cards'}
+              </Button>
+            </LocalizedLink>
             <ExportButton />
           </div>
         </div>

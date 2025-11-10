@@ -30,7 +30,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { Table as TableIcon } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import CardPositionsTableFilteringAndOptions from '../components/card-positions-table-filtering-and-options';
 import { Dictionary } from '../../lib/dict';
@@ -46,6 +46,7 @@ interface DataTableProps<TData, TValue> {
   cardWarehouse: string;
   cardSector: string;
   cardCreators: string[];
+  returnTab?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -58,6 +59,7 @@ export function DataTable<TData, TValue>({
   cardWarehouse,
   cardSector,
   cardCreators,
+  returnTab = 'cards',
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const columns = React.useMemo(
@@ -98,8 +100,8 @@ export function DataTable<TData, TValue>({
             </CardDescription>
           </div>
           <Button variant='outline' asChild>
-            <LocalizedLink href='/inventory'>
-              <TableIcon /> <span>{dict.cardPositions.table.backToCards}</span>
+            <LocalizedLink href={`/inventory?tab=${returnTab}`}>
+              <ArrowLeft /> <span>{dict.cardPositions.table.backToCards}</span>
             </LocalizedLink>
           </Button>
         </div>

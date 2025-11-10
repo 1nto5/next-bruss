@@ -40,7 +40,7 @@ export default function PositionsTableFilteringAndOptions({
     searchParams?.get('quantity') || '',
   );
 
-  const handleClearFilters = () => {
+  const handleClearFiltersClick = () => {
     setPositionFilter('');
     setArticleNameFilter('');
     setArticleNumberFilter('');
@@ -69,10 +69,7 @@ export default function PositionsTableFilteringAndOptions({
   };
 
   const hasActiveFilters = Boolean(
-    positionFilter ||
-      articleNameFilter ||
-      articleNumberFilter ||
-      quantityFilter,
+    positionFilter || articleNameFilter || articleNumberFilter || quantityFilter,
   );
 
   const hasPendingChanges =
@@ -85,8 +82,7 @@ export default function PositionsTableFilteringAndOptions({
 
   return (
     <Card>
-      <CardHeader className='p-4' />
-      <CardContent className='p-4 pt-0'>
+      <CardContent className='p-4'>
         <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
           {/* Row 1: Filters */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
@@ -131,7 +127,7 @@ export default function PositionsTableFilteringAndOptions({
             <Button
               type='button'
               variant='destructive'
-              onClick={handleClearFilters}
+              onClick={handleClearFiltersClick}
               title={dict.common.clearFilters}
               disabled={isPendingSearch || !canSearch}
               className='order-2 w-full sm:order-1'

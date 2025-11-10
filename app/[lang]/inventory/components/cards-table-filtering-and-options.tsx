@@ -89,8 +89,7 @@ export default function CardsTableFilteringAndOptions({
 
   return (
     <Card>
-      <CardHeader className='p-4' />
-      <CardContent className='p-4 pt-0'>
+      <CardContent className='p-4'>
         <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
           {/* Row 1: Card Number, Creators, Warehouse, Sector */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>

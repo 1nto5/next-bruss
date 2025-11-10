@@ -8,9 +8,10 @@
     "selected": "selected",
     "noResults": "No results.",
     "searchPlaceholder": "Search...",
-    "contactIT": "Contact IT!"
+    "contactIT": "Contact IT!",
+    "cancel": "Cancel"
   },
-  "tabs": {
+  "navigation": {
     "cards": "Cards",
     "positions": "Positions"
   },
@@ -65,9 +66,9 @@
   },
   "cardPositions": {
     "table": {
-      "title": "Card Positions",
+      "title": "Card Positions {cardNumber}",
       "cardInfo": "Warehouse: {warehouse}, Sector: {sector}, Creators: {creators}",
-      "backToCards": "Back to Cards"
+      "backToCards": "Return"
     },
     "columns": {
       "positionNumber": "Pos. No.",

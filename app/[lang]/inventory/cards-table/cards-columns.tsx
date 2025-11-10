@@ -7,6 +7,16 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, List } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 
+const CardDetailLink = ({ cardNumber }: { cardNumber: string }) => {
+  return (
+    <LocalizedLink href={`/inventory/${cardNumber}`}>
+      <Button size='sm' type='button' variant='outline'>
+        <List />
+      </Button>
+    </LocalizedLink>
+  );
+};
+
 export const createCardsColumns = (dict: Dictionary): ColumnDef<CardTableDataType>[] => [
   {
     accessorKey: 'sector',
@@ -40,13 +50,7 @@ export const createCardsColumns = (dict: Dictionary): ColumnDef<CardTableDataTyp
     header: dict.cards.columns.cardPosition,
     cell: ({ row }) => {
       const cardNumber = row.original.number;
-      return (
-        <LocalizedLink href={`/inventory/${cardNumber}`}>
-          <Button size='sm' type='button' variant='outline'>
-            <List />
-          </Button>
-        </LocalizedLink>
-      );
+      return <CardDetailLink cardNumber={cardNumber.toString()} />;
     },
   },
   {

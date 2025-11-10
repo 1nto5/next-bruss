@@ -31,10 +31,11 @@ export async function updatePosition(
 ) {
   try {
     const session = await auth();
-    if (
-      !session ||
-      !(session.user?.roles ?? []).includes('inventory-approve')
-    ) {
+    if (!session) {
+      return { error: 'unauthorized' };
+    }
+    const userRoles = session.user?.roles ?? [];
+    if (!(userRoles.includes('inventory-approve') || userRoles.includes('admin'))) {
       return { error: 'unauthorized' };
     }
     const collection = await dbc('inventory_cards');
@@ -103,10 +104,11 @@ export async function updatePosition(
 export async function exportInventoryPositionsToExcel() {
   try {
     const session = await auth();
-    if (
-      !session ||
-      !(session.user?.roles ?? []).includes('inventory-approve')
-    ) {
+    if (!session) {
+      return { error: 'unauthorized' };
+    }
+    const userRoles = session.user?.roles ?? [];
+    if (!(userRoles.includes('inventory-approve') || userRoles.includes('admin'))) {
       return { error: 'unauthorized' };
     }
 

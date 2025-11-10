@@ -30,10 +30,11 @@ import {
 } from '@/components/ui/card';
 import { Dictionary } from '../lib/dict';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, List } from 'lucide-react';
 import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
 import ExportButton from '../components/export-button';
 import { createCardsColumns } from './cards-columns';
+import LocalizedLink from '@/components/localized-link';
 
 interface DataTableProps<TData, TValue> {
   dict: Dictionary;
@@ -76,12 +77,18 @@ export function CardsDataTable<TData, TValue>({
 
   return (
     <Card>
-      <CardHeader>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+      <CardHeader className='pb-2'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <CardTitle>{dict.cards.table.title}</CardTitle>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <LocalizedLink href='/inventory/positions'>
+              <Button variant='outline' size='sm'>
+                <List className='mr-2 h-4 w-4' />
+                {dict.navigation?.positions || 'Positions'}
+              </Button>
+            </LocalizedLink>
             <ExportButton />
           </div>
         </div>
