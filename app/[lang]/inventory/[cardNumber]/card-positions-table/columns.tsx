@@ -1,13 +1,35 @@
 'use client';
 
-import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { PositionType } from '@/app/[lang]/inventory/lib/types';
 import { Button } from '@/components/ui/button';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Check } from 'lucide-react';
-import EditPositionDialog from '../components/edit-position-dialog';
+import { ArrowUpDown, Check, Pencil } from 'lucide-react';
 import { Dictionary } from '../../lib/dict';
+import LocalizedLink from '@/components/localized-link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
+const EditPositionButton = ({ position }: { position: PositionType }) => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Build return URL with current filters
+  // For card detail view, return to the same card page
+  const currentParams = new URLSearchParams(searchParams);
+  const returnUrl = pathname;
+
+  // Use catch-all route: identifier "162/1" works directly in URL
+  const editUrl = `/inventory/positions/${position.identifier}/edit?returnUrl=${encodeURIComponent(returnUrl)}&returnTab=cards`;
+
+  return (
+    <LocalizedLink href={editUrl}>
+      <Button size='sm' variant='outline'>
+        <Pencil />
+      </Button>
+    </LocalizedLink>
+  );
+};
+
+export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   {
     accessorKey: 'position',
     header: ({ column }) => {
@@ -17,7 +39,7 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
           size={'sm'}
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Poz. nr
+          {dict.cardPositions.columns.positionNumber}
           <ArrowUpDown className='ml-2' />
         </Button>
       );
@@ -31,18 +53,18 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
 
   {
     accessorKey: 'identifier',
-    header: 'Id',
+    header: dict.cardPositions.columns.id,
   },
   {
     id: 'actions',
-    header: 'Edycja',
+    header: dict.cardPositions.columns.edit,
     cell: ({ row }) => {
-      return <EditPositionDialog position={row.original} dict={dict} />;
+      return <EditPositionButton position={row.original} />;
     },
   },
   {
     accessorKey: 'articleName',
-    header: 'Art.',
+    header: dict.cardPositions.columns.article,
     cell: ({ row }) => {
       const articleName = row.original.articleName;
       const articleNumber = row.original.articleNumber;
@@ -51,11 +73,12 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
   },
   {
     accessorKey: 'articleNumber',
-    header: 'Nr art.',
+    header: dict.cardPositions.columns.articleNumber,
   },
+
   {
     accessorKey: 'quantity',
-    header: 'Ilość',
+    header: dict.cardPositions.columns.quantity,
     cell: ({ row }) => {
       const quantity = row.original.quantity;
       const unit = row.original.unit;
@@ -65,13 +88,10 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
         </div>
       );
     },
-    filterFn: (row, columnId, value) => {
-      return row.getValue(columnId) === Number(value);
-    },
   },
   {
     accessorKey: 'wip',
-    header: 'WIP',
+    header: dict.cardPositions.columns.wip,
     cell: ({ row }) => {
       const wip = row.original.wip;
       return wip ? <Check /> : null;
@@ -79,11 +99,11 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
   },
   {
     accessorKey: 'approver',
-    header: 'Zatwierdzono',
+    header: dict.cardPositions.columns.approved,
   },
   {
     accessorKey: 'comment',
-    header: 'Komentarz',
+    header: dict.cardPositions.columns.comment,
     cell: ({ row }) => {
       const comment = row.getValue('comment');
       return <div className='w-[300px]'>{comment as React.ReactNode}</div>;
@@ -91,7 +111,7 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
   },
   {
     accessorKey: 'bin',
-    header: 'Storage Bin',
+    header: dict.cardPositions.columns.storageBin,
     cell: ({ row }) => {
       const bin = row.original.bin;
       return <div className='text-nowrap'>{bin && bin.toUpperCase()}</div>;
@@ -99,11 +119,10 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
   },
   {
     accessorKey: 'deliveryDateLocaleString',
-    header: 'Data dostawy',
+    header: dict.cardPositions.columns.deliveryDate,
   },
-
   {
     accessorKey: 'timeLocaleString',
-    header: 'Ostatnia zmiana',
+    header: dict.cardPositions.columns.lastChange,
   },
 ];

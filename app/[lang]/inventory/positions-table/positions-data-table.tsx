@@ -2,11 +2,9 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -26,25 +24,23 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 
-import { ArrowRight } from 'lucide-react';
-// import { useEffect } from 'react';
-// import { revalidateCardPositions as revalidate } from '../actions';
+import { ArrowRight, List } from 'lucide-react';
 import ExportButton from '../components/export-button';
 import PositionsTableFilteringAndOptions from '../components/positions-table-filtering-and-options';
 import { createPositionsColumns } from './positions-columns';
-import { Dictionary } from '../../lib/dict';
+import { Dictionary } from '../lib/dict';
 import { CardPositionsTableDataType } from '../lib/types';
+import LocalizedLink from '@/components/localized-link';
 
 interface DataTableProps<TData, TValue> {
   dict: Dictionary;
   data: TData[];
-  fetchTime: string;
+  fetchTime: Date;
   lang: string;
 }
 
@@ -54,17 +50,7 @@ export function PositionsDataTable<TData, TValue>({
   fetchTime,
   lang,
 }: DataTableProps<TData, TValue>) {
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     revalidate();
-  //   }, 1000 * 30); // 30 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
 
   const columns = React.useMemo(
     () => createPositionsColumns(dict) as ColumnDef<TData, TValue>[],
@@ -78,11 +64,8 @@ export function PositionsDataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnFilters,
     },
     initialState: {
       pagination: {
@@ -93,23 +76,22 @@ export function PositionsDataTable<TData, TValue>({
 
   return (
     <Card>
-      <CardHeader>
-        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+      <CardHeader className='pb-2'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <CardTitle>Pozycje</CardTitle>
-            <CardDescription>
-              Ostatnia synchronizacja: {fetchTime}
-            </CardDescription>
+            <CardTitle>{dict.positions.table.title}</CardTitle>
           </div>
           <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <LocalizedLink href='/inventory'>
+              <Button variant='outline' size='sm'>
+                <List className='mr-2 h-4 w-4' />
+                {dict.navigation?.cards || 'Cards'}
+              </Button>
+            </LocalizedLink>
             <ExportButton />
           </div>
         </div>
-        <PositionsTableFilteringAndOptions
-          setFilter={(columnId, value) =>
-            table.getColumn(columnId)?.setFilterValue(value)
-          }
-        />
+        <PositionsTableFilteringAndOptions dict={dict} fetchTime={fetchTime} />
       </CardHeader>
       <CardContent>
         <div className='rounded-md border'>
@@ -155,7 +137,7 @@ export function PositionsDataTable<TData, TValue>({
                     colSpan={columns.length}
                     className='h-24 text-center'
                   >
-                    No results.
+                    {dict.common.noResults}
                   </TableCell>
                 </TableRow>
               )}

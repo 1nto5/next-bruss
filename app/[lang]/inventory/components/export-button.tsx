@@ -49,7 +49,7 @@ export default function ExportButton() {
       size='sm'
     >
       <Download />
-      Export
+      Export Stock Program
     </Button>
   );
 }

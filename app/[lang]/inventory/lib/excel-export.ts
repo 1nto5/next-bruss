@@ -1,4 +1,4 @@
-import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
+import { PositionType } from '@/app/[lang]/inventory/lib/types';
 import { formatDateTime } from '@/lib/utils/date-format';
 import ExcelJS from 'exceljs';
 

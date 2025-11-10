@@ -1,6 +1,6 @@
 'use server';
 
-import { PositionZodType } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
+import { PositionZodType } from '@/app/[lang]/inventory/lib/zod';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { revalidateTag } from 'next/cache';
@@ -31,10 +31,11 @@ export async function updatePosition(
 ) {
   try {
     const session = await auth();
-    if (
-      !session ||
-      !(session.user?.roles ?? []).includes('inventory-approve')
-    ) {
+    if (!session) {
+      return { error: 'unauthorized' };
+    }
+    const userRoles = session.user?.roles ?? [];
+    if (!(userRoles.includes('inventory-approve') || userRoles.includes('admin'))) {
       return { error: 'unauthorized' };
     }
     const collection = await dbc('inventory_cards');
@@ -103,10 +104,11 @@ export async function updatePosition(
 export async function exportInventoryPositionsToExcel() {
   try {
     const session = await auth();
-    if (
-      !session ||
-      !(session.user?.roles ?? []).includes('inventory-approve')
-    ) {
+    if (!session) {
+      return { error: 'unauthorized' };
+    }
+    const userRoles = session.user?.roles ?? [];
+    if (!(userRoles.includes('inventory-approve') || userRoles.includes('admin'))) {
       return { error: 'unauthorized' };
     }
 

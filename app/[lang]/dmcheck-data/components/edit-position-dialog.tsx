@@ -1,7 +1,7 @@
 'use client';
 
-import { PositionType } from '@/app/[lang]/inw-2/zatwierdz/lib/types';
-import { UpdatePositionSchema } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
+import { PositionType } from '@/app/[lang]/inventory/lib/types';
+import { UpdatePositionSchema } from '@/app/[lang]/inventory/lib/zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

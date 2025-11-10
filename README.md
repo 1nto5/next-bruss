@@ -17,7 +17,7 @@ Industrial manufacturing management web application built with Next.js 16.
 - **Overtime Orders** (`/overtime-orders`) - Overtime order management
 - **Overtime Submissions** (`/overtime-submissions`) - Employee overtime request submissions
 - **Production Overtime** (`/production-overtime`) - Production overtime tracking and approval
-- **Inventory Approval** (`/inw-2/zatwierdz`) - Inventory operation approvals and management
+- **Inventory Approval** (`/inventory`) - Inventory operation approvals and management
 - **Codes Generator** (`/codes-generator`) - Production code and label generation
 
 ## 🔗 Related Projects

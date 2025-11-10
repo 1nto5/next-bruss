@@ -2,11 +2,9 @@
 
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -22,52 +20,42 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-// import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Dictionary } from '../lib/dict';
 
-// import { ArrowRight } from 'lucide-react';
-// import { useEffect } from 'react';
-// import { revalidateCardPositions as revalidate } from '../actions';
-import CardPositionsTableFilteringAndOptions from '../components/card-positions-table-filtering-and-options';
+import { ArrowRight, List } from 'lucide-react';
+import CardsTableFilteringAndOptions from '../components/cards-table-filtering-and-options';
+import ExportButton from '../components/export-button';
+import { createCardsColumns } from './cards-columns';
+import LocalizedLink from '@/components/localized-link';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  dict: Dictionary;
   data: TData[];
-  fetchTime: string;
+  fetchTime: Date;
+  fetchTimeLocaleString: string;
   lang: string;
-  cardNumber: string;
-  cardWarehouse: string;
-  cardSector: string;
-  cardCreators: string[];
 }
 
-export function DataTable<TData, TValue>({
-  columns,
+export function CardsDataTable<TData, TValue>({
+  dict,
   data,
   fetchTime,
+  fetchTimeLocaleString,
   lang,
-  cardNumber,
-  cardWarehouse,
-  cardSector,
-  cardCreators,
 }: DataTableProps<TData, TValue>) {
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     revalidate();
-  //   }, 1000 * 30); // 30 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+
+  const columns = React.useMemo(
+    () => createCardsColumns(dict) as ColumnDef<TData, TValue>[],
+    [dict],
   );
 
   const table = useReactTable({
@@ -77,33 +65,34 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
-      columnFilters,
     },
     initialState: {
       pagination: {
-        pageSize: 25,
+        pageSize: 20,
       },
     },
   });
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Pozycje na karcie: {cardNumber}</CardTitle>
-        <CardDescription className='font-bold'>
-          Magazyn: {cardWarehouse}, sektor: {cardSector}, twórcy:{' '}
-          {cardCreators.join(', ')}
-        </CardDescription>
-        <CardDescription>Ostatnia synchronizacja: {fetchTime}</CardDescription>
-        <CardPositionsTableFilteringAndOptions
-          setFilter={(columnId, value) =>
-            table.getColumn(columnId)?.setFilterValue(value)
-          }
-        />
+      <CardHeader className='pb-2'>
+        <div className='mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div>
+            <CardTitle>{dict.cards.table.title}</CardTitle>
+          </div>
+          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+            <LocalizedLink href='/inventory/positions'>
+              <Button variant='outline' size='sm'>
+                <List className='mr-2 h-4 w-4' />
+                {dict.navigation?.positions || 'Positions'}
+              </Button>
+            </LocalizedLink>
+            <ExportButton />
+          </div>
+        </div>
+        <CardsTableFilteringAndOptions dict={dict} fetchTime={fetchTime} />
       </CardHeader>
       <CardContent>
         <div className='rounded-md border'>
@@ -158,7 +147,7 @@ export function DataTable<TData, TValue>({
         </div>
       </CardContent>
       <CardFooter className='flex justify-between'>
-        {/* <Button
+        <Button
           variant='outline'
           size='sm'
           onClick={() => table.previousPage()}
@@ -173,7 +162,7 @@ export function DataTable<TData, TValue>({
           disabled={!table.getCanNextPage()}
         >
           <ArrowRight />
-        </Button> */}
+        </Button>
       </CardFooter>
     </Card>
   );

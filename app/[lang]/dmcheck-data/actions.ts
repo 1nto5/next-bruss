@@ -1,6 +1,6 @@
 'use server';
 
-import { PositionZodType } from '@/app/[lang]/inw-2/zatwierdz/lib/zod';
+import { PositionZodType } from '@/app/[lang]/inventory/lib/zod';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { revalidateTag } from 'next/cache';
