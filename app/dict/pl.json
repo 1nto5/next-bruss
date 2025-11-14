@@ -63,7 +63,9 @@
     },
     "toasts": {
       "pleaseContactIt": "Skontaktuj się z IT!",
-      "loginSuccess": "Zalogowano!"
+      "loginSuccess": "Zalogowano!",
+      "invalidCredentials": "Nieprawidłowe dane logowania!",
+      "systemError": "Błąd systemu. Spróbuj ponownie później lub skontaktuj się z IT."
     }
   },
   "home": {

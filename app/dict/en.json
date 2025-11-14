@@ -63,7 +63,9 @@
     },
     "toasts": {
       "pleaseContactIt": "Please contact IT!",
-      "loginSuccess": "Logged in!"
+      "loginSuccess": "Logged in!",
+      "invalidCredentials": "Invalid login credentials!",
+      "systemError": "System error. Please try again later or contact IT."
     }
   },
   "home": {

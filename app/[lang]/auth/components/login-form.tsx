@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { login } from '../actions';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -33,6 +34,7 @@ import { Locale } from '@/lib/config/i18n';
 export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
+  const [formError, setFormError] = useState<string>('');
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get('callbackUrl') || '/';
   // Login form automatically adds language prefix to callbackUrl if not already present
@@ -61,11 +63,11 @@ export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale })
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsPending(true);
+      setFormError('');
       const res = await login(values.email, values.password);
 
       // If we get here, login was successful
       if (res?.success) {
-        toast.success(cDict.toasts.loginSuccess);
         // Use window.location for hard refresh to ensure server components update
         // NOTE: window.location.href causes "Uncaught TypeError: Error in input stream" in console
         // because hard refresh interrupts RSC (React Server Components) streaming.
@@ -73,22 +75,15 @@ export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale })
         // to avoid stream interruption while still updating server components.
         window.location.href = finalRedirectUrl;
       } else if (res?.error === 'invalid credentials') {
-        // Handle generic invalid credentials - show as form error on both fields
-        form.setError('email', {
-          type: 'manual',
-          message: cDict.zod.emailOrPasswordIncorrect,
-        });
-        form.setError('password', {
-          type: 'manual',
-          message: cDict.zod.emailOrPasswordIncorrect,
-        });
+        // Handle invalid credentials - show form-level error
+        setFormError(cDict.toasts.invalidCredentials);
       } else {
-        // Handle other errors
-        toast.error(cDict.toasts.pleaseContactIt);
+        // Handle system errors (LDAP, database, etc.)
+        setFormError(cDict.toasts.pleaseContactIt);
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(cDict.toasts.pleaseContactIt);
+      setFormError(cDict.toasts.pleaseContactIt);
     } finally {
       setIsPending(false);
     }
@@ -104,6 +99,11 @@ export default function LoginForm({ cDict, lang }: { cDict: any; lang: Locale })
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className='grid w-full items-center gap-4'>
+            {formError && (
+              <Alert variant='destructive'>
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
+            )}
             <FormField
               control={form.control}
               name='email'

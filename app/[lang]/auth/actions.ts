@@ -21,13 +21,16 @@ export async function login(email: string, password: string) {
     // If we get here, login was successful
     return { success: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'default error';
-
-    if (errorMessage.includes('CredentialsSignin') || errorMessage.includes('Invalid credentials')) {
+    // Check error type/name for CredentialsSignin (not message content)
+    if (
+      error instanceof Error &&
+      (error.name === 'CredentialsSignin' ||
+       (error as any).type === 'CredentialsSignin')
+    ) {
       return { error: 'invalid credentials' };
     }
 
-    // For any other type of error
+    // For any other type of error (LDAP, database, etc.)
     return { error: 'default error' };
   }
 }
