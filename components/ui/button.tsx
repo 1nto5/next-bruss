@@ -20,7 +20,7 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         // New action-specific variants
         approve:
-          'border border-input bg-[#92b34e]/10 text-[#92b34e] hover:bg-[#92b34e]/20 [&_svg]:text-[#92b34e]',
+          'border border-input bg-bruss/10 text-bruss hover:bg-bruss/20 [&_svg]:text-bruss',
         reject:
           'border border-input bg-red-100 text-red-800 hover:bg-red-200 hover:border-red-300 [&_svg]:text-red-800',
       },

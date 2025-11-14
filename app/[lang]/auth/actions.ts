@@ -6,6 +6,10 @@ export async function logout() {
   await signOut();
 }
 
+export async function signOutAction(lang: string) {
+  await signOut({ redirectTo: `/${lang}` });
+}
+
 export async function login(email: string, password: string) {
   try {
     await signIn('credentials', {

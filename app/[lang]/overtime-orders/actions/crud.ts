@@ -45,7 +45,7 @@ export async function insertOvertimeRequest(
 
     const res = await coll.insertOne(overtimeRequestToInsert);
     if (res) {
-      revalidateTag('overtime-orders', 'max');
+      revalidateTag('overtime-orders', { expire: 0 });
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 
-import { auth, signOut } from '@/lib/auth';
+import { auth } from '@/lib/auth';
+import { signOutAction } from '@/app/[lang]/auth/actions';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Logo from '@/components/ui/logo';
 import {
@@ -132,12 +133,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
                   </AvatarFallback>
                 </Avatar>
               )}
-              <form
-                action={async () => {
-                  'use server';
-                  await signOut({ redirectTo: `/${lang}` });
-                }}
-              >
+              <form action={signOutAction.bind(null, lang)}>
                 <Button variant={'ghost'} size='icon'>
                   <LogOut />
                 </Button>

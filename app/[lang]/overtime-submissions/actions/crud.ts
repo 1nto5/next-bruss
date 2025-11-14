@@ -52,7 +52,7 @@ export async function insertOvertimeSubmission(
 
     const res = await coll.insertOne(overtimeSubmissionToInsert);
     if (res) {
-      revalidateTag('overtime', 'max');
+      revalidateTag('overtime', { expire: 0 });
       return { success: 'inserted' };
     } else {
       return { error: 'not inserted' };
@@ -176,7 +176,7 @@ export async function updateOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime', 'max');
+    revalidateTag('overtime', { expire: 0 });
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
@@ -319,7 +319,7 @@ export async function editOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime', 'max');
+    revalidateTag('overtime', { expire: 0 });
     return { success: 'updated' };
   } catch (error) {
     console.error(error);
@@ -472,7 +472,7 @@ export async function correctOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime', 'max');
+    revalidateTag('overtime', { expire: 0 });
     return { success: 'corrected' };
   } catch (error) {
     console.error(error);
@@ -507,7 +507,7 @@ export async function deleteOvertimeSubmission(
       return { error: 'not found' };
     }
 
-    revalidateTag('overtime', 'max');
+    revalidateTag('overtime', { expire: 0 });
     return { success: 'deleted' };
   } catch (error) {
     console.error(error);

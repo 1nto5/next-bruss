@@ -8,21 +8,21 @@ import { generateExcelBuffer } from './lib/excel-export';
 // import { redirect } from 'next/navigation';
 
 export async function revalidateCards() {
-  revalidateTag('inventory-cards', 'max');
+  revalidateTag('inventory-cards', { expire: 0 });
 }
 
 export async function revalidateCardPositions() {
-  revalidateTag('inventory-card-positions', 'max');
+  revalidateTag('inventory-card-positions', { expire: 0 });
 }
 
 export async function revalidatePositions() {
-  revalidateTag('inventory-positions', 'max');
+  revalidateTag('inventory-positions', { expire: 0 });
 }
 
 export async function revalidateAll() {
-  revalidateTag('inventory-cards', 'max');
-  revalidateTag('inventory-card-positions', 'max');
-  revalidateTag('inventory-positions', 'max');
+  revalidateTag('inventory-cards', { expire: 0 });
+  revalidateTag('inventory-card-positions', { expire: 0 });
+  revalidateTag('inventory-positions', { expire: 0 });
 }
 
 export async function updatePosition(
@@ -87,9 +87,9 @@ export async function updatePosition(
     );
 
     if (res.matchedCount > 0) {
-      revalidateTag('inventory-card-positions', 'max');
-      revalidateTag('inventory-cards', 'max');
-      revalidateTag('inventory-positions', 'max');
+      revalidateTag('inventory-card-positions', { expire: 0 });
+      revalidateTag('inventory-cards', { expire: 0 });
+      revalidateTag('inventory-positions', { expire: 0 });
       return { success: 'updated' };
     } else {
       return { error: 'not updated' };

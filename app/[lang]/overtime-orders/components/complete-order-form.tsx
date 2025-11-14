@@ -78,9 +78,33 @@ export default function CompleteOrderForm({
     },
   });
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+  const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const filesArray = Array.from(event.target.files);
+
+      // Validate individual file sizes
+      const oversizedFile = filesArray.find(file => file.size > MAX_FILE_SIZE);
+      if (oversizedFile) {
+        toast.error(`Plik "${oversizedFile.name}" przekracza dozwolony rozmiar (10MB)`);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
+      // Validate total size
+      const totalSize = filesArray.reduce((sum, file) => sum + file.size, 0);
+      if (totalSize > MAX_TOTAL_SIZE) {
+        toast.error('Łączny rozmiar plików przekracza dozwolony limit (50MB)');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+
       setSelectedFiles(filesArray);
       form.setValue('files', filesArray, { shouldValidate: true });
     }
@@ -229,7 +253,27 @@ export default function CompleteOrderForm({
       }),
       {
         loading: dict.completeOrderForm.toast.uploading,
-        success: () => dict.completeOrderForm.toast.successMultiple.replace('{count}', selectedFiles.length.toString()),
+        success: () => {
+          const count = selectedFiles.length;
+          const hasImages = selectedFiles.some(file => file.type.startsWith('image/'));
+          const hasPdfs = selectedFiles.some(file => file.type === 'application/pdf');
+
+          if (count === 1) {
+            if (hasImages) {
+              return 'Plik przesłany oraz przekonwertowany do PDF pomyślnie! Status zlecenia zmieniony na ukończony.';
+            } else {
+              return 'Plik PDF przesłany pomyślnie! Status zlecenia zmieniony na ukończony.';
+            }
+          } else {
+            if (hasImages && hasPdfs) {
+              return `${count} plików przesłanych oraz scalonych do PDF pomyślnie! Status zlecenia zmieniony na ukończony.`;
+            } else if (hasImages) {
+              return `${count} plików przesłanych oraz przekonwertowanych do PDF pomyślnie! Status zlecenia zmieniony na ukończony.`;
+            } else {
+              return `${count} plików PDF scalonych pomyślnie! Status zlecenia zmieniony na ukończony.`;
+            }
+          }
+        },
         error: (err) => err.message,
       },
     );
@@ -269,7 +313,7 @@ export default function CompleteOrderForm({
                       multiple
                       ref={fileInputRef}
                       onChange={handleFileChange}
-                      accept='image/*,image/heic,image/heif,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar'
+                      accept='image/*,image/heic,image/heif,application/pdf'
                       {...rest}
                     />
                   </FormControl>

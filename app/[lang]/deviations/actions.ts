@@ -635,7 +635,7 @@ async function sendTeamLeaderNotificationForPrint(
 }
 
 export async function revalidateDeviations() {
-  revalidateTag('deviations', 'max');
+  revalidateTag('deviations', { expire: 0 });
 }
 
 // Helper function to add 12 hours to a date
@@ -718,7 +718,7 @@ export async function updateCorrectiveAction(
         console.error(
           `Failed to fetch deviation [${id}] after adding corrective action.`,
         );
-        revalidateTag('deviation', 'max'); // Still revalidate
+        revalidateTag('deviation', { expire: 0 }); // Still revalidate
         return { success: 'updated', warning: 'notification_failed' };
       }
 
@@ -754,7 +754,7 @@ export async function updateCorrectiveAction(
         );
       }
 
-      revalidateTag('deviation', 'max'); // Revalidate the specific deviation page
+      revalidateTag('deviation', { expire: 0 }); // Revalidate the specific deviation page
       return { success: 'updated' };
     } else {
       // Handle case where the update didn't modify (e.g., concurrent update)
@@ -772,7 +772,7 @@ export async function redirectToDeviation(id: string, lang: string) {
 }
 
 export async function revalidateReasons() {
-  revalidateTag('deviationReasons', 'max');
+  revalidateTag('deviationReasons', { expire: 0 });
 }
 
 export async function approveDeviation(
@@ -1179,12 +1179,12 @@ export async function redirectToDeviations(lang: string) {
 }
 
 export async function revalidateDeviationsAndDeviation() {
-  revalidateTag('deviation', 'max');
-  revalidateTag('deviations', 'max');
+  revalidateTag('deviation', { expire: 0 });
+  revalidateTag('deviations', { expire: 0 });
 }
 
 export async function revalidateDeviation() {
-  revalidateTag('deviation', 'max');
+  revalidateTag('deviation', { expire: 0 });
 }
 
 // Helper function to generate the next internal ID
@@ -1275,7 +1275,7 @@ export async function insertDeviation(deviation: AddDeviationType) {
 
     const res = await collection.insertOne(deviationToInsert);
     if (res.insertedId) {
-      revalidateTag('deviations', 'max');
+      revalidateTag('deviations', { expire: 0 });
 
       // Call the centralized notification handler for creation
       await handleNotifications(deviationToInsert, res.insertedId, 'creation'); // Pass 'creation' context
@@ -1375,7 +1375,7 @@ export async function deleteDraftDeviation(id: string) {
       status: 'draft',
     });
     if (res) {
-      revalidateTag('deviations', 'max');
+      revalidateTag('deviations', { expire: 0 });
       return { success: 'deleted' };
     } else {
       return { error: 'not deleted' };
@@ -1855,7 +1855,7 @@ export async function notifyRejectorsAfterAttachment(deviationId: string) {
       );
     }
 
-    revalidateTag('deviation', 'max'); // Revalidate the specific deviation page
+    revalidateTag('deviation', { expire: 0 }); // Revalidate the specific deviation page
     return { success: 'notified' };
   } catch (error) {
     console.error('notifyRejectorsAfterAttachment server action error:', error);
@@ -1896,7 +1896,7 @@ export async function addNote(deviationId: string, content: string) {
       return { error: 'not updated' };
     }
 
-    revalidateTag('deviation', 'max');
+    revalidateTag('deviation', { expire: 0 });
     return { success: 'added' };
   } catch (error) {
     console.error('addNote server action error:', error);

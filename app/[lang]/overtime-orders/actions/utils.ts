@@ -6,11 +6,11 @@ import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function revalidateOvertimeOrders() {
-  revalidateTag('overtime-orders', 'max');
+  revalidateTag('overtime-orders', { expire: 0 });
 }
 
 export async function revalidateOvertimeOrdersRequest() {
-  revalidateTag('overtime-orders-request', 'max');
+  revalidateTag('overtime-orders-request', { expire: 0 });
 }
 
 // Helper function to generate the next internal ID

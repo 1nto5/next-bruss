@@ -75,7 +75,7 @@ export async function approveOvertimeSubmission(id: string) {
           if (update.matchedCount === 0) {
             return { error: 'not found' };
           }
-          revalidateTag('overtime', 'max');
+          revalidateTag('overtime', { expire: 0 });
           await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
           return { success: 'approved' };
         }
@@ -96,7 +96,7 @@ export async function approveOvertimeSubmission(id: string) {
         if (update.matchedCount === 0) {
           return { error: 'not found' };
         }
-        revalidateTag('overtime', 'max');
+        revalidateTag('overtime', { expire: 0 });
         await sendApprovalEmailToEmployee(submission.submittedBy, id, 'supervisor');
         return { success: 'supervisor-approved' };
       } else if (submission.status === 'pending-plant-manager') {
@@ -121,7 +121,7 @@ export async function approveOvertimeSubmission(id: string) {
         if (update.matchedCount === 0) {
           return { error: 'not found' };
         }
-        revalidateTag('overtime', 'max');
+        revalidateTag('overtime', { expire: 0 });
         await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
         return { success: 'plant-manager-approved' };
       } else {
@@ -153,7 +153,7 @@ export async function approveOvertimeSubmission(id: string) {
     if (update.matchedCount === 0) {
       return { error: 'not found' };
     }
-        revalidateTag('overtime', 'max');
+        revalidateTag('overtime', { expire: 0 });
     await sendApprovalEmailToEmployee(submission.submittedBy, id, 'final');
     return { success: 'approved' };
   } catch (error) {

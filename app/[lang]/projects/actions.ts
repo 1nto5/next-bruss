@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { ProjectsType } from './lib/zod';
 
 export async function revalidateProjects() {
-  revalidateTag('projects', 'max');
+  revalidateTag('projects', { expire: 0 });
 }
 
 export async function redirectToProjects(lang: string) {

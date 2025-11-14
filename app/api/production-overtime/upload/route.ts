@@ -11,31 +11,16 @@ const BASE_PATH = process.env.UPLOAD_BASE_PATH || './public';
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB limit per file
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB total limit
 
-// Allowed file types
+// Allowed file types (only images and PDFs - documents must have handwritten signatures)
 const ALLOWED_FILE_TYPES = [
-  // Images
+  // Images (convertible to PDF)
   'image/jpeg',
   'image/png',
   'image/gif',
   'image/webp',
   'image/svg+xml',
-  // Documents
+  // PDF documents
   'application/pdf',
-  'application/msword', // doc
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
-  // Excel
-  'application/vnd.ms-excel', // xls
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // xlsx
-  // PowerPoint
-  'application/vnd.ms-powerpoint', // ppt
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // pptx
-  // Text files
-  'text/plain',
-  'text/csv',
-  // Zip archives
-  'application/zip',
-  'application/x-zip-compressed',
-  'application/x-rar-compressed',
 ];
 
 const IMAGE_TYPES = [

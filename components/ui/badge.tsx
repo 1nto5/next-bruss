@@ -19,7 +19,7 @@ const badgeVariants = cva(
         statusPending:
           'border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200',
         statusApproved:
-          'border-transparent bg-[#92b34e] text-white dark:bg-green-700 dark:text-green-100',
+          'border-transparent bg-bruss text-bruss-foreground dark:bg-bruss dark:text-bruss-foreground',
         statusInProgress:
           'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200 whitespace-nowrap',
         statusClosed:

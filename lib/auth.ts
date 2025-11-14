@@ -19,15 +19,17 @@ async function fetchLatestUserRoles(email: string) {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   logger: {
     error: (code: any, ...message: any[]) => {
-      // Handle CredentialsSignin errors
+      // Handle CredentialsSignin errors more reliably
       if (
         code?.name === 'CredentialsSignin' ||
+        code?.type === 'CredentialsSignin' ||
+        code?.code === 'credentials' ||
         (typeof message[0] === 'string' &&
           message[0].includes('CredentialsSignin'))
       ) {
         // Check if this contains a system error (LDAP/DB connection issues)
         const errorStr = JSON.stringify([code, ...message]);
-        if (/ldap|database|refresh/i.test(errorStr)) {
+        if (/ldap|database|refresh|connection|timeout/i.test(errorStr)) {
           // System error - must be logged
           console.error('SYSTEM AUTH ERROR:', code, ...message);
           return;

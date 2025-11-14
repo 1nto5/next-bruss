@@ -7,7 +7,7 @@ import { revalidateTag } from 'next/cache';
 // import { redirect } from 'next/navigation';
 
 export async function revalidateDmcheckTableData() {
-  revalidateTag('dmcheck-data-dmc', 'max');
+  revalidateTag('dmcheck-data-dmc', { expire: 0 });
 }
 
 export async function updatePosition(
@@ -70,9 +70,9 @@ export async function updatePosition(
     );
 
     if (res.matchedCount > 0) {
-      revalidateTag('inventory-card-positions', 'max');
-      revalidateTag('inventory-cards', 'max');
-      revalidateTag('inventory-positions', 'max');
+      revalidateTag('inventory-card-positions', { expire: 0 });
+      revalidateTag('inventory-cards', { expire: 0 });
+      revalidateTag('inventory-positions', { expire: 0 });
       return { success: 'updated' };
     } else {
       return { error: 'not updated' };
