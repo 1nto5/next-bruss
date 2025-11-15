@@ -45,7 +45,15 @@
     "availableCapacity": "Dostępność",
     "totalOvenCapacity": "Całkowita dostępność pieców w okresie",
     "utilizationTrendTitle": "Trend wykorzystania",
-    "percentageCapacityUsed": "Procent wykorzystanej całkowitej dostępności pieców w czasie"
+    "percentageCapacityUsed": "Procent wykorzystanej całkowitej dostępności pieców w czasie",
+    "failures": "Awarie",
+    "ofCapacity": "z dostępności",
+    "utilization": "Wykorzystanie",
+    "target": "Cel",
+    "targetPercent": "Cel (85%)",
+    "utilizationPercent": "Wykorzystanie (%)",
+    "available": "dostępne",
+    "ovensActive": "pieców aktywnych"
   },
   "processTable": {
     "clickToViewChart": "Kliknij wiersz procesu, aby wyświetlić jego dane na wykresie poniżej.",
@@ -67,7 +75,8 @@
     "export": "Eksportuj",
     "search": "Szukaj",
     "searchPlaceholder": "szukaj...",
-    "notFound": "nie znaleziono"
+    "notFound": "nie znaleziono",
+    "itemsSelected": "pozycji wybranych"
   },
   "processColumns": {
     "oven": "Piec",
@@ -105,7 +114,35 @@
   },
   "oeeButtons": {
     "backToOvenData": "Powrót do Danych z pieców",
+    "backToOEE": "Powrót do OEE",
+    "failureStatistics": "Awarie",
     "refresh": "Odśwież"
+  },
+  "failureStatistics": {
+    "title": "Statystyki awarii",
+    "description": "Szczegółowy podział awarii pieców według typu i czasu",
+    "summaryCards": {
+      "totalFailures": "Łączne awarie",
+      "failure": "zarejestrowana awaria",
+      "failures": "zarejestrowanych awarii",
+      "totalDowntime": "Łączny przestój",
+      "totalLost": "stracony czas produkcji",
+      "failureRate": "Wskaźnik awarii",
+      "avgDuration": "Średni czas trwania",
+      "perFailure": "na awarię",
+      "minutesShort": "min"
+    },
+    "charts": {
+      "breakdownByType": "Podział awarii",
+      "trendOverTime": "Trend awarii",
+      "failureCount": "Liczba awarii",
+      "failureHours": "Przestój (min)",
+      "failures": "awarii",
+      "failuresPaucal": "awarie",
+      "failure": "awaria",
+      "downtime": "Przestój",
+      "hoursShort": "godz"
+    }
   },
   "refresh": "Odśwież",
   "temperatureChart": {

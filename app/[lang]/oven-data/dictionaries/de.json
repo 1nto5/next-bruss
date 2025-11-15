@@ -32,7 +32,15 @@
     "availableCapacity": "Verfügbarkeit",
     "totalOvenCapacity": "Gesamte Ofenverfügbarkeit für den Zeitraum",
     "utilizationTrendTitle": "Auslastungstrend",
-    "percentageCapacityUsed": "Prozentsatz der genutzten Gesamtofenverfügbarkeit im Zeitverlauf"
+    "percentageCapacityUsed": "Prozentsatz der genutzten Gesamtofenverfügbarkeit im Zeitverlauf",
+    "failures": "Störungen",
+    "ofCapacity": "der Kapazität",
+    "utilization": "Auslastung",
+    "target": "Ziel",
+    "targetPercent": "Ziel (85%)",
+    "utilizationPercent": "Auslastung (%)",
+    "available": "verfügbar",
+    "ovensActive": "Öfen aktiv"
   },
   "processTable": {
     "clickToViewChart": "Klicken Sie auf eine Prozesszeile, um die Temperaturdaten im Diagramm unten anzuzeigen.",
@@ -54,7 +62,8 @@
     "export": "Exportieren",
     "search": "Suchen",
     "searchPlaceholder": "Suchen...",
-    "notFound": "nicht gefunden"
+    "notFound": "nicht gefunden",
+    "itemsSelected": "ausgewählt"
   },
   "processColumns": {
     "oven": "Ofen",
@@ -92,7 +101,35 @@
   },
   "oeeButtons": {
     "backToOvenData": "Zurück zu Ofendaten",
+    "backToOEE": "Zurück zu OEE",
+    "failureStatistics": "Störungen",
     "refresh": "Aktualisieren"
+  },
+  "failureStatistics": {
+    "title": "Störungsstatistiken",
+    "description": "Detaillierte Aufschlüsselung der Ofenstörungen nach Typ und Zeit",
+    "summaryCards": {
+      "totalFailures": "Gesamtstörungen",
+      "failure": "Störung erfasst",
+      "failures": "Störungen erfasst",
+      "totalDowntime": "Gesamtausfallzeit",
+      "totalLost": "verlorene Produktionszeit",
+      "failureRate": "Störungsrate",
+      "avgDuration": "Durchschn. Dauer",
+      "perFailure": "pro Störung",
+      "minutesShort": "Min"
+    },
+    "charts": {
+      "breakdownByType": "Störungsaufschlüsselung",
+      "trendOverTime": "Störungstrend",
+      "failureCount": "Störungsanzahl",
+      "failureHours": "Ausfallzeit (Min)",
+      "failures": "Störungen",
+      "failuresPaucal": "Störungen",
+      "failure": "Störung",
+      "downtime": "Ausfallzeit",
+      "hoursShort": "Std"
+    }
   },
   "refresh": "Aktualisieren",
   "temperatureChart": {

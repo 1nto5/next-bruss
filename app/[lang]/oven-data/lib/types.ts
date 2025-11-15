@@ -91,31 +91,50 @@ export type OvenConfigType = {
 
 // OEE (Overall Equipment Effectiveness) Types
 export type OeeParams =
-  | { mode: 'day'; date: string }
-  | { mode: 'week'; year: number; week: number }
-  | { mode: 'month'; year: number; month: number }
+  | { mode: 'day'; date: string; ovens?: string[] }
+  | { mode: 'week'; year: number; week: number; ovens?: string[] }
+  | { mode: 'month'; year: number; month: number; ovens?: string[] }
   | {
       mode: 'range';
       from: string;
       to: string;
       granularity?: 'hour' | 'day';
+      ovens?: string[];
     };
 
 export type OeeDataPoint = {
   timestamp: string;
   runningMinutes: number;
   availableMinutes: number;
+  failureMinutes: number;
   utilizationPercent: number;
   activeOvenCount: number;
+  faultCount: number;
 };
 
 export type OeeSummary = {
   overallUtilization: number;
   totalRunningHours: number;
   totalAvailableHours: number;
+  totalFailureHours: number;
+  totalFaults: number;
+};
+
+export type OeeFault = {
+  id: string;
+  oven: string;
+  faultKey: string;
+  faultName: string;
+  status: 'active' | 'finished';
+  startTime: Date;
+  endTime: Date | null;
+  duration: number;
+  reportedBy: string[];
+  finishedBy: string[] | null;
 };
 
 export type OeeResponse = {
   dataPoints: OeeDataPoint[];
   summary: OeeSummary;
+  faults: OeeFault[];
 };

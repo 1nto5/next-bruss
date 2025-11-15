@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Loader, RefreshCw, BarChart3 } from 'lucide-react';
 import LocalizedLink from '@/components/localized-link';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -36,6 +36,12 @@ export default function OeeHeaderButtons({ lang, dict }: OeeHeaderButtonsProps) 
         <Button variant="outline" className="w-full sm:w-auto">
           <ArrowLeft />
           <span>{dict.oeeButtons.backToOvenData}</span>
+        </Button>
+      </LocalizedLink>
+      <LocalizedLink href="/oven-data/failures">
+        <Button variant="outline" className="w-full sm:w-auto">
+          <BarChart3 />
+          <span>{dict.oeeButtons.failureStatistics}</span>
         </Button>
       </LocalizedLink>
       <Button

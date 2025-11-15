@@ -17,8 +17,17 @@ import { CircleX, Loader, Search } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import type { Dictionary } from '../lib/dict';
+import { MultiSelect } from '@/components/ui/multi-select';
 
-export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
+interface OeeFilteringAndOptionsProps {
+  dict: Dictionary;
+  ovens?: string[]; // Optional: list of available ovens
+}
+
+export default function OeeFilteringAndOptions({
+  dict,
+  ovens,
+}: OeeFilteringAndOptionsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -78,6 +87,13 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
     return toParam ? new Date(toParam) : new Date();
   });
 
+  // Oven filter state (only if ovens prop is provided)
+  const [selectedOvens, setSelectedOvens] = useState<string[]>(() => {
+    if (!ovens) return [];
+    const param = searchParams?.get('oven');
+    return param ? param.split(',').filter((o) => o.length > 0) : [];
+  });
+
   const handleClearFilters = () => {
     setMode('range');
     const defaultFrom = new Date();
@@ -89,6 +105,7 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
     setWeekNumber(1);
     setMonthYear(new Date().getFullYear());
     setMonthNumber(new Date().getMonth() + 1);
+    setSelectedOvens([]);
 
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
@@ -122,6 +139,11 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
         break;
     }
 
+    // Add oven parameter if ovens are selected
+    if (selectedOvens.length > 0) {
+      params.set('oven', selectedOvens.join(','));
+    }
+
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -140,17 +162,17 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
           <div>
             <Tabs value={mode} onValueChange={setMode}>
               <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="range">{dict.timeFilters.range}</TabsTrigger>
                 <TabsTrigger value="day">{dict.timeFilters.day}</TabsTrigger>
                 <TabsTrigger value="week">{dict.timeFilters.week}</TabsTrigger>
                 <TabsTrigger value="month">{dict.timeFilters.month}</TabsTrigger>
-                <TabsTrigger value="range">{dict.timeFilters.range}</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
           {/* Day Mode */}
           {mode === 'day' && (
-            <div className="grid grid-cols-1 gap-4">
+            <div className={`grid grid-cols-1 gap-4 ${ovens && ovens.length > 0 ? 'sm:grid-cols-2' : ''}`}>
               <div className="flex flex-col space-y-1">
                 <Label>{dict.timeFilters.selectDate}</Label>
                 <DateTimePicker
@@ -170,12 +192,29 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
                   )}
                 />
               </div>
+              {/* Oven Filter for day mode */}
+              {ovens && ovens.length > 0 && (
+                <div className="flex flex-col space-y-1">
+                  <Label>{dict.processFilters?.oven || 'Ovens'}</Label>
+                  <MultiSelect
+                    options={ovens.map((oven) => ({
+                      value: oven,
+                      label: oven.toUpperCase(),
+                    }))}
+                    value={selectedOvens}
+                    onValueChange={setSelectedOvens}
+                    placeholder={dict.processFilters?.select || 'Select ovens...'}
+                    clearLabel={dict.processFilters?.clear || 'Clear all'}
+                    selectedLabel={dict.processFilters?.itemsSelected || 'items selected'}
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* Week Mode */}
           {mode === 'week' && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className={`grid grid-cols-1 gap-4 ${ovens && ovens.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
               <div className="flex flex-col space-y-1">
                 <Label>{dict.timeFilters.year}</Label>
                 <Select
@@ -212,12 +251,29 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
                   </SelectContent>
                 </Select>
               </div>
+              {/* Oven Filter for week mode */}
+              {ovens && ovens.length > 0 && (
+                <div className="flex flex-col space-y-1">
+                  <Label>{dict.processFilters?.oven || 'Ovens'}</Label>
+                  <MultiSelect
+                    options={ovens.map((oven) => ({
+                      value: oven,
+                      label: oven.toUpperCase(),
+                    }))}
+                    value={selectedOvens}
+                    onValueChange={setSelectedOvens}
+                    placeholder={dict.processFilters?.select || 'Select ovens...'}
+                    clearLabel={dict.processFilters?.clear || 'Clear all'}
+                    selectedLabel={dict.processFilters?.itemsSelected || 'items selected'}
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* Month Mode */}
           {mode === 'month' && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className={`grid grid-cols-1 gap-4 ${ovens && ovens.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
               <div className="flex flex-col space-y-1">
                 <Label>{dict.timeFilters.year}</Label>
                 <Select
@@ -254,12 +310,29 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
                   </SelectContent>
                 </Select>
               </div>
+              {/* Oven Filter for month mode */}
+              {ovens && ovens.length > 0 && (
+                <div className="flex flex-col space-y-1">
+                  <Label>{dict.processFilters?.oven || 'Ovens'}</Label>
+                  <MultiSelect
+                    options={ovens.map((oven) => ({
+                      value: oven,
+                      label: oven.toUpperCase(),
+                    }))}
+                    value={selectedOvens}
+                    onValueChange={setSelectedOvens}
+                    placeholder={dict.processFilters?.select || 'Select ovens...'}
+                    clearLabel={dict.processFilters?.clear || 'Clear all'}
+                    selectedLabel={dict.processFilters?.itemsSelected || 'items selected'}
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* Range Mode */}
           {mode === 'range' && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className={`grid grid-cols-1 gap-4 ${ovens && ovens.length > 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
               <div className="flex flex-col space-y-1">
                 <Label>{dict.timeFilters.from}</Label>
                 <DateTimePicker
@@ -299,6 +372,23 @@ export default function OeeFilteringAndOptions({ dict }: { dict: Dictionary }) {
                   )}
                 />
               </div>
+              {/* Oven Filter (optional, integrated in range mode) */}
+              {ovens && ovens.length > 0 && (
+                <div className="flex flex-col space-y-1">
+                  <Label>{dict.processFilters?.oven || 'Ovens'}</Label>
+                  <MultiSelect
+                    options={ovens.map((oven) => ({
+                      value: oven,
+                      label: oven.toUpperCase(),
+                    }))}
+                    value={selectedOvens}
+                    onValueChange={setSelectedOvens}
+                    placeholder={dict.processFilters?.select || 'Select ovens...'}
+                    clearLabel={dict.processFilters?.clear || 'Clear all'}
+                    selectedLabel={dict.processFilters?.itemsSelected || 'items selected'}
+                  />
+                </div>
+              )}
             </div>
           )}
 

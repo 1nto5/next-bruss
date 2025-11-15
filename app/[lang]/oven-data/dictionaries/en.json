@@ -45,7 +45,15 @@
     "availableCapacity": "Availability",
     "totalOvenCapacity": "Total oven availability for period",
     "utilizationTrendTitle": "Utilization Trend",
-    "percentageCapacityUsed": "Percentage of total oven availability used over time"
+    "percentageCapacityUsed": "Percentage of total oven availability used over time",
+    "failures": "Failures",
+    "ofCapacity": "of capacity",
+    "utilization": "Utilization",
+    "target": "Target",
+    "targetPercent": "Target (85%)",
+    "utilizationPercent": "Utilization (%)",
+    "available": "available",
+    "ovensActive": "ovens active"
   },
   "processTable": {
     "clickToViewChart": "Click a process row to display its temperature data on the chart below.",
@@ -67,7 +75,8 @@
     "export": "Export",
     "search": "Search",
     "searchPlaceholder": "search...",
-    "notFound": "not found"
+    "notFound": "not found",
+    "itemsSelected": "items selected"
   },
   "processColumns": {
     "oven": "Oven",
@@ -105,7 +114,35 @@
   },
   "oeeButtons": {
     "backToOvenData": "Back to Oven Data",
+    "backToOEE": "Back to OEE",
+    "failureStatistics": "Failures",
     "refresh": "Refresh"
+  },
+  "failureStatistics": {
+    "title": "Failure Statistics",
+    "description": "Detailed breakdown of furnace failures by type and time",
+    "summaryCards": {
+      "totalFailures": "Total Failures",
+      "failure": "failure recorded",
+      "failures": "failures recorded",
+      "totalDowntime": "Total Downtime",
+      "totalLost": "production time lost",
+      "failureRate": "Failure Rate",
+      "avgDuration": "Avg Duration",
+      "perFailure": "per failure",
+      "minutesShort": "min"
+    },
+    "charts": {
+      "breakdownByType": "Failure Breakdown",
+      "trendOverTime": "Failure Trend",
+      "failureCount": "Failure Count",
+      "failureHours": "Downtime (min)",
+      "failures": "failures",
+      "failuresPaucal": "failures",
+      "failure": "failure",
+      "downtime": "Downtime",
+      "hoursShort": "h"
+    }
   },
   "refresh": "Refresh",
   "temperatureChart": {

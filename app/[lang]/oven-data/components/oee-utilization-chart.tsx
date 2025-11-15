@@ -36,17 +36,6 @@ interface OeeUtilizationChartProps {
   dict: Dictionary;
 }
 
-const chartConfig = {
-  utilization: {
-    label: 'Utilization',
-    color: 'hsl(var(--chart-1))', // Primary color from theme
-  },
-  target: {
-    label: 'Target (85%)',
-    color: 'hsl(var(--muted-foreground))',
-  },
-} satisfies ChartConfig;
-
 // Helper function to get color based on utilization percentage
 function getUtilizationColor(utilization: number): string {
   // Green for low utilization (0-50%), yellow-orange for medium (50-85%), red for high (85-100%)
@@ -123,6 +112,18 @@ export default function OeeUtilizationChart({
       </Card>
     );
   }
+
+  // Chart configuration with translations
+  const chartConfig = {
+    utilization: {
+      label: dict.oeeMetrics.utilization,
+      color: 'hsl(var(--chart-1))', // Primary color from theme
+    },
+    target: {
+      label: dict.oeeMetrics.targetPercent,
+      color: 'hsl(var(--muted-foreground))',
+    },
+  } satisfies ChartConfig;
 
   // Determine time formatting based on mode
   const formatTimestamp = (timestamp: string) => {
@@ -209,7 +210,7 @@ export default function OeeUtilizationChart({
             <YAxis
               domain={[0, 100]}
               label={{
-                value: 'Utilization (%)',
+                value: dict.oeeMetrics.utilizationPercent,
                 angle: -90,
                 position: 'insideLeft',
                 style: { textAnchor: 'middle' },
@@ -226,17 +227,17 @@ export default function OeeUtilizationChart({
                         <div key="utilization" className="space-y-1">
                           <div className="text-xs text-muted-foreground">
                             {props.payload.runningHours}h /{' '}
-                            {props.payload.availableHours}h available
+                            {props.payload.availableHours}h {dict.oeeMetrics.available}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {props.payload.activeOvens} ovens active
+                            {props.payload.activeOvens} {dict.oeeMetrics.ovensActive}
                           </div>
                         </div>,
                         `${value}%`,
                       ];
                     }
                     if (name === 'target') {
-                      return [`${value}%`, 'Target'];
+                      return [`${value}%`, dict.oeeMetrics.target];
                     }
                     return [value, name];
                   }}

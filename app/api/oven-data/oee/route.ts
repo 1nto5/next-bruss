@@ -1,14 +1,14 @@
-import type { OeeResponse } from '@/app/[lang]/oven-data/lib/types';
+import type { OeeResponse, OeeFault } from '@/app/[lang]/oven-data/lib/types';
 import { dbc } from '@/lib/db/mongo';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Get the total number of configured ovens from the database
+ * Get all configured ovens from the database
  */
-async function getTotalOvensCount(): Promise<number> {
+async function getConfiguredOvens(): Promise<string[]> {
   const ovenConfigsCollection = await dbc('oven_controllino_configs');
-  const count = await ovenConfigsCollection.countDocuments();
-  return count;
+  const configs = await ovenConfigsCollection.find({}).toArray();
+  return configs.map((config: any) => config.oven);
 }
 
 /**
@@ -157,6 +157,10 @@ export async function GET(request: NextRequest) {
           );
         }
 
+        // Set from to start of day and to to end of day
+        from.setHours(0, 0, 0, 0);
+        to.setHours(23, 59, 59, 999);
+
         // Auto-determine granularity based on range length
         const explicitGranularity = searchParams.get('granularity');
         if (explicitGranularity === 'hour' || explicitGranularity === 'day') {
@@ -168,8 +172,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get total number of configured ovens from database
-    const totalOvens = await getTotalOvensCount();
+    // Get all configured ovens from database
+    const configuredOvens = await getConfiguredOvens();
+    const totalOvens = configuredOvens.length;
 
     if (totalOvens === 0) {
       return NextResponse.json(
@@ -182,8 +187,11 @@ export async function GET(request: NextRequest) {
     const bucketMs = granularity === 'hour' ? 3600000 : 86400000; // 1 hour or 1 day
     const bucketMinutes = bucketMs / 60000;
 
-    const collection = await dbc('oven_processes');
+    const processCollection = await dbc('oven_processes');
+    const faultsCollection = await dbc('oven_fault_reports');
+
     const dataPoints = [];
+    const allFaults: OeeFault[] = [];
 
     // Iterate through time buckets
     let bucketStart = new Date(from);
@@ -195,7 +203,7 @@ export async function GET(request: NextRequest) {
       // A process overlaps if:
       // 1. It's finished AND (startTime < bucketEnd AND endTime > bucketStart)
       // 2. It's running AND startTime < bucketEnd
-      const processes = await collection
+      const processes = await processCollection
         .find({
           $or: [
             {
@@ -205,6 +213,26 @@ export async function GET(request: NextRequest) {
             },
             {
               status: 'running',
+              startTime: { $lt: bucketEnd },
+            },
+          ],
+        })
+        .toArray();
+
+      // Find all faults that overlap with this time bucket
+      // Similar logic to processes:
+      // 1. It's finished AND (startTime < bucketEnd AND endTime > bucketStart)
+      // 2. It's active AND startTime < bucketEnd
+      const faults = await faultsCollection
+        .find({
+          $or: [
+            {
+              status: 'finished',
+              startTime: { $lt: bucketEnd },
+              endTime: { $gt: bucketStart },
+            },
+            {
+              status: 'active',
               startTime: { $lt: bucketEnd },
             },
           ],
@@ -278,19 +306,82 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Calculate capacity and utilization based on actual configured oven count
-      const availableMinutes = totalOvens * bucketMinutes;
+      // Calculate failure time per oven and adjust available capacity
+      const ovenFailureMinutes = new Map<string, number>();
+      let totalFailureMinutes = 0;
+
+      for (const fault of faults) {
+        const faultStart = new Date(fault.startTime);
+        // For active faults, use current time as end (like running processes)
+        const faultEnd = fault.endTime
+          ? new Date(fault.endTime)
+          : new Date();
+
+        // Calculate overlap with bucket
+        const overlapStart =
+          faultStart > bucketStart ? faultStart : bucketStart;
+        const overlapEnd = faultEnd < bucketEnd ? faultEnd : bucketEnd;
+
+        if (overlapEnd > overlapStart) {
+          const overlapMinutes =
+            (overlapEnd.getTime() - overlapStart.getTime()) / 60000;
+
+          // Add to this oven's failure time
+          const currentFailureTime = ovenFailureMinutes.get(fault.oven) || 0;
+          ovenFailureMinutes.set(fault.oven, currentFailureTime + overlapMinutes);
+        }
+
+        // Track all faults for response (only once, not per bucket)
+        if (
+          !allFaults.some(
+            (f) => f.id === fault._id.toString() || f.id === fault.id,
+          )
+        ) {
+          allFaults.push({
+            id: fault._id?.toString() || fault.id,
+            oven: fault.oven,
+            faultKey: fault.faultKey,
+            faultName: fault.faultKey, // Will be translated in UI
+            status: fault.status,
+            startTime: faultStart,
+            endTime: fault.endTime ? new Date(fault.endTime) : null,
+            duration: faultEnd
+              ? (faultEnd.getTime() - faultStart.getTime()) / 60000
+              : (new Date().getTime() - faultStart.getTime()) / 60000,
+            reportedBy: fault.reportedBy || [],
+            finishedBy: fault.finishedBy || null,
+          });
+        }
+      }
+
+      // Calculate adjusted available capacity per oven
+      let adjustedAvailableMinutes = 0;
+
+      for (const oven of configuredOvens) {
+        const ovenFailureTime = ovenFailureMinutes.get(oven) || 0;
+        const ovenAvailableMinutes = bucketMinutes - ovenFailureTime;
+        adjustedAvailableMinutes += ovenAvailableMinutes;
+        totalFailureMinutes += ovenFailureTime;
+      }
+
+      // Calculate utilization with adjusted capacity
       const utilizationPercent =
-        availableMinutes > 0
-          ? (totalRunningMinutes / availableMinutes) * 100
+        adjustedAvailableMinutes > 0
+          ? (totalRunningMinutes / adjustedAvailableMinutes) * 100
           : 0;
+
+      // Count active faults in this bucket
+      const activeFaultCount = faults.filter((f) => f.status === 'active')
+        .length;
 
       dataPoints.push({
         timestamp: bucketStart.toISOString(),
         runningMinutes: Math.round(totalRunningMinutes),
-        availableMinutes,
+        availableMinutes: Math.round(adjustedAvailableMinutes),
+        failureMinutes: Math.round(totalFailureMinutes),
         utilizationPercent: Math.round(utilizationPercent * 10) / 10,
         activeOvenCount: activeOvens.size,
+        faultCount: activeFaultCount,
       });
 
       // Move to next bucket
@@ -306,6 +397,10 @@ export async function GET(request: NextRequest) {
       (sum, dp) => sum + dp.availableMinutes,
       0,
     );
+    const totalFailureMinutes = dataPoints.reduce(
+      (sum, dp) => sum + dp.failureMinutes,
+      0,
+    );
     const overallUtilization =
       totalAvailableMinutes > 0
         ? (totalRunningMinutes / totalAvailableMinutes) * 100
@@ -317,7 +412,10 @@ export async function GET(request: NextRequest) {
         overallUtilization: Math.round(overallUtilization * 10) / 10,
         totalRunningHours: Math.round(totalRunningMinutes / 60),
         totalAvailableHours: Math.round(totalAvailableMinutes / 60),
+        totalFailureHours: Math.round(totalFailureMinutes / 60),
+        totalFaults: allFaults.length,
       },
+      faults: allFaults,
     };
 
     return NextResponse.json(response);
