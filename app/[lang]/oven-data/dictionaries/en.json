@@ -130,7 +130,7 @@
       "failureRate": "Failure Rate",
       "avgDuration": "Avg Duration",
       "perFailure": "per failure",
-      "minutesShort": "min"
+      "minutesShort": "min."
     },
     "charts": {
       "breakdownByType": "Failure Breakdown",
@@ -141,7 +141,7 @@
       "failuresPaucal": "failures",
       "failure": "failure",
       "downtime": "Downtime",
-      "hoursShort": "h"
+      "hoursShort": "h."
     }
   },
   "refresh": "Refresh",

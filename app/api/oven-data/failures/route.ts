@@ -41,10 +41,9 @@ function getDayDates(date: Date): { from: Date; to: Date } {
 
 /**
  * Determine appropriate granularity based on date range
+ * For failure statistics, always use daily granularity
  */
 function getAutoGranularity(from: Date, to: Date): 'hour' | 'day' {
-  const diffDays = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24);
-  if (diffDays <= 2) return 'hour';
   return 'day';
 }
 
@@ -116,7 +115,7 @@ export async function GET(request: NextRequest) {
         const dates = getDayDates(date);
         from = dates.from;
         to = dates.to;
-        granularity = 'hour';
+        granularity = 'day';
         break;
       }
 

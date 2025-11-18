@@ -5,6 +5,7 @@ import { AlertTriangle, Clock, TrendingUp, Timer } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFailureStats } from '../hooks/use-failure-stats';
 import type { OeeParams } from '../lib/types';
+import { formatDuration } from '../lib/format-time';
 
 interface FailureStatsSummaryCardsProps {
   params: OeeParams;
@@ -101,7 +102,10 @@ export default function FailureStatsSummaryCards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {summary.avgFailureDuration} {dict.failureStatistics.summaryCards.minutesShort}
+            {formatDuration(summary.avgFailureDuration, {
+              minutesShort: dict.failureStatistics.summaryCards.minutesShort,
+              hoursShort: dict.failureStatistics.charts.hoursShort,
+            })}
           </div>
         </CardContent>
       </Card>

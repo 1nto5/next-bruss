@@ -117,7 +117,7 @@
       "failureRate": "Störungsrate",
       "avgDuration": "Durchschn. Dauer",
       "perFailure": "pro Störung",
-      "minutesShort": "Min"
+      "minutesShort": "Min."
     },
     "charts": {
       "breakdownByType": "Störungsaufschlüsselung",
@@ -128,7 +128,7 @@
       "failuresPaucal": "Störungen",
       "failure": "Störung",
       "downtime": "Ausfallzeit",
-      "hoursShort": "Std"
+      "hoursShort": "Std."
     }
   },
   "refresh": "Aktualisieren",

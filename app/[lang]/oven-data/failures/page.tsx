@@ -15,6 +15,7 @@ import FailureTrendChart from './components/failure-trend-chart';
 import OeeFilteringAndOptions from '../components/oee-filtering-and-options';
 import { getDictionary } from '../lib/dict';
 import type { OeeParams } from './lib/types';
+import { getOvens } from '../lib/get-ovens';
 
 export default async function FailureStatisticsPage({
   params,
@@ -28,10 +29,7 @@ export default async function FailureStatisticsPage({
   const dict = await getDictionary(lang);
 
   // Fetch available ovens
-  const ovensResponse = await fetch(`${process.env.API}oven-data/ovens`, {
-    next: { revalidate: 3600 },
-  });
-  const ovens: string[] = ovensResponse.ok ? await ovensResponse.json() : [];
+  const ovens = await getOvens();
 
   // Extract oven filter from search params
   const ovenParam = sp.oven;

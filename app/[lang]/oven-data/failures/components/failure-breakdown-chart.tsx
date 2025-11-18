@@ -64,17 +64,17 @@ export default function FailureBreakdownChart({
         <CardTitle>{dict.failureStatistics.charts.breakdownByType}</CardTitle>
       </CardHeader>
       <CardContent className="pb-4">
-        {/* Pie Chart with legend on right */}
-        <div className="h-[300px]">
+        {/* Pie Chart with responsive legend */}
+        <div className="h-[350px] sm:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={translatedData}
                 dataKey="percentage"
                 nameKey="faultName"
-                cx="40%"
-                cy="50%"
-                outerRadius={100}
+                cx="50%"
+                cy="45%"
+                outerRadius={80}
                 label={(entry) => `${entry.percentage}%`}
               >
                 {translatedData.map((entry, index) => (
@@ -101,9 +101,10 @@ export default function FailureBreakdownChart({
                 }}
               />
               <Legend
-                layout="vertical"
-                align="right"
-                verticalAlign="middle"
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                wrapperStyle={{ paddingTop: '10px' }}
               />
             </PieChart>
           </ResponsiveContainer>

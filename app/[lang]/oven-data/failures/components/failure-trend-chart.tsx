@@ -50,16 +50,32 @@ export default function FailureTrendChart({
     );
   }
 
+  // Detect granularity based on timestamp intervals
+  const isHourlyGranularity = trendData.length >= 2
+    ? (new Date(trendData[1].timestamp).getTime() - new Date(trendData[0].timestamp).getTime()) <= 3600000
+    : false;
+
   // Format timestamps for display
-  const formattedData = trendData.map((point) => ({
-    ...point,
-    displayTime: new Date(point.timestamp).toLocaleString('pl-PL', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    }),
-  }));
+  const formattedData = trendData.map((point) => {
+    const date = new Date(point.timestamp);
+
+    const displayTime = isHourlyGranularity
+      ? date.toLocaleString('pl-PL', {
+          day: '2-digit',
+          month: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : date.toLocaleString('pl-PL', {
+          day: '2-digit',
+          month: '2-digit',
+        });
+
+    return {
+      ...point,
+      displayTime,
+    };
+  });
 
   return (
     <Card>

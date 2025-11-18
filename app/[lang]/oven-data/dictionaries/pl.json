@@ -130,7 +130,7 @@
       "failureRate": "Wskaźnik awarii",
       "avgDuration": "Średni czas trwania",
       "perFailure": "na awarię",
-      "minutesShort": "min"
+      "minutesShort": "min."
     },
     "charts": {
       "breakdownByType": "Podział awarii",
@@ -141,7 +141,7 @@
       "failuresPaucal": "awarie",
       "failure": "awaria",
       "downtime": "Przestój",
-      "hoursShort": "godz"
+      "hoursShort": "godz."
     }
   },
   "refresh": "Odśwież",

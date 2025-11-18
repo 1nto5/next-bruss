@@ -66,12 +66,6 @@ export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) 
 
   const { summary } = data;
 
-  // Calculate failure rate as percentage of available capacity
-  const failureRate =
-    summary.totalAvailableHours > 0
-      ? ((summary.totalFailureHours / summary.totalAvailableHours) * 100).toFixed(1)
-      : '0.0';
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Overall Utilization */}
@@ -86,9 +80,6 @@ export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) 
           <div className="text-2xl font-bold">
             {summary.overallUtilization}%
           </div>
-          <p className="text-xs text-muted-foreground">
-            {dict.oeeMetrics.averageAcrossOvens}
-          </p>
         </CardContent>
       </Card>
 
@@ -104,9 +95,6 @@ export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) 
           <div className="text-2xl font-bold">
             {summary.totalRunningHours.toLocaleString()}h
           </div>
-          <p className="text-xs text-muted-foreground">
-            {dict.oeeMetrics.actualProductionTime}
-          </p>
         </CardContent>
       </Card>
 
@@ -122,9 +110,6 @@ export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) 
           <div className="text-2xl font-bold">
             {summary.totalAvailableHours.toLocaleString()}h
           </div>
-          <p className="text-xs text-muted-foreground">
-            {dict.oeeMetrics.totalOvenCapacity}
-          </p>
         </CardContent>
       </Card>
 
@@ -147,9 +132,6 @@ export default function OeeSummaryCards({ params, dict }: OeeSummaryCardsProps) 
               </Badge>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {failureRate}% {dict.oeeMetrics.ofCapacity}
-          </p>
         </CardContent>
       </Card>
     </div>
