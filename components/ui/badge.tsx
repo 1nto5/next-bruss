@@ -45,6 +45,21 @@ const badgeVariants = cva(
         // New variant for 'forecast' status
         statusForecast:
           'border-transparent bg-sky-100 text-sky-800 dark:bg-sky-800 dark:text-sky-200',
+        // IT Inventory status variants
+        statusInUse:
+          'border-transparent bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200',
+        statusInStock:
+          'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200',
+        statusDamaged:
+          'border-transparent bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200',
+        statusToDispose:
+          'border-transparent bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200',
+        statusDisposed:
+          'border-transparent bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+        statusToReview:
+          'border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200',
+        statusToRepair:
+          'border-transparent bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-200',
       },
       size: {
         default: 'px-2.5 py-0.5 text-xs',
