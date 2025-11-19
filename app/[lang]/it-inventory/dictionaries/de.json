@@ -1,0 +1,240 @@
+{
+  "title": "IT-Geräteinventar",
+  "page": {
+    "title": "IT-Geräteinventar",
+    "newItem": "Eintrag hinzufügen",
+    "login": "Anmelden"
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "clear": "Löschen",
+    "search": "Suchen",
+    "select": "auswählen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "assign": "Zuweisen",
+    "unassign": "Entfernen",
+    "details": "Details",
+    "back": "Zurück",
+    "saveAndAddAnother": "Speichern und weiteres hinzufügen"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse.",
+    "columns": {
+      "assetId": "ID",
+      "category": "Kategorie",
+      "manufacturer": "Hersteller",
+      "model": "Modell",
+      "serialNumber": "Seriennummer",
+      "statuses": "Status",
+      "currentAssignment": "Zuweisung",
+      "purchaseDate": "Kaufdatum",
+      "lastReview": "Letzte Überprüfung",
+      "actions": "Aktionen"
+    }
+  },
+  "categories": {
+    "notebook": "Notebook",
+    "workstation": "Workstation",
+    "monitor": "Monitor",
+    "iphone": "iPhone",
+    "android": "Android",
+    "printer": "Drucker",
+    "label-printer": "Etikettendrucker",
+    "portable-scanner": "Mobiler Scanner"
+  },
+  "statuses": {
+    "in-use": "In Benutzung",
+    "in-stock": "Auf Lager",
+    "damaged": "Beschädigt",
+    "to-dispose": "Zu entsorgen",
+    "disposed": "Entsorgt",
+    "to-review": "Zu überprüfen",
+    "to-repair": "Zu reparieren"
+  },
+  "connectionTypes": {
+    "USB": "USB",
+    "Network": "Netzwerk",
+    "Bluetooth": "Bluetooth",
+    "WiFi": "WiFi"
+  },
+  "filters": {
+    "title": "Filter",
+    "category": "Kategorie",
+    "status": "Status",
+    "assignment": "Zuweisung",
+    "manufacturer": "Hersteller",
+    "purchaseDate": "Kaufdatum",
+    "purchaseDateFrom": "Kaufdatum (Von)",
+    "purchaseDateTo": "Kaufdatum (Bis)",
+    "assignmentDate": "Zuweisungsdatum",
+    "assignmentDateFrom": "Zuweisungsdatum (Von)",
+    "assignmentDateTo": "Zuweisungsdatum (Bis)",
+    "assignmentOptions": {
+      "all": "Alle",
+      "assigned": "Zugewiesen",
+      "unassigned": "Nicht zugewiesen"
+    }
+  },
+  "summary": {
+    "totalItems": "Alle Geräte",
+    "allEquipment": "alle Geräte",
+    "assigned": "Zugewiesen",
+    "inUse": "in Benutzung",
+    "unassigned": "Nicht zugewiesen",
+    "available": "verfügbar",
+    "byCategory": "Nach Kategorie",
+    "phones": "Telefone",
+    "printers": "Drucker/Scanner"
+  },
+  "form": {
+    "newItem": {
+      "title": "Neues Gerät hinzufügen",
+      "inventoryTable": "Inventartabelle",
+      "category": "Kategorie",
+      "assetNumber": "ID",
+      "manufacturer": "Hersteller",
+      "model": "Modell",
+      "serialNumber": "Seriennummer",
+      "purchaseDate": "Kaufdatum",
+      "lastReview": "Letzte Überprüfung",
+      "statuses": "Status",
+      "connectionType": "Verbindungstyp",
+      "ipAddress": "IP-Adresse",
+      "notes": "Notizen"
+    },
+    "editItem": {
+      "title": "Gerät bearbeiten",
+      "backToItem": "Zurück zum Gerät",
+      "inventoryTable": "Inventartabelle"
+    },
+    "assign": {
+      "title": "Gerät zuweisen",
+      "inventoryTable": "Inventartabelle",
+      "assignmentType": "Zuweisungstyp",
+      "assignToEmployee": "Mitarbeiter",
+      "assignToCustom": "Andere (Raum, Büro, etc.)",
+      "employee": "Mitarbeiter",
+      "customName": "Name (Raum, Büro, etc.)",
+      "customNamePlaceholder": "z.B. Konferenzraum, Büro 101...",
+      "assignedAt": "Zuweisungsdatum",
+      "reason": "Grund / Notiz",
+      "searchPlaceholder": "Mitarbeiter suchen...",
+      "statusChangeConfirmTitle": "Statusänderung",
+      "statusChangeConfirmMessage": "Dieses Gerät hat den Status 'Auf Lager'. Die Zuweisung entfernt 'Auf Lager' und fügt 'In Benutzung' hinzu. Fortfahren?",
+      "statusChangeConfirm": "Ja, zuweisen",
+      "statusChangeCancel": "Abbrechen"
+    },
+    "unassign": {
+      "title": "Zuweisung entfernen",
+      "inventoryTable": "Inventartabelle",
+      "description": "Möchten Sie die Zuweisung dieses Geräts wirklich entfernen: {employeeName}?",
+      "reason": "Grund / Notiz",
+      "newStatuses": "Neue Status",
+      "statusesDescription": "Wählen Sie Status für das Gerät nach der Entfernung"
+    }
+  },
+  "validation": {
+    "categoryRequired": "Wählen Sie eine Kategorie!",
+    "assetNumberRequired": "Inventarnummer ist erforderlich!",
+    "manufacturerRequired": "Hersteller ist erforderlich!",
+    "modelRequired": "Modell ist erforderlich!",
+    "serialNumberRequired": "Seriennummer ist erforderlich!",
+    "purchaseDateRequired": "Wählen Sie ein Kaufdatum!",
+    "purchaseDateFuture": "Kaufdatum kann nicht in der Zukunft liegen!",
+    "statusesMinOne": "Wählen Sie mindestens einen Status!",
+    "connectionTypeRequired": "Verbindungstyp ist für Drucker und Scanner erforderlich!",
+    "ipAddressInvalid": "Ungültige IP-Adresse!",
+    "employeeRequired": "Wählen Sie einen Mitarbeiter!",
+    "customNameRequired": "Geben Sie einen Namen ein!",
+    "assignmentDateRequired": "Wählen Sie ein Zuweisungsdatum!",
+    "assignmentDateFuture": "Zuweisungsdatum kann nicht in der Zukunft liegen!",
+    "reasonOptional": "Grund ist optional",
+    "statusesRequiredForUnassign": "Wählen Sie mindestens einen Status!",
+    "cannotHaveNaStanieWhenAssigned": "Status 'Auf Lager' kann nicht für zugewiesene Geräte gesetzt werden"
+  },
+  "details": {
+    "title": "Gerätedetails",
+    "basicInfo": "Grundinformationen",
+    "assetId": "ID",
+    "category": "Kategorie",
+    "manufacturer": "Hersteller",
+    "model": "Modell",
+    "serialNumber": "Seriennummer",
+    "purchaseDate": "Kaufdatum",
+    "lastReview": "Letzte Überprüfung",
+    "statuses": "Status",
+    "connectionType": "Verbindungstyp",
+    "ipAddress": "IP-Adresse",
+    "notes": "Notizen",
+    "currentAssignment": "Aktuelle Zuweisung",
+    "assignedTo": "Zugewiesen an",
+    "assignedAt": "Zuweisungsdatum",
+    "assignedBy": "Zugewiesen von",
+    "unassigned": "Nicht zugewiesen",
+    "assignmentHistory": "Zuweisungshistorie",
+    "noHistory": "Keine Zuweisungshistorie",
+    "employee": "Mitarbeiter",
+    "assigned": "Zugewiesen",
+    "unassignedOn": "Entfernt",
+    "reason": "Grund",
+    "audit": "Änderungshistorie",
+    "createdAt": "Erstellt am",
+    "createdBy": "Erstellt von",
+    "editedAt": "Geändert am",
+    "editedBy": "Geändert von"
+  },
+  "dialogs": {
+    "delete": {
+      "title": "Gerät löschen?",
+      "description": "Möchten Sie dieses Gerät wirklich DAUERHAFT löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancelButton": "Nein, behalten",
+      "confirmButton": "Ja, löschen",
+      "deleting": "Gerät wird gelöscht...",
+      "deleted": "Gerät wurde gelöscht!"
+    },
+    "bulkDelete": {
+      "title": "Ausgewählte Geräte löschen?",
+      "description": "Möchten Sie wirklich {count} ausgewählte Geräte DAUERHAFT löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmButton": "Ja, alle löschen"
+    }
+  },
+  "bulk": {
+    "selected": "ausgewählt",
+    "actions": "Aktionen",
+    "updateStatuses": "Status aktualisieren",
+    "deleteItems": "Ausgewählte löschen",
+    "updateStatusesTitle": "Status aktualisieren",
+    "updateStatusesDescription": "Status für {count} ausgewählte Geräte aktualisieren.",
+    "deleteTitle": "Ausgewählte Geräte löschen?",
+    "deleteDescription": "Möchten Sie wirklich {count} ausgewählte Geräte DAUERHAFT löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "more": "mehr",
+    "confirmDelete": "Ja, alle löschen",
+    "selectStatus": "Wählen Sie mindestens einen Status",
+    "updating": "Status werden aktualisiert...",
+    "updated": "Status wurden aktualisiert!",
+    "deleting": "Geräte werden gelöscht...",
+    "deleted": "Geräte wurden gelöscht!",
+    "deleteFailed": "Fehler beim Löschen der Geräte",
+    "partialDelete": "Teilweise gelöscht"
+  },
+  "toast": {
+    "loading": "Änderungen werden gespeichert...",
+    "success": "Änderungen gespeichert!",
+    "error": "Ein Fehler ist aufgetreten!",
+    "unauthorized": "Sie haben keine Berechtigung!",
+    "notFound": "Nicht gefunden!",
+    "contactIT": "Kontaktieren Sie IT!",
+    "itemCreated": "Gerät wurde hinzugefügt!",
+    "itemUpdated": "Gerät wurde aktualisiert!",
+    "itemDeleted": "Gerät wurde gelöscht!",
+    "assigned": "Gerät wurde zugewiesen!",
+    "unassigned": "Gerät wurde entfernt!",
+    "bulkDeleted": "{count} Geräte gelöscht!",
+    "bulkStatusUpdated": "Status für {count} Geräte aktualisiert!",
+    "statusesChanged": "Status wurden geändert",
+    "bulkUpdateSkipped": "{count} Geräte übersprungen (zugewiesen mit Statuskonflikt)"
+  }
+}
