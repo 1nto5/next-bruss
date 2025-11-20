@@ -61,9 +61,9 @@ export const createOvertimeEntrySchema = (validation: {
         const now = new Date();
         now.setHours(23, 59, 59, 999);
 
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setHours(0, 0, 0, 0);
-        threeDaysAgo.setDate(now.getDate() - 3);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+        sevenDaysAgo.setDate(now.getDate() - 7);
 
         const startOfCurrentMonth = new Date(
           now.getFullYear(),
@@ -72,15 +72,15 @@ export const createOvertimeEntrySchema = (validation: {
         );
         startOfCurrentMonth.setHours(0, 0, 0, 0);
 
-        if (data.hours < 0) {
-          return data.date > now;
-        } else {
-          const effectiveStartDate =
-            threeDaysAgo > startOfCurrentMonth
-              ? threeDaysAgo
-              : startOfCurrentMonth;
-          return data.date >= effectiveStartDate && data.date <= now;
-        }
+        const threeDaysBeforeMonth = new Date(startOfCurrentMonth);
+        threeDaysBeforeMonth.setDate(startOfCurrentMonth.getDate() - 3);
+
+        const minAllowedDate =
+          sevenDaysAgo > threeDaysBeforeMonth
+            ? sevenDaysAgo
+            : threeDaysBeforeMonth;
+
+        return data.date >= minAllowedDate && data.date <= now;
       },
       {
         message: validation.dateRangeInvalid,
@@ -248,7 +248,7 @@ export const createWorkOrderSchema = (validation: {
 // CORRECTION SCHEMAS (without date range restrictions)
 // ============================================================================
 
-// Schema for correcting regular overtime entries (no date range restrictions)
+// Schema for correcting regular overtime entries (with 7-day date range restriction)
 export const createOvertimeCorrectionSchema = (validation: {
   supervisorEmailInvalid: string;
   supervisorRequired: string;
@@ -258,6 +258,7 @@ export const createOvertimeCorrectionSchema = (validation: {
   hoursIncrementInvalid: string;
   reasonRequired: string;
   previousMonthNotAllowed: string;
+  dateRangeInvalid: string;
 }) => {
   return z
     .object({
@@ -294,6 +295,39 @@ export const createOvertimeCorrectionSchema = (validation: {
       },
       {
         message: validation.previousMonthNotAllowed,
+        path: ['date'],
+      },
+    )
+    .refine(
+      (data) => {
+        if (!data.date) return true;
+
+        const now = new Date();
+        now.setHours(23, 59, 59, 999);
+
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+        sevenDaysAgo.setDate(now.getDate() - 7);
+
+        const startOfCurrentMonth = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+        );
+        startOfCurrentMonth.setHours(0, 0, 0, 0);
+
+        const threeDaysBeforeMonth = new Date(startOfCurrentMonth);
+        threeDaysBeforeMonth.setDate(startOfCurrentMonth.getDate() - 3);
+
+        const minAllowedDate =
+          sevenDaysAgo > threeDaysBeforeMonth
+            ? sevenDaysAgo
+            : threeDaysBeforeMonth;
+
+        return data.date >= minAllowedDate && data.date <= now;
+      },
+      {
+        message: validation.dateRangeInvalid,
         path: ['date'],
       },
     )

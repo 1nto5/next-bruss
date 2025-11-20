@@ -585,21 +585,30 @@ export default function OvertimeRequestForm({
                   const now = new Date();
                   now.setHours(23, 59, 59, 999);
 
-                  const hoursValue = form.watch('hours');
+                  // Calculate 7 days ago
+                  const sevenDaysAgo = new Date();
+                  sevenDaysAgo.setHours(0, 0, 0, 0);
+                  sevenDaysAgo.setDate(now.getDate() - 7);
 
-                  let minDate, maxDate;
-                  if (hoursValue < 0) {
-                    // Overtime pickup: any time after now
-                    minDate = now;
-                    maxDate = undefined;
-                  } else {
-                    // Regular overtime entry: last 7 days (validation will enforce last 3 days of current month)
-                    const sevenDaysAgo = new Date();
-                    sevenDaysAgo.setHours(0, 0, 0, 0);
-                    sevenDaysAgo.setDate(now.getDate() - 7);
-                    minDate = sevenDaysAgo;
-                    maxDate = undefined;
-                  }
+                  // Calculate month boundary protection
+                  const startOfCurrentMonth = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    1,
+                  );
+                  startOfCurrentMonth.setHours(0, 0, 0, 0);
+
+                  const threeDaysBeforeMonth = new Date(startOfCurrentMonth);
+                  threeDaysBeforeMonth.setDate(
+                    startOfCurrentMonth.getDate() - 3,
+                  );
+
+                  // Use the later date as minimum
+                  const minDate =
+                    sevenDaysAgo > threeDaysBeforeMonth
+                      ? sevenDaysAgo
+                      : threeDaysBeforeMonth;
+                  const maxDate = undefined;
 
                   return (
                     <FormItem>

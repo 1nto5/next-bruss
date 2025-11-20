@@ -264,29 +264,61 @@ export default function CorrectOvertimeForm({
                 <FormField
                   control={form.control}
                   name='date'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{dict.form.date}</FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          modal
-                          hideTime
-                          value={field.value || new Date()}
-                          onChange={field.onChange}
-                          renderTrigger={({ open, value, setOpen }) => (
-                            <DateTimeInput
-                              value={field.value}
-                              onChange={(x) => !open && field.onChange(x)}
-                              format='dd/MM/yyyy'
-                              disabled={open}
-                              onCalendarClick={() => setOpen(!open)}
-                            />
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const now = new Date();
+                    now.setHours(23, 59, 59, 999);
+
+                    // Calculate 7 days ago
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setHours(0, 0, 0, 0);
+                    sevenDaysAgo.setDate(now.getDate() - 7);
+
+                    // Calculate month boundary protection
+                    const startOfCurrentMonth = new Date(
+                      now.getFullYear(),
+                      now.getMonth(),
+                      1,
+                    );
+                    startOfCurrentMonth.setHours(0, 0, 0, 0);
+
+                    const threeDaysBeforeMonth = new Date(startOfCurrentMonth);
+                    threeDaysBeforeMonth.setDate(
+                      startOfCurrentMonth.getDate() - 3,
+                    );
+
+                    // Use the later date as minimum
+                    const minDate =
+                      sevenDaysAgo > threeDaysBeforeMonth
+                        ? sevenDaysAgo
+                        : threeDaysBeforeMonth;
+                    const maxDate = undefined;
+
+                    return (
+                      <FormItem>
+                        <FormLabel>{dict.form.date}</FormLabel>
+                        <FormControl>
+                          <DateTimePicker
+                            modal
+                            hideTime
+                            value={field.value || new Date()}
+                            onChange={field.onChange}
+                            min={minDate}
+                            max={maxDate}
+                            renderTrigger={({ open, value, setOpen }) => (
+                              <DateTimeInput
+                                value={field.value}
+                                onChange={(x) => !open && field.onChange(x)}
+                                format='dd/MM/yyyy'
+                                disabled={open}
+                                onCalendarClick={() => setOpen(!open)}
+                              />
+                            )}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 {/* Hours Field */}

@@ -104,6 +104,7 @@
   },
   "form": {
     "titleNew": "Neue Überstunden-Meldung",
+    "titleNewWorkOrder": "Neuer Überstundenauftrag",
     "titleEdit": "Überstunden-Meldung bearbeiten",
     "supervisor": "Vorgesetzter",
     "hours": "Stunden",

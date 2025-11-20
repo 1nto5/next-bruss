@@ -104,6 +104,7 @@
   },
   "form": {
     "titleNew": "New overtime submission",
+    "titleNewWorkOrder": "New overtime work order",
     "titleEdit": "Edit overtime submission",
     "supervisor": "Supervisor",
     "hours": "Hours",

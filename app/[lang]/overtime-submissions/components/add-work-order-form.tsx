@@ -222,7 +222,7 @@ export default function AddWorkOrderForm({
   };
 
   const getTitle = () => {
-    return isEditMode ? dict.form.titleEdit : dict.form.titleNew;
+    return isEditMode ? dict.form.titleEdit : dict.form.titleNewWorkOrder;
   };
 
   const getSubmitButtonText = () => {
