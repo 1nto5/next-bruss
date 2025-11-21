@@ -149,7 +149,6 @@ export default function QrGeneratorForm() {
       form.setValue('codeSize', 44);
       form.setValue('fontSize', 26);
       form.setValue('spacing', 10);
-      form.setValue('orientation', 'landscape');
     } else if (selectedPageSize === 'a4') {
       form.setValue('codeSize', 190);
       form.setValue('fontSize', 105);
@@ -342,7 +341,7 @@ export default function QrGeneratorForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    disabled={selectedCodeType === 'dmc' || selectedPageSize === 'label70x100'}
+                    disabled={selectedCodeType === 'dmc'}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -357,9 +356,7 @@ export default function QrGeneratorForm() {
                   <FormDescription>
                     {selectedCodeType === 'dmc'
                       ? 'DMC uses fixed orientation'
-                      : selectedPageSize === 'label70x100'
-                        ? '70x100mm uses fixed landscape orientation'
-                        : 'Choose page orientation'}
+                      : 'Choose page orientation'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

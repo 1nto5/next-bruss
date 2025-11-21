@@ -98,8 +98,7 @@ export async function codesPdfGenerator({
   } else if (pageSize === 'standard') {
     format = orientation === 'portrait' ? [125, 104] : [104, 125];
   } else if (pageSize === 'label70x100') {
-    format = [100, 70]; // Always landscape: 100mm width × 70mm height
-    orientation = 'landscape';
+    format = orientation === 'portrait' ? [70, 100] : [100, 70];
   }
 
   const doc = new jsPDF({
