@@ -30,10 +30,11 @@ import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
 import { getDefectsColumns } from './defects-columns';
 import type { Dictionary } from '../lib/dict';
+import type { DefectType } from '../lib/defects-types';
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
-  defects: any[];
+  defects: DefectType[];
   fetchTime: Date;
   fetchTimeLocaleString: string;
   lang: Locale;
