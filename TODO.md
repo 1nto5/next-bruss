@@ -3,6 +3,18 @@
 - filtrowanie po ID w overtime-submissions
 - dodawanie zleceń przez hr
 
+## Defects API Pattern for Power BI/Excel
+
+**Implemented in:** `app/api/dmcheck-data/defects-data/`
+**Consider for:** failures, deviations, oven-data when similar flattened multi-language export needed
+
+- JSON API endpoint for Power Query consumption (not .xlsx file)
+- Flattens nested arrays (one row per defect occurrence)
+- Includes multi-language translations (PL, DE, EN)
+- Supports query params (date, workplace, article, batches)
+- Limit: 10k records from main + archive collections
+- Usage in Excel: Data → Get Data from Web → `/api/dmcheck-data/defects-data?from=2025-01-01&to=2025-01-31`
+
 ## Performance Optimizations to Apply Globally
 
 **Implemented in:** `app/[lang]/dmcheck-data/`
