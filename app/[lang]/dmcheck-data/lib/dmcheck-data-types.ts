@@ -1,5 +1,5 @@
 export type DmcType = {
-  status: string;
+  status: "box" | "pallet" | "warehouse" | "rework" | "defect";
   pallet: string;
   dmc: string;
   workplace: string;
@@ -15,6 +15,7 @@ export type DmcType = {
   rework_reason?: string;
   rework_user?: string;
   rework_time?: string;
+  defectKeys?: string[];
 };
 
 export type DmcTableDataType = DmcType & {
@@ -38,4 +39,16 @@ export type ArticleConfigType = {
   hydraProcess: string;
   ford?: boolean;
   bmw?: boolean;
+  enableDefectReporting?: boolean;
+};
+
+export type DefectType = {
+  _id?: string;
+  key: string;
+  category: string;
+  group: string;
+  order: number;
+  translations: {
+    [key: string]: string; // e.g., { "pl": "Uszkodzona uszczelka PD", "en": "Damaged PD seal", "de": "..." }
+  };
 };

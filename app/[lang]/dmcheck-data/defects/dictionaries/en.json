@@ -1,0 +1,34 @@
+{
+  "title": "DMCheck Defects",
+  "lastSync": "Last sync",
+  "columns": {
+    "dmc": "DMC",
+    "time": "Time",
+    "article": "Article",
+    "workplace": "Workplace",
+    "operator": "Operator",
+    "defects": "Defects"
+  },
+  "filters": {
+    "from": "From:",
+    "to": "To:",
+    "workplace": "Workplace",
+    "article": "Article",
+    "defectKey": "Defect",
+    "defectCategory": "Category",
+    "defectGroup": "Defect group",
+    "select": "Select...",
+    "search": "search...",
+    "notFound": "not found",
+    "clear": "Clear",
+    "clearFilters": "Clear filters",
+    "clearFilter": "clear filter",
+    "selected": "selected",
+    "export": "Export",
+    "search_button": "Search",
+    "refresh": "Refresh"
+  },
+  "table": {
+    "noResults": "No results"
+  }
+}

@@ -24,53 +24,43 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 
 import { Locale } from '@/lib/config/i18n';
 import { ArrowRight } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
-import { getDmcColumns } from './dmc-columns';
+import { useEffect } from 'react';
+import { getDefectsColumns } from './defects-columns';
 import type { Dictionary } from '../lib/dict';
-import type { ArticleConfigType, DefectType } from '../lib/dmcheck-data-types';
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
-  articles: ArticleConfigType[];
-  defects: DefectType[];
+  defects: any[];
   fetchTime: Date;
   fetchTimeLocaleString: string;
   lang: Locale;
   dict: Dictionary;
 }
 
-export function DmcDataTable<TData, TValue>({
+export function DefectsDataTable<TData, TValue>({
   data,
-  articles,
   defects,
   fetchTime,
   fetchTimeLocaleString,
   lang,
   dict,
 }: DataTableProps<TData, TValue>) {
-  const columns = getDmcColumns(dict, defects, lang) as ColumnDef<TData, TValue>[];
-
-  const [showOnlyDefects, setShowOnlyDefects] = React.useState(false);
-
-  // Filter data to show only defects if toggle is on
-  const filteredData = useMemo(() => {
-    if (!showOnlyDefects) return data;
-    return data.filter((row: any) => row.defectKeys && row.defectKeys.length > 0);
-  }, [data, showOnlyDefects]);
+  const columns = getDefectsColumns(dict, defects, lang) as ColumnDef<
+    TData,
+    TValue
+  >[];
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+    []
   );
   const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -96,16 +86,6 @@ export function DmcDataTable<TData, TValue>({
   return (
     <>
       <CardContent>
-        <div className='mb-4 flex items-center space-x-2'>
-          <Switch
-            id='show-defects'
-            checked={showOnlyDefects}
-            onCheckedChange={setShowOnlyDefects}
-          />
-          <Label htmlFor='show-defects' className='cursor-pointer'>
-            {dict.filters.showOnlyDefects}
-          </Label>
-        </div>
         <div className='rounded-md border'>
           <Table>
             <TableHeader>
@@ -118,7 +98,7 @@ export function DmcDataTable<TData, TValue>({
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext(),
+                              header.getContext()
                             )}
                       </TableHead>
                     );
@@ -137,7 +117,7 @@ export function DmcDataTable<TData, TValue>({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}

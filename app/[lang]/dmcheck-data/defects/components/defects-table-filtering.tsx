@@ -1,0 +1,265 @@
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
+import { DateTimeInput } from '@/components/ui/datetime-input';
+import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
+import { CircleX, Search, Loader } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import type { Dictionary } from '../lib/dict';
+import type { ArticleConfigType, DefectType } from '../../lib/dmcheck-data-types';
+import { getOneWeekAgo, getToday } from '../../lib/utils';
+
+export default function DefectsTableFiltering({
+  articles,
+  defects,
+  fetchTime,
+  dict,
+  lang,
+}: {
+  articles: ArticleConfigType[];
+  defects: DefectType[];
+  fetchTime: Date;
+  dict: Dictionary;
+  lang: string;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [isPendingSearch, setIsPendingSearch] = useState(false);
+
+  useEffect(() => {
+    setIsPendingSearch(false);
+  }, [fetchTime]);
+
+  const [fromFilter, setFromFilter] = useState<Date | null>(() => {
+    const fromParam = searchParams?.get('from');
+    return fromParam ? new Date(fromParam) : getOneWeekAgo();
+  });
+  const [toFilter, setToFilter] = useState<Date | null>(() => {
+    const toParam = searchParams?.get('to');
+    return toParam ? new Date(toParam) : getToday();
+  });
+  const [workplaceFilter, setWorkplaceFilter] = useState<string[]>(() => {
+    const workplaceParam = searchParams?.get('workplace');
+    return workplaceParam
+      ? workplaceParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
+      : [];
+  });
+  const [articleFilter, setArticleFilter] = useState<string[]>(() => {
+    const articleParam = searchParams?.get('article');
+    return articleParam
+      ? articleParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
+      : [];
+  });
+  const [defectKeyFilter, setDefectKeyFilter] = useState<string[]>(() => {
+    const defectKeyParam = searchParams?.get('defectKey');
+    return defectKeyParam
+      ? defectKeyParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0)
+      : [];
+  });
+
+  const hasFilters =
+    fromFilter || toFilter || workplaceFilter.length > 0 || articleFilter.length > 0 || defectKeyFilter.length > 0;
+
+  const handleSearchClick = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (fromFilter) params.set('from', fromFilter.toISOString());
+    if (toFilter) params.set('to', toFilter.toISOString());
+    if (workplaceFilter.length > 0) params.set('workplace', workplaceFilter.join(','));
+    if (articleFilter.length > 0) params.set('article', articleFilter.join(','));
+    if (defectKeyFilter.length > 0) params.set('defectKey', defectKeyFilter.join(','));
+    const newUrl = `${pathname}?${params.toString()}`;
+    setIsPendingSearch(true);
+    router.push(newUrl);
+  }, [fromFilter, toFilter, workplaceFilter, articleFilter, defectKeyFilter, pathname, router]);
+
+  const handleClearFilters = useCallback(() => {
+    setFromFilter(null);
+    setToFilter(null);
+    setWorkplaceFilter([]);
+    setArticleFilter([]);
+    setDefectKeyFilter([]);
+
+    if (searchParams?.toString()) {
+      setIsPendingSearch(true);
+      router.push(pathname || '');
+    }
+  }, [searchParams, pathname, router]);
+
+  // Filter articles to only those with defect reporting enabled
+  const defectReportingArticles = useMemo(
+    () => articles.filter((article) => article.enableDefectReporting === true),
+    [articles],
+  );
+
+  const workplaceOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(defectReportingArticles.map((article) => article.workplace)),
+      ).map((workplace) => ({
+        value: workplace,
+        label: workplace.toUpperCase(),
+      })),
+    [defectReportingArticles],
+  );
+
+  const articleOptions = useMemo(
+    () =>
+      defectReportingArticles
+        .filter(
+          (article) =>
+            workplaceFilter.length === 0 ||
+            workplaceFilter.includes(article.workplace),
+        )
+        .reduce((acc: { value: string; label: string }[], current) => {
+          const x = acc.find((item) => item.value === current.articleNumber);
+          if (!x) {
+            return acc.concat([
+              {
+                value: current.articleNumber,
+                label: `${current.articleNumber} - ${current.articleName}`,
+              },
+            ]);
+          } else {
+            return acc;
+          }
+        }, [])
+        .sort((a, b) => a.value.localeCompare(b.value)),
+    [defectReportingArticles, workplaceFilter],
+  );
+
+  const defectOptions = useMemo(
+    () =>
+      defects
+        .sort((a, b) => a.order - b.order)
+        .map((defect) => ({
+          value: defect.key,
+          label: defect.translations[lang] || defect.key,
+        })),
+    [defects, lang],
+  );
+
+  return (
+    <Card>
+      <CardContent className='p-4'>
+        <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+            <div className='flex flex-col space-y-1'>
+              <Label>{dict.filters.from}</Label>
+              <DateTimePicker
+                value={fromFilter || undefined}
+                onChange={(date) => setFromFilter(date || null)}
+                max={toFilter || undefined}
+                renderTrigger={({ value, setOpen, open }) => (
+                  <DateTimeInput
+                    value={value}
+                    onChange={(x) => !open && setFromFilter(x || null)}
+                    format='dd/MM/yyyy HH:mm'
+                    disabled={open}
+                    onCalendarClick={() => setOpen(!open)}
+                    className='w-full'
+                  />
+                )}
+              />
+            </div>
+            <div className='flex flex-col space-y-1'>
+              <Label>{dict.filters.to}</Label>
+              <DateTimePicker
+                value={toFilter || undefined}
+                onChange={(date) => setToFilter(date || null)}
+                max={new Date()}
+                min={fromFilter || undefined}
+                renderTrigger={({ value, setOpen, open }) => (
+                  <DateTimeInput
+                    value={value}
+                    onChange={(x) => !open && setToFilter(x || null)}
+                    format='dd/MM/yyyy HH:mm'
+                    disabled={open}
+                    onCalendarClick={() => setOpen(!open)}
+                    className='w-full'
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+            <div className='flex flex-col space-y-1'>
+              <Label>{dict.filters.workplace}</Label>
+              <MultiSelect
+                options={workplaceOptions}
+                value={workplaceFilter}
+                onValueChange={setWorkplaceFilter}
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
+                className='w-full'
+              />
+            </div>
+
+            <div className='flex flex-col space-y-1'>
+              <Label>{dict.filters.article}</Label>
+              <MultiSelect
+                options={articleOptions}
+                value={articleFilter}
+                onValueChange={setArticleFilter}
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
+                className='w-full'
+              />
+            </div>
+
+            <div className='flex flex-col space-y-1'>
+              <Label>{dict.filters.defectKey}</Label>
+              <MultiSelect
+                options={defectOptions}
+                value={defectKeyFilter}
+                onValueChange={setDefectKeyFilter}
+                placeholder={dict.filters.select}
+                searchPlaceholder={dict.filters.search}
+                emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
+                className='w-full'
+              />
+            </div>
+          </div>
+
+          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4'>
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={handleClearFilters}
+              title={dict.filters.clearFilters}
+              disabled={isPendingSearch || !hasFilters}
+              className='order-2 w-full sm:order-1'
+            >
+              <CircleX /> <span>{dict.filters.clear}</span>
+            </Button>
+
+            <Button
+              type='submit'
+              variant='secondary'
+              disabled={isPendingSearch}
+              className='order-1 w-full sm:order-2'
+            >
+              {isPendingSearch ? <Loader className='animate-spin' /> : <Search />}
+              <span>{dict.filters.search_button}</span>
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}

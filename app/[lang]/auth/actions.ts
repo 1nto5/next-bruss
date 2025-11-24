@@ -6,7 +6,8 @@ export async function logout() {
   await signOut();
 }
 
-export async function signOutAction(lang: string) {
+export async function signOutAction(formData: FormData) {
+  const lang = formData.get('lang') as string;
   await signOut({ redirectTo: `/${lang}` });
 }
 

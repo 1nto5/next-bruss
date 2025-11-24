@@ -1,0 +1,34 @@
+{
+  "title": "DMCheck Mängel",
+  "lastSync": "Letzte Synchronisierung",
+  "columns": {
+    "dmc": "DMC",
+    "time": "Zeit",
+    "article": "Artikel",
+    "workplace": "Arbeitsplatz",
+    "operator": "Operator",
+    "defects": "Mängel"
+  },
+  "filters": {
+    "from": "Von:",
+    "to": "Bis:",
+    "workplace": "Arbeitsplatz",
+    "article": "Artikel",
+    "defectKey": "Mangel",
+    "defectCategory": "Kategorie",
+    "defectGroup": "Mangelgruppe",
+    "select": "Auswählen...",
+    "search": "suchen...",
+    "notFound": "nicht gefunden",
+    "clear": "Löschen",
+    "clearFilters": "Filter löschen",
+    "clearFilter": "filter löschen",
+    "selected": "ausgewählt",
+    "export": "Exportieren",
+    "search_button": "Suchen",
+    "refresh": "Aktualisieren"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse"
+  }
+}

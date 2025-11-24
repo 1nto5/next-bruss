@@ -1,0 +1,34 @@
+{
+  "title": "Wady DMCheck",
+  "lastSync": "Ostatnia synchronizacja",
+  "columns": {
+    "dmc": "DMC",
+    "time": "Czas",
+    "article": "Artykuł",
+    "workplace": "Stanowisko",
+    "operator": "Operator",
+    "defects": "Wada"
+  },
+  "filters": {
+    "from": "Od:",
+    "to": "Do:",
+    "workplace": "Stanowisko",
+    "article": "Artykuł",
+    "defectKey": "Wada",
+    "defectCategory": "Kategoria",
+    "defectGroup": "Grupa wady",
+    "select": "Wybierz...",
+    "search": "szukaj...",
+    "notFound": "nie znaleziono",
+    "clear": "Wyczyść",
+    "clearFilters": "Wyczyść filtry",
+    "clearFilter": "wyczyść filtr",
+    "selected": "wybrano",
+    "export": "Eksportuj",
+    "search_button": "Szukaj",
+    "refresh": "Odśwież"
+  },
+  "table": {
+    "noResults": "Brak wyników"
+  }
+}

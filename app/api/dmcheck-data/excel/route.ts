@@ -59,16 +59,22 @@ export async function GET(req: NextRequest) {
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
 
-      if (key === 'status' && values.includes('rework')) {
-        // Handle rework special case - match all rework attempts
-        const otherStatuses = values.filter((v) => v !== 'rework');
+      if (key === 'status' && (values.includes('rework') || values.includes('defect'))) {
+        // Handle rework and defect special cases
+        const otherStatuses = values.filter((v) => v !== 'rework' && v !== 'defect');
         const statusConditions = [];
 
         if (otherStatuses.length > 0) {
           statusConditions.push({ status: { $in: otherStatuses } });
         }
 
-        statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        if (values.includes('rework')) {
+          statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        }
+
+        if (values.includes('defect')) {
+          statusConditions.push({ status: 'defect' });
+        }
 
         if (statusConditions.length === 1) {
           Object.assign(query, statusConditions[0]);
@@ -93,6 +99,12 @@ export async function GET(req: NextRequest) {
   try {
     const collScans = await dbc('dmcheck_scans');
     const collScansArchive = await dbc('dmcheck_scans_archive');
+    const collDefects = await dbc('dmcheck_defects');
+
+    // Fetch defects for translation
+    const defects = await collDefects.find().toArray();
+    const defectsMap = new Map(defects.map((d: any) => [d.key, d]));
+
     let scans = await collScans
       .find(query)
       .sort({ _id: -1 })
@@ -115,6 +127,7 @@ export async function GET(req: NextRequest) {
     sheet.columns = [
       { header: 'ID', key: '_id', width: 24, hidden: true },
       { header: 'Status', key: 'status', width: 15 },
+      { header: 'Defects', key: 'defects', width: 40 },
       { header: 'DMC', key: 'dmc', width: 36 },
       { header: 'Time', key: 'time', width: 18 },
       { header: 'Article', key: 'article', width: 10 },
@@ -140,9 +153,18 @@ export async function GET(req: NextRequest) {
     };
 
     scans.forEach((doc) => {
+      // Map defectKeys to translated names (using Polish as default)
+      const defectsText = doc.defectKeys && doc.defectKeys.length > 0
+        ? doc.defectKeys.map((key: string) => {
+            const defect = defectsMap.get(key);
+            return defect?.translations?.pl || key;
+          }).join(', ')
+        : '';
+
       const row = {
         _id: doc._id.toString(),
         status: doc.status,
+        defects: defectsText,
         dmc: doc.dmc,
         workplace: doc.workplace.toUpperCase(),
         type: doc.type,
