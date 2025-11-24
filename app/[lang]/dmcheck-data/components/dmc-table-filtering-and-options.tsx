@@ -9,13 +9,12 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { CircleX, FileSpreadsheet, Loader, Search } from 'lucide-react';
-import { CommandShortcut } from '@/components/ui/command';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { usePlatform } from '@/lib/hooks/use-platform';
 import { revalidateDmcheckTableData as revalidate } from '../actions';
 import PasteValuesDialog from './paste-values-dialog';
 import type { Dictionary } from '../lib/dict';
+import { getValueCount, getOneWeekAgo, getToday } from '../lib/utils';
 
 export default function DmcTableFilteringAndOptions({
   articles,
@@ -29,7 +28,6 @@ export default function DmcTableFilteringAndOptions({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isMac, isClient } = usePlatform();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -49,11 +47,11 @@ export default function DmcTableFilteringAndOptions({
   });
   const [fromFilter, setFromFilter] = useState<Date | null>(() => {
     const fromParam = searchParams?.get('from');
-    return fromParam ? new Date(fromParam) : null;
+    return fromParam ? new Date(fromParam) : getOneWeekAgo();
   });
   const [toFilter, setToFilter] = useState<Date | null>(() => {
     const toParam = searchParams?.get('to');
-    return toParam ? new Date(toParam) : null;
+    return toParam ? new Date(toParam) : getToday();
   });
   const [dmcFilter, setDmcFilter] = useState(searchParams?.get('dmc') || '');
   const [hydraFilter, setHydraFilter] = useState(
@@ -81,37 +79,8 @@ export default function DmcTableFilteringAndOptions({
       : [];
   });
 
-  // Helper function to count values
-  const getValueCount = (value: string) => {
-    if (!value.trim()) return 0;
-    return value
-      .split(',')
-      .map((v) => v.trim())
-      .filter((v) => v.length > 0).length;
-  };
-
   // Check if filters have been modified from their initial state
   const hasFilters = statusFilter.length > 0 || fromFilter || toFilter || dmcFilter || hydraFilter || palletFilter || workplaceFilter.length > 0 || articleFilter.length > 0;
-  
-  // Check if current filters match the URL params (use useMemo to prevent hydration issues)
-  const isRefresh = useMemo(() => {
-    if (!isClient) return true; // Default to refresh on server
-    
-    const currentParams = new URLSearchParams();
-    if (statusFilter.length > 0) currentParams.set('status', statusFilter.join(','));
-    if (fromFilter) currentParams.set('from', fromFilter.toISOString());
-    if (toFilter) currentParams.set('to', toFilter.toISOString());
-    if (dmcFilter) currentParams.set('dmc', dmcFilter);
-    if (hydraFilter) currentParams.set('hydra_batch', hydraFilter);
-    if (palletFilter) currentParams.set('pallet_batch', palletFilter);
-    if (workplaceFilter.length > 0)
-      currentParams.set('workplace', workplaceFilter.join(','));
-    if (articleFilter.length > 0)
-      currentParams.set('article', articleFilter.join(','));
-    
-    const filtersMatchUrl = currentParams.toString() === (searchParams?.toString() || '');
-    return !hasFilters || filtersMatchUrl;
-  }, [isClient, statusFilter, fromFilter, toFilter, dmcFilter, hydraFilter, palletFilter, workplaceFilter, articleFilter, searchParams, hasFilters]);
 
   const handleSearchClick = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -149,24 +118,7 @@ export default function DmcTableFilteringAndOptions({
     setIsPendingSearch
   ]);
 
-  useEffect(() => {
-    if (!isClient) return;
-    
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Command+Enter on macOS, Ctrl+Enter on Windows/Linux
-      if (event.key === 'Enter' && 
-          ((isMac && event.metaKey) ||
-           (!isMac && event.ctrlKey))) {
-        event.preventDefault();
-        handleSearchClick(event as any);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isClient, isMac, handleSearchClick]);
-
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setStatusFilter([]);
     setFromFilter(null);
     setToFilter(null);
@@ -180,9 +132,9 @@ export default function DmcTableFilteringAndOptions({
       setIsPendingSearch(true);
       router.push(pathname || '');
     }
-  };
+  }, [searchParams, pathname, router]);
 
-  const handleExportClick = async () => {
+  const handleExportClick = useCallback(async () => {
     setIsExporting(true);
     try {
       const params = new URLSearchParams(
@@ -227,7 +179,7 @@ export default function DmcTableFilteringAndOptions({
     } finally {
       setIsExporting(false);
     }
-  };
+  }, [statusFilter, fromFilter, toFilter, dmcFilter, hydraFilter, palletFilter, workplaceFilter, articleFilter]);
 
 
   const statusOptions = [
@@ -235,35 +187,44 @@ export default function DmcTableFilteringAndOptions({
     { value: 'pallet', label: dict.statusOptions.pallet },
     { value: 'warehouse', label: dict.statusOptions.warehouse },
     { value: 'rework', label: dict.statusOptions.rework },
+    { value: 'defect', label: dict.statusOptions.defect },
   ];
 
-  const workplaceOptions = Array.from(
-    new Set(articles.map((article) => article.workplace)),
-  ).map((workplace) => ({
-    value: workplace,
-    label: workplace.toUpperCase(),
-  }));
+  const workplaceOptions = useMemo(
+    () =>
+      Array.from(new Set(articles.map((article) => article.workplace))).map(
+        (workplace) => ({
+          value: workplace,
+          label: workplace.toUpperCase(),
+        }),
+      ),
+    [articles],
+  );
 
-  const articleOptions = articles
-    .filter(
-      (article) =>
-        workplaceFilter.length === 0 ||
-        workplaceFilter.includes(article.workplace),
-    )
-    .reduce((acc: { value: string; label: string }[], current) => {
-      const x = acc.find((item) => item.value === current.articleNumber);
-      if (!x) {
-        return acc.concat([
-          {
-            value: current.articleNumber,
-            label: `${current.articleNumber} - ${current.articleName}`,
-          },
-        ]);
-      } else {
-        return acc;
-      }
-    }, [])
-    .sort((a, b) => a.value.localeCompare(b.value));
+  const articleOptions = useMemo(
+    () =>
+      articles
+        .filter(
+          (article) =>
+            workplaceFilter.length === 0 ||
+            workplaceFilter.includes(article.workplace),
+        )
+        .reduce((acc: { value: string; label: string }[], current) => {
+          const x = acc.find((item) => item.value === current.articleNumber);
+          if (!x) {
+            return acc.concat([
+              {
+                value: current.articleNumber,
+                label: `${current.articleNumber} - ${current.articleName}`,
+              },
+            ]);
+          } else {
+            return acc;
+          }
+        }, [])
+        .sort((a, b) => a.value.localeCompare(b.value)),
+    [articles, workplaceFilter],
+  );
 
   return (
     <Card>
@@ -321,6 +282,8 @@ export default function DmcTableFilteringAndOptions({
                 placeholder={dict.filters.select}
                 searchPlaceholder={dict.filters.search}
                 emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
                 className='w-full'
               />
             </div>
@@ -334,6 +297,8 @@ export default function DmcTableFilteringAndOptions({
                 placeholder={dict.filters.select}
                 searchPlaceholder={dict.filters.search}
                 emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
                 className='w-full'
               />
             </div>
@@ -347,6 +312,8 @@ export default function DmcTableFilteringAndOptions({
                 placeholder={dict.filters.select}
                 searchPlaceholder={dict.filters.search}
                 emptyText={dict.filters.notFound}
+                clearLabel={dict.filters.clearFilter}
+                selectedLabel={dict.filters.selected}
                 className='w-full'
               />
             </div>
@@ -440,14 +407,14 @@ export default function DmcTableFilteringAndOptions({
           </div>
 
           {/* Row 4: Action buttons - Clear, Export to Excel, Search */}
-          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-4 sm:gap-4'>
+          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-3 sm:gap-4'>
             <Button
               type='button'
               variant='destructive'
               onClick={handleClearFilters}
               title={dict.filters.clearFilters}
               disabled={isPendingSearch}
-              className='order-3 w-full justify-start sm:order-1'
+              className='order-2 w-full sm:order-1'
             >
               <CircleX /> <span>{dict.filters.clear}</span>
             </Button>
@@ -455,7 +422,7 @@ export default function DmcTableFilteringAndOptions({
             <Button
               onClick={handleExportClick}
               disabled={isExporting || isPendingSearch}
-              className='order-2 w-full justify-start sm:order-2'
+              className='order-2 w-full sm:order-2'
             >
               {isExporting ? (
                 <Loader className='animate-spin' />
@@ -469,17 +436,14 @@ export default function DmcTableFilteringAndOptions({
               type='submit'
               variant='secondary'
               disabled={isPendingSearch}
-              className='order-1 w-full justify-start sm:order-3 sm:col-span-2'
+              className='order-1 w-full sm:order-3'
             >
               {isPendingSearch ? (
                 <Loader className='animate-spin' />
               ) : (
                 <Search />
               )}
-              <span>{isRefresh ? dict.filters.refresh : dict.filters.search_button}</span>
-              <CommandShortcut>
-                {isClient ? (isMac ? '⌘↵' : 'Ctrl+↵') : ''}
-              </CommandShortcut>
+              <span>{dict.filters.search_button}</span>
             </Button>
           </div>
         </form>

@@ -1,4 +1,5 @@
-import { DmcTableDataType } from '@/app/[lang]/dmcheck-data/lib/dmcheck-data-types';
+import { DmcTableDataType, DefectType } from '@/app/[lang]/dmcheck-data/lib/dmcheck-data-types';
+import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import type { Dictionary } from '../lib/dict';
 
@@ -11,13 +12,18 @@ function formatOperators(operator: string | string[] | undefined): string {
   return operator;
 }
 
-export function getDmcColumns(dict: Dictionary): ColumnDef<DmcTableDataType>[] {
+export function getDmcColumns(dict: Dictionary, defects: DefectType[], lang: string): ColumnDef<DmcTableDataType>[] {
   return [
     {
       accessorKey: 'status',
       header: dict.columns.status,
+      cell: ({ row }) => {
+        const status = row.original.status;
+        // Handle rework variants (rework, rework2, rework3, etc.)
+        const baseStatus = status.match(/^rework/) ? 'rework' : status;
+        return (dict.statusLabels as any)[baseStatus] || status;
+      },
     },
-
     {
       accessorKey: 'dmc',
       header: dict.columns.dmc,
@@ -89,6 +95,28 @@ export function getDmcColumns(dict: Dictionary): ColumnDef<DmcTableDataType>[] {
     {
       accessorKey: 'reworkTimeLocaleString',
       header: dict.columns.reworkTime,
+    },
+    {
+      accessorKey: 'defectKeys',
+      header: dict.columns.defects,
+      cell: ({ row }) => {
+        const defectKeys = row.original.defectKeys;
+        if (!defectKeys || defectKeys.length === 0) return null;
+
+        return (
+          <div className="flex gap-1">
+            {defectKeys.map((key) => {
+              const defect = defects.find((d) => d.key === key);
+              const label = defect?.translations[lang] || key;
+              return (
+                <Badge key={key} variant="destructive" className="text-xs whitespace-nowrap">
+                  {label}
+                </Badge>
+              );
+            })}
+          </div>
+        );
+      },
     },
   ];
 }

@@ -1,8 +1,10 @@
 {
   "title": "Dane DMCheck",
   "lastSync": "Ostatnia synchronizacja",
+  "defectsButton": "Wady",
   "columns": {
     "status": "Status",
+    "defects": "Wada",
     "dmc": "DMC",
     "time": "Czas",
     "article": "Artykuł",
@@ -36,15 +38,26 @@
     "pasteTitle": "Kliknij, aby wkleić wartości z Excel lub edytuj ręcznie",
     "clear": "Wyczyść",
     "clearFilters": "Wyczyść filtry",
+    "clearFilter": "wyczyść filtr",
+    "selected": "wybrano",
     "export": "Eksportuj",
     "search_button": "Szukaj",
-    "refresh": "Odśwież"
+    "refresh": "Odśwież",
+    "showOnlyDefects": "Pokaż tylko wady"
   },
   "statusOptions": {
-    "box": "box - zeskanowane",
-    "pallet": "pallet - potwierdzone etykietą hydra",
-    "warehouse": "warehouse - potwierdzone etykietą palety",
-    "rework": "rework - wszystkie próby przeróbki"
+    "box": "box",
+    "pallet": "pallet",
+    "warehouse": "magazyn",
+    "rework": "rework",
+    "defect": "wada"
+  },
+  "statusLabels": {
+    "box": "box",
+    "pallet": "pallet",
+    "warehouse": "magazyn",
+    "rework": "rework",
+    "defect": "wada"
   },
   "pasteDialog": {
     "manageTitle": "Zarządzaj wartościami",
@@ -67,5 +80,8 @@
   },
   "editDialog": {
     "save": "Zapisz"
+  },
+  "table": {
+    "noResults": "Brak wyników"
   }
 }

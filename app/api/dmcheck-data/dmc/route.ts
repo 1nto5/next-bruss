@@ -54,16 +54,22 @@ export async function GET(req: NextRequest) {
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
 
-      if (key === 'status' && values.includes('rework')) {
-        // Handle rework special case - match all rework attempts
-        const otherStatuses = values.filter((v) => v !== 'rework');
+      if (key === 'status' && (values.includes('rework') || values.includes('defect'))) {
+        // Handle rework and defect special cases
+        const otherStatuses = values.filter((v) => v !== 'rework' && v !== 'defect');
         const statusConditions = [];
 
         if (otherStatuses.length > 0) {
           statusConditions.push({ status: { $in: otherStatuses } });
         }
 
-        statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        if (values.includes('rework')) {
+          statusConditions.push({ status: { $regex: /^rework\d*$/ } });
+        }
+
+        if (values.includes('defect')) {
+          statusConditions.push({ status: 'defect' });
+        }
 
         if (statusConditions.length === 1) {
           Object.assign(query, statusConditions[0]);

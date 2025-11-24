@@ -1,8 +1,10 @@
 {
   "title": "DMCheck Daten",
   "lastSync": "Letzte Synchronisierung",
+  "defectsButton": "Mängel",
   "columns": {
     "status": "Status",
+    "defects": "Mängel",
     "dmc": "DMC",
     "time": "Zeit",
     "article": "Artikel",
@@ -36,15 +38,26 @@
     "pasteTitle": "Klicken Sie, um Werte aus Excel einzufügen oder manuell zu bearbeiten",
     "clear": "Löschen",
     "clearFilters": "Filter löschen",
+    "clearFilter": "filter löschen",
+    "selected": "ausgewählt",
     "export": "Exportieren",
     "search_button": "Suchen",
-    "refresh": "Aktualisieren"
+    "refresh": "Aktualisieren",
+    "showOnlyDefects": "Nur Mängel anzeigen"
   },
   "statusOptions": {
-    "box": "box - gescannt",
-    "pallet": "pallet - mit Hydra-Etikett bestätigt",
-    "warehouse": "warehouse - mit Paletten-Etikett bestätigt",
-    "rework": "rework - alle Nacharbeitsversuche"
+    "box": "box",
+    "pallet": "pallet",
+    "warehouse": "lager",
+    "rework": "nacharbeit",
+    "defect": "mangel"
+  },
+  "statusLabels": {
+    "box": "box",
+    "pallet": "pallet",
+    "warehouse": "lager",
+    "rework": "nacharbeit",
+    "defect": "mangel"
   },
   "pasteDialog": {
     "manageTitle": "Werte verwalten",
@@ -67,5 +80,8 @@
   },
   "editDialog": {
     "save": "Speichern"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse"
   }
 }

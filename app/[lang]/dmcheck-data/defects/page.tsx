@@ -1,23 +1,17 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Locale } from '@/lib/config/i18n';
-import DmcTableFilteringAndOptions from './components/dmc-table-filtering-and-options';
-import { DmcDataTable } from './dmc-table/dmc-data-table';
+import DefectsTableFiltering from './components/defects-table-filtering';
+import { DefectsDataTable } from './defects-table/defects-data-table';
 import { getDictionary } from './lib/dict';
-import { getArticles } from './lib/get-articles';
-import { getDefects } from './lib/get-defects';
-import { getScans } from './lib/get-scans';
+import { getDefectScans } from './lib/get-defect-scans';
+import { getArticles } from '../lib/get-articles';
+import { getDefects } from '../lib/get-defects';
 import LocalizedLink from '@/components/localized-link';
-import { AlertTriangle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
-export default async function InventoryPage(props: {
+export default async function DefectsPage(props: {
   params: Promise<{ lang: Locale }>;
-  // searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await props.params;
@@ -26,7 +20,7 @@ export default async function InventoryPage(props: {
   const { lang } = params;
 
   const dict = await getDictionary(lang);
-  const { fetchTime, fetchTimeLocaleString, data } = await getScans(searchParams);
+  const { fetchTime, fetchTimeLocaleString, data } = await getDefectScans(searchParams);
   const articles = await getArticles();
   const defects = await getDefects();
 
@@ -35,22 +29,23 @@ export default async function InventoryPage(props: {
       <CardHeader>
         <div className='flex items-center justify-between mb-4'>
           <CardTitle>{dict.title}</CardTitle>
-          <LocalizedLink href='/dmcheck-data/defects'>
+          <LocalizedLink href='/dmcheck-data'>
             <Button variant='outline'>
-              <AlertTriangle />
-              <span>{dict.defectsButton}</span>
+              <ArrowLeft />
+              <span>DMCheck Data</span>
             </Button>
           </LocalizedLink>
         </div>
-        <DmcTableFilteringAndOptions
+        <DefectsTableFiltering
           articles={articles}
+          defects={defects}
           fetchTime={fetchTime}
           dict={dict}
+          lang={lang}
         />
       </CardHeader>
-      <DmcDataTable
+      <DefectsDataTable
         data={data}
-        articles={articles}
         defects={defects}
         fetchTime={fetchTime}
         fetchTimeLocaleString={fetchTimeLocaleString}
