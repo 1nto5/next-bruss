@@ -11,16 +11,31 @@ import { generateNextInternalId } from './utils';
 /**
  * Insert new overtime submission
  * Available to all authenticated users
+ * HR/Admin can create on behalf of other users via onBehalfOf parameter
  */
 export async function insertOvertimeSubmission(
   data: OvertimeSubmissionType,
+  onBehalfOf?: string,
 ): Promise<{ success: 'inserted' } | { error: string }> {
   const session = await auth();
   if (!session || !session.user?.email) {
     redirectToAuth();
   }
   // TypeScript narrowing: session is guaranteed to be non-null after redirectToAuth()
-  const userEmail = session!.user!.email;
+  const userEmail = session!.user!.email as string;
+  const userRoles = session!.user!.roles ?? [];
+  const isHR = userRoles.includes('hr');
+  const isAdmin = userRoles.includes('admin');
+
+  // Determine submittedBy and createdBy based on role and onBehalfOf
+  let submittedBy = userEmail;
+  let createdBy: string | undefined;
+
+  if (onBehalfOf && (isHR || isAdmin)) {
+    submittedBy = onBehalfOf;
+    createdBy = userEmail;
+  }
+
   try {
     const coll = await dbc('overtime_submissions');
 
@@ -45,7 +60,8 @@ export async function insertOvertimeSubmission(
       status: 'pending', // Always set to pending for new submissions
       payment: data.payment ?? false,
       submittedAt: new Date(),
-      submittedBy: userEmail,
+      submittedBy,
+      ...(createdBy && { createdBy }),
       editedAt: new Date(),
       editedBy: userEmail,
     };
