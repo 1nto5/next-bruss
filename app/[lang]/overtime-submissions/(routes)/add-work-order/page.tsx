@@ -13,20 +13,26 @@ export default async function AddWorkOrderPage(props: {
   const params = await props.params;
   const { lang } = params;
   const dict = await getDictionary(lang);
-  const managers = await getUsers();
+  const users = await getUsers();
   const session = await auth();
   if (!session || !session.user?.email) {
     redirect(
       `/${lang}/auth?callbackUrl=${encodeURIComponent(`/overtime-submissions/add-work-order`)}`,
     );
   }
+
+  const userRoles = session.user?.roles ?? [];
+  const isHROrAdmin = userRoles.includes('hr') || userRoles.includes('admin');
+
   return (
     <AddWorkOrderForm
-      managers={managers}
+      managers={users}
+      users={users}
       loggedInUserEmail={session?.user?.email ?? ''}
       mode='new'
       dict={dict}
       lang={lang}
+      isHROrAdmin={isHROrAdmin}
     />
   );
 }

@@ -77,6 +77,15 @@ export async function GET(req: NextRequest) {
         ];
       }
 
+      // Not Orders filter - shows entries without payment and without scheduledDayOff
+      if (searchParams.get('notOrders') === 'true') {
+        filters.payment = false;
+        filters.$or = [
+          { scheduledDayOff: null },
+          { scheduledDayOff: { $exists: false } }
+        ];
+      }
+
       // Employee filter - for HR, Admin, and Managers
       if (searchParams.get('employee') && (isAdmin || isHR || isManager)) {
         const employees = searchParams.get('employee')!.split(',');
@@ -209,6 +218,13 @@ export async function GET(req: NextRequest) {
       } else {
         filters.supervisor = searchParams.get('manager');
       }
+    }
+
+    // Internal ID filter - partial/contains match (case-insensitive)
+    const idSearch = searchParams.get('id');
+    if (idSearch) {
+      // Search for internalId that contains the search term (case insensitive)
+      filters.internalId = { $regex: idSearch, $options: 'i' };
     }
 
     const submissions = await coll

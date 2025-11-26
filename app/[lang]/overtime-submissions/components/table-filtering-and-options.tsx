@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
 import { Switch } from '@/components/ui/switch';
@@ -30,6 +31,7 @@ export default function TableFilteringAndOptions({
   assignedToMePendingCount = 0,
   pendingSettlementsCount = 0,
   ordersCount = 0,
+  notOrdersCount = 0,
   onlyMySubmissionsCount = 0,
   dict,
 }: {
@@ -40,6 +42,7 @@ export default function TableFilteringAndOptions({
   assignedToMePendingCount?: number;
   pendingSettlementsCount?: number;
   ordersCount?: number;
+  notOrdersCount?: number;
   onlyMySubmissionsCount?: number;
   dict: Dictionary;
 }) {
@@ -102,6 +105,15 @@ export default function TableFilteringAndOptions({
     return param === 'true';
   });
 
+  const [notOrders, setNotOrders] = useState(() => {
+    const param = searchParams?.get('notOrders');
+    return param === 'true';
+  });
+
+  const [idFilter, setIdFilter] = useState(() => {
+    return searchParams?.get('id') || '';
+  });
+
   const handleOnlyMySubmissionsChange = (checked: boolean) => {
     setOnlyMySubmissions(checked);
     const params = new URLSearchParams(searchParams?.toString() || '');
@@ -143,8 +155,26 @@ export default function TableFilteringAndOptions({
     const params = new URLSearchParams(searchParams?.toString() || '');
     if (checked) {
       params.set('onlyOrders', 'true');
+      // Mutually exclusive with notOrders
+      params.delete('notOrders');
+      setNotOrders(false);
     } else {
       params.delete('onlyOrders');
+    }
+    setIsPendingSearch(true);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleNotOrdersChange = (checked: boolean) => {
+    setNotOrders(checked);
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (checked) {
+      params.set('notOrders', 'true');
+      // Mutually exclusive with onlyOrders
+      params.delete('onlyOrders');
+      setOnlyOrders(false);
+    } else {
+      params.delete('notOrders');
     }
     setIsPendingSearch(true);
     router.push(`${pathname}?${params.toString()}`);
@@ -345,6 +375,9 @@ export default function TableFilteringAndOptions({
     setOnlyMySubmissions(false);
     setAssignedToMe(false);
     setOnlyPendingSettlements(false);
+    setOnlyOrders(false);
+    setNotOrders(false);
+    setIdFilter('');
     if (searchParams?.toString()) {
       setIsPendingSearch(true);
       router.push(pathname || '');
@@ -391,6 +424,9 @@ export default function TableFilteringAndOptions({
     if (onlyMySubmissions) params.set('onlyMySubmissions', 'true');
     if (assignedToMe) params.set('assignedToMe', 'true');
     if (onlyPendingSettlements) params.set('pendingSettlements', 'true');
+    if (onlyOrders) params.set('onlyOrders', 'true');
+    if (notOrders) params.set('notOrders', 'true');
+    if (idFilter) params.set('id', idFilter);
     const newUrl = `${pathname}?${params.toString()}`;
     if (newUrl !== `${pathname}?${searchParams?.toString()}`) {
       setIsPendingSearch(true);
@@ -431,6 +467,8 @@ export default function TableFilteringAndOptions({
     assignedToMe ||
     onlyPendingSettlements ||
     onlyOrders ||
+    notOrders ||
+    idFilter ||
     searchParams?.toString() // Enable buttons if there are URL params to clear
   );
 
@@ -443,6 +481,17 @@ export default function TableFilteringAndOptions({
     <Card>
       <CardHeader className='p-4'>
         <div className='flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 sm:flex-wrap'>
+          <div className='flex items-center space-x-2'>
+            <Switch
+              id='overtime-only'
+              checked={notOrders}
+              onCheckedChange={handleNotOrdersChange}
+            />
+            <Label htmlFor='overtime-only'>
+              {dict.filters.overtimeOnly || 'Overtime'}
+              {notOrdersCount > 0 && ` (${notOrdersCount})`}
+            </Label>
+          </div>
           <div className='flex items-center space-x-2'>
             <Switch
               id='only-orders'
@@ -515,8 +564,18 @@ export default function TableFilteringAndOptions({
         <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
             {hasAdvancedFilters ? (
               <>
-                {/* Row 1: Status, Employee (conditional), Manager (conditional) */}
-                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+                {/* Row 1: ID, Status, Employee (conditional), Manager (conditional) */}
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                  <div className='flex flex-col space-y-1'>
+                    <Label>{dict.filters.id || 'ID'}</Label>
+                    <Input
+                      value={idFilter}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setIdFilter(e.target.value)
+                      }
+                      className='w-full'
+                    />
+                  </div>
                   <div className='flex flex-col space-y-1'>
                     <Label>{dict.filters.status}</Label>
                     <MultiSelect

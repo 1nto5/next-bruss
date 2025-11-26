@@ -144,7 +144,9 @@ export default async function OvertimePage(props: {
     searchParams.onlyMySubmissions ||
     searchParams.assignedToMe ||
     searchParams.pendingSettlements ||
-    searchParams.onlyOrders
+    searchParams.onlyOrders ||
+    searchParams.notOrders ||
+    searchParams.id
   );
 
   // Check if there are filters OTHER than the toggle switches (onlyMySubmissions, assignedToMe, pendingSettlements)
@@ -175,7 +177,9 @@ export default async function OvertimePage(props: {
     !searchParams.manager &&
     !searchParams.assignedToMe &&
     !searchParams.pendingSettlements &&
-    !searchParams.onlyOrders
+    !searchParams.onlyOrders &&
+    !searchParams.notOrders &&
+    !searchParams.id
   );
 
   const showBothCards = Boolean(
@@ -188,7 +192,9 @@ export default async function OvertimePage(props: {
           !searchParams.onlyMySubmissions &&
           !searchParams.assignedToMe &&
           !searchParams.pendingSettlements &&
-          !searchParams.onlyOrders)),
+          !searchParams.onlyOrders &&
+          !searchParams.notOrders &&
+          !searchParams.id)),
   );
 
   // Calculate counts from filtered submissions to respect active filters
@@ -210,6 +216,10 @@ export default async function OvertimePage(props: {
     (s) => s.payment || s.scheduledDayOff,
   ).length;
 
+  const notOrdersCount = overtimeSubmissionsLocaleString.filter(
+    (s) => !s.payment && !s.scheduledDayOff,
+  ).length;
+
   const onlyMySubmissionsCount = overtimeSubmissionsLocaleString.filter(
     (s) => s.submittedBy === session.user.email,
   ).length;
@@ -222,7 +232,9 @@ export default async function OvertimePage(props: {
     !searchParams.onlyMySubmissions &&
     !searchParams.assignedToMe &&
     !searchParams.pendingSettlements &&
-    !searchParams.onlyOrders;
+    !searchParams.onlyOrders &&
+    !searchParams.notOrders &&
+    !searchParams.id;
 
   const selectedEmployeeEmail = isSingleEmployee ? selectedEmployee : null;
   const onlyMySubmissions = searchParams.onlyMySubmissions === 'true';
@@ -270,6 +282,7 @@ export default async function OvertimePage(props: {
           assignedToMePendingCount={assignedToMePendingCount}
           pendingSettlementsCount={pendingSettlementsCount}
           ordersCount={ordersCount}
+          notOrdersCount={notOrdersCount}
           onlyMySubmissionsCount={onlyMySubmissionsCount}
           dict={dict}
         />

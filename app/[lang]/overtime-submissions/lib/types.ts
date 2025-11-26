@@ -65,6 +65,7 @@ export type OvertimeSubmissionType = {
   status: OvertimeStatus;
   submittedAt: Date;
   submittedBy: string; // Email of the employee who submitted
+  createdBy?: string; // Email of HR/Admin who created on behalf of employee (undefined if self-submitted)
   editedAt?: Date;
   editedBy?: string;
   rejectedAt?: Date;

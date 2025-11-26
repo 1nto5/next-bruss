@@ -213,6 +213,19 @@ export default async function OvertimeSubmissionDetailsPage(props: {
                       </TableCell>
                     </TableRow>
 
+                    {/* Show createdBy when submission was created on behalf of someone */}
+                    {submission.createdBy &&
+                      submission.createdBy !== submission.submittedBy && (
+                        <TableRow>
+                          <TableCell className='font-medium'>
+                            {dict.form.createdBy}
+                          </TableCell>
+                          <TableCell>
+                            {extractNameFromEmail(submission.createdBy)}
+                          </TableCell>
+                        </TableRow>
+                      )}
+
                     <TableRow>
                       <TableCell className='font-medium'>
                         {dict.detailsPage.supervisor}
