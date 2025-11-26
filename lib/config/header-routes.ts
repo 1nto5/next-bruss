@@ -17,6 +17,7 @@ export const ROUTE_PATHS = {
   inw2zatwierdz: '/inw-2/zatwierdz',
 
   newsAdd: '/news/add',
+  itInventory: '/it-inventory',
   overtimeProduction: '/production-overtime',
   overtimeOrders: '/overtime-orders',
   overtimeSubmissions: '/overtime-submissions',
@@ -174,6 +175,10 @@ export const adminHeaderRoutes: HeaderRoute[] = [
     title: 'Admin',
     href: '',
     submenu: [
+      {
+        href: ROUTE_PATHS.itInventory,
+        title: 'IT Inventory',
+      },
       {
         href: ROUTE_PATHS.projects,
         title: 'Projects',

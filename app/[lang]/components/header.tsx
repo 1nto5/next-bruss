@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 
-import { auth, signOut } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Logo from '@/components/ui/logo';
 import {
@@ -28,7 +28,8 @@ import {
 import { getInitialsFromEmail } from '@/lib/utils/name-format';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Locale } from '@/lib/config/i18n';
-import { LogIn, LogOut, Menu } from 'lucide-react';
+import { LogIn, Menu } from 'lucide-react';
+import { LogoutButton } from './logout-button';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react';
@@ -132,16 +133,7 @@ export default async function Header({ dict, lang }: HeaderProps) {
                   </AvatarFallback>
                 </Avatar>
               )}
-              <form
-                action={async () => {
-                  'use server';
-                  await signOut({ redirectTo: `/${lang}` });
-                }}
-              >
-                <Button variant={'ghost'} size='icon'>
-                  <LogOut />
-                </Button>
-              </form>
+              <LogoutButton lang={lang} />
             </>
           ) : (
             <form

@@ -1,29 +1,100 @@
 import { dbc } from '@/lib/db/mongo';
 import { NextResponse, type NextRequest } from 'next/server';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
+// Allowlists for valid values
+const VALID_CATEGORIES = [
+  'notebook',
+  'workstation',
+  'monitor',
+  'iphone',
+  'android',
+  'printer',
+  'label-printer',
+  'portable-scanner',
+] as const;
+
+const VALID_STATUSES = [
+  'in-use',
+  'in-stock',
+  'damaged',
+  'to-dispose',
+  'disposed',
+  'to-review',
+  'to-repair',
+] as const;
+
+const VALID_ASSIGNMENT_STATUSES = ['assigned', 'unassigned'] as const;
+
+// Zod schema for query params validation
+const queryParamsSchema = z.object({
+  category: z.array(z.enum(VALID_CATEGORIES)).optional(),
+  status: z.array(z.enum(VALID_STATUSES)).optional(),
+  assignmentStatus: z.enum(VALID_ASSIGNMENT_STATUSES).optional(),
+  purchaseDateFrom: z.string().optional(),
+  purchaseDateTo: z.string().optional(),
+  assignmentDateFrom: z.string().optional(),
+  assignmentDateTo: z.string().optional(),
+  search: z
+    .string()
+    .max(100)
+    .regex(/^[a-zA-Z0-9\s\-_.]+$/, 'Invalid search characters')
+    .optional(),
+});
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
-  const query: any = {};
 
-  // Multi-select filters
-  if (searchParams.has('category')) {
-    const categories = searchParams.getAll('category');
-    query.category = categories.length === 1 ? categories[0] : { $in: categories };
+  // Parse and validate query params
+  const rawParams = {
+    category: searchParams.has('category')
+      ? searchParams.getAll('category')
+      : undefined,
+    status: searchParams.has('status')
+      ? searchParams.getAll('status')
+      : undefined,
+    assignmentStatus: searchParams.get('assignmentStatus') ?? undefined,
+    purchaseDateFrom: searchParams.get('purchaseDateFrom') ?? undefined,
+    purchaseDateTo: searchParams.get('purchaseDateTo') ?? undefined,
+    assignmentDateFrom: searchParams.get('assignmentDateFrom') ?? undefined,
+    assignmentDateTo: searchParams.get('assignmentDateTo') ?? undefined,
+    search: searchParams.get('search') ?? undefined,
+  };
+
+  const parsed = queryParamsSchema.safeParse(rawParams);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid query parameters', details: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
-  if (searchParams.has('status')) {
-    const statuses = searchParams.getAll('status');
-    query.statuses = statuses.length === 1 ? statuses[0] : { $in: statuses };
+  const params = parsed.data;
+  const query: Record<string, unknown> = {};
+
+  // Category filter (validated)
+  if (params.category && params.category.length > 0) {
+    query.category =
+      params.category.length === 1 ? params.category[0] : { $in: params.category };
   }
 
-  // Assignment status filter
-  if (searchParams.has('assignmentStatus')) {
-    const assignmentStatus = searchParams.get('assignmentStatus');
-    if (assignmentStatus === 'assigned') {
+  // Status filter (validated)
+  if (params.status && params.status.length > 0) {
+    query.statuses =
+      params.status.length === 1 ? params.status[0] : { $in: params.status };
+  }
+
+  // Assignment status filter (validated)
+  if (params.assignmentStatus) {
+    if (params.assignmentStatus === 'assigned') {
       query.currentAssignment = { $exists: true, $ne: null };
-    } else if (assignmentStatus === 'unassigned') {
+    } else {
       query.$or = [
         { currentAssignment: { $exists: false } },
         { currentAssignment: null },
@@ -31,36 +102,36 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Purchase date range filter
-  if (searchParams.has('purchaseDateFrom') || searchParams.has('purchaseDateTo')) {
+  // Purchase date range filter (validated dates)
+  if (params.purchaseDateFrom || params.purchaseDateTo) {
     query.purchaseDate = {};
-    if (searchParams.has('purchaseDateFrom')) {
-      query.purchaseDate.$gte = new Date(searchParams.get('purchaseDateFrom')!);
+    if (params.purchaseDateFrom) {
+      (query.purchaseDate as any).$gte = new Date(params.purchaseDateFrom);
     }
-    if (searchParams.has('purchaseDateTo')) {
-      query.purchaseDate.$lte = new Date(searchParams.get('purchaseDateTo')!);
+    if (params.purchaseDateTo) {
+      (query.purchaseDate as any).$lte = new Date(params.purchaseDateTo);
     }
   }
 
-  // Assignment date range filter
-  if (searchParams.has('assignmentDateFrom') || searchParams.has('assignmentDateTo')) {
+  // Assignment date range filter (validated dates)
+  if (params.assignmentDateFrom || params.assignmentDateTo) {
     query['currentAssignment.assignedAt'] = {};
-    if (searchParams.has('assignmentDateFrom')) {
-      query['currentAssignment.assignedAt'].$gte = new Date(
-        searchParams.get('assignmentDateFrom')!,
+    if (params.assignmentDateFrom) {
+      (query['currentAssignment.assignedAt'] as any).$gte = new Date(
+        params.assignmentDateFrom,
       );
     }
-    if (searchParams.has('assignmentDateTo')) {
-      query['currentAssignment.assignedAt'].$lte = new Date(
-        searchParams.get('assignmentDateTo')!,
+    if (params.assignmentDateTo) {
+      (query['currentAssignment.assignedAt'] as any).$lte = new Date(
+        params.assignmentDateTo,
       );
     }
   }
 
-  // Text search filter
-  if (searchParams.has('search')) {
-    const search = searchParams.get('search')!;
-    const searchRegex = new RegExp(search, 'i');
+  // Text search filter (validated and escaped)
+  if (params.search) {
+    const escapedSearch = escapeRegex(params.search);
+    const searchRegex = new RegExp(escapedSearch, 'i');
     query.$or = [
       { assetId: searchRegex },
       { serialNumber: searchRegex },
