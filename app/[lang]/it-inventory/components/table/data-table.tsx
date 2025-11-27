@@ -22,17 +22,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { CardContent } from '@/components/ui/card';
-import { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Session } from 'next-auth';
 import { Dictionary } from '../../lib/dict';
 import { ITInventoryItem } from '../../lib/types';
 import BulkActions from '../bulk-actions';
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: (session: Session | null, dict: Dictionary, lang: string) => ColumnDef<TData, TValue>[];
   data: TData[];
   session: Session | null;
   dict: Dictionary;
+  lang: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,11 +41,18 @@ export function DataTable<TData, TValue>({
   data,
   session,
   dict,
+  lang,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+
+  // Create columns using useMemo
+  const tableColumns = React.useMemo(
+    () => columns(session, dict, lang),
+    [columns, session, dict, lang],
+  );
 
   // Check IT/Admin role for bulk actions
   const hasITRole = session?.user?.roles?.includes('it');
@@ -53,7 +61,7 @@ export function DataTable<TData, TValue>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -76,7 +84,7 @@ export function DataTable<TData, TValue>({
   });
 
   // Reset row selection when data changes
-  useEffect(() => {
+  React.useEffect(() => {
     setRowSelection({});
   }, [data]);
 
@@ -133,7 +141,7 @@ export function DataTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={tableColumns.length}
                     className='h-24 text-center'
                   >
                     {dict.table.noResults}

@@ -17,7 +17,13 @@ export default function InventoryTableWrapper({
   dict: Dictionary;
   lang: string;
 }) {
-  const columns = createColumns(session, dict, lang);
-
-  return <DataTable columns={columns} data={items} session={session} dict={dict} />;
+  return (
+    <DataTable
+      columns={createColumns}
+      data={items}
+      session={session}
+      dict={dict}
+      lang={lang}
+    />
+  );
 }
