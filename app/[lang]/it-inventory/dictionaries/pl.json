@@ -1,0 +1,240 @@
+{
+  "title": "Inwentaryzacja sprzętu IT",
+  "page": {
+    "title": "Inwentaryzacja sprzętu IT",
+    "newItem": "Dodaj wpis",
+    "login": "Zaloguj się"
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "clear": "Wyczyść",
+    "search": "Szukaj",
+    "select": "wybierz",
+    "save": "Zapisz",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "assign": "Przypisz",
+    "unassign": "Usuń przypisanie",
+    "details": "Szczegóły",
+    "back": "Powrót",
+    "saveAndAddAnother": "Zapisz i dodaj kolejny"
+  },
+  "table": {
+    "noResults": "Brak wyników.",
+    "columns": {
+      "assetId": "ID",
+      "category": "Kategoria",
+      "manufacturer": "Producent",
+      "model": "Model",
+      "serialNumber": "Numer seryjny",
+      "statuses": "Statusy",
+      "currentAssignment": "Przypisanie",
+      "purchaseDate": "Data zakupu",
+      "lastReview": "Ostatni przegląd",
+      "actions": "Akcje"
+    }
+  },
+  "categories": {
+    "notebook": "Notebook",
+    "workstation": "Komputer",
+    "monitor": "Monitor",
+    "iphone": "iPhone",
+    "android": "Android",
+    "printer": "Drukarka",
+    "label-printer": "Drukarka etykiet",
+    "portable-scanner": "Skaner przenośny"
+  },
+  "statuses": {
+    "in-use": "W użyciu",
+    "in-stock": "Na stanie",
+    "damaged": "Uszkodzone",
+    "to-dispose": "Do utylizacji",
+    "disposed": "Zutylizowane",
+    "to-review": "Do przeglądu",
+    "to-repair": "Do naprawy"
+  },
+  "connectionTypes": {
+    "USB": "USB",
+    "Network": "Sieć",
+    "Bluetooth": "Bluetooth",
+    "WiFi": "WiFi"
+  },
+  "filters": {
+    "title": "Filtry",
+    "category": "Kategoria",
+    "status": "Status",
+    "assignment": "Przypisanie",
+    "manufacturer": "Producent",
+    "purchaseDate": "Data zakupu",
+    "purchaseDateFrom": "Data zakupu (Od)",
+    "purchaseDateTo": "Data zakupu (Do)",
+    "assignmentDate": "Data przypisania",
+    "assignmentDateFrom": "Data przypisania (Od)",
+    "assignmentDateTo": "Data przypisania (Do)",
+    "assignmentOptions": {
+      "all": "Wszystkie",
+      "assigned": "Przypisane",
+      "unassigned": "Nieprzypisane"
+    }
+  },
+  "summary": {
+    "totalItems": "Wszystkie sprzęty",
+    "allEquipment": "wszystkie urządzenia",
+    "assigned": "Przypisane",
+    "inUse": "w użyciu",
+    "unassigned": "Nieprzypisane",
+    "available": "dostępne",
+    "byCategory": "Według kategorii",
+    "phones": "Telefony",
+    "printers": "Drukarki/Skanery"
+  },
+  "form": {
+    "newItem": {
+      "title": "Dodaj nowy sprzęt",
+      "inventoryTable": "Tabela inwentaryzacji",
+      "category": "Kategoria",
+      "assetNumber": "ID",
+      "manufacturer": "Producent",
+      "model": "Model",
+      "serialNumber": "Numer seryjny",
+      "purchaseDate": "Data zakupu",
+      "lastReview": "Ostatni przegląd",
+      "statuses": "Statusy",
+      "connectionType": "Typ połączenia",
+      "ipAddress": "Adres IP",
+      "notes": "Notatki"
+    },
+    "editItem": {
+      "title": "Edytuj sprzęt",
+      "backToItem": "Powrót do sprzętu",
+      "inventoryTable": "Tabela inwentaryzacji"
+    },
+    "assign": {
+      "title": "Przypisz sprzęt",
+      "inventoryTable": "Tabela inwentaryzacji",
+      "assignmentType": "Typ przypisania",
+      "assignToEmployee": "Pracownik",
+      "assignToCustom": "Inne (pomieszczenie, biuro, itp.)",
+      "employee": "Pracownik",
+      "customName": "Nazwa (pomieszczenie, biuro, itp.)",
+      "customNamePlaceholder": "np. Sala konferencyjna, Biuro 101...",
+      "assignedAt": "Data przypisania",
+      "reason": "Powód / Notatka",
+      "searchPlaceholder": "Wyszukaj pracownika...",
+      "statusChangeConfirmTitle": "Zmiana statusu",
+      "statusChangeConfirmMessage": "Ten sprzęt ma status 'na stanie'. Przypisanie spowoduje usunięcie statusu 'na stanie' i dodanie statusu 'w użyciu'. Kontynuować?",
+      "statusChangeConfirm": "Tak, przypisz",
+      "statusChangeCancel": "Anuluj"
+    },
+    "unassign": {
+      "title": "Usuń przypisanie",
+      "inventoryTable": "Tabela inwentaryzacji",
+      "description": "Czy na pewno chcesz usunąć przypisanie tego sprzętu: {employeeName}?",
+      "reason": "Powód / Notatka",
+      "newStatuses": "Nowe statusy",
+      "statusesDescription": "Wybierz statusy dla sprzętu po usunięciu przypisania"
+    }
+  },
+  "validation": {
+    "categoryRequired": "Wybierz kategorię!",
+    "assetNumberRequired": "Numer inwentarzowy jest wymagany!",
+    "manufacturerRequired": "Producent jest wymagany!",
+    "modelRequired": "Model jest wymagany!",
+    "serialNumberRequired": "Numer seryjny jest wymagany!",
+    "purchaseDateRequired": "Wybierz datę zakupu!",
+    "purchaseDateFuture": "Data zakupu nie może być w przyszłości!",
+    "statusesMinOne": "Wybierz co najmniej jeden status!",
+    "connectionTypeRequired": "Typ połączenia jest wymagany dla drukarek i skanerów!",
+    "ipAddressInvalid": "Nieprawidłowy adres IP!",
+    "employeeRequired": "Wybierz pracownika!",
+    "customNameRequired": "Wprowadź nazwę!",
+    "assignmentDateRequired": "Wybierz datę przypisania!",
+    "assignmentDateFuture": "Data przypisania nie może być w przyszłości!",
+    "reasonOptional": "Powód jest opcjonalny",
+    "statusesRequiredForUnassign": "Wybierz co najmniej jeden status!",
+    "cannotHaveNaStanieWhenAssigned": "Nie można ustawić statusu 'na stanie' dla przypisanego sprzętu"
+  },
+  "details": {
+    "title": "Szczegóły sprzętu",
+    "basicInfo": "Informacje podstawowe",
+    "assetId": "ID",
+    "category": "Kategoria",
+    "manufacturer": "Producent",
+    "model": "Model",
+    "serialNumber": "Numer seryjny",
+    "purchaseDate": "Data zakupu",
+    "lastReview": "Ostatni przegląd",
+    "statuses": "Statusy",
+    "connectionType": "Typ połączenia",
+    "ipAddress": "Adres IP",
+    "notes": "Notatki",
+    "currentAssignment": "Obecne przypisanie",
+    "assignedTo": "Przypisane do",
+    "assignedAt": "Data przypisania",
+    "assignedBy": "Przypisane przez",
+    "unassigned": "Nieprzypisane",
+    "assignmentHistory": "Historia przypisań",
+    "noHistory": "Brak historii przypisań",
+    "employee": "Pracownik",
+    "assigned": "Przypisano",
+    "unassignedOn": "Usunięto przypisanie",
+    "reason": "Powód",
+    "audit": "Historia zmian",
+    "createdAt": "Utworzono",
+    "createdBy": "Utworzył",
+    "editedAt": "Zmodyfikowano",
+    "editedBy": "Zmodyfikował"
+  },
+  "dialogs": {
+    "delete": {
+      "title": "Usunąć sprzęt?",
+      "description": "Czy na pewno chcesz TRWALE usunąć ten sprzęt? Tej operacji nie można cofnąć.",
+      "cancelButton": "Nie, zachowaj",
+      "confirmButton": "Tak, usuń",
+      "deleting": "Usuwanie sprzętu...",
+      "deleted": "Sprzęt został usunięty!"
+    },
+    "bulkDelete": {
+      "title": "Usunąć zaznaczone sprzęty?",
+      "description": "Czy na pewno chcesz TRWALE usunąć {count} zaznaczonych sprzętów? Tej operacji nie można cofnąć.",
+      "confirmButton": "Tak, usuń wszystkie"
+    }
+  },
+  "bulk": {
+    "selected": "zaznaczono",
+    "actions": "Akcje",
+    "updateStatuses": "Aktualizuj statusy",
+    "deleteItems": "Usuń zaznaczone",
+    "updateStatusesTitle": "Aktualizacja statusów",
+    "updateStatusesDescription": "Zaktualizuj statusy dla {count} zaznaczonych sprzętów.",
+    "deleteTitle": "Usunąć zaznaczone sprzęty?",
+    "deleteDescription": "Czy na pewno chcesz TRWALE usunąć {count} zaznaczonych sprzętów? Tej operacji nie można cofnąć.",
+    "more": "więcej",
+    "confirmDelete": "Tak, usuń wszystkie",
+    "selectStatus": "Wybierz co najmniej jeden status",
+    "updating": "Aktualizacja statusów...",
+    "updated": "Statusy zostały zaktualizowane!",
+    "deleting": "Usuwanie sprzętów...",
+    "deleted": "Sprzęty zostały usunięte!",
+    "deleteFailed": "Nie udało się usunąć sprzętów",
+    "partialDelete": "Częściowo usunięto"
+  },
+  "toast": {
+    "loading": "Zapisuję zmiany...",
+    "success": "Zmiany zapisane!",
+    "error": "Wystąpił błąd!",
+    "unauthorized": "Nie masz uprawnień!",
+    "notFound": "Nie znaleziono!",
+    "contactIT": "Skontaktuj się z IT!",
+    "itemCreated": "Sprzęt został dodany!",
+    "itemUpdated": "Sprzęt został zaktualizowany!",
+    "itemDeleted": "Sprzęt został usunięty!",
+    "assigned": "Sprzęt został przypisany!",
+    "unassigned": "Usunięto przypisanie sprzętu!",
+    "bulkDeleted": "Usunięto {count} sprzętów!",
+    "bulkStatusUpdated": "Zaktualizowano statusy dla {count} sprzętów!",
+    "statusesChanged": "Statusy zostały zmienione",
+    "bulkUpdateSkipped": "Pominięto {count} sprzętów (przypisanych z konfliktem statusu)"
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "title": "IT Equipment Inventory",
+  "page": {
+    "title": "IT Equipment Inventory",
+    "newItem": "Add Entry",
+    "login": "Log In"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "clear": "Clear",
+    "search": "Search",
+    "select": "select",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "assign": "Assign",
+    "unassign": "Unassign",
+    "details": "Details",
+    "back": "Back",
+    "saveAndAddAnother": "Save and Add Another"
+  },
+  "table": {
+    "noResults": "No results.",
+    "columns": {
+      "assetId": "ID",
+      "category": "Category",
+      "manufacturer": "Manufacturer",
+      "model": "Model",
+      "serialNumber": "Serial Number",
+      "statuses": "Statuses",
+      "currentAssignment": "Assignment",
+      "purchaseDate": "Purchase Date",
+      "lastReview": "Last Review",
+      "actions": "Actions"
+    }
+  },
+  "categories": {
+    "notebook": "Notebook",
+    "workstation": "Workstation",
+    "monitor": "Monitor",
+    "iphone": "iPhone",
+    "android": "Android",
+    "printer": "Printer",
+    "label-printer": "Label Printer",
+    "portable-scanner": "Portable Scanner"
+  },
+  "statuses": {
+    "in-use": "In Use",
+    "in-stock": "In Stock",
+    "damaged": "Damaged",
+    "to-dispose": "To Dispose",
+    "disposed": "Disposed",
+    "to-review": "To Review",
+    "to-repair": "To Repair"
+  },
+  "connectionTypes": {
+    "USB": "USB",
+    "Network": "Network",
+    "Bluetooth": "Bluetooth",
+    "WiFi": "WiFi"
+  },
+  "filters": {
+    "title": "Filters",
+    "category": "Category",
+    "status": "Status",
+    "assignment": "Assignment",
+    "manufacturer": "Manufacturer",
+    "purchaseDate": "Purchase Date",
+    "purchaseDateFrom": "Purchase Date (From)",
+    "purchaseDateTo": "Purchase Date (To)",
+    "assignmentDate": "Assignment Date",
+    "assignmentDateFrom": "Assignment Date (From)",
+    "assignmentDateTo": "Assignment Date (To)",
+    "assignmentOptions": {
+      "all": "All",
+      "assigned": "Assigned",
+      "unassigned": "Unassigned"
+    }
+  },
+  "summary": {
+    "totalItems": "Total Items",
+    "allEquipment": "all equipment",
+    "assigned": "Assigned",
+    "inUse": "in use",
+    "unassigned": "Unassigned",
+    "available": "available",
+    "byCategory": "By Category",
+    "phones": "Phones",
+    "printers": "Printers/Scanners"
+  },
+  "form": {
+    "newItem": {
+      "title": "Add New Equipment",
+      "inventoryTable": "Inventory Table",
+      "category": "Category",
+      "assetNumber": "ID",
+      "manufacturer": "Manufacturer",
+      "model": "Model",
+      "serialNumber": "Serial Number",
+      "purchaseDate": "Purchase Date",
+      "lastReview": "Last Review",
+      "statuses": "Statuses",
+      "connectionType": "Connection Type",
+      "ipAddress": "IP Address",
+      "notes": "Notes"
+    },
+    "editItem": {
+      "title": "Edit Equipment",
+      "backToItem": "Back to Equipment",
+      "inventoryTable": "Inventory Table"
+    },
+    "assign": {
+      "title": "Assign Equipment",
+      "inventoryTable": "Inventory Table",
+      "assignmentType": "Assignment Type",
+      "assignToEmployee": "Employee",
+      "assignToCustom": "Other (room, office, etc.)",
+      "employee": "Employee",
+      "customName": "Name (room, office, etc.)",
+      "customNamePlaceholder": "e.g. Conference Room, Office 101...",
+      "assignedAt": "Assignment Date",
+      "reason": "Reason / Note",
+      "searchPlaceholder": "Search employee...",
+      "statusChangeConfirmTitle": "Status Change",
+      "statusChangeConfirmMessage": "This equipment has 'In Stock' status. Assignment will remove 'In Stock' and add 'In Use' status. Continue?",
+      "statusChangeConfirm": "Yes, assign",
+      "statusChangeCancel": "Cancel"
+    },
+    "unassign": {
+      "title": "Unassign Equipment",
+      "inventoryTable": "Inventory Table",
+      "description": "Are you sure you want to unassign this equipment: {employeeName}?",
+      "reason": "Reason / Note",
+      "newStatuses": "New Statuses",
+      "statusesDescription": "Select statuses for the equipment after unassignment"
+    }
+  },
+  "validation": {
+    "categoryRequired": "Select a category!",
+    "assetNumberRequired": "Asset number is required!",
+    "manufacturerRequired": "Manufacturer is required!",
+    "modelRequired": "Model is required!",
+    "serialNumberRequired": "Serial number is required!",
+    "purchaseDateRequired": "Select purchase date!",
+    "purchaseDateFuture": "Purchase date cannot be in the future!",
+    "statusesMinOne": "Select at least one status!",
+    "connectionTypeRequired": "Connection type is required for printers and scanners!",
+    "ipAddressInvalid": "Invalid IP address!",
+    "employeeRequired": "Select an employee!",
+    "customNameRequired": "Enter a name!",
+    "assignmentDateRequired": "Select assignment date!",
+    "assignmentDateFuture": "Assignment date cannot be in the future!",
+    "reasonOptional": "Reason is optional",
+    "statusesRequiredForUnassign": "Select at least one status!",
+    "cannotHaveNaStanieWhenAssigned": "Cannot set 'In Stock' status for assigned equipment"
+  },
+  "details": {
+    "title": "Equipment Details",
+    "basicInfo": "Basic Information",
+    "assetId": "ID",
+    "category": "Category",
+    "manufacturer": "Manufacturer",
+    "model": "Model",
+    "serialNumber": "Serial Number",
+    "purchaseDate": "Purchase Date",
+    "lastReview": "Last Review",
+    "statuses": "Statuses",
+    "connectionType": "Connection Type",
+    "ipAddress": "IP Address",
+    "notes": "Notes",
+    "currentAssignment": "Current Assignment",
+    "assignedTo": "Assigned To",
+    "assignedAt": "Assignment Date",
+    "assignedBy": "Assigned By",
+    "unassigned": "Unassigned",
+    "assignmentHistory": "Assignment History",
+    "noHistory": "No assignment history",
+    "employee": "Employee",
+    "assigned": "Assigned",
+    "unassignedOn": "Unassigned",
+    "reason": "Reason",
+    "audit": "Change History",
+    "createdAt": "Created At",
+    "createdBy": "Created By",
+    "editedAt": "Modified At",
+    "editedBy": "Modified By"
+  },
+  "dialogs": {
+    "delete": {
+      "title": "Delete Equipment?",
+      "description": "Are you sure you want to PERMANENTLY delete this equipment? This action cannot be undone.",
+      "cancelButton": "No, keep it",
+      "confirmButton": "Yes, delete",
+      "deleting": "Deleting equipment...",
+      "deleted": "Equipment has been deleted!"
+    },
+    "bulkDelete": {
+      "title": "Delete Selected Equipment?",
+      "description": "Are you sure you want to PERMANENTLY delete {count} selected equipment items? This action cannot be undone.",
+      "confirmButton": "Yes, delete all"
+    }
+  },
+  "bulk": {
+    "selected": "selected",
+    "actions": "Actions",
+    "updateStatuses": "Update Statuses",
+    "deleteItems": "Delete Selected",
+    "updateStatusesTitle": "Update Statuses",
+    "updateStatusesDescription": "Update statuses for {count} selected equipment items.",
+    "deleteTitle": "Delete Selected Equipment?",
+    "deleteDescription": "Are you sure you want to PERMANENTLY delete {count} selected equipment items? This action cannot be undone.",
+    "more": "more",
+    "confirmDelete": "Yes, delete all",
+    "selectStatus": "Select at least one status",
+    "updating": "Updating statuses...",
+    "updated": "Statuses have been updated!",
+    "deleting": "Deleting equipment...",
+    "deleted": "Equipment has been deleted!",
+    "deleteFailed": "Failed to delete equipment",
+    "partialDelete": "Partially deleted"
+  },
+  "toast": {
+    "loading": "Saving changes...",
+    "success": "Changes saved!",
+    "error": "An error occurred!",
+    "unauthorized": "You don't have permission!",
+    "notFound": "Not found!",
+    "contactIT": "Contact IT!",
+    "itemCreated": "Equipment has been added!",
+    "itemUpdated": "Equipment has been updated!",
+    "itemDeleted": "Equipment has been deleted!",
+    "assigned": "Equipment has been assigned!",
+    "unassigned": "Equipment has been unassigned!",
+    "bulkDeleted": "Deleted {count} equipment items!",
+    "bulkStatusUpdated": "Updated statuses for {count} equipment items!",
+    "statusesChanged": "Statuses have been changed",
+    "bulkUpdateSkipped": "Skipped {count} items (assigned with status conflict)"
+  }
+}
