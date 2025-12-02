@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
         }
 
         if (values.includes('defect')) {
-          statusConditions.push({ status: 'defect' });
+          statusConditions.push({ status: { $regex: /^defect\d*$/ } });
         }
 
         if (statusConditions.length === 1) {
