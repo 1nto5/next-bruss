@@ -19,8 +19,12 @@ export function getDmcColumns(dict: Dictionary, defects: DefectType[], lang: str
       header: dict.columns.status,
       cell: ({ row }) => {
         const status = row.original.status;
-        // Handle rework variants (rework, rework2, rework3, etc.)
-        const baseStatus = status.match(/^rework/) ? 'rework' : status;
+        // Handle rework/defect variants (rework2, defect1, etc.)
+        const baseStatus = status.match(/^rework/)
+          ? 'rework'
+          : status.match(/^defect/)
+            ? 'defect'
+            : status;
         return (dict.statusLabels as any)[baseStatus] || status;
       },
     },
