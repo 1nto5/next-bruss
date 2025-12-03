@@ -121,6 +121,13 @@ export async function GET(req: NextRequest) {
     defectKeys: { $exists: true, $ne: [], $nin: [null] },
   });
 
+  // Only return defect status (defect, defect1, defect2, etc.) - not rework
+  if (!query.status && !query.$or) {
+    andConditions.push({
+      status: { $regex: /^defect\d*$/ },
+    });
+  }
+
   // Add $and conditions if any exist
   if (andConditions.length > 0) {
     query.$and = andConditions;
