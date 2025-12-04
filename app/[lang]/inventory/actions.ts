@@ -49,8 +49,6 @@ export async function updatePosition(
       return { error: 'article not found' };
     }
 
-    console.log(session.user?.email);
-
     const positionData: any = {
       time: new Date(),
       articleNumber: article.number,
