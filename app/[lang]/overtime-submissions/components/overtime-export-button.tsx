@@ -101,7 +101,7 @@ export function OvertimeExportButton({
   };
 
   return (
-    <Button onClick={handleExport} variant="outline">
+    <Button onClick={handleExport} variant="outline" size="sm">
       <Download />
       {dict.exportCsv}
     </Button>

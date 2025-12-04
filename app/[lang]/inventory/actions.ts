@@ -1,17 +1,32 @@
 'use server';
 
-import { PositionZodType } from '@/app/[lang]/inventory/lib/zod';
+import { PositionZodType } from './lib/zod';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
 import { revalidateTag } from 'next/cache';
-// import { redirect } from 'next/navigation';
+import { generateExcelBuffer } from './lib/excel-export';
+import { redirect } from 'next/navigation';
 
-export async function revalidateDmcheckTableData() {
-  revalidateTag('dmcheck-data-dmc', { expire: 0 });
+export async function revalidateCards() {
+  revalidateTag('inventory-cards', { expire: 0 });
 }
 
-export async function revalidateDmcheckDefectsData() {
-  revalidateTag('dmcheck-data-dmc', { expire: 0 });
+export async function revalidateCardPositions() {
+  revalidateTag('inventory-card-positions', { expire: 0 });
+}
+
+export async function revalidatePositions() {
+  revalidateTag('inventory-positions', { expire: 0 });
+}
+
+export async function revalidateAll() {
+  revalidateTag('inventory-cards', { expire: 0 });
+  revalidateTag('inventory-card-positions', { expire: 0 });
+  revalidateTag('inventory-positions', { expire: 0 });
+}
+
+export async function redirectToCardPositions(lang: string, cardNumber: string) {
+  redirect(`/${lang}/inventory/${cardNumber}`);
 }
 
 export async function updatePosition(
@@ -20,10 +35,8 @@ export async function updatePosition(
 ) {
   try {
     const session = await auth();
-    if (
-      !session ||
-      !(session.user?.roles ?? []).includes('inventory-approve')
-    ) {
+    const roles = session?.user?.roles ?? [];
+    if (!session || (!roles.includes('inventory-approve') && !roles.includes('admin'))) {
       return { error: 'unauthorized' };
     }
     const collection = await dbc('inventory_cards');
@@ -44,7 +57,9 @@ export async function updatePosition(
       articleName: article.name,
       quantity: data.quantity,
       wip: data.wip,
-      comment: data.comment,
+      bin: data.bin,
+      deliveryDate: data.deliveryDate,
+      comment: data.comment?.toLowerCase(),
       approver: data.approved ? session.user?.email : '',
     };
 
@@ -84,5 +99,39 @@ export async function updatePosition(
   } catch (error) {
     console.error(error);
     return { error: 'updatePosition server action error' };
+  }
+}
+
+export async function exportInventoryPositionsToExcel() {
+  try {
+    const session = await auth();
+    const roles = session?.user?.roles ?? [];
+    if (!session || (!roles.includes('inventory-approve') && !roles.includes('admin'))) {
+      return { error: 'unauthorized' };
+    }
+
+    const collection = await dbc('inventory_cards');
+    const inventoryCards = await collection.find().toArray();
+
+    const exportData = inventoryCards.map((card) => ({
+      card: {
+        number: card.number,
+        warehouse: card.warehouse,
+        sector: card.sector,
+        creators: card.creators,
+      },
+      positions: card.positions || [],
+    }));
+
+    const buffer = await generateExcelBuffer(exportData);
+
+    return {
+      success: true,
+      data: buffer.toString('base64'),
+      filename: `inventory_positions_${new Date().toISOString().split('T')[0]}.xlsx`,
+    };
+  } catch (error) {
+    console.error('Export error:', error);
+    return { error: 'export failed' };
   }
 }

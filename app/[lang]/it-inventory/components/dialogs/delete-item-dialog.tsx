@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { deleteItem } from '../../actions/crud';
 import { Dictionary } from '../../lib/dict';
@@ -29,34 +29,25 @@ export default function DeleteItemDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const handleDelete = async () => {
-    setIsDeleting(true);
-    toast.loading(dict.dialogs.delete.deleting);
+    onOpenChange(false);
 
-    try {
-      const result = await deleteItem(item._id);
-
-      if ('error' in result) {
-        toast.dismiss();
-        toast.error(result.error);
-        setIsDeleting(false);
-        return;
-      }
-
-      toast.dismiss();
-      toast.success(dict.dialogs.delete.deleted);
-      onOpenChange(false);
-
-      // Refresh the page to update the table
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-      toast.dismiss();
-      toast.error(dict.toast.error);
-      setIsDeleting(false);
-    }
+    toast.promise(
+      deleteItem(item._id).then((result) => {
+        if ('error' in result) {
+          throw new Error(result.error);
+        }
+        router.refresh();
+        return result;
+      }),
+      {
+        loading: dict.dialogs.delete.deleting,
+        success: dict.dialogs.delete.deleted,
+        error: (error) => error.message || dict.toast.error,
+      },
+    );
   };
 
   return (
@@ -72,12 +63,11 @@ export default function DeleteItemDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>
+          <AlertDialogCancel>
             {dict.dialogs.delete.cancelButton}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            disabled={isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {dict.dialogs.delete.confirmButton}
