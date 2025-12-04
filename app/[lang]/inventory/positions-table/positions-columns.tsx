@@ -110,6 +110,6 @@ export const createPositionsColumns = (dict: Dictionary): ColumnDef<PositionType
   },
   {
     accessorKey: 'timeLocaleString',
-    header: dict.cards.lastSync,
+    header: dict.positions.approvedAt,
   },
 ];
