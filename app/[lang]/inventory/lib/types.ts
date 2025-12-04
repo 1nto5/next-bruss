@@ -15,7 +15,6 @@ export type PositionType = {
 };
 
 export type CardPositionsTableDataType = PositionType & {
-  timeLocaleString: string;
   approvedAtLocaleString: string;
   deliveryDateLocaleString: string;
 };

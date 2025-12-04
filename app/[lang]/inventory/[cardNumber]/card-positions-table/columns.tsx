@@ -86,6 +86,10 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
     header: dict.positions.approved,
   },
   {
+    accessorKey: 'approvedAtLocaleString',
+    header: dict.positions.approvedAt,
+  },
+  {
     accessorKey: 'comment',
     header: dict.positions.comment,
     cell: ({ row }) => {
@@ -104,9 +108,5 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   {
     accessorKey: 'deliveryDateLocaleString',
     header: dict.positions.deliveryDate,
-  },
-  {
-    accessorKey: 'timeLocaleString',
-    header: dict.positions.approvedAt,
   },
 ];

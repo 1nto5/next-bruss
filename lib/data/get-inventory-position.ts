@@ -12,6 +12,7 @@ export type InventoryPositionForEdit = {
   wip: boolean;
   comment: string;
   approver: string;
+  approvedAt: string;
   warehouse: string;
   sector: string;
 };
@@ -42,6 +43,7 @@ export async function getInventoryPosition(
       wip: position.wip || false,
       comment: position.comment || '',
       approver: position.approver || '',
+      approvedAt: position.approvedAt || '',
       warehouse: card.warehouse || '',
       sector: card.sector || '',
     };

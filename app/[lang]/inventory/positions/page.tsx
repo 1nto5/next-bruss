@@ -33,8 +33,9 @@ async function getAllPositions(): Promise<{
 
   positions = positions.map((position) => ({
     ...position,
-    timeLocaleString: formatDateTime(position.time),
     approver: position.approver ? extractNameFromEmail(position.approver) : '',
+    approvedAtLocaleString:
+      position.approvedAt && formatDateTime(position.approvedAt),
     deliveryDateLocaleString:
       position.deliveryDate && formatDate(position.deliveryDate),
   }));

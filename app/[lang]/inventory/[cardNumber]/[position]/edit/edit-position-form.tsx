@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { formatDateTime } from '@/lib/utils/date-format';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
@@ -98,9 +100,16 @@ export default function EditPositionForm({
     <Card className='w-full max-w-2xl'>
       <CardHeader>
         <div className='flex items-center justify-between'>
-          <CardTitle>
-            {dict.editPage.title} {position.identifier}
-          </CardTitle>
+          <div>
+            <CardTitle>
+              {dict.editPage.title} {position.identifier}
+            </CardTitle>
+            {position.approver && position.approvedAt && (
+              <CardDescription className='mt-1'>
+                {dict.positions.approver}: {position.approver}, {dict.positions.approvedAt}: {formatDateTime(position.approvedAt)}
+              </CardDescription>
+            )}
+          </div>
           <LocalizedLink href={`/inventory/${cardNumber}`}>
             <Button variant='outline' size='sm'>
               <ArrowLeft /> {dict.editPage.back}
