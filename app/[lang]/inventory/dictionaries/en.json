@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Inventory Approval",
+    "allPositions": "All Positions",
+    "backToCards": "Back to cards"
+  },
+  "cards": {
+    "sector": "Sector",
+    "number": "Number",
+    "positions": "Card positions",
+    "creators": "Creators",
+    "positionsCount": "Pos.",
+    "approvedCount": "Appr. pos.",
+    "warehouse": "Warehouse"
+  },
+  "positions": {
+    "title": "All Positions",
+    "position": "Position",
+    "articleNumber": "Article Number",
+    "articleName": "Article Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "wip": "WIP",
+    "approved": "Approved",
+    "approver": "Approver",
+    "approvedAt": "Approved At",
+    "bin": "Bin",
+    "deliveryDate": "Delivery Date",
+    "comment": "Comment",
+    "actions": "Actions",
+    "edit": "Edit"
+  },
+  "editForm": {
+    "title": "Edit Position",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "success": "Position updated successfully",
+    "error": "Error while saving"
+  },
+  "editPage": {
+    "title": "Edit Position",
+    "save": "Save Changes",
+    "discard": "Cancel",
+    "back": "Back",
+    "success": "Position updated successfully",
+    "error": "Error while saving",
+    "unauthorized": "Unauthorized",
+    "articleNotFound": "Article not found",
+    "wipNotAllowed": "WIP not allowed for S900"
+  },
+  "filters": {
+    "cardNumber": "Card No.",
+    "creators": "Creators",
+    "warehouse": "Warehouse",
+    "sector": "Sector",
+    "notSelected": "not selected",
+    "search": "Search",
+    "searchPlaceholder": "Search...",
+    "notFound": "Not found",
+    "clearFilters": "Clear",
+    "clear": "Clear",
+    "selected": "selected",
+    "refresh": "Refresh"
+  },
+  "table": {
+    "noResults": "No results"
+  },
+  "validation": {
+    "quantityMustBeNumber": "Quantity must be a number",
+    "quantityCannotBeNegative": "Quantity cannot be negative"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Inventarfreigabe",
+    "allPositions": "Alle Positionen",
+    "backToCards": "Zurück zu Karten"
+  },
+  "cards": {
+    "sector": "Sektor",
+    "number": "Nummer",
+    "positions": "Kartenpositionen",
+    "creators": "Ersteller",
+    "positionsCount": "Pos.",
+    "approvedCount": "Gen. Pos.",
+    "warehouse": "Lager"
+  },
+  "positions": {
+    "title": "Alle Positionen",
+    "position": "Position",
+    "articleNumber": "Artikelnummer",
+    "articleName": "Artikelname",
+    "quantity": "Menge",
+    "unit": "Einheit",
+    "wip": "WIP",
+    "approved": "Genehmigt",
+    "approver": "Genehmiger",
+    "approvedAt": "Genehmigt am",
+    "bin": "Bin",
+    "deliveryDate": "Lieferdatum",
+    "comment": "Kommentar",
+    "actions": "Aktionen",
+    "edit": "Bearbeiten"
+  },
+  "editForm": {
+    "title": "Position bearbeiten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "saving": "Speichern...",
+    "success": "Position erfolgreich aktualisiert",
+    "error": "Fehler beim Speichern"
+  },
+  "editPage": {
+    "title": "Position bearbeiten",
+    "save": "Änderungen speichern",
+    "discard": "Abbrechen",
+    "back": "Zurück",
+    "success": "Position erfolgreich aktualisiert",
+    "error": "Fehler beim Speichern",
+    "unauthorized": "Nicht autorisiert",
+    "articleNotFound": "Artikel nicht gefunden",
+    "wipNotAllowed": "WIP nicht erlaubt für S900"
+  },
+  "filters": {
+    "cardNumber": "Kartennr.",
+    "creators": "Ersteller",
+    "warehouse": "Lager",
+    "sector": "Sektor",
+    "notSelected": "nicht ausgewählt",
+    "search": "Suchen",
+    "searchPlaceholder": "Suchen...",
+    "notFound": "Nicht gefunden",
+    "clearFilters": "Löschen",
+    "clear": "Löschen",
+    "selected": "ausgewählt",
+    "refresh": "Aktualisieren"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse"
+  },
+  "validation": {
+    "quantityMustBeNumber": "Menge muss eine Zahl sein",
+    "quantityCannotBeNegative": "Menge darf nicht negativ sein"
+  }
+}

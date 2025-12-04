@@ -1,0 +1,73 @@
+{
+  "page": {
+    "title": "Zatwierdzenie inwentaryzacji",
+    "allPositions": "Wszystkie pozycje",
+    "backToCards": "Powrót do kart"
+  },
+  "cards": {
+    "sector": "Sektor",
+    "number": "Numer",
+    "positions": "Pozycja na karcie",
+    "creators": "Spisujący",
+    "positionsCount": "Poz.",
+    "approvedCount": "Zatw. poz.",
+    "warehouse": "Magazyn"
+  },
+  "positions": {
+    "title": "Wszystkie pozycje",
+    "position": "Pozycja",
+    "articleNumber": "Numer artykułu",
+    "articleName": "Nazwa artykułu",
+    "quantity": "Ilość",
+    "unit": "Jednostka",
+    "wip": "WIP",
+    "approved": "Zatwierdzone",
+    "approver": "Zatwierdzający",
+    "approvedAt": "Data zatwierdzenia",
+    "bin": "Bin",
+    "deliveryDate": "Data dostawy",
+    "comment": "Komentarz",
+    "actions": "Akcje",
+    "edit": "Edytuj"
+  },
+  "editForm": {
+    "title": "Edycja pozycji",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "saving": "Zapisywanie...",
+    "success": "Pozycja została zaktualizowana",
+    "error": "Wystąpił błąd podczas zapisywania"
+  },
+  "editPage": {
+    "title": "Edycja pozycji",
+    "save": "Zapisz zmiany",
+    "discard": "Anuluj",
+    "back": "Powrót",
+    "success": "Pozycja została zaktualizowana",
+    "error": "Wystąpił błąd podczas zapisywania",
+    "unauthorized": "Brak uprawnień",
+    "articleNotFound": "Artykuł nie istnieje",
+    "wipNotAllowed": "WIP niedozwolony dla S900"
+  },
+  "filters": {
+    "cardNumber": "Nr karty",
+    "creators": "Spisujący",
+    "warehouse": "Magazyn",
+    "sector": "Sektor",
+    "notSelected": "nie wybrano",
+    "search": "Szukaj",
+    "searchPlaceholder": "Szukaj...",
+    "notFound": "Nie znaleziono",
+    "clearFilters": "Wyczyść",
+    "clear": "Wyczyść",
+    "selected": "wybrano",
+    "refresh": "Odśwież"
+  },
+  "table": {
+    "noResults": "Brak wyników"
+  },
+  "validation": {
+    "quantityMustBeNumber": "Ilość musi być liczbą",
+    "quantityCannotBeNegative": "Ilość nie może być ujemna"
+  }
+}
