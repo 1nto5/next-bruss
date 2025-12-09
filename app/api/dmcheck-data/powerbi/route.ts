@@ -95,7 +95,7 @@ export async function GET() {
         const defect = defectKey ? defectsMap.get(defectKey) : null;
 
         const row = [
-          escapeCSV(doc.dmc),
+          `"${doc.dmc || ''}"`,
           escapeCSV(convertToLocalTime(doc.time)),
           escapeCSV(doc.workplace?.toUpperCase()),
           escapeCSV(doc.article),
