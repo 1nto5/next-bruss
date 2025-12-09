@@ -49,21 +49,15 @@ export async function GET() {
     const defects = await collDefects.find().toArray();
     const defectsMap = new Map(defects.map((d: any) => [d.key, d]));
 
-    // Query main collection first
-    let scans = await collScans
-      .find(query)
-      .sort({ _id: -1 })
-      .limit(10000)
-      .toArray();
+    // Query main collection
+    let scans = await collScans.find(query).sort({ _id: -1 }).toArray();
 
-    // If less than 10k and archive not skipped, query archive to fill remaining
-    if (scans.length < 10000 && !skipArchive) {
+    // Query archive if not skipped
+    if (!skipArchive) {
       const collScansArchive = await dbc('dmcheck_scans_archive');
-      const remainingLimit = 10000 - scans.length;
       const scansArchive = await collScansArchive
         .find(query)
         .sort({ _id: -1 })
-        .limit(remainingLimit)
         .toArray();
       scans = [...scans, ...scansArchive];
     }
