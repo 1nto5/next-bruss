@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { formatDateTime } from '@/lib/utils/date-format';
+import { extractFullNameFromEmail } from '@/lib/utils/name-format';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
@@ -106,7 +107,7 @@ export default function EditPositionForm({
             </CardTitle>
             {position.approver && position.approvedAt && (
               <CardDescription className='mt-1'>
-                {dict.positions.approver}: {position.approver}, {dict.positions.approvedAt}: {formatDateTime(position.approvedAt)}
+                {dict.positions.approver}: {extractFullNameFromEmail(position.approver)}, {dict.positions.approvedAt}: {formatDateTime(position.approvedAt)}
               </CardDescription>
             )}
           </div>
@@ -187,7 +188,7 @@ export default function EditPositionForm({
                     </FormLabel>
                     {position.approver && (
                       <FormDescription>
-                        {dict.positions.approver}: {position.approver}
+                        {dict.positions.approver}: {extractFullNameFromEmail(position.approver)}
                       </FormDescription>
                     )}
                   </div>

@@ -83,7 +83,7 @@ export const createColumns = (dict: Dictionary): ColumnDef<PositionType>[] => [
   },
   {
     accessorKey: 'approver',
-    header: dict.positions.approved,
+    header: dict.positions.approver,
   },
   {
     accessorKey: 'approvedAtLocaleString',

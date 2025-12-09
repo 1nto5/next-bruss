@@ -59,6 +59,7 @@ export async function updatePosition(
       deliveryDate: data.deliveryDate,
       comment: data.comment?.toLowerCase(),
       approver: data.approved ? session.user?.email : '',
+      approvedAt: data.approved ? new Date() : null,
     };
 
     if (data.wip) {
@@ -82,6 +83,7 @@ export async function updatePosition(
           'positions.$.wip': positionData.wip,
           'positions.$.comment': positionData.comment,
           'positions.$.approver': positionData.approver,
+          'positions.$.approvedAt': positionData.approvedAt,
         },
       },
     );
