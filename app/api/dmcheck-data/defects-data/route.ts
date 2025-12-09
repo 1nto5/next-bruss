@@ -35,6 +35,21 @@ function convertToLocalTimeWithMoment(date: Date) {
 export async function GET() {
   const query = {
     time: { $gte: DEFECT_REPORTING_START },
+    workplace: {
+      $in: [
+        'eol810',
+        'eol405',
+        'eol488',
+        'fw1',
+        'fw2',
+        'fw3',
+        'fw4',
+        'fw5',
+        'fw6',
+        'fw7',
+        'fw8',
+      ],
+    },
   };
 
   // Skip archive if query date is within archive threshold
