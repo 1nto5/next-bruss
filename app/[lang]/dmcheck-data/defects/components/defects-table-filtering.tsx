@@ -6,7 +6,7 @@ import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { DateTimeInput } from '@/components/ui/datetime-input';
 import { Label } from '@/components/ui/label';
 import { MultiSelect } from '@/components/ui/multi-select';
-import { CircleX, Search, Loader } from 'lucide-react';
+import { CircleX, Search, Loader, FileSpreadsheet } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import type { Dictionary } from '../lib/dict';
@@ -31,6 +31,7 @@ export default function DefectsTableFiltering({
   const searchParams = useSearchParams();
 
   const [isPendingSearch, setIsPendingSearch] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     setIsPendingSearch(false);
@@ -91,6 +92,44 @@ export default function DefectsTableFiltering({
       router.push(pathname || '');
     }
   }, [searchParams, pathname, router]);
+
+  const handleExportClick = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      const params = new URLSearchParams(
+        Object.entries({
+          from: fromFilter?.toISOString(),
+          to: toFilter?.toISOString(),
+          workplace: workplaceFilter.length > 0 ? workplaceFilter.join(',') : undefined,
+          article: articleFilter.length > 0 ? articleFilter.join(',') : undefined,
+          defectKey: defectKeyFilter.length > 0 ? defectKeyFilter.join(',') : undefined,
+        }).reduce(
+          (acc, [key, value]) => {
+            if (value) acc[key] = value;
+            return acc;
+          },
+          {} as Record<string, string>,
+        ),
+      );
+
+      const response = await fetch(`/api/dmcheck-data/defects-excel?${params.toString()}`);
+      if (!response.ok) throw new Error('Export failed');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'DMCheck-defects.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [fromFilter, toFilter, workplaceFilter, articleFilter, defectKeyFilter]);
 
   // Filter articles to only those with defect reporting enabled
   const defectReportingArticles = useMemo(
@@ -236,23 +275,33 @@ export default function DefectsTableFiltering({
             </div>
           </div>
 
-          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-4'>
+          <div className='flex flex-col gap-2 sm:grid sm:grid-cols-3 sm:gap-4'>
             <Button
               type='button'
               variant='destructive'
               onClick={handleClearFilters}
               title={dict.filters.clearFilters}
               disabled={isPendingSearch || !hasFilters}
-              className='order-2 w-full sm:order-1'
+              className='order-3 w-full sm:order-1'
             >
               <CircleX /> <span>{dict.filters.clear}</span>
+            </Button>
+
+            <Button
+              type='button'
+              onClick={handleExportClick}
+              disabled={isExporting || isPendingSearch}
+              className='order-2 w-full sm:order-2'
+            >
+              {isExporting ? <Loader className='animate-spin' /> : <FileSpreadsheet />}
+              <span>{dict.filters.export}</span>
             </Button>
 
             <Button
               type='submit'
               variant='secondary'
               disabled={isPendingSearch}
-              className='order-1 w-full sm:order-2'
+              className='order-1 w-full sm:order-3'
             >
               {isPendingSearch ? <Loader className='animate-spin' /> : <Search />}
               <span>{dict.filters.search_button}</span>

@@ -7,6 +7,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 // 'auto' | 'force-dynamic' | 'error' | 'force-static'
 
+// TODO: TEMPORARY OPTIMIZATION - Remove after ~6 months (mid-2026)
+// Defect reporting started November 2025. This date clamp prevents
+// unnecessary archive queries while defect data is still new.
+// Once sufficient defect history exists, remove this logic entirely.
+const DEFECT_REPORTING_START = new Date('2025-11-01T00:00:00.000Z');
+const ARCHIVE_DAYS = 90; // 3 * 30 days, matches archive-scans.js in bruss-cron
+
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   const query: any = {};
@@ -91,11 +98,27 @@ export async function GET(req: NextRequest) {
     query.$and = andConditions;
   }
 
+  // Clamp from date for defect queries - no defects exist before this date
+  const statusParam = searchParams.get('status');
+  if (statusParam?.includes('defect')) {
+    if (!query.time) query.time = {};
+    if (!query.time.$gte || query.time.$gte < DEFECT_REPORTING_START) {
+      query.time.$gte = DEFECT_REPORTING_START;
+    }
+  }
+
+  // Skip archive if query date is within archive threshold and after defect reporting start
+  const archiveThreshold = new Date(Date.now() - ARCHIVE_DAYS * 24 * 60 * 60 * 1000);
+  const skipArchive =
+    statusParam?.includes('defect') &&
+    query.time?.$gte >= DEFECT_REPORTING_START &&
+    query.time?.$gte >= archiveThreshold;
+
   try {
     const coll = await dbc('dmcheck_scans');
     let scans = await coll.find(query).sort({ _id: -1 }).limit(1000).toArray();
 
-    if (scans.length < 1000) {
+    if (scans.length < 1000 && !skipArchive) {
       const archiveColl = await dbc('dmcheck_scans_archive');
       const archiveScans = await archiveColl
         .find(query)

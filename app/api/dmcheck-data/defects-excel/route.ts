@@ -1,20 +1,14 @@
 import { dbc } from '@/lib/db/mongo';
+import { Workbook } from 'exceljs';
 import moment from 'moment';
-import { NextResponse, type NextRequest } from 'next/server';
-
-export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from 'next/server';
 
 // TODO: TEMPORARY OPTIMIZATION - Remove after ~6 months (mid-2026)
 // Defect reporting started November 2025. This date clamp prevents
 // unnecessary archive queries while defect data is still new.
-// Once sufficient defect history exists, remove this logic entirely.
 const DEFECT_REPORTING_START = new Date('2025-11-01T00:00:00.000Z');
 const ARCHIVE_DAYS = 90; // 3 * 30 days, matches archive-scans.js in bruss-cron
 
-// Query parameters and response times are in Poland local time
-// Uses same conversion as excel/route.ts for consistency
-
-// Helper function to format operator(s) - handles both string and array
 function formatOperators(operator: string | string[] | undefined): string {
   if (!operator) return '';
   if (Array.isArray(operator)) {
@@ -23,7 +17,6 @@ function formatOperators(operator: string | string[] | undefined): string {
   return operator;
 }
 
-// Convert UTC to Poland local time (same as excel/route.ts)
 function convertToLocalTimeWithMoment(date: Date) {
   if (!date) return null;
   const offset = moment(date).utcOffset();
@@ -39,7 +32,6 @@ export async function GET(req: NextRequest) {
 
   searchParams.forEach((value, key) => {
     if (key === 'from' || key === 'to') {
-      // Date filters - convert Poland local time to UTC for MongoDB query
       if (!query.time) query.time = {};
       if (key === 'from') {
         const localDate = new Date(value);
@@ -60,40 +52,35 @@ export async function GET(req: NextRequest) {
       key === 'hydra_batch' ||
       key === 'pallet_batch'
     ) {
-      // Handle multiple values separated by commas - OR within field, AND between fields
       const values = value
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
 
       if (values.length > 0) {
-        // Ensure field exists and is not empty
         andConditions.push({
           [key]: { $exists: true, $nin: [null, ''] },
         });
 
         if (values.length === 1) {
-          // Single value - use exact match
-          andConditions.push({
-            [key]: values[0],
-          });
+          andConditions.push({ [key]: values[0] });
         } else {
-          // Multiple values - use $in for exact matches
-          andConditions.push({
-            [key]: { $in: values },
-          });
+          andConditions.push({ [key]: { $in: values } });
         }
       }
     } else if (key === 'status' || key === 'workplace' || key === 'article') {
-      // Handle multi-select filters - OR within field, AND between fields
       const values = value
         .split(',')
         .map((v) => v.trim())
         .filter((v) => v.length > 0);
 
-      if (key === 'status' && (values.includes('rework') || values.includes('defect'))) {
-        // Handle rework and defect special cases
-        const otherStatuses = values.filter((v) => v !== 'rework' && v !== 'defect');
+      if (
+        key === 'status' &&
+        (values.includes('rework') || values.includes('defect'))
+      ) {
+        const otherStatuses = values.filter(
+          (v) => v !== 'rework' && v !== 'defect',
+        );
         const statusConditions = [];
 
         if (otherStatuses.length > 0) {
@@ -114,21 +101,31 @@ export async function GET(req: NextRequest) {
           query.$or = statusConditions;
         }
       } else if (values.length === 1) {
-        // Single value
         query[key] = values[0];
       } else if (values.length > 1) {
-        // Multiple values - use $in for OR within field
         query[key] = { $in: values };
+      }
+    } else if (key === 'defectKey') {
+      const values = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+
+      if (values.length > 0) {
+        if (values.length === 1) {
+          andConditions.push({ defectKeys: values[0] });
+        } else {
+          andConditions.push({ defectKeys: { $in: values } });
+        }
       }
     }
   });
 
-  // Add filter for defectKeys existence - only return scans with defects
+  // Only return scans with defects
   andConditions.push({
     defectKeys: { $exists: true, $ne: [], $nin: [null] },
   });
 
-  // Add $and conditions if any exist
   if (andConditions.length > 0) {
     query.$and = andConditions;
   }
@@ -140,7 +137,9 @@ export async function GET(req: NextRequest) {
   }
 
   // Skip archive if query date is within archive threshold and after defect reporting start
-  const archiveThreshold = new Date(Date.now() - ARCHIVE_DAYS * 24 * 60 * 60 * 1000);
+  const archiveThreshold = new Date(
+    Date.now() - ARCHIVE_DAYS * 24 * 60 * 60 * 1000,
+  );
   const skipArchive =
     query.time.$gte >= DEFECT_REPORTING_START &&
     query.time.$gte >= archiveThreshold;
@@ -149,18 +148,15 @@ export async function GET(req: NextRequest) {
     const collScans = await dbc('dmcheck_scans');
     const collDefects = await dbc('dmcheck_defects');
 
-    // Fetch defects for translation
     const defects = await collDefects.find().toArray();
     const defectsMap = new Map(defects.map((d: any) => [d.key, d]));
 
-    // Query main collection first
     let scans = await collScans
       .find(query)
       .sort({ _id: -1 })
       .limit(10000)
       .toArray();
 
-    // If less than 10k and archive not skipped, query archive to fill remaining
     if (scans.length < 10000 && !skipArchive) {
       const collScansArchive = await dbc('dmcheck_scans_archive');
       const remainingLimit = 10000 - scans.length;
@@ -172,18 +168,32 @@ export async function GET(req: NextRequest) {
       scans = [...scans, ...scansArchive];
     }
 
-    // Flatten: one row per defect occurrence
-    const flattenedDefects: any[] = [];
+    const workbook = new Workbook();
+    const sheet = workbook.addWorksheet('defects');
 
+    sheet.columns = [
+      { header: 'DMC', key: 'dmc', width: 36 },
+      { header: 'Time', key: 'time', width: 18 },
+      { header: 'Workplace', key: 'workplace', width: 15 },
+      { header: 'Article', key: 'article', width: 10 },
+      { header: 'Operator', key: 'operator', width: 20 },
+      { header: 'Status', key: 'status', width: 12 },
+      { header: 'Defect Key', key: 'defect_key', width: 20 },
+      { header: 'Defect (PL)', key: 'defect_pl', width: 30 },
+      { header: 'Defect (DE)', key: 'defect_de', width: 30 },
+      { header: 'Defect (EN)', key: 'defect_en', width: 30 },
+    ];
+
+    // Flatten: one row per defect occurrence
     scans.forEach((doc) => {
       if (!doc.defectKeys || doc.defectKeys.length === 0) return;
 
       doc.defectKeys.forEach((defectKey: string) => {
         const defect = defectsMap.get(defectKey);
 
-        flattenedDefects.push({
+        sheet.addRow({
           dmc: doc.dmc,
-          time: convertToLocalTimeWithMoment(doc.time),
+          time: convertToLocalTimeWithMoment(new Date(doc.time)),
           workplace: doc.workplace?.toUpperCase() || '',
           article: doc.article,
           operator: formatOperators(doc.operator),
@@ -196,15 +206,20 @@ export async function GET(req: NextRequest) {
       });
     });
 
-    return NextResponse.json(flattenedDefects, {
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    return new NextResponse(buffer, {
+      status: 200,
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type':
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': 'attachment; filename="DMCheck-defects.xlsx"',
       },
     });
   } catch (error) {
-    console.error('api/dmcheck-data/defects-data: ' + error);
+    console.error('Error generating defects Excel file:', error);
     return NextResponse.json(
-      { error: 'dmcheck-data/defects-data api' },
+      { error: 'defects-excel api' },
       { status: 503 },
     );
   }
