@@ -1,6 +1,6 @@
 import { dbc } from '@/lib/db/mongo';
 import moment from 'moment';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,118 +32,14 @@ function convertToLocalTimeWithMoment(date: Date) {
   return localDate;
 }
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams;
-  const query: any = {};
-  const andConditions: any[] = [];
+export async function GET() {
+  const query = {
+    time: { $gte: DEFECT_REPORTING_START },
+  };
 
-  searchParams.forEach((value, key) => {
-    if (key === 'from' || key === 'to') {
-      // Date filters - convert Poland local time to UTC for MongoDB query
-      if (!query.time) query.time = {};
-      if (key === 'from') {
-        const localDate = new Date(value);
-        const offset = moment(localDate).utcOffset();
-        const utcDate = new Date(localDate);
-        utcDate.setMinutes(utcDate.getMinutes() - offset);
-        query.time.$gte = utcDate;
-      }
-      if (key === 'to') {
-        const localDate = new Date(value);
-        const offset = moment(localDate).utcOffset();
-        const utcDate = new Date(localDate);
-        utcDate.setMinutes(utcDate.getMinutes() - offset);
-        query.time.$lte = utcDate;
-      }
-    } else if (
-      key === 'dmc' ||
-      key === 'hydra_batch' ||
-      key === 'pallet_batch'
-    ) {
-      // Handle multiple values separated by commas - OR within field, AND between fields
-      const values = value
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v.length > 0);
-
-      if (values.length > 0) {
-        // Ensure field exists and is not empty
-        andConditions.push({
-          [key]: { $exists: true, $nin: [null, ''] },
-        });
-
-        if (values.length === 1) {
-          // Single value - use exact match
-          andConditions.push({
-            [key]: values[0],
-          });
-        } else {
-          // Multiple values - use $in for exact matches
-          andConditions.push({
-            [key]: { $in: values },
-          });
-        }
-      }
-    } else if (key === 'status' || key === 'workplace' || key === 'article') {
-      // Handle multi-select filters - OR within field, AND between fields
-      const values = value
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v.length > 0);
-
-      if (key === 'status' && (values.includes('rework') || values.includes('defect'))) {
-        // Handle rework and defect special cases
-        const otherStatuses = values.filter((v) => v !== 'rework' && v !== 'defect');
-        const statusConditions = [];
-
-        if (otherStatuses.length > 0) {
-          statusConditions.push({ status: { $in: otherStatuses } });
-        }
-
-        if (values.includes('rework')) {
-          statusConditions.push({ status: { $regex: /^rework\d*$/ } });
-        }
-
-        if (values.includes('defect')) {
-          statusConditions.push({ status: { $regex: /^defect\d*$/ } });
-        }
-
-        if (statusConditions.length === 1) {
-          Object.assign(query, statusConditions[0]);
-        } else {
-          query.$or = statusConditions;
-        }
-      } else if (values.length === 1) {
-        // Single value
-        query[key] = values[0];
-      } else if (values.length > 1) {
-        // Multiple values - use $in for OR within field
-        query[key] = { $in: values };
-      }
-    }
-  });
-
-  // Add filter for defectKeys existence - only return scans with defects
-  andConditions.push({
-    defectKeys: { $exists: true, $ne: [], $nin: [null] },
-  });
-
-  // Add $and conditions if any exist
-  if (andConditions.length > 0) {
-    query.$and = andConditions;
-  }
-
-  // Clamp from date - defects don't exist before this date
-  if (!query.time) query.time = {};
-  if (!query.time.$gte || query.time.$gte < DEFECT_REPORTING_START) {
-    query.time.$gte = DEFECT_REPORTING_START;
-  }
-
-  // Skip archive if query date is within archive threshold and after defect reporting start
+  // Skip archive if query date is within archive threshold
   const archiveThreshold = new Date(Date.now() - ARCHIVE_DAYS * 24 * 60 * 60 * 1000);
-  const skipArchive =
-    query.time.$gte >= DEFECT_REPORTING_START &&
-    query.time.$gte >= archiveThreshold;
+  const skipArchive = DEFECT_REPORTING_START >= archiveThreshold;
 
   try {
     const collScans = await dbc('dmcheck_scans');
@@ -172,14 +68,14 @@ export async function GET(req: NextRequest) {
       scans = [...scans, ...scansArchive];
     }
 
-    // Flatten: one row per defect occurrence
+    // Flatten: one row per defect occurrence, or single row if no defects
     const flattenedDefects: any[] = [];
 
     scans.forEach((doc) => {
-      if (!doc.defectKeys || doc.defectKeys.length === 0) return;
+      const defectKeysList = doc.defectKeys?.length ? doc.defectKeys : [null];
 
-      doc.defectKeys.forEach((defectKey: string) => {
-        const defect = defectsMap.get(defectKey);
+      defectKeysList.forEach((defectKey: string | null) => {
+        const defect = defectKey ? defectsMap.get(defectKey) : null;
 
         flattenedDefects.push({
           dmc: doc.dmc,
@@ -188,10 +84,10 @@ export async function GET(req: NextRequest) {
           article: doc.article,
           operator: formatOperators(doc.operator),
           status: doc.status,
-          defect_key: defectKey,
-          defect_pl: defect?.translations?.pl || defectKey,
-          defect_de: defect?.translations?.de || defectKey,
-          defect_en: defect?.translations?.en || defectKey,
+          defect_key: defectKey || '',
+          defect_pl: defect?.translations?.pl || '',
+          defect_de: defect?.translations?.de || '',
+          defect_en: defect?.translations?.en || '',
         });
       });
     });
