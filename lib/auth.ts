@@ -1,5 +1,4 @@
 import { dbc } from '@/lib/db/mongo';
-import bcrypt from 'bcryptjs';
 
 import NextAuth, { User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
@@ -62,24 +61,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: string;
           password: string;
         };
-
-        // Check for manual user first
-        const usersCollection = await dbc('users');
-        const existingUser = await usersCollection.findOne({
-          email: email.toLowerCase(),
-        });
-
-        if (existingUser?.source === 'manual') {
-          if (!existingUser.password) return null;
-          const valid = await bcrypt.compare(password, existingUser.password);
-          if (!valid) return null;
-          return {
-            email: existingUser.email,
-            roles: existingUser.roles || ['user'],
-          } as User;
-        }
-
-        // LDAP authentication for domain users
         const ldapClient = new LdapClient({
           url: process.env.LDAP,
         });
@@ -121,7 +102,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
 
             try {
-              if (!existingUser) {
+              const usersCollection = await dbc('users');
+              let user;
+
+              try {
+                user = await usersCollection.findOne({
+                  email: email.toLowerCase(),
+                });
+              } catch (error) {
+                try {
+                  await ldapClient.unbind();
+                } catch (unbindError) {
+                  // Unbind error can be ignored - connection might be already closed
+                }
+                throw new Error('authorize database error: findOne failed');
+              }
+
+              if (!user) {
                 try {
                   await usersCollection.insertOne({
                     email: email.toLowerCase(),
@@ -142,7 +139,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               } else {
                 return {
                   email,
-                  roles: existingUser.roles,
+                  roles: user.roles,
                 } as User;
               }
             } catch (error) {
