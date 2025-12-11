@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -266,70 +267,72 @@ export default function AddAttachmentDialog({
       <DialogContent className='sm:max-w-[600px]'>
         <DialogHeader>
           <DialogTitle>Dodaj listę obecności</DialogTitle>
+          <DialogDescription>
+            Dodanie listy obecności jest równoznaczne z potwierdzeniem wykonania
+            zlecenia oraz zmieni jego status na ukończony. Możesz przesłać wiele
+            plików jednocześnie.
+          </DialogDescription>
         </DialogHeader>
-        <DialogDescription>
-          Dodanie listy obecności jest równoznaczne z potwierdzeniem wykonania
-          zlecenia oraz zmieni jego status na ukończony. Możesz przesłać wiele
-          plików jednocześnie.
-        </DialogDescription>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            <FormField
-              control={form.control}
-              name='files'
-              render={({ field: { onChange, value, ref, ...rest } }) => (
-                <FormItem>
-                  <FormLabel htmlFor='files'>Lista obecności</FormLabel>
-                  <FormControl>
-                    <Input
-                      id='files'
-                      type='file'
-                      multiple
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      accept='image/*,image/heic,image/heif,application/pdf'
-                      {...rest}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogBody className='space-y-4'>
+              <FormField
+                control={form.control}
+                name='files'
+                render={({ field: { onChange, value, ref, ...rest } }) => (
+                  <FormItem>
+                    <FormLabel htmlFor='files'>Lista obecności</FormLabel>
+                    <FormControl>
+                      <Input
+                        id='files'
+                        type='file'
+                        multiple
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept='image/*,image/heic,image/heif,application/pdf'
+                        {...rest}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Display selected files */}
-            {selectedFiles.length > 0 && (
-              <div className='space-y-2'>
-                <Label>Wybrane pliki ({selectedFiles.length}):</Label>
-                <div className='max-h-40 space-y-2 overflow-y-auto'>
-                  {selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className='bg-muted flex items-center justify-between rounded-md p-2'
-                    >
-                      <div className='min-w-0 flex-1'>
-                        <p className='truncate text-sm font-medium'>
-                          {file.name}
-                        </p>
-                        <p className='text-muted-foreground text-xs'>
-                          {formatFileSize(file.size)}
-                        </p>
-                      </div>
-                      <Button
-                        type='button'
-                        variant='ghost'
-                        size='sm'
-                        onClick={() => removeFile(index)}
-                        className='h-6 w-6 p-0'
+              {/* Display selected files */}
+              {selectedFiles.length > 0 && (
+                <div className='space-y-2'>
+                  <Label>Wybrane pliki ({selectedFiles.length}):</Label>
+                  <div className='max-h-40 space-y-2 overflow-y-auto'>
+                    {selectedFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className='bg-muted flex items-center justify-between rounded-md p-2'
                       >
-                        <X className='h-4 w-4' />
-                      </Button>
-                    </div>
-                  ))}
+                        <div className='min-w-0 flex-1'>
+                          <p className='truncate text-sm font-medium'>
+                            {file.name}
+                          </p>
+                          <p className='text-muted-foreground text-xs'>
+                            {formatFileSize(file.size)}
+                          </p>
+                        </div>
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          onClick={() => removeFile(index)}
+                          className='h-6 w-6 p-0'
+                        >
+                          <X className='h-4 w-4' />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </DialogBody>
 
-            <DialogFooter className='mt-4'>
+            <DialogFooter>
               <Button
                 type='submit'
                 disabled={isUploading || selectedFiles.length === 0}

@@ -24,12 +24,10 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { CardContent, CardFooter } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 
 import { Locale } from '@/lib/config/i18n';
 import { ArrowRight } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { getDmcColumns } from './dmc-columns';
 import type { Dictionary } from '../lib/dict';
 import type { ArticleConfigType, DefectType } from '../lib/dmcheck-data-types';
@@ -55,14 +53,6 @@ export function DmcDataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const columns = getDmcColumns(dict, defects, lang) as ColumnDef<TData, TValue>[];
 
-  const [showOnlyDefects, setShowOnlyDefects] = React.useState(false);
-
-  // Filter data to show only defects if toggle is on
-  const filteredData = useMemo(() => {
-    if (!showOnlyDefects) return data;
-    return data.filter((row: any) => row.defectKeys && row.defectKeys.length > 0);
-  }, [data, showOnlyDefects]);
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -70,7 +60,7 @@ export function DmcDataTable<TData, TValue>({
   const [isPendingSearch, setIsPendingSearch] = React.useState(false);
 
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -96,16 +86,6 @@ export function DmcDataTable<TData, TValue>({
   return (
     <>
       <CardContent>
-        <div className='mb-4 flex items-center space-x-2'>
-          <Switch
-            id='show-defects'
-            checked={showOnlyDefects}
-            onCheckedChange={setShowOnlyDefects}
-          />
-          <Label htmlFor='show-defects' className='cursor-pointer'>
-            {dict.filters.showOnlyDefects}
-          </Label>
-        </div>
         <div className='rounded-md border'>
           <Table>
             <TableHeader>

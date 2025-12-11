@@ -41,7 +41,8 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  'group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-accent/50',
+  // Industrial nav trigger: subtle hover, bruss accent on active
+  'group inline-flex h-10 w-max items-center justify-center rounded-sm px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-150 ease-[var(--ease-standard)] hover:bg-bruss/5 hover:text-foreground focus:bg-bruss/10 focus:text-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-bruss/10 data-active:text-bruss data-[state=open]:bg-bruss/10 data-[state=open]:text-bruss',
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -86,7 +87,13 @@ const NavigationMenuViewport = React.forwardRef<
   <div className={cn('absolute top-full left-0 flex justify-center')}>
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        'origin-top-center bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow-lg md:w-[var(--radix-navigation-menu-viewport-width)]',
+        // Industrial dropdown: panel styling
+        'origin-top-center relative mt-1.5 w-full overflow-hidden md:w-[var(--radix-navigation-menu-viewport-width)]',
+        'h-[var(--radix-navigation-menu-viewport-height)]',
+        'rounded-sm border border-[var(--panel-border)] bg-[var(--panel-bg)] text-popover-foreground',
+        'shadow-[var(--shadow-md)]',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90',
         className,
       )}
       ref={ref}

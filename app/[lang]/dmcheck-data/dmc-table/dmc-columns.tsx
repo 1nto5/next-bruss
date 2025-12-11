@@ -42,6 +42,12 @@ export function getDmcColumns(dict: Dictionary, defects: DefectType[], lang: str
     {
       accessorKey: 'article',
       header: dict.columns.article,
+      size: 80,
+      cell: ({ row }) => (
+        <span className="block max-w-[80px] truncate" title={String(row.original.article)}>
+          {row.original.article}
+        </span>
+      ),
     },
     {
       accessorKey: 'operator',

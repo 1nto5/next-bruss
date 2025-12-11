@@ -166,7 +166,8 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        'border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl',
+        // Industrial tooltip: panel styling, sharp corners, strong shadow
+        'grid min-w-[8rem] items-start gap-1.5 rounded-sm border border-[var(--panel-border)] bg-[var(--panel-bg)] px-3 py-2 text-xs shadow-[var(--shadow-md)]',
         className,
       )}
     >
@@ -195,11 +196,12 @@ function ChartTooltipContent({
                     !hideIndicator && (
                       <div
                         className={cn(
-                          'shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)',
+                          // Industrial LED-style indicator with glow
+                          'shrink-0 rounded-full border-(--color-border) bg-(--color-bg) shadow-[0_0_4px_var(--color-bg)]',
                           {
                             'h-2.5 w-2.5': indicator === 'dot',
-                            'w-1': indicator === 'line',
-                            'w-0 border-[1.5px] border-dashed bg-transparent':
+                            'w-1 rounded-sm': indicator === 'line',
+                            'w-0 border-[1.5px] border-dashed bg-transparent shadow-none':
                               indicator === 'dashed',
                             'my-0.5': nestLabel && indicator === 'dashed',
                           },

@@ -42,8 +42,7 @@
     "selected": "wybrano",
     "export": "Eksportuj",
     "search_button": "Szukaj",
-    "refresh": "Odśwież",
-    "showOnlyDefects": "Pokaż tylko wady"
+    "refresh": "Odśwież"
   },
   "statusOptions": {
     "box": "box",

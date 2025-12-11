@@ -20,7 +20,15 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+  <thead
+    ref={ref}
+    className={cn(
+      // Industrial header: subtle gradient, stronger border
+      'bg-[var(--panel-bg)] [&_tr]:border-b [&_tr]:border-[var(--panel-border)]',
+      className,
+    )}
+    {...props}
+  />
 ));
 TableHeader.displayName = 'TableHeader';
 
@@ -43,7 +51,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      'bg-muted/50 border-t font-medium last:[&>tr]:border-b-0',
+      'bg-[var(--panel-inset)] border-t border-[var(--panel-border)] font-medium last:[&>tr]:border-b-0',
       className,
     )}
     {...props}
@@ -58,7 +66,10 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors',
+      // Industrial row: subtle hover, left accent on selected
+      'border-b border-[var(--panel-border)]/50 transition-colors',
+      'hover:bg-[var(--panel-bg)]',
+      'data-[state=selected]:bg-bruss/5 data-[state=selected]:border-l-2 data-[state=selected]:border-l-bruss',
       className,
     )}
     {...props}
@@ -73,7 +84,9 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      'text-muted-foreground h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0',
+      // Industrial header cell: uppercase, tracking, semibold
+      'text-muted-foreground h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wider',
+      '[&:has([role=checkbox])]:pr-0',
       className,
     )}
     {...props}
@@ -87,7 +100,12 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
+    className={cn(
+      'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+      // Numeric data styling hint via data attribute
+      'data-[numeric=true]:font-mono data-[numeric=true]:tabular-nums',
+      className,
+    )}
     {...props}
   />
 ));

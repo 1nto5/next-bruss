@@ -42,8 +42,7 @@
     "selected": "selected",
     "export": "Export",
     "search_button": "Search",
-    "refresh": "Refresh",
-    "showOnlyDefects": "Show only defects"
+    "refresh": "Refresh"
   },
   "statusOptions": {
     "box": "box",
