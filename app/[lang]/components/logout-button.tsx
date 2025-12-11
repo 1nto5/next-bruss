@@ -2,16 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOutAction } from '@/app/[lang]/auth/actions';
 
 export function LogoutButton({ lang }: { lang: string }) {
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => signOut({ callbackUrl: `/${lang}` })}
-    >
-      <LogOut />
-    </Button>
+    <form action={signOutAction}>
+      <input type="hidden" name="lang" value={lang} />
+      <Button variant="ghost" size="icon" type="submit">
+        <LogOut />
+      </Button>
+    </form>
   );
 }
