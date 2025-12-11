@@ -91,6 +91,18 @@ export const deHeaderRoutes: HeaderRoute[] = [
         href: ROUTE_PATHS.dmcheckData,
         title: 'DMCheck Data',
       },
+      {
+        href: ROUTE_PATHS.ovenData,
+        title: 'Ofen Daten',
+      },
+      {
+        href: ROUTE_PATHS.deviations,
+        title: 'Abweichungen',
+      },
+      {
+        href: ROUTE_PATHS.failuresLv,
+        title: 'LV Störungen',
+      },
     ],
   },
   {
@@ -107,7 +119,21 @@ export const deHeaderRoutes: HeaderRoute[] = [
       },
       {
         href: ROUTE_PATHS.overtimeSubmissions,
-        title: 'Überstundenmeldungen - test',
+        title: 'Überstundenmeldungen - Test',
+      },
+    ],
+  },
+  {
+    title: 'Werkzeuge',
+    href: '',
+    submenu: [
+      {
+        href: ROUTE_PATHS.codesGenerator,
+        title: 'QR/Barcode/DMC Generator',
+      },
+      {
+        href: ROUTE_PATHS.inventory,
+        title: 'Inventurgenehmigung',
       },
     ],
   },
