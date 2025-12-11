@@ -58,9 +58,15 @@ export default async function Header({ dict, lang }: HeaderProps) {
 
   return (
     <header
-      className={`bg-background sticky top-0 z-50 w-full border-b px-2 py-4 transition-all`}
+      className={cn(
+        // Industrial header: panel styling with subtle shadow
+        'sticky top-0 z-50 w-full transition-all',
+        'bg-[var(--panel-bg)] border-b border-[var(--panel-border)]',
+        'shadow-[0_1px_3px_oklch(0.2_0.02_260/0.08)]',
+        'px-4 py-3',
+      )}
     >
-      <div className='relative mx-auto flex h-4 w-full items-center justify-between'>
+      <div className='relative mx-auto flex h-6 w-full items-center justify-between'>
         <div className='flex items-center'>
           <Sheet>
             <SheetTrigger asChild>
@@ -166,12 +172,16 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline outline-hidden transition-colors select-none',
+            // Industrial list item: subtle hover with bruss accent
+            'block space-y-1 rounded-sm p-3 leading-none no-underline outline-hidden select-none',
+            'transition-all duration-150 ease-[var(--ease-standard)]',
+            'hover:bg-bruss/5 hover:text-foreground',
+            'focus:bg-bruss/10 focus:text-foreground',
             className,
           )}
           {...props}
         >
-          <div className='text-sm leading-none font-medium'>{title}</div>
+          <div className='text-sm leading-none font-semibold'>{title}</div>
           <p className='text-muted-foreground line-clamp-2 text-sm leading-snug'>
             {children}
           </p>

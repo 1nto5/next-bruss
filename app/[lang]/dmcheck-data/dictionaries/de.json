@@ -42,8 +42,7 @@
     "selected": "ausgewählt",
     "export": "Exportieren",
     "search_button": "Suchen",
-    "refresh": "Aktualisieren",
-    "showOnlyDefects": "Nur Mängel anzeigen"
+    "refresh": "Aktualisieren"
   },
   "statusOptions": {
     "box": "box",

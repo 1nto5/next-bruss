@@ -4,129 +4,232 @@
 @custom-variant dark (&:is(.dark *));
 
 ::selection {
-  background-color: #92b34e;
+  background-color: oklch(0.68 0.14 126);
   color: white;
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.14 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.14 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.14 0 0);
-  --primary: oklch(0.72 0.13 124.79);
+  /* ═══════════════════════════════════════════════════════════════
+     INDUSTRIAL PREMIUM DESIGN SYSTEM - Light Mode
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Core Colors - Warm Industrial */
+  --background: oklch(0.985 0.003 90);
+  --foreground: oklch(0.15 0.01 260);
+  --card: oklch(0.995 0.002 90);
+  --card-foreground: oklch(0.15 0.01 260);
+  --popover: oklch(0.995 0.002 90);
+  --popover-foreground: oklch(0.15 0.01 260);
+
+  /* Primary - BRUSS Green */
+  --primary: oklch(0.68 0.14 126);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.2 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.88 0.06 123.58);
-  --accent-foreground: oklch(0.2 0 0);
-  --destructive: oklch(0.58 0.24 28.48);
-  --destructive-foreground: oklch(0.97 0 0);
-  --border: oklch(0.92 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.72 0.13 124.79);
-  --chart-1: oklch(0.72 0.13 124.79);
-  --chart-2: oklch(0.72 0.13 124.79);
-  --chart-3: oklch(0.72 0.13 124.79);
-  --chart-4: oklch(0.72 0.13 124.79);
-  --chart-5: oklch(0.72 0.13 124.79);
-  --bruss: oklch(0.68 0.12 126);
+
+  /* Secondary - Steel Gray */
+  --secondary: oklch(0.94 0.008 260);
+  --secondary-foreground: oklch(0.25 0.01 260);
+
+  /* Muted */
+  --muted: oklch(0.94 0.005 90);
+  --muted-foreground: oklch(0.45 0.01 260);
+
+  /* Accent - Copper/Bronze */
+  --accent: oklch(0.92 0.03 55);
+  --accent-foreground: oklch(0.30 0.05 55);
+
+  /* Destructive - Industrial Red */
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+
+  /* Borders & Inputs */
+  --border: oklch(0.88 0.008 260);
+  --input: oklch(0.88 0.008 260);
+  --ring: oklch(0.68 0.14 126);
+
+  /* Chart Colors - 5 Distinct Industrial */
+  --chart-1: oklch(0.68 0.14 126);
+  --chart-2: oklch(0.55 0.12 245);
+  --chart-3: oklch(0.68 0.12 55);
+  --chart-4: oklch(0.55 0.18 25);
+  --chart-5: oklch(0.75 0.14 85);
+
+  /* BRUSS Brand */
+  --bruss: oklch(0.68 0.14 126);
   --bruss-foreground: oklch(0.99 0 0);
-  --sidebar: oklch(0.99 0 0);
-  --sidebar-foreground: oklch(0.14 0 0);
-  --sidebar-primary: oklch(0.2 0 0);
+
+  /* LED Status Colors */
+  --led-green: oklch(0.72 0.22 145);
+  --led-green-glow: oklch(0.72 0.22 145 / 0.4);
+  --led-amber: oklch(0.75 0.18 75);
+  --led-amber-glow: oklch(0.75 0.18 75 / 0.4);
+  --led-red: oklch(0.62 0.24 25);
+  --led-red-glow: oklch(0.62 0.24 25 / 0.4);
+  --led-blue: oklch(0.65 0.18 250);
+  --led-blue-glow: oklch(0.65 0.18 250 / 0.4);
+
+  /* Panel Colors */
+  --panel-bg: oklch(0.97 0.005 260);
+  --panel-border: oklch(0.85 0.01 260);
+  --panel-inset: oklch(0.93 0.006 260);
+
+  /* Industrial Metal Tones */
+  --industrial-steel: oklch(0.70 0.01 260);
+  --industrial-gunmetal: oklch(0.35 0.02 260);
+  --industrial-chrome: oklch(0.88 0.005 260);
+
+  /* Sidebar */
+  --sidebar: oklch(0.98 0.003 90);
+  --sidebar-foreground: oklch(0.15 0.01 260);
+  --sidebar-primary: oklch(0.68 0.14 126);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.2 0 0);
-  --sidebar-border: oklch(0.92 0 0);
-  --sidebar-ring: oklch(0.71 0 0);
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  --radius: 0rem;
-  --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
-  --shadow-xs: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
-  --shadow-sm:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 1px 2px -1px hsl(0 0% 10.2% / 0);
-  --shadow:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 1px 2px -1px hsl(0 0% 10.2% / 0);
-  --shadow-md:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 2px 4px -1px hsl(0 0% 10.2% / 0);
-  --shadow-lg:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 4px 6px -1px hsl(0 0% 10.2% / 0);
-  --shadow-xl:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 8px 10px -1px hsl(0 0% 10.2% / 0);
-  --shadow-2xl: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
+  --sidebar-accent: oklch(0.94 0.02 126);
+  --sidebar-accent-foreground: oklch(0.25 0.05 126);
+  --sidebar-border: oklch(0.88 0.008 260);
+  --sidebar-ring: oklch(0.68 0.14 126);
+
+  /* Typography - Using CSS variables from next/font */
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+  --font-mono: var(--font-mono), ui-monospace, 'SF Mono', monospace;
+
+  /* Radius - Subtle Industrial Softening */
+  --radius: 0.25rem;
+
+  /* Shadows - Industrial Precision */
+  --shadow-2xs: 0 1px 2px 0 oklch(0.20 0.02 260 / 0.04);
+  --shadow-xs: 0 1px 3px 0 oklch(0.20 0.02 260 / 0.06);
+  --shadow-sm: 0 1px 2px 0 oklch(0.20 0.02 260 / 0.05), 0 2px 4px -1px oklch(0.20 0.02 260 / 0.05);
+  --shadow: 0 1px 3px 0 oklch(0.20 0.02 260 / 0.08), 0 4px 6px -2px oklch(0.20 0.02 260 / 0.05);
+  --shadow-md: 0 2px 4px 0 oklch(0.20 0.02 260 / 0.06), 0 6px 10px -3px oklch(0.20 0.02 260 / 0.08);
+  --shadow-lg: 0 4px 6px 0 oklch(0.20 0.02 260 / 0.05), 0 10px 15px -5px oklch(0.20 0.02 260 / 0.10);
+  --shadow-xl: 0 8px 10px 0 oklch(0.20 0.02 260 / 0.04), 0 20px 25px -8px oklch(0.20 0.02 260 / 0.12);
+  --shadow-2xl: 0 25px 50px -12px oklch(0.20 0.02 260 / 0.25);
+  --shadow-inset: inset 0 2px 4px 0 oklch(0.20 0.02 260 / 0.06);
+
+  /* Motion - Industrial Precision */
+  --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-instant: 75ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 }
 
 .dark {
-  --background: oklch(0.14 0 0);
-  --foreground: oklch(0.99 0 0);
-  --card: oklch(0.21 0 0);
-  --card-foreground: oklch(0.99 0 0);
-  --popover: oklch(0.27 0 0);
-  --popover-foreground: oklch(0.99 0 0);
-  --primary: oklch(0.72 0.13 124.79);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.27 0 0);
-  --secondary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.27 0 0);
-  --muted-foreground: oklch(0.71 0 0);
-  --accent: oklch(0.49 0.09 130.55);
-  --accent-foreground: oklch(0.99 0 0);
-  --destructive: oklch(0.7 0.19 22.23);
-  --destructive-foreground: oklch(0.27 0 0);
-  --border: oklch(0.34 0 0);
-  --input: oklch(0.44 0 0);
-  --ring: oklch(0.72 0.13 124.79);
-  --chart-1: oklch(0.72 0.13 124.79);
-  --chart-2: oklch(0.72 0.13 124.79);
-  --chart-3: oklch(0.72 0.13 124.79);
-  --chart-4: oklch(0.72 0.13 124.79);
-  --chart-5: oklch(0.72 0.13 124.79);
-  --bruss: oklch(0.68 0.12 126);
-  --bruss-foreground: oklch(0.99 0 0);
-  --sidebar: oklch(0.2 0 0);
-  --sidebar-foreground: oklch(0.99 0 0);
-  --sidebar-primary: oklch(0.99 0 0);
-  --sidebar-primary-foreground: oklch(0.2 0 0);
-  --sidebar-accent: oklch(0.27 0 0);
-  --sidebar-accent-foreground: oklch(0.99 0 0);
-  --sidebar-border: oklch(1 0 0);
-  --sidebar-ring: oklch(0.44 0 0);
-  --font-sans:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  --radius: 0rem;
-  --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
-  --shadow-xs: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
-  --shadow-sm:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 1px 2px -1px hsl(0 0% 10.2% / 0);
-  --shadow:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 1px 2px -1px hsl(0 0% 10.2% / 0);
-  --shadow-md:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 2px 4px -1px hsl(0 0% 10.2% / 0);
-  --shadow-lg:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 4px 6px -1px hsl(0 0% 10.2% / 0);
-  --shadow-xl:
-    0px 1px 0px 0px hsl(0 0% 10.2% / 0), 0px 8px 10px -1px hsl(0 0% 10.2% / 0);
-  --shadow-2xl: 0px 1px 0px 0px hsl(0 0% 10.2% / 0);
+  /* ═══════════════════════════════════════════════════════════════
+     INDUSTRIAL PREMIUM DESIGN SYSTEM - Dark Mode
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Core Colors - Steel Dark */
+  --background: oklch(0.16 0.01 260);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.20 0.01 260);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.22 0.01 260);
+  --popover-foreground: oklch(0.95 0 0);
+
+  /* Primary - BRUSS Green (slightly brighter for dark) */
+  --primary: oklch(0.72 0.14 126);
+  --primary-foreground: oklch(0.15 0 0);
+
+  /* Secondary - Steel */
+  --secondary: oklch(0.28 0.01 260);
+  --secondary-foreground: oklch(0.92 0 0);
+
+  /* Muted */
+  --muted: oklch(0.26 0.01 260);
+  --muted-foreground: oklch(0.65 0 0);
+
+  /* Accent - Copper (darker) */
+  --accent: oklch(0.35 0.06 55);
+  --accent-foreground: oklch(0.90 0.04 55);
+
+  /* Destructive */
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.95 0 0);
+
+  /* Borders & Inputs */
+  --border: oklch(0.32 0.01 260);
+  --input: oklch(0.28 0.01 260);
+  --ring: oklch(0.72 0.14 126);
+
+  /* Chart Colors - 5 Distinct (much brighter for dark mode contrast) */
+  --chart-1: oklch(0.78 0.16 126);
+  --chart-2: oklch(0.72 0.14 245);
+  --chart-3: oklch(0.78 0.14 55);
+  --chart-4: oklch(0.72 0.20 25);
+  --chart-5: oklch(0.85 0.16 85);
+
+  /* BRUSS Brand */
+  --bruss: oklch(0.72 0.14 126);
+  --bruss-foreground: oklch(0.15 0 0);
+
+  /* LED Status Colors (same, they glow!) */
+  --led-green: oklch(0.72 0.22 145);
+  --led-green-glow: oklch(0.72 0.22 145 / 0.5);
+  --led-amber: oklch(0.75 0.18 75);
+  --led-amber-glow: oklch(0.75 0.18 75 / 0.5);
+  --led-red: oklch(0.62 0.24 25);
+  --led-red-glow: oklch(0.62 0.24 25 / 0.5);
+  --led-blue: oklch(0.65 0.18 250);
+  --led-blue-glow: oklch(0.65 0.18 250 / 0.5);
+
+  /* Panel Colors */
+  --panel-bg: oklch(0.18 0.01 260);
+  --panel-border: oklch(0.30 0.01 260);
+  --panel-inset: oklch(0.14 0.01 260);
+
+  /* Industrial Metal Tones */
+  --industrial-steel: oklch(0.55 0.01 260);
+  --industrial-gunmetal: oklch(0.30 0.02 260);
+  --industrial-chrome: oklch(0.75 0.005 260);
+
+  /* Sidebar */
+  --sidebar: oklch(0.18 0.01 260);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.72 0.14 126);
+  --sidebar-primary-foreground: oklch(0.15 0 0);
+  --sidebar-accent: oklch(0.28 0.04 126);
+  --sidebar-accent-foreground: oklch(0.90 0.02 126);
+  --sidebar-border: oklch(0.32 0.01 260);
+  --sidebar-ring: oklch(0.72 0.14 126);
+
+  /* Typography */
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+  --font-mono: var(--font-mono), ui-monospace, 'SF Mono', monospace;
+
+  /* Radius */
+  --radius: 0.25rem;
+
+  /* Shadows - Darker, more dramatic */
+  --shadow-2xs: 0 1px 2px 0 oklch(0 0 0 / 0.15);
+  --shadow-xs: 0 1px 3px 0 oklch(0 0 0 / 0.20);
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.15), 0 2px 4px -1px oklch(0 0 0 / 0.15);
+  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.20), 0 4px 6px -2px oklch(0 0 0 / 0.15);
+  --shadow-md: 0 2px 4px 0 oklch(0 0 0 / 0.18), 0 6px 10px -3px oklch(0 0 0 / 0.22);
+  --shadow-lg: 0 4px 6px 0 oklch(0 0 0 / 0.15), 0 10px 15px -5px oklch(0 0 0 / 0.25);
+  --shadow-xl: 0 8px 10px 0 oklch(0 0 0 / 0.12), 0 20px 25px -8px oklch(0 0 0 / 0.30);
+  --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.50);
+  --shadow-inset: inset 0 2px 4px 0 oklch(0 0 0 / 0.15);
+
+  /* Motion - Same as light */
+  --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-instant: 75ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 }
 
 @theme inline {
+  /* Core Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -146,13 +249,39 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Chart Colors */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* BRUSS Brand */
   --color-bruss: var(--bruss);
   --color-bruss-foreground: var(--bruss-foreground);
+
+  /* LED Status Colors */
+  --color-led-green: var(--led-green);
+  --color-led-green-glow: var(--led-green-glow);
+  --color-led-amber: var(--led-amber);
+  --color-led-amber-glow: var(--led-amber-glow);
+  --color-led-red: var(--led-red);
+  --color-led-red-glow: var(--led-red-glow);
+  --color-led-blue: var(--led-blue);
+  --color-led-blue-glow: var(--led-blue-glow);
+
+  /* Panel Colors */
+  --color-panel-bg: var(--panel-bg);
+  --color-panel-border: var(--panel-border);
+  --color-panel-inset: var(--panel-inset);
+
+  /* Industrial Metal Tones */
+  --color-industrial-steel: var(--industrial-steel);
+  --color-industrial-gunmetal: var(--industrial-gunmetal);
+  --color-industrial-chrome: var(--industrial-chrome);
+
+  /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -162,15 +291,19 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Typography */
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
   --radius-xl: calc(var(--radius) + 4px);
 
+  /* Shadows */
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
@@ -179,6 +312,17 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+  --shadow-inset: var(--shadow-inset);
+
+  /* Motion */
+  --ease-standard: var(--ease-standard);
+  --ease-enter: var(--ease-enter);
+  --ease-exit: var(--ease-exit);
+  --ease-bounce: var(--ease-bounce);
+  --duration-instant: var(--duration-instant);
+  --duration-fast: var(--duration-fast);
+  --duration-normal: var(--duration-normal);
+  --duration-slow: var(--duration-slow);
 }
 @layer base {
   * {
@@ -302,4 +446,217 @@
   select {
     font-size: max(16px, 1rem) !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INDUSTRIAL PREMIUM ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes industrial-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.6;
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes press-down {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes led-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes skeleton-industrial {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes success-flash {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: oklch(0.72 0.22 145 / 0.15);
+  }
+}
+
+@keyframes error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INDUSTRIAL UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Button press feedback */
+.press-feedback:active {
+  animation: press-down 0.1s var(--ease-standard);
+}
+
+/* Success state */
+.success-state {
+  animation: success-flash 0.6s var(--ease-standard);
+}
+
+/* Error state */
+.error-state {
+  animation: error-shake 0.4s var(--ease-standard);
+}
+
+/* Industrial skeleton loading */
+.skeleton-industrial {
+  background: linear-gradient(
+    90deg,
+    var(--panel-inset) 0%,
+    var(--panel-bg) 50%,
+    var(--panel-inset) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-industrial 1.5s ease-in-out infinite;
+}
+
+/* LED indicator base */
+.led-indicator {
+  animation: led-glow 2s ease-in-out infinite;
+}
+
+/* Industrial accent line (left border) */
+.industrial-accent-line {
+  position: relative;
+}
+.industrial-accent-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background-color: var(--bruss);
+}
+
+/* Corner brackets decoration */
+.corner-brackets {
+  position: relative;
+}
+.corner-brackets::before,
+.corner-brackets::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--bruss);
+  opacity: 0.4;
+}
+.corner-brackets::before {
+  top: 0;
+  left: 0;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+.corner-brackets::after {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+}
+
+/* Hover lift effect for cards */
+.hover-lift {
+  transition: transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Industrial panel background with subtle texture */
+.panel-texture {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px;
+  background-blend-mode: overlay;
+}
+.panel-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.015;
+  pointer-events: none;
+}
+
+/* Technical grid pattern */
+.grid-pattern {
+  background-image: linear-gradient(
+      var(--panel-border) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, var(--panel-border) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Display font for headings */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Tabular numbers for data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
 }

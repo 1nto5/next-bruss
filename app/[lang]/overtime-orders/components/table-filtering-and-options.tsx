@@ -507,7 +507,7 @@ export default function TableFilteringAndOptions({
           </div>
         )}
       </CardHeader>
-      <CardContent className='p-4 pt-0'>
+      <CardContent className='p-4 pt-4'>
         <form onSubmit={handleSearchClick} className='flex flex-col gap-4'>
           {/* Row 1: ID, Status, Department */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>

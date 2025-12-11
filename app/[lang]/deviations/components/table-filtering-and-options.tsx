@@ -218,7 +218,7 @@ export default function TableFilteringAndOptions({
         </form>
       </CardHeader>
       {showFilters && (
-        <CardContent className="p-4 pt-0">
+        <CardContent className="p-4 pt-4">
           {' '}
           {/* Adjust padding */}
           <form onSubmit={handleSearchClick} className="flex flex-col gap-4">
