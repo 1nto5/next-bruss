@@ -186,7 +186,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.rolesLastRefreshed = Date.now();
           session.user.roles = latestRoles;
         } catch (error) {
-          throw new Error('refresh user roles error');
+          console.error('Failed to refresh user roles:', error);
+          // Fall back to cached roles instead of crashing
+          session.user.roles = token.role as string[];
         }
       } else {
         session.user.roles = token.role as string[];
