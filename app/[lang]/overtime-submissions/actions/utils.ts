@@ -1,5 +1,9 @@
 'use server';
 
+import {
+  overtimeSubmissionApprovalNotification,
+  overtimeSubmissionRejectionNotification,
+} from '@/lib/services/email-templates';
 import mailer from '@/lib/services/mailer';
 import { dbc } from '@/lib/db/mongo';
 import { revalidateTag } from 'next/cache';
@@ -87,25 +91,11 @@ export async function sendRejectionEmailToEmployee(
   id: string,
   rejectionReason?: string,
 ) {
-  const subject = 'Odrzucone nadgodziny';
-  const additionalText = rejectionReason
-    ? `<p><strong>Powód odrzucenia:</strong> ${rejectionReason}</p>`
-    : '';
-  const mailOptions = {
-    to: email,
-    subject,
-    html: `<div style="font-family: sans-serif;">
-          <p>Twoje zgłoszenie nadgodzin zostało odrzucone.</p>
-          ${additionalText}
-          <p>
-          <a href="${process.env.BASE_URL}/overtime/${id}"
-             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
-            Otwórz zgłoszenie
-          </a>
-          </p>
-        </div>`,
-  };
-  await mailer(mailOptions);
+  const { subject, html } = overtimeSubmissionRejectionNotification({
+    requestUrl: `${process.env.BASE_URL}/overtime/${id}`,
+    reason: rejectionReason,
+  });
+  await mailer({ to: email, subject, html });
 }
 
 /**
@@ -118,27 +108,9 @@ export async function sendApprovalEmailToEmployee(
   id: string,
   approvalType: 'supervisor' | 'final' = 'final',
 ) {
-  const subject =
-    approvalType === 'supervisor'
-      ? 'Nadgodziny zatwierdzone przez przełożonego'
-      : 'Zatwierdzone nadgodziny';
-  const message =
-    approvalType === 'supervisor'
-      ? '<p>Twoje zgłoszenie nadgodzin zostało zatwierdzone przez przełożonego i oczekuje na zatwierdzenie przez Plant Managera.</p>'
-      : '<p>Twoje zgłoszenie nadgodzin zostało zatwierdzone!</p>';
-
-  const mailOptions = {
-    to: email,
-    subject,
-    html: `<div style="font-family: sans-serif;">
-          ${message}
-          <p>
-          <a href="${process.env.BASE_URL}/overtime/${id}"
-             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #28a745; text-decoration: none; border-radius: 5px;">
-            Otwórz zgłoszenie
-          </a>
-          </p>
-        </div>`,
-  };
-  await mailer(mailOptions);
+  const { subject, html } = overtimeSubmissionApprovalNotification({
+    requestUrl: `${process.env.BASE_URL}/overtime/${id}`,
+    stage: approvalType,
+  });
+  await mailer({ to: email, subject, html });
 }

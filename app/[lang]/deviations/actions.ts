@@ -11,9 +11,18 @@ import {
 } from '@/app/[lang]/deviations/lib/types';
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
-import mailer from '@/lib/services/mailer'; // Import the mailer utility
+import {
+  approvalDecisionNotification,
+  correctiveActionAssignmentNotification,
+  deviationNoGroupLeaderNotification,
+  deviationRoleNotification,
+  deviationVacancyNotification,
+  plantManagerFinalApprovalNotification,
+  printImplementationNotification,
+  rejectionReevaluationNotification,
+} from '@/lib/services/email-templates';
+import mailer from '@/lib/services/mailer';
 import { formatDate } from '@/lib/utils/date-format';
-import { extractNameFromEmail } from '@/lib/utils/name-format';
 import { Collection, ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -38,14 +47,6 @@ const APPROVAL_ROLES = [
   'production-manager',
   'plant-manager',
 ] as const;
-
-// Polish translations for roles
-const ROLE_TRANSLATIONS: { [key: string]: string } = {
-  'group-leader': 'Group Leader',
-  'quality-manager': 'Kierownik Jakości',
-  'production-manager': 'Kierownik Produkcji',
-  'plant-manager': 'Dyrektor Zakładu', // Updated translation
-};
 
 // --- Notification Helper Functions ---
 
@@ -72,22 +73,13 @@ async function sendGroupLeaderNotification(
   );
 
   if (uniqueEmails.length > 0) {
-    const roleTranslated = ROLE_TRANSLATIONS['group-leader'];
-    const actionText =
-      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
-    const requirementText = 'zatwierdzenie';
-
-    // Standardized subject
-    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
-    // Standardized HTML body
-    const html = `
-      <div>
-        <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
-        <p>Obszar: ${deviationArea?.toUpperCase() || 'Ogólny'}</p>
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+    const { subject, html } = deviationRoleNotification({
+      internalId,
+      deviationUrl,
+      role: 'group-leader',
+      area: deviationArea,
+      isEdit: notificationContext === 'edit',
+    });
 
     for (const email of uniqueEmails) {
       try {
@@ -128,21 +120,12 @@ async function sendVacancyNotificationToPlantManager(
   );
 
   if (uniqueEmails.length > 0) {
-    const actionText =
-      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
-    const requirementText = 'zatwierdzenie';
-    const vacantRoleTranslated = ROLE_TRANSLATIONS[vacantRole] || vacantRole;
-    // Standardized subject for vacancy
-    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat - ${vacantRoleTranslated})`;
-    // Standardized HTML body for vacancy
-    const html = `
-        <div>
-          <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText}.</p>
-          <p style="color: red; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu wakatu na stanowisku: ${vacantRoleTranslated}.</p>
-          <p>
-            <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-          </p>
-        </div>`;
+    const { subject, html } = deviationVacancyNotification({
+      internalId,
+      deviationUrl,
+      vacantRole,
+      isEdit: notificationContext === 'edit',
+    });
 
     for (const email of uniqueEmails) {
       try {
@@ -152,7 +135,7 @@ async function sendVacancyNotificationToPlantManager(
           sentAt: new Date(),
           type:
             notificationContext === 'creation'
-              ? `creation-vacant-role-${vacantRole}` // More specific type
+              ? `creation-vacant-role-${vacantRole}`
               : `edit-vacant-role-${vacantRole}`,
         });
       } catch (e) {
@@ -188,21 +171,12 @@ async function sendNoGroupLeaderNotification(
   );
 
   if (uniqueEmails.length > 0) {
-    const actionText =
-      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
-    const requirementText = 'zatwierdzenia';
-
-    // Standardized subject for no GL
-    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (wakat Group Leader)`;
-    // Standardized HTML body for no GL
-    const html = `
-      <div>
-        <p>${actionText} odchylenie [${internalId}] w obszarze ${deviationArea?.toUpperCase()}, które wymaga ${requirementText}.</p>
-        <p style="color: orange; font-weight: bold;">Powiadomienie wysłano do Dyrektora Zakładu z powodu braku przypisanego: Group Leadera (${deviationArea?.toUpperCase()}).</p>
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+    const { subject, html } = deviationNoGroupLeaderNotification({
+      internalId,
+      deviationUrl,
+      area: deviationArea || '',
+      isEdit: notificationContext === 'edit',
+    });
 
     for (const email of uniqueEmails) {
       try {
@@ -213,7 +187,7 @@ async function sendNoGroupLeaderNotification(
           type:
             notificationContext === 'creation'
               ? 'no-group-leader'
-              : 'edit-no-group-leader', // Context-based type
+              : 'edit-no-group-leader',
         });
       } catch (e) {
         console.error(`Failed No-GL mail to Plant Manager ${email}:`, e);
@@ -246,21 +220,12 @@ async function sendRoleNotification(
   );
 
   if (uniqueEmails.length > 0) {
-    const roleTranslated = ROLE_TRANSLATIONS[role] || role; // Translate role name if available
-    const actionText =
-      notificationContext === 'creation' ? 'Utworzono nowe' : 'Zaktualizowano';
-    const requirementText = 'zatwierdzenie';
-
-    // Standardized subject
-    const subject = `Odchylenie [${internalId}] - wymagane ${requirementText} (${roleTranslated})`;
-    // Standardized HTML body
-    const html = `
-      <div>
-        <p>${actionText} odchylenie [${internalId}] - wymagane ${requirementText} przez: ${roleTranslated}.</p>
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+    const { subject, html } = deviationRoleNotification({
+      internalId,
+      deviationUrl,
+      role,
+      isEdit: notificationContext === 'edit',
+    });
 
     for (const email of uniqueEmails) {
       try {
@@ -271,7 +236,7 @@ async function sendRoleNotification(
           type:
             notificationContext === 'creation'
               ? `creation-${role}`
-              : `edit-${role}`, // Context-based type using role
+              : `edit-${role}`,
         });
       } catch (e) {
         console.error(`Failed ${role} mail to ${email}:`, e);
@@ -452,16 +417,12 @@ async function sendCorrectiveActionAssignmentNotification(
   responsibleUserEmail: string, // Email of the person responsible
   deviationUrl: string,
 ): Promise<NotificationLogType | null> {
-  const subject = `Przypisano akcję korygującą w odchyleniu [${internalId}]`;
-  const html = `
-      <div>
-        <p>Zostałeś/aś wyznaczony/a jako osoba odpowiedzialna za wykonanie akcji korygującej w odchyleniu [${internalId}].</p>
-        <p><strong>Opis akcji:</strong> ${correctiveAction.description}</p>
-        <p><strong>Termin wykonania:</strong> ${formatDate(correctiveAction.deadline)}</p>
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+  const { subject, html } = correctiveActionAssignmentNotification({
+    internalId,
+    deviationUrl,
+    description: correctiveAction.description,
+    deadline: formatDate(correctiveAction.deadline),
+  });
 
   try {
     await mailer({ to: responsibleUserEmail, subject, html });
@@ -509,18 +470,11 @@ async function sendRejectionReevaluationNotification(
     return logs; // No one to notify
   }
 
-  const reasonText =
-    reason === 'corrective_action'
-      ? 'dodano nową akcję korygującą'
-      : 'dodano nowy załącznik';
-  const subject = `Odchylenie [${deviation.internalId}] - aktualizacja (wymaga ponownej weryfikacji)`;
-  const html = `
-      <div>
-        <p>W odchyleniu [${deviation.internalId}], które wcześniej odrzuciłeś/aś, ${reasonText}.</p>
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+  const { subject, html } = rejectionReevaluationNotification({
+    internalId: deviation.internalId!,
+    deviationUrl,
+    reason,
+  });
 
   // Loop through the identified rejectors and send email
   for (const email of Array.from(rejectors)) {
@@ -558,17 +512,14 @@ async function sendApprovalDecisionNotificationToOwner(
     return null;
   }
 
-  const decisionText = decision === 'approved' ? 'zatwierdzone' : 'odrzucone';
-  const roleTranslated = ROLE_TRANSLATIONS[approverRole] || approverRole;
-  const subject = `Odchylenie [${deviation.internalId}] zostało ${decisionText}`;
-  const html = `
-      <div>
-        <p>Twoje odchylenie [${deviation.internalId}] zostało ${decisionText} przez ${extractNameFromEmail(approverEmail)} (${roleTranslated}).</p>
-        ${decision === 'rejected' && comment ? `<p><strong>Komentarz:</strong> ${comment}</p>` : ''}
-        <p>
-          <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-        </p>
-      </div>`;
+  const { subject, html } = approvalDecisionNotification({
+    internalId: deviation.internalId!,
+    deviationUrl,
+    decision,
+    approverEmail,
+    approverRole,
+    comment,
+  });
 
   try {
     await mailer({ to: deviation.owner, subject, html });
@@ -605,16 +556,11 @@ async function sendTeamLeaderNotificationForPrint(
   );
 
   if (uniqueEmails.length > 0) {
-    const subject = `Odchylenie [${deviation.internalId}] wymaga wydruku i wdrożenia`;
-
-    // HTML body with clear instructions
-    const html = `
-      <div>
-      <p>Odchylenie [${deviation.internalId}] zostało zatwierdzone - wymaga wydruku i wdrożenia na: ${deviation.area === 'coating' ? 'POWLEKANIE' : deviation.area?.toUpperCase()} </p>
-      <p>
-        <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-      </p>
-      </div>`;
+    const { subject, html } = printImplementationNotification({
+      internalId: deviation.internalId!,
+      deviationUrl,
+      area: deviation.area || '',
+    });
 
     for (const email of uniqueEmails) {
       try {
@@ -1044,15 +990,10 @@ export async function approveDeviation(
           );
 
           if (uniqueEmails.length > 0) {
-            // Special subject and message for when all other roles have approved
-            const subject = `Odchylenie [${updatedDeviation.internalId}] - wymaga decyzji Dyrektora Zakładu`;
-            const html = `
-              <div>
-                <p>Wszystkie stanowiska zatwierdziły odchylenie [${updatedDeviation.internalId}], czeka na decyzję Dyrektora Zakładu.</p>
-                <p>
-                  <a href="${deviationUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">Przejdź do odchylenia</a>
-                </p>
-              </div>`;
+            const { subject, html } = plantManagerFinalApprovalNotification({
+              internalId: updatedDeviation.internalId!,
+              deviationUrl,
+            });
 
             const plantManagerNotificationLogs: NotificationLogType[] = [];
             for (const email of uniqueEmails) {
