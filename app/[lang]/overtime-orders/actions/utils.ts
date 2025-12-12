@@ -1,5 +1,6 @@
 'use server';
 
+import { overtimeOrderApprovalNotification } from '@/lib/services/email-templates';
 import mailer from '@/lib/services/mailer';
 import { dbc } from '@/lib/db/mongo';
 import { revalidateTag } from 'next/cache';
@@ -63,19 +64,8 @@ export async function redirectToOvertimeOrdersDaysOff(id: string, lang: string) 
 }
 
 export async function sendEmailNotificationToRequestor(email: string, id: string) {
-  const mailOptions = {
-    to: email,
-    subject:
-      'Zatwierdzone zlecanie wykonania pracy w godzinach nadliczbowych - produkcja',
-    html: `<div style="font-family: sans-serif;">
-          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych zostało zatwierdzone.</p>
-          <p>
-          <a href="${process.env.BASE_URL}/overtime-orders/${id}"
-             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
-            Otwórz zlecenie
-          </a>
-          </p>
-        </div>`,
-  };
-  await mailer(mailOptions);
+  const { subject, html } = overtimeOrderApprovalNotification({
+    requestUrl: `${process.env.BASE_URL}/overtime-orders/${id}`,
+  });
+  await mailer({ to: email, subject, html });
 }

@@ -2,6 +2,7 @@
 
 import { auth } from '@/lib/auth';
 import { dbc } from '@/lib/db/mongo';
+import { overtimeOrderApprovalNotification } from '@/lib/services/email-templates';
 import mailer from '@/lib/services/mailer';
 import { ObjectId } from 'mongodb';
 import { revalidateTag } from 'next/cache';
@@ -29,21 +30,10 @@ export async function redirectToProductionOvertimeDaysOff(
 }
 
 async function sendEmailNotificationToRequestor(email: string, id: string) {
-  const mailOptions = {
-    to: email,
-    subject:
-      'Zatwierdzone zlecanie wykonania pracy w godzinach nadliczbowych - produkcja',
-    html: `<div style="font-family: sans-serif;">
-          <p>Twoje zlecenie wykonania pracy w godzinach nadliczbowych - produkcja zostało zatwierdzone.</p>
-          <p>
-          <a href="${process.env.BASE_URL}/production-overtime/${id}" 
-             style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px;">
-            Otwórz zlecenie
-          </a>
-          </p>
-        </div>`,
-  };
-  await mailer(mailOptions);
+  const { subject, html } = overtimeOrderApprovalNotification({
+    requestUrl: `${process.env.BASE_URL}/production-overtime/${id}`,
+  });
+  await mailer({ to: email, subject, html });
 }
 
 export async function approveOvertimeRequest(id: string) {
