@@ -1,0 +1,226 @@
+{
+  "title": "Purchase Requests",
+  "page": {
+    "title": "Purchase Requests",
+    "newRequest": "New Request",
+    "login": "Log in",
+    "settings": "Settings"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "clear": "Clear",
+    "search": "Search",
+    "select": "select",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "back": "Back"
+  },
+  "table": {
+    "noResults": "No results."
+  },
+  "tableColumns": {
+    "id": "No.",
+    "status": "Status",
+    "supplier": "Supplier",
+    "total": "Total",
+    "currency": "Currency",
+    "itemCount": "Items",
+    "manager": "Manager",
+    "requestedBy": "Requested By",
+    "requestedAt": "Request Date",
+    "actions": "Actions",
+    "preApprovedBy": "Pre-approved By",
+    "preApprovedAt": "Pre-approval Date",
+    "approvedBy": "Approved By",
+    "approvedAt": "Approval Date",
+    "orderedBy": "Ordered By",
+    "orderedAt": "Order Date",
+    "statuses": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "pre-approved": "Pre-approved",
+      "approved": "Approved",
+      "ordered": "Ordered",
+      "received": "Received",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Show Filters",
+    "myRequests": "My Requests",
+    "toApprove": "To Approve",
+    "status": "Status",
+    "dateAdded": "Date Added"
+  },
+  "details": {
+    "draft": "Draft",
+    "info": "Information",
+    "actions": "Actions",
+    "preApprovedBy": "Pre-approved by",
+    "preApprovedAt": "Pre-approval date",
+    "approvedBy": "Final approved by",
+    "approvedAt": "Final approval date",
+    "rejectionReason": "Rejection reason"
+  },
+  "form": {
+    "title": "New Purchase Request",
+    "editTitle": "Edit Purchase Request",
+    "supplier": "Supplier",
+    "supplierPlaceholder": "Enter supplier name",
+    "currency": "Currency",
+    "currencyPlaceholder": "Select currency",
+    "manager": "Manager (approver)",
+    "managerPlaceholder": "Select manager",
+    "items": "Items",
+    "addItem": "Add Item",
+    "saveAsDraft": "Save as Draft",
+    "submit": "Submit Request",
+    "saveChanges": "Save Changes",
+    "save": "Save"
+  },
+  "itemForm": {
+    "description": "Description",
+    "descriptionPlaceholder": "Item description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit Price",
+    "article": "Article",
+    "articlePlaceholder": "Article number (optional)",
+    "link": "Link",
+    "linkPlaceholder": "Product link (optional)",
+    "reason": "Reason",
+    "reasonPlaceholder": "Purchase justification",
+    "expectedDelivery": "Expected Delivery",
+    "toolNumber": "Tool Number",
+    "isEstimate": "Estimated Price"
+  },
+  "preApproveDialog": {
+    "title": "Pre-approve Request",
+    "description": "Are you sure you want to pre-approve this request?",
+    "comment": "Comment (optional)",
+    "action": "Pre-approve",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Request pre-approved!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Request not found!",
+      "limitExceeded": "Spending limit exceeded!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "finalApproveDialog": {
+    "title": "Final Approval",
+    "description": "Are you sure you want to give final approval to this request?",
+    "comment": "Comment (optional)",
+    "action": "Approve",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Request approved!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Request not found!",
+      "notPreApproved": "Request not pre-approved!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "rejectDialog": {
+    "title": "Reject Request",
+    "description": "Please provide a reason for rejection.",
+    "reason": "Rejection Reason",
+    "reasonPlaceholder": "Enter reason (min. 10 characters)",
+    "action": "Reject",
+    "reasonMinLength": "Reason must be at least 10 characters!",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Request rejected!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Request not found!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "markOrderedDialog": {
+    "title": "Mark as Ordered",
+    "description": "Enter order number (optional).",
+    "orderNumber": "Order Number",
+    "orderNumberPlaceholder": "Internal order number",
+    "action": "Mark as Ordered",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Request marked as ordered!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Request not found!",
+      "notApproved": "Request not approved!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "markReceivedDialog": {
+    "title": "Confirm Item Receipt",
+    "description": "Do you confirm receipt of this item?",
+    "quantity": "Quantity Received",
+    "action": "Confirm Receipt",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Receipt confirmed!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Item not found!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "addComment": "Add Comment",
+    "placeholder": "Comment content",
+    "noComments": "No comments"
+  },
+  "attachments": {
+    "title": "Attachments",
+    "upload": "Add Attachment",
+    "noAttachments": "No attachments",
+    "maxSize": "Max size: 10MB",
+    "allowedTypes": "Allowed types: PDF"
+  },
+  "settings": {
+    "title": "Purchase Request Settings",
+    "approvers": "Approvers",
+    "approversDescription": "Manage users who can approve purchase requests",
+    "addApprover": "Add Approver",
+    "editApprover": "Edit Approver",
+    "user": "User",
+    "email": "Email",
+    "name": "Name",
+    "isFinalApprover": "Final Approver",
+    "finalApprover": "Final Approver",
+    "limits": "Spending Limits (EUR)",
+    "perUnit": "Per Item",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "unlimited": "Unlimited",
+    "accumulated": "Used",
+    "noApprovers": "No approvers",
+    "add": "Add"
+  },
+  "validation": {
+    "managerRequired": "Select a manager!",
+    "currencyRequired": "Select a currency!",
+    "itemsRequired": "Add at least one item!",
+    "itemsMinLength": "Add at least one item!",
+    "descriptionRequired": "Description is required!",
+    "descriptionMinLength": "Description must be at least 3 characters!",
+    "quantityRequired": "Quantity is required!",
+    "quantityPositive": "Quantity must be greater than 0!",
+    "unitPriceRequired": "Unit price is required!",
+    "unitPriceNonNegative": "Price cannot be negative!",
+    "reasonMinLength": "Reason must be at least 10 characters!"
+  },
+  "toast": {
+    "saved": "Request saved!",
+    "submitted": "Request submitted!",
+    "updated": "Request updated!",
+    "deleted": "Request deleted!",
+    "contactIT": "Contact IT!"
+  }
+}

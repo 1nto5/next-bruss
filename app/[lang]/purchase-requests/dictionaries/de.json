@@ -1,0 +1,226 @@
+{
+  "title": "Bestellanforderungen",
+  "page": {
+    "title": "Bestellanforderungen",
+    "newRequest": "Neue Anforderung",
+    "login": "Anmelden",
+    "settings": "Einstellungen"
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "clear": "Löschen",
+    "search": "Suchen",
+    "select": "auswählen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "add": "Hinzufügen",
+    "back": "Zurück"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse."
+  },
+  "tableColumns": {
+    "id": "Nr.",
+    "status": "Status",
+    "supplier": "Lieferant",
+    "total": "Gesamt",
+    "currency": "Währung",
+    "itemCount": "Positionen",
+    "manager": "Manager",
+    "requestedBy": "Angefordert von",
+    "requestedAt": "Anforderungsdatum",
+    "actions": "Aktionen",
+    "preApprovedBy": "Vorgenehm. von",
+    "preApprovedAt": "Vorgenehm.-Datum",
+    "approvedBy": "Genehmigt von",
+    "approvedAt": "Genehm.-Datum",
+    "orderedBy": "Bestellt von",
+    "orderedAt": "Bestelldatum",
+    "statuses": {
+      "draft": "Entwurf",
+      "pending": "Ausstehend",
+      "pre-approved": "Vorgenehmigt",
+      "approved": "Genehmigt",
+      "ordered": "Bestellt",
+      "received": "Erhalten",
+      "completed": "Abgeschlossen",
+      "rejected": "Abgelehnt"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Filter anzeigen",
+    "myRequests": "Meine Anforderungen",
+    "toApprove": "Zu genehmigen",
+    "status": "Status",
+    "dateAdded": "Hinzugefügt am"
+  },
+  "details": {
+    "draft": "Entwurf",
+    "info": "Informationen",
+    "actions": "Aktionen",
+    "preApprovedBy": "Vorgenehmigt von",
+    "preApprovedAt": "Vorgenehm.-Datum",
+    "approvedBy": "Endgültig genehmigt von",
+    "approvedAt": "Genehm.-Datum",
+    "rejectionReason": "Ablehnungsgrund"
+  },
+  "form": {
+    "title": "Neue Bestellanforderung",
+    "editTitle": "Bestellanforderung bearbeiten",
+    "supplier": "Lieferant",
+    "supplierPlaceholder": "Lieferantenname eingeben",
+    "currency": "Währung",
+    "currencyPlaceholder": "Währung auswählen",
+    "manager": "Manager (Genehmiger)",
+    "managerPlaceholder": "Manager auswählen",
+    "items": "Positionen",
+    "addItem": "Position hinzufügen",
+    "saveAsDraft": "Als Entwurf speichern",
+    "submit": "Anforderung einreichen",
+    "saveChanges": "Änderungen speichern",
+    "save": "Speichern"
+  },
+  "itemForm": {
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Artikelbeschreibung",
+    "quantity": "Menge",
+    "unitPrice": "Stückpreis",
+    "article": "Artikel",
+    "articlePlaceholder": "Artikelnummer (optional)",
+    "link": "Link",
+    "linkPlaceholder": "Produktlink (optional)",
+    "reason": "Begründung",
+    "reasonPlaceholder": "Kaufbegründung",
+    "expectedDelivery": "Erwartete Lieferung",
+    "toolNumber": "Werkzeugnummer",
+    "isEstimate": "Geschätzter Preis"
+  },
+  "preApproveDialog": {
+    "title": "Vorgenehmigung",
+    "description": "Möchten Sie diese Anforderung wirklich vorgenehmigen?",
+    "comment": "Kommentar (optional)",
+    "action": "Vorgenehmigen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Anforderung vorgenehmigt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Anforderung nicht gefunden!",
+      "limitExceeded": "Ausgabenlimit überschritten!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "finalApproveDialog": {
+    "title": "Endgültige Genehmigung",
+    "description": "Möchten Sie dieser Anforderung wirklich die endgültige Genehmigung erteilen?",
+    "comment": "Kommentar (optional)",
+    "action": "Genehmigen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Anforderung genehmigt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Anforderung nicht gefunden!",
+      "notPreApproved": "Anforderung nicht vorgenehmigt!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "rejectDialog": {
+    "title": "Anforderung ablehnen",
+    "description": "Bitte geben Sie einen Ablehnungsgrund an.",
+    "reason": "Ablehnungsgrund",
+    "reasonPlaceholder": "Grund eingeben (min. 10 Zeichen)",
+    "action": "Ablehnen",
+    "reasonMinLength": "Grund muss mindestens 10 Zeichen haben!",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Anforderung abgelehnt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Anforderung nicht gefunden!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "markOrderedDialog": {
+    "title": "Als bestellt markieren",
+    "description": "Bestellnummer eingeben (optional).",
+    "orderNumber": "Bestellnummer",
+    "orderNumberPlaceholder": "Interne Bestellnummer",
+    "action": "Als bestellt markieren",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Als bestellt markiert!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Anforderung nicht gefunden!",
+      "notApproved": "Anforderung nicht genehmigt!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "markReceivedDialog": {
+    "title": "Empfang bestätigen",
+    "description": "Bestätigen Sie den Empfang dieser Position?",
+    "quantity": "Erhaltene Menge",
+    "action": "Empfang bestätigen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Empfang bestätigt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Position nicht gefunden!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "comments": {
+    "title": "Kommentare",
+    "addComment": "Kommentar hinzufügen",
+    "placeholder": "Kommentarinhalt",
+    "noComments": "Keine Kommentare"
+  },
+  "attachments": {
+    "title": "Anhänge",
+    "upload": "Anhang hinzufügen",
+    "noAttachments": "Keine Anhänge",
+    "maxSize": "Max. Größe: 10MB",
+    "allowedTypes": "Erlaubte Typen: PDF"
+  },
+  "settings": {
+    "title": "Einstellungen Bestellanforderungen",
+    "approvers": "Genehmiger",
+    "approversDescription": "Verwalten Sie Benutzer, die Bestellanforderungen genehmigen können",
+    "addApprover": "Genehmiger hinzufügen",
+    "editApprover": "Genehmiger bearbeiten",
+    "user": "Benutzer",
+    "email": "E-Mail",
+    "name": "Name",
+    "isFinalApprover": "Endgenehmiger",
+    "finalApprover": "Endgenehmiger",
+    "limits": "Ausgabenlimits (EUR)",
+    "perUnit": "Pro Position",
+    "daily": "Täglich",
+    "weekly": "Wöchentlich",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "unlimited": "Unbegrenzt",
+    "accumulated": "Verwendet",
+    "noApprovers": "Keine Genehmiger",
+    "add": "Hinzufügen"
+  },
+  "validation": {
+    "managerRequired": "Manager auswählen!",
+    "currencyRequired": "Währung auswählen!",
+    "itemsRequired": "Mindestens eine Position hinzufügen!",
+    "itemsMinLength": "Mindestens eine Position hinzufügen!",
+    "descriptionRequired": "Beschreibung erforderlich!",
+    "descriptionMinLength": "Beschreibung muss mindestens 3 Zeichen haben!",
+    "quantityRequired": "Menge erforderlich!",
+    "quantityPositive": "Menge muss größer als 0 sein!",
+    "unitPriceRequired": "Stückpreis erforderlich!",
+    "unitPriceNonNegative": "Preis kann nicht negativ sein!",
+    "reasonMinLength": "Grund muss mindestens 10 Zeichen haben!"
+  },
+  "toast": {
+    "saved": "Anforderung gespeichert!",
+    "submitted": "Anforderung eingereicht!",
+    "updated": "Anforderung aktualisiert!",
+    "deleted": "Anforderung gelöscht!",
+    "contactIT": "IT kontaktieren!"
+  }
+}

@@ -1,0 +1,292 @@
+{
+  "title": "Rechnungsworkflow",
+  "page": {
+    "title": "Rechnungsworkflow",
+    "newInvoice": "Neue Rechnung",
+    "uploadInvoice": "Rechnung hinzufügen",
+    "supplierCodes": "Lieferantencodes",
+    "login": "Anmelden"
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "clear": "Löschen",
+    "search": "Suchen",
+    "select": "auswählen",
+    "save": "Speichern",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "add": "Hinzufügen",
+    "back": "Zurück",
+    "details": "Details",
+    "reopen": "Wiedereröffnen"
+  },
+  "table": {
+    "noResults": "Keine Ergebnisse."
+  },
+  "tableColumns": {
+    "invoiceNumber": "Rechnungsnr.",
+    "status": "Status",
+    "supplier": "Lieferant",
+    "value": "Wert",
+    "currency": "Währung",
+    "receiver": "Empfänger",
+    "sender": "Absender",
+    "addedAt": "Hinzugefügt am",
+    "invoiceDate": "Rechnungsdatum",
+    "confirmationType": "Bestätigungstyp",
+    "linkedPr": "Verknüpfte BA",
+    "linkedSc": "Verknüpfter LC",
+    "actions": "Aktionen",
+    "statuses": {
+      "to-confirm": "Zu bestätigen",
+      "confirmed": "Bestätigt",
+      "manager-review": "Manager-Prüfung",
+      "booked": "Gebucht",
+      "rejected": "Abgelehnt"
+    },
+    "confirmationTypes": {
+      "pr": "Bestellanforderung (BA)",
+      "sc": "Lieferantencode (LC)",
+      "non-pr": "Ohne BA"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Filter anzeigen",
+    "myInvoices": "Meine Rechnungen",
+    "toConfirm": "Zu bestätigen",
+    "status": "Status",
+    "dateAdded": "Hinzugefügt am"
+  },
+  "uploadForm": {
+    "title": "Neue Rechnung hinzufügen",
+    "invoiceNumber": "Rechnungsnummer",
+    "invoiceNumberPlaceholder": "Lieferanten-Rechnungsnummer",
+    "supplier": "Lieferant",
+    "supplierPlaceholder": "Lieferantenname",
+    "value": "Wert",
+    "currency": "Währung",
+    "currencyPlaceholder": "Währung auswählen",
+    "receiver": "Empfänger (bestätigende Person)",
+    "receiverPlaceholder": "Empfänger auswählen",
+    "invoiceDate": "Rechnungsdatum",
+    "receiveDate": "Eingangsdatum",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Kurze Rechnungsbeschreibung",
+    "proposedPr": "Vorgeschlagene BA",
+    "proposedPrPlaceholder": "BA-Nummer (optional)",
+    "attachment": "Anhang (PDF)",
+    "submit": "Rechnung hinzufügen"
+  },
+  "form": {
+    "title": "Neue Rechnung",
+    "description": "Neue Rechnung zum Workflow hinzufügen",
+    "invoiceNumber": "Rechnungsnummer",
+    "invoiceNumberPlaceholder": "FV/2024/001",
+    "supplierName": "Lieferantenname",
+    "supplierNamePlaceholder": "Lieferantenname",
+    "value": "Wert",
+    "currency": "Währung",
+    "currencyPlaceholder": "Währung auswählen",
+    "receiver": "Empfänger",
+    "receiverPlaceholder": "max.mustermann@bruss-group.com",
+    "invoiceDate": "Rechnungsdatum",
+    "receiveDate": "Eingangsdatum",
+    "shortDescription": "Kurzbeschreibung",
+    "shortDescriptionPlaceholder": "Rechnungsbeschreibung",
+    "upload": "Rechnung hinzufügen"
+  },
+  "details": {
+    "info": "Informationen",
+    "actions": "Aktionen",
+    "sender": "Absender",
+    "confirmedWith": "Bestätigt mit",
+    "bookingReference": "Buchungsreferenz",
+    "rejectionReason": "Ablehnungsgrund",
+    "reviewReason": "Prüfungsgrund",
+    "history": "Verlauf",
+    "confirmDescription": "Rechnung mit Bestellanforderung oder Lieferantencode bestätigen"
+  },
+  "confirmDialog": {
+    "action": "Bestätigen",
+    "withPR": "Mit BA bestätigen",
+    "withSC": "Mit LC bestätigen",
+    "withPRTitle": "Mit Bestellanforderung bestätigen",
+    "withPRDescription": "Wählen Sie eine Bestellanforderung zur Verknüpfung mit dieser Rechnung",
+    "withSCTitle": "Mit Lieferantencode bestätigen",
+    "withSCDescription": "Wählen Sie einen Lieferantencode zur Bestätigung dieser Rechnung",
+    "searchPR": "Bestellanforderung suchen...",
+    "noPRsFound": "Keine Bestellanforderungen gefunden",
+    "selected": "Ausgewählt",
+    "selectSC": "Lieferantencode auswählen",
+    "selectSCPlaceholder": "Code auswählen...",
+    "scDescription": "Beschreibung",
+    "scLimit": "Limit",
+    "notSCOwner": "Sie sind nicht der Eigentümer dieses Codes",
+    "sentToReview": "Rechnung zur Manager-Prüfung gesendet",
+    "success": "Rechnung bestätigt!"
+  },
+  "bookDialog": {
+    "title": "Rechnung buchen",
+    "description": "Buchungsreferenz eingeben (optional)",
+    "reference": "Buchungsreferenz",
+    "referencePlaceholder": "Interne Buchungsnummer",
+    "action": "Buchen",
+    "success": "Rechnung gebucht!"
+  },
+  "rejectDialog": {
+    "title": "Rechnung ablehnen",
+    "description": "Bitte geben Sie einen Ablehnungsgrund an.",
+    "reason": "Ablehnungsgrund",
+    "reasonPlaceholder": "Grund eingeben (min. 10 Zeichen)",
+    "reasonMinLength": "Grund muss mindestens 10 Zeichen haben",
+    "action": "Ablehnen",
+    "success": "Rechnung abgelehnt!",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Rechnung abgelehnt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "managerReviewDialog": {
+    "title": "Manager-Prüfung",
+    "description": "Diese Rechnung erfordert eine Prüfung aufgrund von Abweichungen.",
+    "reason": "Prüfungsgrund",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "success": "Rechnung genehmigt!",
+    "toast": {
+      "loading": "Speichern...",
+      "approveSuccess": "Rechnung genehmigt!",
+      "rejectSuccess": "Rechnung abgelehnt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "confirmWithPrDialog": {
+    "title": "Mit Bestellanforderung bestätigen",
+    "description": "Wählen Sie eine Bestellanforderung zur Verknüpfung mit dieser Rechnung.",
+    "selectPr": "Bestellanforderung auswählen",
+    "searchPr": "BA suchen...",
+    "prDetails": "BA-Details",
+    "action": "Mit BA bestätigen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Rechnung bestätigt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "prNotFound": "BA nicht gefunden!",
+      "currencyMismatch": "Währungsabweichung!",
+      "supplierMismatch": "Lieferantenabweichung!",
+      "valueMismatch": "Wertabweichung - zur Manager-Prüfung gesendet!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "confirmWithScDialog": {
+    "title": "Mit Lieferantencode bestätigen",
+    "description": "Wählen Sie einen Lieferantencode zur Bestätigung dieser Rechnung.",
+    "selectSc": "Lieferantencode auswählen",
+    "searchSc": "Code suchen...",
+    "scDetails": "Code-Details",
+    "action": "Mit LC bestätigen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Rechnung bestätigt!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "scNotFound": "Lieferantencode nicht gefunden!",
+      "notOwner": "Sie sind nicht der Eigentümer dieses Codes!",
+      "limitExceeded": "Code-Limit überschritten - zur Manager-Prüfung gesendet!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "reopenDialog": {
+    "title": "Rechnung wiedereröffnen",
+    "description": "Möchten Sie diese Rechnung zur Bestätigung wiedereröffnen?",
+    "action": "Wiedereröffnen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Rechnung wiedereröffnet!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "markBookedDialog": {
+    "title": "Rechnung buchen",
+    "description": "Buchungsreferenz eingeben (optional).",
+    "bookingReference": "Buchungsreferenz",
+    "bookingReferencePlaceholder": "Interne Buchungsnummer",
+    "action": "Buchen",
+    "toast": {
+      "loading": "Speichern...",
+      "success": "Rechnung gebucht!",
+      "unauthorized": "Nicht autorisiert!",
+      "notFound": "Rechnung nicht gefunden!",
+      "notConfirmed": "Rechnung nicht bestätigt!",
+      "contactIT": "IT kontaktieren!"
+    }
+  },
+  "logs": {
+    "title": "Verlauf",
+    "noLogs": "Kein Verlauf"
+  },
+  "supplierCodes": {
+    "title": "Lieferantencodes (LC)",
+    "list": "Code-Liste",
+    "description": "Lieferantencodes werden verwendet, um Rechnungen ohne Bestellanforderung zu bestätigen",
+    "newCode": "Neuer Code",
+    "add": "Code hinzufügen",
+    "edit": "Code bearbeiten",
+    "addDescription": "Neuen Lieferantencode erstellen",
+    "editDescription": "Lieferantencode bearbeiten",
+    "code": "Code",
+    "codePlaceholder": "SC-001",
+    "descriptionLabel": "Beschreibung",
+    "descriptionPlaceholder": "Lieferantencode-Beschreibung",
+    "owner": "Eigentümer",
+    "ownerName": "Eigentümername",
+    "ownerPlaceholder": "Eigentümer auswählen",
+    "limit": "Limit",
+    "noLimit": "Kein Limit",
+    "maxValue": "Max. Wert",
+    "maxCurrency": "Limit-Währung",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "noCodes": "Keine Lieferantencodes",
+    "codeExists": "Code mit dieser ID existiert bereits",
+    "statuses": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    }
+  },
+  "validation": {
+    "invoiceNumberRequired": "Rechnungsnummer erforderlich!",
+    "invoiceNumberMinLength": "Rechnungsnummer erforderlich!",
+    "supplierRequired": "Lieferant erforderlich!",
+    "valueRequired": "Wert erforderlich!",
+    "valuePositive": "Wert muss größer als 0 sein!",
+    "currencyRequired": "Währung erforderlich!",
+    "receiverRequired": "Empfänger erforderlich!",
+    "codeRequired": "Code erforderlich!",
+    "codeFormat": "Code muss im Format SC-XXX sein!",
+    "descriptionRequired": "Beschreibung erforderlich!",
+    "ownerRequired": "Eigentümer erforderlich!",
+    "reasonMinLength": "Grund muss mindestens 10 Zeichen haben!"
+  },
+  "toast": {
+    "uploaded": "Rechnung hinzugefügt!",
+    "updated": "Rechnung aktualisiert!",
+    "deleted": "Rechnung gelöscht!",
+    "reopened": "Rechnung wiedereröffnet!",
+    "created": "Erstellt!",
+    "scCreated": "Lieferantencode erstellt!",
+    "scUpdated": "Lieferantencode aktualisiert!",
+    "scDeleted": "Lieferantencode gelöscht!",
+    "contactIT": "IT kontaktieren!"
+  }
+}

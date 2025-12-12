@@ -1,0 +1,292 @@
+{
+  "title": "Obieg faktur",
+  "page": {
+    "title": "Obieg faktur",
+    "newInvoice": "Nowa faktura",
+    "uploadInvoice": "Dodaj fakturę",
+    "supplierCodes": "Kody dostawców",
+    "login": "Zaloguj się"
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "clear": "Wyczyść",
+    "search": "Szukaj",
+    "select": "wybierz",
+    "save": "Zapisz",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "add": "Dodaj",
+    "back": "Powrót",
+    "details": "Szczegóły",
+    "reopen": "Otwórz ponownie"
+  },
+  "table": {
+    "noResults": "Brak wyników."
+  },
+  "tableColumns": {
+    "invoiceNumber": "Nr faktury",
+    "status": "Status",
+    "supplier": "Dostawca",
+    "value": "Wartość",
+    "currency": "Waluta",
+    "receiver": "Odbiorca",
+    "sender": "Nadawca",
+    "addedAt": "Data dodania",
+    "invoiceDate": "Data faktury",
+    "confirmationType": "Typ potwierdzenia",
+    "linkedPr": "Powiązane ZZ",
+    "linkedSc": "Powiązany KD",
+    "actions": "Akcje",
+    "statuses": {
+      "to-confirm": "Do potwierdzenia",
+      "confirmed": "Potwierdzona",
+      "manager-review": "Weryfikacja kierownika",
+      "booked": "Zaksięgowana",
+      "rejected": "Odrzucona"
+    },
+    "confirmationTypes": {
+      "pr": "Zapotrzebowanie (ZZ)",
+      "sc": "Kod dostawcy (KD)",
+      "non-pr": "Bez ZZ"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Pokaż filtry",
+    "myInvoices": "Moje faktury",
+    "toConfirm": "Do potwierdzenia",
+    "status": "Status",
+    "dateAdded": "Data dodania"
+  },
+  "uploadForm": {
+    "title": "Dodaj nową fakturę",
+    "invoiceNumber": "Numer faktury",
+    "invoiceNumberPlaceholder": "Numer faktury dostawcy",
+    "supplier": "Dostawca",
+    "supplierPlaceholder": "Nazwa dostawcy",
+    "value": "Wartość",
+    "currency": "Waluta",
+    "currencyPlaceholder": "Wybierz walutę",
+    "receiver": "Odbiorca (osoba potwierdzająca)",
+    "receiverPlaceholder": "Wybierz odbiorcę",
+    "invoiceDate": "Data faktury",
+    "receiveDate": "Data otrzymania",
+    "description": "Opis",
+    "descriptionPlaceholder": "Krótki opis faktury",
+    "proposedPr": "Proponowane ZZ",
+    "proposedPrPlaceholder": "Numer zapotrzebowania (opcjonalnie)",
+    "attachment": "Załącznik (PDF)",
+    "submit": "Dodaj fakturę"
+  },
+  "form": {
+    "title": "Nowa faktura",
+    "description": "Dodaj nową fakturę do obiegu",
+    "invoiceNumber": "Numer faktury",
+    "invoiceNumberPlaceholder": "FV/2024/001",
+    "supplierName": "Nazwa dostawcy",
+    "supplierNamePlaceholder": "Nazwa dostawcy",
+    "value": "Wartość",
+    "currency": "Waluta",
+    "currencyPlaceholder": "Wybierz walutę",
+    "receiver": "Odbiorca",
+    "receiverPlaceholder": "jan.kowalski@bruss-group.com",
+    "invoiceDate": "Data faktury",
+    "receiveDate": "Data otrzymania",
+    "shortDescription": "Krótki opis",
+    "shortDescriptionPlaceholder": "Opis faktury",
+    "upload": "Dodaj fakturę"
+  },
+  "details": {
+    "info": "Informacje",
+    "actions": "Akcje",
+    "sender": "Nadawca",
+    "confirmedWith": "Potwierdzona z",
+    "bookingReference": "Nr księgowania",
+    "rejectionReason": "Powód odrzucenia",
+    "reviewReason": "Powód weryfikacji",
+    "history": "Historia",
+    "confirmDescription": "Potwierdź fakturę zapotrzebowaniem lub kodem dostawcy"
+  },
+  "confirmDialog": {
+    "action": "Potwierdź",
+    "withPR": "Potwierdź z ZZ",
+    "withSC": "Potwierdź z KD",
+    "withPRTitle": "Potwierdź zapotrzebowaniem",
+    "withPRDescription": "Wybierz zapotrzebowanie zakupowe do powiązania z fakturą",
+    "withSCTitle": "Potwierdź kodem dostawcy",
+    "withSCDescription": "Wybierz kod dostawcy do potwierdzenia faktury",
+    "searchPR": "Szukaj zapotrzebowania...",
+    "noPRsFound": "Nie znaleziono zapotrzebowań",
+    "selected": "Wybrano",
+    "selectSC": "Wybierz kod dostawcy",
+    "selectSCPlaceholder": "Wybierz kod...",
+    "scDescription": "Opis",
+    "scLimit": "Limit",
+    "notSCOwner": "Nie jesteś właścicielem tego kodu",
+    "sentToReview": "Faktura wysłana do weryfikacji kierownika",
+    "success": "Faktura potwierdzona!"
+  },
+  "bookDialog": {
+    "title": "Zaksięguj fakturę",
+    "description": "Wprowadź numer księgowania (opcjonalnie)",
+    "reference": "Numer księgowania",
+    "referencePlaceholder": "Numer księgowania wewnętrznego",
+    "action": "Zaksięguj",
+    "success": "Faktura zaksięgowana!"
+  },
+  "rejectDialog": {
+    "title": "Odrzuć fakturę",
+    "description": "Podaj powód odrzucenia faktury.",
+    "reason": "Powód odrzucenia",
+    "reasonPlaceholder": "Wprowadź powód (min. 10 znaków)",
+    "reasonMinLength": "Powód musi mieć minimum 10 znaków",
+    "action": "Odrzuć",
+    "success": "Faktura odrzucona!",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Faktura odrzucona!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "managerReviewDialog": {
+    "title": "Weryfikacja kierownika",
+    "description": "Ta faktura wymaga weryfikacji ze względu na rozbieżności.",
+    "reason": "Powód weryfikacji",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "success": "Faktura zatwierdzona!",
+    "toast": {
+      "loading": "Zapisuję...",
+      "approveSuccess": "Faktura zatwierdzona!",
+      "rejectSuccess": "Faktura odrzucona!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "confirmWithPrDialog": {
+    "title": "Potwierdź fakturą zapotrzebowaniem",
+    "description": "Wybierz zapotrzebowanie zakupowe do powiązania z fakturą.",
+    "selectPr": "Wybierz zapotrzebowanie",
+    "searchPr": "Szukaj zapotrzebowania...",
+    "prDetails": "Szczegóły zapotrzebowania",
+    "action": "Potwierdź z ZZ",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Faktura potwierdzona!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "prNotFound": "Nie znaleziono zapotrzebowania!",
+      "currencyMismatch": "Niezgodność waluty!",
+      "supplierMismatch": "Niezgodność dostawcy!",
+      "valueMismatch": "Niezgodność wartości - faktura wysłana do weryfikacji kierownika!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "confirmWithScDialog": {
+    "title": "Potwierdź kodem dostawcy",
+    "description": "Wybierz kod dostawcy do potwierdzenia faktury.",
+    "selectSc": "Wybierz kod dostawcy",
+    "searchSc": "Szukaj kodu...",
+    "scDetails": "Szczegóły kodu",
+    "action": "Potwierdź z KD",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Faktura potwierdzona!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "scNotFound": "Nie znaleziono kodu dostawcy!",
+      "notOwner": "Nie jesteś właścicielem tego kodu!",
+      "limitExceeded": "Przekroczono limit kodu - faktura wysłana do weryfikacji kierownika!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "reopenDialog": {
+    "title": "Otwórz ponownie fakturę",
+    "description": "Czy chcesz otworzyć tę fakturę ponownie do potwierdzenia?",
+    "action": "Otwórz ponownie",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Faktura otwarta ponownie!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "markBookedDialog": {
+    "title": "Zaksięguj fakturę",
+    "description": "Wprowadź numer księgowania (opcjonalnie).",
+    "bookingReference": "Numer księgowania",
+    "bookingReferencePlaceholder": "Numer księgowania wewnętrznego",
+    "action": "Zaksięguj",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Faktura zaksięgowana!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono faktury!",
+      "notConfirmed": "Faktura nie została potwierdzona!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "logs": {
+    "title": "Historia",
+    "noLogs": "Brak historii"
+  },
+  "supplierCodes": {
+    "title": "Kody dostawców (KD)",
+    "list": "Lista kodów",
+    "description": "Kody dostawców służą do potwierdzania faktur bez zapotrzebowania zakupowego",
+    "newCode": "Nowy kod",
+    "add": "Dodaj kod",
+    "edit": "Edytuj kod",
+    "addDescription": "Utwórz nowy kod dostawcy",
+    "editDescription": "Edytuj kod dostawcy",
+    "code": "Kod",
+    "codePlaceholder": "SC-001",
+    "descriptionLabel": "Opis",
+    "descriptionPlaceholder": "Opis kodu dostawcy",
+    "owner": "Właściciel",
+    "ownerName": "Nazwa właściciela",
+    "ownerPlaceholder": "Wybierz właściciela",
+    "limit": "Limit",
+    "noLimit": "Bez limitu",
+    "maxValue": "Maksymalna wartość",
+    "maxCurrency": "Waluta limitu",
+    "status": "Status",
+    "active": "Aktywny",
+    "inactive": "Nieaktywny",
+    "noCodes": "Brak kodów dostawców",
+    "codeExists": "Kod o tym identyfikatorze już istnieje",
+    "statuses": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    }
+  },
+  "validation": {
+    "invoiceNumberRequired": "Numer faktury jest wymagany!",
+    "invoiceNumberMinLength": "Numer faktury jest wymagany!",
+    "supplierRequired": "Dostawca jest wymagany!",
+    "valueRequired": "Wartość jest wymagana!",
+    "valuePositive": "Wartość musi być większa od 0!",
+    "currencyRequired": "Waluta jest wymagana!",
+    "receiverRequired": "Odbiorca jest wymagany!",
+    "codeRequired": "Kod jest wymagany!",
+    "codeFormat": "Kod musi mieć format SC-XXX!",
+    "descriptionRequired": "Opis jest wymagany!",
+    "ownerRequired": "Właściciel jest wymagany!",
+    "reasonMinLength": "Powód musi mieć co najmniej 10 znaków!"
+  },
+  "toast": {
+    "uploaded": "Faktura dodana!",
+    "updated": "Faktura zaktualizowana!",
+    "deleted": "Faktura usunięta!",
+    "reopened": "Faktura otwarta ponownie!",
+    "created": "Utworzono!",
+    "scCreated": "Kod dostawcy utworzony!",
+    "scUpdated": "Kod dostawcy zaktualizowany!",
+    "scDeleted": "Kod dostawcy usunięty!",
+    "contactIT": "Skontaktuj się z IT!"
+  }
+}

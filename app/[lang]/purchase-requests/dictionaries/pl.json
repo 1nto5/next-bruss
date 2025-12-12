@@ -1,0 +1,226 @@
+{
+  "title": "Zapotrzebowania zakupowe",
+  "page": {
+    "title": "Zapotrzebowania zakupowe",
+    "newRequest": "Nowe zapotrzebowanie",
+    "login": "Zaloguj się",
+    "settings": "Ustawienia"
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "clear": "Wyczyść",
+    "search": "Szukaj",
+    "select": "wybierz",
+    "save": "Zapisz",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "add": "Dodaj",
+    "back": "Powrót"
+  },
+  "table": {
+    "noResults": "Brak wyników."
+  },
+  "tableColumns": {
+    "id": "Nr",
+    "status": "Status",
+    "supplier": "Dostawca",
+    "total": "Wartość",
+    "currency": "Waluta",
+    "itemCount": "Pozycje",
+    "manager": "Kierownik",
+    "requestedBy": "Zlecający",
+    "requestedAt": "Data zlecenia",
+    "actions": "Akcje",
+    "preApprovedBy": "Wstępna akceptacja",
+    "preApprovedAt": "Data wst. akceptacji",
+    "approvedBy": "Akceptacja finalna",
+    "approvedAt": "Data akceptacji",
+    "orderedBy": "Zamówione przez",
+    "orderedAt": "Data zamówienia",
+    "statuses": {
+      "draft": "Szkic",
+      "pending": "Oczekuje",
+      "pre-approved": "Wstępnie zaakceptowane",
+      "approved": "Zaakceptowane",
+      "ordered": "Zamówione",
+      "received": "Odebrane",
+      "completed": "Zakończone",
+      "rejected": "Odrzucone"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Pokaż filtry",
+    "myRequests": "Moje zapotrzebowania",
+    "toApprove": "Do akceptacji",
+    "status": "Status",
+    "dateAdded": "Data dodania"
+  },
+  "form": {
+    "title": "Nowe zapotrzebowanie zakupowe",
+    "editTitle": "Edycja zapotrzebowania",
+    "supplier": "Dostawca",
+    "supplierPlaceholder": "Wprowadź nazwę dostawcy",
+    "currency": "Waluta",
+    "currencyPlaceholder": "Wybierz walutę",
+    "manager": "Kierownik (akceptujący)",
+    "managerPlaceholder": "Wybierz kierownika",
+    "items": "Pozycje",
+    "addItem": "Dodaj pozycję",
+    "saveAsDraft": "Zapisz jako szkic",
+    "save": "Zapisz",
+    "submit": "Złóż zapotrzebowanie",
+    "saveChanges": "Zapisz zmiany"
+  },
+  "details": {
+    "draft": "Szkic",
+    "info": "Informacje",
+    "actions": "Akcje",
+    "preApprovedBy": "Wstępnie zaakceptował",
+    "preApprovedAt": "Data wst. akceptacji",
+    "approvedBy": "Zaakceptował finalnie",
+    "approvedAt": "Data fin. akceptacji",
+    "rejectionReason": "Powód odrzucenia"
+  },
+  "itemForm": {
+    "description": "Opis",
+    "descriptionPlaceholder": "Opis przedmiotu zamówienia",
+    "quantity": "Ilość",
+    "unitPrice": "Cena jednostkowa",
+    "article": "Artykuł",
+    "articlePlaceholder": "Numer artykułu (opcjonalnie)",
+    "link": "Link",
+    "linkPlaceholder": "Link do produktu (opcjonalnie)",
+    "reason": "Uzasadnienie",
+    "reasonPlaceholder": "Uzasadnienie zakupu",
+    "expectedDelivery": "Oczekiwana dostawa",
+    "toolNumber": "Numer narzędzia",
+    "isEstimate": "Cena szacunkowa"
+  },
+  "preApproveDialog": {
+    "title": "Wstępna akceptacja",
+    "description": "Czy na pewno chcesz wstępnie zaakceptować to zapotrzebowanie?",
+    "comment": "Komentarz (opcjonalnie)",
+    "action": "Zaakceptuj wstępnie",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Zapotrzebowanie wstępnie zaakceptowane!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono zapotrzebowania!",
+      "limitExceeded": "Przekroczono limit wydatków!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "finalApproveDialog": {
+    "title": "Finalna akceptacja",
+    "description": "Czy na pewno chcesz finalnie zaakceptować to zapotrzebowanie?",
+    "comment": "Komentarz (opcjonalnie)",
+    "action": "Zaakceptuj finalnie",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Zapotrzebowanie finalnie zaakceptowane!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono zapotrzebowania!",
+      "notPreApproved": "Zapotrzebowanie nie jest wstępnie zaakceptowane!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "rejectDialog": {
+    "title": "Odrzuć zapotrzebowanie",
+    "description": "Podaj powód odrzucenia zapotrzebowania.",
+    "reason": "Powód odrzucenia",
+    "reasonPlaceholder": "Wprowadź powód (min. 10 znaków)",
+    "action": "Odrzuć",
+    "reasonMinLength": "Powód musi mieć co najmniej 10 znaków!",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Zapotrzebowanie odrzucone!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono zapotrzebowania!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "markOrderedDialog": {
+    "title": "Oznacz jako zamówione",
+    "description": "Wprowadź numer zamówienia (opcjonalnie).",
+    "orderNumber": "Numer zamówienia",
+    "orderNumberPlaceholder": "Numer zamówienia wewnętrznego",
+    "action": "Oznacz jako zamówione",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Zapotrzebowanie oznaczone jako zamówione!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono zapotrzebowania!",
+      "notApproved": "Zapotrzebowanie nie jest zatwierdzone!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "markReceivedDialog": {
+    "title": "Potwierdź odbiór pozycji",
+    "description": "Czy potwierdzasz odbiór tej pozycji?",
+    "quantity": "Ilość odebrana",
+    "action": "Potwierdź odbiór",
+    "toast": {
+      "loading": "Zapisuję...",
+      "success": "Odbiór potwierdzony!",
+      "unauthorized": "Nie masz uprawnień!",
+      "notFound": "Nie znaleziono pozycji!",
+      "contactIT": "Skontaktuj się z IT!"
+    }
+  },
+  "comments": {
+    "title": "Komentarze",
+    "addComment": "Dodaj komentarz",
+    "placeholder": "Treść komentarza",
+    "noComments": "Brak komentarzy"
+  },
+  "attachments": {
+    "title": "Załączniki",
+    "upload": "Dodaj załącznik",
+    "noAttachments": "Brak załączników",
+    "maxSize": "Maks. rozmiar: 10MB",
+    "allowedTypes": "Dozwolone typy: PDF"
+  },
+  "settings": {
+    "title": "Ustawienia zapotrzebowań zakupowych",
+    "approvers": "Osoby akceptujące",
+    "approversDescription": "Lista osób uprawnionych do akceptacji zapotrzebowań zakupowych",
+    "addApprover": "Dodaj osobę akceptującą",
+    "editApprover": "Edytuj osobę akceptującą",
+    "user": "Użytkownik",
+    "email": "Email",
+    "name": "Imię i nazwisko",
+    "finalApprover": "Akceptujący finalnie",
+    "isFinalApprover": "Akceptacja finalna",
+    "limits": "Limity wydatków (EUR)",
+    "perUnit": "Na pozycję",
+    "daily": "Dzienny",
+    "weekly": "Tygodniowy",
+    "monthly": "Miesięczny",
+    "yearly": "Roczny",
+    "unlimited": "Bez limitu",
+    "accumulated": "Wykorzystano",
+    "noApprovers": "Brak osób akceptujących",
+    "add": "Dodaj"
+  },
+  "validation": {
+    "managerRequired": "Wybierz kierownika!",
+    "currencyRequired": "Wybierz walutę!",
+    "itemsRequired": "Dodaj co najmniej jedną pozycję!",
+    "itemsMinLength": "Dodaj co najmniej jedną pozycję!",
+    "descriptionRequired": "Opis jest wymagany!",
+    "descriptionMinLength": "Opis musi mieć co najmniej 3 znaki!",
+    "quantityRequired": "Ilość jest wymagana!",
+    "quantityPositive": "Ilość musi być większa od 0!",
+    "unitPriceRequired": "Cena jednostkowa jest wymagana!",
+    "unitPriceNonNegative": "Cena nie może być ujemna!",
+    "reasonMinLength": "Powód musi mieć co najmniej 10 znaków!"
+  },
+  "toast": {
+    "saved": "Zapotrzebowanie zapisane!",
+    "submitted": "Zapotrzebowanie złożone!",
+    "updated": "Zapotrzebowanie zaktualizowane!",
+    "deleted": "Zapotrzebowanie usunięte!",
+    "contactIT": "Skontaktuj się z IT!"
+  }
+}

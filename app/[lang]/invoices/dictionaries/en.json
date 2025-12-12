@@ -1,0 +1,292 @@
+{
+  "title": "Invoice Workflow",
+  "page": {
+    "title": "Invoice Workflow",
+    "newInvoice": "New Invoice",
+    "uploadInvoice": "Add Invoice",
+    "supplierCodes": "Supplier Codes",
+    "login": "Log in"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "clear": "Clear",
+    "search": "Search",
+    "select": "select",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "back": "Back",
+    "details": "Details",
+    "reopen": "Reopen"
+  },
+  "table": {
+    "noResults": "No results."
+  },
+  "tableColumns": {
+    "invoiceNumber": "Invoice No.",
+    "status": "Status",
+    "supplier": "Supplier",
+    "value": "Value",
+    "currency": "Currency",
+    "receiver": "Receiver",
+    "sender": "Sender",
+    "addedAt": "Added Date",
+    "invoiceDate": "Invoice Date",
+    "confirmationType": "Confirmation Type",
+    "linkedPr": "Linked PR",
+    "linkedSc": "Linked SC",
+    "actions": "Actions",
+    "statuses": {
+      "to-confirm": "To Confirm",
+      "confirmed": "Confirmed",
+      "manager-review": "Manager Review",
+      "booked": "Booked",
+      "rejected": "Rejected"
+    },
+    "confirmationTypes": {
+      "pr": "Purchase Request (PR)",
+      "sc": "Supplier Code (SC)",
+      "non-pr": "Non-PR"
+    }
+  },
+  "tableFiltering": {
+    "showFilters": "Show Filters",
+    "myInvoices": "My Invoices",
+    "toConfirm": "To Confirm",
+    "status": "Status",
+    "dateAdded": "Date Added"
+  },
+  "uploadForm": {
+    "title": "Add New Invoice",
+    "invoiceNumber": "Invoice Number",
+    "invoiceNumberPlaceholder": "Supplier invoice number",
+    "supplier": "Supplier",
+    "supplierPlaceholder": "Supplier name",
+    "value": "Value",
+    "currency": "Currency",
+    "currencyPlaceholder": "Select currency",
+    "receiver": "Receiver (confirming person)",
+    "receiverPlaceholder": "Select receiver",
+    "invoiceDate": "Invoice Date",
+    "receiveDate": "Receive Date",
+    "description": "Description",
+    "descriptionPlaceholder": "Short invoice description",
+    "proposedPr": "Suggested PR",
+    "proposedPrPlaceholder": "PR number (optional)",
+    "attachment": "Attachment (PDF)",
+    "submit": "Add Invoice"
+  },
+  "form": {
+    "title": "New Invoice",
+    "description": "Add a new invoice to workflow",
+    "invoiceNumber": "Invoice Number",
+    "invoiceNumberPlaceholder": "FV/2024/001",
+    "supplierName": "Supplier Name",
+    "supplierNamePlaceholder": "Supplier name",
+    "value": "Value",
+    "currency": "Currency",
+    "currencyPlaceholder": "Select currency",
+    "receiver": "Receiver",
+    "receiverPlaceholder": "john.doe@bruss-group.com",
+    "invoiceDate": "Invoice Date",
+    "receiveDate": "Receive Date",
+    "shortDescription": "Short Description",
+    "shortDescriptionPlaceholder": "Invoice description",
+    "upload": "Add Invoice"
+  },
+  "details": {
+    "info": "Information",
+    "actions": "Actions",
+    "sender": "Sender",
+    "confirmedWith": "Confirmed with",
+    "bookingReference": "Booking Reference",
+    "rejectionReason": "Rejection Reason",
+    "reviewReason": "Review Reason",
+    "history": "History",
+    "confirmDescription": "Confirm invoice with purchase request or supplier code"
+  },
+  "confirmDialog": {
+    "action": "Confirm",
+    "withPR": "Confirm with PR",
+    "withSC": "Confirm with SC",
+    "withPRTitle": "Confirm with Purchase Request",
+    "withPRDescription": "Select a purchase request to link with this invoice",
+    "withSCTitle": "Confirm with Supplier Code",
+    "withSCDescription": "Select a supplier code to confirm this invoice",
+    "searchPR": "Search purchase request...",
+    "noPRsFound": "No purchase requests found",
+    "selected": "Selected",
+    "selectSC": "Select supplier code",
+    "selectSCPlaceholder": "Select code...",
+    "scDescription": "Description",
+    "scLimit": "Limit",
+    "notSCOwner": "You are not the owner of this code",
+    "sentToReview": "Invoice sent to manager review",
+    "success": "Invoice confirmed!"
+  },
+  "bookDialog": {
+    "title": "Book Invoice",
+    "description": "Enter booking reference (optional)",
+    "reference": "Booking Reference",
+    "referencePlaceholder": "Internal booking number",
+    "action": "Book",
+    "success": "Invoice booked!"
+  },
+  "rejectDialog": {
+    "title": "Reject Invoice",
+    "description": "Please provide a reason for rejection.",
+    "reason": "Rejection Reason",
+    "reasonPlaceholder": "Enter reason (min. 10 characters)",
+    "reasonMinLength": "Reason must be at least 10 characters",
+    "action": "Reject",
+    "success": "Invoice rejected!",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Invoice rejected!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "managerReviewDialog": {
+    "title": "Manager Review",
+    "description": "This invoice requires review due to discrepancies.",
+    "reason": "Review Reason",
+    "approve": "Approve",
+    "reject": "Reject",
+    "success": "Invoice approved!",
+    "toast": {
+      "loading": "Saving...",
+      "approveSuccess": "Invoice approved!",
+      "rejectSuccess": "Invoice rejected!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "confirmWithPrDialog": {
+    "title": "Confirm with Purchase Request",
+    "description": "Select a purchase request to link with this invoice.",
+    "selectPr": "Select Purchase Request",
+    "searchPr": "Search PR...",
+    "prDetails": "PR Details",
+    "action": "Confirm with PR",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Invoice confirmed!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "prNotFound": "PR not found!",
+      "currencyMismatch": "Currency mismatch!",
+      "supplierMismatch": "Supplier mismatch!",
+      "valueMismatch": "Value mismatch - sent to manager review!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "confirmWithScDialog": {
+    "title": "Confirm with Supplier Code",
+    "description": "Select a supplier code to confirm this invoice.",
+    "selectSc": "Select Supplier Code",
+    "searchSc": "Search code...",
+    "scDetails": "Code Details",
+    "action": "Confirm with SC",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Invoice confirmed!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "scNotFound": "Supplier code not found!",
+      "notOwner": "You are not the owner of this code!",
+      "limitExceeded": "Code limit exceeded - sent to manager review!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "reopenDialog": {
+    "title": "Reopen Invoice",
+    "description": "Do you want to reopen this invoice for confirmation?",
+    "action": "Reopen",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Invoice reopened!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "markBookedDialog": {
+    "title": "Book Invoice",
+    "description": "Enter booking reference (optional).",
+    "bookingReference": "Booking Reference",
+    "bookingReferencePlaceholder": "Internal booking number",
+    "action": "Book",
+    "toast": {
+      "loading": "Saving...",
+      "success": "Invoice booked!",
+      "unauthorized": "Unauthorized!",
+      "notFound": "Invoice not found!",
+      "notConfirmed": "Invoice not confirmed!",
+      "contactIT": "Contact IT!"
+    }
+  },
+  "logs": {
+    "title": "History",
+    "noLogs": "No history"
+  },
+  "supplierCodes": {
+    "title": "Supplier Codes (SC)",
+    "list": "Code List",
+    "description": "Supplier codes are used to confirm invoices without a purchase request",
+    "newCode": "New Code",
+    "add": "Add Code",
+    "edit": "Edit Code",
+    "addDescription": "Create a new supplier code",
+    "editDescription": "Edit supplier code",
+    "code": "Code",
+    "codePlaceholder": "SC-001",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Supplier code description",
+    "owner": "Owner",
+    "ownerName": "Owner Name",
+    "ownerPlaceholder": "Select owner",
+    "limit": "Limit",
+    "noLimit": "No limit",
+    "maxValue": "Max Value",
+    "maxCurrency": "Limit Currency",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noCodes": "No supplier codes",
+    "codeExists": "Code with this ID already exists",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "validation": {
+    "invoiceNumberRequired": "Invoice number is required!",
+    "invoiceNumberMinLength": "Invoice number is required!",
+    "supplierRequired": "Supplier is required!",
+    "valueRequired": "Value is required!",
+    "valuePositive": "Value must be greater than 0!",
+    "currencyRequired": "Currency is required!",
+    "receiverRequired": "Receiver is required!",
+    "codeRequired": "Code is required!",
+    "codeFormat": "Code must be in SC-XXX format!",
+    "descriptionRequired": "Description is required!",
+    "ownerRequired": "Owner is required!",
+    "reasonMinLength": "Reason must be at least 10 characters!"
+  },
+  "toast": {
+    "uploaded": "Invoice added!",
+    "updated": "Invoice updated!",
+    "deleted": "Invoice deleted!",
+    "reopened": "Invoice reopened!",
+    "created": "Created!",
+    "scCreated": "Supplier code created!",
+    "scUpdated": "Supplier code updated!",
+    "scDeleted": "Supplier code deleted!",
+    "contactIT": "Contact IT!"
+  }
+}
