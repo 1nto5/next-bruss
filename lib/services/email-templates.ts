@@ -5,6 +5,9 @@
 
 type Lang = 'pl' | 'en' | 'de';
 
+// Supported languages constant
+const SUPPORTED_LANGS: Lang[] = ['pl', 'en', 'de'];
+
 // Common translations used across emails
 const COMMON = {
   goToDeviation: {
@@ -83,6 +86,17 @@ export const ROLE_TRANSLATIONS_TRILINGUAL = {
 
 type RoleKey = keyof typeof ROLE_TRANSLATIONS_TRILINGUAL;
 
+// Area translations for display
+const AREA_TRANSLATIONS: Record<string, Record<Lang, string>> = {
+  coating: { pl: 'POWLEKANIE', en: 'COATING', de: 'BESCHICHTUNG' },
+};
+
+// Helper to get translated area
+const getAreaDisplay = (area: string, lang: Lang): string => {
+  const translated = AREA_TRANSLATIONS[area.toLowerCase()]?.[lang];
+  return translated || area.toUpperCase();
+};
+
 // Helper to get translated role
 export const getTranslatedRole = (role: string, lang: Lang): string => {
   const translations = ROLE_TRANSLATIONS_TRILINGUAL[role as RoleKey];
@@ -119,12 +133,11 @@ const langSection = (lang: Lang, content: string): string => {
 const buildTrilingualEmail = (
   contentBuilder: (lang: Lang) => string
 ): string => {
-  const langs: Lang[] = ['pl', 'en', 'de'];
   return `
     <div style="font-family: sans-serif; max-width: 600px;">
-      ${langs.map((lang, i) =>
+      ${SUPPORTED_LANGS.map((lang, i) =>
         langSection(lang, contentBuilder(lang)) +
-        (i < langs.length - 1 ? `<hr style="${STYLES.separator}" />` : '')
+        (i < SUPPORTED_LANGS.length - 1 ? `<hr style="${STYLES.separator}" />` : '')
       ).join('')}
     </div>
   `;
@@ -406,8 +419,6 @@ export const printImplementationNotification = ({
   deviationUrl,
   area,
 }: PrintImplementationParams) => {
-  const areaDisplay = area === 'coating' ? 'POWLEKANIE' : area?.toUpperCase();
-
   const subject = {
     pl: `Odchylenie [${internalId}] wymaga wydruku i wdrożenia`,
     en: `Deviation [${internalId}] requires printing and implementation`,
@@ -415,6 +426,8 @@ export const printImplementationNotification = ({
   };
 
   const html = buildTrilingualEmail((lang) => {
+    const areaDisplay = getAreaDisplay(area, lang);
+
     const messages: Record<Lang, string> = {
       pl: `Odchylenie [${internalId}] zostało zatwierdzone - wymaga wydruku i wdrożenia na: ${areaDisplay}`,
       en: `Deviation [${internalId}] has been approved - requires printing and implementation at: ${areaDisplay}`,
@@ -600,11 +613,16 @@ export const overtimeSubmissionApprovalNotification = ({
 // ============================================
 
 function extractNameFromEmail(email: string): string {
-  const localPart = email.split('@')[0];
-  return localPart
-    .split('.')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
+  if (!email || typeof email !== 'string') return '';
+  const localPart = email.split('@')[0] || '';
+  if (!localPart) return email;
+  return (
+    localPart
+      .split('.')
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ') || email
+  );
 }
 
 // Export utilities
